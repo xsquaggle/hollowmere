@@ -1,0 +1,13 @@
+/* News ribbon: small queued notes under the HUD */
+#news{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 60px);z-index:60;transform:translate(-50%,-8px);max-width:calc(100% - 40px);box-sizing:border-box;pointer-events:none;opacity:0;
+  background:rgba(27,34,50,.86);color:var(--paper);border:1px solid rgba(243,234,215,.22);border-radius:999px;padding:8px 14px;font:800 13px/1.25 var(--body);text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.3);transition:opacity .25s,transform .25s;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#news.show{opacity:1;transform:translate(-50%,0)}#news.hide{opacity:0;transform:translate(-50%,-6px)}
+#news.gold{color:#F2D47E;border-color:rgba(242,212,126,.4)}#news.good{color:#CFE7B9}#news.warn{color:#F5D08A}#news.bad{color:#F4A595}
+/* small fixes */
+.icon-btn{flex-shrink:0}
+#hud .chip{flex-shrink:1;min-width:0}
+@media (max-width:380px){#clock{font-size:12px;padding:6px 9px}.chip{gap:5px;padding:6px 9px}#hud{gap:6px}}
+#clock{pointer-events:auto;-webkit-user-select:none;user-select:none}
+.aq-peek{justify-self:center;background:none;border:0;color:rgba(243,234,215,.75);font:800 12px var(--body);letter-spacing:.06em;padding:2px 8px;cursor:pointer;animation:inPulse 3s ease-in-out infinite}
+#cPB.minor{background:#F3E7C8;border-color:#B08D4C}#cPB.minor b{font-size:18px}
+

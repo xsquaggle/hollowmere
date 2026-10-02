@@ -1,0 +1,24 @@
+/* Settings: sound, save, install */
+.st-card{border:1.5px solid rgba(43,42,51,.18);border-radius:12px;padding:12px 14px;margin:0 0 12px;display:grid;gap:8px}
+.st-card h3{margin:0;font:400 18px/1.15 var(--display)}
+.st-card p{margin:0;font-size:13px;line-height:1.45;color:#55514A}
+.st-card .row{margin:0}
+.st-card.danger{border-color:rgba(217,97,76,.35)}
+.st-dim{color:#8A847A!important;font-size:12px!important}
+.st-ok{color:#3D6A3A!important;font-weight:800}
+.st-warn{color:#9A5A1E!important;font-weight:800;margin:0 0 10px!important;font-size:13px;line-height:1.45}
+.st-card textarea{width:100%;box-sizing:border-box;resize:vertical;border:1.5px solid rgba(43,42,51,.3);border-radius:10px;padding:9px 10px;font:600 12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);background:#FBF7EE;word-break:break-all;-webkit-user-select:text;user-select:text}
+#codeOut{display:grid;gap:8px}
+.st-found{display:grid;gap:4px;padding:10px 12px;border-radius:10px;background:#E6F0D6;border:1.5px solid #4E7B4C}
+.st-found b{font:400 16px/1.2 var(--display)}.st-found span{font-size:12.5px;font-weight:700;color:#3D5A3A}.st-found .btn{justify-self:start;margin-top:4px}
+.st-snaps{display:grid;gap:8px}
+.st-snap{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(43,42,51,.05)}
+.st-snap b{display:block;font-size:13px}.st-snap span{display:block;font-size:11.5px;color:#6B665C}.st-snap em{display:block;font-style:normal;font-size:11px;color:#8A847A}
+.st-steps{margin:0;padding-left:20px;display:grid;gap:8px;font-size:13.5px;line-height:1.45;color:#3F3C37}
+.st-steps li .row{margin-top:6px}
+.gl{width:16px;height:16px;vertical-align:-3px;color:#2F7F96}
+.in-restore{pointer-events:auto;margin-top:22px;background:none;border:0;color:rgba(243,234,215,.6);font:800 12px var(--body);text-decoration:underline;text-underline-offset:3px;cursor:pointer;animation:inFade 2s 1.8s both}
+body.cine #sheet{z-index:70}
+.icon-btn .mute-dot{position:absolute;right:-2px;bottom:-2px;width:14px;height:14px;border-radius:50%;background:#D9614C;box-shadow:0 0 0 2px #2B2A33;display:grid;place-items:center}
+.icon-btn{position:relative}
+

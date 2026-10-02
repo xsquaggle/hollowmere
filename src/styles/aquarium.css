@@ -1,0 +1,52 @@
+/* Aquarium: the shack room, tank tabs, the shop below the tanks, fish cards */
+#aqua{position:fixed;inset:0;z-index:8;background:#2E2530;animation:aqIn .3s ease;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+.aq-stage{position:relative;height:100%;min-height:100%}
+.aq-shop{position:relative;min-height:60%;padding:26px 16px calc(env(safe-area-inset-bottom,0px) + 26px);color:var(--paper);
+  background:repeating-linear-gradient(180deg,#6E4A33 0 44px,#5E3E2A 44px 46px,#77503A 46px 90px,#5E3E2A 90px 92px);box-shadow:inset 0 14px 18px -10px rgba(0,0,0,.6)}
+.aq-shop::before{content:"";position:absolute;left:0;right:0;top:0;height:10px;background:linear-gradient(#3B281C,#5E3E2A)}
+.aq-shop-head{display:grid;gap:2px;margin-bottom:6px}
+.aq-shop-head h2{margin:0;font:400 24px/1.1 var(--display)}
+.aq-shop-head p{margin:0;font-size:13px;font-weight:700;color:rgba(243,234,215,.85)}
+.aq-shop-head .cash{display:flex;align-items:center;gap:6px;color:var(--paper)}
+.aq-shop-sub{margin:16px 0 8px;font:800 11px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:#E9C98A}
+.aq-shop-note{font-size:13px;font-weight:700;background:rgba(0,0,0,.2);padding:10px 12px;border-radius:10px}
+.aq-items{display:grid;gap:10px}
+.aq-item{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:10px;box-shadow:0 3px 0 #2B1D14}
+.aq-item .ico{width:48px;height:48px;border-radius:10px;background:#D8E7E4;border:1.5px solid var(--ink);display:grid;place-items:center;overflow:hidden}
+.aq-item .ico svg{width:44px;height:44px}
+.aq-item .txt{min-width:0;display:grid;gap:2px}
+.aq-item h4{margin:0;font:400 16px/1.15 var(--display)}
+.aq-item p{margin:0;font-size:12px;line-height:1.35;color:#5C574E}
+.aq-item .eff{font-weight:800;color:#3D5A3A}
+.aq-item .loved{font-size:11px;color:#8A6A3A;font-weight:700}
+.aq-item.own{background:#E6F0D6;border-color:#4E7B4C}
+.aq-item.own .ico{background:#CFE3C2}
+.aq-item.just{animation:jpulse .7s ease 2}
+.aq-up{display:block;width:100%;margin-top:18px}
+.aq-card .tip{color:#3D5A3A;font-weight:800}
+.coin-badge{background:#C9A15A;color:#2B2A33}
+#aqua.closing{animation:fadeOut .25s forwards}
+@keyframes aqIn{from{opacity:0;transform:scale(1.04)}}
+#aqCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:pan-y;display:block}
+.aq-top{position:absolute;left:16px;right:16px;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;pointer-events:none}
+.aq-top h2{margin:0;font:400 26px/1.1 var(--display);color:var(--paper)}
+.aq-top p{margin:2px 0 0;color:rgba(243,234,215,.8);font-weight:700;font-size:13px}
+.aq-top .btn{pointer-events:auto}
+.aq-tabs{position:absolute;left:16px;right:16px;top:calc(env(safe-area-inset-top,0px) + 66px);display:flex;gap:6px}
+.aq-tabs button{flex:1;font:800 12.5px/1 var(--body);padding:9px 6px;border-radius:10px;border:1.5px solid rgba(243,234,215,.35);background:rgba(0,0,0,.2);color:var(--paper);cursor:pointer}
+.aq-tabs button.on{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.aq-tabs button:disabled{opacity:.5;cursor:default}
+.aq-bottom{position:absolute;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:grid;gap:10px}
+.aq-bottom .row .btn{flex:1}
+.aq-sets{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;touch-action:pan-x}
+.aq-set{flex:0 0 200px;display:grid;gap:2px;background:rgba(243,234,215,.94);color:var(--ink);border-radius:10px;padding:8px 10px;border:2px solid var(--ink);font-size:12px}
+.aq-set b{font:400 15px/1.1 var(--display)}.aq-set span{color:#6B665C}.aq-set em{font-style:normal;font-weight:800;color:#3D5A3A}
+.aq-set.done{background:#E6F0D6;border-color:#4E7B4C}
+.aq-card{position:absolute;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:2;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:12px;box-shadow:0 4px 0 var(--ink);display:grid;gap:6px;animation:appIn .2s ease}
+.aq-card-top{display:flex;justify-content:space-between;align-items:center}
+.aq-card .r{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.aq-card .x{font:400 24px/1 var(--body);background:none;border:0;color:var(--ink);cursor:pointer;padding:0 4px}
+.aq-card h3{margin:0;font:400 21px/1.1 var(--display)}.aq-card p{margin:0;font-size:13px;color:#55514A;line-height:1.4}.aq-card .lore{font-style:italic}
+.aq-card .row .btn{flex:1}
+#cTank{background:none;border:0;padding:2px;font:800 13px var(--body);color:#2F7F96;text-decoration:underline;cursor:pointer;justify-self:center}
+@keyframes fadeOut{to{opacity:0}}

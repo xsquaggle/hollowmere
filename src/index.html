@@ -1,0 +1,53 @@
+<title>Hollowmere</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1B2232">
+<style id="fontface">/* Nunito, Young Serif and Caveat (SIL Open Font License), subset and built in so the game looks right offline */@font-face{font-family:'Nunito';font-style:normal;font-weight:600 800;font-display:swap;src:url(data:font/woff;base64,{{woff:nunito}}) format('woff')}@font-face{font-family:'Young Serif';font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff;base64,{{woff:young-serif}}) format('woff')}@font-face{font-family:'Caveat';font-style:normal;font-weight:600;font-display:swap;src:url(data:font/woff;base64,{{woff:caveat}}) format('woff')}</style>
+<style>
+{{css}}
+</style>
+
+<canvas id="lake" aria-label="Fishing lake. Drag down and release to cast."></canvas>
+
+<div id="hud">
+  <div class="chip"><span class="coin" aria-hidden="true"></span><span id="coins">0</span></div><div class="chip meal-chip" id="mealChip" hidden role="button" tabindex="0" aria-label="Meal"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="10.5" r="6.8" fill="#F3EAD7" stroke="#2B2A33" stroke-width="1.2"/><path d="M5 10.5 q4 -3.6 8 0 q-4 3.6 -8 0 Z" fill="#E8B866" stroke="#2B2A33" stroke-width=".9"/><path d="M6.6 4.6 q-1 -1.6 0 -3.2 M10.6 4.6 q-1 -1.6 0 -3.2" stroke="#F3EAD7" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg><span id="mealCasts">0</span></div>
+  <div class="chip" id="species">Journal 0/6</div>
+  <div class="chip" id="clock">6:00 PM</div>
+  <div class="spacer"></div>
+  <button class="icon-btn" id="soundBtn" type="button" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M8.6 1.8 h2.8 l.5 2.3 a6.3 6.3 0 0 1 1.7 1 l2.2 -.8 1.4 2.4 -1.8 1.6 a6.3 6.3 0 0 1 0 2 l1.8 1.6 -1.4 2.4 -2.2 -.8 a6.3 6.3 0 0 1 -1.7 1 l-.5 2.3 h-2.8 l-.5 -2.3 a6.3 6.3 0 0 1 -1.7 -1 l-2.2 .8 -1.4 -2.4 1.8 -1.6 a6.3 6.3 0 0 1 0 -2 l-1.8 -1.6 1.4 -2.4 2.2 .8 a6.3 6.3 0 0 1 1.7 -1 Z" fill="currentColor"/><circle cx="10" cy="10" r="2.6" fill="var(--paper)"/></svg><span class="mute-dot" id="muteDot" hidden><svg width="8" height="8" viewBox="0 0 8 8"><path d="M1.5 1.5 L6.5 6.5 M6.5 1.5 L1.5 6.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
+  <button class="icon-btn" id="labBtn" type="button" aria-label="Playtest tools"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M13.6 2.2 a4.6 4.6 0 0 0 -4.4 6 L2.8 14.6 a1.9 1.9 0 0 0 2.7 2.7 L11.9 10.9 a4.6 4.6 0 0 0 6 -4.4 L15.4 9 L12.9 8.3 L12.2 5.8 L14.7 3.3 Z" fill="currentColor"/></svg></button>
+</div>
+<div id="hint" aria-live="polite"></div>
+<div id="coach" hidden aria-live="polite"><span id="coachStep">1 of 4</span><p id="coachText"></p></div>
+<div id="toast" aria-live="assertive"></div>
+<div class="corner center"><button class="book-peek" id="journalBtn" type="button" aria-label="Open journal"><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><rect x="6" y="4" width="44" height="44" rx="5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.8"/><rect x="10" y="4" width="40" height="44" rx="4" fill="#7E5439"/><path d="M10 4 V48" stroke="#4A3022" stroke-width="2"/><rect x="16" y="12" width="28" height="18" rx="3" fill="none" stroke="#C9A15A" stroke-width="1.4"/><path d="M23 21 q6 -6 13 0 q-7 6 -13 0 Z M36 21 l4 -3 v6 Z" fill="#C9A15A"/><rect x="46" y="20" width="8" height="10" rx="2" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><path d="M8 47 H50" stroke="#F1E4C6" stroke-width="2"/></svg></button><button class="bowl-peek" id="aquaBtn" type="button" aria-label="Open aquarium" hidden><svg width="58" height="50" viewBox="0 0 58 50" aria-hidden="true"><path d="M14 8 H44 C55 14 57 30 50 40 C46 46 40 48 29 48 C18 48 12 46 8 40 C1 30 3 14 14 8 Z" fill="rgba(210,235,240,.35)" stroke="#2B2A33" stroke-width="1.8"/><path d="M6 22 C10 20 16 24 22 22 C28 20 34 24 40 22 C46 20 50 23 52 22 C54 30 52 38 48 42 C44 46 38 48 29 48 C20 48 14 46 10 42 C6 38 4 30 6 22 Z" fill="#4E8F9E" opacity=".85"/><path d="M22 33 q7 -7 15 0 q-8 7 -15 0 Z M37 33 l5 -4 v8 Z" fill="#E08A3E" stroke="#2B2A33" stroke-width="1.2"/><circle cx="25.5" cy="32" r="1.2" fill="#2B2A33"/><path d="M14 46 q3 -10 8 -12 M16 46 q-2 -8 -1 -11" fill="none" stroke="#5E8F4E" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="16" r="2" fill="none" stroke="#F6F1E6" stroke-width="1"/><circle cx="43" cy="11" r="1.4" fill="none" stroke="#F6F1E6" stroke-width="1"/><path d="M12 8 H46" stroke="#2B2A33" stroke-width="3" stroke-linecap="round"/><path d="M12 14 C10 22 10 30 13 36" fill="none" stroke="#fff" stroke-width="1.6" opacity=".55" stroke-linecap="round"/></svg><span class="pk-badge coin-badge" id="aquaTips" hidden></span></button><button class="pan-peek" id="kitchenBtn" type="button" aria-label="Open kitchen" hidden><svg width="60" height="50" viewBox="0 0 60 50" aria-hidden="true"><path d="M41 17 L56 6" stroke="#2B2A33" stroke-width="8" stroke-linecap="round"/><path d="M41 17 L56 6" stroke="#6E4A33" stroke-width="4.5" stroke-linecap="round"/><ellipse cx="26" cy="33" rx="23" ry="16" fill="#2F2C31" stroke="#2B2A33" stroke-width="1.8"/><ellipse cx="26" cy="32" rx="18" ry="11.5" fill="#4A454D"/><path d="M14 33 q10 -10 22 -2 q-10 9 -22 2 Z" fill="#E8B866" stroke="#2B2A33" stroke-width="1.2"/><path d="M19 30 l3 4 M24 28 l3 5 M29 28 l2.5 5" stroke="#B9762F" stroke-width="1.3" stroke-linecap="round"/><path d="M21 15 q-3 -4 0 -8 M29 14 q-3 -4 0 -8" fill="none" stroke="#F6F1E6" stroke-width="1.7" stroke-linecap="round" opacity=".85"/><path d="M9 28 q3 -6 9 -8" fill="none" stroke="#fff" stroke-width="1.4" opacity=".3" stroke-linecap="round"/></svg></button><button class="map-peek" id="mapBtn" type="button" aria-label="Open map" hidden><svg width="66" height="50" viewBox="0 0 66 50" aria-hidden="true"><rect x="9" y="9" width="48" height="34" fill="#F1E4C6" stroke="#2B2A33" stroke-width="1.6"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43 L57 43 L57 9 Z" fill="#C3D9D7"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43" fill="none" stroke="#2B2A33" stroke-width="1"/><ellipse cx="21" cy="34" rx="7" ry="4.5" fill="#AFCDD2" stroke="#2B2A33" stroke-width="1"/><path d="M26 32 C32 26 36 22 44 17" fill="none" stroke="#B4584A" stroke-width="1.6" stroke-dasharray="2.5 2"/><circle cx="44" cy="17" r="2.4" fill="#C9A15A" stroke="#2B2A33" stroke-width="1"/><path d="M14 20 l3 -5 l3 5 Z M19 20 l3 -6 l3 6 Z" fill="#E4D6B6" stroke="#2B2A33" stroke-width=".8"/><rect x="4" y="4" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="4" y="41" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/></svg></button><button class="phone-peek" id="phoneBtn" type="button" aria-label="Open phone" hidden><span class="pk-glow"><span class="pk-logo"></span></span><span class="pk-notch"></span><span class="pk-badge" id="phoneBadge" hidden>1</span></button></div>
+<div id="phone" hidden></div>
+<div id="aqua" hidden></div>
+<div id="intro" hidden></div>
+<div id="news" role="status" aria-live="polite"></div>
+<div id="kitchen" hidden></div>
+<div id="mapLayer" hidden></div>
+
+<div id="card" hidden role="dialog" aria-label="Catch">
+  <div class="card-top"><span class="rarity" id="cRarity">Common</span><span class="beh" id="cBeh">Darter</span><span class="stamp" id="cNew">NEW</span><span class="spacer"></span><span id="cQ"></span></div>
+  <canvas id="cFish"></canvas>
+  <div class="c-name"><h2 id="cName">Copper Perch</h2><span class="rec-stamp" id="cRec" hidden>Personal<br>record</span></div>
+  <p id="cPB" hidden></p>
+  <div class="facts">
+    <div><span class="k">Length</span><span id="cSize">0 cm</span></div>
+    <div><span class="k">Weight</span><span id="cW">0 g</span></div>
+    <div><span class="k">Value</span><span id="cValue">0</span></div>
+  </div>
+  <p id="cTags"></p>
+  <p id="cLore"></p>
+  <div class="card-actions"><button class="btn" id="cSell" type="button">Sell · +0</button><button class="btn" id="cKeep" type="button">Keep</button></div>
+  <button id="cTank" type="button" hidden>Send straight to the aquarium</button>
+  <p id="cAuto">Selling in a moment · tap Keep to keep it</p>
+</div>
+
+<div id="sheet" hidden><div class="panel" id="panel" role="dialog"></div></div>
+
+<script>
+(() => {
+{{js}}
+})();
+</script>
