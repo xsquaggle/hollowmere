@@ -12,15 +12,14 @@
 .aq-shop-note{font-size:13px;font-weight:700;background:rgba(0,0,0,.2);padding:10px 12px;border-radius:10px}
 .aq-items{display:grid;gap:10px}
 .aq-item{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:10px;box-shadow:0 3px 0 #2B1D14}
-.aq-item .ico{width:48px;height:48px;border-radius:10px;background:#D8E7E4;border:1.5px solid var(--ink);display:grid;place-items:center;overflow:hidden}
-.aq-item .ico svg{width:44px;height:44px}
+.aq-item .ico{width:48px;height:48px;border-radius:10px;background:#2F6A66;border:1.5px solid var(--ink);display:grid;place-items:center;overflow:hidden}
+.aq-item .ico canvas{width:100%;height:100%;display:block}
 .aq-item .txt{min-width:0;display:grid;gap:2px}
 .aq-item h4{margin:0;font:400 16px/1.15 var(--display)}
 .aq-item p{margin:0;font-size:12px;line-height:1.35;color:#5C574E}
 .aq-item .eff{font-weight:800;color:#3D5A3A}
 .aq-item .loved{font-size:11px;color:#8A6A3A;font-weight:700}
 .aq-item.own{background:#E6F0D6;border-color:#4E7B4C}
-.aq-item.own .ico{background:#CFE3C2}
 .aq-item.just{animation:jpulse .7s ease 2}
 .aq-up{display:block;width:100%;margin-top:18px}
 .aq-card .tip{color:#3D5A3A;font-weight:800}
@@ -37,7 +36,10 @@
 .aq-tabs button.on{background:var(--paper);color:var(--ink);border-color:var(--paper)}
 .aq-tabs button:disabled{opacity:.5;cursor:default}
 .aq-bottom{position:absolute;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:grid;gap:10px}
-.aq-bottom .row .btn{flex:1}
+.aq-bottom .row{flex-wrap:nowrap}
+.aq-bottom .row .btn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aq-bottom .row #aqCollect{flex:1.35}
+@media (max-width:360px){.aq-bottom .row .btn{font-size:13px;padding-left:6px;padding-right:6px}}
 .aq-sets{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;touch-action:pan-x}
 .aq-set{flex:0 0 200px;display:grid;gap:2px;background:rgba(243,234,215,.94);color:var(--ink);border-radius:10px;padding:8px 10px;border:2px solid var(--ink);font-size:12px}
 .aq-set b{font:400 15px/1.1 var(--display)}.aq-set span{color:#6B665C}.aq-set em{font-style:normal;font-weight:800;color:#3D5A3A}

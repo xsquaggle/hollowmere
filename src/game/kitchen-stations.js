@@ -4,10 +4,11 @@ const K={open:false, mode:'book', cv:null, ctx:null, W:0, H:0, dpr:1, s:1, CT:0,
 const STATIONS=['clean','season','cook','plate'];
 const STATION_NAME={clean:'Clean', season:'Season', cook:'Cook', plate:'Plate'};
 function kLayout(){
-  const r=K.cv.getBoundingClientRect(); K.W=r.width; K.H=r.height; K.dpr=Math.min(window.devicePixelRatio||1,2);
+  // layout sizes, not screen rects: the kitchen opens with a little zoom, and a rect taken mid-zoom would be off
+  K.W=K.cv.offsetWidth; K.H=K.cv.offsetHeight; K.dpr=Math.min(window.devicePixelRatio||1,2);
   K.cv.width=Math.round(K.W*K.dpr); K.cv.height=Math.round(K.H*K.dpr);
-  const top=$('kTop'), bot=$('kBottom'); K.top=top?top.getBoundingClientRect().bottom:90;
-  const bh=Math.max(150,bot?K.H-bot.getBoundingClientRect().top+8:150);
+  const top=$('kTop'), bot=$('kBottom'); K.top=top?top.offsetTop+top.offsetHeight:90;
+  const bh=Math.max(150,bot?K.H-bot.offsetTop+8:150);
   K.CT=Math.max(K.top+120,K.H*.34); const avail=K.H-K.CT-bh;
   K.s=clamp(Math.min(K.W/400,avail/370),.55,1.3); K.SY=K.CT+8+avail/2; K.cb=(K.CT-K.SY)/K.s; K.bot=(K.H-bh-K.SY)/K.s;
   K.bg=null; const tk=$('kTicket'); if (tk) tk.style.top=(K.top+10)+'px'; const bk=$('kBook'); if (bk) bk.style.top=K.top+'px';
@@ -73,9 +74,9 @@ function drawClean(c){ const st=K.st, L=st.L, h=st.h;
   if (st.phase==='lift'){ const u=Math.min(1,st.lift/1.1), e=1-Math.pow(1-u,3);
     c.save(); c.globalAlpha=Math.min(1,u*2.2); const sc=.86+.14*Math.min(1,u*1.6)+Math.sin(Math.min(1,u*1.4)*Math.PI)*.06; c.scale(sc,sc); drawFood(c,{fid:K.fid,L:L*.82,form:kFormNow(),top:0,specks:[]}); c.restore();
     c.save(); c.translate(e*260,-e*340); c.rotate(e*.9); c.globalAlpha=1-Math.max(0,(u-.6)/.4); drawSkeleton(c,K.fid,L); c.restore();
-    if (u<.25){ c.save(); c.globalAlpha=1-u/.25; drawFish(c,K.fid,L,false); c.restore(); }
+    if (u<.25){ c.save(); c.globalAlpha=1-u/.25; drawBoardFish(c,K.fid,L,true); c.restore(); }
     return; }
-  drawFish(c,K.fid,L,false);
+  drawBoardFish(c,K.fid,L,st.phase!=='scale');
   for (const g of st.gl){ if (!g.on) continue; const tw=.65+.35*Math.sin(K.t*3+g.tw);
     c.save(); c.translate(g.x,g.y); c.rotate(g.a); c.fillStyle='rgba(235,244,248,'+(.55*tw)+')'; c.beginPath(); c.ellipse(0,0,6.5,4.2,0,-Math.PI*.9,Math.PI*.9); c.fill();
     c.strokeStyle='rgba(43,42,51,.35)'; c.lineWidth=1; c.beginPath(); c.arc(-2,0,5.5,-1.1,1.1); c.stroke(); c.restore(); }
@@ -175,7 +176,7 @@ function updateCook(dt){ const st=K.st, R=RECIPES[K.rid]; st.idleT+=dt;
   if (st.p>.85 && st.phase==='cook'){ st.smokeT-=dt; if (st.smokeT<=0){ st.smokeT=.12; K.parts.push({x:rand(-40,40),y:st.cy,vx:rand(-15,15),vy:rand(-80,-50),g:-10,t:0,max:1.6,r:rand(10,18),col:'rgba(70,65,68,',kind:'smoke'}); } }
 }
 function drawCook(c){ const st=K.st, R=RECIPES[K.rid], cy=st.cy;
-  if (R.cook==='pan'){ drawStove(c,K.t); c.save(); c.translate(0,cy); drawPan(c,145,st.heat,K.t); c.restore(); }
+  if (R.cook==='pan'){ drawStove(c); c.save(); c.translate(0,cy); drawPan(c,145,st.heat,K.t); c.restore(); }
   else { c.save(); c.translate(0,cy); drawGrill(c,st.heat,K.t); c.restore(); }
   // the food: jumps and turns over on a flip
   let fy=cy, sy=1, rot=0, face=st.side===0?0:st.topA, marks=st.side===0?0:st.marksA, edge=st.phase==='cook'?st.p:st.side?st.p:0;

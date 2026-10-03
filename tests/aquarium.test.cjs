@@ -41,4 +41,26 @@ module.exports = [
       assert.equal(await page.evaluate(() => window.__AQ.open), false);
     },
   },
+  {
+    name: 'the tank fits between the tabs and the buttons on short and tall phones',
+    async run({ newPage, openGame, veteran }) {
+      const now = Date.now();
+      for (const height of [600, 664, 844, 932]) {
+        const page = await newPage({ viewport: { width: 390, height } });
+        await openGame(page, { save: veteran({ boat: true, tanks: { fresh: { lvl: 0, fish: [{ id: 'perch', size: 22, value: 2, t: now }], owned: true, decor: ['moss', 'townhall'], tips: 30, tipT: now } } }) });
+        await page.click('#aquaBtn'); await page.waitForTimeout(900);
+        const m = await page.evaluate(() => { const A = window.__AQ, cv = A.cv.getBoundingClientRect(), tabs = document.getElementById('aqTabs').getBoundingClientRect(), bot = document.querySelector('#aqua .aq-bottom').getBoundingClientRect();
+          return { jarTop: A.jar.y, tabsBottom: tabs.bottom - cv.top, standBottom: A.stand.y + A.stand.h, bottomTop: bot.top - cv.top, h: A.box.h }; });
+        assert.ok(m.jarTop >= m.tabsBottom, `at ${height} px the jar on the hood clears the tabs (${m.jarTop.toFixed(0)} vs ${m.tabsBottom.toFixed(0)})`);
+        assert.ok(m.standBottom <= m.bottomTop, `at ${height} px the stand ends above the buttons (${m.standBottom.toFixed(0)} vs ${m.bottomTop.toFixed(0)})`);
+        assert.ok(m.h >= 150, `at ${height} px the tank is still a good size (${m.h.toFixed(0)} px)`);
+        // the shop's decor icons are painted from the same drawings as the tank
+        await page.click('#aqShopBtn'); await page.waitForTimeout(700);
+        const painted = await page.evaluate(() => [...document.querySelectorAll('#aqShop canvas[data-decor]')].map(cv => { const x = cv.getContext('2d').getImageData(cv.width / 2, cv.height / 2, 1, 1).data; return x[3] > 0; }));
+        assert.ok(painted.length >= 7 && painted.every(Boolean), 'every decor card has its picture');
+        assert.deepEqual(page.errors, []);
+        await page.close();
+      }
+    },
+  },
 ];

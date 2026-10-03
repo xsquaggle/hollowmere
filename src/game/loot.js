@@ -182,7 +182,7 @@ function haulItemHTML(it,i){ const st=' style="--i:'+i+'"';
   if (it.type==='paint'){ const P=PAINTS[it.id];
     return '<div class="hl-item rf" data-r="'+P.crate+'"'+st+'><canvas class="hl-art" data-paint="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[P.crate].label+' hull paint · <b>New</b></span><h3>'+P.name+'</h3><p>'+(save.boat?'Paint your skiff with it from Tacklegram’s Boat tab.':'For your boat, once you have one.')+'</p></div></div>'; }
   if (it.type==='decor'){ const D=DECOR[it.tank].find(d=>d.id===it.id);
-    return '<div class="hl-item rf" data-r="'+D.crate+'"'+st+'><svg class="hl-art" viewBox="0 0 44 44" aria-hidden="true">'+DECOR_ICON[it.id]+'</svg><div class="hl-txt"><span class="k">'+RAR[D.crate].label+' aquarium decor · <b>New</b></span><h3>'+D.name+'</h3><p>'+D.eff+'. Place it from the aquarium’s shop.</p></div></div>'; }
+    return '<div class="hl-item rf" data-r="'+D.crate+'"'+st+'><canvas class="hl-art" data-decor="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[D.crate].label+' aquarium decor · <b>New</b></span><h3>'+D.name+'</h3><p>'+D.eff+'. Place it from the aquarium’s shop.</p></div></div>'; }
   if (it.type==='gear'){ const T=TACKLE[it.id], r=T.crate||'common', on=T.kind!=='bait'&&rigFor(save.rod)[T.kind]===it.id;
     return '<div class="hl-item rf" data-r="'+r+'"'+st+'><canvas class="hl-art" data-gear="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[r].label+' '+(isLure(it.id)?'lure':T.kind)+' · <b>New</b></span><h3>'+T.name+'</h3>'+
       '<p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+(on?'<p class="on">On your '+ROD().name+'.</p>':T.kind==='bait'?'<p class="on">In your tackle bag.</p>':'<button class="btn sm" type="button" data-rigit="'+it.id+'">Put it on your '+ROD().name+'</button>')+'</div></div>'; }
@@ -205,7 +205,7 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   const n=g.items.length, last=.35+Math.max(0,n-1)*.55;
   h+='<button class="btn primary" id="hlGo" type="button" style="animation-delay:'+(last+.3).toFixed(2)+'s">Collect</button>';
   el.innerHTML=h; el.hidden=false; ovOpen('haul',()=>{ lootEnd(); });
-  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear]'));
+  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear],canvas[data-decor]'));
   // the coins count up, then each item arrives with its own sound
   if (base){ const b=$('hlCoins'), t0=performance.now(), dur=REDUCED?1:Math.min(1100,350+base*.25); sfx.coin(6);
     (function step(now){ if (!b.isConnected) return; const k=Math.min(1,(now-t0)/dur); b.textContent=Math.round(base*(1-Math.pow(1-k,3))).toLocaleString(); if (k<1) requestAnimationFrame(step); else tallyCoins(); })(t0); }
@@ -231,6 +231,8 @@ function paintTile(cv,r,d){ r=r||cv.getBoundingClientRect(); d=d||Math.min(windo
   else if (cv.dataset.paint) drawHullSwatch(x,cv.dataset.paint,s);
   else if (cv.dataset.gear) drawTackle(x,cv.dataset.gear,s,S.time);
   else if (cv.dataset.hook) drawBareHook(x,s);
+  else if (cv.dataset.decor) drawDecorIcon(x,cv.dataset.decor,s);
+  else if (cv.dataset.tankicon) drawTankIcon(x,cv.dataset.tankicon,s);
   else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
 function drawHullSwatch(c,id,s){ const P=PAINTS[id]; c.save(); c.scale(s/100,s/100); laInk(c);
   c.fillStyle='rgba(60,110,130,.25)'; laEll(c,0,24,44,7); c.fill();
@@ -254,11 +256,11 @@ function openNote(id,o){ if (!id || !NOTES[id]) { if (o&&o.done) o.done(); retur
   el.hidden=false; el.classList.remove('out'); ovOpen('note',()=>{ closeNote(); });
   const paper=el.querySelector('.nt-paper'); paper.addEventListener('click',e=>{ if (e.target.id!=='ntGo'){ paper.classList.add('done'); penStop(); } });
   $('ntGo').addEventListener('click',e=>{ e.stopPropagation(); closeNote(); });
-  if (!REDUCED && AC) penScratch(N.lines);
+  if (!REDUCED && AC) notePenScratch(N.lines);
   sfx.paper(); }
 /** The pen scratching as each line inks in, through one gain node so closing the note silences it. */
 let PEN=null;
-function penScratch(lines){ penStop(); const g=AC.createGain(); g.gain.value=1; g.connect(master); PEN=g; let tt=AC.currentTime+.5;
+function notePenScratch(lines){ penStop(); const g=AC.createGain(); g.gain.value=1; g.connect(master); PEN=g; let tt=AC.currentTime+.5;
   for (const ln of lines){ const d=Math.max(.45,ln.length*.045); for (let k=0;k<d;k+=.09){ const t=tt+k, s=AC.createBufferSource(), f=AC.createBiquadFilter(), v=AC.createGain();
       s.buffer=noiseBuf; f.type='bandpass'; f.Q.value=3; f.frequency.value=rand(2600,4200); v.gain.setValueAtTime(.022,t); v.gain.exponentialRampToValueAtTime(.0001,t+.05);
       s.connect(f); f.connect(v); v.connect(g); s.start(t); s.stop(t+.07); } tt+=d+.12; } }

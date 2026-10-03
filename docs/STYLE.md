@@ -17,7 +17,7 @@ with soft grain, bold ink outlines on characters, fish and props, and atmospheri
 
 Rarity colors (`--c-common` to `--c-godly` in `src/styles/base.css`) are used for rarity and nothing else.
 
-The angler wears a mustard oilskin (`#BF8F3E`, shade `#8F6A2E`, light `#DDB25F`) and a slate hat (`#3B5560`). The tackle bag adds its own materials: waxed canvas `#857E4E`, with `#6A643C` for shade and `#9C9563` for light; leather `#6B4630`; and a cloth lining `#F1E6CC`.
+The angler wears a mustard oilskin (`#BF8F3E`, shade `#8F6A2E`, light `#DDB25F`) and a slate hat (`#3B5560`). The aquarium room keeps its plum boards (`#4A3B44`), with a walnut hood and stand (`#6B4A33`) and brass fittings; the kitchen keeps its warm brown boards, a butcher-block counter and cream tiles painted in blue (`#5A83AE`). The tackle bag adds its own materials: waxed canvas `#857E4E`, with `#6A643C` for shade and `#9C9563` for light; leather `#6B4630`; and a cloth lining `#F1E6CC`.
 
 ## Type
 
@@ -35,7 +35,7 @@ The angler wears a mustard oilskin (`#BF8F3E`, shade `#8F6A2E`, light `#DDB25F`)
 
 ## The art bar (from step 15 on)
 
-Every new or redrawn asset meets these, checked in a phone-sized screenshot before it ships:
+The bar holds for every screen: the fishing scene, every overlay (aquarium, kitchen, tackle bag, shops, journal and map) and every icon. Every new or redrawn asset meets these, checked in a phone-sized screenshot before it ships:
 
 - **Values:** 3–4 per shape (base, shadow, light), with ink outlines on characters and props.
 - **Material:** surface detail that says what it's made of: wood grain and nails, rope twist, metal sheen, stone strata and barnacles, canvas weave.
@@ -43,7 +43,12 @@ Every new or redrawn asset meets these, checked in a phone-sized screenshot befo
 - **Life:** an idle motion wherever the real thing would move, and at least 5 idle animations per scene.
 - **Speed:** static detail is drawn once and cached; only the moving parts redraw each frame.
 
-Step 16, the scene art pass, brought the earlier scene up to this bar. Scene art lives in `src/game/angler.js`, `dock.js`, `folk.js` and `coast.js`; light comes from the upper left everywhere.
+Step 16, the art pass, brought everything older up to this bar: the scene in part one (build 16), the aquarium and kitchen in part two (build 17). Light comes from the upper left everywhere.
+
+- **Scene art** lives in `src/game/angler.js`, `dock.js`, `folk.js` and `coast.js`.
+- **Aquarium art** lives in `src/game/aquarium-art.js`. Each decor piece draws from an anchor on the sand, split into a still part (painted once) and a moving part. The shop's and crates' decor icons come from the same drawings, so they always match the tank.
+- **Kitchen art** lives in `src/game/kitchen-art.js`. The board, the stove and the whole fish on the board are painted once per scale.
+- **Fish up close:** past 44 px a fish gets a gill line, a side fin, a darker back, a mouth and a glint in its eye; past 80 px, fin rays, a lateral line and scales. Catfish, eels, and fish whose pattern already reads as scales don't get extra scales.
 
 ## Rarity kit
 

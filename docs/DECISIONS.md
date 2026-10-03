@@ -4,6 +4,12 @@ Newest first. Each entry records what was decided and why, so later changes don'
 
 ## 2026-10-03
 
+- **The art pass got a second part for the aquarium and the kitchen (build 17),** at the owner's request. From now on the art bar covers every screen, overlays and icons included, not just the fishing scene.
+  - The tank is sized to the space between the tabs and the buttons, so nothing overlaps on a short screen. Rooms measure their layout, not their on-screen size, because they open with a small zoom.
+  - Decor icons in the shop and in crates are drawn from the tank's own drawings instead of separate SVGs, so the two can't drift apart.
+  - Still parts of the art are painted once and copied each frame. In the same CPU-throttled test, the aquarium runs a little faster than build 16, and the kitchen measures the same.
+  - The kitchen's herbs stay still, because making them sway cost more frame rate than it was worth. The plan's steaming kettle became a steaming mug of tea on the shelf, since a kettle on a shelf wouldn't steam.
+- **After every step or major update, the roadmap doc and the current build are sent together in the chat.**
 - **Scene art pass (build 16).**
   - The angler is drawn from behind: a mustard oilskin coat, a slate hat with a brass band and a fly, and both hands on the rod. They breathe, glance along the shore, and wind the reel while reeling.
   - The reel on the rod, and the line's color on the water, follow the tackle that's on it.

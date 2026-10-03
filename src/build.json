@@ -60,6 +60,7 @@
     "game/barnaby.js",
     "game/map.js",
     "game/tacklegram.js",
+    "game/aquarium-art.js",
     "game/aquarium.js",
     "game/kitchen-meals.js",
     "game/kitchen-art.js",

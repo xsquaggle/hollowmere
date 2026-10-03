@@ -25,6 +25,10 @@ function openNet(){
     if (rare && !armed){ armed=true; sa.textContent='Includes rare fish · tap again'; return; } sell(save.net.map((f,i)=>i)); }); }
 }
 let OTT_TAB='rods';
+/** Draws each rod on its card, with the reel and line it carries (or the starter ones, in the shop window). */
+function paintRodArt(list){ const d=Math.min(window.devicePixelRatio||1,2);
+  list.forEach(cv=>{ const r=layoutBox(cv); if (!r.width) return; cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0);
+    const id=cv.dataset.rodart, rig=save.rods.includes(id)?rigFor(id):{reel:'clicker',line:'cotton'}; drawRig(x,r.width,r.height,id,rig,null,0); }); }
 function openShop(tab){
   audioInit(); if (tab) OTT_TAB=tab;
   const first=!save.metOttilie; save.metOttilie=true; persist();
@@ -46,12 +50,12 @@ function openShop(tab){
     const btn=eq?'<span class="r" style="color:#4E7B4C">Equipped</span>':owned?'<button class="btn" data-eq="'+id+'" type="button">Equip</button>'
       :'<button class="btn" data-buy="'+id+'" type="button"'+(can?'':' disabled style="opacity:.45"')+'>Buy · '+R.price.toLocaleString()+'</button>';
     h+='<div class="entry" style="grid-template-columns:1fr auto;'+(isNext?'border-color:#C9A15A;border-width:2px':'')+'"><div style="display:grid;gap:5px;min-width:0">'+
-      (isNext?'<span class="r" style="color:#A07A2E">Next upgrade</span>':'')+'<h3>'+R.name+'</h3><p style="margin:0">Reaches: <b>'+R.where+'</b></p>'+
+      (isNext?'<span class="r" style="color:#A07A2E">Next upgrade</span>':'')+'<h3>'+R.name+'</h3><canvas class="rod-art" data-rodart="'+id+'" aria-hidden="true"></canvas><p style="margin:0">Reaches: <b>'+R.where+'</b></p>'+
       bar('Reach',R.reach,1,cur.reach)+bar('Line',R.line,maxStat('line'),cur.line)+bar('Reel',R.reel,maxStat('reel'),cur.reel)+bar('Luck',R.luck,maxStat('luck'),cur.luck)+bar('Value',R.value,maxStat('value'),cur.value)+
       '<p style="margin:2px 0 0;font-weight:700;color:'+(id==='willow'?'#7A7468':'#3D5A3A')+'">'+(id==='willow'?'':'Perk: ')+R.perk+'</p></div><div>'+btn+'</div></div>'; });
   openSheet(h+'</div>');
   $('closeS').addEventListener('click',closeSheet); bindOttTabs();
-  paintTiles(document.querySelectorAll('#panel canvas[data-find]'));
+  paintTiles(document.querySelectorAll('#panel canvas[data-find]')); paintRodArt(document.querySelectorAll('#panel canvas[data-rodart]'));
   document.querySelectorAll('#panel [data-give]').forEach(b=>b.addEventListener('click',()=>returnFind(b.dataset.give)));
   document.querySelectorAll('[data-eq]').forEach(b=>b.addEventListener('click',()=>{ save.rod=b.dataset.eq; persist(); sfx.hook(false); news('Equipped '+RODS[save.rod].name,'good'); openShop(); }));
   document.querySelectorAll('[data-buy]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.buy, R=RODS[id]; if (save.coins<R.price) return;

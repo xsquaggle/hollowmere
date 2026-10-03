@@ -53,7 +53,7 @@ function renderApp(tab){
     SEA_RODS.forEach((id,i)=>{ const R=RODS[id], owned=save.rods.includes(id), eq=save.rod===id, can=save.coins>=R.price, prevOwned=i===0||save.rods.includes(SEA_RODS[i-1])||isPending('rod',SEA_RODS[i-1]);
       const btn=eq?'<span class="tag ok">Equipped</span>':owned?'<button class="btn sm" data-eq="'+id+'">Equip</button>':isPending('rod',id)?'<span class="tag">On its way</span>'
         :!prevOwned?'<span class="tag">Locked</span>':'<button class="btn sm" data-order="rod:'+id+'"'+(can?'':' disabled')+'>Order · '+R.price.toLocaleString()+'</button>';
-      body+='<div class="app-item"><div class="app-row"><div><h4>'+R.name+'</h4><p>'+R.blurb+'</p></div>'+btn+'</div>'+
+      body+='<div class="app-item"><div class="app-row"><div><h4>'+R.name+'</h4><p>'+R.blurb+'</p></div>'+btn+'</div><canvas class="rod-art" data-rodart="'+id+'" aria-hidden="true"></canvas>'+
         statBar('Line',R.line,'line',cur.line)+statBar('Reel',R.reel,'reel',cur.reel)+statBar('Luck',R.luck,'luck',cur.luck)+statBar('Value',R.value,'value',cur.value)+
         '<p class="perk">Perk: '+R.perk+'</p></div>'; });
   } else if (tab==='tackle'){
@@ -80,7 +80,7 @@ function renderApp(tab){
     (pend.length?'<p class="app-ship">Pell’s mail boat is bringing: '+pend.map(itemName).join(', ')+'</p>':'')+
     '<div class="app-body">'+body+'</div></div>';
   L.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>renderApp(b.dataset.tab)));
-  paintTiles(L.querySelectorAll('canvas[data-gear]'));
+  paintTiles(L.querySelectorAll('canvas[data-gear]')); paintRodArt(L.querySelectorAll('canvas[data-rodart]'));
   L.querySelectorAll('[data-eq]').forEach(b=>b.addEventListener('click',()=>{ save.rod=b.dataset.eq; persist(); sfx.hook(false); news('Equipped '+RODS[save.rod].name,'good'); renderApp('rods'); }));
   L.querySelectorAll('[data-paint]').forEach(b=>b.addEventListener('click',()=>{ save.paint=b.dataset.paint; persist(); sfx.hook(false); renderApp('boat'); }));
   L.querySelectorAll('[data-order]').forEach(b=>b.addEventListener('click',()=>{ const [kind,id]=b.dataset.order.split(':');

@@ -12,7 +12,7 @@ each build.
 | 12 | One modifier pipeline, the balance simulator and the Bonuses page |
 | 14 | Treasure: loot crates from Common to Mythic, finds, artifacts and keepsakes, bottles and letters |
 | 15 | The tackle bag: the rod rig (reel, line and bait), rods, vest pockets, keepsakes, and the first tackle (build 15) |
-| 16 | Scene art pass: the angler, the dock and its props, the townsfolk and their boats, the coast's rocks, kelp and skiff (build 16) |
+| 16 | Art pass. Part one: the angler, the dock and its props, the townsfolk and their boats, the coast's rocks, kelp and skiff (build 16). Part two: the aquarium room, tank and decor, fish up close, the kitchen's stove, board, wall and counter, and rod drawings in the shops (build 17) |
 
 ## Next
 

@@ -214,6 +214,19 @@ const SOCKETS = ['reel', 'line', 'bait'], TK_IDS = keys(TACKLE);
 sameSet('TACKLE_ORDER', keys(TACKLE_ORDER), SOCKETS, 'tray sockets and the sockets the bag draws');
 noDupes('TACKLE_ORDER', SOCKETS.flatMap(k => TACKLE_ORDER[k] || []));
 for (const k of SOCKETS) sameSet('TACKLE_ORDER.' + k, TACKLE_ORDER[k] || [], TK_IDS.filter(id => TACKLE[id].kind === k), 'the ' + k + ' tray and the ' + k + 's in TACKLE');
+// every decor piece is drawn in game/aquarium-art.js: an anchor, a layer, a box for its icon, and a still or moving part
+const AQART = readFileSync(join(ROOT, 'src/game/aquarium-art.js'), 'utf8');
+const decorArt = new Map([...(AQART.match(/const DECOR_ART=\{([\s\S]*?)\n\};/) || ['', ''])[1].matchAll(/^ {2}([a-z][a-z0-9]*):\{x:([.\d]+), layer:'(back|mid|front)', box:\[([-\d,.\s]+)\]([^\n]*)/gm)].map(m => [m[1], { x: +m[2], box: m[4].split(',').map(Number), rest: m[5] }]));
+if (!decorArt.size) bad('src/game/aquarium-art.js', 'could not find DECOR_ART to check the decor drawings against');
+for (const id of decorIds) { const A = decorArt.get(id), w = 'DECOR_ART.' + id;
+  if (!A) { bad(w, 'no drawing (src/game/aquarium-art.js)'); continue; }
+  if (!(A.x > 0 && A.x < 1)) bad(w, 'x is a fraction of the tank, between 0 and 1');
+  const [x0, y0, x1, y1] = A.box; if (A.box.length !== 4 || !(x0 < x1 && y0 < y1)) bad(w, 'box is [left, top, right, bottom]'); }
+for (const id of decorArt.keys()) if (!decorIds.includes(id)) bad('DECOR_ART.' + id, 'is drawn but not in DECOR');
+const artBlock = (AQART.match(/const DECOR_ART=\{([\s\S]*?)\n\};/) || ['', ''])[1];
+for (const id of decorIds) { const at = artBlock.search(new RegExp('^ {2}' + id + ':\\{', 'm')); if (at < 0) continue;
+  const rest = artBlock.slice(at + 2), next = rest.search(/\n {2}[a-z][a-z0-9]*:\{x:/), body = next < 0 ? rest : rest.slice(0, next);
+  if (!/\b(still|live)\(c/.test(body)) bad('DECOR_ART.' + id, 'draws nothing: it needs a still(c) part, a live(c,t) part, or both'); }
 // every piece is drawn in game/tackle-art.js: its tile in TACKLE_ART, and a line's color on the rod in LINE_COL
 const ART = readFileSync(join(ROOT, 'src/game/tackle-art.js'), 'utf8');
 const artKeys = new Set([...(ART.match(/const TACKLE_ART=\{([\s\S]*?)\n\};/) || ['', ''])[1].matchAll(/^ {2}([a-z][a-z0-9]*)\(c/gm)].map(m => m[1]));

@@ -7,6 +7,9 @@ function kUpdate(dt){ K.t+=dt;
   K.parts=K.parts.filter(p=>p.t<p.max); if (K.parts.length>320) K.parts.splice(0,K.parts.length-320);
   for (const f of K.floats) f.t+=dt; K.floats=K.floats.filter(f=>f.t<1.3);
   if (K.bg && Math.abs(save.clock-K.bgHour)>.25) K.bg=null;
+  // smoke curling up off the rack, and steam off the mug of tea
+  if (K.mode!=='banquet'){ if (Math.random()<dt*4.8) K.parts.push({x:rand(K.W*.62,K.W*.93),y:K.top+96*K.s,vx:rand(-6,6),vy:rand(-22,-12),g:-2,t:0,max:3,r:rand(3,5),col:'rgba(225,215,205,',kind:'wisp',screen:true});
+    if (K.shelf && Math.random()<dt*2.2) K.parts.push({x:K.shelf.mx+rand(-2,2)*K.s,y:K.shelf.my,vx:rand(-2,2),vy:rand(-12,-8),g:-1,t:0,max:2.2,r:rand(1.6,2.6)*K.s,col:'rgba(245,240,232,',kind:'wisp',screen:true}); }
 }
 function kDrawParts(c,screen){ for (const p of K.parts){ if (!!p.screen!==screen) continue; const a=1-p.t/p.max;
   if (p.kind==='steam'||p.kind==='smoke'||p.kind==='wisp'){ c.fillStyle=p.col+(p.kind==='smoke'?.45:p.kind==='wisp'?.1*Math.min(1,p.t*2):.16)*a+')'; c.beginPath(); c.arc(p.x+(p.kind==='wisp'?Math.sin(p.t*2+p.r)*6:0),p.y,p.r,0,6.28); c.fill(); }
@@ -20,10 +23,8 @@ function kDraw(){ const c=K.ctx; c.setTransform(K.dpr,0,0,K.dpr,0,0);
   if (K.mode==='banquet'){ drawBanquet(c); kDrawParts(c,true); return; }
   if (!K.bg) kRoom(); c.drawImage(K.bg,0,0,K.W,K.H);
   kDrawRack(c,K.t);
-  // smoke curling up behind the rack
-  if (Math.random()<.08) K.parts.push({x:rand(K.W*.62,K.W*.93),y:K.top+96*K.s,vx:rand(-6,6),vy:rand(-22,-12),g:-2,t:0,max:3,r:rand(3,5),col:'rgba(225,215,205,',kind:'wisp',screen:true});
   kDrawParts(c,true);
-  kDrawLantern(c,K.t);
+  kDrawLantern(c,K.t); kDrawMoth(c,K.t);
   c.save(); c.translate(K.W/2,K.SY); c.scale(K.s,K.s);
   if (K.mode==='station' && K.st){ ({clean:drawClean,season:drawSeason,cook:drawCook,plate:drawPlateStation})[K.st.kind](c); kDrawParts(c,false); kDrawFloats(c); }
   else if (K.mode==='result' && K.res){ const R=RECIPES[K.rid], G=plateGuides(R.dish), r=K.res, e=Math.min(1,r.t/.6), sc=lerp(.85,1.08,1-Math.pow(1-e,3))+(r.pop||0)*.03;
@@ -37,7 +38,7 @@ function kDraw(){ const c=K.ctx; c.setTransform(K.dpr,0,0,K.dpr,0,0);
   c.restore();
 }
 function kLoop(now){ if (!K.open) return; const dt=Math.min(.05,(now-K.last)/1000||0); K.last=now; kUpdate(dt); kDraw(); requestAnimationFrame(kLoop); }
-function kPtr(e){ const r=K.cv.getBoundingClientRect(); return toD(e.clientX-r.left,e.clientY-r.top); }
+function kPtr(e){ const r=K.cv.getBoundingClientRect(), k=r.width?K.W/r.width:1; return toD((e.clientX-r.left)*k,(e.clientY-r.top)*k); }
 function kDown(e){ if (K.mode!=='station' || !K.st) return; e.preventDefault(); audioInit(); try { K.cv.setPointerCapture(e.pointerId); } catch(_){}
   const p=kPtr(e); K.ptr={x:p.x,y:p.y,down:true,id:e.pointerId}; const k=K.st.kind;
   if (k==='clean'){ K.st.prev=p; if (K.st.phase==='cut') K.st.armed=true; cleanMove(p,true); } else if (k==='season') seasonDown(p); else if (k==='cook') cookTap(); else if (k==='plate') plateDown(p); }
