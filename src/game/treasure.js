@@ -99,6 +99,8 @@ function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',
       if (it.note && Math.random()<it.note){ const id=nextBottleNote(c); if (id){ note(id); continue; } }
       if (it.paint){ const ids=Object.keys(PAINTS).filter(id=>PAINTS[id].crate===it.paint && !(save.paints||[]).includes(id));
         if (ids.length){ const id=ids[Math.floor(Math.random()*ids.length)]; grantPaint(id); out.items.push({type:'paint',id}); } else spare(it.paint); continue; }
+      if (it.gear){ const ids=Object.keys(TACKLE).filter(id=>TACKLE[id].crate && rarRank(TACKLE[id].crate)<=rarRank(it.gear) && !gearState().own[id]);
+        if (ids.length){ const id=ids[Math.floor(Math.random()*ids.length)]; grantGear(id); out.items.push({type:'gear',id}); } continue; }   // nothing left: the crate just doesn't hold it
       if (it.prize){ const P=prizesFor(it.prize); if (P.length){ const p=P[Math.floor(Math.random()*P.length)];
         if (p.type==='find') give(p.id); else { if (p.type==='paint') grantPaint(p.id); else grantDecor(p.tank,p.id); out.items.push(p); } continue; } }
       const lean=it.lean||it.prize, id=pickLean(lean,c); if (id) give(id); else spare(lean);

@@ -84,25 +84,29 @@ module.exports = [
     },
   },
   {
-    name: 'artifacts only work from a vest pocket, and Ottilie sews more',
+    name: 'artifacts only work from a vest pocket in the tackle bag, and Ottilie sews more',
     async run({ newPage, openGame, veteran, readSave }) {
       const page = await newPage();
       await openGame(page, { save: veteran({ coins: 7000, finds: finds(['penny', 'tuningfork']) }) });
       const luck = () => page.evaluate(() => window.__hm.luckPoints({}));
       assert.equal(await luck(), 0, 'an artifact outside a pocket does nothing');
-      await page.click('#journalBtn'); await page.waitForTimeout(300); await page.click('[data-jt="finds"]'); await page.waitForTimeout(300);
-      await page.click('[data-in="penny"]'); await page.waitForTimeout(250);
+      await page.click('#bagBtn'); await page.waitForTimeout(950);
+      await page.click('.pk[data-pk="0"]'); await page.waitForTimeout(350);
+      await page.click('[data-act="pocket"][data-id="penny"]'); await page.waitForTimeout(450);
       assert.ok(Math.abs(await luck() - 0.1) < 1e-9, 'the Lucky Penny adds +10 luck from a pocket');
-      assert.equal(await page.$('[data-in="tuningfork"]'), null, 'with one pocket full there is no room');
+      assert.equal(await page.$('.pk[data-pk="1"]'), null, 'one pocket to start, so no room for the fork');
       await page.click('#sewBtn'); await page.waitForTimeout(300);
       let s = await readSave(page); assert.deepEqual([s.finds.pockets, s.coins], [2, 5500], 'a second pocket costs 1,500');
-      await page.click('[data-in="tuningfork"]'); await page.waitForTimeout(250);
+      await page.click('.pk[data-pk="1"]'); await page.waitForTimeout(350);
+      await page.click('[data-act="pocket"][data-id="tuningfork"]'); await page.waitForTimeout(450);
       const v = await page.evaluate(() => ({ perfect: window.__hm.modMul('perfect'), rare: window.__hm.luckPoints({ rarity: 'rare' }), common: window.__hm.luckPoints({ rarity: 'uncommon' }) }));
       assert.equal(v.perfect, 2, 'the Tuning Fork doubles the perfect-hook window');
       assert.ok(Math.abs(v.rare - 0) < 1e-9 && Math.abs(v.common - 0.1) < 1e-9, 'and costs rare fish 10 luck');
-      await page.click('[data-out="penny"]'); await page.waitForTimeout(250);
+      assert.match(await page.textContent('.bag-sum'), /Tuning Fork/, 'the bag’s setup summary lists it');
+      await page.click('.pk[data-pk="0"]'); await page.waitForTimeout(350);
+      await page.click('[data-act="out"][data-id="penny"]'); await page.waitForTimeout(450);
       s = await readSave(page); assert.deepEqual(s.finds.equip, ['tuningfork']);
-      await page.click('[data-jt="bonuses"]'); await page.waitForTimeout(300);
+      await page.click('#bagBonuses'); await page.waitForTimeout(400);
       const text = await page.textContent('#panel');
       for (const w of ['Tuning Fork', 'Artifact', 'Vest']) assert.ok(text.includes(w), 'the Bonuses page shows ' + w);
     },

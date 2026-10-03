@@ -30,7 +30,7 @@ function hookEats(){ const L=S.land, p=landPos(); save.stats.eaten=(save.stats.e
   for (let i=0;i<16;i++) S.particles.push({x:p.x,y:p.y,vx:rand(-140,140),vy:rand(-160,40),g:420,life:0,max:rand(.4,.8),r:rand(1.4,3),c:i%3?'rgba('+rgbOf(L.F.color)+',':'rgba(243,234,215,'});
   S.particles.push({x:p.x,y:p.y-30,vx:0,vy:-30,g:0,life:0,max:1.3,r:0,c:'rgba(0,0,0,',word:'CHOMP!'});
   news('The Hungry Hook ate your '+L.F.name,'bad');
-  if (!save.stats.eatenTip){ save.stats.eatenTip=true; persist(); coachFor('The Hungry Hook doubles what fish are worth, but now and then it eats one. Take it out of your pocket on the journal’s Finds page.',8); }
+  if (!save.stats.eatenTip){ save.stats.eatenTip=true; persist(); coachFor('The Hungry Hook doubles what fish are worth, but now and then it eats one. Take it out of your pocket in your tackle bag.',8); }
   S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); }
 function landPos(){ const L=S.land, p=L.p, c={x:(L.from.x+L.to.x)/2, y:Math.min(L.from.y,L.to.y)-H*.16};
   const e=1-Math.pow(1-p,2);
@@ -103,5 +103,5 @@ function coinTally(dur){ const start=coinShown, end=save.coins, t0=performance.n
 function updateHud(){
   const all=REGION_FISH.lake.concat(save.boat?REGION_FISH.coast:[]), n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
   $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('aquaBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; $('kitchenBtn').hidden=!save.kitchenOpen; $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
-  $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot();
+  $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
 }

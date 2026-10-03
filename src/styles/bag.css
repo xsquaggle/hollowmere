@@ -1,0 +1,177 @@
+/* Tackle bag (game/bag.js): a waxed-canvas satchel whose flap lifts onto a cloth with your rod rig, rods, vest
+   pockets, keepsakes and what the setup adds up to. Opens in 0.7 s, closes in 0.35 s, fades in 0.15 s with
+   reduced motion. The flap's resting state is open; the .opening and .closing classes animate to and from it. */
+#bag{position:fixed;inset:0;z-index:5;display:flex;align-items:flex-end;justify-content:center;
+  --bag:#857E4E;--bag-d:#6A643C;--bag-l:#9C9563;--lining:#4E4A2E;--leather:#6B4630;--leather-l:#8A5E3C;--cloth:#F1E6CC}
+.bag-shade{position:absolute;inset:0;background:rgba(10,13,22,.6)}
+.bag{position:relative;width:min(480px,100%);max-height:calc(100% - env(safe-area-inset-top,0px) - 116px);display:flex;flex-direction:column;box-sizing:border-box;
+  padding:16px 9px 0;perspective:1000px;border:2px solid var(--ink);border-bottom:0;border-radius:26px 26px 0 0;box-shadow:0 -10px 34px rgba(0,0,0,.45);
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 4px),
+    linear-gradient(var(--bag-l),var(--bag) 26%,var(--bag-d))}
+.bag::before{content:'';position:absolute;inset:6px 6px 0;border:1.5px dashed rgba(241,228,198,.42);border-bottom:0;border-radius:21px 21px 0 0;pointer-events:none}
+/* the mouth of the bag: a leather band with two rivets where the flap is sewn on */
+.bag-rim{position:absolute;left:18px;right:18px;top:-2px;height:10px;border:2px solid var(--ink);border-top:0;border-radius:0 0 7px 7px;background:linear-gradient(var(--leather-l),var(--leather));z-index:2}
+.bag-rim i{position:absolute;top:2px;width:5px;height:5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#F2D896,var(--brass) 60%,#8C6A2E);box-shadow:0 0 0 1px var(--ink)}
+.bag-rim i:first-child{left:14%}.bag-rim i:last-child{right:14%}
+/* the flap: front face with its strap and buckle, and a darker lining on the back. At rest it stands open, above the bag */
+.bag-flap{position:absolute;left:-2px;right:-2px;top:-2px;height:122px;z-index:3;transform-origin:50% 0;transform-style:preserve-3d;transform:rotateX(166deg);pointer-events:none}
+.bf-face,.bf-under{position:absolute;inset:0;box-sizing:border-box;border:2px solid var(--ink);-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.bf-face{border-radius:26px 26px 46px 46px / 26px 26px 34px 34px;box-shadow:0 8px 14px rgba(0,0,0,.3);
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 4px),linear-gradient(var(--bag),var(--bag-d))}
+.bf-under{transform:rotateX(180deg);border-radius:46px 46px 26px 26px / 34px 34px 26px 26px;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px),linear-gradient(#3F3B22,var(--lining) 70%,#5A5534)}
+.bf-stitch{position:absolute;inset:7px;border:1.5px dashed rgba(241,228,198,.45);border-radius:20px 20px 38px 38px / 20px 20px 28px 28px}
+.bf-under .bf-stitch{border-color:rgba(241,228,198,.22);border-radius:38px 38px 20px 20px / 28px 28px 20px 20px}
+.bf-strap{position:absolute;left:50%;bottom:-30px;width:26px;height:62px;margin-left:-13px;box-sizing:border-box;border:2px solid var(--ink);border-radius:4px 4px 9px 9px;background:linear-gradient(90deg,var(--leather),var(--leather-l) 45%,var(--leather))}
+.bf-tongue{position:absolute;left:3px;right:3px;bottom:4px;height:14px;border-radius:2px 2px 7px 7px;background:#5A3A27;box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.25)}
+.bf-buckle{position:absolute;left:50%;bottom:-14px;width:40px;height:28px;margin-left:-20px;box-sizing:border-box;border:4px solid var(--brass);border-radius:6px;box-shadow:0 0 0 2px var(--ink),inset 0 0 0 2px var(--ink)}
+.bf-buckle i{position:absolute;left:50%;top:-2px;bottom:-2px;width:3px;margin-left:-1.5px;background:#E3C27A;box-shadow:0 0 0 1px var(--ink)}
+/* the cloth inside */
+.bag-in{position:relative;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;-webkit-user-select:none;user-select:none;
+  display:grid;gap:10px;align-content:start;box-sizing:border-box;padding:14px 12px calc(env(safe-area-inset-bottom,0px) + 20px);color:var(--ink);
+  border:2px solid var(--ink);border-bottom:0;border-radius:15px 15px 0 0;box-shadow:inset 0 12px 16px -10px rgba(60,40,20,.45);
+  background:repeating-linear-gradient(45deg,rgba(120,96,56,.05) 0 2px,transparent 2px 5px),repeating-linear-gradient(-45deg,rgba(120,96,56,.05) 0 2px,transparent 2px 5px),var(--cloth)}
+.bag-head{display:flex;align-items:center;gap:10px}
+.bag-head>div{flex:1;min-width:0}
+.bag-head h2{margin:0;font:400 25px/1.1 var(--display)}
+.bag-head p{margin:3px 0 0;display:flex;align-items:center;gap:5px;font-size:13px;font-weight:800;color:#6B665C;font-variant-numeric:tabular-nums}
+.bag-card{position:relative;display:grid;gap:8px;padding:10px 11px 11px;border:1.5px solid rgba(43,42,51,.2);border-radius:12px;background:rgba(255,252,243,.8);box-shadow:0 2px 0 rgba(43,42,51,.08)}
+.bag-card>header{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.bag-card h3{margin:0;font:400 18px/1.15 var(--display)}
+.bag-card>header>span{font-size:11.5px;font-weight:800;color:#7A7468;text-align:right}
+.bag-card .k{display:block;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468}
+.bag-hint{margin:0;font-size:12.5px;line-height:1.4;color:#5E5A52}
+.bag-card.pop{animation:bagPop .32s ease}
+@keyframes bagPop{40%{transform:scale(1.012)}}
+.nw{font-style:normal;color:#fff;background:#3E7A35;border-radius:999px;padding:2px 5px;font-size:9px;font-weight:800;letter-spacing:.04em;vertical-align:1px;text-transform:uppercase}
+/* the rod rig: the rod drawn large on a stitched mat, three sockets under it */
+.bag-rig{background:linear-gradient(#EBDDBB,#E2D2AC);border-color:#8A6A44}
+.bag-rig::after{content:'';position:absolute;inset:4px;border:1.5px dashed rgba(110,82,54,.3);border-radius:9px;pointer-events:none}
+.rig-reach{white-space:nowrap}
+.rig-art{position:relative;height:clamp(118px,36vw,156px);margin:-4px -4px 0}
+.rig-art canvas{position:absolute;inset:0;width:100%;height:100%}
+.rig-hot{position:absolute;width:56px;height:46px;margin:-23px 0 0 -28px;border:0;border-radius:50%;background:none;cursor:pointer;z-index:1}
+.rig-hot:focus-visible{outline:3px solid var(--brass);outline-offset:-3px}
+.rig-socks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;position:relative;z-index:1}
+.sock{display:grid;justify-items:center;align-content:start;text-align:center;gap:2px;min-width:0;padding:7px 4px 8px;font:inherit;color:inherit;cursor:pointer;
+  border:2px solid var(--ink);border-radius:11px;background:#FBF3DF;box-shadow:0 3px 0 var(--ink);touch-action:manipulation}
+.sock:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.sock:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.sock canvas{width:46px;height:46px}
+.sock b{font:400 13.5px/1.15 var(--display);max-width:100%}
+.sock small{font-size:10.5px;font-weight:700;line-height:1.25;color:#6B665C;max-width:100%}
+.sock.bare{background:rgba(255,248,232,.55);border-style:dashed;box-shadow:0 3px 0 rgba(43,42,51,.35)}
+.sock.pop{animation:sockPop .4s cubic-bezier(.2,1.7,.4,1)}
+@keyframes sockPop{0%{transform:scale(.9)}55%{transform:scale(1.07)}}
+/* rods */
+.rod-row{position:relative;display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scroll-snap-type:x proximity;padding:2px 2px 6px;margin:0 -2px;scrollbar-width:none}
+.rod-row::-webkit-scrollbar{display:none}
+.rod-tile{flex:0 0 122px;scroll-snap-align:start;display:grid;gap:2px;align-content:start;padding:6px 8px 8px;font:inherit;color:inherit;text-align:left;cursor:pointer;
+  border:1.5px solid rgba(43,42,51,.25);border-radius:10px;background:#FBF3DF;touch-action:manipulation}
+.rod-tile canvas{width:100%;height:46px}
+.rod-tile b{font:400 13.5px/1.15 var(--display)}
+.rod-tile span{font-size:10.5px;font-weight:700;color:#7A7468;line-height:1.25}
+.rod-tile.on{border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--brass);cursor:default}
+.rod-tile.on span{color:#4E7B4C}
+/* vest pockets (the pocket tiles share finds.css) and keepsakes */
+.bag-vest{background:linear-gradient(#EFE3C6,#E6D6B2);border-color:#8A6A44}
+.bag-vest .pk-row{gap:6px}
+button.pk{font-family:var(--body);touch-action:manipulation}
+.pk.empty{cursor:pointer}
+.pk.empty:active,.pk.full:active{transform:translateY(1px)}
+.ks-list{display:grid;gap:6px}
+.ks{display:grid;grid-template-columns:42px 1fr;gap:9px;align-items:center;padding:6px 9px}
+.ks.rf,.tr-row.rf{animation:none}
+.ks canvas{width:42px;height:42px}
+.ks b{font:400 14.5px/1.15 var(--display)}
+.ks p{margin:1px 0 0;font-size:12px;line-height:1.3;color:#4B4842}
+/* what the setup adds up to (lines share bonuses.css) */
+.bag-sum b.up{color:#3E7A35}.bag-sum b.down{color:#B2493A}
+.bag-more{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:44px;margin-top:2px;padding:6px 2px 0;border:0;border-top:1px solid rgba(43,42,51,.12);background:none;font:800 13px/1 var(--body);color:#6E5236;cursor:pointer}
+.bag-more span{font-size:20px;line-height:.6}
+/* the swap tray */
+.bag-tray{position:absolute;inset:0;z-index:4;display:flex;align-items:flex-end;justify-content:center}
+.tray-shade{position:absolute;inset:0;background:rgba(10,13,22,.45)}
+.tray{position:relative;width:min(480px,100%);max-height:74%;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;box-sizing:border-box;color:var(--ink);
+  padding:14px 14px calc(env(safe-area-inset-bottom,0px) + 18px);background:var(--paper);border:2px solid var(--ink);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.35)}
+.bag-tray.in .tray{animation:trayIn .24s cubic-bezier(.2,1.1,.4,1)}.bag-tray.in .tray-shade{animation:bagShade .2s ease-out both}
+.bag-tray.out .tray{animation:trayOut .18s ease-in both}.bag-tray.out .tray-shade{animation:bagShadeOut .18s ease-in both}
+@keyframes trayIn{from{transform:translateY(100%)}}
+@keyframes trayOut{to{transform:translateY(100%)}}
+.tray>header{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.tray>header>div{flex:1;min-width:0}
+.tray .k{display:block;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468}
+.tray h3{margin:1px 0 0;font:400 21px/1.15 var(--display)}
+.tray-list{display:grid;gap:7px}
+.tr-row{display:grid;grid-template-columns:50px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 9px;border:1.5px solid rgba(43,42,51,.2);border-radius:11px;background:rgba(255,255,255,.45)}
+.tr-row canvas{width:50px;height:50px}
+.tr-row.on{border:2px solid var(--ink);background:#FBF3DF;box-shadow:inset 4px 0 0 var(--brass)}
+.tr-row.none{border-style:dashed;background:none}
+.tr-row.none canvas,.tr-row.none .tr-txt{opacity:.6}
+.tr-txt h4{margin:0;font:400 16px/1.15 var(--display)}
+.tr-txt p{margin:2px 0 0;font-size:12.5px;line-height:1.35;color:#4B4842}
+.tr-txt .down{color:#A04636}
+.tr-txt .also,.tr-txt .stock{font-size:11.5px;font-weight:700;color:#7A7468}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.chips span{font-size:10.5px;font-weight:800;padding:3px 7px;border-radius:999px;background:rgba(94,155,78,.16);color:#3D6B33}
+.chips span.down{background:rgba(192,112,92,.16);color:#9A4632}
+.tr-row .where{display:grid;justify-items:end;gap:3px;font-size:11px;font-weight:800;color:#6E5236;text-align:right;white-space:nowrap}
+.tr-row .where b{display:flex;align-items:center;gap:3px}.tr-row .where .coin{width:10px;height:10px}
+.tr-sub{margin:7px 0 0;font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468}
+.tr-empty{margin:0 0 4px;font-size:13.5px;line-height:1.45;color:#4B4842}
+/* opening: rise, buckle, flap, then the gear slides out (0.7 s in all) */
+@keyframes bagShade{from{opacity:0}}
+@keyframes bagShadeOut{to{opacity:0}}
+@keyframes bagRise{from{transform:translateY(70px);opacity:0}}
+@keyframes bagSink{to{transform:translateY(80px);opacity:0}}
+@keyframes bagBuckle{0%{transform:none}55%{transform:scale(1.3) rotate(-7deg)}100%{transform:translateY(-3px) scale(1.06) rotate(5deg)}}
+@keyframes bagTongue{to{transform:translateY(-15px) rotate(-9deg)}}
+@keyframes bagFlap{from{transform:rotateX(0)}to{transform:rotateX(166deg)}}
+@keyframes bagFlapShut{from{transform:rotateX(166deg)}to{transform:rotateX(0)}}
+@keyframes bagOut{from{opacity:0;transform:translateY(-22px) scale(.97)}}
+@keyframes bagGearIn{to{opacity:0;transform:translateY(-16px) scale(.97)}}
+#bag.opening .bag-shade{animation:bagShade .2s ease-out both}
+#bag.opening .bag{animation:bagRise .16s cubic-bezier(.2,.9,.3,1) both}
+#bag.opening .bf-buckle{animation:bagBuckle .13s .02s ease-out both}
+#bag.opening .bf-tongue{animation:bagTongue .12s .03s ease-out both}
+#bag.opening .bag-flap{animation:bagFlap .25s .15s cubic-bezier(.55,0,.25,1) both}
+#bag.opening .bag-in>*{animation:bagOut .22s calc(.4s + var(--i,0) * .012s) cubic-bezier(.2,1.25,.4,1) both}
+/* closing: the same, backwards (0.35 s) */
+#bag.closing .bag-in>*{animation:bagGearIn .1s ease-in both}
+#bag.closing .bag-flap{animation:bagFlapShut .15s .09s cubic-bezier(.5,0,.6,1) both}
+#bag.closing .bag{animation:bagSink .12s .23s ease-in both}
+#bag.closing .bag-shade{animation:bagShadeOut .14s .21s ease-in both}
+/* a tap mid-way jumps to the end */
+#bag.skip,#bag.skip *{animation-duration:.001s!important;animation-delay:0s!important}
+/* reduced motion: a quick fade, no movement */
+#bag.reduced *{animation:none!important}
+#bag.reduced.opening{animation:bagShade .15s ease-out both}
+#bag.reduced.closing{animation:bagShadeOut .15s ease-in both}
+@media (prefers-reduced-motion: reduce){.bag-peek{animation-duration:.01s!important;animation-delay:0s!important}}
+/* the bag on the bottom bar: a dot for new gear, a tag counting the bait left */
+.bag-peek{position:relative;padding:0;border:0;background:none;cursor:pointer;pointer-events:auto;line-height:0;
+  margin-bottom:calc(-12px - env(safe-area-inset-bottom,0px));filter:drop-shadow(0 -4px 8px rgba(0,0,0,.35));transition:transform .25s cubic-bezier(.2,1.5,.4,1);animation:peek 9s 6.75s infinite}
+.bag-peek:hover,.bag-peek:focus-visible{transform:translateY(-8px) rotate(2deg);outline:none}
+.bag-peek:active{transform:translateY(-14px)}
+#bagBtn.pulse{animation:jpulse .9s ease 3}
+#bagBtn.dot::after{content:'';position:absolute;right:1px;top:6px;width:11px;height:11px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 2px var(--night)}
+.bait-tag{top:auto;bottom:14px;right:-8px;min-width:18px;height:17px;padding:0 4px;box-sizing:border-box;font-size:10.5px;line-height:17px;background:var(--paper);color:var(--ink)}
+.bait-tag.low{background:var(--danger);color:#fff}
+/* until the bottom bar is regrouped (step 13), it scales down to fit narrow phones */
+.corner.center{transform:scale(var(--fit,1));transform-origin:50% 100%}
+body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(var(--fit,1))}
+/* tackle in the shops: Ottilie's Tackle tab (game/shops.js) and Tacklegram's (game/tacklegram.js) */
+.entry.tk-entry{grid-template-columns:52px minmax(0,1fr) auto;align-items:center}
+.entry.tk-entry canvas{width:52px;height:52px}
+.tk-entry .down{color:#A04636}
+.tk-have{font-size:12px!important;font-weight:700;color:#7A7468!important}
+.app-row.tk-app{grid-template-columns:44px minmax(0,1fr) auto;align-items:center}
+.tk-app canvas{width:44px;height:44px}
+.tk-app .down{color:#A04636}
+.app-kind{display:block;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468}
+/* tap targets: 44 px at least on everything you press in the bag and tray */
+#bagClose,#trayClose{min-height:44px;padding-left:14px;padding-right:14px}
+.tray .btn.sm{min-height:44px;padding-left:12px;padding-right:12px}
+.fd-vest .btn{min-height:44px}
+/* the bottom bar keeps each button's own width; fitBar scales the whole row instead */
+.corner.center>*{flex-shrink:0}

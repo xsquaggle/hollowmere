@@ -32,8 +32,8 @@ const noDupes = (where, list) => { const seen = new Set(); for (const x of list)
 const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, SPOT_NAME, REGION_FISH, REGION_NAME, MAP_PLACES,
   RODS, ROD_ORDER, SEA_RODS, PARTS, PAINTS, OTT_LINES, BAR_LINES, BANQUET_LINES, LETTER,
   TANKS, TIP_BASE, DECOR, TANK_SETS, SPICES, SPICE_ORDER, SIDES, FLESH, COOK_NAME, RECIPES, RECIPE_ORDER, MUSH, MEAL_STR, MEAL_CASTS,
-  CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER } = D;
-for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES }))
+  CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER, TACKLE, TACKLE_ORDER } = D;
+for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER }))
   if (!v) { console.error('Missing table ' + n + ' in src/data/.'); process.exit(1); }
 
 /* ---------- fish ---------- */
@@ -142,14 +142,14 @@ for (const r of RARS) { const c = RAR[r].luckCap; if (r === RARS[0]) { if (c !==
 // ceilings climb with rarity, except Godly's, which sits below Mythic's on purpose (see data/fish.js)
 for (let i = 2; i < RARS.length; i++) if (RARS[i] !== 'godly' && RAR[RARS[i]].luckCap < RAR[RARS[i - 1]].luckCap) bad('RAR.' + RARS[i], 'rarer tiers should have a ceiling at least as high as the tier below');
 for (const r of RARS) if (RAR[r].luckCap > 4) bad('RAR.' + r, 'a luck ceiling above ×4 lets luck run away (the design caps Mythic at ×4)');
-const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true], fish: FIDS, rarity: RARS, rarityMin: RARS, lucky: [true] };
+const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true], fish: FIDS, beh: BEHS, rarity: RARS, rarityMin: RARS, lucky: [true] };
 const checkMod = (w, m) => {
   const st = STATS[m.stat]; if (!st) return bad(w, `unknown stat ${JSON.stringify(m.stat)} (see data/stats.js)`);
   if (st.kind === 'flag') { if (m.v !== undefined) bad(w, m.stat + ' is a flag and takes no v'); }
   else if (!isNum(m.v)) bad(w, 'v should be a number');
   else if (st.kind === 'mul' && !(m.v > 0)) bad(w, 'a multiplier should be above 0');
   if (m.omen && m.stat !== 'luck') bad(w, 'only luck can be an omen');
-  for (const [k, v] of Object.entries(m.when || {})) { if (!WHEN[k]) { bad(w + '.when', 'unknown condition ' + k + ' (region, spot, night, fish, rarity, lucky)'); continue; }
+  for (const [k, v] of Object.entries(m.when || {})) { if (!WHEN[k]) { bad(w + '.when', 'unknown condition ' + k + ' (region, spot, night, fish, beh, rarity, rarityMin, lucky)'); continue; }
     if (k === 'rarity' && !Array.isArray(v)) bad(w + '.when.rarity', 'a list of rarities; use rarityMin for "this rarity and rarer"');
     for (const x of Array.isArray(v) ? v : [v]) oneOf(w + '.when.' + k, x, WHEN[k], k); }
   for (const k of keys(m)) if (!['stat', 'v', 'when', 'omen'].includes(k)) bad(w, 'unknown modifier field ' + k);
@@ -180,9 +180,9 @@ for (const t of CT) { const C = CRATES[t], w = 'CRATES.' + t; need(w, C, { name:
   if (!(Number.isInteger(C.snags) && C.snags >= 0 && C.snags <= 3)) bad(w + '.snags', '0 to 3');
   if (prevC) { for (const k of ['pull', 'reel', 'fish', 'floor']) if (!(C[k] >= prevC[k])) bad(w, `${k} should not drop below the tier before`); if (!(C.weight < prevC.weight)) bad(w, 'rarer crates should be rarer'); }
   for (const [i, it] of (C.items || []).entries()) { const iw = w + '.items[' + i + ']';
-    for (const k of keys(it)) if (!['lean', 'prize', 'paint', 'note', 'chance'].includes(k)) bad(iw, 'unknown item field ' + k);
-    for (const k of ['lean', 'prize', 'paint']) if (it[k] !== undefined) { oneOf(iw + '.' + k, it[k], RARS, 'rarity'); if (rank(it[k]) > rank(t)) bad(iw, `${k} ${it[k]} is rarer than the crate`); }
-    if (!(it.lean || it.prize || it.paint)) bad(iw, 'needs a lean, prize or paint');
+    for (const k of keys(it)) if (!['lean', 'prize', 'paint', 'gear', 'note', 'chance'].includes(k)) bad(iw, 'unknown item field ' + k);
+    for (const k of ['lean', 'prize', 'paint', 'gear']) if (it[k] !== undefined) { oneOf(iw + '.' + k, it[k], RARS, 'rarity'); if (rank(it[k]) > rank(t)) bad(iw, `${k} ${it[k]} is rarer than the crate`); }
+    if (!(it.lean || it.prize || it.paint || it.gear)) bad(iw, 'needs a lean, prize, paint or gear');
     for (const k of ['note', 'chance']) if (it[k] !== undefined && !(it[k] > 0 && it[k] <= 1)) bad(iw + '.' + k, 'a chance in (0, 1]'); }
   prevC = C; }
 const FKINDS = ['curio', 'artifact', 'keepsake'];
@@ -209,6 +209,42 @@ for (const id of keys(NOTES)) { const N = NOTES[id], w = 'NOTES.' + id; oneOf(w 
 sameSet('LETTER_ORDER', LETTER_ORDER, keys(NOTES).filter(id => NOTES[id].kind === 'letter'), 'LETTER_ORDER and the letters in NOTES');
 if (!keys(NOTES).some(id => NOTES[id].kind === 'bottle' && !NOTES[id].region)) bad('NOTES', 'some bottle notes should turn up anywhere');
 
+/* ---------- tackle ---------- */
+const SOCKETS = ['reel', 'line', 'bait'], TK_IDS = keys(TACKLE);
+sameSet('TACKLE_ORDER', keys(TACKLE_ORDER), SOCKETS, 'tray sockets and the sockets the bag draws');
+noDupes('TACKLE_ORDER', SOCKETS.flatMap(k => TACKLE_ORDER[k] || []));
+for (const k of SOCKETS) sameSet('TACKLE_ORDER.' + k, TACKLE_ORDER[k] || [], TK_IDS.filter(id => TACKLE[id].kind === k), 'the ' + k + ' tray and the ' + k + 's in TACKLE');
+// every piece is drawn in game/tackle-art.js: its tile in TACKLE_ART, and a line's color on the rod in LINE_COL
+const ART = readFileSync(join(ROOT, 'src/game/tackle-art.js'), 'utf8');
+const artKeys = new Set([...(ART.match(/const TACKLE_ART=\{([\s\S]*?)\n\};/) || ['', ''])[1].matchAll(/^ {2}([a-z][a-z0-9]*)\(c/gm)].map(m => m[1]));
+const lineCol = new Set([...(ART.match(/const LINE_COL=\{([^}]*)\}/) || ['', ''])[1].matchAll(/([a-z][a-z0-9]*):/g)].map(m => m[1]));
+for (const id of TK_IDS) { const T = TACKLE[id], w = 'TACKLE.' + id;
+  if (!/^[a-z][a-z0-9]*$/.test(id)) bad(w, 'ids are lowercase letters and digits');
+  for (const k of keys(T)) if (!['kind', 'name', 'eff', 'down', 'mods', 'starter', 'shop', 'price', 'crate', 'kitchen', 'casts', 'tins'].includes(k)) bad(w, 'unknown field ' + k);
+  if (!artKeys.has(id)) bad(w, 'no drawing in TACKLE_ART (src/game/tackle-art.js)');
+  if (T.kind === 'line' && !lineCol.has(id)) bad(w, 'no color on the rod in LINE_COL (src/game/tackle-art.js)');
+  need(w, T, { name: 'str', eff: 'str', mods: 'arr' }); oneOf(w + '.kind', T.kind, SOCKETS, 'socket');
+  if (T.down !== undefined && !isStr(T.down)) bad(w + '.down', 'empty');
+  (T.mods || []).forEach((m, i) => checkMod(`${w}.mods[${i}]`, m));
+  const src = [T.starter && 'starter', T.shop && 'shop', T.crate && 'crate', T.kitchen && 'kitchen'].filter(Boolean);
+  if (src.length !== 1) bad(w, 'comes from exactly one place: starter, shop, crate or kitchen (has ' + (src.join(', ') || 'none') + ')');
+  if (T.starter) { if (T.kind === 'bait') bad(w, 'a rod starts bare of bait, so no starter bait'); if ((T.mods || []).length) bad(w, 'a starter piece is the plain baseline, so no mods'); }
+  else if (!(T.mods || []).length) bad(w, 'needs at least one modifier, or it does nothing');
+  if (T.shop) { oneOf(w + '.shop', T.shop, ['ottilie', 'tacklegram'], 'shop'); if (!(isNum(T.price) && T.price > 0)) bad(w + '.price', 'a shop piece needs a price above 0'); }
+  else if (T.price !== undefined) bad(w, 'only shop pieces have a price');
+  if (T.crate) oneOf(w + '.crate', T.crate, RARS, 'rarity');
+  if (T.kind === 'bait') { const lure = T.casts === undefined;
+    if (!lure && !(Number.isInteger(T.casts) && T.casts > 0)) bad(w + '.casts', 'a whole number of casts per tin');
+    if (!lure && !(Number.isInteger(T.tins) && T.tins > 0)) bad(w + '.tins', 'how many tins come at once, a whole number');
+    if (lure && T.tins !== undefined) bad(w, 'a lure never runs out, so no tins');
+    if (T.kitchen && lure) bad(w, 'kitchen bait comes in tins'); }
+  else if (T.casts !== undefined || T.tins !== undefined) bad(w, 'only bait has casts and tins'); }
+for (const k of SOCKETS.filter(k => k !== 'bait')) if (TK_IDS.filter(id => TACKLE[id].kind === k && TACKLE[id].starter).length !== 1) bad('TACKLE', 'exactly one starter ' + k + ' (what every rod comes with)');
+if (TK_IDS.filter(id => TACKLE[id].kitchen).length !== 1) bad('TACKLE', 'exactly one kitchen bait (every cook leaves a tin of it)');
+if (!artKeys.size) bad('src/game/tackle-art.js', 'could not find TACKLE_ART to check the drawings against');
+for (const t of CT) for (const it of CRATES[t].items) if (it.gear && !TK_IDS.some(id => TACKLE[id].crate && rank(TACKLE[id].crate) <= rank(it.gear))) bad('CRATES.' + t, 'a gear item, but no crate gear of ' + it.gear + ' or commoner');
+for (const id of TK_IDS.filter(id => TACKLE[id].crate)) if (!CT.some(t => CRATES[t].items.some(it => it.gear && rank(it.gear) >= rank(TACKLE[id].crate)))) bad('TACKLE.' + id, 'only comes in crates, but no crate holds gear that rare');
+
 /* ---------- every string ---------- */
 let strings = 0;
 const walk = (v, w) => { if (typeof v === 'string') { strings++; if (v !== v.trim() && !(w.startsWith('LETTER'))) bad(w, 'leading or trailing space'); if (/ {2}/.test(v)) bad(w, 'double space'); }
@@ -216,4 +252,4 @@ const walk = (v, w) => { if (typeof v === 'string') { strings++; if (v !== v.tri
 for (const n of Object.keys(D)) walk(D[n], n);
 
 if (problems.length) { console.error(problems.length + ' content problem(s):\n  ' + problems.join('\n  ')); process.exit(1); }
-console.log(`Content OK: ${FIDS.length} fish in ${REGIONS.length} regions, ${RIDS.length} rods, ${keys(RECIPES).length} recipes, ${decorIds.length} decor, ${TANK_SETS.length} tank sets, ${keys(FINDS).length} finds, ${keys(NOTES).length} notes, ${keys(MOODS).length} moods, ${strings} strings checked.`);
+console.log(`Content OK: ${FIDS.length} fish in ${REGIONS.length} regions, ${RIDS.length} rods, ${keys(RECIPES).length} recipes, ${decorIds.length} decor, ${TANK_SETS.length} tank sets, ${keys(FINDS).length} finds, ${TK_IDS.length} tackle, ${keys(NOTES).length} notes, ${keys(MOODS).length} moods, ${strings} strings checked.`);

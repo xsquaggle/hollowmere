@@ -62,6 +62,7 @@ module.exports = [
       s = await readSave(page);
       assert.equal(s.meal.id, 'bream', 'tossing the mush keeps the meal you ate');
       assert.equal(s.net.length, KEEPNET.length - 4, 'chowder used three common fish');
+      assert.equal(s.gear.tins.chum, 2, 'every cook, even the mush, leaves a tin of chum from the scraps');
     },
   },
 ];

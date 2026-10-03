@@ -148,6 +148,12 @@ const sfx = {
   uncork: letter => { if (letter){ noise(.1,{vol:.25,f:1500}); tone(700,.05,{vol:.05,type:'triangle'}); } else { tone(900,.09,{to:480,vol:.22,type:'sine'}); noise(.06,{vol:.22,f:3200}); } },
   paper: () => noise(.35,{vol:.09,f:2400,to:1200,q:.7}),
   find: r => { const N=RAR[r].notes; N.slice(0,Math.min(N.length,3+rarRank(r))).forEach((n,i)=>tone(n*2,.22,{vol:.06,type:'sine',delay:i*.05})); },
+  // the tackle bag (game/bag.js)
+  buckle: () => { tone(2400,.022,{type:'square',vol:.035}); tone(1500,.05,{vol:.06,type:'triangle',delay:.02}); noise(.05,{vol:.08,f:3200,type:'highpass',delay:.01}); },
+  flap: shut => { if (shut){ noise(.14,{vol:.1,f:1300,to:500,q:.6}); tone(1350,.035,{type:'square',vol:.03,delay:.16}); } else noise(.24,{vol:.11,f:600,to:1500,q:.6}); },
+  rig: k => { if (k==='reel'){ for (let i=0;i<5;i++) tone(1750+i*50,.014,{type:'square',vol:.032,delay:i*.034}); }
+    else if (k==='line') noise(.16,{vol:.08,f:3200,to:6200,q:2});
+    else { tone(330,.08,{to:190,vol:.09,type:'triangle'}); noise(.06,{vol:.05,f:900,type:'lowpass',delay:.03}); } },
   pocket: on => { noise(.08,{vol:.12,f:on?1800:900}); tone(on?660:440,.07,{vol:.07,type:'triangle',delay:.03}); },
   chomp: () => { noise(.12,{vol:.32,f:700}); noise(.12,{vol:.28,f:600,delay:.14}); tone(160,.1,{to:80,vol:.12,type:'square'}); tone(140,.1,{to:70,vol:.1,type:'square',delay:.14}); }
 };

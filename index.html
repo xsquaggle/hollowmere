@@ -383,6 +383,8 @@ body:not([data-state="idle"]) .corner button{pointer-events:none!important}
 #journalBtn.pulse,#aquaBtn.pulse,#kitchenBtn.pulse{animation:jpulse .9s ease 3}
 @keyframes jpulse{50%{transform:translateY(-12px) scale(1.08)}}
 
+.k-scraps{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-size:12.5px;font-weight:700;line-height:1.35;color:#6B665C;text-align:left}
+.k-scraps canvas{flex:0 0 34px;width:34px;height:34px}
 /* Catch card */
 #card{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);width:min(340px,calc(100% - 32px));
   transform:translateX(-50%);background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:12px;
@@ -645,6 +647,183 @@ body:not([data-state="idle"]) .corner button{pointer-events:none!important}
 .rt-gifts{display:grid;gap:8px;margin:0 0 12px}
 .rt-gift{display:flex;align-items:center;gap:8px;font-weight:800;color:#6B665C}.rt-gift b{font:400 26px/1 var(--display);color:var(--ink)}.rt-gift .coin{width:20px;height:20px}
 .rt-go{width:100%;font-size:15px;padding:12px}
+/* Tackle bag (game/bag.js): a waxed-canvas satchel whose flap lifts onto a cloth with your rod rig, rods, vest
+   pockets, keepsakes and what the setup adds up to. Opens in 0.7 s, closes in 0.35 s, fades in 0.15 s with
+   reduced motion. The flap's resting state is open; the .opening and .closing classes animate to and from it. */
+#bag{position:fixed;inset:0;z-index:5;display:flex;align-items:flex-end;justify-content:center;
+  --bag:#857E4E;--bag-d:#6A643C;--bag-l:#9C9563;--lining:#4E4A2E;--leather:#6B4630;--leather-l:#8A5E3C;--cloth:#F1E6CC}
+.bag-shade{position:absolute;inset:0;background:rgba(10,13,22,.6)}
+.bag{position:relative;width:min(480px,100%);max-height:calc(100% - env(safe-area-inset-top,0px) - 116px);display:flex;flex-direction:column;box-sizing:border-box;
+  padding:16px 9px 0;perspective:1000px;border:2px solid var(--ink);border-bottom:0;border-radius:26px 26px 0 0;box-shadow:0 -10px 34px rgba(0,0,0,.45);
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 4px),
+    linear-gradient(var(--bag-l),var(--bag) 26%,var(--bag-d))}
+.bag::before{content:'';position:absolute;inset:6px 6px 0;border:1.5px dashed rgba(241,228,198,.42);border-bottom:0;border-radius:21px 21px 0 0;pointer-events:none}
+/* the mouth of the bag: a leather band with two rivets where the flap is sewn on */
+.bag-rim{position:absolute;left:18px;right:18px;top:-2px;height:10px;border:2px solid var(--ink);border-top:0;border-radius:0 0 7px 7px;background:linear-gradient(var(--leather-l),var(--leather));z-index:2}
+.bag-rim i{position:absolute;top:2px;width:5px;height:5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#F2D896,var(--brass) 60%,#8C6A2E);box-shadow:0 0 0 1px var(--ink)}
+.bag-rim i:first-child{left:14%}.bag-rim i:last-child{right:14%}
+/* the flap: front face with its strap and buckle, and a darker lining on the back. At rest it stands open, above the bag */
+.bag-flap{position:absolute;left:-2px;right:-2px;top:-2px;height:122px;z-index:3;transform-origin:50% 0;transform-style:preserve-3d;transform:rotateX(166deg);pointer-events:none}
+.bf-face,.bf-under{position:absolute;inset:0;box-sizing:border-box;border:2px solid var(--ink);-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.bf-face{border-radius:26px 26px 46px 46px / 26px 26px 34px 34px;box-shadow:0 8px 14px rgba(0,0,0,.3);
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 4px),linear-gradient(var(--bag),var(--bag-d))}
+.bf-under{transform:rotateX(180deg);border-radius:46px 46px 26px 26px / 34px 34px 26px 26px;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px),linear-gradient(#3F3B22,var(--lining) 70%,#5A5534)}
+.bf-stitch{position:absolute;inset:7px;border:1.5px dashed rgba(241,228,198,.45);border-radius:20px 20px 38px 38px / 20px 20px 28px 28px}
+.bf-under .bf-stitch{border-color:rgba(241,228,198,.22);border-radius:38px 38px 20px 20px / 28px 28px 20px 20px}
+.bf-strap{position:absolute;left:50%;bottom:-30px;width:26px;height:62px;margin-left:-13px;box-sizing:border-box;border:2px solid var(--ink);border-radius:4px 4px 9px 9px;background:linear-gradient(90deg,var(--leather),var(--leather-l) 45%,var(--leather))}
+.bf-tongue{position:absolute;left:3px;right:3px;bottom:4px;height:14px;border-radius:2px 2px 7px 7px;background:#5A3A27;box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.25)}
+.bf-buckle{position:absolute;left:50%;bottom:-14px;width:40px;height:28px;margin-left:-20px;box-sizing:border-box;border:4px solid var(--brass);border-radius:6px;box-shadow:0 0 0 2px var(--ink),inset 0 0 0 2px var(--ink)}
+.bf-buckle i{position:absolute;left:50%;top:-2px;bottom:-2px;width:3px;margin-left:-1.5px;background:#E3C27A;box-shadow:0 0 0 1px var(--ink)}
+/* the cloth inside */
+.bag-in{position:relative;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;-webkit-user-select:none;user-select:none;
+  display:grid;gap:10px;align-content:start;box-sizing:border-box;padding:14px 12px calc(env(safe-area-inset-bottom,0px) + 20px);color:var(--ink);
+  border:2px solid var(--ink);border-bottom:0;border-radius:15px 15px 0 0;box-shadow:inset 0 12px 16px -10px rgba(60,40,20,.45);
+  background:repeating-linear-gradient(45deg,rgba(120,96,56,.05) 0 2px,transparent 2px 5px),repeating-linear-gradient(-45deg,rgba(120,96,56,.05) 0 2px,transparent 2px 5px),var(--cloth)}
+.bag-head{display:flex;align-items:center;gap:10px}
+.bag-head>div{flex:1;min-width:0}
+.bag-head h2{margin:0;font:400 25px/1.1 var(--display)}
+.bag-head p{margin:3px 0 0;display:flex;align-items:center;gap:5px;font-size:13px;font-weight:800;color:#6B665C;font-variant-numeric:tabular-nums}
+.bag-card{position:relative;display:grid;gap:8px;padding:10px 11px 11px;border:1.5px solid rgba(43,42,51,.2);border-radius:12px;background:rgba(255,252,243,.8);box-shadow:0 2px 0 rgba(43,42,51,.08)}
+.bag-card>header{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.bag-card h3{margin:0;font:400 18px/1.15 var(--display)}
+.bag-card>header>span{font-size:11.5px;font-weight:800;color:#7A7468;text-align:right}
+.bag-card .k{display:block;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468}
+.bag-hint{margin:0;font-size:12.5px;line-height:1.4;color:#5E5A52}
+.bag-card.pop{animation:bagPop .32s ease}
+@keyframes bagPop{40%{transform:scale(1.012)}}
+.nw{font-style:normal;color:#fff;background:#3E7A35;border-radius:999px;padding:2px 5px;font-size:9px;font-weight:800;letter-spacing:.04em;vertical-align:1px;text-transform:uppercase}
+/* the rod rig: the rod drawn large on a stitched mat, three sockets under it */
+.bag-rig{background:linear-gradient(#EBDDBB,#E2D2AC);border-color:#8A6A44}
+.bag-rig::after{content:'';position:absolute;inset:4px;border:1.5px dashed rgba(110,82,54,.3);border-radius:9px;pointer-events:none}
+.rig-reach{white-space:nowrap}
+.rig-art{position:relative;height:clamp(118px,36vw,156px);margin:-4px -4px 0}
+.rig-art canvas{position:absolute;inset:0;width:100%;height:100%}
+.rig-hot{position:absolute;width:56px;height:46px;margin:-23px 0 0 -28px;border:0;border-radius:50%;background:none;cursor:pointer;z-index:1}
+.rig-hot:focus-visible{outline:3px solid var(--brass);outline-offset:-3px}
+.rig-socks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;position:relative;z-index:1}
+.sock{display:grid;justify-items:center;align-content:start;text-align:center;gap:2px;min-width:0;padding:7px 4px 8px;font:inherit;color:inherit;cursor:pointer;
+  border:2px solid var(--ink);border-radius:11px;background:#FBF3DF;box-shadow:0 3px 0 var(--ink);touch-action:manipulation}
+.sock:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.sock:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.sock canvas{width:46px;height:46px}
+.sock b{font:400 13.5px/1.15 var(--display);max-width:100%}
+.sock small{font-size:10.5px;font-weight:700;line-height:1.25;color:#6B665C;max-width:100%}
+.sock.bare{background:rgba(255,248,232,.55);border-style:dashed;box-shadow:0 3px 0 rgba(43,42,51,.35)}
+.sock.pop{animation:sockPop .4s cubic-bezier(.2,1.7,.4,1)}
+@keyframes sockPop{0%{transform:scale(.9)}55%{transform:scale(1.07)}}
+/* rods */
+.rod-row{position:relative;display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scroll-snap-type:x proximity;padding:2px 2px 6px;margin:0 -2px;scrollbar-width:none}
+.rod-row::-webkit-scrollbar{display:none}
+.rod-tile{flex:0 0 122px;scroll-snap-align:start;display:grid;gap:2px;align-content:start;padding:6px 8px 8px;font:inherit;color:inherit;text-align:left;cursor:pointer;
+  border:1.5px solid rgba(43,42,51,.25);border-radius:10px;background:#FBF3DF;touch-action:manipulation}
+.rod-tile canvas{width:100%;height:46px}
+.rod-tile b{font:400 13.5px/1.15 var(--display)}
+.rod-tile span{font-size:10.5px;font-weight:700;color:#7A7468;line-height:1.25}
+.rod-tile.on{border:2px solid var(--ink);box-shadow:inset 0 0 0 2px var(--brass);cursor:default}
+.rod-tile.on span{color:#4E7B4C}
+/* vest pockets (the pocket tiles share finds.css) and keepsakes */
+.bag-vest{background:linear-gradient(#EFE3C6,#E6D6B2);border-color:#8A6A44}
+.bag-vest .pk-row{gap:6px}
+button.pk{font-family:var(--body);touch-action:manipulation}
+.pk.empty{cursor:pointer}
+.pk.empty:active,.pk.full:active{transform:translateY(1px)}
+.ks-list{display:grid;gap:6px}
+.ks{display:grid;grid-template-columns:42px 1fr;gap:9px;align-items:center;padding:6px 9px}
+.ks.rf,.tr-row.rf{animation:none}
+.ks canvas{width:42px;height:42px}
+.ks b{font:400 14.5px/1.15 var(--display)}
+.ks p{margin:1px 0 0;font-size:12px;line-height:1.3;color:#4B4842}
+/* what the setup adds up to (lines share bonuses.css) */
+.bag-sum b.up{color:#3E7A35}.bag-sum b.down{color:#B2493A}
+.bag-more{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:44px;margin-top:2px;padding:6px 2px 0;border:0;border-top:1px solid rgba(43,42,51,.12);background:none;font:800 13px/1 var(--body);color:#6E5236;cursor:pointer}
+.bag-more span{font-size:20px;line-height:.6}
+/* the swap tray */
+.bag-tray{position:absolute;inset:0;z-index:4;display:flex;align-items:flex-end;justify-content:center}
+.tray-shade{position:absolute;inset:0;background:rgba(10,13,22,.45)}
+.tray{position:relative;width:min(480px,100%);max-height:74%;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;box-sizing:border-box;color:var(--ink);
+  padding:14px 14px calc(env(safe-area-inset-bottom,0px) + 18px);background:var(--paper);border:2px solid var(--ink);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.35)}
+.bag-tray.in .tray{animation:trayIn .24s cubic-bezier(.2,1.1,.4,1)}.bag-tray.in .tray-shade{animation:bagShade .2s ease-out both}
+.bag-tray.out .tray{animation:trayOut .18s ease-in both}.bag-tray.out .tray-shade{animation:bagShadeOut .18s ease-in both}
+@keyframes trayIn{from{transform:translateY(100%)}}
+@keyframes trayOut{to{transform:translateY(100%)}}
+.tray>header{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.tray>header>div{flex:1;min-width:0}
+.tray .k{display:block;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468}
+.tray h3{margin:1px 0 0;font:400 21px/1.15 var(--display)}
+.tray-list{display:grid;gap:7px}
+.tr-row{display:grid;grid-template-columns:50px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 9px;border:1.5px solid rgba(43,42,51,.2);border-radius:11px;background:rgba(255,255,255,.45)}
+.tr-row canvas{width:50px;height:50px}
+.tr-row.on{border:2px solid var(--ink);background:#FBF3DF;box-shadow:inset 4px 0 0 var(--brass)}
+.tr-row.none{border-style:dashed;background:none}
+.tr-row.none canvas,.tr-row.none .tr-txt{opacity:.6}
+.tr-txt h4{margin:0;font:400 16px/1.15 var(--display)}
+.tr-txt p{margin:2px 0 0;font-size:12.5px;line-height:1.35;color:#4B4842}
+.tr-txt .down{color:#A04636}
+.tr-txt .also,.tr-txt .stock{font-size:11.5px;font-weight:700;color:#7A7468}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.chips span{font-size:10.5px;font-weight:800;padding:3px 7px;border-radius:999px;background:rgba(94,155,78,.16);color:#3D6B33}
+.chips span.down{background:rgba(192,112,92,.16);color:#9A4632}
+.tr-row .where{display:grid;justify-items:end;gap:3px;font-size:11px;font-weight:800;color:#6E5236;text-align:right;white-space:nowrap}
+.tr-row .where b{display:flex;align-items:center;gap:3px}.tr-row .where .coin{width:10px;height:10px}
+.tr-sub{margin:7px 0 0;font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468}
+.tr-empty{margin:0 0 4px;font-size:13.5px;line-height:1.45;color:#4B4842}
+/* opening: rise, buckle, flap, then the gear slides out (0.7 s in all) */
+@keyframes bagShade{from{opacity:0}}
+@keyframes bagShadeOut{to{opacity:0}}
+@keyframes bagRise{from{transform:translateY(70px);opacity:0}}
+@keyframes bagSink{to{transform:translateY(80px);opacity:0}}
+@keyframes bagBuckle{0%{transform:none}55%{transform:scale(1.3) rotate(-7deg)}100%{transform:translateY(-3px) scale(1.06) rotate(5deg)}}
+@keyframes bagTongue{to{transform:translateY(-15px) rotate(-9deg)}}
+@keyframes bagFlap{from{transform:rotateX(0)}to{transform:rotateX(166deg)}}
+@keyframes bagFlapShut{from{transform:rotateX(166deg)}to{transform:rotateX(0)}}
+@keyframes bagOut{from{opacity:0;transform:translateY(-22px) scale(.97)}}
+@keyframes bagGearIn{to{opacity:0;transform:translateY(-16px) scale(.97)}}
+#bag.opening .bag-shade{animation:bagShade .2s ease-out both}
+#bag.opening .bag{animation:bagRise .16s cubic-bezier(.2,.9,.3,1) both}
+#bag.opening .bf-buckle{animation:bagBuckle .13s .02s ease-out both}
+#bag.opening .bf-tongue{animation:bagTongue .12s .03s ease-out both}
+#bag.opening .bag-flap{animation:bagFlap .25s .15s cubic-bezier(.55,0,.25,1) both}
+#bag.opening .bag-in>*{animation:bagOut .22s calc(.4s + var(--i,0) * .012s) cubic-bezier(.2,1.25,.4,1) both}
+/* closing: the same, backwards (0.35 s) */
+#bag.closing .bag-in>*{animation:bagGearIn .1s ease-in both}
+#bag.closing .bag-flap{animation:bagFlapShut .15s .09s cubic-bezier(.5,0,.6,1) both}
+#bag.closing .bag{animation:bagSink .12s .23s ease-in both}
+#bag.closing .bag-shade{animation:bagShadeOut .14s .21s ease-in both}
+/* a tap mid-way jumps to the end */
+#bag.skip,#bag.skip *{animation-duration:.001s!important;animation-delay:0s!important}
+/* reduced motion: a quick fade, no movement */
+#bag.reduced *{animation:none!important}
+#bag.reduced.opening{animation:bagShade .15s ease-out both}
+#bag.reduced.closing{animation:bagShadeOut .15s ease-in both}
+@media (prefers-reduced-motion: reduce){.bag-peek{animation-duration:.01s!important;animation-delay:0s!important}}
+/* the bag on the bottom bar: a dot for new gear, a tag counting the bait left */
+.bag-peek{position:relative;padding:0;border:0;background:none;cursor:pointer;pointer-events:auto;line-height:0;
+  margin-bottom:calc(-12px - env(safe-area-inset-bottom,0px));filter:drop-shadow(0 -4px 8px rgba(0,0,0,.35));transition:transform .25s cubic-bezier(.2,1.5,.4,1);animation:peek 9s 6.75s infinite}
+.bag-peek:hover,.bag-peek:focus-visible{transform:translateY(-8px) rotate(2deg);outline:none}
+.bag-peek:active{transform:translateY(-14px)}
+#bagBtn.pulse{animation:jpulse .9s ease 3}
+#bagBtn.dot::after{content:'';position:absolute;right:1px;top:6px;width:11px;height:11px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 2px var(--night)}
+.bait-tag{top:auto;bottom:14px;right:-8px;min-width:18px;height:17px;padding:0 4px;box-sizing:border-box;font-size:10.5px;line-height:17px;background:var(--paper);color:var(--ink)}
+.bait-tag.low{background:var(--danger);color:#fff}
+/* until the bottom bar is regrouped (step 13), it scales down to fit narrow phones */
+.corner.center{transform:scale(var(--fit,1));transform-origin:50% 100%}
+body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(var(--fit,1))}
+/* tackle in the shops: Ottilie's Tackle tab (game/shops.js) and Tacklegram's (game/tacklegram.js) */
+.entry.tk-entry{grid-template-columns:52px minmax(0,1fr) auto;align-items:center}
+.entry.tk-entry canvas{width:52px;height:52px}
+.tk-entry .down{color:#A04636}
+.tk-have{font-size:12px!important;font-weight:700;color:#7A7468!important}
+.app-row.tk-app{grid-template-columns:44px minmax(0,1fr) auto;align-items:center}
+.tk-app canvas{width:44px;height:44px}
+.tk-app .down{color:#A04636}
+.app-kind{display:block;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468}
+/* tap targets: 44 px at least on everything you press in the bag and tray */
+#bagClose,#trayClose{min-height:44px;padding-left:14px;padding-right:14px}
+.tray .btn.sm{min-height:44px;padding-left:12px;padding-right:12px}
+.fd-vest .btn{min-height:44px}
+/* the bottom bar keeps each button's own width; fitBar scales the whole row instead */
+.corner.center>*{flex-shrink:0}
 /* Sheets */
 #sheet{position:fixed;inset:0;background:rgba(10,13,22,.55);display:flex;align-items:flex-end;justify-content:center;z-index:5}
 .panel{width:min(480px,100%);max-height:82%;overflow:auto;background:var(--paper);color:var(--ink);border-radius:16px 16px 0 0;
@@ -720,7 +899,7 @@ body:not([data-state="idle"]) .corner button{pointer-events:none!important}
 <div id="hint" aria-live="polite"></div>
 <div id="coach" hidden aria-live="polite"><span id="coachStep">1 of 4</span><p id="coachText"></p></div>
 <div id="toast" aria-live="assertive"></div>
-<div class="corner center"><button class="book-peek" id="journalBtn" type="button" aria-label="Open journal"><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><rect x="6" y="4" width="44" height="44" rx="5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.8"/><rect x="10" y="4" width="40" height="44" rx="4" fill="#7E5439"/><path d="M10 4 V48" stroke="#4A3022" stroke-width="2"/><rect x="16" y="12" width="28" height="18" rx="3" fill="none" stroke="#C9A15A" stroke-width="1.4"/><path d="M23 21 q6 -6 13 0 q-7 6 -13 0 Z M36 21 l4 -3 v6 Z" fill="#C9A15A"/><rect x="46" y="20" width="8" height="10" rx="2" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><path d="M8 47 H50" stroke="#F1E4C6" stroke-width="2"/></svg></button><button class="bowl-peek" id="aquaBtn" type="button" aria-label="Open aquarium" hidden><svg width="58" height="50" viewBox="0 0 58 50" aria-hidden="true"><path d="M14 8 H44 C55 14 57 30 50 40 C46 46 40 48 29 48 C18 48 12 46 8 40 C1 30 3 14 14 8 Z" fill="rgba(210,235,240,.35)" stroke="#2B2A33" stroke-width="1.8"/><path d="M6 22 C10 20 16 24 22 22 C28 20 34 24 40 22 C46 20 50 23 52 22 C54 30 52 38 48 42 C44 46 38 48 29 48 C20 48 14 46 10 42 C6 38 4 30 6 22 Z" fill="#4E8F9E" opacity=".85"/><path d="M22 33 q7 -7 15 0 q-8 7 -15 0 Z M37 33 l5 -4 v8 Z" fill="#E08A3E" stroke="#2B2A33" stroke-width="1.2"/><circle cx="25.5" cy="32" r="1.2" fill="#2B2A33"/><path d="M14 46 q3 -10 8 -12 M16 46 q-2 -8 -1 -11" fill="none" stroke="#5E8F4E" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="16" r="2" fill="none" stroke="#F6F1E6" stroke-width="1"/><circle cx="43" cy="11" r="1.4" fill="none" stroke="#F6F1E6" stroke-width="1"/><path d="M12 8 H46" stroke="#2B2A33" stroke-width="3" stroke-linecap="round"/><path d="M12 14 C10 22 10 30 13 36" fill="none" stroke="#fff" stroke-width="1.6" opacity=".55" stroke-linecap="round"/></svg><span class="pk-badge coin-badge" id="aquaTips" hidden></span></button><button class="pan-peek" id="kitchenBtn" type="button" aria-label="Open kitchen" hidden><svg width="60" height="50" viewBox="0 0 60 50" aria-hidden="true"><path d="M41 17 L56 6" stroke="#2B2A33" stroke-width="8" stroke-linecap="round"/><path d="M41 17 L56 6" stroke="#6E4A33" stroke-width="4.5" stroke-linecap="round"/><ellipse cx="26" cy="33" rx="23" ry="16" fill="#2F2C31" stroke="#2B2A33" stroke-width="1.8"/><ellipse cx="26" cy="32" rx="18" ry="11.5" fill="#4A454D"/><path d="M14 33 q10 -10 22 -2 q-10 9 -22 2 Z" fill="#E8B866" stroke="#2B2A33" stroke-width="1.2"/><path d="M19 30 l3 4 M24 28 l3 5 M29 28 l2.5 5" stroke="#B9762F" stroke-width="1.3" stroke-linecap="round"/><path d="M21 15 q-3 -4 0 -8 M29 14 q-3 -4 0 -8" fill="none" stroke="#F6F1E6" stroke-width="1.7" stroke-linecap="round" opacity=".85"/><path d="M9 28 q3 -6 9 -8" fill="none" stroke="#fff" stroke-width="1.4" opacity=".3" stroke-linecap="round"/></svg></button><button class="map-peek" id="mapBtn" type="button" aria-label="Open map" hidden><svg width="66" height="50" viewBox="0 0 66 50" aria-hidden="true"><rect x="9" y="9" width="48" height="34" fill="#F1E4C6" stroke="#2B2A33" stroke-width="1.6"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43 L57 43 L57 9 Z" fill="#C3D9D7"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43" fill="none" stroke="#2B2A33" stroke-width="1"/><ellipse cx="21" cy="34" rx="7" ry="4.5" fill="#AFCDD2" stroke="#2B2A33" stroke-width="1"/><path d="M26 32 C32 26 36 22 44 17" fill="none" stroke="#B4584A" stroke-width="1.6" stroke-dasharray="2.5 2"/><circle cx="44" cy="17" r="2.4" fill="#C9A15A" stroke="#2B2A33" stroke-width="1"/><path d="M14 20 l3 -5 l3 5 Z M19 20 l3 -6 l3 6 Z" fill="#E4D6B6" stroke="#2B2A33" stroke-width=".8"/><rect x="4" y="4" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="4" y="41" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/></svg></button><button class="phone-peek" id="phoneBtn" type="button" aria-label="Open phone" hidden><span class="pk-glow"><span class="pk-logo"></span></span><span class="pk-notch"></span><span class="pk-badge" id="phoneBadge" hidden>1</span></button></div>
+<div class="corner center"><button class="book-peek" id="journalBtn" type="button" aria-label="Open journal"><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><rect x="6" y="4" width="44" height="44" rx="5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.8"/><rect x="10" y="4" width="40" height="44" rx="4" fill="#7E5439"/><path d="M10 4 V48" stroke="#4A3022" stroke-width="2"/><rect x="16" y="12" width="28" height="18" rx="3" fill="none" stroke="#C9A15A" stroke-width="1.4"/><path d="M23 21 q6 -6 13 0 q-7 6 -13 0 Z M36 21 l4 -3 v6 Z" fill="#C9A15A"/><rect x="46" y="20" width="8" height="10" rx="2" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><path d="M8 47 H50" stroke="#F1E4C6" stroke-width="2"/></svg></button><button class="bag-peek" id="bagBtn" type="button" aria-label="Open tackle bag" hidden><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><path d="M15 19 L3 3" stroke="#2B2A33" stroke-width="4.4" stroke-linecap="round"/><path d="M15 19 L3 3" stroke="#8A5E3C" stroke-width="2.2" stroke-linecap="round"/><circle cx="3" cy="3" r="1.5" fill="#C9A15A" stroke="#2B2A33" stroke-width=".8"/><path d="M12 21 C12 6 44 6 44 21" fill="none" stroke="#2B2A33" stroke-width="5.4" stroke-linecap="round"/><path d="M12 21 C12 6 44 6 44 21" fill="none" stroke="#6B4630" stroke-width="3" stroke-linecap="round"/><rect x="5" y="17" width="46" height="31" rx="7" fill="#8A8352" stroke="#2B2A33" stroke-width="1.8"/><rect x="11" y="34" width="34" height="11" rx="3" fill="#7A7447" stroke="#2B2A33" stroke-width="1.2"/><path d="M14 37 H42" stroke="#F1E4C6" stroke-width=".9" stroke-dasharray="1.6 1.6" opacity=".45"/><path d="M5 23 C5 19.5 8 17 12 17 H44 C48 17 51 19.5 51 23 V27 C51 32 46 34.5 40 34.5 H16 C10 34.5 5 32 5 27 Z" fill="#6E6840" stroke="#2B2A33" stroke-width="1.8"/><path d="M9 21.5 H47" stroke="#F1E4C6" stroke-width="1" stroke-dasharray="2 2" opacity=".55"/><path d="M8 26 q2 5 8 6" stroke="#fff" stroke-width="1.3" opacity=".22" fill="none" stroke-linecap="round"/><rect x="25" y="25" width="6" height="15" rx="1.5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.2"/><rect x="22.6" y="29.5" width="10.8" height="7.4" rx="1.6" fill="none" stroke="#2B2A33" stroke-width="3.6"/><rect x="22.6" y="29.5" width="10.8" height="7.4" rx="1.6" fill="none" stroke="#C9A15A" stroke-width="1.9"/><path d="M28 30 V36.4" stroke="#E3C27A" stroke-width="1.2"/></svg><span class="pk-badge bait-tag" id="bagBait" hidden></span></button><button class="bowl-peek" id="aquaBtn" type="button" aria-label="Open aquarium" hidden><svg width="58" height="50" viewBox="0 0 58 50" aria-hidden="true"><path d="M14 8 H44 C55 14 57 30 50 40 C46 46 40 48 29 48 C18 48 12 46 8 40 C1 30 3 14 14 8 Z" fill="rgba(210,235,240,.35)" stroke="#2B2A33" stroke-width="1.8"/><path d="M6 22 C10 20 16 24 22 22 C28 20 34 24 40 22 C46 20 50 23 52 22 C54 30 52 38 48 42 C44 46 38 48 29 48 C20 48 14 46 10 42 C6 38 4 30 6 22 Z" fill="#4E8F9E" opacity=".85"/><path d="M22 33 q7 -7 15 0 q-8 7 -15 0 Z M37 33 l5 -4 v8 Z" fill="#E08A3E" stroke="#2B2A33" stroke-width="1.2"/><circle cx="25.5" cy="32" r="1.2" fill="#2B2A33"/><path d="M14 46 q3 -10 8 -12 M16 46 q-2 -8 -1 -11" fill="none" stroke="#5E8F4E" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="16" r="2" fill="none" stroke="#F6F1E6" stroke-width="1"/><circle cx="43" cy="11" r="1.4" fill="none" stroke="#F6F1E6" stroke-width="1"/><path d="M12 8 H46" stroke="#2B2A33" stroke-width="3" stroke-linecap="round"/><path d="M12 14 C10 22 10 30 13 36" fill="none" stroke="#fff" stroke-width="1.6" opacity=".55" stroke-linecap="round"/></svg><span class="pk-badge coin-badge" id="aquaTips" hidden></span></button><button class="pan-peek" id="kitchenBtn" type="button" aria-label="Open kitchen" hidden><svg width="60" height="50" viewBox="0 0 60 50" aria-hidden="true"><path d="M41 17 L56 6" stroke="#2B2A33" stroke-width="8" stroke-linecap="round"/><path d="M41 17 L56 6" stroke="#6E4A33" stroke-width="4.5" stroke-linecap="round"/><ellipse cx="26" cy="33" rx="23" ry="16" fill="#2F2C31" stroke="#2B2A33" stroke-width="1.8"/><ellipse cx="26" cy="32" rx="18" ry="11.5" fill="#4A454D"/><path d="M14 33 q10 -10 22 -2 q-10 9 -22 2 Z" fill="#E8B866" stroke="#2B2A33" stroke-width="1.2"/><path d="M19 30 l3 4 M24 28 l3 5 M29 28 l2.5 5" stroke="#B9762F" stroke-width="1.3" stroke-linecap="round"/><path d="M21 15 q-3 -4 0 -8 M29 14 q-3 -4 0 -8" fill="none" stroke="#F6F1E6" stroke-width="1.7" stroke-linecap="round" opacity=".85"/><path d="M9 28 q3 -6 9 -8" fill="none" stroke="#fff" stroke-width="1.4" opacity=".3" stroke-linecap="round"/></svg></button><button class="map-peek" id="mapBtn" type="button" aria-label="Open map" hidden><svg width="66" height="50" viewBox="0 0 66 50" aria-hidden="true"><rect x="9" y="9" width="48" height="34" fill="#F1E4C6" stroke="#2B2A33" stroke-width="1.6"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43 L57 43 L57 9 Z" fill="#C3D9D7"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43" fill="none" stroke="#2B2A33" stroke-width="1"/><ellipse cx="21" cy="34" rx="7" ry="4.5" fill="#AFCDD2" stroke="#2B2A33" stroke-width="1"/><path d="M26 32 C32 26 36 22 44 17" fill="none" stroke="#B4584A" stroke-width="1.6" stroke-dasharray="2.5 2"/><circle cx="44" cy="17" r="2.4" fill="#C9A15A" stroke="#2B2A33" stroke-width="1"/><path d="M14 20 l3 -5 l3 5 Z M19 20 l3 -6 l3 6 Z" fill="#E4D6B6" stroke="#2B2A33" stroke-width=".8"/><rect x="4" y="4" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="4" y="41" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/></svg></button><button class="phone-peek" id="phoneBtn" type="button" aria-label="Open phone" hidden><span class="pk-glow"><span class="pk-logo"></span></span><span class="pk-notch"></span><span class="pk-badge" id="phoneBadge" hidden>1</span></button></div>
 <div id="phone" hidden></div>
 <div id="aqua" hidden></div>
 <div id="intro" hidden></div>
@@ -748,6 +927,7 @@ body:not([data-state="idle"]) .corner button{pointer-events:none!important}
 <div id="haul" hidden role="dialog" aria-label="Treasure"></div>
 <div id="note" hidden></div>
 
+<div id="bag" hidden></div>
 <div id="sheet" hidden><div class="panel" id="panel" role="dialog"></div></div>
 
 <script>
@@ -1019,8 +1199,10 @@ const AMB_LV={ lake_day:{water:.55,wind:.22}, lake_dusk:{water:.5,wind:.14}, lak
                 {lean:tier}     a find of about that rarity: 55% that tier, 30% one below, 15% two below
                 {prize:tier}    a crate-only reward of that tier (a find, hull paint or decor) you don't have yet
                 {paint:tier}    a crate-only hull paint of that tier;  {note:p}  a message-bottle note, with chance p
+                {gear:tier}     crate-only tackle (data/tackle.js) of that tier or commoner you don't have yet; once you
+                                have it all, the crate simply doesn't hold it
                 chance          the item is only in the crate this often
-              When everything an item could be is already found, it pays spare coins: half what a crate of its tier pays.
+              When everything any other item could be is already found, it pays spare coins: half what a crate of its tier pays.
               Measured with npm run sim: treasure adds 10 to 20% to coins an hour with a good rod (25 to 35% with the
               Willow Switch, where crate floors matter most), and about 15 new finds turn up in the first 1,000 casts.
    FINDS[id]  every one-of-a-kind object. kind: curio (to collect), artifact (works in a vest pocket) or keepsake
@@ -1044,11 +1226,11 @@ const TREASURE={
 const CRATES={
   common:   {name:'Common crate', look:'Plain slatted pine', weight:40, pull:.85, reel:3.4, snags:0, fish:1.5, floor:10, items:[{lean:'common', chance:.25}]},
   uncommon: {name:'Uncommon crate', look:'Moss-green with notched corners', weight:27, pull:.95, reel:4.2, snags:1, fish:2.5, floor:20, items:[{lean:'uncommon', note:.4, chance:.6}]},
-  rare:     {name:'Rare crate', look:'Lake-blue bands and scalloped trim', weight:16, pull:1.05, reel:5, snags:1, fish:4, floor:40, items:[{lean:'rare', chance:.7}]},
-  epic:     {name:'Epic crate', look:'Violet double bands', weight:9, pull:1.15, reel:5.8, snags:2, fish:8, floor:80, items:[{lean:'epic'}, {paint:'epic', chance:.35}]},
-  legendary:{name:'Legendary chest', look:'Dark oak with brass corners', weight:4.5, pull:1.3, reel:7, snags:2, fish:16, floor:160, items:[{lean:'legendary'}, {prize:'legendary'}]},
-  exotic:   {name:'Exotic chest', look:'Prism-cut edges that shift color', weight:2, pull:1.45, reel:8, snags:3, fish:32, floor:320, items:[{prize:'exotic'}, {lean:'legendary'}, {lean:'epic'}]},
-  mythic:   {name:'Mythic chest', look:'Ink black and silver', weight:1.2, pull:1.6, reel:9, snags:3, fish:64, floor:640, items:[{prize:'mythic'}, {lean:'exotic'}, {lean:'legendary'}]}
+  rare:     {name:'Rare crate', look:'Lake-blue bands and scalloped trim', weight:16, pull:1.05, reel:5, snags:1, fish:4, floor:40, items:[{lean:'rare', chance:.7}, {gear:'rare', chance:.2}]},
+  epic:     {name:'Epic crate', look:'Violet double bands', weight:9, pull:1.15, reel:5.8, snags:2, fish:8, floor:80, items:[{lean:'epic'}, {paint:'epic', chance:.35}, {gear:'epic', chance:.2}]},
+  legendary:{name:'Legendary chest', look:'Dark oak with brass corners', weight:4.5, pull:1.3, reel:7, snags:2, fish:16, floor:160, items:[{lean:'legendary'}, {prize:'legendary'}, {gear:'legendary', chance:.25}]},
+  exotic:   {name:'Exotic chest', look:'Prism-cut edges that shift color', weight:2, pull:1.45, reel:8, snags:3, fish:32, floor:320, items:[{prize:'exotic'}, {lean:'legendary'}, {lean:'epic'}, {gear:'exotic', chance:.3}]},
+  mythic:   {name:'Mythic chest', look:'Ink black and silver', weight:1.2, pull:1.6, reel:9, snags:3, fish:64, floor:640, items:[{prize:'mythic'}, {lean:'exotic'}, {lean:'legendary'}, {gear:'mythic', chance:.3}]}
 };
 const OWNERS={ottilie:{name:'Ottilie'}, barnaby:{name:'Barnaby'}, pell:{name:'Pell'}};
 const POCKETS={start:1, max:5, costs:[1500, 6000, 18000, 45000]};
@@ -1082,7 +1264,7 @@ const FINDS={
   penny:   {name:'Lucky Penny', kind:'artifact', rarity:'common', region:'any', lore:'Heads on both sides. Someone wanted to be sure.',
             eff:'+10 luck.', mods:[{stat:'luck', v:.1}]},
   cork:    {name:'Old Cork Float', kind:'artifact', rarity:'common', region:'any', lore:'It has bobbed on this lake longer than you’ve been alive. Fish trust it.',
-            eff:'Fish swim over 15% sooner.', mods:[{stat:'bite', v:.85}]},
+            eff:'Fish bite 15% sooner.', mods:[{stat:'bite', v:.85}]},
   spool:   {name:'Brass Spool', kind:'artifact', rarity:'uncommon', region:'any', lore:'It still smells of machine oil and somebody’s pipe.',
             eff:'You reel 15% faster.', mods:[{stat:'reel', v:1.15}]},
   sinker:  {name:'Lead Sinker', kind:'artifact', rarity:'uncommon', region:'any', lore:'Heavy for its size, and it throws like a dream.',
@@ -1136,6 +1318,41 @@ const NOTES={
 };
 const LETTER_ORDER=['edith','albert','keeper'];
 
+/* Tackle: what goes on a rod. Every rod has a Reel socket and a Line socket, and one bait (or lure) rides on
+   whichever rod you hold. Gear lives in the tackle bag (game/bag.js); its effects are modifiers (data/stats.js).
+   TACKLE[id]  kind: reel, line or bait; name; eff (what it does, one sentence); down (its catch, if any);
+               mods (modifiers, as on rods); starter:true for the piece every rod comes with;
+               shop: 'ottilie' (her ferry) or 'tacklegram' (delivered by Pell) with price; crate: a rarity for
+               gear that only comes in crates of that tier or better; kitchen:true for bait made in the kitchen.
+               Bait: casts (how long one tin lasts; a lure has none and never runs out) and tins (how many come
+               in one purchase). Drawn in game/tackle-art.js.
+   TACKLE_ORDER  how each socket's tray lists them.
+   Measured with npm run sim -- --tackle (6,000 casts, steady player, treasure left out): worms bring about 7% more
+   fish an hour and chum about 13%; Clearwater Line and the Quickwind Reel about 5%; the Whisper Reel's perfect hooks
+   add about 3% to what a fish is worth. The Wire Leader turns the Ash Caster's reed casts from 74% to 99.9% landed.
+   Glow Line and Glow Grubs add about 15% and 27% to coins an hour in the coast's trench at night, where they draw the
+   Saltjaw; at the lake they only draw more Lantern Carp. The spinner turns the lily pads from 62% to 71% leapers.
+   The Brass Drag Reel and Braided Silk are a safety net: a steady player rarely snaps a line anyway. */
+const TACKLE={
+  // reels
+  clicker:   {kind:'reel', name:'Clicker Reel', starter:true, eff:'Clicks as it winds. Every rod comes with one.', mods:[]},
+  brassdrag: {kind:'reel', name:'Brass Drag Reel', shop:'ottilie', price:400, eff:'Tension builds 15% slower.', mods:[{stat:'drag', v:.85}]},
+  quickwind: {kind:'reel', name:'Quickwind Reel', shop:'ottilie', price:1200, eff:'You reel 20% faster.', down:'Tension builds 10% faster.', mods:[{stat:'reel', v:1.2}, {stat:'drag', v:1.1}]},
+  whisper:   {kind:'reel', name:'Whisper Reel', shop:'tacklegram', price:3000, eff:'The perfect-hook window is 30% wider.', mods:[{stat:'perfect', v:1.3}]},
+  // lines
+  cotton:    {kind:'line', name:'Cotton Line', starter:true, eff:'Plain and dependable. Every rod comes with it.', mods:[]},
+  silk:      {kind:'line', name:'Braided Silk', shop:'ottilie', price:300, eff:'Your line takes 20% more strain.', mods:[{stat:'line', v:1.2}]},
+  wire:      {kind:'line', name:'Wire Leader', shop:'ottilie', price:600, eff:'Never snags in the reeds.', down:'The hook window is 10% shorter.', mods:[{stat:'snag', v:0}, {stat:'hook', v:.9}]},
+  clearwater:{kind:'line', name:'Clearwater Line', shop:'tacklegram', price:1500, eff:'Fish bite 15% sooner.', mods:[{stat:'bite', v:.85}]},
+  glowline:  {kind:'line', name:'Glow Line', crate:'rare', eff:'Night fish bite 30% more often after dark.', mods:[{stat:'night', v:1.3}]},
+  // bait and lures
+  worms:     {kind:'bait', name:'Worms', shop:'ottilie', price:10, casts:20, tins:1, eff:'Fish bite 20% sooner.', mods:[{stat:'bite', v:.8}]},
+  grubs:     {kind:'bait', name:'Glow Grubs', shop:'ottilie', price:60, casts:15, tins:1, eff:'Night fish bite 50% more often after dark.', mods:[{stat:'night', v:1.5}]},
+  chum:      {kind:'bait', name:'Chum', kitchen:true, casts:10, tins:1, eff:'Fish bite 35% sooner.', mods:[{stat:'bite', v:.65}]},
+  spinner:   {kind:'bait', name:'Silver Spinner', shop:'tacklegram', price:900, eff:'Leapers bite 50% more often. A lure: it never runs out.', mods:[{stat:'lure', v:1.5, when:{beh:'leaper'}}]}
+};
+const TACKLE_ORDER={reel:['clicker','brassdrag','quickwind','whisper'], line:['cotton','silk','wire','clearwater','glowline'], bait:['worms','grubs','chum','spinner']};
+
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
          luck  bonuses add up as luck points; each rarity turns the points into odds on a curve that flattens
@@ -1145,6 +1362,8 @@ const LETTER_ORDER=['edith','albert','keeper'];
          flag  on when any source turns it on
    good  'up' when more is better, 'down' when less is better.  tune:true stats only come from Playtest tuning.
    when  where every bonus to this stat applies, on top of its own conditions (there are no swells at the lake).
+         A modifier's own when can name a region, spot, night, fish, beh (a kind of fish: leaper, sulker…), rarity,
+         rarityMin or lucky.
    unit  'x' to show the total as ×2.5 rather than +150%; 'chance' for a chance shown as a share of catches;
          'count' for a number of things (+4 fish).
    hint  the plain sentence the Bonuses page shows under the stat. The order here is the order on that page. */
@@ -1153,11 +1372,13 @@ const STATS={
   value:    {name:'Fish value', kind:'mul', good:'up', hint:'Coins for every fish you sell.'},
   reel:     {name:'Reel speed', kind:'mul', good:'up', hint:'How fast a hooked fish comes in while you hold.'},
   line:     {name:'Line strength', kind:'mul', good:'up', hint:'Tension builds more slowly, so the line snaps less.'},
+  drag:     {name:'Tension build-up', kind:'mul', good:'down', hint:'How fast tension rises while you reel. A good drag lets the line give.'},
   hook:     {name:'Hook window', kind:'mul', good:'up', hint:'Time to tap after the bobber plunges.'},
   perfect:  {name:'Perfect-hook window', kind:'mul', good:'up', hint:'Tap this fast for a perfect hook: a bigger fish, worth more, that reels faster.'},
-  bite:     {name:'Wait for a bite', kind:'mul', good:'down', hint:'The quiet before a fish swims over to your bobber.'},
+  bite:     {name:'Time to a bite', kind:'mul', good:'down', hint:'From your bobber landing to the bite: the quiet, the swim over and the nibbles.'},
   night:    {name:'Night fish', kind:'mul', good:'up', unit:'x', when:{night:true}, hint:'Fish that come up after dark bite more often.'},
   twitch:   {name:'Twitch pull', kind:'mul', good:'up', unit:'x', hint:'A twitch draws a fish in from farther, and brings the next one sooner.'},
+  lure:     {name:'Lure pull', kind:'mul', good:'up', unit:'x', hint:'Some kinds of fish bite more often.'},
   reedBite: {name:'Reed bites', kind:'mul', good:'up', when:{spot:'reeds'}, hint:'Fish in the reeds bite sooner.'},
   tug:      {name:'Tugger pull', kind:'mul', good:'down', hint:'Tuggers yank the line less hard.'},
   swell:    {name:'Swell hits', kind:'mul', good:'down', when:{region:'coast'}, hint:'A swell spikes your line’s tension less.'},
@@ -1183,7 +1404,7 @@ const STATS={
 const MASTERY={catches:10, reel:1.65};
 
 /* ---------- Modifiers: every bonus in the game goes through here ---------- */
-/* Each source (the rod in hand, the meal you ate, tank sets, decor, boat parts, artifacts in your vest pockets,
+/* Each source (the rod in hand and its tackle, the meal you ate, tank sets, decor, boat parts, artifacts in your vest pockets,
    keepsakes, mastery, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
    stat's total in a context (region, time, spot, fish, rarity, Gull Luck) and only matching modifiers count.
    STATS (data/stats.js) says how each stat combines and where it can apply at all. Adding an enchantment or
@@ -1214,6 +1435,10 @@ function modSources(){
   for (const k in TANKS) for (const d of decorFor(k)) if (d.luck && T[k].fish.some(f=>d.ids&&d.ids.includes(f.id))) add('decor',d.name,'luck',d.luck.v,{when:{region:d.luck.region}});
   // boat parts
   for (const id of save.parts||[]){ const P=PARTS[id]; if (P) for (const x of P.mods||[]) L.push(Object.assign({src:'part',name:P.name},x)); }
+  // tackle: the reel and line on the rod in hand, and the bait or lure on it (game/bag.js)
+  const rig=rigFor(save.rod);
+  for (const id of [rig.reel, rig.line]){ const T=TACKLE[id]; if (T) for (const x of T.mods) L.push(Object.assign({src:'gear',name:T.name},x)); }
+  const bait=baitOn(); if (bait) for (const x of TACKLE[bait].mods) L.push(Object.assign({src:'gear',name:TACKLE[bait].name},x));
   // artifacts work while they're in a vest pocket; keepsakes work from the moment you have them
   const FS=findsState();
   for (const id of FS.equip){ const D=FINDS[id]; if (D && FS.have[id]) for (const x of D.mods||[]) L.push(Object.assign({src:'artifact',name:D.name},x)); }
@@ -1238,7 +1463,7 @@ function modList(){ if (MODC.list && MODC.at===MODC.frame && !MODC.dirty) return
 /** The context a stat is read in. Region and time come from the game; callers add spot, fish, rarity or lucky.
     A fish brings its rarity along. */
 function modCtx(c){ const x=Object.assign({region:REG(), night:isNight(save.clock)}, c);
-  if (x.fish && !x.rarity) x.rarity=FISH[x.fish].rarity; return x; }
+  if (x.fish){ if (!x.rarity) x.rarity=FISH[x.fish].rarity; if (!x.beh) x.beh=FISH[x.fish].beh; } return x; }
 const rarRank=r=>Object.keys(RAR).indexOf(r);
 function modMatch(m,c){ const w=m.when; if (!w) return true;
   for (const k in w){ const want=w[k], have=c[k];
@@ -1276,14 +1501,14 @@ function poolFor(spot,lucky){
   if (w.mayor && ((h>=5 && h<8) || modFlag('mayorWakes',{spot}))) w.mayor*=3;   // the Mayor's dawns, or the Mayor's Spectacles
   // your bonuses: night-fish boosts (only at night, see STATS.night), then luck per rarity (game/mods.js)
   const c={spot,lucky}, nightMul=modMul('night',c);
-  for (const k in w){ const F=FISH[k]; if (F.night) w[k]*=nightMul; w[k]*=tierMul(F.rarity,c); }
+  for (const k in w){ const F=FISH[k]; if (F.night) w[k]*=nightMul; w[k]*=tierMul(F.rarity,c)*modMul('lure',{spot,lucky,fish:k}); }   // a lure draws its kind of fish
   return w;
 }
 const ROD = () => RODS[save.rod] || RODS.willow;
 
 /* ---------- Save ---------- */
 const KEY = 'hollowmere-castlab-v1';
-const fresh = () => ({coins:0, fish:{}, stats:{casts:0,catches:0,perfect:0,escapes:0,snaps:0}, tune:{hook:1,tension:1,wait:1}, sound:true, firstCast:true, tutorialDone:false, clock:18, rod:'willow', rods:['willow'], metOttilie:false, region:'lake', boat:false, barnabyCame:false, coastSeen:false, parts:[], paint:'blue', paints:['blue'], pending:[], net:[], netSeen:false, tanks:null, aquaSeen:false, kitchenOpen:false, kitchenSeen:false, meal:null, pantry:[], units:null, pbSeen:false, introSeen:false, hideLab:false, vol:null, lastBackup:0, backupHinted:false, lastPlayed:0, finds:null});
+const fresh = () => ({coins:0, fish:{}, stats:{casts:0,catches:0,perfect:0,escapes:0,snaps:0}, tune:{hook:1,tension:1,wait:1}, sound:true, firstCast:true, tutorialDone:false, clock:18, rod:'willow', rods:['willow'], metOttilie:false, region:'lake', boat:false, barnabyCame:false, coastSeen:false, parts:[], paint:'blue', paints:['blue'], pending:[], net:[], netSeen:false, tanks:null, aquaSeen:false, kitchenOpen:false, kitchenSeen:false, meal:null, pantry:[], units:null, pbSeen:false, introSeen:false, hideLab:false, vol:null, lastBackup:0, backupHinted:false, lastPlayed:0, finds:null, gear:null});
 let save = fresh();
 function load(d){ if (!d || typeof d!=='object') return; const f=fresh(); save=Object.assign(f,d); save.stats=Object.assign(f.stats,d.stats||{}); save.tune=Object.assign(fresh().tune,d.tune||{}); save.fish=d.fish||{}; if (d.tutorialDone===undefined) save.tutorialDone=save.stats.catches>0; if (typeof d.clock!=='number') save.clock=18; if (!Array.isArray(d.rods)) save.rods=['willow']; if (!Array.isArray(d.net)) save.net=[]; if (!RODS[save.rod]) save.rod='willow'; }
 try { const raw = localStorage.getItem(KEY); if (raw) load(JSON.parse(raw)); } catch(e) {}
@@ -1496,6 +1721,12 @@ const sfx = {
   uncork: letter => { if (letter){ noise(.1,{vol:.25,f:1500}); tone(700,.05,{vol:.05,type:'triangle'}); } else { tone(900,.09,{to:480,vol:.22,type:'sine'}); noise(.06,{vol:.22,f:3200}); } },
   paper: () => noise(.35,{vol:.09,f:2400,to:1200,q:.7}),
   find: r => { const N=RAR[r].notes; N.slice(0,Math.min(N.length,3+rarRank(r))).forEach((n,i)=>tone(n*2,.22,{vol:.06,type:'sine',delay:i*.05})); },
+  // the tackle bag (game/bag.js)
+  buckle: () => { tone(2400,.022,{type:'square',vol:.035}); tone(1500,.05,{vol:.06,type:'triangle',delay:.02}); noise(.05,{vol:.08,f:3200,type:'highpass',delay:.01}); },
+  flap: shut => { if (shut){ noise(.14,{vol:.1,f:1300,to:500,q:.6}); tone(1350,.035,{type:'square',vol:.03,delay:.16}); } else noise(.24,{vol:.11,f:600,to:1500,q:.6}); },
+  rig: k => { if (k==='reel'){ for (let i=0;i<5;i++) tone(1750+i*50,.014,{type:'square',vol:.032,delay:i*.034}); }
+    else if (k==='line') noise(.16,{vol:.08,f:3200,to:6200,q:2});
+    else { tone(330,.08,{to:190,vol:.09,type:'triangle'}); noise(.06,{vol:.05,f:900,type:'lowpass',delay:.03}); } },
   pocket: on => { noise(.08,{vol:.12,f:on?1800:900}); tone(on?660:440,.07,{vol:.07,type:'triangle',delay:.03}); },
   chomp: () => { noise(.12,{vol:.32,f:700}); noise(.12,{vol:.28,f:600,delay:.14}); tone(160,.1,{to:80,vol:.12,type:'square'}); tone(140,.1,{to:70,vol:.1,type:'square',delay:.14}); }
 };
@@ -1544,7 +1775,7 @@ function coach(text, step, warn){ const c=$('coach'); $('coachText').textContent
 function coachOff(){ $('coach').hidden=true; $('hint').hidden=false; }
 let coachTimer=0;
 function coachFor(text,secs){ coachLater(text,secs); }
-function setState(s){ S.state=s; document.body.dataset.state=s; updateHint(); if (s==='idle' && save.meal && save.meal.last) mealEnd();
+function setState(s){ S.state=s; document.body.dataset.state=s; updateHint(); if (s==='idle' && save.meal && save.meal.last) mealEnd(); if (s==='idle') baitCheck();
   if (s==='idle' && !save.tutorialDone){ S.tut='cast'; coach('Drag down from anywhere, then let go to cast your line.','1 of 4'); } }
 
 /* ---------- Effects ---------- */
@@ -1588,7 +1819,7 @@ function release(){
   if (a && a.onOtt && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openShop(); return; }
   if (!a || !a.target || a.p<.12){ setState('idle'); if (S.tut) coach('Drag a little farther down before you let go.','1 of 4'); else toast('Pull back farther','warn'); return; }
   S.cast={t:0, dur:.4+.42*a.p, from:{x:G.rodBase.x+18,y:G.rodBase.y-88}, to:a.target, p:a.p, th:a.th, spot:a.spot};
-  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal();
+  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal(); tickBait();
   if (save.firstCast){ save.firstCast=false; persist(); }
   setState('casting');
 }
@@ -1628,13 +1859,15 @@ function startWaiting(){
   if (S.bob.spot==='reeds') S.wait.t/=modMul('reedBite',{spot:'reeds'});
   if (S.tut){ S.tut='wait'; S.wait.t=.8; coach('Nice cast! Now wait. A fish will swim over to your bobber.','2 of 4'); }
 }
-/** The quiet before a fish shows up: Playtest tuning and anything that brings fish over sooner. */
+/** The quiet before a fish shows up: Playtest tuning and anything that brings a bite sooner (which also speeds
+    the swim over and the nibbles: spawnApproach). */
 function biteWait(spot){ const c={spot}; return rand(.75,2.1)*modMul('wait',c)*modMul('bite',c); }
 function spawnApproach(){
   const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.fish=S.tut?'perch':pickW(poolFor(b.spot,w.lucky)); const F=FISH[w.fish];
   const ang=rand(0,Math.PI*2), d=rand(85,150);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
   w.sh={x,y,ang:Math.atan2(b.y-y,b.x-x),alpha:0,flee:false};
+  w.bm=S.tut?1:modMul('bite',{spot:b.spot,fish:w.fish,lucky:w.lucky});   // bait and the like: a quicker swim over and shorter nibbles
   if (sonarOn() && !S.tut){ setHint('Sonar: '+(F.rarity==='common'?'a common fish':'a '+RAR[F.rarity].label+' fish')+' is coming in.'); if (F.rarity!=='common') tone(1250,.09,{vol:.06,type:'sine'}); }
   w.phase='approach'; w.attract=1;
 }
@@ -1647,17 +1880,17 @@ function updateWaiting(dt){
       const F=FISH[w.fish];
       if (w.phase==='approach'){
         const dx=b.x-sh.x, dy=b.y-sh.y, d=Math.hypot(dx,dy);
-        const sp=(20+F.len*.35)*w.attract*sc(sh.y)*(F.beh==='sleeper'?.5:1);
+        const sp=(20+F.len*.35)*w.attract*sc(sh.y)*(F.beh==='sleeper'?.5:1)/(w.bm||1);
         sh.ang=angLerp(sh.ang, Math.atan2(dy,dx)+Math.sin(S.time*2.2)*.5*Math.min(1,d/70), dt*3);
         sh.x+=Math.cos(sh.ang)*sp*dt; sh.y+=Math.sin(sh.ang)*sp*dt*.6;
-        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3)); w.nibT=S.tut?1.2:rand(.5,1.1); }
+        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3)); w.nibT=S.tut?1.2:rand(.5,1.1)*(w.bm||1); }
       } else if (w.phase==='nibble'){
         sh.ang=angLerp(sh.ang,Math.atan2(b.y-sh.y,b.x-sh.x),dt*2);
         const hx=b.x-Math.cos(sh.ang)*F.len*.38*sc(b.y), hy=b.y-Math.sin(sh.ang)*F.len*.2*sc(b.y);
         sh.x=lerp(sh.x,hx,dt*3); sh.y=lerp(sh.y,hy,dt*3);
         w.nibT-=dt;
         if (w.nibT<=0){
-          if (w.nib>0){ w.nib--; w.nibT=S.tut?2.2:FISH[w.fish].beh==='sleeper'?rand(1,1.8):rand(.55,1.4); b.nibble=1; ripple(b.x,b.y,14); sfx.nibble(); if (S.tut) coach('That little bob was just a nibble. Wait for the bobber to plunge under.','2 of 4'); }
+          if (w.nib>0){ w.nib--; w.nibT=S.tut?2.2:(FISH[w.fish].beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*(w.bm||1); b.nibble=1; ripple(b.x,b.y,14); sfx.nibble(); if (S.tut) coach('That little bob was just a nibble. Wait for the bobber to plunge under.','2 of 4'); }
           else triggerBite();
         }
       }
@@ -1726,12 +1959,12 @@ function startReel(id,perfect){
 function newFight(id,perfect,from,lucky,tut,spot){
   const F=FISH[id], c={fish:id,spot,lucky};
   // bonuses lock in when the fish is hooked
-  const mod={tm:modMul('tension')/modMul('line',c), tug:modMul('tug',c), reel:modMul('reel',c)};
+  const mod={tm:modMul('tension')*modMul('drag',c)/modMul('line',c), tug:modMul('tug',c), reel:modMul('reel',c)};
   return fightOf(F,perfect,from,{id,lucky,tut,mod,fam:modFlag('autoTilt',c)});
 }
 /** A haul: treasure on the line (game/treasure.js). It comes up like a dead weight that catches on the bottom. */
 function newHaul(loot,perfect,from,lucky,spot){
-  const c={spot,lucky}, mod={tm:modMul('tension')/modMul('line',c), tug:1, reel:modMul('reel',c)};
+  const c={spot,lucky}, mod={tm:modMul('tension')*modMul('drag',c)/modMul('line',c), tug:1, reel:modMul('reel',c)};
   return fightOf(haulOf(loot),perfect,from,{id:null,loot,lucky,tut:false,mod,fam:false});
 }
 function fightOf(F,perfect,from,o){ const weight=F.beh==='weight';
@@ -1908,7 +2141,7 @@ function hookEats(){ const L=S.land, p=landPos(); save.stats.eaten=(save.stats.e
   for (let i=0;i<16;i++) S.particles.push({x:p.x,y:p.y,vx:rand(-140,140),vy:rand(-160,40),g:420,life:0,max:rand(.4,.8),r:rand(1.4,3),c:i%3?'rgba('+rgbOf(L.F.color)+',':'rgba(243,234,215,'});
   S.particles.push({x:p.x,y:p.y-30,vx:0,vy:-30,g:0,life:0,max:1.3,r:0,c:'rgba(0,0,0,',word:'CHOMP!'});
   news('The Hungry Hook ate your '+L.F.name,'bad');
-  if (!save.stats.eatenTip){ save.stats.eatenTip=true; persist(); coachFor('The Hungry Hook doubles what fish are worth, but now and then it eats one. Take it out of your pocket on the journal’s Finds page.',8); }
+  if (!save.stats.eatenTip){ save.stats.eatenTip=true; persist(); coachFor('The Hungry Hook doubles what fish are worth, but now and then it eats one. Take it out of your pocket in your tackle bag.',8); }
   S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); }
 function landPos(){ const L=S.land, p=L.p, c={x:(L.from.x+L.to.x)/2, y:Math.min(L.from.y,L.to.y)-H*.16};
   const e=1-Math.pow(1-p,2);
@@ -1981,7 +2214,7 @@ function coinTally(dur){ const start=coinShown, end=save.coins, t0=performance.n
 function updateHud(){
   const all=REGION_FISH.lake.concat(save.boat?REGION_FISH.coast:[]), n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
   $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('aquaBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; $('kitchenBtn').hidden=!save.kitchenOpen; $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
-  $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot();
+  $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
 }
 
 /* ---------- Treasure: the roll, what's inside, and the haul ---------- */
@@ -2085,6 +2318,8 @@ function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',
       if (it.note && Math.random()<it.note){ const id=nextBottleNote(c); if (id){ note(id); continue; } }
       if (it.paint){ const ids=Object.keys(PAINTS).filter(id=>PAINTS[id].crate===it.paint && !(save.paints||[]).includes(id));
         if (ids.length){ const id=ids[Math.floor(Math.random()*ids.length)]; grantPaint(id); out.items.push({type:'paint',id}); } else spare(it.paint); continue; }
+      if (it.gear){ const ids=Object.keys(TACKLE).filter(id=>TACKLE[id].crate && rarRank(TACKLE[id].crate)<=rarRank(it.gear) && !gearState().own[id]);
+        if (ids.length){ const id=ids[Math.floor(Math.random()*ids.length)]; grantGear(id); out.items.push({type:'gear',id}); } continue; }   // nothing left: the crate just doesn't hold it
       if (it.prize){ const P=prizesFor(it.prize); if (P.length){ const p=P[Math.floor(Math.random()*P.length)];
         if (p.type==='find') give(p.id); else { if (p.type==='paint') grantPaint(p.id); else grantDecor(p.tank,p.id); out.items.push(p); } continue; } }
       const lean=it.lean||it.prize, id=pickLean(lean,c); if (id) give(id); else spare(lean);
@@ -2123,6 +2358,62 @@ function startHaul(loot,perfect){
   const FS=findsState();
   if (!FS.treasure) coachShow('Something heavy, and it isn’t a fish. Hold to haul it up, and let go if the ring turns red.',7); }
 function haulBubbles(R){ for (let i=0;i<2;i++) S.particles.push({x:R.x+rand(-8,8)*sc(R.y),y:R.y+rand(0,4),vx:rand(-6,6),vy:-rand(14,34),g:-14,life:0,max:rand(.35,.7),r:rand(1,2.4)*sc(R.y),c:'rgba(225,238,242,'}); }
+
+/* ---------- Tackle: what's on the rod in hand (data/tackle.js) ---------- */
+/* Reels and lines are bought once and kept in the bag; each rod remembers which reel and line it carries, so
+   swapping rods swaps them too. Bait comes in tins: one tin is opened onto the rod and lasts a number of casts,
+   and switching bait keeps an opened tin's casts for later. A lure never runs out.
+   save.gear = {own:{id:1}, rig:{rodId:{reel, line}}, bait:id|null, left:{id:casts in the opened tin}, tins:{id:unopened},
+                lastBait (a tin's last cast, until it ends), fresh:[ids new since you last looked in the bag]}
+   Everything here reads only the save, so the balance simulator can lend its own. */
+const isObj = v => !!v && typeof v==='object' && !Array.isArray(v);
+/** The piece every rod comes with, for each socket (the checker makes sure there's exactly one). */
+const GEAR_START = Object.fromEntries(['reel','line'].map(k=>[k,Object.keys(TACKLE).find(id=>TACKLE[id].kind===k && TACKLE[id].starter)]));
+/** The bait the kitchen makes from its scraps. */
+const KITCHEN_BAIT = Object.keys(TACKLE).find(id=>TACKLE[id].kitchen);
+function gearState(){ if (!isObj(save.gear)) save.gear={}; const g=save.gear;
+  for (const k of ['own','rig','left','tins']) if (!isObj(g[k])) g[k]={};
+  for (const id in TACKLE) if (TACKLE[id].starter) g.own[id]=1;
+  if (!Array.isArray(g.fresh)) g.fresh=[]; g.fresh=g.fresh.filter(id=>TACKLE[id]);
+  if (g.bait && !TACKLE[g.bait]) g.bait=null; if (g.lastBait && !TACKLE[g.lastBait]) g.lastBait=null; return g; }
+/** The reel and line on rod `rod` (each rod comes with the starter pieces). */
+function rigFor(rod){ const g=gearState(); if (!isObj(g.rig[rod])) g.rig[rod]={reel:GEAR_START.reel, line:GEAR_START.line}; const r=g.rig[rod];
+  for (const k of ['reel','line']) if (!g.own[r[k]] || (TACKLE[r[k]]||{}).kind!==k) r[k]=GEAR_START[k]; return r; }
+const isLure = id => !!TACKLE[id] && TACKLE[id].kind==='bait' && !TACKLE[id].casts;
+const ownsGear = id => { const g=gearState(), T=TACKLE[id]; return T.kind==='bait' ? (isLure(id)?!!g.own[id]:(g.tins[id]||0)+(g.left[id]||0)>0) : !!g.own[id]; };
+/** The bait or lure working on the rod right now, or null. A tin's last cast still counts until that cast ends. */
+function baitOn(){ const g=gearState(), id=g.bait; if (!id) return null; return (isLure(id)?!!g.own[id]:(g.left[id]||0)>0 || g.lastBait===id) ? id : null; }
+/** Puts bait `id` on the rod: an opened tin if there is one, else a fresh tin. Returns false if there's none. */
+function loadBait(id){ const g=gearState(); if (!TACKLE[id] || TACKLE[id].kind!=='bait') return false;
+  if (isLure(id)){ if (!g.own[id]) return false; }
+  else if (!(g.left[id]>0)){ if (!(g.tins[id]>0)) return false; g.tins[id]--; g.left[id]=TACKLE[id].casts; }
+  g.bait=id; g.lastBait=null; persist(); if (!SIMULATING) updateBagBtn(); return true; }
+function unloadBait(){ const g=gearState(); g.bait=null; g.lastBait=null; persist(); if (!SIMULATING) updateBagBtn(); }
+/** One cast's worth of bait. When a tin runs dry its last cast still counts; baitCheck opens the next. */
+function tickBait(){ const g=gearState(), id=g.bait; if (!id || isLure(id) || !(g.left[id]>0)) return;
+  g.left[id]--; if (g.left[id]<=0){ g.left[id]=0; g.lastBait=id; } persist(); if (!SIMULATING) updateBagBtn(); }
+/** Back at idle after a tin's last cast: open the next tin of the same bait, or the rod goes bare. */
+function baitCheck(){ const g=gearState(), id=g.lastBait; if (!id) return; g.lastBait=null;
+  const more=g.tins[id]>0, name=TACKLE[id].name.toLowerCase();
+  if (more){ g.tins[id]--; g.left[id]=TACKLE[id].casts; } else if (g.bait===id) g.bait=null;
+  persist(); if (SIMULATING) return; updateBagBtn();
+  setTimeout(()=>news(more?'Opened another tin of '+name:'Out of '+name+'. Your hook is bare.',more?'':'warn'),400); }
+/** Buying: reels, lines and lures are kept once; bait adds tins. */
+function grantGear(id,n){ const g=gearState(), T=TACKLE[id]; if (!T) return;
+  const had=ownsGear(id);
+  if (T.kind==='bait' && !isLure(id)) g.tins[id]=(g.tins[id]||0)+(n||T.tins||1); else g.own[id]=1;
+  if (!had && !g.fresh.includes(id)) g.fresh.push(id); persist(); if (!SIMULATING) updateBagBtn(); }
+/** Puts reel or line `id` on the rod in hand. */
+function rigGear(id){ const T=TACKLE[id]; if (!T || !gearState().own[id]) return false; const r=rigFor(save.rod); if (T.kind==='reel') r.reel=id; else if (T.kind==='line') r.line=id; else return false; persist(); return true; }
+/** A piece you just bought goes straight to work: a reel or line onto the rod in hand, bait onto a bare hook.
+    Returns what happened, for the news line. */
+function fitNewGear(id){ const T=TACKLE[id]; if (!T) return '';
+  if (T.kind==='bait'){ if (baitOn()) return 'It’s in your tackle bag.'; return loadBait(id)?(isLure(id)?'Tied onto your line.':'On your hook now.'):''; }
+  return rigGear(id)?'It’s on your '+ROD().name+' now.':''; }
+const gearSource = T => T.shop==='ottilie'?'Ottilie sells it':T.shop==='tacklegram'?'On Tacklegram':T.kitchen?'Comes with every meal you cook':T.crate?'In '+cratesOf(T.crate)+' and better':'';
+/** "Tension −15%", "Reel speed +20%": one chip per modifier, for trays and shops. */
+function gearChips(id){ return (TACKLE[id].mods||[]).map(m=>{ const st=STATS[m.stat], val=st.kind==='flag'?'':st.kind==='base'&&m.v===0?'none':modValueText(m.stat,m.v), w=modWhenText(m.when);
+  return {stat:m.stat, text:st.name+(val?' '+val:'')+(w?' '+w:''), up:st.kind==='flag'||modHelps(m.stat,m.v)}; }); }
 
 /* ---------- Drawing ---------- */
 function fishPath(id,len){
@@ -2454,6 +2745,164 @@ function drawPortrait(c,who,s){ c.save(); c.scale(s/100,s/100);
     c.fillStyle='#2D4870'; c.fillRect(-22,-30,44,10); c.fillRect(-14,-38,28,9); c.fillStyle=LA.brass; c.fillRect(-4,-30,8,5); }
   c.restore(); c.restore(); }
 
+/* ---------- Tackle art: every reel, line and bait, and the rod rig in the bag ---------- */
+/* Same field-journal style as the finds (game/loot-art.js): flat fills, one highlight, bold ink outlines.
+   Each piece is drawn in a 100 by 100 box centered on the origin, so drawTackle can scale it to any tile.
+   drawRig draws the rod in hand across the top of the bag with its reel, line and bait in place. */
+
+/* ---------- reels: a side plate, a spool rim and a handle ---------- */
+function taReel(c,o){ laInk(c);
+  // the foot that clamps to the rod
+  rrect(c,-30,34,60,9,4); laFill(c,o.foot||'#6E737C'); c.fillStyle=o.foot||'#6E737C'; c.fillRect(-7,22,14,14); c.strokeRect(-7,22,14,14);
+  // the rim, then the side plate
+  c.beginPath(); c.arc(0,-4,34,0,7); laFill(c,o.rim);
+  c.beginPath(); c.arc(0,-4,27,0,7); laFill(c,o.plate);
+  if (o.ports){ c.fillStyle=o.portCol||'rgba(43,42,51,.35)'; for (let i=0;i<6;i++){ const a=i/6*Math.PI*2+.3; c.beginPath(); c.arc(Math.cos(a)*17,-4+Math.sin(a)*17,4.2,0,7); c.fill(); c.stroke(); } }
+  if (o.inner){ c.beginPath(); c.arc(0,-4,19,0,7); c.strokeStyle=o.inner; c.lineWidth=2; c.stroke(); laInk(c); }
+  // the crank: arm from the hub to a knob (two for a double handle)
+  for (const k of o.double?[1,-1]:[1]){ c.save(); c.translate(0,-4); c.rotate(o.arm*k+(k<0?Math.PI:0));
+    laInk(c); rrect(c,-4,-4,30,8,4); laFill(c,o.armCol||INK);
+    c.beginPath(); c.arc(28,0,o.knobR||7,0,7); laFill(c,o.knob); laShine(c,26,-2,2.2,1.4,.6); c.restore(); }
+  // the hub
+  c.beginPath(); c.arc(0,-4,o.hubR||7,0,7); laFill(c,o.hub);
+  laShine(c,-14,-20,9,4,.45); }
+function taStar(c,r,n,col){ c.beginPath(); for (let i=0;i<n*2;i++){ const a=i/(n*2)*Math.PI*2-Math.PI/2, rr=i%2?r*.55:r; c.lineTo(Math.cos(a)*rr,-4+Math.sin(a)*rr); } c.closePath(); laFill(c,col); }
+
+/* ---------- lines: a spool with the line wound on and a loose end ---------- */
+function taSpool(c,o){ laInk(c); const t=o.t||0;
+  if (o.glow) laGlow(c,0,0,52,o.glow,.35+.1*Math.sin(t*2.4));
+  // the wound line between two flanges
+  laInk(c); rrect(c,-24,-22,48,44,6); laFill(c,o.line);
+  c.save(); rrect(c,-24,-22,48,44,6); c.clip(); c.strokeStyle=o.wrap||'rgba(43,42,51,.22)'; c.lineWidth=1.6;
+  if (o.braid){ for (let x=-40;x<40;x+=6){ c.beginPath(); c.moveTo(x,-24); c.lineTo(x+16,24); c.stroke(); c.beginPath(); c.moveTo(x+16,-24); c.lineTo(x,24); c.stroke(); } }
+  else for (let y=-18;y<22;y+=5){ c.beginPath(); c.moveTo(-26,y); c.lineTo(26,y+3); c.stroke(); }
+  if (o.sheen){ c.fillStyle='rgba(255,255,255,.55)'; c.fillRect(-24,-14,48,6); }
+  c.restore(); laInk(c); rrect(c,-24,-22,48,44,6); c.stroke();
+  for (const sx of [-1,1]){ rrect(c,sx*30-6,-34,12,68,5); laFill(c,o.flange); c.fillStyle='rgba(255,255,255,.28)'; c.fillRect(sx*30-3,-28,3,56); }
+  laShine(c,-12,-12,6,3,o.sheen?.7:.4);
+  // the loose end, pulled off the top and curling away
+  c.save(); c.lineCap='round'; c.beginPath(); c.moveTo(6,-21); c.bezierCurveTo(14,-32,28,-28,33,-38); c.bezierCurveTo(36,-45,28,-48,25,-41);
+  c.strokeStyle=INK; c.lineWidth=5; c.stroke(); c.strokeStyle=o.line; c.lineWidth=2.4; c.stroke(); c.restore();
+  if (o.end) o.end(c); }
+
+/* ---------- bait: tins, a jar and a lure ---------- */
+function taTin(c,o){ laInk(c);
+  // the body of a short round tin, seen a little from above
+  c.beginPath(); c.moveTo(-32,-8); c.lineTo(-30,30); c.quadraticCurveTo(0,42,30,30); c.lineTo(32,-8); laFill(c,o.body);
+  c.save(); c.beginPath(); c.moveTo(-32,-8); c.lineTo(-30,30); c.quadraticCurveTo(0,42,30,30); c.lineTo(32,-8); c.closePath(); c.clip();
+  c.fillStyle=o.band; c.fillRect(-40,4,80,16); c.restore(); laInk(c,2.4); c.beginPath(); c.moveTo(-31,4); c.quadraticCurveTo(0,10,31,4); c.stroke(); c.beginPath(); c.moveTo(-30.5,20); c.quadraticCurveTo(0,27,30.5,20); c.stroke();
+  if (o.label) o.label(c);
+  // the open top, with what's inside
+  laInk(c); laEll(c,0,-8,32,9); laFill(c,o.inside);
+  if (o.fill) o.fill(c);
+  laInk(c); laEll(c,0,-8,32,9); c.stroke();
+  laShine(c,-22,12,3,10,.35);
+  // the lid, propped behind
+  if (o.lid){ c.save(); c.translate(14,-26); c.rotate(.5); laInk(c); laEll(c,0,0,30,8); laFill(c,o.lid); laEll(c,0,-2,22,4.5); c.strokeStyle='rgba(43,42,51,.3)'; c.lineWidth=1.6; c.stroke(); c.restore(); } }
+function taWorm(c,pts,w){ c.save(); c.lineCap='round'; c.lineJoin='round'; c.beginPath(); c.moveTo(pts[0][0],pts[0][1]); for (let i=1;i<pts.length;i+=2) c.quadraticCurveTo(pts[i][0],pts[i][1],pts[i+1][0],pts[i+1][1]);
+  c.strokeStyle=INK; c.lineWidth=w+3.4; c.stroke(); c.strokeStyle='#D98A86'; c.lineWidth=w; c.stroke(); c.strokeStyle='rgba(255,255,255,.35)'; c.lineWidth=w*.3; c.stroke();
+  c.strokeStyle='rgba(120,50,50,.45)'; c.lineWidth=1.4; const [x,y]=pts[2]||pts[1]; c.beginPath(); c.moveTo(x-w*.4,y-w*.5); c.lineTo(x+w*.4,y+w*.5); c.stroke(); c.restore(); }
+function taGrub(c,x,y,r,rot,t){ c.save(); c.translate(x,y); c.rotate(rot||0); laGlow(c,0,0,r*3,'214,240,150',.5+.15*Math.sin((t||0)*3+x));
+  laInk(c,2.4); laEll(c,0,0,r*1.5,r); laFill(c,'#EDF2B8'); c.strokeStyle='rgba(120,130,60,.5)'; c.lineWidth=1.2;
+  for (const k of [-.5,0,.5]){ c.beginPath(); c.moveTo(k*r*1.5,-r*.9); c.lineTo(k*r*1.5,r*.9); c.stroke(); }
+  c.fillStyle=INK; c.beginPath(); c.arc(r*1.15,-r*.2,1.2,0,7); c.fill(); c.restore(); }
+function taSpinner(c,t,small){ const spin=Math.sin((t||0)*7);
+  laInk(c,small?2.6:3); c.strokeStyle=INK; c.lineWidth=small?2.4:3; c.beginPath(); c.moveTo(0,-44); c.lineTo(0,30); c.stroke();
+  c.strokeStyle='#B5B9C2'; c.lineWidth=small?1.2:1.6; c.stroke(); laInk(c,small?2.6:3);
+  c.beginPath(); c.arc(0,-46,4,0,7); c.stroke();
+  // the blade, turning
+  c.save(); c.translate(4,-22); c.scale(.45+.55*Math.abs(spin),1); c.rotate(.25); laEll(c,10,0,13,20); const g=c.createLinearGradient(-4,-18,20,18); g.addColorStop(0,'#F4F6FA'); g.addColorStop(.5,'#AEB4BE'); g.addColorStop(1,'#E2E6EC'); c.fillStyle=g; c.fill(); c.stroke();
+  laShine(c,6,-6,3,8,.8); c.restore();
+  // beads and the body
+  for (const [y,col] of [[-6,'#C0392B'],[1,'#E8D28A']]){ c.beginPath(); c.arc(0,y,4,0,7); laFill(c,col); }
+  c.beginPath(); c.moveTo(-5,6); c.quadraticCurveTo(-7,16,0,22); c.quadraticCurveTo(7,16,5,6); c.closePath(); laFill(c,BRASS);
+  // a treble hook
+  for (const k of [-1,0,1]){ c.save(); c.translate(0,30); c.rotate(k*.9); c.beginPath(); c.moveTo(0,0); c.lineTo(0,10); c.quadraticCurveTo(0,17,6,15); c.lineTo(7,11); c.strokeStyle=INK; c.lineWidth=small?2.4:2.8; c.stroke(); c.strokeStyle='#C9CCD3'; c.lineWidth=1.1; c.stroke(); c.restore(); } }
+
+const TACKLE_ART={
+  clicker(c){ taReel(c,{rim:'#6E737C', plate:'#A4A9B2', hub:'#5B5F68', knob:'#2F3038', arm:-.9, inner:'rgba(43,42,51,.3)'});
+    laInk(c); c.save(); c.translate(0,-38); rrect(c,-5,-6,10,9,3); laFill(c,'#C9CCD3'); c.restore(); },
+  brassdrag(c){ taReel(c,{rim:LA.brassD, plate:LA.brass, hub:LA.brassD, knob:'#7A5236', arm:-.7, foot:LA.brassD, hubR:4, inner:'rgba(90,60,20,.35)'}); laInk(c); taStar(c,13,6,'#E3C27A'); c.beginPath(); c.arc(0,-4,4,0,7); laFill(c,LA.brassD); },
+  quickwind(c){ taReel(c,{rim:'#2F5E48', plate:'#4E9273', hub:'#E8E2D2', knob:'#E8E2D2', arm:-.5, double:true, ports:true, portCol:'#2F5E48', foot:'#2F5E48', knobR:6, armCol:'#2B2A33'}); },
+  whisper(c){ taReel(c,{rim:'#B5B9C2', plate:'#EFEBE3', hub:'#C9CCD3', knob:'#F4EFF6', arm:-1.1, inner:'rgba(140,150,170,.45)', foot:'#8E929C'});
+    c.save(); c.globalAlpha=.6; c.strokeStyle='#8EA3C2'; c.lineWidth=2.2; c.lineCap='round'; for (const r of [40,46]){ c.beginPath(); c.arc(0,-4,r,-1.1,-.5); c.stroke(); c.beginPath(); c.arc(0,-4,r,Math.PI+.5,Math.PI+1.1); c.stroke(); } c.restore();
+    const g=c.createRadialGradient(-6,-10,1,0,-4,8); g.addColorStop(0,'#FFFFFF'); g.addColorStop(.6,'#E4DCEF'); g.addColorStop(1,'#B9C7D9'); c.beginPath(); c.arc(0,-4,7,0,7); c.fillStyle=g; c.fill(); laInk(c,2.4); c.stroke(); },
+  cotton(c){ taSpool(c,{line:'#EFE8D8', flange:'#B98B5E'}); },
+  silk(c){ taSpool(c,{line:'#D9B45A', flange:'#6B4630', braid:true, wrap:'rgba(120,80,20,.35)'}); },
+  wire(c){ taSpool(c,{line:'#A9AFB8', flange:'#4A4C54', wrap:'rgba(43,42,51,.3)', sheen:true, end(c){ c.save(); c.translate(25,-41); c.rotate(-.4); laInk(c,2.6); laEll(c,0,-5,3.5,5); c.stroke(); laEll(c,0,5,3.5,5); c.stroke(); c.beginPath(); c.moveTo(0,10); c.lineTo(0,16); c.quadraticCurveTo(6,22,10,14); c.stroke(); c.restore(); }}); },
+  clearwater(c){ taSpool(c,{line:'rgba(196,230,238,.9)', flange:'#9CC4D0', wrap:'rgba(90,150,170,.35)', sheen:true}); },
+  glowline(c,s,t){ taSpool(c,{line:'#9BE58A', flange:'#2E3B34', wrap:'rgba(40,110,50,.35)', glow:'150,235,130', t}); },
+  worms(c,s,t){ taTin(c,{body:'#5E8F4E', band:'#E9DCC1', inside:'#5A3E2A', lid:'#4E7B3E',
+    label(c){ taWorm(c,[[-14,13],[-6,6],[0,12],[6,18],[14,11]],3.2); },
+    fill(c){ c.fillStyle='rgba(30,18,10,.35)'; for (const [x,y] of [[-14,-8],[8,-6],[18,-10],[-2,-11]]){ c.beginPath(); c.arc(x,y,2,0,7); c.fill(); }
+      const w=Math.sin((t||0)*3)*3; taWorm(c,[[-16,-7],[-12,-22-w],[-2,-20],[8,-18+w],[10,-30]],6); taWorm(c,[[6,-6],[14,-12],[20,-9]],5); }}); },
+  grubs(c,s,t){ laInk(c); laGlow(c,0,6,48,'214,240,150',.25+.08*Math.sin((t||0)*2));
+    rrect(c,-14,-40,28,12,4); laFill(c,'#B98B5E'); c.strokeStyle='rgba(90,60,30,.4)'; c.lineWidth=1.4; c.beginPath(); c.moveTo(-8,-36); c.lineTo(-8,-31); c.moveTo(0,-37); c.lineTo(0,-31); c.moveTo(8,-36); c.lineTo(8,-31); c.stroke(); laInk(c);
+    c.beginPath(); c.moveTo(-12,-28); c.lineTo(-12,-22); c.quadraticCurveTo(-28,-18,-28,0); c.lineTo(-28,26); c.quadraticCurveTo(-28,36,-18,36); c.lineTo(18,36); c.quadraticCurveTo(28,36,28,26); c.lineTo(28,0); c.quadraticCurveTo(28,-18,12,-22); c.lineTo(12,-28); c.closePath();
+    c.fillStyle='rgba(196,226,232,.4)'; c.fill(); c.save(); c.clip(); c.fillStyle='rgba(92,70,48,.55)'; c.fillRect(-30,14,60,30);
+    taGrub(c,-10,6,6,.5,t); taGrub(c,9,-2,6,-.6,t); taGrub(c,4,20,5.5,.2,t); c.restore();
+    laInk(c); c.beginPath(); c.moveTo(-12,-28); c.lineTo(-12,-22); c.quadraticCurveTo(-28,-18,-28,0); c.lineTo(-28,26); c.quadraticCurveTo(-28,36,-18,36); c.lineTo(18,36); c.quadraticCurveTo(28,36,28,26); c.lineTo(28,0); c.quadraticCurveTo(28,-18,12,-22); c.lineTo(12,-28); c.stroke();
+    laShine(c,-19,0,3,13,.6); },
+  chum(c){ taTin(c,{body:'#9AA0A8', band:'#E7D4A8', inside:'#7E3A2A',
+    label(c){ laInk(c,2); c.beginPath(); c.moveTo(-12,12); c.lineTo(10,12); c.moveTo(-6,8); c.lineTo(-6,16); c.moveTo(0,7.5); c.lineTo(0,16.5); c.moveTo(6,8); c.lineTo(6,16); c.stroke(); c.beginPath(); c.moveTo(10,12); c.lineTo(16,8); c.lineTo(16,16); c.closePath(); c.stroke(); laEll(c,-15,12,3,3); c.stroke(); },
+    fill(c){ for (const [x,y,r,col] of [[-16,-10,6,'#B4584A'],[-2,-12,7,'#D08A6A'],[12,-9,6,'#B4584A'],[4,-4,5,'#E8C9A8'],[-10,-4,4.5,'#E8C9A8'],[20,-6,4,'#D08A6A']]){ laInk(c,2); laEll(c,x,y,r,r*.75); laFill(c,col); } }}); },
+  spinner(c,s,t){ c.save(); c.rotate(.18); taSpinner(c,t); c.restore(); }
+};
+/** An empty hook, for a rod with no bait on. */
+function drawBareHook(c,s){ c.save(); c.scale(s/100,s/100); laInk(c,4.4);
+  c.beginPath(); c.moveTo(4,-38); c.lineTo(4,14); c.quadraticCurveTo(4,34,-14,32); c.quadraticCurveTo(-26,30,-24,14); c.lineTo(-30,20); c.stroke();
+  c.strokeStyle='#C9CCD3'; c.lineWidth=2; c.stroke(); laInk(c,3.4); c.beginPath(); c.arc(4,-43,5,0,7); c.stroke(); c.restore(); }
+/** Draws reel, line or bait `id` into a tile `s` across. `t` animates glows and spinning blades. */
+function drawTackle(c,id,s,t){ const f=TACKLE_ART[id]; if (!f) return; c.save(); c.scale(s/100,s/100); f(c,s,t||0); c.restore(); }
+
+/* ---------- the rod rig: the rod in hand, its reel and line, and whatever is on the hook ---------- */
+const LINE_COL={cotton:'#EFE8D8', silk:'#E2BE62', wire:'#B9BFC8', clearwater:'rgba(205,236,244,.8)', glowline:'#A8F096'};
+/** The rod's geometry on a w by h drawing: grip end, tip, and where the reel, line and hook sit (the bag puts
+    tap targets over them). The reel rides on top of the rod just ahead of the grip, and the guides stand on top too. */
+function rigLayout(w,h){ const hx=w*.06, hy=h*.8, tx=w*.88, ty=h*.2, ang=Math.atan2(ty-hy,tx-hx), len=Math.hypot(tx-hx,ty-hy);
+  const ux=Math.sin(ang), uy=-Math.cos(ang);                       // the side of the rod facing up
+  const at=(k,d)=>{ const b=Math.sin(k*Math.PI*.9)*h*.035*k, x=hx+Math.cos(ang)*len*k, y=hy+Math.sin(ang)*len*k+b; return {x:x+ux*(d||0), y:y+uy*(d||0)}; };
+  const reel=at(.17,h*.2);
+  return {hx,hy,tx,ty,ang,len,at, reel, line:at(.58,h*.06), bait:{x:tx+w*.02, y:h*.7}}; }
+function drawRig(c,w,h,rod,rig,bait,t){ const R=RODS[rod]||RODS.willow, L=rigLayout(w,h), at=L.at, ang=L.ang;
+  c.save(); c.lineCap='round'; c.lineJoin='round';
+  const swing=REDUCED?0:Math.sin((t||0)*1.3)*.06, tip=at(1), hook={x:L.bait.x+Math.sin(swing)*h*.3, y:L.bait.y-h*.06}, lc=LINE_COL[rig.line]||LINE_COL.cotton;
+  // the blank, tapering to the tip, in the rod's own color
+  const segs=24, wAt=k=>lerp(h*.05,h*.012,k);
+  for (const pass of [0,1]) for (let i=0;i<segs;i++){ const k0=.06+i/segs*.94, k1=.06+(i+1)/segs*.94, a=at(k0), b=at(k1);
+    c.strokeStyle=pass?R.color:INK; c.lineWidth=wAt(i/segs)+(pass?0:2.6); c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); }
+  c.strokeStyle='rgba(255,255,255,.25)'; c.lineWidth=1.2; const s0=at(.14,h*.012), s1=at(.8,h*.004); c.beginPath(); c.moveTo(s0.x,s0.y); c.lineTo(s1.x,s1.y); c.stroke();
+  // the guides stand on top of the blank; the line runs from the reel through each one to the tip, then down to the hook
+  const gk=[.3,.48,.65,.8,.92], ring=i=>lerp(h*.028,h*.015,i/gk.length), guides=gk.map((k,i)=>({base:at(k,wAt(k)*.4), eye:at(k,wAt(k)*.4+ring(i)*2.2), r:ring(i)}));
+  for (const g of guides){ c.strokeStyle=INK; c.lineWidth=2; c.beginPath(); c.moveTo(g.base.x,g.base.y); c.lineTo(g.eye.x,g.eye.y); c.stroke(); }
+  const spool=at(.17,h*.2+h*.07);
+  if (rig.line==='glowline'){ c.save(); c.shadowColor='rgba(150,240,130,.9)'; c.shadowBlur=8; }
+  c.strokeStyle=lc; c.lineWidth=rig.line==='silk'?2:rig.line==='wire'?1.8:1.4; c.beginPath(); c.moveTo(spool.x,spool.y); for (const g of guides) c.lineTo(g.eye.x,g.eye.y); c.lineTo(tip.x,tip.y);
+  c.quadraticCurveTo(tip.x+h*.05,(tip.y+hook.y)*.5,hook.x,hook.y-h*.02); c.stroke();
+  if (rig.line==='glowline') c.restore();
+  for (const g of guides){ c.beginPath(); c.arc(g.eye.x,g.eye.y,g.r*.8,0,7); c.strokeStyle=INK; c.lineWidth=2.2; c.stroke(); c.strokeStyle='#C9CCD3'; c.lineWidth=1; c.stroke();
+    c.strokeStyle=BRASS; c.lineWidth=h*.03; const b=g.base; c.beginPath(); c.moveTo(b.x-3*Math.cos(ang),b.y-3*Math.sin(ang)); c.lineTo(b.x+3*Math.cos(ang),b.y+3*Math.sin(ang)); c.stroke(); }
+  c.beginPath(); c.arc(tip.x,tip.y,h*.014,0,7); c.fillStyle=BRASS; c.fill(); c.strokeStyle=INK; c.lineWidth=1.6; c.stroke();
+  // the cork grip, its butt cap and the reel seat
+  c.save(); c.translate(L.hx,L.hy); c.rotate(ang); const gl=L.len*.15, gh=h*.11;
+  rrect(c,-gl*.1,-gh/2,gl,gh,gh*.45); c.fillStyle='#C9A577'; c.fill(); c.save(); c.clip(); c.fillStyle='rgba(120,80,40,.35)';
+  for (let i=0;i<26;i++){ c.beginPath(); c.arc(((i*37)%100)/100*gl-gl*.1,((i*53)%100)/100*gh-gh/2,1.1,0,7); c.fill(); } c.restore();
+  c.strokeStyle=INK; c.lineWidth=2.4; rrect(c,-gl*.1,-gh/2,gl,gh,gh*.45); c.stroke();
+  rrect(c,-gl*.2,-gh*.42,gl*.12,gh*.84,3); c.fillStyle='#4A4C54'; c.fill(); c.stroke();
+  rrect(c,gl*.86,-gh*.4,gl*.42,gh*.8,3); c.fillStyle=BRASS; c.fill(); c.stroke(); c.restore();
+  // the reel, seated on top
+  c.save(); c.translate(L.reel.x,L.reel.y); c.rotate(ang); drawTackle(c,rig.reel,h*.44,t); c.restore();
+  // what's on the hook
+  c.save(); c.translate(hook.x,hook.y); c.rotate(swing);
+  if (bait==='spinner'){ const k=h/250; c.scale(k,k); c.translate(0,44); taSpinner(c,t,true); c.restore(); c.restore(); return; }
+  const k=h/150; c.scale(k,k); laInk(c,2.6);
+  c.beginPath(); c.moveTo(0,-2); c.lineTo(0,14); c.quadraticCurveTo(0,24,-8,22); c.quadraticCurveTo(-13,20,-12,13); c.stroke();
+  c.strokeStyle='#C9CCD3'; c.lineWidth=1.1; c.stroke(); laInk(c,2); c.beginPath(); c.arc(0,-4,2.4,0,7); c.stroke();
+  if (bait==='worms') taWorm(c,[[-2,4],[6,10],[0,14],[-8,18],[-4,26],[0,34],[-6,38]],4.2);
+  else if (bait==='grubs') taGrub(c,-3,14,5.4,1.3,t);
+  else if (bait==='chum'){ laInk(c,2.2); laEll(c,-2,15,8,7); laFill(c,'#B4584A'); c.fillStyle='#E8C9A8'; laEll(c,-5,12,2.6,2); c.fill(); laEll(c,1,18,2,1.6); c.fill(); }
+  c.restore(); c.restore(); }
+
 /* ---------- Catch card: the fish, the tape measure, and the record moment ---------- */
 const CARD={raf:0,t0:0,L:null,w:0,h:0,d:1,lastTick:null,snapped:false,passed:-1,shownW:''};
 function tapeUnits(){ const uc=imperial()?2.54:1; return {uc}; }
@@ -2622,7 +3071,7 @@ function lootEnd(){ const L=S.loot; hideHaul(); closeNote(true); S.loot=null; S.
   const FS=findsState(), fresh=L && L.got.items.some(it=>it.type==='find'||it.type==='note');
   if (fresh){ $('journalBtn').classList.remove('pulse'); void $('journalBtn').offsetWidth; $('journalBtn').classList.add('pulse'); }
   if (L && L.got.items.some(it=>it.type==='find' && FINDS[it.id].kind==='artifact') && !save.finds.pocketTip){ save.finds.pocketTip=true; persist();
-    coachFor('Artifacts only work from a vest pocket. You have one to start. Pocket and swap them on the journal’s Finds page.',8); }
+    coachFor('Artifacts only work from a vest pocket. You have one to start. Pocket and swap them in your tackle bag.',8); }
   else if (fresh && FS.treasure<=2) coachFor('Everything you find is kept on the Finds page of your journal.',6);
   if (L && L.kind==='letter') letterToPell(L.got.items[0]&&L.got.items[0].id);
 }
@@ -2702,12 +3151,15 @@ function haulItemHTML(it,i){ const st=' style="--i:'+i+'"';
   if (it.type==='find'){ const D=FINDS[it.id], art=D.kind==='artifact', eq=findsState().equip.includes(it.id);
     return '<div class="hl-item rf" data-r="'+D.rarity+'"'+st+'><canvas class="hl-art" data-find="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[D.rarity].label+' '+KIND_LABEL[D.kind]+' · <b>New</b></span><h3>'+D.name+'</h3>'+
       '<p>'+(D.eff||D.lore)+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+(D.owner?'<p class="owner">This belongs to '+OWNERS[D.owner].name+'. Give it back from your journal’s Finds page.</p>':'')+
-      (art?(eq?'<p class="on">In a pocket. Working now.</p>':freePocket()?'<button class="btn sm" type="button" data-pocket="'+it.id+'">Put it in a pocket</button>':'<p class="pk-note">Your pockets are full. Swap it in from the journal’s Finds page.</p>'):'')+
+      (art?(eq?'<p class="on">In a pocket. Working now.</p>':freePocket()?'<button class="btn sm" type="button" data-pocket="'+it.id+'">Put it in a pocket</button>':'<p class="pk-note">Your pockets are full. Swap it in from your tackle bag.</p>'):'')+
       (D.kind==='keepsake'?'<p class="on">Working now, from your shelf.</p>':'')+'</div></div>'; }
   if (it.type==='paint'){ const P=PAINTS[it.id];
     return '<div class="hl-item rf" data-r="'+P.crate+'"'+st+'><canvas class="hl-art" data-paint="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[P.crate].label+' hull paint · <b>New</b></span><h3>'+P.name+'</h3><p>'+(save.boat?'Paint your skiff with it from Tacklegram’s Boat tab.':'For your boat, once you have one.')+'</p></div></div>'; }
   if (it.type==='decor'){ const D=DECOR[it.tank].find(d=>d.id===it.id);
     return '<div class="hl-item rf" data-r="'+D.crate+'"'+st+'><svg class="hl-art" viewBox="0 0 44 44" aria-hidden="true">'+DECOR_ICON[it.id]+'</svg><div class="hl-txt"><span class="k">'+RAR[D.crate].label+' aquarium decor · <b>New</b></span><h3>'+D.name+'</h3><p>'+D.eff+'. Place it from the aquarium’s shop.</p></div></div>'; }
+  if (it.type==='gear'){ const T=TACKLE[it.id], r=T.crate||'common', on=T.kind!=='bait'&&rigFor(save.rod)[T.kind]===it.id;
+    return '<div class="hl-item rf" data-r="'+r+'"'+st+'><canvas class="hl-art" data-gear="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[r].label+' '+(isLure(it.id)?'lure':T.kind)+' · <b>New</b></span><h3>'+T.name+'</h3>'+
+      '<p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+(on?'<p class="on">On your '+ROD().name+'.</p>':T.kind==='bait'?'<p class="on">In your tackle bag.</p>':'<button class="btn sm" type="button" data-rigit="'+it.id+'">Put it on your '+ROD().name+'</button>')+'</div></div>'; }
   if (it.type==='note'){ const N=NOTES[it.id];
     return '<div class="hl-item rf" data-r="common"'+st+'><canvas class="hl-art" data-notekind="'+N.kind+'"></canvas><div class="hl-txt"><span class="k">'+noteKind(N)+'</span><h3>'+noteTitle(it.id)+'</h3><p>Kept with your notes in the journal.</p><button class="btn sm" type="button" data-read="'+it.id+'">Read it</button></div></div>'; }
   if (it.type==='spare') return '<div class="hl-item spare"'+st+'><div class="hl-txt"><span class="k">Spare coins</span><h3><span class="coin"></span>+'+it.n.toLocaleString()+'</h3><p>You’ve found every '+RAR[it.rarity].label.toLowerCase()+' thing this could have held, so it paid in coins.</p></div></div>';
@@ -2727,7 +3179,7 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   const n=g.items.length, last=.35+Math.max(0,n-1)*.55;
   h+='<button class="btn primary" id="hlGo" type="button" style="animation-delay:'+(last+.3).toFixed(2)+'s">Collect</button>';
   el.innerHTML=h; el.hidden=false; ovOpen('haul',()=>{ lootEnd(); });
-  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind]'));
+  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear]'));
   // the coins count up, then each item arrives with its own sound
   if (base){ const b=$('hlCoins'), t0=performance.now(), dur=REDUCED?1:Math.min(1100,350+base*.25); sfx.coin(6);
     (function step(now){ if (!b.isConnected) return; const k=Math.min(1,(now-t0)/dur); b.textContent=Math.round(base*(1-Math.pow(1-k,3))).toLocaleString(); if (k<1) requestAnimationFrame(step); else tallyCoins(); })(t0); }
@@ -2735,21 +3187,24 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   g.items.forEach((it,i)=>setTimeout(()=>{ if (!el.hidden) sfx.find(itemRarity(it)); },REDUCED?0:(350+i*550)));
   $('hlGo').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); lootEnd(); });
   el.querySelectorAll('[data-pocket]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); if (!pocketIt(b.dataset.pocket)) return; b.outerHTML='<p class="on">In a pocket. Working now.</p>';
-    if (!freePocket()) el.querySelectorAll('[data-pocket]').forEach(o=>{ o.outerHTML='<p class="pk-note">Your pockets are full now. Swap it in from the journal’s Finds page.</p>'; }); }));
+    if (!freePocket()) el.querySelectorAll('[data-pocket]').forEach(o=>{ o.outerHTML='<p class="pk-note">Your pockets are full now. Swap it in from your tackle bag.</p>'; }); }));
   el.querySelectorAll('[data-read]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); openNote(b.dataset.read,{}); }));
+  el.querySelectorAll('[data-rigit]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); const id=b.dataset.rigit; if (!rigGear(id)) return; sfx.rig(TACKLE[id].kind); b.outerHTML='<p class="on">On your '+ROD().name+'.</p>'; }));
   // keep the open crate in view above the card
   const cardTop=window.innerHeight-(parseFloat(getComputedStyle(el).bottom)||18)-el.offsetHeight, room=cardTop-14-(L.kind==='crate'?crateW(L.ti)*1.02+L.hv:90)-64;
   L.lift=Math.min(L.to.y,cardTop-14); if (L.kind==='crate' && room<0) L.fit=Math.max(.5,1+room/(crateW(L.ti)*1.02));
 }
-const itemRarity=it=>it.type==='find'?FINDS[it.id].rarity:it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
+const itemRarity=it=>it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
 function hideHaul(){ const el=$('haul'); if (el.hidden) return; ovClosed('haul'); el.classList.add('out'); setTimeout(()=>{ el.hidden=true; el.classList.remove('out'); el.innerHTML=''; },REDUCED?0:250); }
 /** Paints tiles in two passes, every size read before any canvas is resized, so the page lays out once. */
 function paintTiles(list){ const d=Math.min(window.devicePixelRatio||1,2), rs=[...list].map(cv=>[cv,cv.getBoundingClientRect()]); for (const [cv,r] of rs) paintTile(cv,r,d); }
-/** Draws a find, paint or note tile into a canvas sized by CSS. */
+/** Draws a find, paint, note or tackle tile into a canvas sized by CSS. */
 function paintTile(cv,r,d){ r=r||cv.getBoundingClientRect(); d=d||Math.min(window.devicePixelRatio||1,2); if (!r.width) return;
   cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); const s=Math.min(r.width,r.height)*.86;
   if (cv.dataset.find){ if (cv.dataset.sil) drawFindSilhouette(x,cv.dataset.find,s); else drawFind(x,cv.dataset.find,s,0); }
   else if (cv.dataset.paint) drawHullSwatch(x,cv.dataset.paint,s);
+  else if (cv.dataset.gear) drawTackle(x,cv.dataset.gear,s,S.time);
+  else if (cv.dataset.hook) drawBareHook(x,s);
   else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
 function drawHullSwatch(c,id,s){ const P=PAINTS[id]; c.save(); c.scale(s/100,s/100); laInk(c);
   c.fillStyle='rgba(60,110,130,.25)'; laEll(c,0,24,44,7); c.fill();
@@ -3797,8 +4252,9 @@ function grant(o){
   if (o.kind==='rod'){ if (!save.rods.includes(o.id)) save.rods.push(o.id); save.rod=o.id; }
   else if (o.kind==='part'){ save.parts=save.parts||[]; if (!save.parts.includes(o.id)) save.parts.push(o.id); }
   else if (o.kind==='paint'){ save.paints=save.paints||['blue']; if (!save.paints.includes(o.id)) save.paints.push(o.id); save.paint=o.id; }
+  else if (o.kind==='gear' && TACKLE[o.id]){ grantGear(o.id); fitNewGear(o.id); }
 }
-function itemName(o){ return o.kind==='rod'?RODS[o.id].name:o.kind==='part'?PARTS[o.id].name:PAINTS[o.id].name+' paint'; }
+function itemName(o){ return o.kind==='rod'?RODS[o.id].name:o.kind==='part'?PARTS[o.id].name:o.kind==='gear'?(TACKLE[o.id]||{}).name:PAINTS[o.id].name+' paint'; }
 function updateMail(dt){
   if (MAIL.state==='away') return;
   MAIL.t-=dt; const stopX=W*.27;
@@ -3809,7 +4265,7 @@ function updateMail(dt){
     if (MAIL.sayT>0){ MAIL.sayT-=dt; if (MAIL.sayT<=0){ MAIL.say=''; MAIL.t=.5; } return; }   // Pell finishes reading out an address
     if (MAIL.t<=0){
       const got=(save.pending||[]).splice(0); got.forEach(grant); persist();
-      if (got.length){ sfx.out('uncommon'); buzz([0,30,40,30]); news('Delivered: '+got.map(itemName).join(', '),'gold'); updateHud(); }
+      if (got.length){ sfx.out('uncommon'); buzz([0,30,40,30]); news('Delivered: '+got.map(itemName).join(', '),'gold'); updateHud(); bagRefresh(); }
       const line=pellReads(); if (line){ MAIL.say=line; MAIL.sayT=5; tone(587,.16,{vol:.06,type:'triangle'}); tone(784,.2,{vol:.06,type:'triangle',delay:.16}); return; }
       MAIL.state='leaving'; } }
   else if (MAIL.state==='leaving'){ MAIL.x-=dt*80; if (MAIL.x<-120){ MAIL.state=(save.pending||[]).length||lettersWaiting()?'waiting':'away'; MAIL.t=4; } }
@@ -3846,6 +4302,12 @@ function renderApp(tab){
       body+='<div class="app-item"><div class="app-row"><div><h4>'+R.name+'</h4><p>'+R.blurb+'</p></div>'+btn+'</div>'+
         statBar('Line',R.line,'line',cur.line)+statBar('Reel',R.reel,'reel',cur.reel)+statBar('Luck',R.luck,'luck',cur.luck)+statBar('Value',R.value,'value',cur.value)+
         '<p class="perk">Perk: '+R.perk+'</p></div>'; });
+  } else if (tab==='tackle'){
+    const g=gearState();
+    body+='<p class="app-note">Reels, lines and lures for any rod. They go straight onto the rod in your hand, and live in your tackle bag.</p>';
+    for (const kind of SOCKETS) for (const id of TACKLE_ORDER[kind].filter(id=>TACKLE[id].shop==='tacklegram')){ const T=TACKLE[id], owned=!!g.own[id], can=save.coins>=T.price;
+      const btn=owned?'<span class="tag ok">In your bag</span>':isPending('gear',id)?'<span class="tag">On its way</span>':'<button class="btn sm" data-order="gear:'+id+'"'+(can?'':' disabled')+'>Order · '+T.price.toLocaleString()+'</button>';
+      body+='<div class="app-item"><div class="app-row tk-app"><canvas data-gear="'+id+'"></canvas><div><span class="app-kind">'+(isLure(id)?'Lure':SOCK_NAME[kind])+'</span><h4>'+T.name+'</h4><p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+'</div>'+btn+'</div></div>'; }
   } else {
     body+='<p class="app-note">Upgrades for your skiff. Parts work while you fish from the boat.</p>';
     Object.entries(PARTS).forEach(([id,P])=>{ const owned=hasPart(id), can=save.coins>=P.price;
@@ -3860,14 +4322,16 @@ function renderApp(tab){
   const L=$('phoneScreen'); if (!L) return;
   L.innerHTML='<div class="app-in">'+
     '<div class="app-head"><div><b>Tacklegram</b><span>Tackle, delivered anywhere</span></div><div class="app-coins"><span class="coin"></span>'+save.coins.toLocaleString()+'</div></div>'+
-    '<div class="app-tabs"><button data-tab="rods" class="'+(tab==='rods'?'on':'')+'">Rods</button><button data-tab="boat" class="'+(tab==='boat'?'on':'')+'">Boat</button></div>'+
+    '<div class="app-tabs"><button data-tab="rods" class="'+(tab==='rods'?'on':'')+'">Rods</button><button data-tab="tackle" class="'+(tab==='tackle'?'on':'')+'">Tackle</button><button data-tab="boat" class="'+(tab==='boat'?'on':'')+'">Boat</button></div>'+
     (pend.length?'<p class="app-ship">Pell’s mail boat is bringing: '+pend.map(itemName).join(', ')+'</p>':'')+
     '<div class="app-body">'+body+'</div></div>';
   L.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>renderApp(b.dataset.tab)));
+  paintTiles(L.querySelectorAll('canvas[data-gear]'));
   L.querySelectorAll('[data-eq]').forEach(b=>b.addEventListener('click',()=>{ save.rod=b.dataset.eq; persist(); sfx.hook(false); news('Equipped '+RODS[save.rod].name,'good'); renderApp('rods'); }));
   L.querySelectorAll('[data-paint]').forEach(b=>b.addEventListener('click',()=>{ save.paint=b.dataset.paint; persist(); sfx.hook(false); renderApp('boat'); }));
   L.querySelectorAll('[data-order]').forEach(b=>b.addEventListener('click',()=>{ const [kind,id]=b.dataset.order.split(':');
-    const price=kind==='rod'?RODS[id].price:kind==='part'?PARTS[id].price:PAINTS[id].price; if (save.coins<price) return;
+    const price=kind==='rod'?RODS[id].price:kind==='part'?PARTS[id].price:kind==='gear'?TACKLE[id].price:PAINTS[id].price; if (save.coins<price) return;
+    if (!(kind==='gear'&&TACKLE[id].casts) && (save.pending||[]).some(o=>o.kind===kind&&o.id===id)) return;   // a double tap orders a one-of-a-kind piece once
     addCoins(-price); queueOrder(kind,id); tone(880,.08,{vol:.08,type:'triangle'}); tone(1320,.12,{vol:.08,type:'triangle',delay:.08});
     toast(REG()==='lake'?'Ordered! Pell will bring it to the dock.':'Ordered! Pell’s mail boat is on the way.','good'); updateHud(); renderApp(tab); }));
 }
@@ -4820,6 +5284,7 @@ function starsFor(total){ const p=total/400; return p>=.85?3:p>=.62?2:p>=.3?1:0;
 function showResult(){ sizzleStop(); const total=STATIONS.reduce((a,k)=>a+(K.scores[k]||0),0), stars=starsFor(total), mush=stars===0, R=RECIPES[K.rid];
   K.mode='result'; K.res={total,stars,mush,t:0,rays:0}; K.st=null; K.used=[]; kTopUI(); kPips(); kSay(''); $('kBottom').hidden=true; $('kTicket').hidden=true;
   const el=$('kResult'), meal=save.meal&&save.meal.casts>0?save.meal:null, pantryFull=(save.pantry||[]).length>=3;
+  grantGear(KITCHEN_BAIT,1);   // the scraps from every cook go into a tin of chum (data/tackle.js)
   const bars=STATIONS.map(k=>'<div class="k-sb"><span>'+STATION_NAME[k]+'</span><i><b style="width:'+(K.scores[k]||0)+'%"></b></i><em>'+(K.scores[k]||0)+'</em></div>').join('');
   const SP='<path d="M12 2.6 l2.9 6 6.5 .8 -4.8 4.5 1.2 6.5 -5.8 -3.2 -5.8 3.2 1.2 -6.5 -4.8 -4.5 6.5 -.8 Z"/>';
   const starHtml=[0,1,2].map(i=>'<span class="k-star'+(i<stars?' on':'')+'"><svg class="bg" viewBox="0 0 24 24">'+SP+'</svg>'+(i<stars?'<svg class="fg" viewBox="0 0 24 24" style="animation-delay:'+(.35+i*.32)+'s">'+SP+'</svg>':'')+'</span>').join('');
@@ -4829,8 +5294,9 @@ function showResult(){ sizzleStop(); const total=STATIONS.reduce((a,k)=>a+(K.sco
     '<div class="k-bars">'+bars+'</div>'+
     (mush?'<div class="row"><button class="btn" id="kToss" type="button">Give it to the heron</button><button class="btn primary" id="kEat" type="button">Eat it anyway</button></div>'
       :'<div class="row"><button class="btn" id="kSave" type="button"'+(pantryFull?' disabled':'')+'>'+(pantryFull?'Pantry full':'Save for later')+'</button><button class="btn primary" id="kEat" type="button">Eat now</button></div>')+
-    (meal?'<p class="k-note" id="kNote">You’re still on '+mealName(meal.id)+' ('+meal.casts+' casts left). Eating this replaces it.</p>':'');
-  el.hidden=false;
+    (meal?'<p class="k-note" id="kNote">You’re still on '+mealName(meal.id)+' ('+meal.casts+' casts left). Eating this replaces it.</p>':'')+
+    '<p class="k-scraps"><canvas data-gear="'+KITCHEN_BAIT+'" aria-hidden="true"></canvas><span>The scraps went into a tin of '+TACKLE[KITCHEN_BAIT].name.toLowerCase()+'. It’s in your tackle bag.</span></p>';
+  el.hidden=false; paintTiles(el.querySelectorAll('canvas[data-gear]'));
   musicDuck(.35,2.4); for (let i=0;i<stars;i++) setTimeout(()=>{ if (!K.open) return; tone([784,988,1319][i],.3,{vol:.1,type:'triangle'}); tone([1568,1976,2637][i],.2,{vol:.04,delay:.03}); buzz(10); K.res.pop=1; },350+i*320);
   if (mush) setTimeout(()=>{ tone(330,.35,{to:220,vol:.09,type:'triangle'}); tone(262,.4,{to:180,vol:.07,type:'triangle',delay:.25}); },300);
   else if (stars===3) setTimeout(()=>{ if (K.open){ kBurst(0,-60,40,'#F2D47E',{v0:120,v1:360,g:260,l0:.8,l1:1.4,r0:2,r1:4,kind:'conf'}); } },1300);
@@ -5099,10 +5565,16 @@ function coachLater(text,secs){ if (coachTimer || S.tut){ if (!COACHQ.some(c=>c.
 function coachShow(text,secs){ coach(text,'Tip'); clearTimeout(coachTimer); coachTimer=setTimeout(()=>{ coachTimer=0; if (!S.tut) coachOff(); setTimeout(coachDrain,700); },secs*1000); }
 function coachDrain(){ if (coachTimer || S.tut) return; while (COACHQ.length && performance.now()-COACHQ[0].at>90000) COACHQ.shift(); const n=COACHQ.shift(); if (n) coachShow(n.text,n.secs); }
 /* ---------- Leaving things: back gesture, Escape and swipe-down all close the top layer ---------- */
-const OV=[]; let ovSkip=0, ovPopping=false;
-function ovOpen(name,back){ if (OV.some(o=>o.name===name)) return; OV.push({name,back}); try { history.pushState({hm:name},''); } catch(e){} }
+const OV=[]; let ovSkip=0, ovPopping=false, ovQueue=[], ovQueueT=0;
+/* Opening one layer as another closes (a sheet that opens the bag or the map) would push the new entry before the
+   old one's history.back() lands, and that back would then eat it. So while a back is on its way, the push waits for it. */
+function ovPush(name){ try { history.pushState({hm:name},''); } catch(e){} }
+function ovFlush(){ clearTimeout(ovQueueT); for (const n of ovQueue.splice(0)) if (OV.some(o=>o.name===n)) ovPush(n); }
+function ovOpen(name,back){ if (OV.some(o=>o.name===name)) return; OV.push({name,back});
+  if (ovSkip>0){ ovQueue.push(name); clearTimeout(ovQueueT); ovQueueT=setTimeout(ovFlush,800); return; }
+  ovPush(name); }
 function ovClosed(name){ const i=OV.findIndex(o=>o.name===name); if (i<0) return; OV.splice(i,1); if (!ovPopping){ ovSkip++; try { history.back(); } catch(e){ ovSkip--; } } }
-window.addEventListener('popstate',()=>{ if (ovSkip>0){ ovSkip--; return; } const top=OV[OV.length-1]; if (!top) return;
+window.addEventListener('popstate',()=>{ if (ovSkip>0){ ovSkip--; if (!ovSkip) ovFlush(); return; } const top=OV[OV.length-1]; if (!top) return;
   ovPopping=true; const closed=top.back(); ovPopping=false;
   if (closed===false){ try { history.pushState({hm:top.name},''); } catch(e){} } else { const i=OV.indexOf(top); if (i>=0) OV.splice(i,1); } });
 document.addEventListener('keydown',e=>{ if (e.key!=='Escape') return; const top=OV[OV.length-1]; if (top) history.back(); });
@@ -5115,7 +5587,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=14, SNAP_KEY=KEY+'-snapshots';
+const BUILD=15, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -5302,7 +5774,7 @@ $('mealChip').addEventListener('click',()=>{ const m=save.meal; if (!m) return; 
 $('journalBtn').addEventListener('click',()=>{ $('journalBtn').classList.remove('pulse'); openJournal(); });
 
 /* ---------- Bonuses: the journal page that shows every bonus and where it comes from ---------- */
-const SRC_LABEL={rod:'Rod', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', event:'Event'};
+const SRC_LABEL={rod:'Rod', gear:'Tackle', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', event:'Event'};
 /** How a modifier reads: +35 luck, +25%, −30%, ×2.5. Each stat keeps one unit. */
 function modValueText(stat,v,omen){
   if (omen) return '×'+trimNum(v);
@@ -5327,6 +5799,7 @@ function modWhenText(w){
   if (w.rarity) out.push('for '+w.rarity.map(r=>RAR[r].label.toLowerCase()).join(' and ')+' fish');
   if (w.rarityMin) out.push(w.rarityMin===Object.keys(RAR)[1]?'for every fish above common':'for '+RAR[w.rarityMin].label.toLowerCase()+' fish and rarer');
   if (w.fish) out.push('with '+FISH[w.fish].name);
+  if (w.beh) out.push('for '+BEH[w.beh].toLowerCase()+'s');
   return out.join(', ');
 }
 /** 'on' applies wherever you cast right now; 'cond' depends on where you cast or what bites; 'off-here' and
@@ -5336,7 +5809,7 @@ function modState(m,now){ const w=m.when; if (!w) return 'on';
   if ((w.region && w.region!==now.region) || (w.spot && !spots.includes(w.spot))) return 'off-here';
   if (w.night && !now.night) return 'off-now';
   if (now.rarity && ((w.rarity && !w.rarity.includes(now.rarity)) || (w.rarityMin && rarRank(now.rarity)<rarRank(w.rarityMin)))) return 'off-here';
-  const open=w.spot||w.fish||w.lucky||((w.rarity||w.rarityMin)&&!now.rarity);
+  const open=w.spot||w.fish||w.beh||w.lucky||((w.rarity||w.rarityMin)&&!now.rarity);
   return open ? 'cond' : 'on'; }
 const stateClass=st=>st.startsWith('off')?'off':st;
 const stateNote=st=>st==='off-here'?' · not here':st==='off-now'?' · not now':'';
@@ -5399,8 +5872,9 @@ function bonusesHTML(){
   return h;
 }
 
-/* ---------- Finds: the journal page for everything treasure turns up, and the vest ---------- */
+/* ---------- Finds: the journal page for everything treasure turns up ---------- */
 /* Artifacts work only from a vest pocket: one to start, and Ottilie sews on more (POCKETS in data/treasure.js).
+   The pockets are shown and managed in the tackle bag (game/bag.js), with the pocket and sewing functions here.
    Keepsakes work from the moment you have them. Curios are for the collection, and a few belong to people in
    town, who give something back for them. Notes from bottles, the logbook and drowned letters can be reread. */
 let FD_SEL=null;
@@ -5418,16 +5892,11 @@ function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(ha
   const all=Object.keys(FINDS), got=all.filter(hasFind).length, cost=sewCost();
   let h='<p class="fd-count"><b>'+got+'</b> of '+all.length+' finds'+(FS.treasure?' · '+FS.treasure+' treasure'+(FS.treasure===1?'':'s')+' pulled up':'')+'</p>';
   if (!FS.treasure) h+='<p class="note">About one cast in a dozen, your line snags on something that isn’t a fish. Everything you pull up is kept here.</p>';
-  // the vest
-  h+='<section class="fd-card fd-vest"><header><h3>Vest pockets</h3><span>'+FS.equip.length+' of '+FS.pockets+' in use</span></header><p class="bn-hint">Artifacts only work from a pocket. Take one out to swap another in.</p><div class="pk-row">';
-  for (let i=0;i<POCKETS.max;i++){ const id=FS.equip[i];
-    if (i<FS.pockets) h+=id?'<button type="button" class="pk full" data-sel="'+id+'" aria-label="'+FINDS[id].name+'"><canvas data-find="'+id+'"></canvas><span>'+FINDS[id].name+'</span></button>':'<div class="pk empty"><i></i><span>Empty</span></div>';
-    else if (i===FS.pockets) h+='<button type="button" class="pk lock" id="sewBtn" aria-label="Sew a pocket for '+cost.toLocaleString()+' coins"'+(save.coins>=cost?'':' disabled')+'><b>+</b><span>Sew one</span><small><span class="coin"></span>'+cost.toLocaleString()+'</small></button>';
-    else h+='<div class="pk lock dim"><b>+</b><small>'+POCKETS.costs[i-POCKETS.start].toLocaleString()+'</small></div>'; }
-  h+='</div>'+(cost!=null?'<p class="bn-hint">Ottilie sews on each new pocket. The next costs '+cost.toLocaleString()+' coins.</p>':'<p class="bn-hint">Five pockets: as many as one vest can hold.</p>')+'</section>';
+  // the vest itself lives in the tackle bag (game/bag.js); this is what's in it
+  h+='<section class="fd-card fd-vest"><header><h3>Vest pockets</h3><span>'+FS.equip.length+' of '+FS.pockets+' in use</span></header><p class="bn-hint">'+(FS.equip.length?'Carrying '+FS.equip.map(id=>FINDS[id].name).join(', ')+'. ':'')+'You pocket and swap artifacts in your tackle bag.</p><button type="button" class="btn sm" id="fdBag">Open your tackle bag</button></section>';
   // artifacts and keepsakes you have
   const row=id=>{ const D=FINDS[id], eq=FS.equip.includes(id), art=D.kind==='artifact';
-    const btn=!art?'<span class="tag ok">Always on</span>':eq?'<button type="button" class="btn sm" data-out="'+id+'">Take out</button>':FS.equip.length<FS.pockets?'<button type="button" class="btn sm primary" data-in="'+id+'">Pocket it</button>':'<span class="tag">Pockets full</span>';
+    const btn=!art?'<span class="tag ok">Always on</span>':eq?'<span class="tag ok">In a pocket</span>':'<span class="tag">Not carried</span>';
     return '<div class="fd-row rf'+(eq?' eq':'')+'" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+D.kind+(FS.fresh.includes(id)?' · <b>New</b>':'')+'</span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+'</div>'+btn+'</div>'; };
   if (arts.length) h+='<section class="fd-card"><header><h3>Artifacts</h3><span>'+arts.length+' of '+findList('artifact').length+'</span></header>'+arts.map(row).join('')+'</section>';
   if (keeps.length) h+='<section class="fd-card"><header><h3>Keepsakes</h3><span>'+keeps.length+' of '+findList('keepsake').length+'</span></header>'+keeps.map(row).join('')+'</section>';
@@ -5458,10 +5927,8 @@ const fdReady = () => performance.now()-FD_T>350;   // the page just re-rendered
 function bindFinds(){ const p=$('panel'); FD_T=performance.now();
   paintTiles(p.querySelectorAll('canvas[data-find],canvas[data-notekind]'));
   p.querySelectorAll('[data-sel]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.sel, pocket=b.classList.contains('pk'); FD_SEL=FD_SEL===id&&!pocket?null:id; tone(900,.04,{vol:.04,type:'triangle'}); showDetail(pocket); }));
-  p.querySelectorAll('[data-in]').forEach(b=>b.addEventListener('click',()=>{ if (!fdReady()) return; pocketIt(b.dataset.in); refreshJournal(); }));
-  p.querySelectorAll('[data-out]').forEach(b=>b.addEventListener('click',()=>{ if (!fdReady()) return; unpocket(b.dataset.out); refreshJournal(); }));
   p.querySelectorAll('[data-read]').forEach(b=>b.addEventListener('click',()=>openNote(b.dataset.read,{})));
-  const sew=$('sewBtn'); if (sew) sew.addEventListener('click',()=>{ if (fdReady() && sewPocket()) refreshJournal(); });
+  const fb=$('fdBag'); if (fb) fb.addEventListener('click',()=>{ if (!fdReady()) return; closeSheet(); if (!BAG) openBag(); });   // with the bag already open under the journal, closing the sheet is enough
   bindDetail();
   // having seen the page, nothing is new any more
   const FS=findsState(); if (FS.fresh.length){ FS.fresh=[]; persist(); updateJournalDot(); } }
@@ -5492,6 +5959,217 @@ function returnFind(id){ const D=FINDS[id], FS=findsState(); if (!D || !D.owner 
   paintTiles(document.querySelectorAll('#panel canvas[data-find]'));
   document.querySelectorAll('#panel canvas[data-who]').forEach(cv=>{ const r=cv.getBoundingClientRect(), d=Math.min(window.devicePixelRatio||1,2); cv.width=r.width*d; cv.height=r.height*d; const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); drawPortrait(x,cv.dataset.who,Math.min(r.width,r.height)); });
   updateHud(); }
+
+/* ---------- The tackle bag: the rod rig, your rods, the vest pockets, keepsakes and what it all adds up to ---------- */
+/* Tap the bag on the bottom bar and it opens in 0.7 s: it rises, the buckle pops (0 to 0.15 s), the flap lifts
+   (0.15 to 0.4 s) and the gear slides out onto the cloth (0.4 to 0.7 s). Closing plays it backwards in 0.35 s, and
+   with reduced motion it fades in 0.15 s. A tap mid-way skips to the end. Every socket, and every vest pocket,
+   opens the same swap tray. Reels and lines belong to a rod (game/tackle.js); bait rides on whichever rod you hold. */
+const BAG_MS={open:700, close:350, fade:150};
+let BAG=null;   // while open: {phase:'opening'|'open'|'closing', timer, readyT, tray:{kind, at}|null, raf, last}
+const SOCKETS=['reel','line','bait'], SOCK_NAME={reel:'Reel', line:'Line', bait:'Bait'};
+
+const bagCan = () => S.state==='idle' && !!save.tutorialDone;
+const bagTapOK = () => BAG && BAG.phase==='open' && performance.now()-BAG.readyT>250;   // after a skip, the skipping tap can't land on what appears
+/** Opens the bag; `then` ('reel', 'line', 'bait' or 'pocket') opens that tray once it's out. */
+function openBag(then){ if (BAG || !bagCan()) return; audioInit(); const el=$('bag');
+  BAG={phase:'opening', tray:null, raf:0, readyT:Infinity, last:0};
+  el.innerHTML=bagFrameHTML(); el.hidden=false; el.className=REDUCED?'reduced':''; el.dataset.open='';
+  void el.offsetWidth; el.classList.add('opening');
+  ovOpen('bag',()=>{ closeBag(); });
+  renderBag(); bindBagFrame();
+  sfx.buckle(); if (!REDUCED) setTimeout(()=>{ if (BAG && BAG.phase==='opening') sfx.flap(false); },140);
+  buzz(12);
+  BAG.then=then||null;
+  BAG.timer=setTimeout(bagOpened, REDUCED?BAG_MS.fade:BAG_MS.open); }
+function bagOpened(){ if (!BAG || BAG.phase!=='opening') return; clearTimeout(BAG.timer); const el=$('bag');
+  BAG.phase='open'; BAG.readyT=0; el.classList.remove('opening'); el.classList.add('open'); el.dataset.open='done';
+  if (BAG.dirty){ BAG.dirty=false; renderBag(); }
+  rigLoop(); if (BAG.then){ const t=BAG.then; BAG.then=null; openTray(t,0); } }
+/** Something changed the bag's contents from outside (a delivery): redraw now, or once the tray closes. */
+function bagRefresh(){ if (!BAG) return; if (BAG.phase==='open' && !BAG.tray) renderBag(); else BAG.dirty=true; }
+function closeBag(){ if (!BAG || BAG.phase==='closing') return; const el=$('bag');
+  if (BAG.tray) closeTray(true);
+  clearTimeout(BAG.timer); cancelAnimationFrame(BAG.raf); BAG.phase='closing';
+  el.classList.remove('opening','open','skip'); void el.offsetWidth; el.classList.add('closing'); el.dataset.open='';
+  if (!REDUCED) sfx.flap(true);
+  ovClosed('bag'); BAG.timer=setTimeout(bagClosed, REDUCED?BAG_MS.fade:BAG_MS.close); }
+function bagClosed(){ if (!BAG) return; clearTimeout(BAG.timer); cancelAnimationFrame(BAG.raf); const el=$('bag');
+  el.hidden=true; el.className=''; el.innerHTML=''; BAG=null; updateBagBtn(); }
+/** A tap while it's opening finishes the opening; a tap while it's closing finishes the close. */
+function bagSkip(e){ if (!BAG) return;
+  if (BAG.phase==='opening'){ e.preventDefault(); e.stopPropagation(); $('bag').classList.add('skip'); bagOpened(); BAG.readyT=performance.now(); }
+  else if (BAG.phase==='closing'){ e.preventDefault(); e.stopPropagation(); bagClosed(); } }
+$('bag').addEventListener('pointerdown',bagSkip,true);
+$('bag').addEventListener('click',e=>{ if (BAG && BAG.phase!=='open'){ e.preventDefault(); e.stopPropagation(); } },true);
+
+/* ---------- the frame: shade, the bag body with its flap, the cloth inside, and the tray ---------- */
+function bagFrameHTML(){
+  return '<div class="bag-shade"></div>'+
+    '<div class="bag" role="dialog" aria-label="Tackle bag">'+
+      '<div class="bag-flap" aria-hidden="true"><div class="bf-face"><i class="bf-stitch"></i><span class="bf-strap"><i class="bf-tongue"></i></span><span class="bf-buckle"><i></i></span></div><div class="bf-under"><i class="bf-stitch"></i></div></div>'+
+      '<div class="bag-rim" aria-hidden="true"><i></i><i></i></div>'+
+      '<div class="bag-in" id="bagIn"></div>'+
+    '</div>'+
+    '<div class="bag-tray" id="bagTray" hidden></div>'; }
+function bindBagFrame(){ const el=$('bag');
+  el.querySelector('.bag-shade').addEventListener('click',()=>{ if (bagTapOK()) closeBag(); }); }
+
+/* ---------- what's inside ---------- */
+function bagHTML(){ const R=ROD(), rig=rigFor(save.rod), bait=baitOn(), g=gearState(), FS=findsState();
+  let h='<header class="bag-head" style="--i:0"><div><h2>Tackle bag</h2><p><span class="coin"></span>'+save.coins.toLocaleString()+' coins</p></div><button class="btn" id="bagClose" type="button">Close</button></header>';
+  // the rod rig
+  h+='<section class="bag-card bag-rig" style="--i:1"><header><div><span class="k">In your hand</span><h3>'+R.name+'</h3></div><span class="rig-reach">'+(castReach()>=1?'Casts to the horizon':'Reaches '+R.where.toLowerCase())+'</span></header>'+
+    '<div class="rig-art"><canvas id="rigCv" aria-hidden="true"></canvas>'+SOCKETS.map(k=>'<button type="button" class="rig-hot" data-hot="'+k+'" aria-label="Change the '+SOCK_NAME[k].toLowerCase()+'"></button>').join('')+'</div>'+
+    '<div class="rig-socks">'+SOCKETS.map(k=>sockHTML(k,rig,bait,g)).join('')+'</div></section>';
+  // rods you own
+  const rods=[...ROD_ORDER,...SEA_RODS].filter(id=>save.rods.includes(id));
+  if (rods.length>1) h+='<section class="bag-card bag-rods" style="--i:2"><header><h3>Rods</h3><span>Each keeps its own reel and line</span></header><div class="rod-row">'+rods.map(id=>{ const on=id===save.rod, r=rigFor(id);
+    return '<button type="button" class="rod-tile'+(on?' on':'')+'" data-rod="'+id+'"'+(on?' aria-current="true"':'')+'><canvas data-rodcv="'+id+'" aria-hidden="true"></canvas><b>'+RODS[id].name+'</b><span>'+(on?'In your hand':TACKLE[r.reel].name.replace(/ Reel$/,'')+' · '+TACKLE[r.line].name.replace(/ Line$/,''))+'</span></button>'; }).join('')+'</div></section>';
+  // the vest
+  const cost=sewCost();
+  h+='<section class="bag-card bag-vest" style="--i:3"><header><h3>Vest pockets</h3><span>'+FS.equip.length+' of '+FS.pockets+' in use</span></header><div class="pk-row">';
+  for (let i=0;i<POCKETS.max;i++){ const id=FS.equip[i];
+    if (i<FS.pockets) h+=id?'<button type="button" class="pk full" data-pk="'+i+'" aria-label="'+FINDS[id].name+', pocket '+(i+1)+'"><canvas data-find="'+id+'"></canvas><span>'+FINDS[id].name+'</span></button>'
+      :'<button type="button" class="pk empty" data-pk="'+i+'" aria-label="Empty pocket '+(i+1)+'"><i></i><span>Empty</span></button>';
+    else if (i===FS.pockets) h+='<button type="button" class="pk lock" id="sewBtn" aria-label="Sew a pocket for '+cost.toLocaleString()+' coins"'+(save.coins>=cost?'':' disabled')+'><b>+</b><span>Sew one</span><small><span class="coin"></span>'+cost.toLocaleString()+'</small></button>';
+    else h+='<div class="pk lock dim" aria-hidden="true"><b>+</b><small>'+POCKETS.costs[i-POCKETS.start].toLocaleString()+'</small></div>'; }
+  const arts=findList('artifact').filter(hasFind);
+  h+='</div><p class="bag-hint">'+(arts.length?'Artifacts only work from a pocket. Tap one to swap it.':'Artifacts you pull up go in these pockets, and only work while they’re in one.')+(cost!=null&&save.coins<cost?' The next pocket costs '+cost.toLocaleString()+' coins.':'')+'</p></section>';
+  // keepsakes
+  const keeps=findList('keepsake').filter(hasFind);
+  h+='<section class="bag-card bag-keeps" style="--i:4"><header><h3>Keepsakes</h3><span>'+(keeps.length?'Always working':'None yet')+'</span></header>'+
+    (keeps.length?'<div class="ks-list">'+keeps.map(id=>{ const D=FINDS[id]; return '<div class="ks rf" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div><b>'+D.name+'</b><p>'+D.eff+'</p></div></div>'; }).join('')+'</div>'
+      :'<p class="bag-hint">Keepsakes work from the moment you have them. Some turn up in crates, and people in town give them as thanks.</p>')+'</section>';
+  // what it all does
+  const lines=setupLines();
+  h+='<section class="bag-card bag-sum" style="--i:5"><header><h3>This setup</h3><span>Tackle, pockets and keepsakes</span></header>'+
+    (lines.length?'<ul class="bn-src">'+lines.join('')+'</ul>':'<p class="bag-hint">Nothing extra yet. Your rod has the plain reel and line every rod comes with.</p>')+
+    '<button type="button" class="bag-more" id="bagBonuses">Every bonus you have<span aria-hidden="true">›</span></button></section>';
+  return h; }
+function sockHTML(k,rig,bait,g){ const id=k==='bait'?bait:rig[k], T=id&&TACKLE[id], fresh=g.fresh.some(f=>TACKLE[f].kind===k);
+  const sub=k==='bait'?(id?(isLure(id)?'A lure: never runs out':baitLeftText(id)):'Bare hook'):(T&&T.starter?'Plain':gearChips(id).map(c=>c.text).join(' · '));
+  return '<button type="button" class="sock'+(id?'':' bare')+'" data-sock="'+k+'" aria-label="'+SOCK_NAME[k]+': '+(T?T.name:'nothing')+'"><canvas '+(id?'data-gear="'+id+'"':'data-hook="1"')+' aria-hidden="true"></canvas>'+
+    '<span class="k">'+SOCK_NAME[k]+(fresh?' <i class="nw">New</i>':'')+'</span><b>'+(T?T.name:'Nothing on')+'</b><small>'+sub+'</small></button>'; }
+/** "14 casts left · 2 more tins" */
+function baitLeftText(id){ const g=gearState(), n=(g.left[id]||0), tins=g.tins[id]||0;
+  return (n?n+' cast'+(n===1?'':'s')+' left':'Last cast')+(tins?' · '+tins+' more tin'+(tins===1?'':'s'):''); }
+/** One line per stat that your tackle, pockets and keepsakes change, the way the Bonuses page reads them. */
+function setupLines(){ const now=modCtx({}), all=modList().filter(m=>m.src==='gear'||m.src==='artifact'||m.src==='keepsake'), groups=new Map(), order=Object.keys(STATS);
+  for (const m of all){ const key=m.stat+'|'+JSON.stringify(m.when||{})+'|'+(m.omen?1:0); if (!groups.has(key)) groups.set(key,{stat:m.stat, when:m.when, omen:m.omen, ms:[]}); groups.get(key).ms.push(m); }
+  return [...groups.values()].sort((a,b)=>order.indexOf(a.stat)-order.indexOf(b.stat)).map(G=>{ const st=STATS[G.stat], flag=st.kind==='flag';
+    const add=st.kind==='add'||(st.kind==='luck'&&!G.omen), v=flag?null:G.ms.reduce((a,m)=>add?a+m.v:a*m.v,add?0:1);
+    const state=modState(G.ms[0],now), w=modWhenText(G.when), helps=flag||modHelps(G.stat,v,G.omen);
+    const val=flag?'On':st.kind==='base'&&v===0?'None':modValueText(G.stat,v,G.omen);
+    return '<li class="'+stateClass(state)+'"><span class="n">'+st.name+'</span><span class="s">'+G.ms.map(m=>m.name).join(', ')+(w?' · '+w:'')+stateNote(state)+'</span><b class="'+(state.startsWith('off')?'':helps?'up':'down')+'">'+val+'</b></li>'; }); }
+
+/** Draws the bag's contents and wires them up. Keeps the scroll where it was. */
+function renderBag(){ const box=$('bagIn'); if (!box) return; const y=box.scrollTop, row0=box.querySelector('.rod-row'), x=row0?row0.scrollLeft:null;
+  box.innerHTML=bagHTML(); box.scrollTop=y;
+  // the rod in hand stays in view in the rods row
+  const row=box.querySelector('.rod-row'), on=row&&row.querySelector('.rod-tile.on');
+  if (row) row.scrollLeft=x!=null&&on&&on.offsetLeft>=x&&on.offsetLeft+on.offsetWidth<=x+row.clientWidth?x:on?Math.max(0,on.offsetLeft-(row.clientWidth-on.offsetWidth)/2):0;
+  paintBag(); bindBag(); }
+/** Canvases are sized by their layout box, not their box on screen, which the opening scales mid-way. */
+const layoutBox = el => ({width:el.offsetWidth, height:el.offsetHeight});
+function paintBag(){ const box=$('bagIn'); if (!box) return; const d=Math.min(window.devicePixelRatio||1,2);
+  box.querySelectorAll('canvas[data-find],canvas[data-gear],canvas[data-hook]').forEach(cv=>paintTile(cv,layoutBox(cv),d));
+  box.querySelectorAll('canvas[data-rodcv]').forEach(cv=>{ const r=layoutBox(cv); if (!r.width) return; cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
+    const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); const id=cv.dataset.rodcv; drawRig(x,r.width,r.height,id,rigFor(id),id===save.rod?baitOn():null,0); });
+  drawRigCv(true); }
+/** The big rig drawing, and the tap targets over its reel, line and hook. */
+function drawRigCv(place){ const cv=$('rigCv'); if (!cv) return; const r=layoutBox(cv); if (!r.width) return; const d=Math.min(window.devicePixelRatio||1,2);
+  if (cv.width!==Math.round(r.width*d) || cv.height!==Math.round(r.height*d)){ cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); }
+  const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,r.width,r.height); drawRig(x,r.width,r.height,save.rod,rigFor(save.rod),baitOn(),S.time);
+  if (!place) return; const L=rigLayout(r.width,r.height), at={reel:L.reel, line:L.line, bait:{x:L.bait.x,y:L.bait.y}};
+  cv.parentNode.querySelectorAll('.rig-hot').forEach(b=>{ const p=at[b.dataset.hot]; b.style.left=Math.round(Math.min(r.width-26,Math.max(26,p.x)))+'px'; b.style.top=Math.round(Math.min(r.height-22,Math.max(22,p.y)))+'px'; }); }
+/** The hook sways, a spinner turns and glow line breathes while the bag is open (about 30 times a second). */
+function rigLoop(){ if (!BAG || REDUCED) return; cancelAnimationFrame(BAG.raf);
+  const step=now=>{ if (!BAG || BAG.phase==='closing') return; BAG.raf=requestAnimationFrame(step); if (document.hidden || now-BAG.last<33) return; BAG.last=now; drawRigCv(false); };
+  BAG.raf=requestAnimationFrame(step); }
+function bindBag(){ const box=$('bagIn'); if (!box) return;
+  $('bagClose').addEventListener('click',()=>{ if (bagTapOK()) closeBag(); });
+  box.querySelectorAll('[data-sock],[data-hot]').forEach(b=>b.addEventListener('click',()=>{ if (!bagTapOK()) return; tone(900,.04,{vol:.04,type:'triangle'}); openTray(b.dataset.sock||b.dataset.hot,0); }));
+  box.querySelectorAll('[data-pk]').forEach(b=>b.addEventListener('click',()=>{ if (!bagTapOK()) return; tone(900,.04,{vol:.04,type:'triangle'}); openTray('pocket',+b.dataset.pk); }));
+  box.querySelectorAll('[data-rod]').forEach(b=>b.addEventListener('click',()=>{ if (!bagTapOK()) return; const id=b.dataset.rod; if (id===save.rod) return;
+    save.rod=id; persist(); sfx.hook(false); buzz(12); news('Equipped '+RODS[id].name,'good'); renderBag(); bagPop('.bag-rig'); }));
+  const sew=$('sewBtn'); if (sew) sew.addEventListener('click',()=>{ if (bagTapOK() && sewPocket()){ renderBag(); bagPop('.bag-vest'); } });
+  $('bagBonuses').addEventListener('click',()=>{ if (bagTapOK()) openJournal('bonuses'); }); }
+/** A little pop on whatever just changed. */
+function bagPop(sel){ const el=document.querySelector('#bag '+sel); if (!el || REDUCED) return; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+
+/* ---------- the swap tray ---------- */
+/** One tray for every socket: what fits, what it changes, and where to get what you don't have yet. */
+function openTray(kind,at){ if (!BAG) return; const el=$('bagTray'), first=!BAG.tray;
+  BAG.tray={kind,at:at||0};
+  el.innerHTML='<div class="tray-shade"></div><div class="tray" role="dialog" aria-label="'+trayTitle(kind,at)+'">'+trayHTML(kind,at)+'</div>';
+  // having seen what's new for this socket, it isn't new any more (the tray still marks it this time)
+  if (kind!=='pocket'){ const g=gearState(), was=g.fresh.length; g.fresh=g.fresh.filter(id=>TACKLE[id].kind!==kind); if (g.fresh.length!==was){ persist(); BAG.seen=true; } }
+  el.hidden=false; el.classList.remove('out'); if (first){ el.classList.remove('in'); void el.offsetWidth; el.classList.add('in'); ovOpen('bagtray',()=>{ closeTray(); }); }
+  const d=Math.min(window.devicePixelRatio||1,2); el.querySelectorAll('canvas[data-find],canvas[data-gear],canvas[data-hook]').forEach(cv=>paintTile(cv,layoutBox(cv),d));
+  el.querySelector('.tray-shade').addEventListener('click',()=>closeTray());
+  el.querySelector('#trayClose').addEventListener('click',()=>closeTray());
+  el.querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click',()=>trayAct(b.dataset.act,b.dataset.id))); }
+function closeTray(now){ if (!BAG || !BAG.tray) return; const el=$('bagTray'); BAG.tray=null; ovClosed('bagtray');
+  if (BAG.seen || BAG.dirty){ BAG.seen=false; BAG.dirty=false; renderBag(); updateBagBtn(); }
+  if (now || REDUCED){ el.hidden=true; el.innerHTML=''; return; }
+  el.classList.remove('in'); el.classList.add('out'); setTimeout(()=>{ if (BAG && BAG.tray) return; el.hidden=true; el.innerHTML=''; el.classList.remove('out'); },180); }
+function trayTitle(kind,at){ return kind==='pocket'?'Pocket '+(at+1):SOCK_NAME[kind]+' for the '+ROD().name; }
+function trayHTML(kind,at){
+  let h='<header><div><span class="k">'+(kind==='pocket'?'Vest pocket '+(at+1):SOCK_NAME[kind]+' · '+ROD().name)+'</span><h3>'+(kind==='pocket'?'Carry an artifact':kind==='bait'?'Choose your bait':'Choose a '+kind)+'</h3></div><button class="btn" id="trayClose" type="button">Done</button></header><div class="tray-list">';
+  if (kind==='pocket') h+=pocketRows(at); else h+=gearRows(kind);
+  return h+'</div>'; }
+function chipsHTML(id){ return '<div class="chips">'+gearChips(id).map(c=>'<span class="'+(c.up?'up':'down')+'">'+c.text+'</span>').join('')+'</div>'; }
+function gearRows(kind){ const g=gearState(), rig=rigFor(save.rod), on=kind==='bait'?baitOn():rig[kind];
+  const ids=TACKLE_ORDER[kind], have=ids.filter(ownsGear), not=ids.filter(id=>!ownsGear(id));
+  let h='';
+  if (kind==='bait') h+='<div class="tr-row'+(on?'':' on')+'"><canvas data-hook="1"></canvas><div class="tr-txt"><h4>Bare hook</h4><p>No bait. Fish still bite a bare hook; bait brings them sooner, or brings different fish.</p></div>'+(on?'<button class="btn sm" type="button" data-act="unbait">Take bait off</button>':'<span class="tag ok">On the hook</span>')+'</div>';
+  for (const id of have){ const T=TACKLE[id], is=id===on, fresh=g.fresh.includes(id);
+    const other=kind!=='bait' && !T.starter ? [...ROD_ORDER,...SEA_RODS].filter(r=>r!==save.rod && save.rods.includes(r) && rigFor(r)[kind]===id).map(r=>RODS[r].name) : [];
+    const stock=kind==='bait'&&!isLure(id)?'<p class="stock">'+((g.left[id]||0)?(g.left[id])+' casts left in the open tin':'')+((g.left[id]||0)&&(g.tins[id]||0)?' · ':'')+((g.tins[id]||0)?(g.tins[id])+' unopened tin'+(g.tins[id]===1?'':'s')+' of '+T.casts+' casts':'')+'</p>':'';
+    h+='<div class="tr-row'+(is?' on':'')+'"><canvas data-gear="'+id+'"></canvas><div class="tr-txt"><h4>'+T.name+(fresh?' <i class="nw">New</i>':'')+'</h4><p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+(T.mods.length?chipsHTML(id):'')+stock+
+      (other.length?'<p class="also">Also on your '+other.join(' and ')+'</p>':'')+'</div>'+
+      (is?'<span class="tag ok">'+(kind==='bait'?'On the hook':'On the rod')+'</span>':'<button class="btn sm primary" type="button" data-act="'+(kind==='bait'?'bait':'rig')+'" data-id="'+id+'">'+(kind==='bait'?(isLure(id)?'Tie it on':'Bait up'):'Put it on')+'</button>')+'</div>'; }
+  if (not.length) h+='<p class="tr-sub">Not in your bag yet</p>'+not.map(id=>{ const T=TACKLE[id];
+    return '<div class="tr-row none"><canvas data-gear="'+id+'"></canvas><div class="tr-txt"><h4>'+T.name+'</h4><p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+'</div><span class="where">'+gearWhere(T)+'</span></div>'; }).join('');
+  return h; }
+/** Where to get a piece you don't have: "Ottilie · 400", "Tacklegram · 3,000", "Rare crates and up". */
+function gearWhere(T){ return T.shop==='ottilie'?'Ottilie<b><span class="coin"></span>'+T.price.toLocaleString()+'</b>':T.shop==='tacklegram'?'Tacklegram<b><span class="coin"></span>'+T.price.toLocaleString()+'</b>':T.kitchen?'From the kitchen':T.crate?RAR[T.crate].label+' crates<b>and up</b>':''; }
+function pocketRows(at){ const FS=findsState(), cur=FS.equip[at], arts=findList('artifact').filter(hasFind);
+  if (!arts.length) return '<p class="tr-empty">You haven’t found an artifact yet. About one cast in a dozen pulls up treasure, and some of it works from a pocket.</p>';
+  let h='';
+  for (const id of arts){ const D=FINDS[id], where=FS.equip.indexOf(id), here=where===at;
+    const act=here?'<button class="btn sm" type="button" data-act="out" data-id="'+id+'">Take it out</button>'
+      :where>=0?'<span class="tag">In pocket '+(where+1)+'</span>'
+      :'<button class="btn sm primary" type="button" data-act="pocket" data-id="'+id+'">'+(cur?'Swap it in':'Pocket it')+'</button>';
+    h+='<div class="tr-row rf'+(here?' on':'')+'" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div class="tr-txt"><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' artifact</span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+'</div>'+act+'</div>'; }
+  const left=findList('artifact').length-arts.length; if (left) h+='<p class="tr-sub">'+left+' more artifact'+(left===1?'':'s')+' still out there</p>';
+  return h; }
+function trayAct(act,id){ if (!BAG || !BAG.tray) return; const {kind,at}=BAG.tray, FS=findsState();
+  if (act==='rig'){ if (!rigGear(id)) return; sfx.rig(kind); }
+  else if (act==='bait'){ if (!loadBait(id)) return; sfx.rig('bait'); }
+  else if (act==='unbait'){ unloadBait(); sfx.rig('bait'); }
+  else if (act==='out'){ unpocket(id); }
+  else if (act==='pocket'){ const cur=FS.equip[at]; if (FS.equip.includes(id) || !hasFind(id)) return;
+    if (cur){ FS.equip[at]=id; persist(); sfx.pocket(true); news(FINDS[id].name+' is in a pocket','good'); }   // the one it replaces goes back in the bag
+    else if (!pocketIt(id)) return; }
+  buzz(12); renderBag(); bagPop(kind==='pocket'?'.bag-vest':'.sock[data-sock="'+kind+'"]'); updateBagBtn();
+  setTimeout(()=>closeTray(),REDUCED?0:140); }
+
+/* ---------- the bag on the bottom bar ---------- */
+/** Shows the bag once the tutorial's done, with a dot for new gear and a tag counting the bait left. */
+function updateBagBtn(){ const b=$('bagBtn'); if (!b) return; b.hidden=!save.tutorialDone; const g=gearState(), id=baitOn(), tag=$('bagBait');
+  b.classList.toggle('dot',g.fresh.length>0);
+  const n=id&&!isLure(id)?(g.left[id]||0):null; tag.hidden=n==null; if (n!=null){ tag.textContent=n||'!'; tag.classList.toggle('low',n<=3); }
+  b.setAttribute('aria-label','Open tackle bag'+(n!=null?', '+TACKLE[id].name.toLowerCase()+': '+n+' casts left':'')+(g.fresh.length?', new gear inside':''));
+  fitBar(); }
+/** Until the bottom bar is regrouped (step 13), it shrinks to fit narrow phones rather than running off the edge. */
+function fitBar(){ const bar=document.querySelector('.corner.center'); if (!bar) return; let w=0, n=0;
+  for (const c of bar.children){ if (c.hidden || getComputedStyle(c).display==='none') continue; w+=c.offsetWidth; n++; }
+  const gap=parseFloat(getComputedStyle(bar).columnGap)||0, need=w+gap*Math.max(0,n-1), room=window.innerWidth-12;
+  bar.style.setProperty('--fit',need>room?(room/need).toFixed(3):'1'); }
+window.addEventListener('resize',()=>{ fitBar(); if (BAG && BAG.phase==='open') paintBag(); });   // a turned phone redraws the rig and moves its tap spots
+$('bagBtn').addEventListener('click',()=>{ $('bagBtn').classList.remove('pulse'); openBag(); });
 
 /* ---------- Journal: species pages, personal records, finds (game/finds.js) and bonuses ---------- */
 let JTAB='species';
@@ -5570,9 +6248,12 @@ function openNet(){
   const sa=$('sellAll'); if (sa){ let armed=false; sa.addEventListener('click',()=>{ const rare=save.net.some(f=>FISH[f.id].rarity!=='common');
     if (rare && !armed){ armed=true; sa.textContent='Includes rare fish · tap again'; return; } sell(save.net.map((f,i)=>i)); }); }
 }
-function openShop(){
-  audioInit();
+let OTT_TAB='rods';
+function openShop(tab){
+  audioInit(); if (tab) OTT_TAB=tab;
   const first=!save.metOttilie; save.metOttilie=true; persist();
+  if (first) OTT_TAB='rods';
+  if (OTT_TAB==='tackle') return openTackleShop();
   const cur=ROD(), nextId=ROD_ORDER.find(id=>!save.rods.includes(id));
   const greet=first?'So you’re the new keeper. That Willow barely reaches past the dock. Earn some coins and I’ll set you up with something better.'
     : nextId && save.coins>=RODS[nextId].price ? 'Now you’ve got coin. The '+RODS[nextId].name+' will take you farther out.'
@@ -5581,7 +6262,7 @@ function openShop(){
   const bar=(label,v,max,cv)=>'<div style="display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:center;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#7A7468">'+label+
     '<div style="position:relative;height:7px;background:rgba(43,42,51,.12);border-radius:4px"><i style="position:absolute;inset:0 auto 0 0;width:'+Math.round(v/max*100)+'%;background:'+(v>cv?'#5E9B4E':v<cv?'#C0705C':'#8A8578')+';border-radius:4px"></i>'+
     '<i style="position:absolute;top:-3px;bottom:-3px;left:calc('+Math.round(cv/max*100)+'% - 1px);width:2px;background:#2B2A33"></i></div></div>';
-  let h='<div class="panel-head"><div><h2>Ottilie’s Rods</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins · Equipped: '+cur.name+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>';
+  let h='<div class="panel-head"><div><h2>Ottilie’s Rods</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins · Equipped: '+cur.name+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+(first?'':ottTabs());
   const mine=ownerHas('ottilie');
   if (mine.length){ const D=FINDS[mine[0]]; h+='<div class="entry rf ott-ask" data-r="'+D.rarity+'" style="grid-template-columns:64px 1fr"><canvas data-find="'+mine[0]+'" style="width:64px;height:64px"></canvas><div><p style="margin:0;font-style:italic;font-size:14px;color:#4B4842">“Hold on. Is that my '+D.name.toLowerCase().replace(/^tin /,'')+'? Where on earth did you find it?”</p><button class="btn primary" type="button" data-give="'+mine[0]+'" style="margin-top:8px">Give it back</button></div></div>'; }
   h+='<p class="note" style="font-style:italic;font-size:14px;color:#4B4842">“'+greet+'”</p><p class="note" style="margin-top:-6px">Dark line on each bar = your equipped rod.</p><div class="entries">';
@@ -5593,13 +6274,35 @@ function openShop(){
       bar('Reach',R.reach,1,cur.reach)+bar('Line',R.line,maxStat('line'),cur.line)+bar('Reel',R.reel,maxStat('reel'),cur.reel)+bar('Luck',R.luck,maxStat('luck'),cur.luck)+bar('Value',R.value,maxStat('value'),cur.value)+
       '<p style="margin:2px 0 0;font-weight:700;color:'+(id==='willow'?'#7A7468':'#3D5A3A')+'">'+(id==='willow'?'':'Perk: ')+R.perk+'</p></div><div>'+btn+'</div></div>'; });
   openSheet(h+'</div>');
-  $('closeS').addEventListener('click',closeSheet);
+  $('closeS').addEventListener('click',closeSheet); bindOttTabs();
   paintTiles(document.querySelectorAll('#panel canvas[data-find]'));
   document.querySelectorAll('#panel [data-give]').forEach(b=>b.addEventListener('click',()=>returnFind(b.dataset.give)));
   document.querySelectorAll('[data-eq]').forEach(b=>b.addEventListener('click',()=>{ save.rod=b.dataset.eq; persist(); sfx.hook(false); news('Equipped '+RODS[save.rod].name,'good'); openShop(); }));
   document.querySelectorAll('[data-buy]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.buy, R=RODS[id]; if (save.coins<R.price) return;
     addCoins(-R.price); save.rods.push(id); save.rod=id; persist(); sfx.out('uncommon'); buzz([0,30,40,30]); toast('New rod: '+R.name+'!','gold'); openShop(); }));
 }
+
+/* ---------- Ottilie's tackle: reels and lines she makes herself, and bait by the tin (data/tackle.js) ---------- */
+const ottTabs = () => '<div class="seg" role="tablist">'+[['rods','Rods'],['tackle','Reels, lines & bait']].map(([k,l])=>'<button type="button" role="tab" data-ott="'+k+'" aria-selected="'+(OTT_TAB===k)+'" class="'+(OTT_TAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+function bindOttTabs(){ document.querySelectorAll('#panel [data-ott]').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.ott===OTT_TAB) return; tone(900,.04,{vol:.04,type:'triangle'}); openShop(b.dataset.ott); $('panel').scrollTop=0; })); }
+function openTackleShop(){ const g=gearState(), rig=rigFor(save.rod), bait=baitOn();
+  let h='<div class="panel-head"><div><h2>Ottilie’s Tackle</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins · On your '+ROD().name+': '+TACKLE[rig.reel].name+', '+TACKLE[rig.line].name+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+ottTabs();
+  h+='<p class="note" style="font-style:italic;font-size:14px;color:#4B4842">“Reels and line I make myself, the old way, and the worms I dig every morning. Each rod keeps its own reel and line, so fit what you buy to whichever you like.”</p><div class="entries">';
+  for (const kind of SOCKETS){ const ids=TACKLE_ORDER[kind].filter(id=>TACKLE[id].shop==='ottilie'); if (!ids.length) continue;
+    h+='<h3 class="j-reg">'+(kind==='bait'?'Bait, by the tin':kind==='reel'?'Reels':'Lines')+'</h3>';
+    for (const id of ids){ const T=TACKLE[id], tin=kind==='bait'&&!isLure(id), owned=!tin&&g.own[id], on=kind==='bait'?bait===id:rig[kind]===id, can=save.coins>=T.price;
+      const have=tin?(g.tins[id]||0)+((g.left[id]||0)>0?1:0):0;
+      const btn=owned?(on?'<span class="tag ok">On your rod</span>':'<button class="btn" data-fit="'+id+'" type="button">Put it on</button>')
+        :'<button class="btn" data-buyg="'+id+'" type="button"'+(can?'':' disabled')+'>'+(tin?'Buy a tin':'Buy')+' · '+T.price.toLocaleString()+'</button>';
+      h+='<div class="entry tk-entry"><canvas data-gear="'+id+'"></canvas><div style="min-width:0"><h3>'+T.name+'</h3><p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+
+        (tin?'<p class="tk-have">'+T.casts+' casts a tin'+(have?' · you have '+have+(have===1?' tin':' tins'):'')+'</p>':'')+'</div><div>'+btn+'</div></div>'; } }
+  h+='</div><p class="note" style="margin-top:12px">Your tackle bag on the bottom bar shows what’s on each rod. Bought pieces go straight onto the rod in your hand.</p>';
+  openSheet(h); $('closeS').addEventListener('click',closeSheet); bindOttTabs();
+  paintTiles(document.querySelectorAll('#panel canvas[data-gear]'));
+  document.querySelectorAll('#panel [data-fit]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.fit, T=TACKLE[id]; if (!(T.kind==='bait'?loadBait(id):rigGear(id))) return; sfx.rig(T.kind); news(T.name+' is on your '+ROD().name,'good'); openShop('tackle'); }));
+  document.querySelectorAll('#panel [data-buyg]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.buyg, T=TACKLE[id]; if (save.coins<T.price) return;
+    addCoins(-T.price); grantGear(id); const said=fitNewGear(id); sfx.rig(T.kind); buzz([0,20,30,20]);
+    news('Bought '+(T.kind==='bait'&&!isLure(id)?'a tin of '+T.name.toLowerCase():'the '+T.name)+'. '+said,'gold'); openShop('tackle'); })); }
 
 /* ---------- Balance simulator: the 1,000-cast report ---------- */
 /* Plays casts with any setup without drawing anything, using the game's own odds (poolFor), fights
@@ -5609,6 +6312,7 @@ function openShop(){
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
+   Tackle counts (reel, line and bait, through the same modifiers); bait never runs out in a run.
    Not modeled: aiming (every cast reaches its spot), keeping fish (every catch sells), the aquarium, the
    kitchen, Barnaby or the mail boat, and the clock (an artifact that speeds or stops time doesn't change the
    hour of a run). The setup lives in a stand-in save for the run, then the real save
@@ -5624,7 +6328,7 @@ const SIM_PLAYERS={
    390 by 844 phone; keep in step if spots move. */
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
                  coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]}};
-/** A stand-in save for a setup. tanks, parts, fish and finds can be copied from a real save ("Use my setup"). */
+/** A stand-in save for a setup. tanks, parts, fish, finds and gear can be copied from a real save ("Use my setup"). */
 function simSave(st){
   const s=fresh(), now=Date.now(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
   s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.clock=st.hour==null?12:st.hour;
@@ -5646,6 +6350,14 @@ function simSave(st){
   else { s.finds={have:{},equip:[],pockets:POCKETS.max,treasure:1};
     for (const id of st.artifacts||[]) if (FINDS[id]){ s.finds.have[id]={t:now}; if (FINDS[id].kind==='artifact') s.finds.equip.push(id); } }
   s.finds.treasure=Math.max(1,s.finds.treasure||0); s.finds.fresh=[];
+  // tackle: copied from a real save, or a reel, line and bait named for the run. Bait never runs out in a run.
+  if (st.gear) s.gear=JSON.parse(JSON.stringify(st.gear));
+  else { const own={}, rig={reel:GEAR_START.reel, line:GEAR_START.line};
+    for (const k of ['reel','line']) if (st[k] && TACKLE[st[k]] && TACKLE[st[k]].kind===k){ own[st[k]]=1; rig[k]=st[k]; }
+    s.gear={own, rig:{[s.rod]:rig}, left:{}, tins:{}, fresh:[]};
+    if (st.bait && TACKLE[st.bait] && TACKLE[st.bait].kind==='bait'){ s.gear.bait=st.bait; if (isLure(st.bait)) own[st.bait]=1; } }
+  if (s.gear.bait && !isLure(s.gear.bait)) s.gear.left[s.gear.bait]=1e9;
+  s.gear.lastBait=null;
   return s;
 }
 /** Plays one fight (a fish or a haul) through the game's fight step, the way player P would. Returns {end, ft, why}. */
@@ -5702,9 +6414,10 @@ function simulate(st,n){
       // a fish swims over and nibbles
       const id=pickW(poolFor(spot,lucky)), F=FISH[id];
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
-      t+=wait+Math.max(.4,(rand(85,150)-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1))*1.2);
+      const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
+      t+=wait+Math.max(.4,(rand(85,150)-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm)*1.2);
       const nib=F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3));
-      t+=rand(.5,1.1); for (let i=0;i<nib;i++) t+=F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4);
+      t+=rand(.5,1.1)*bm; for (let i=0;i<nib;i++) t+=(F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*bm;
       // the bite
       const fc={fish:id,spot,lucky}, r=P.react(); t+=r;
       if (r>F.window*modMul('hook',fc)){ out.lost.slow++; out.secs+=t+.7; continue; }
@@ -5743,8 +6456,8 @@ const BAL={form:null, last:null, prev:null};
 const BAL_TIMES=[[6.5,'Dawn'],[12,'Noon'],[18.5,'Dusk'],[22,'Night']];
 /** The time of day the clock is in: dawn (the Mayor's hours), dusk, night or the middle of the day. */
 const balTime=h=>h>=5&&h<8?6.5:isNight(h)?22:h>=17?18.5:12;
-function balMine(){ const m=save.meal;
-  return {region:REG(), spot:'open', hour:balTime(save.clock), rod:save.rod, meal:mealActive()?m.id:'', stars:mealActive()?m.stars:3,
+function balMine(){ const m=save.meal, rig=rigFor(save.rod);
+  return {region:REG(), spot:'open', hour:balTime(save.clock), rod:save.rod, reel:rig.reel, line:rig.line, bait:baitOn()||'', meal:mealActive()?m.id:'', stars:mealActive()?m.stars:3,
     sets:'mine', parts:'mine', mastery:'mine', finds:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000}; }
 function balanceFormHTML(){
   const f=BAL.form||(BAL.form=balMine());
@@ -5752,12 +6465,15 @@ function balanceFormHTML(){
   const spots=Object.keys(f.region==='coast'?POOLS_COAST:POOLS).map(sp=>[sp,f.region==='coast'&&sp==='deep'?'Dark trench':SPOT_NAME[sp]]);
   const mySets=setsDone().length, myParts=(save.parts||[]).length, myMast=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=MASTERY.catches).length;
   const myArts=findsState().equip.length;
-  let h='<p class="note">Plays casts with the game’s own odds, fights, catch rolls, snags, swells, treasure and tuning. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps. Every catch is sold; aiming, the aquarium and the kitchen aren’t played.</p>'+
+  let h='<p class="note">Plays casts with the game’s own odds, fights, catch rolls, snags, swells, treasure, tackle and tuning. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps. Every catch is sold; aiming, the aquarium and the kitchen aren’t played.</p>'+
     '<div class="bal-form">'+
     sel('bRegion','Water',Object.keys(REGION_NAME).map(r=>[r,REGION_NAME[r]]),f.region)+
     sel('bSpot','Spot',[...spots,['mix','Every spot']],f.spot)+
     sel('bHour','Time',BAL_TIMES.map(([h,l])=>[h,l]),f.hour)+
     sel('bRod','Rod',[...ROD_ORDER,...SEA_RODS].map(id=>[id,RODS[id].name]),f.rod)+
+    sel('bReel','Reel',TACKLE_ORDER.reel.map(id=>[id,TACKLE[id].name]),f.reel||'clicker')+
+    sel('bLine','Line',TACKLE_ORDER.line.map(id=>[id,TACKLE[id].name]),f.line||'cotton')+
+    sel('bBait','Bait',[['','Bare hook'],...TACKLE_ORDER.bait.map(id=>[id,TACKLE[id].name])],f.bait||'')+
     sel('bMeal','Meal',[['','None'],...RECIPE_ORDER.map(id=>[id,RECIPES[id].name])],f.meal)+
     sel('bStars','Meal stars',[[1,'★'],[2,'★★'],[3,'★★★']],f.stars)+
     sel('bSets','Tank sets',[['mine','Yours ('+mySets+')'],['none','None'],['all','Every set']],f.sets)+
@@ -5772,7 +6488,7 @@ function balanceFormHTML(){
     '<div id="bOut">'+(BAL.last?balanceResultHTML(BAL.last,BAL.prev):'')+'</div>';
   return h;
 }
-function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:f.rod, meal:f.meal?{id:f.meal,stars:+f.stars}:null,
+function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:f.rod, reel:f.reel, line:f.line, bait:f.bait||null, meal:f.meal?{id:f.meal,stars:+f.stars}:null,
     parts:f.parts==='all'?'all':f.parts==='mine'?(save.parts||[]).slice():[], lucky:f.lucky==='yes', player:f.player};
   if (f.sets==='mine') st.tanks=tanks(); else st.sets=f.sets;
   if (f.mastery==='mine') st.fish=save.fish; else st.mastery=f.mastery==='all';
@@ -5780,7 +6496,7 @@ function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:
   if (f.treasure==='no') st.treasure=false;
   return st; }
 function bindBalance(){
-  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bFinds:'finds',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n'};
+  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bFinds:'finds',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n'};
   for (const [id,k] of Object.entries(ids)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
     if (k==='region'){ BAL.form.spot='open'; const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; }
     if (k==='n') $('bRun').textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts'; });
@@ -5795,7 +6511,7 @@ function balanceResultHTML(r,prev){
   const st=r.setup, fmt=n=>Math.round(n).toLocaleString();
   const delta=(k)=>{ if (!prev) return ''; const a=prev[k], b=r[k]; if (!a) return ''; const d=Math.round((b-a)/a*100);
     return '<em class="'+(d>0?'up':d<0?'down':'')+'">'+(d===0?'same as last run':(d>0?'▲ ':'▼ ')+Math.abs(d)+'% vs last run')+'</em>'; };
-  const title=REGION_NAME[st.region]+' · '+(st.spot==='mix'?'every spot':(st.region==='coast'&&st.spot==='deep'?'the trench':SPOT_NAME[st.spot].toLowerCase()))+' · '+BAL_TIMES.find(t=>t[0]===st.hour)[1].toLowerCase()+' · '+RODS[st.rod].name+(st.meal?' · '+RECIPES[st.meal.id].name+' '+'★'.repeat(st.meal.stars):'');
+  const title=REGION_NAME[st.region]+' · '+(st.spot==='mix'?'every spot':(st.region==='coast'&&st.spot==='deep'?'the trench':SPOT_NAME[st.spot].toLowerCase()))+' · '+BAL_TIMES.find(t=>t[0]===st.hour)[1].toLowerCase()+' · '+RODS[st.rod].name+[st.reel,st.line].filter(id=>id&&!TACKLE[id].starter).map(id=>' · '+TACKLE[id].name).join('')+(st.bait?' · '+TACKLE[st.bait].name:'')+(st.meal?' · '+RECIPES[st.meal.id].name+' '+'★'.repeat(st.meal.stars):'');
   let h='<section class="bal-res" aria-live="polite"><h3>'+r.casts.toLocaleString()+' casts: '+title+'</h3>';
   if (!r.reach.ok) h+='<p class="bal-warn">'+RODS[st.rod].name+' can’t reach this spot (it casts '+Math.round(r.reach.rod*100)+'% of the way out). These numbers assume it could.</p>';
   h+='<div class="stats bal-stats">'+
@@ -5837,12 +6553,13 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
       [['pouch','A coin pouch'],['bottle','A message bottle'],['letter','A drowned letter'],['find','A find']].concat(LOOT_TIERS.map(t=>['crate:'+t,aOrAn(CRATES[t].name.toLowerCase())])).map(([v,l])=>'<option value="'+v+'">'+l+'</option>').join('')+
       '</select><span class="note" style="grid-column:1/-1;margin:0">Treasure turns up on its own about once in 12 casts. This picks the next one, so you can see every crate open.</span></label></div>'+
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
-    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
+    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
   bindPlaytestTabs();
   [['tHook','hook'],['tTension','tension'],['tWait','wait']].forEach(([id,k])=>{ $(id).addEventListener('input',e=>{ save.tune[k]=+e.target.value; $(id+'O').textContent=(+e.target.value).toFixed(2)+'×'; persist(); }); });
   $('tClock').addEventListener('input',e=>{ save.clock=+e.target.value; $('tClockO').textContent=clockText(save.clock); buildBg(); persist(); });
   $('coinBtn').addEventListener('click',()=>{ addCoins(1000); });
   $('tLoot').addEventListener('change',e=>{ const v=e.target.value, [kind,tier]=v.split(':'); TREASURE_CTL.force=v?(tier?{kind,tier}:{kind}):null; $('tLootO').textContent=TREASURE_CTL.force?lootName(TREASURE_CTL.force):'A fish'; });
+  $('gearBtn').addEventListener('click',()=>{ for (const id in TACKLE) if (!TACKLE[id].starter) grantGear(id,TACKLE[id].casts?3:1); news('Every reel, line and lure, and three tins of each bait, are in your tackle bag','gold'); });
   $('findsBtn').addEventListener('click',()=>{ const FS=findsState(), now=Date.now(); for (const id in FINDS) if (!FS.have[id]){ FS.have[id]={t:now,hr:save.clock,reg:REG(),src:'playtest'}; FS.fresh.push(id); }
     persist(); updateJournalDot(); closeSheet(); news('Every find is in your journal','good'); });
   $('barBtn').addEventListener('click',()=>{ closeSheet(); if (save.boat){ toast('You already own a boat','warn'); return; } if (REG()==='lake' && BAR.state==='away'){ save.barnabyCame=false; BAR.state='arriving'; BAR.x=W+80; BAR.t=0; news('A boat is coming…','gold'); } });

@@ -1,5 +1,5 @@
 /* ---------- Modifiers: every bonus in the game goes through here ---------- */
-/* Each source (the rod in hand, the meal you ate, tank sets, decor, boat parts, artifacts in your vest pockets,
+/* Each source (the rod in hand and its tackle, the meal you ate, tank sets, decor, boat parts, artifacts in your vest pockets,
    keepsakes, mastery, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
    stat's total in a context (region, time, spot, fish, rarity, Gull Luck) and only matching modifiers count.
    STATS (data/stats.js) says how each stat combines and where it can apply at all. Adding an enchantment or
@@ -30,6 +30,10 @@ function modSources(){
   for (const k in TANKS) for (const d of decorFor(k)) if (d.luck && T[k].fish.some(f=>d.ids&&d.ids.includes(f.id))) add('decor',d.name,'luck',d.luck.v,{when:{region:d.luck.region}});
   // boat parts
   for (const id of save.parts||[]){ const P=PARTS[id]; if (P) for (const x of P.mods||[]) L.push(Object.assign({src:'part',name:P.name},x)); }
+  // tackle: the reel and line on the rod in hand, and the bait or lure on it (game/bag.js)
+  const rig=rigFor(save.rod);
+  for (const id of [rig.reel, rig.line]){ const T=TACKLE[id]; if (T) for (const x of T.mods) L.push(Object.assign({src:'gear',name:T.name},x)); }
+  const bait=baitOn(); if (bait) for (const x of TACKLE[bait].mods) L.push(Object.assign({src:'gear',name:TACKLE[bait].name},x));
   // artifacts work while they're in a vest pocket; keepsakes work from the moment you have them
   const FS=findsState();
   for (const id of FS.equip){ const D=FINDS[id]; if (D && FS.have[id]) for (const x of D.mods||[]) L.push(Object.assign({src:'artifact',name:D.name},x)); }
@@ -54,7 +58,7 @@ function modList(){ if (MODC.list && MODC.at===MODC.frame && !MODC.dirty) return
 /** The context a stat is read in. Region and time come from the game; callers add spot, fish, rarity or lucky.
     A fish brings its rarity along. */
 function modCtx(c){ const x=Object.assign({region:REG(), night:isNight(save.clock)}, c);
-  if (x.fish && !x.rarity) x.rarity=FISH[x.fish].rarity; return x; }
+  if (x.fish){ if (!x.rarity) x.rarity=FISH[x.fish].rarity; if (!x.beh) x.beh=FISH[x.fish].beh; } return x; }
 const rarRank=r=>Object.keys(RAR).indexOf(r);
 function modMatch(m,c){ const w=m.when; if (!w) return true;
   for (const k in w){ const want=w[k], have=c[k];

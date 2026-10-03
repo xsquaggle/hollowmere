@@ -1,5 +1,6 @@
-/* ---------- Finds: the journal page for everything treasure turns up, and the vest ---------- */
+/* ---------- Finds: the journal page for everything treasure turns up ---------- */
 /* Artifacts work only from a vest pocket: one to start, and Ottilie sews on more (POCKETS in data/treasure.js).
+   The pockets are shown and managed in the tackle bag (game/bag.js), with the pocket and sewing functions here.
    Keepsakes work from the moment you have them. Curios are for the collection, and a few belong to people in
    town, who give something back for them. Notes from bottles, the logbook and drowned letters can be reread. */
 let FD_SEL=null;
@@ -17,16 +18,11 @@ function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(ha
   const all=Object.keys(FINDS), got=all.filter(hasFind).length, cost=sewCost();
   let h='<p class="fd-count"><b>'+got+'</b> of '+all.length+' finds'+(FS.treasure?' · '+FS.treasure+' treasure'+(FS.treasure===1?'':'s')+' pulled up':'')+'</p>';
   if (!FS.treasure) h+='<p class="note">About one cast in a dozen, your line snags on something that isn’t a fish. Everything you pull up is kept here.</p>';
-  // the vest
-  h+='<section class="fd-card fd-vest"><header><h3>Vest pockets</h3><span>'+FS.equip.length+' of '+FS.pockets+' in use</span></header><p class="bn-hint">Artifacts only work from a pocket. Take one out to swap another in.</p><div class="pk-row">';
-  for (let i=0;i<POCKETS.max;i++){ const id=FS.equip[i];
-    if (i<FS.pockets) h+=id?'<button type="button" class="pk full" data-sel="'+id+'" aria-label="'+FINDS[id].name+'"><canvas data-find="'+id+'"></canvas><span>'+FINDS[id].name+'</span></button>':'<div class="pk empty"><i></i><span>Empty</span></div>';
-    else if (i===FS.pockets) h+='<button type="button" class="pk lock" id="sewBtn" aria-label="Sew a pocket for '+cost.toLocaleString()+' coins"'+(save.coins>=cost?'':' disabled')+'><b>+</b><span>Sew one</span><small><span class="coin"></span>'+cost.toLocaleString()+'</small></button>';
-    else h+='<div class="pk lock dim"><b>+</b><small>'+POCKETS.costs[i-POCKETS.start].toLocaleString()+'</small></div>'; }
-  h+='</div>'+(cost!=null?'<p class="bn-hint">Ottilie sews on each new pocket. The next costs '+cost.toLocaleString()+' coins.</p>':'<p class="bn-hint">Five pockets: as many as one vest can hold.</p>')+'</section>';
+  // the vest itself lives in the tackle bag (game/bag.js); this is what's in it
+  h+='<section class="fd-card fd-vest"><header><h3>Vest pockets</h3><span>'+FS.equip.length+' of '+FS.pockets+' in use</span></header><p class="bn-hint">'+(FS.equip.length?'Carrying '+FS.equip.map(id=>FINDS[id].name).join(', ')+'. ':'')+'You pocket and swap artifacts in your tackle bag.</p><button type="button" class="btn sm" id="fdBag">Open your tackle bag</button></section>';
   // artifacts and keepsakes you have
   const row=id=>{ const D=FINDS[id], eq=FS.equip.includes(id), art=D.kind==='artifact';
-    const btn=!art?'<span class="tag ok">Always on</span>':eq?'<button type="button" class="btn sm" data-out="'+id+'">Take out</button>':FS.equip.length<FS.pockets?'<button type="button" class="btn sm primary" data-in="'+id+'">Pocket it</button>':'<span class="tag">Pockets full</span>';
+    const btn=!art?'<span class="tag ok">Always on</span>':eq?'<span class="tag ok">In a pocket</span>':'<span class="tag">Not carried</span>';
     return '<div class="fd-row rf'+(eq?' eq':'')+'" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+D.kind+(FS.fresh.includes(id)?' · <b>New</b>':'')+'</span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+'</div>'+btn+'</div>'; };
   if (arts.length) h+='<section class="fd-card"><header><h3>Artifacts</h3><span>'+arts.length+' of '+findList('artifact').length+'</span></header>'+arts.map(row).join('')+'</section>';
   if (keeps.length) h+='<section class="fd-card"><header><h3>Keepsakes</h3><span>'+keeps.length+' of '+findList('keepsake').length+'</span></header>'+keeps.map(row).join('')+'</section>';
@@ -57,10 +53,8 @@ const fdReady = () => performance.now()-FD_T>350;   // the page just re-rendered
 function bindFinds(){ const p=$('panel'); FD_T=performance.now();
   paintTiles(p.querySelectorAll('canvas[data-find],canvas[data-notekind]'));
   p.querySelectorAll('[data-sel]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.sel, pocket=b.classList.contains('pk'); FD_SEL=FD_SEL===id&&!pocket?null:id; tone(900,.04,{vol:.04,type:'triangle'}); showDetail(pocket); }));
-  p.querySelectorAll('[data-in]').forEach(b=>b.addEventListener('click',()=>{ if (!fdReady()) return; pocketIt(b.dataset.in); refreshJournal(); }));
-  p.querySelectorAll('[data-out]').forEach(b=>b.addEventListener('click',()=>{ if (!fdReady()) return; unpocket(b.dataset.out); refreshJournal(); }));
   p.querySelectorAll('[data-read]').forEach(b=>b.addEventListener('click',()=>openNote(b.dataset.read,{})));
-  const sew=$('sewBtn'); if (sew) sew.addEventListener('click',()=>{ if (fdReady() && sewPocket()) refreshJournal(); });
+  const fb=$('fdBag'); if (fb) fb.addEventListener('click',()=>{ if (!fdReady()) return; closeSheet(); if (!BAG) openBag(); });   // with the bag already open under the journal, closing the sheet is enough
   bindDetail();
   // having seen the page, nothing is new any more
   const FS=findsState(); if (FS.fresh.length){ FS.fresh=[]; persist(); updateJournalDot(); } }

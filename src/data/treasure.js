@@ -7,8 +7,10 @@
                 {lean:tier}     a find of about that rarity: 55% that tier, 30% one below, 15% two below
                 {prize:tier}    a crate-only reward of that tier (a find, hull paint or decor) you don't have yet
                 {paint:tier}    a crate-only hull paint of that tier;  {note:p}  a message-bottle note, with chance p
+                {gear:tier}     crate-only tackle (data/tackle.js) of that tier or commoner you don't have yet; once you
+                                have it all, the crate simply doesn't hold it
                 chance          the item is only in the crate this often
-              When everything an item could be is already found, it pays spare coins: half what a crate of its tier pays.
+              When everything any other item could be is already found, it pays spare coins: half what a crate of its tier pays.
               Measured with npm run sim: treasure adds 10 to 20% to coins an hour with a good rod (25 to 35% with the
               Willow Switch, where crate floors matter most), and about 15 new finds turn up in the first 1,000 casts.
    FINDS[id]  every one-of-a-kind object. kind: curio (to collect), artifact (works in a vest pocket) or keepsake
@@ -32,11 +34,11 @@ const TREASURE={
 const CRATES={
   common:   {name:'Common crate', look:'Plain slatted pine', weight:40, pull:.85, reel:3.4, snags:0, fish:1.5, floor:10, items:[{lean:'common', chance:.25}]},
   uncommon: {name:'Uncommon crate', look:'Moss-green with notched corners', weight:27, pull:.95, reel:4.2, snags:1, fish:2.5, floor:20, items:[{lean:'uncommon', note:.4, chance:.6}]},
-  rare:     {name:'Rare crate', look:'Lake-blue bands and scalloped trim', weight:16, pull:1.05, reel:5, snags:1, fish:4, floor:40, items:[{lean:'rare', chance:.7}]},
-  epic:     {name:'Epic crate', look:'Violet double bands', weight:9, pull:1.15, reel:5.8, snags:2, fish:8, floor:80, items:[{lean:'epic'}, {paint:'epic', chance:.35}]},
-  legendary:{name:'Legendary chest', look:'Dark oak with brass corners', weight:4.5, pull:1.3, reel:7, snags:2, fish:16, floor:160, items:[{lean:'legendary'}, {prize:'legendary'}]},
-  exotic:   {name:'Exotic chest', look:'Prism-cut edges that shift color', weight:2, pull:1.45, reel:8, snags:3, fish:32, floor:320, items:[{prize:'exotic'}, {lean:'legendary'}, {lean:'epic'}]},
-  mythic:   {name:'Mythic chest', look:'Ink black and silver', weight:1.2, pull:1.6, reel:9, snags:3, fish:64, floor:640, items:[{prize:'mythic'}, {lean:'exotic'}, {lean:'legendary'}]}
+  rare:     {name:'Rare crate', look:'Lake-blue bands and scalloped trim', weight:16, pull:1.05, reel:5, snags:1, fish:4, floor:40, items:[{lean:'rare', chance:.7}, {gear:'rare', chance:.2}]},
+  epic:     {name:'Epic crate', look:'Violet double bands', weight:9, pull:1.15, reel:5.8, snags:2, fish:8, floor:80, items:[{lean:'epic'}, {paint:'epic', chance:.35}, {gear:'epic', chance:.2}]},
+  legendary:{name:'Legendary chest', look:'Dark oak with brass corners', weight:4.5, pull:1.3, reel:7, snags:2, fish:16, floor:160, items:[{lean:'legendary'}, {prize:'legendary'}, {gear:'legendary', chance:.25}]},
+  exotic:   {name:'Exotic chest', look:'Prism-cut edges that shift color', weight:2, pull:1.45, reel:8, snags:3, fish:32, floor:320, items:[{prize:'exotic'}, {lean:'legendary'}, {lean:'epic'}, {gear:'exotic', chance:.3}]},
+  mythic:   {name:'Mythic chest', look:'Ink black and silver', weight:1.2, pull:1.6, reel:9, snags:3, fish:64, floor:640, items:[{prize:'mythic'}, {lean:'exotic'}, {lean:'legendary'}, {gear:'mythic', chance:.3}]}
 };
 const OWNERS={ottilie:{name:'Ottilie'}, barnaby:{name:'Barnaby'}, pell:{name:'Pell'}};
 const POCKETS={start:1, max:5, costs:[1500, 6000, 18000, 45000]};
@@ -70,7 +72,7 @@ const FINDS={
   penny:   {name:'Lucky Penny', kind:'artifact', rarity:'common', region:'any', lore:'Heads on both sides. Someone wanted to be sure.',
             eff:'+10 luck.', mods:[{stat:'luck', v:.1}]},
   cork:    {name:'Old Cork Float', kind:'artifact', rarity:'common', region:'any', lore:'It has bobbed on this lake longer than you’ve been alive. Fish trust it.',
-            eff:'Fish swim over 15% sooner.', mods:[{stat:'bite', v:.85}]},
+            eff:'Fish bite 15% sooner.', mods:[{stat:'bite', v:.85}]},
   spool:   {name:'Brass Spool', kind:'artifact', rarity:'uncommon', region:'any', lore:'It still smells of machine oil and somebody’s pipe.',
             eff:'You reel 15% faster.', mods:[{stat:'reel', v:1.15}]},
   sinker:  {name:'Lead Sinker', kind:'artifact', rarity:'uncommon', region:'any', lore:'Heavy for its size, and it throws like a dream.',

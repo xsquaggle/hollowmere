@@ -7,7 +7,7 @@ function poolFor(spot,lucky){
   if (w.mayor && ((h>=5 && h<8) || modFlag('mayorWakes',{spot}))) w.mayor*=3;   // the Mayor's dawns, or the Mayor's Spectacles
   // your bonuses: night-fish boosts (only at night, see STATS.night), then luck per rarity (game/mods.js)
   const c={spot,lucky}, nightMul=modMul('night',c);
-  for (const k in w){ const F=FISH[k]; if (F.night) w[k]*=nightMul; w[k]*=tierMul(F.rarity,c); }
+  for (const k in w){ const F=FISH[k]; if (F.night) w[k]*=nightMul; w[k]*=tierMul(F.rarity,c)*modMul('lure',{spot,lucky,fish:k}); }   // a lure draws its kind of fish
   return w;
 }
 const ROD = () => RODS[save.rod] || RODS.willow;

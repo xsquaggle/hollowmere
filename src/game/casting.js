@@ -15,7 +15,7 @@ function release(){
   if (a && a.onOtt && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openShop(); return; }
   if (!a || !a.target || a.p<.12){ setState('idle'); if (S.tut) coach('Drag a little farther down before you let go.','1 of 4'); else toast('Pull back farther','warn'); return; }
   S.cast={t:0, dur:.4+.42*a.p, from:{x:G.rodBase.x+18,y:G.rodBase.y-88}, to:a.target, p:a.p, th:a.th, spot:a.spot};
-  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal();
+  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal(); tickBait();
   if (save.firstCast){ save.firstCast=false; persist(); }
   setState('casting');
 }

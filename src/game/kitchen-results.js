@@ -3,6 +3,7 @@ function starsFor(total){ const p=total/400; return p>=.85?3:p>=.62?2:p>=.3?1:0;
 function showResult(){ sizzleStop(); const total=STATIONS.reduce((a,k)=>a+(K.scores[k]||0),0), stars=starsFor(total), mush=stars===0, R=RECIPES[K.rid];
   K.mode='result'; K.res={total,stars,mush,t:0,rays:0}; K.st=null; K.used=[]; kTopUI(); kPips(); kSay(''); $('kBottom').hidden=true; $('kTicket').hidden=true;
   const el=$('kResult'), meal=save.meal&&save.meal.casts>0?save.meal:null, pantryFull=(save.pantry||[]).length>=3;
+  grantGear(KITCHEN_BAIT,1);   // the scraps from every cook go into a tin of chum (data/tackle.js)
   const bars=STATIONS.map(k=>'<div class="k-sb"><span>'+STATION_NAME[k]+'</span><i><b style="width:'+(K.scores[k]||0)+'%"></b></i><em>'+(K.scores[k]||0)+'</em></div>').join('');
   const SP='<path d="M12 2.6 l2.9 6 6.5 .8 -4.8 4.5 1.2 6.5 -5.8 -3.2 -5.8 3.2 1.2 -6.5 -4.8 -4.5 6.5 -.8 Z"/>';
   const starHtml=[0,1,2].map(i=>'<span class="k-star'+(i<stars?' on':'')+'"><svg class="bg" viewBox="0 0 24 24">'+SP+'</svg>'+(i<stars?'<svg class="fg" viewBox="0 0 24 24" style="animation-delay:'+(.35+i*.32)+'s">'+SP+'</svg>':'')+'</span>').join('');
@@ -12,8 +13,9 @@ function showResult(){ sizzleStop(); const total=STATIONS.reduce((a,k)=>a+(K.sco
     '<div class="k-bars">'+bars+'</div>'+
     (mush?'<div class="row"><button class="btn" id="kToss" type="button">Give it to the heron</button><button class="btn primary" id="kEat" type="button">Eat it anyway</button></div>'
       :'<div class="row"><button class="btn" id="kSave" type="button"'+(pantryFull?' disabled':'')+'>'+(pantryFull?'Pantry full':'Save for later')+'</button><button class="btn primary" id="kEat" type="button">Eat now</button></div>')+
-    (meal?'<p class="k-note" id="kNote">You’re still on '+mealName(meal.id)+' ('+meal.casts+' casts left). Eating this replaces it.</p>':'');
-  el.hidden=false;
+    (meal?'<p class="k-note" id="kNote">You’re still on '+mealName(meal.id)+' ('+meal.casts+' casts left). Eating this replaces it.</p>':'')+
+    '<p class="k-scraps"><canvas data-gear="'+KITCHEN_BAIT+'" aria-hidden="true"></canvas><span>The scraps went into a tin of '+TACKLE[KITCHEN_BAIT].name.toLowerCase()+'. It’s in your tackle bag.</span></p>';
+  el.hidden=false; paintTiles(el.querySelectorAll('canvas[data-gear]'));
   musicDuck(.35,2.4); for (let i=0;i<stars;i++) setTimeout(()=>{ if (!K.open) return; tone([784,988,1319][i],.3,{vol:.1,type:'triangle'}); tone([1568,1976,2637][i],.2,{vol:.04,delay:.03}); buzz(10); K.res.pop=1; },350+i*320);
   if (mush) setTimeout(()=>{ tone(330,.35,{to:220,vol:.09,type:'triangle'}); tone(262,.4,{to:180,vol:.07,type:'triangle',delay:.25}); },300);
   else if (stars===3) setTimeout(()=>{ if (K.open){ kBurst(0,-60,40,'#F2D47E',{v0:120,v1:360,g:260,l0:.8,l1:1.4,r0:2,r1:4,kind:'conf'}); } },1300);

@@ -16,8 +16,9 @@ function grant(o){
   if (o.kind==='rod'){ if (!save.rods.includes(o.id)) save.rods.push(o.id); save.rod=o.id; }
   else if (o.kind==='part'){ save.parts=save.parts||[]; if (!save.parts.includes(o.id)) save.parts.push(o.id); }
   else if (o.kind==='paint'){ save.paints=save.paints||['blue']; if (!save.paints.includes(o.id)) save.paints.push(o.id); save.paint=o.id; }
+  else if (o.kind==='gear' && TACKLE[o.id]){ grantGear(o.id); fitNewGear(o.id); }
 }
-function itemName(o){ return o.kind==='rod'?RODS[o.id].name:o.kind==='part'?PARTS[o.id].name:PAINTS[o.id].name+' paint'; }
+function itemName(o){ return o.kind==='rod'?RODS[o.id].name:o.kind==='part'?PARTS[o.id].name:o.kind==='gear'?(TACKLE[o.id]||{}).name:PAINTS[o.id].name+' paint'; }
 function updateMail(dt){
   if (MAIL.state==='away') return;
   MAIL.t-=dt; const stopX=W*.27;
@@ -28,7 +29,7 @@ function updateMail(dt){
     if (MAIL.sayT>0){ MAIL.sayT-=dt; if (MAIL.sayT<=0){ MAIL.say=''; MAIL.t=.5; } return; }   // Pell finishes reading out an address
     if (MAIL.t<=0){
       const got=(save.pending||[]).splice(0); got.forEach(grant); persist();
-      if (got.length){ sfx.out('uncommon'); buzz([0,30,40,30]); news('Delivered: '+got.map(itemName).join(', '),'gold'); updateHud(); }
+      if (got.length){ sfx.out('uncommon'); buzz([0,30,40,30]); news('Delivered: '+got.map(itemName).join(', '),'gold'); updateHud(); bagRefresh(); }
       const line=pellReads(); if (line){ MAIL.say=line; MAIL.sayT=5; tone(587,.16,{vol:.06,type:'triangle'}); tone(784,.2,{vol:.06,type:'triangle',delay:.16}); return; }
       MAIL.state='leaving'; } }
   else if (MAIL.state==='leaving'){ MAIL.x-=dt*80; if (MAIL.x<-120){ MAIL.state=(save.pending||[]).length||lettersWaiting()?'waiting':'away'; MAIL.t=4; } }
@@ -65,6 +66,12 @@ function renderApp(tab){
       body+='<div class="app-item"><div class="app-row"><div><h4>'+R.name+'</h4><p>'+R.blurb+'</p></div>'+btn+'</div>'+
         statBar('Line',R.line,'line',cur.line)+statBar('Reel',R.reel,'reel',cur.reel)+statBar('Luck',R.luck,'luck',cur.luck)+statBar('Value',R.value,'value',cur.value)+
         '<p class="perk">Perk: '+R.perk+'</p></div>'; });
+  } else if (tab==='tackle'){
+    const g=gearState();
+    body+='<p class="app-note">Reels, lines and lures for any rod. They go straight onto the rod in your hand, and live in your tackle bag.</p>';
+    for (const kind of SOCKETS) for (const id of TACKLE_ORDER[kind].filter(id=>TACKLE[id].shop==='tacklegram')){ const T=TACKLE[id], owned=!!g.own[id], can=save.coins>=T.price;
+      const btn=owned?'<span class="tag ok">In your bag</span>':isPending('gear',id)?'<span class="tag">On its way</span>':'<button class="btn sm" data-order="gear:'+id+'"'+(can?'':' disabled')+'>Order · '+T.price.toLocaleString()+'</button>';
+      body+='<div class="app-item"><div class="app-row tk-app"><canvas data-gear="'+id+'"></canvas><div><span class="app-kind">'+(isLure(id)?'Lure':SOCK_NAME[kind])+'</span><h4>'+T.name+'</h4><p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+'</div>'+btn+'</div></div>'; }
   } else {
     body+='<p class="app-note">Upgrades for your skiff. Parts work while you fish from the boat.</p>';
     Object.entries(PARTS).forEach(([id,P])=>{ const owned=hasPart(id), can=save.coins>=P.price;
@@ -79,14 +86,16 @@ function renderApp(tab){
   const L=$('phoneScreen'); if (!L) return;
   L.innerHTML='<div class="app-in">'+
     '<div class="app-head"><div><b>Tacklegram</b><span>Tackle, delivered anywhere</span></div><div class="app-coins"><span class="coin"></span>'+save.coins.toLocaleString()+'</div></div>'+
-    '<div class="app-tabs"><button data-tab="rods" class="'+(tab==='rods'?'on':'')+'">Rods</button><button data-tab="boat" class="'+(tab==='boat'?'on':'')+'">Boat</button></div>'+
+    '<div class="app-tabs"><button data-tab="rods" class="'+(tab==='rods'?'on':'')+'">Rods</button><button data-tab="tackle" class="'+(tab==='tackle'?'on':'')+'">Tackle</button><button data-tab="boat" class="'+(tab==='boat'?'on':'')+'">Boat</button></div>'+
     (pend.length?'<p class="app-ship">Pell’s mail boat is bringing: '+pend.map(itemName).join(', ')+'</p>':'')+
     '<div class="app-body">'+body+'</div></div>';
   L.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>renderApp(b.dataset.tab)));
+  paintTiles(L.querySelectorAll('canvas[data-gear]'));
   L.querySelectorAll('[data-eq]').forEach(b=>b.addEventListener('click',()=>{ save.rod=b.dataset.eq; persist(); sfx.hook(false); news('Equipped '+RODS[save.rod].name,'good'); renderApp('rods'); }));
   L.querySelectorAll('[data-paint]').forEach(b=>b.addEventListener('click',()=>{ save.paint=b.dataset.paint; persist(); sfx.hook(false); renderApp('boat'); }));
   L.querySelectorAll('[data-order]').forEach(b=>b.addEventListener('click',()=>{ const [kind,id]=b.dataset.order.split(':');
-    const price=kind==='rod'?RODS[id].price:kind==='part'?PARTS[id].price:PAINTS[id].price; if (save.coins<price) return;
+    const price=kind==='rod'?RODS[id].price:kind==='part'?PARTS[id].price:kind==='gear'?TACKLE[id].price:PAINTS[id].price; if (save.coins<price) return;
+    if (!(kind==='gear'&&TACKLE[id].casts) && (save.pending||[]).some(o=>o.kind===kind&&o.id===id)) return;   // a double tap orders a one-of-a-kind piece once
     addCoins(-price); queueOrder(kind,id); tone(880,.08,{vol:.08,type:'triangle'}); tone(1320,.12,{vol:.08,type:'triangle',delay:.08});
     toast(REG()==='lake'?'Ordered! Pell will bring it to the dock.':'Ordered! Pell’s mail boat is on the way.','good'); updateHud(); renderApp(tab); }));
 }

@@ -97,7 +97,7 @@ function lootEnd(){ const L=S.loot; hideHaul(); closeNote(true); S.loot=null; S.
   const FS=findsState(), fresh=L && L.got.items.some(it=>it.type==='find'||it.type==='note');
   if (fresh){ $('journalBtn').classList.remove('pulse'); void $('journalBtn').offsetWidth; $('journalBtn').classList.add('pulse'); }
   if (L && L.got.items.some(it=>it.type==='find' && FINDS[it.id].kind==='artifact') && !save.finds.pocketTip){ save.finds.pocketTip=true; persist();
-    coachFor('Artifacts only work from a vest pocket. You have one to start. Pocket and swap them on the journal’s Finds page.',8); }
+    coachFor('Artifacts only work from a vest pocket. You have one to start. Pocket and swap them in your tackle bag.',8); }
   else if (fresh && FS.treasure<=2) coachFor('Everything you find is kept on the Finds page of your journal.',6);
   if (L && L.kind==='letter') letterToPell(L.got.items[0]&&L.got.items[0].id);
 }
@@ -177,12 +177,15 @@ function haulItemHTML(it,i){ const st=' style="--i:'+i+'"';
   if (it.type==='find'){ const D=FINDS[it.id], art=D.kind==='artifact', eq=findsState().equip.includes(it.id);
     return '<div class="hl-item rf" data-r="'+D.rarity+'"'+st+'><canvas class="hl-art" data-find="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[D.rarity].label+' '+KIND_LABEL[D.kind]+' · <b>New</b></span><h3>'+D.name+'</h3>'+
       '<p>'+(D.eff||D.lore)+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+(D.owner?'<p class="owner">This belongs to '+OWNERS[D.owner].name+'. Give it back from your journal’s Finds page.</p>':'')+
-      (art?(eq?'<p class="on">In a pocket. Working now.</p>':freePocket()?'<button class="btn sm" type="button" data-pocket="'+it.id+'">Put it in a pocket</button>':'<p class="pk-note">Your pockets are full. Swap it in from the journal’s Finds page.</p>'):'')+
+      (art?(eq?'<p class="on">In a pocket. Working now.</p>':freePocket()?'<button class="btn sm" type="button" data-pocket="'+it.id+'">Put it in a pocket</button>':'<p class="pk-note">Your pockets are full. Swap it in from your tackle bag.</p>'):'')+
       (D.kind==='keepsake'?'<p class="on">Working now, from your shelf.</p>':'')+'</div></div>'; }
   if (it.type==='paint'){ const P=PAINTS[it.id];
     return '<div class="hl-item rf" data-r="'+P.crate+'"'+st+'><canvas class="hl-art" data-paint="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[P.crate].label+' hull paint · <b>New</b></span><h3>'+P.name+'</h3><p>'+(save.boat?'Paint your skiff with it from Tacklegram’s Boat tab.':'For your boat, once you have one.')+'</p></div></div>'; }
   if (it.type==='decor'){ const D=DECOR[it.tank].find(d=>d.id===it.id);
     return '<div class="hl-item rf" data-r="'+D.crate+'"'+st+'><svg class="hl-art" viewBox="0 0 44 44" aria-hidden="true">'+DECOR_ICON[it.id]+'</svg><div class="hl-txt"><span class="k">'+RAR[D.crate].label+' aquarium decor · <b>New</b></span><h3>'+D.name+'</h3><p>'+D.eff+'. Place it from the aquarium’s shop.</p></div></div>'; }
+  if (it.type==='gear'){ const T=TACKLE[it.id], r=T.crate||'common', on=T.kind!=='bait'&&rigFor(save.rod)[T.kind]===it.id;
+    return '<div class="hl-item rf" data-r="'+r+'"'+st+'><canvas class="hl-art" data-gear="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[r].label+' '+(isLure(it.id)?'lure':T.kind)+' · <b>New</b></span><h3>'+T.name+'</h3>'+
+      '<p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+(on?'<p class="on">On your '+ROD().name+'.</p>':T.kind==='bait'?'<p class="on">In your tackle bag.</p>':'<button class="btn sm" type="button" data-rigit="'+it.id+'">Put it on your '+ROD().name+'</button>')+'</div></div>'; }
   if (it.type==='note'){ const N=NOTES[it.id];
     return '<div class="hl-item rf" data-r="common"'+st+'><canvas class="hl-art" data-notekind="'+N.kind+'"></canvas><div class="hl-txt"><span class="k">'+noteKind(N)+'</span><h3>'+noteTitle(it.id)+'</h3><p>Kept with your notes in the journal.</p><button class="btn sm" type="button" data-read="'+it.id+'">Read it</button></div></div>'; }
   if (it.type==='spare') return '<div class="hl-item spare"'+st+'><div class="hl-txt"><span class="k">Spare coins</span><h3><span class="coin"></span>+'+it.n.toLocaleString()+'</h3><p>You’ve found every '+RAR[it.rarity].label.toLowerCase()+' thing this could have held, so it paid in coins.</p></div></div>';
@@ -202,7 +205,7 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   const n=g.items.length, last=.35+Math.max(0,n-1)*.55;
   h+='<button class="btn primary" id="hlGo" type="button" style="animation-delay:'+(last+.3).toFixed(2)+'s">Collect</button>';
   el.innerHTML=h; el.hidden=false; ovOpen('haul',()=>{ lootEnd(); });
-  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind]'));
+  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear]'));
   // the coins count up, then each item arrives with its own sound
   if (base){ const b=$('hlCoins'), t0=performance.now(), dur=REDUCED?1:Math.min(1100,350+base*.25); sfx.coin(6);
     (function step(now){ if (!b.isConnected) return; const k=Math.min(1,(now-t0)/dur); b.textContent=Math.round(base*(1-Math.pow(1-k,3))).toLocaleString(); if (k<1) requestAnimationFrame(step); else tallyCoins(); })(t0); }
@@ -210,21 +213,24 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   g.items.forEach((it,i)=>setTimeout(()=>{ if (!el.hidden) sfx.find(itemRarity(it)); },REDUCED?0:(350+i*550)));
   $('hlGo').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); lootEnd(); });
   el.querySelectorAll('[data-pocket]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); if (!pocketIt(b.dataset.pocket)) return; b.outerHTML='<p class="on">In a pocket. Working now.</p>';
-    if (!freePocket()) el.querySelectorAll('[data-pocket]').forEach(o=>{ o.outerHTML='<p class="pk-note">Your pockets are full now. Swap it in from the journal’s Finds page.</p>'; }); }));
+    if (!freePocket()) el.querySelectorAll('[data-pocket]').forEach(o=>{ o.outerHTML='<p class="pk-note">Your pockets are full now. Swap it in from your tackle bag.</p>'; }); }));
   el.querySelectorAll('[data-read]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); openNote(b.dataset.read,{}); }));
+  el.querySelectorAll('[data-rigit]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); const id=b.dataset.rigit; if (!rigGear(id)) return; sfx.rig(TACKLE[id].kind); b.outerHTML='<p class="on">On your '+ROD().name+'.</p>'; }));
   // keep the open crate in view above the card
   const cardTop=window.innerHeight-(parseFloat(getComputedStyle(el).bottom)||18)-el.offsetHeight, room=cardTop-14-(L.kind==='crate'?crateW(L.ti)*1.02+L.hv:90)-64;
   L.lift=Math.min(L.to.y,cardTop-14); if (L.kind==='crate' && room<0) L.fit=Math.max(.5,1+room/(crateW(L.ti)*1.02));
 }
-const itemRarity=it=>it.type==='find'?FINDS[it.id].rarity:it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
+const itemRarity=it=>it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
 function hideHaul(){ const el=$('haul'); if (el.hidden) return; ovClosed('haul'); el.classList.add('out'); setTimeout(()=>{ el.hidden=true; el.classList.remove('out'); el.innerHTML=''; },REDUCED?0:250); }
 /** Paints tiles in two passes, every size read before any canvas is resized, so the page lays out once. */
 function paintTiles(list){ const d=Math.min(window.devicePixelRatio||1,2), rs=[...list].map(cv=>[cv,cv.getBoundingClientRect()]); for (const [cv,r] of rs) paintTile(cv,r,d); }
-/** Draws a find, paint or note tile into a canvas sized by CSS. */
+/** Draws a find, paint, note or tackle tile into a canvas sized by CSS. */
 function paintTile(cv,r,d){ r=r||cv.getBoundingClientRect(); d=d||Math.min(window.devicePixelRatio||1,2); if (!r.width) return;
   cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); const s=Math.min(r.width,r.height)*.86;
   if (cv.dataset.find){ if (cv.dataset.sil) drawFindSilhouette(x,cv.dataset.find,s); else drawFind(x,cv.dataset.find,s,0); }
   else if (cv.dataset.paint) drawHullSwatch(x,cv.dataset.paint,s);
+  else if (cv.dataset.gear) drawTackle(x,cv.dataset.gear,s,S.time);
+  else if (cv.dataset.hook) drawBareHook(x,s);
   else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
 function drawHullSwatch(c,id,s){ const P=PAINTS[id]; c.save(); c.scale(s/100,s/100); laInk(c);
   c.fillStyle='rgba(60,110,130,.25)'; laEll(c,0,24,44,7); c.fill();

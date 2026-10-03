@@ -15,12 +15,12 @@ function startReel(id,perfect){
 function newFight(id,perfect,from,lucky,tut,spot){
   const F=FISH[id], c={fish:id,spot,lucky};
   // bonuses lock in when the fish is hooked
-  const mod={tm:modMul('tension')/modMul('line',c), tug:modMul('tug',c), reel:modMul('reel',c)};
+  const mod={tm:modMul('tension')*modMul('drag',c)/modMul('line',c), tug:modMul('tug',c), reel:modMul('reel',c)};
   return fightOf(F,perfect,from,{id,lucky,tut,mod,fam:modFlag('autoTilt',c)});
 }
 /** A haul: treasure on the line (game/treasure.js). It comes up like a dead weight that catches on the bottom. */
 function newHaul(loot,perfect,from,lucky,spot){
-  const c={spot,lucky}, mod={tm:modMul('tension')/modMul('line',c), tug:1, reel:modMul('reel',c)};
+  const c={spot,lucky}, mod={tm:modMul('tension')*modMul('drag',c)/modMul('line',c), tug:1, reel:modMul('reel',c)};
   return fightOf(haulOf(loot),perfect,from,{id:null,loot,lucky,tut:false,mod,fam:false});
 }
 function fightOf(F,perfect,from,o){ const weight=F.beh==='weight';

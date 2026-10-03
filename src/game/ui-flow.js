@@ -10,10 +10,16 @@ function coachLater(text,secs){ if (coachTimer || S.tut){ if (!COACHQ.some(c=>c.
 function coachShow(text,secs){ coach(text,'Tip'); clearTimeout(coachTimer); coachTimer=setTimeout(()=>{ coachTimer=0; if (!S.tut) coachOff(); setTimeout(coachDrain,700); },secs*1000); }
 function coachDrain(){ if (coachTimer || S.tut) return; while (COACHQ.length && performance.now()-COACHQ[0].at>90000) COACHQ.shift(); const n=COACHQ.shift(); if (n) coachShow(n.text,n.secs); }
 /* ---------- Leaving things: back gesture, Escape and swipe-down all close the top layer ---------- */
-const OV=[]; let ovSkip=0, ovPopping=false;
-function ovOpen(name,back){ if (OV.some(o=>o.name===name)) return; OV.push({name,back}); try { history.pushState({hm:name},''); } catch(e){} }
+const OV=[]; let ovSkip=0, ovPopping=false, ovQueue=[], ovQueueT=0;
+/* Opening one layer as another closes (a sheet that opens the bag or the map) would push the new entry before the
+   old one's history.back() lands, and that back would then eat it. So while a back is on its way, the push waits for it. */
+function ovPush(name){ try { history.pushState({hm:name},''); } catch(e){} }
+function ovFlush(){ clearTimeout(ovQueueT); for (const n of ovQueue.splice(0)) if (OV.some(o=>o.name===n)) ovPush(n); }
+function ovOpen(name,back){ if (OV.some(o=>o.name===name)) return; OV.push({name,back});
+  if (ovSkip>0){ ovQueue.push(name); clearTimeout(ovQueueT); ovQueueT=setTimeout(ovFlush,800); return; }
+  ovPush(name); }
 function ovClosed(name){ const i=OV.findIndex(o=>o.name===name); if (i<0) return; OV.splice(i,1); if (!ovPopping){ ovSkip++; try { history.back(); } catch(e){ ovSkip--; } } }
-window.addEventListener('popstate',()=>{ if (ovSkip>0){ ovSkip--; return; } const top=OV[OV.length-1]; if (!top) return;
+window.addEventListener('popstate',()=>{ if (ovSkip>0){ ovSkip--; if (!ovSkip) ovFlush(); return; } const top=OV[OV.length-1]; if (!top) return;
   ovPopping=true; const closed=top.back(); ovPopping=false;
   if (closed===false){ try { history.pushState({hm:top.name},''); } catch(e){} } else { const i=OV.indexOf(top); if (i>=0) OV.splice(i,1); } });
 document.addEventListener('keydown',e=>{ if (e.key!=='Escape') return; const top=OV[OV.length-1]; if (top) history.back(); });

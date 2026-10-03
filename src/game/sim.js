@@ -6,6 +6,7 @@
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
+   Tackle counts (reel, line and bait, through the same modifiers); bait never runs out in a run.
    Not modeled: aiming (every cast reaches its spot), keeping fish (every catch sells), the aquarium, the
    kitchen, Barnaby or the mail boat, and the clock (an artifact that speeds or stops time doesn't change the
    hour of a run). The setup lives in a stand-in save for the run, then the real save
@@ -21,7 +22,7 @@ const SIM_PLAYERS={
    390 by 844 phone; keep in step if spots move. */
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
                  coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]}};
-/** A stand-in save for a setup. tanks, parts, fish and finds can be copied from a real save ("Use my setup"). */
+/** A stand-in save for a setup. tanks, parts, fish, finds and gear can be copied from a real save ("Use my setup"). */
 function simSave(st){
   const s=fresh(), now=Date.now(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
   s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.clock=st.hour==null?12:st.hour;
@@ -43,6 +44,14 @@ function simSave(st){
   else { s.finds={have:{},equip:[],pockets:POCKETS.max,treasure:1};
     for (const id of st.artifacts||[]) if (FINDS[id]){ s.finds.have[id]={t:now}; if (FINDS[id].kind==='artifact') s.finds.equip.push(id); } }
   s.finds.treasure=Math.max(1,s.finds.treasure||0); s.finds.fresh=[];
+  // tackle: copied from a real save, or a reel, line and bait named for the run. Bait never runs out in a run.
+  if (st.gear) s.gear=JSON.parse(JSON.stringify(st.gear));
+  else { const own={}, rig={reel:GEAR_START.reel, line:GEAR_START.line};
+    for (const k of ['reel','line']) if (st[k] && TACKLE[st[k]] && TACKLE[st[k]].kind===k){ own[st[k]]=1; rig[k]=st[k]; }
+    s.gear={own, rig:{[s.rod]:rig}, left:{}, tins:{}, fresh:[]};
+    if (st.bait && TACKLE[st.bait] && TACKLE[st.bait].kind==='bait'){ s.gear.bait=st.bait; if (isLure(st.bait)) own[st.bait]=1; } }
+  if (s.gear.bait && !isLure(s.gear.bait)) s.gear.left[s.gear.bait]=1e9;
+  s.gear.lastBait=null;
   return s;
 }
 /** Plays one fight (a fish or a haul) through the game's fight step, the way player P would. Returns {end, ft, why}. */
@@ -99,9 +108,10 @@ function simulate(st,n){
       // a fish swims over and nibbles
       const id=pickW(poolFor(spot,lucky)), F=FISH[id];
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
-      t+=wait+Math.max(.4,(rand(85,150)-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1))*1.2);
+      const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
+      t+=wait+Math.max(.4,(rand(85,150)-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm)*1.2);
       const nib=F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3));
-      t+=rand(.5,1.1); for (let i=0;i<nib;i++) t+=F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4);
+      t+=rand(.5,1.1)*bm; for (let i=0;i<nib;i++) t+=(F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*bm;
       // the bite
       const fc={fish:id,spot,lucky}, r=P.react(); t+=r;
       if (r>F.window*modMul('hook',fc)){ out.lost.slow++; out.secs+=t+.7; continue; }

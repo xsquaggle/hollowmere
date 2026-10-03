@@ -7,13 +7,15 @@ function startWaiting(){
   if (S.bob.spot==='reeds') S.wait.t/=modMul('reedBite',{spot:'reeds'});
   if (S.tut){ S.tut='wait'; S.wait.t=.8; coach('Nice cast! Now wait. A fish will swim over to your bobber.','2 of 4'); }
 }
-/** The quiet before a fish shows up: Playtest tuning and anything that brings fish over sooner. */
+/** The quiet before a fish shows up: Playtest tuning and anything that brings a bite sooner (which also speeds
+    the swim over and the nibbles: spawnApproach). */
 function biteWait(spot){ const c={spot}; return rand(.75,2.1)*modMul('wait',c)*modMul('bite',c); }
 function spawnApproach(){
   const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.fish=S.tut?'perch':pickW(poolFor(b.spot,w.lucky)); const F=FISH[w.fish];
   const ang=rand(0,Math.PI*2), d=rand(85,150);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
   w.sh={x,y,ang:Math.atan2(b.y-y,b.x-x),alpha:0,flee:false};
+  w.bm=S.tut?1:modMul('bite',{spot:b.spot,fish:w.fish,lucky:w.lucky});   // bait and the like: a quicker swim over and shorter nibbles
   if (sonarOn() && !S.tut){ setHint('Sonar: '+(F.rarity==='common'?'a common fish':'a '+RAR[F.rarity].label+' fish')+' is coming in.'); if (F.rarity!=='common') tone(1250,.09,{vol:.06,type:'sine'}); }
   w.phase='approach'; w.attract=1;
 }
@@ -26,17 +28,17 @@ function updateWaiting(dt){
       const F=FISH[w.fish];
       if (w.phase==='approach'){
         const dx=b.x-sh.x, dy=b.y-sh.y, d=Math.hypot(dx,dy);
-        const sp=(20+F.len*.35)*w.attract*sc(sh.y)*(F.beh==='sleeper'?.5:1);
+        const sp=(20+F.len*.35)*w.attract*sc(sh.y)*(F.beh==='sleeper'?.5:1)/(w.bm||1);
         sh.ang=angLerp(sh.ang, Math.atan2(dy,dx)+Math.sin(S.time*2.2)*.5*Math.min(1,d/70), dt*3);
         sh.x+=Math.cos(sh.ang)*sp*dt; sh.y+=Math.sin(sh.ang)*sp*dt*.6;
-        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3)); w.nibT=S.tut?1.2:rand(.5,1.1); }
+        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3)); w.nibT=S.tut?1.2:rand(.5,1.1)*(w.bm||1); }
       } else if (w.phase==='nibble'){
         sh.ang=angLerp(sh.ang,Math.atan2(b.y-sh.y,b.x-sh.x),dt*2);
         const hx=b.x-Math.cos(sh.ang)*F.len*.38*sc(b.y), hy=b.y-Math.sin(sh.ang)*F.len*.2*sc(b.y);
         sh.x=lerp(sh.x,hx,dt*3); sh.y=lerp(sh.y,hy,dt*3);
         w.nibT-=dt;
         if (w.nibT<=0){
-          if (w.nib>0){ w.nib--; w.nibT=S.tut?2.2:FISH[w.fish].beh==='sleeper'?rand(1,1.8):rand(.55,1.4); b.nibble=1; ripple(b.x,b.y,14); sfx.nibble(); if (S.tut) coach('That little bob was just a nibble. Wait for the bobber to plunge under.','2 of 4'); }
+          if (w.nib>0){ w.nib--; w.nibT=S.tut?2.2:(FISH[w.fish].beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*(w.bm||1); b.nibble=1; ripple(b.x,b.y,14); sfx.nibble(); if (S.tut) coach('That little bob was just a nibble. Wait for the bobber to plunge under.','2 of 4'); }
           else triggerBite();
         }
       }

@@ -3,6 +3,8 @@
 // in a headless browser on build/test.html, so run `npm run build` first.
 //   node tools/simulate.mjs                          the standard report: rods, spots and luck stacks
 //   node tools/simulate.mjs --rod brasscap --spot deep --hour 6.5 --meal pie:3 --sets all --casts 5000
+//   node tools/simulate.mjs --rod ash --reel brassdrag --line silk --bait worms   any reel, line and bait (data/tackle.js)
+//   node tools/simulate.mjs --tackle                  every piece of tackle against the plain rig, where each one matters
 //   node tools/simulate.mjs --compare-luck           the standard report, before and after step 12's luck curve
 //   node tools/simulate.mjs --json                   machine-readable output
 import { existsSync } from 'node:fs';
@@ -35,14 +37,30 @@ const STANDARD = [
 ];
 function custom() {
   const st = {};
-  for (const k of ['rod', 'spot', 'region', 'sets', 'player']) if (opt[k]) st[k] = opt[k];
+  for (const k of ['rod', 'spot', 'region', 'sets', 'player', 'reel', 'line', 'bait']) if (opt[k]) st[k] = opt[k];
   if (opt.hour) st.hour = +opt.hour;
   if (opt.meal) { const [id, s] = String(opt.meal).split(':'); st.meal = { id, stars: +(s || 3) }; }
   if (opt.parts) st.parts = opt.parts === 'all' ? 'all' : String(opt.parts).split(',');
   if (opt.mastery) st.mastery = true; if (opt.lucky) st.lucky = true;
   return [['Custom setup', st]];
 }
-const runs = Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'lucky', 'player'].includes(k)) ? custom() : STANDARD;
+// every reel, line and bait against the plain rig, each where it can show what it does: night pieces after dark
+// (at the lake, where they draw Lantern Carp, and in the coast's trench, where they draw the Saltjaw),
+// the Wire Leader in the reeds, the spinner on the lily pads (where leapers feed), the rest in the deep pool at dusk
+const SOCKET_OF = { brassdrag: 'reel', quickwind: 'reel', whisper: 'reel', silk: 'line', wire: 'line', clearwater: 'line', glowline: 'line', worms: 'bait', grubs: 'bait', chum: 'bait', spinner: 'bait' };
+const TACKLE_GROUPS = [
+  [{ spot: 'deep', hour: 18.5 }, ['brassdrag', 'quickwind', 'whisper', 'silk', 'clearwater', 'worms', 'chum']],
+  [{ spot: 'deep', hour: 22 }, ['glowline', 'grubs']],
+  [{ region: 'coast', rod: 'deepwater', spot: 'deep', hour: 22 }, ['glowline', 'grubs']],
+  [{ spot: 'reeds', hour: 12 }, ['wire']],
+  [{ spot: 'pads', hour: 12 }, ['spinner']],
+];
+function tackleRuns() { const rows = [];
+  for (const [where, ids] of TACKLE_GROUPS) { const base = Object.assign({ rod: opt.rod || 'ash', player: opt.player || 'steady', treasure: !opt['no-treasure'] }, where);
+    rows.push(['Plain rig · ' + base.rod + ', ' + (base.region || 'lake') + ' ' + base.spot + ', ' + base.hour + 'h', base]);
+    for (const id of ids) rows.push(['  + ' + id, Object.assign({}, base, { [SOCKET_OF[id]]: id })]); }
+  return rows; }
+const runs = opt.tackle ? tackleRuns() : Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'lucky', 'player', 'reel', 'line', 'bait'].includes(k)) ? custom() : STANDARD;
 const casts = +(opt.casts || 1000);
 
 const browser = await chromium.launch(); const p = await browser.newPage({ viewport: { width: 390, height: 844 } });
