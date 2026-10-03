@@ -1,0 +1,23 @@
+/* Playtest > Balance: the simulator's form and its report */
+.bal-form{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin:0 0 12px}
+.bal-form label{display:grid;gap:3px}
+.bal-form label span{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468}
+.bal-form select{width:100%;min-height:38px;box-sizing:border-box;border:1.5px solid rgba(43,42,51,.3);border-radius:9px;padding:7px 8px;font:700 14px/1.2 var(--body);color:var(--ink);background:#FBF7EE}
+.bal-form select:focus-visible{outline:3px solid var(--brass);outline-offset:1px}
+.bal-go{margin:0 0 14px}
+.bal-res{border-top:1.5px solid rgba(43,42,51,.15);padding-top:12px;scroll-margin-top:8px}
+.bal-res h3{margin:0 0 10px;font:400 18px/1.25 var(--display)}
+.bal-warn{margin:0 0 10px;padding:8px 10px;border-radius:9px;background:#F7DFA6;font-size:13px;font-weight:700;line-height:1.4}
+.bal-stats em{display:block;margin-top:2px;font-style:normal;font-size:10.5px;font-weight:800;color:#7A7468}
+.bal-stats em.up{color:#3E7A35}.bal-stats em.down{color:#B2493A}
+.bal-mix{display:flex;height:14px;border-radius:7px;overflow:hidden;box-shadow:inset 0 0 0 1.5px rgba(43,42,51,.25);margin:2px 0 6px}
+.bal-mix i{display:block;height:100%}
+.bal-mix i+i{box-shadow:-1.5px 0 0 var(--paper)}
+.bal-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0 0 12px;font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.bal-legend span,.bal-tab td span{display:inline-flex;align-items:center;gap:6px}
+.bal-legend i,.bal-tab i{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(43,42,51,.3);flex:none}
+.bal-tab{width:100%;border-collapse:collapse;color:var(--ink);font-family:var(--body);font-size:13px;font-variant-numeric:tabular-nums;margin:0 0 10px}
+.bal-tab th{text-align:left;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#7A7468;padding:4px 0}
+.bal-tab th+th,.bal-tab td+td{text-align:right}
+.bal-tab td{padding:5px 0;border-top:1px solid rgba(43,42,51,.1);font-weight:700}
+.bal-notes{margin-bottom:4px}

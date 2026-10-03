@@ -5,6 +5,7 @@
    STATS (data/stats.js) says how each stat combines. Adding an enchantment or relic later means adding its
    modifiers to a source; nothing that reads the stats has to change. */
 const MODC={frame:0, at:-1, dirty:true, list:null};
+let SIMULATING=false;   // true while the balance simulator borrows the save (game/sim.js)
 function modSources(){
   const L=[], add=(src,name,stat,v,extra)=>L.push(Object.assign({src,name,stat,v},extra));
   // the rod in hand: its own numbers, then its perk

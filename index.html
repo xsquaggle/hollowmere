@@ -465,6 +465,31 @@ body:not([data-state="idle"]) .corner button{pointer-events:none!important}
 @keyframes drain{from{width:100%}to{width:0}}
 #cAuto{font-size:12px;color:#7A7468;text-align:center;margin:0}
 
+/* Bonuses: the journal page listing every bonus and its sources */
+.bn-where{margin:0 0 10px;font-size:12.5px;font-weight:700;color:#6B665C}
+.bn-gear{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:0 0 14px;padding:10px 12px;border-radius:10px;background:rgba(43,42,51,.06);font-size:13px}
+.bn-gear dt{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468;padding-top:2px}
+.bn-gear dd{margin:0;color:#3A3832;font-weight:700}
+.bn-card{border:1.5px solid rgba(43,42,51,.18);border-radius:12px;padding:11px 13px 9px;margin:0 0 10px}
+.bn-card header{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.bn-card h3{margin:0;font:400 18px/1.15 var(--display)}
+.bn-card header b{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.bn-card b.up{color:#3E7A35}.bn-card b.down{color:#B2493A}.bn-card b.cond{color:#8A7A52}
+.bn-hint{margin:2px 0 8px;font-size:12.5px;line-height:1.4;color:#6B665C}
+.bn-luck{border:2px solid #C99A2E;background:linear-gradient(#FBF3DF,#F5E9CB)}
+.bn-sum{margin:0 0 6px;font-size:12.5px;font-weight:700;line-height:1.4;color:#55514A}
+.bn-tiers{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 8px;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+.bn-tiers span{display:inline-flex;align-items:center;gap:6px}
+.bn-tiers i{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(43,42,51,.35)}
+.bn-src{list-style:none;margin:0;padding:0;display:grid}
+.bn-src li{display:grid;grid-template-columns:1fr auto;gap:0 10px;padding:6px 0;border-top:1px solid rgba(43,42,51,.1);font-size:13.5px}
+.bn-src li .n{font-weight:800;color:#2B2A33}
+.bn-src li .s{grid-column:1;font-size:12px;color:#7A7468;line-height:1.35}
+.bn-src li b{grid-row:1 / span 2;grid-column:2;align-self:center;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.bn-src li.off{opacity:.5}
+.bn-src li.cond .s{color:#6E5A2E}
+.bn-cap{margin:8px 0 2px;font-size:12px;line-height:1.4;color:#7A7468}
+.bn-list{margin:0 0 4px;font-size:13.5px;font-weight:700;color:#3A3832;line-height:1.45}
 /* Sheets */
 #sheet{position:fixed;inset:0;background:rgba(10,13,22,.55);display:flex;align-items:flex-end;justify-content:center;z-index:5}
 .panel{width:min(480px,100%);max-height:82%;overflow:auto;background:var(--paper);color:var(--ink);border-radius:16px 16px 0 0;
@@ -500,6 +525,29 @@ body:not([data-state="idle"]) .corner button{pointer-events:none!important}
 #coachStep{font:800 10.5px/1 var(--body);letter-spacing:.1em;color:var(--paper);background:var(--ink);border-radius:6px;padding:5px 6px;white-space:nowrap}
 #coachText{margin:0;font-weight:700;font-size:15px;line-height:1.3}
 @media (prefers-reduced-motion: reduce){#card,#card.out,.panel,#toast.show,.stamp{animation-duration:.01s!important}}
+/* Playtest > Balance: the simulator's form and its report */
+.bal-form{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin:0 0 12px}
+.bal-form label{display:grid;gap:3px}
+.bal-form label span{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468}
+.bal-form select{width:100%;min-height:38px;box-sizing:border-box;border:1.5px solid rgba(43,42,51,.3);border-radius:9px;padding:7px 8px;font:700 14px/1.2 var(--body);color:var(--ink);background:#FBF7EE}
+.bal-form select:focus-visible{outline:3px solid var(--brass);outline-offset:1px}
+.bal-go{margin:0 0 14px}
+.bal-res{border-top:1.5px solid rgba(43,42,51,.15);padding-top:12px;scroll-margin-top:8px}
+.bal-res h3{margin:0 0 10px;font:400 18px/1.25 var(--display)}
+.bal-warn{margin:0 0 10px;padding:8px 10px;border-radius:9px;background:#F7DFA6;font-size:13px;font-weight:700;line-height:1.4}
+.bal-stats em{display:block;margin-top:2px;font-style:normal;font-size:10.5px;font-weight:800;color:#7A7468}
+.bal-stats em.up{color:#3E7A35}.bal-stats em.down{color:#B2493A}
+.bal-mix{display:flex;height:14px;border-radius:7px;overflow:hidden;box-shadow:inset 0 0 0 1.5px rgba(43,42,51,.25);margin:2px 0 6px}
+.bal-mix i{display:block;height:100%}
+.bal-mix i+i{box-shadow:-1.5px 0 0 var(--paper)}
+.bal-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0 0 12px;font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.bal-legend span,.bal-tab td span{display:inline-flex;align-items:center;gap:6px}
+.bal-legend i,.bal-tab i{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(43,42,51,.3);flex:none}
+.bal-tab{width:100%;border-collapse:collapse;color:var(--ink);font-family:var(--body);font-size:13px;font-variant-numeric:tabular-nums;margin:0 0 10px}
+.bal-tab th{text-align:left;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#7A7468;padding:4px 0}
+.bal-tab th+th,.bal-tab td+td{text-align:right}
+.bal-tab td{padding:5px 0;border-top:1px solid rgba(43,42,51,.1);font-weight:700}
+.bal-notes{margin-bottom:4px}
 </style>
 
 </head>
@@ -793,7 +841,7 @@ const AMB_LV={ lake_day:{water:.55,wind:.22}, lake_dusk:{water:.5,wind:.14}, lak
    good  'up' when more is better, 'down' when less is better.  tune:true stats only come from Playtest tuning.
    hint  the plain sentence the Bonuses page shows under the stat. */
 const STATS={
-  luck:     {name:'Rarity luck', kind:'luck', good:'up', hint:'Rarer fish bite more often. Luck has diminishing returns, and each rarity has a ceiling.'},
+  luck:     {name:'Rarity luck', kind:'luck', good:'up', hint:'Rarer fish bite more often.'},
   value:    {name:'Fish value', kind:'mul', good:'up', hint:'Coins for every fish you sell.'},
   reel:     {name:'Reel speed', kind:'mul', good:'up', hint:'How fast a hooked fish comes in while you hold.'},
   line:     {name:'Line strength', kind:'mul', good:'up', hint:'Tension builds more slowly, so the line snaps less.'},
@@ -822,6 +870,7 @@ const STATS={
    STATS (data/stats.js) says how each stat combines. Adding an enchantment or relic later means adding its
    modifiers to a source; nothing that reads the stats has to change. */
 const MODC={frame:0, at:-1, dirty:true, list:null};
+let SIMULATING=false;   // true while the balance simulator borrows the save (game/sim.js)
 function modSources(){
   const L=[], add=(src,name,stat,v,extra)=>L.push(Object.assign({src,name,stat,v},extra));
   // the rod in hand: its own numbers, then its perk
@@ -900,7 +949,7 @@ const fresh = () => ({coins:0, fish:{}, stats:{casts:0,catches:0,perfect:0,escap
 let save = fresh();
 function load(d){ if (!d || typeof d!=='object') return; const f=fresh(); save=Object.assign(f,d); save.stats=Object.assign(f.stats,d.stats||{}); save.tune=Object.assign(fresh().tune,d.tune||{}); save.fish=d.fish||{}; if (d.tutorialDone===undefined) save.tutorialDone=save.stats.catches>0; if (typeof d.clock!=='number') save.clock=18; if (!Array.isArray(d.rods)) save.rods=['willow']; if (!Array.isArray(d.net)) save.net=[]; if (!RODS[save.rod]) save.rod='willow'; }
 try { const raw = localStorage.getItem(KEY); if (raw) load(JSON.parse(raw)); } catch(e) {}
-function persist(){ MODC.dirty=true; if (typeof APP!=='undefined' && APP && APP.stale) return; try { save.lastPlayed=Date.now(); localStorage.setItem(KEY, JSON.stringify(save)); } catch(e) {} }
+function persist(){ MODC.dirty=true; if (SIMULATING) return; if (typeof APP!=='undefined' && APP && APP.stale) return; try { save.lastPlayed=Date.now(); localStorage.setItem(KEY, JSON.stringify(save)); } catch(e) {} }
 const rec = id => save.fish[id] || (save.fish[id] = {caught:0, best:0, seen:false});
 
 /* ---------- Size, weight and records ---------- */
@@ -1297,10 +1346,8 @@ function hook(){
 
 /* ---------- Reeling ---------- */
 function startReel(id,perfect){
-  const F=FISH[id], fam=modFlag('autoTilt',{fish:id}), first=rec(id).caught===0;
-  S.reel={lucky:!!(S.wait&&S.wait.lucky),id,F,perfect,fam,dist:1,dir:0,tgt:0,dirT:S.tut?99:rand(1.2,1.8),tension:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
-    from:{x:S.bob.x,y:S.bob.y},x:S.bob.x,y:S.bob.y,jump:null,nextJump:rand(2,3),dive:0,warn:0,nextDive:rand(2.4,3.4),surge:0,
-    click:0,splashT:0,buzzT:0};
+  const F=FISH[id], first=rec(id).caught===0;
+  S.reel=newFight(id,perfect,S.bob,!!(S.wait&&S.wait.lucky),!!S.tut);
   S.holding=S.pointers.size>0; S.tilt=0; S.pressX=S.thumbX; S.pressTilt=0; humStart(); setState('reeling');
   if (S.tut){ S.tut='reel1'; coach('Hooked! Now press and hold your finger down to reel it in.','4 of 4'); }
   else if (first && F.beh==='leaper') coachShow('New fish: Leapers jump out of the water. Tap while it’s in the air to keep the line tight.',6);
@@ -1309,79 +1356,128 @@ function startReel(id,perfect){
   else if (first && F.beh==='sulker') coachShow('New fish: Sulkers dive. When it dives, let go, then reel hard when it comes back up.',6);
   else if (first && F.rarity==='legendary') coachShow('Something huge. Reel in short bursts and let go whenever the ring turns red.',6);
 }
-function updateReel(dt){
-  const R=S.reel, F=R.F, tm=modMul('tension')/modMul('line',{fish:R.id}), tut=S.tut;
+/** A fresh fight with fish `id`, hooked at `from` (the bobber). */
+function newFight(id,perfect,from,lucky,tut){
+  const F=FISH[id], c={fish:id}, fam=modFlag('autoTilt',c);
+  // bonuses lock in when the fish is hooked
+  const mod={tm:modMul('tension')/modMul('line',c), tug:modMul('tug',c), reel:modMul('reel',c)};
+  return {lucky,id,F,perfect,fam,mod,dist:1,dir:0,tgt:0,dirT:tut?99:rand(1.2,1.8),tension:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
+    from:{x:from.x,y:from.y},x:from.x,y:from.y,jump:null,nextJump:rand(2,3),dive:0,warn:0,nextDive:rand(2.4,3.4),surge:0,
+    click:0,splashT:0,buzzT:0};
+}
+/* One step of a fight: the fish moves, the line gains or loses tension, and the fish comes in or gets away.
+   Nothing is drawn or played here. What happened is pushed onto io.ev for the caller to show, and the
+   step returns 'land', 'lose' (reason in io.why) or 'snap' when the fight ends. The game and the balance
+   simulator both fight through this, so a fish fights the same in both.
+   io: {t: seconds on the clock, holding: finger down, tut: tutorial step or null, tilt: the player's ring,
+        steer(R,dt): where the ring goes this step, ev: [], why: ''} */
+function fightStep(R,dt,io){
+  const F=R.F, ev=io.ev, tm=R.mod.tm, tut=io.tut;
   const quick=F.rarity==='legendary', calm=F.rarity==='common';
   if (tut==='reel1'||tut==='reel2'){ /* direction is scripted by the tutorial */ }
   else if (F.beh==='darter'){
     R.dirT-=dt;
-    if (R.dirT<=0){ R.tgt=(R.tgt>0?-1:1)*rand(.5,.9); R.dirT=tut?3:quick?rand(.9,1.4):calm?rand(1.8,2.7):rand(1.3,2); splash(R.x,R.y,5); }
-  } else if (F.beh==='sulker'){ R.tgt=Math.sin(S.time*.5+1)*.5; }
-  else if (F.beh==='tugger'||F.beh==='sleeper'){ R.tgt=Math.sin(S.time*(F.beh==='sleeper'?.25:.4)+1)*(F.beh==='sleeper'?.35:.45); }
+    if (R.dirT<=0){ R.tgt=(R.tgt>0?-1:1)*rand(.5,.9); R.dirT=tut?3:quick?rand(.9,1.4):calm?rand(1.8,2.7):rand(1.3,2); ev.push('turn'); }
+  } else if (F.beh==='sulker'){ R.tgt=Math.sin(io.t*.5+1)*.5; }
+  else if (F.beh==='tugger'||F.beh==='sleeper'){ R.tgt=Math.sin(io.t*(F.beh==='sleeper'?.25:.4)+1)*(F.beh==='sleeper'?.35:.45); }
   else { R.dirT-=dt; if (R.dirT<=0){ R.tgt=rand(-.8,.8); R.dirT=rand(1.4,2.2); } }
   R.dir=lerp(R.dir,R.tgt,Math.min(1,dt*(quick?3:1.7)));
 
-  if (R.fam) S.tilt=lerp(S.tilt,R.dir,Math.min(1,dt*8));
-  else if (S.holding){ const want=clamp(S.pressTilt+(S.thumbX-S.pressX)/(W*.65),-1,1); S.tilt=lerp(S.tilt,want,Math.min(1,dt*14)); }
-  const gap=Math.abs(S.tilt-R.dir), m=clamp((gap-.32)/.9,0,1);
+  io.tilt=io.steer(R,dt);
+  const gap=Math.abs(io.tilt-R.dir), m=clamp((gap-.32)/.9,0,1);
   R.onIt=m===0?R.onIt+dt:0;
 
-  if (tut==='reel1' && R.dist<.72){ S.tut='reel2'; R.tgt=S.tilt>0?-.75:.75;
-    coach('It’s pulling '+(R.tgt>0?'right':'left')+'! Keep holding and slide your finger '+(R.tgt>0?'right':'left')+' until your ring is under the fish.','4 of 4'); }
-  if (S.tut==='reel2' && R.onIt>.6 && Math.abs(R.dir-R.tgt)<.1){ S.tut='reel3'; R.dirT=2.6;
-    coach('That’s it! It will switch sides, so follow it. If the ring turns red, lift your finger for a moment.','4 of 4'); }
+  if (tut==='reel1' && R.dist<.72){ io.tut='reel2'; R.tgt=io.tilt>0?-.75:.75; ev.push('tut:reel2'); }
+  if (io.tut==='reel2' && R.onIt>.6 && Math.abs(R.dir-R.tgt)<.1){ io.tut='reel3'; R.dirT=2.6; ev.push('tut:reel3'); }
 
   let diving=false, airborne=false, tug=false;
   if (F.beh==='tugger'){ R.beat=(R.beat||0)+dt; const ph=R.beat%1.15; tug=ph<.5;
-    if (tug && !R.wasTug){ splash(R.x,R.y,6); ripple(R.x,R.y,14); buzz(12); if (!S.tut) shake(1.5); }
+    if (tug && !R.wasTug) ev.push('tug');
     R.wasTug=tug; R.tug=tug; }
   if (F.beh==='sulker'){
-    if (R.dive>0){ R.dive-=dt; diving=true; if (R.dive<=0){ R.surge=1.1; toast('Now! Reel hard.','good'); } }
-    else if (R.warn>0){ R.warn-=dt; if (R.warn<=0){ R.dive=1.6; sfx.dive(); buzz([0,60]); shake(3); } }
-    else { R.nextDive-=dt; if (R.nextDive<=0){ R.warn=.6; R.nextDive=rand(2.6,4.2); toast('It’s diving. Let go!','warn'); } }
+    if (R.dive>0){ R.dive-=dt; diving=true; if (R.dive<=0){ R.surge=1.1; ev.push('surge'); } }
+    else if (R.warn>0){ R.warn-=dt; if (R.warn<=0){ R.dive=1.6; ev.push('dive'); } }
+    else { R.nextDive-=dt; if (R.nextDive<=0){ R.warn=.6; R.nextDive=rand(2.6,4.2); ev.push('diveWarn'); } }
     if (R.surge>0) R.surge-=dt;
   }
   if (F.beh==='leaper'){
     if (R.jump){ R.jump.t+=dt; airborne=true;
-      if (R.jump.t>=R.jump.dur){ const j=R.jump; R.jump=null; splash(R.x,R.y,14); ripple(R.x,R.y,30);
-        if (!j.tapped){ R.tension=.02; R.dist=Math.min(1,R.dist+.12); toast('Slack! Tap while it jumps.','warn');
-          if (Math.random()<.3){ lose('It shook the hook mid-jump.'); return; } } }
-    } else { R.nextJump-=dt; if (R.nextJump<=0){ R.jump={t:0,dur:.8,tapped:false}; R.nextJump=rand(2.2,3.6); splash(R.x,R.y,10); sfx.leap(); } }
+      if (R.jump.t>=R.jump.dur){ const j=R.jump; R.jump=null; ev.push('splashdown');
+        if (!j.tapped){ R.tension=.02; R.dist=Math.min(1,R.dist+.12); ev.push('slackJump');
+          if (Math.random()<.3){ io.why='It shook the hook mid-jump.'; return 'lose'; } } }
+    } else { R.nextJump-=dt; if (R.nextJump<=0){ R.jump={t:0,dur:.8,tapped:false}; R.nextJump=rand(2.2,3.6); ev.push('jump'); } }
   }
 
-  const reeling=S.holding && !airborne;
-  if (reeling && tug){ R.tension+=.75*tm*dt*modMul('tug',{fish:R.id}); }
+  const reeling=io.holding && !airborne; io.reeling=reeling;
+  if (reeling && tug){ R.tension+=.75*tm*dt*R.mod.tug; }
   else if (!reeling && tug){ R.dist=Math.min(1,R.dist+.03*dt); }
   if (tug){ if (!reeling) R.tension=Math.max(0,R.tension-.6*dt); }
   else if (reeling){
     if (diving) R.tension+=1.1*tm*dt;
     else {
-      R.tension+=(.04+.05*F.pull+F.pull*.4*m)*tm*dt*(S.tut?.7:1);
-      const spd=(1/F.reel)*(1-.6*m)*(R.surge>0?2:1)*(F.beh==='tugger'?1.4:1)*(R.perfect?1.1:1)*modMul('reel',{fish:R.id});
+      R.tension+=(.04+.05*F.pull+F.pull*.4*m)*tm*dt*(io.tut?.7:1);
+      const spd=(1/F.reel)*(1-.6*m)*(R.surge>0?2:1)*(F.beh==='tugger'?1.4:1)*(R.perfect?1.1:1)*R.mod.reel;
       R.dist-=spd*dt; R.click+=spd*dt;
     }
   } else if (diving){ R.tension=Math.max(.15,R.tension-.35*dt); R.dist=Math.min(1,R.dist+.015*dt); }
   else if (!airborne){ R.tension=Math.max(0,R.tension-.9*dt); R.dist=Math.min(1,R.dist+.02*F.pull*dt); }
 
-  while (R.click>.03){ R.click-=.03; sfx.click(); }
-  if (R.tension<.04 && !airborne){ R.slack+=dt; if (R.slack>1 && !R.slackWarned){ R.slackWarned=true; toast('Line’s slack. Hold!','warn'); } }
+  while (R.click>.03){ R.click-=.03; ev.push('click'); }
+  if (R.tension<.04 && !airborne){ R.slack+=dt; if (R.slack>1 && !R.slackWarned){ R.slackWarned=true; ev.push('slackWarn'); } }
   else { R.slack=0; R.slackWarned=false; }
-  if (R.slack>(S.tut?1e9:3.5)){ lose('The line went slack. It slipped away.'); return; }
-  if (S.tut){ R.tension=Math.min(R.tension,.97);
-    if (R.tension>.85 && !R.tutWarn){ R.tutWarn=$('coachText').textContent; coach('Red ring! Lift your finger to ease off, then hold again.','4 of 4', true); }
-    else if (R.tension<.5 && R.tutWarn){ coach(R.tutWarn,'4 of 4'); R.tutWarn=null; } }
-  if (R.tension>=1){ R.tension=1; R.strain+=dt; if (R.strain>.6){ snap(); return; } } else R.strain=Math.max(0,R.strain-dt*2);
-  if (R.tension>.82){ R.buzzT-=dt; if (R.buzzT<=0){ buzz(18); pulse(.4,'217,97,76'); R.buzzT=.3; } }
+  if (R.slack>(io.tut?1e9:3.5)){ io.why='The line went slack. It slipped away.'; return 'lose'; }
+  if (io.tut){ R.tension=Math.min(R.tension,.97);
+    if (R.tension>.85 && !R.tutWarn) ev.push('tut:red');
+    else if (R.tension<.5 && R.tutWarn) ev.push('tut:calm'); }
+  if (R.tension>=1){ R.tension=1; R.strain+=dt; if (R.strain>.6) return 'snap'; } else R.strain=Math.max(0,R.strain-dt*2);
+  if (R.tension>.82){ R.buzzT-=dt; if (R.buzzT<=0){ ev.push('strain'); R.buzzT=.3; } }
 
   const k=1-R.dist, by=lerp(R.from.y,Math.min(G.near+22,H-140),k), bx=lerp(R.from.x,W/2,k);
-  R.x=clamp(bx+R.dir*60*sc(by),18,W-18); R.y=by+Math.sin(S.time*5)*2;
-  R.splashT-=dt; if (R.splashT<=0){ splash(R.x,R.y,3+Math.round(R.tension*6)); if (Math.random()<.5) ripple(R.x,R.y,16); R.splashT=rand(.15,.4)-R.tension*.1; }
-  if (hum){ hum.o.frequency.setTargetAtTime(90+R.tension*280,AC.currentTime,.05); hum.g.gain.setTargetAtTime(reeling?.025+.06*R.tension:0,AC.currentTime,.05); }
-  if (R.dist<=0) startLand();
+  R.x=clamp(bx+R.dir*60*sc(by),18,W-18); R.y=by+Math.sin(io.t*5)*2;
+  R.splashT-=dt; if (R.splashT<=0){ ev.push(Math.random()<.5?'splash+ripple':'splash'); R.splashT=rand(.15,.4)-R.tension*.1; }
+  return R.dist<=0?'land':null;
+}
+/** A tap while a leaper is in the air keeps the line tight. */
+function fightTap(R){ if (!R || !R.jump || R.jump.tapped) return false; R.jump.tapped=true; R.dist=Math.max(0,R.dist-.07); R.tension=Math.max(R.tension,.3); return true; }
+
+const FIGHT_IO={t:0,holding:false,tut:null,tilt:0,reeling:false,ev:[],why:'',
+  steer(R,dt){ if (R.fam) return lerp(S.tilt,R.dir,Math.min(1,dt*8));
+    if (S.holding){ const want=clamp(S.pressTilt+(S.thumbX-S.pressX)/(W*.65),-1,1); return lerp(S.tilt,want,Math.min(1,dt*14)); }
+    return S.tilt; }};
+function updateReel(dt){
+  const R=S.reel, io=FIGHT_IO; io.t=S.time; io.holding=S.holding; io.tut=S.tut; io.tilt=S.tilt; io.ev.length=0; io.why='';
+  const end=fightStep(R,dt,io);
+  S.tilt=io.tilt; S.tut=io.tut;
+  for (const e of io.ev) fightShow(R,e);
+  if (end==='lose') return lose(io.why);
+  if (end==='snap') return snap();
+  if (hum){ hum.o.frequency.setTargetAtTime(90+R.tension*280,AC.currentTime,.05); hum.g.gain.setTargetAtTime(io.reeling?.025+.06*R.tension:0,AC.currentTime,.05); }
+  if (end==='land') startLand();
+}
+/** What the player sees and hears for each thing that happened in a fight step. */
+function fightShow(R,e){
+  switch(e){
+    case 'turn': splash(R.x,R.y,5); break;
+    case 'tug': splash(R.x,R.y,6); ripple(R.x,R.y,14); buzz(12); if (!S.tut) shake(1.5); break;
+    case 'surge': toast('Now! Reel hard.','good'); break;
+    case 'dive': sfx.dive(); buzz([0,60]); shake(3); break;
+    case 'diveWarn': toast('It’s diving. Let go!','warn'); break;
+    case 'jump': splash(R.x,R.y,10); sfx.leap(); break;
+    case 'splashdown': splash(R.x,R.y,14); ripple(R.x,R.y,30); break;
+    case 'slackJump': toast('Slack! Tap while it jumps.','warn'); break;
+    case 'click': sfx.click(); break;
+    case 'slackWarn': toast('Line’s slack. Hold!','warn'); break;
+    case 'strain': buzz(18); pulse(.4,'217,97,76'); break;
+    case 'splash': splash(R.x,R.y,3+Math.round(R.tension*6)); break;
+    case 'splash+ripple': splash(R.x,R.y,3+Math.round(R.tension*6)); ripple(R.x,R.y,16); break;
+    case 'tut:reel2': coach('It’s pulling '+(R.tgt>0?'right':'left')+'! Keep holding and slide your finger '+(R.tgt>0?'right':'left')+' until your ring is under the fish.','4 of 4'); break;
+    case 'tut:reel3': coach('That’s it! It will switch sides, so follow it. If the ring turns red, lift your finger for a moment.','4 of 4'); break;
+    case 'tut:red': R.tutWarn=$('coachText').textContent; coach('Red ring! Lift your finger to ease off, then hold again.','4 of 4', true); break;
+    case 'tut:calm': coach(R.tutWarn,'4 of 4'); R.tutWarn=null; break;
+  }
 }
 function leapTap(){
-  const R=S.reel; if (!R || !R.jump || R.jump.tapped) return false;
-  R.jump.tapped=true; R.dist=Math.max(0,R.dist-.07); R.tension=Math.max(R.tension,.3);
+  if (!fightTap(S.reel)) return false;
   sfx.hook(false); buzz(15); toast('Kept it tight!','good'); return true;
 }
 function snap(){
@@ -1403,12 +1499,15 @@ function updateLost(dt){
 }
 
 /* ---------- Landing & card ---------- */
-function startLand(){
-  humStop(); const R=S.reel, F=R.F;
-  const u=Math.pow(Math.random(),1.4); let size=lerp(F.size[0],F.size[1],u); if (R.perfect) size=Math.min(F.size[1]*1.05,size*1.08);
-  size=Math.round(size*10)/10; const build=rollBuild(), wgt=Math.round(weighFish(R.id,size,build));
+/** How big a landed fish is, what it weighs and what it sells for. The balance simulator rolls catches here too. */
+function catchRoll(id,perfect){ const F=FISH[id];
+  const u=Math.pow(Math.random(),1.4); let size=lerp(F.size[0],F.size[1],u); if (perfect) size=Math.min(F.size[1]*1.05,size*1.08);
+  size=Math.round(size*10)/10; const build=rollBuild(), w=Math.round(weighFish(id,size,build));
   const q=(size-F.size[0])/(F.size[1]-F.size[0]);
-  const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(R.perfect?1.25:1)*modMul('value',{fish:R.id})));
+  const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(perfect?1.25:1)*modMul('value',{fish:id})));
+  return {size,build,w,value,stars:qualityOf(id,size,perfect)}; }
+function startLand(){
+  humStop(); const R=S.reel, F=R.F, {size,build,w:wgt,value}=catchRoll(R.id,R.perfect);
   S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot:(S.bob&&S.bob.spot)||'open',hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0};
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
   sfx.out(F.rarity); buzz(F.rarity==='legendary'?[0,40,60,40,60,120]:40); shake(F.rarity==='legendary'?6:2);
@@ -4079,6 +4178,83 @@ $('kitchenBtn').addEventListener('click',()=>{ $('kitchenBtn').classList.remove(
 $('mealChip').addEventListener('click',()=>{ const m=save.meal; if (!m) return; coachFor(mealName(m.id)+(m.id==='mush'?'':' '+'★'.repeat(m.stars))+': '+effText(m.id,m.stars)+'. '+(m.last?'Last cast.':m.casts+' casts left.'),5); });
 $('journalBtn').addEventListener('click',()=>{ $('journalBtn').classList.remove('pulse'); openJournal(); });
 
+/* ---------- Bonuses: the journal page that shows every bonus and where it comes from ---------- */
+const BONUS_ORDER=['luck','value','reel','line','hook','perfect','night','tug','swell','twitch','reedBite'];
+const SRC_LABEL={rod:'Rod', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', mastery:'Mastery', event:'Event'};
+const trimNum=v=>(Math.round(v*100)/100).toString();
+/** How a modifier reads: +35%, −30%, ×2. */
+function modValueText(stat,v,omen){
+  if (STATS[stat].kind==='luck' && !omen){ const p=Math.round(v*100); return (p>=0?'+':'−')+Math.abs(p)+'%'; }
+  if (omen || v>=2) return '×'+trimNum(v);
+  const p=Math.round((v-1)*100); return (p>=0?'+':'−')+Math.abs(p)+'%';
+}
+/** Whether a stat change helps: luck and most stats are better up; tug and swell are better down. */
+const modHelps=(stat,v,omen)=>STATS[stat].kind==='luck'&&!omen ? v>=0 : (STATS[stat].good==='down' ? v<=1 : v>=1);
+/** When a modifier applies, in words: "at night", "in the trench", "for rare and legendary fish". */
+function modWhenText(w){
+  if (!w) return '';
+  const out=[], coast=w.region==='coast';
+  if (w.spot){ const n={deep:coast?'the trench':'the deep pool', reeds:'the reeds', pads:'the lily pads', far:'far water', open:'open water', rocks:'the sea stacks', kelp:'the kelp'}[w.spot]||SPOT_NAME[w.spot];
+    out.push('in '+n); }
+  else if (w.region) out.push('at '+REGION_NAME[w.region]);
+  if (w.night) out.push('at night');
+  if (w.rarity) out.push('for '+w.rarity.map(r=>RAR[r].label.toLowerCase()).join(' and ')+' fish');
+  if (w.fish) out.push('with '+FISH[w.fish].name);
+  if (w.lucky) out.push('while you fish a lucky splash');
+  return out.join(', ');
+}
+/** 'on' applies wherever you cast now, 'cond' depends on where or what you catch, 'off' doesn't apply here and now. */
+function modState(m,now){ const w=m.when; if (!w) return 'on';
+  if ((w.region && w.region!==now.region) || (w.night && !now.night)) return 'off';
+  return (w.spot||w.fish||w.rarity||w.lucky) ? 'cond' : 'on'; }
+function bonusesHTML(){
+  const now=modCtx({}), all=modList().filter(m=>m.src!=='tune' && m.src!=='base'), R=ROD(), meal=save.meal;
+  const where='At '+REGION_NAME[now.region]+(now.night?', at night':', by day');
+  // gear: what you're carrying
+  const sets=setsDone(), parts=(save.parts||[]).map(id=>PARTS[id]&&PARTS[id].name).filter(Boolean);
+  const mealOn=meal && meal.id!=='mush' && (meal.casts||meal.last) && RECIPES[meal.id];
+  const reach=modBase('reach'), gear=[['Rod',R.name+(reach>=1?' · casts to the horizon':' · casts '+Math.round(reach*100)+'% of the way out')],
+    ['Meal',mealOn?RECIPES[meal.id].name+' '+'★'.repeat(meal.stars)+' · '+(meal.casts||0)+' casts left':'None. The kitchen cooks meals with boosts.'],
+    ['Tank sets',sets.length?sets.map(s=>s.name).join(', '):'None yet'],
+    ['Boat',save.boat?(parts.length?parts.join(', '):'No parts yet'):'No boat yet'],
+    ['Keepnet',netCap()+' fish']];
+  let h='<p class="bn-where">'+where+'. Bonuses that depend on where you cast are marked.</p><dl class="bn-gear">'+gear.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('')+'</dl>';
+  const mastered=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=10);
+  const line=(m)=>{ const st=modState(m,now), w=modWhenText(m.when);
+    return '<li class="'+st+'"><span class="n">'+m.name+(m.stars?' '+'★'.repeat(m.stars):'')+'</span><span class="s">'+(SRC_LABEL[m.src]||'')+(w?' · '+w:'')+(st==='off'?' · not here':'')+'</span>'+
+      '<b class="'+(modHelps(m.stat,m.v,m.omen)?'up':'down')+'">'+modValueText(m.stat,m.v,m.omen)+'</b></li>'; };
+  let any=false;
+  for (const stat of BONUS_ORDER){
+    const ms=all.filter(m=>m.stat===stat && m.src!=='mastery'); const mast=all.filter(m=>m.stat===stat && m.src==='mastery');
+    if (!ms.length && !mast.length) continue;
+    const S0=STATS[stat];
+    if (stat==='luck'){
+      const real=ms.filter(m=>!m.omen && modState(m,now)==='on'), pts=real.reduce((a,m)=>a+m.v,0);
+      if (!real.length && ms.every(m=>m.src==='event')) continue;    // Gull Luck alone: nothing to show until you have luck of your own
+      any=true;
+      const tiers=Object.keys(RAR).filter(r=>RAR[r].luckCap).map(r=>'<span><i style="background:'+RAR[r].color+'"></i>'+RAR[r].label+' ×'+trimNum(luckCurve(pts,RAR[r].luckCap))+'</span>').join('');
+      const top=Object.keys(RAR).filter(r=>RAR[r].luckCap).at(-1);
+      h+='<section class="bn-card bn-luck"><header><h3>'+S0.name+'</h3><b class="up">'+modValueText('luck',pts)+'</b></header><p class="bn-hint">'+S0.hint+'</p>'+
+        '<p class="bn-sum">Your luck here adds up to '+modValueText('luck',pts)+'. After diminishing returns, rarer fish bite this much more often:</p>'+
+        '<div class="bn-tiers">'+tiers+'</div><ul class="bn-src">'+ms.map(line).join('')+'</ul>'+
+        '<p class="bn-cap">'+RAR[top].label+' odds top out at ×'+RAR[top].luckCap+' from luck. Omens like Gull Luck multiply on top while they last.</p></section>';
+      continue;
+    }
+    any=true;
+    const on=ms.filter(m=>modState(m,now)==='on'), cond=ms.filter(m=>modState(m,now)==='cond');
+    const tot=(on.length?on:cond).reduce((a,m)=>a*m.v,1), totCls=on.length?(modHelps(stat,tot)?'up':'down'):'cond';
+    let lines=ms.map(line).join('');
+    if (mast.length) lines+='<li class="cond"><span class="n">Mastered fish</span><span class="s">Mastery · with your '+mast.length+' mastered species</span><b class="up">'+modValueText(stat,mast[0].v)+'</b></li>';
+    h+='<section class="bn-card"><header><h3>'+S0.name+'</h3><b class="'+totCls+'">'+(tot===1?'—':modValueText(stat,tot))+'</b></header><p class="bn-hint">'+S0.hint+'</p><ul class="bn-src">'+lines+'</ul></section>';
+  }
+  const flags=['reveal','sonar','noWashout'].map(st=>({st,ms:all.filter(m=>m.stat===st)})).filter(x=>x.ms.length);
+  if (flags.length){ any=true; h+='<section class="bn-card"><header><h3>Perks</h3></header><ul class="bn-src">'+flags.map(({st,ms})=>{ const m=ms[0], state=modState(m,now), w=modWhenText(m.when);
+    return '<li class="'+state+'"><span class="n">'+STATS[st].name+'</span><span class="s">'+ms.map(x=>x.name).join(', ')+(w?' · '+w:'')+(state==='off'?' · not here':'')+'</span><b class="'+(state==='off'?'':'up')+'">'+(state==='off'?'—':'On')+'</b></li>'; }).join('')+'</ul></section>'; }
+  if (mastered.length){ any=true; h+='<section class="bn-card"><header><h3>Mastery</h3><b>'+mastered.length+'</b></header><p class="bn-hint">Catch ten of a species and it reels in 65% faster, with your rod following it for you.</p><p class="bn-list">'+mastered.map(id=>FISH[id].name).join(', ')+'</p></section>'; }
+  if (!any) h+='<p class="note">No bonuses yet. Better rods, meals from the kitchen, tank sets in the aquarium and boat parts all add up here.</p>';
+  return h;
+}
+
 /* ---------- Journal: species pages and personal records ---------- */
 let JTAB='species';
 function recWhere(pb){ if (!pb) return ''; if (!pb.t) return 'Caught before the tape measure, at '+(REGION_NAME[pb.reg]||'the lake');
@@ -4096,8 +4272,8 @@ function drawPlaque(x,id,w,h){ const F=FISH[id], pw=Math.min(w*.86,330), ph=h*.9
 function journalRegions(){ return save.boat?[REG(),REG()==='lake'?'coast':'lake']:['lake']; }
 function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
   let h='<div class="panel-head"><div><h2>Journal</h2><p>'+regs.map(r=>REGION_NAME[r]+' '+REGION_FISH[r].filter(id=>(save.fish[id]||{}).caught>0).length+'/'+REGION_FISH[r].length).join(' · ')+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
-    '<div class="seg" role="tablist"><button type="button" role="tab" data-jt="species" class="'+(JTAB==='species'?'on':'')+'">Species</button><button type="button" role="tab" data-jt="records" class="'+(JTAB==='records'?'on':'')+'">Records</button></div>';
-  h+=JTAB==='records'?recordsHTML(regs):speciesHTML(regs);
+    '<div class="seg" role="tablist">'+[['species','Species'],['records','Records'],['bonuses','Bonuses']].map(([k,l])=>'<button type="button" role="tab" data-jt="'+k+'" aria-selected="'+(JTAB===k)+'" class="'+(JTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+  h+=JTAB==='records'?recordsHTML(regs):JTAB==='bonuses'?bonusesHTML():speciesHTML(regs);
   openSheet(h); $('closeS').addEventListener('click',closeSheet);
   document.querySelectorAll('#panel [data-jt]').forEach(b=>b.addEventListener('click',()=>{ tone(900,.04,{vol:.04,type:'triangle'}); openJournal(b.dataset.jt); $('panel').scrollTop=0; }));
   document.querySelectorAll('#panel [data-units]').forEach(b=>b.addEventListener('click',()=>{ save.units=b.dataset.units; persist(); openJournal('records'); }));
@@ -4183,17 +4359,180 @@ function openShop(){
     addCoins(-R.price); save.rods.push(id); save.rod=id; persist(); sfx.out('uncommon'); buzz([0,30,40,30]); toast('New rod: '+R.name+'!','gold'); openShop(); }));
 }
 
+/* ---------- Balance simulator: the 1,000-cast report ---------- */
+/* Plays casts with any setup without drawing anything, using the game's own odds (poolFor), fights
+   (fightStep), catch rolls (catchRoll) and bonuses (game/mods.js), so the report can't drift from the game.
+   Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
+   the fish, eases off when the ring turns red, and handles most dives, tugs and jumps; a new player is
+   slower and handles fewer. The setup lives in a stand-in
+   save for the run, then the real save comes back untouched. */
+const SIM_PLAYERS={
+  steady:{name:'Steady player', react:()=>.2+.38*Math.pow(Math.random(),1.6), track:5, easeAt:.8, easeFor:.45, dives:.8, tugs:.7, jumps:.85, swells:.5},
+  new:   {name:'New player', react:()=>.28+.6*Math.pow(Math.random(),1.3), track:3, easeAt:.92, easeFor:.35, dives:.4, tugs:.35, jumps:.5, swells:.15}
+};
+/* Where each spot sits on the cast's 0 (shore) to 1 (horizon) scale: [nearest edge, middle]. The rod's reach
+   has to cover the nearest edge. Worked out from the layout in game/layout.js and game/regions.js on a
+   390 by 844 phone; keep in step if spots move. */
+const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
+                 coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]}};
+function simSave(st){
+  const s=fresh(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
+  s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.clock=st.hour==null?12:st.hour;
+  s.rod=st.rod||'willow'; s.rods=[s.rod]; s.parts=st.parts==='all'?Object.keys(PARTS):(st.parts||[]).slice();
+  if (st.meal && st.meal.id) s.meal={id:st.meal.id,stars:st.meal.stars||3,casts:1e9};
+  if (st.sets==='all'){ const now=Date.now(), F=id=>({id,size:FISH[id].size[1],value:FISH[id].value,t:now});
+    // every species twice: enough for every tank set to complete
+    s.tanks={fresh:{lvl:TANKS.fresh.caps.length-1,owned:true,fish:[],decor:DECOR.fresh.map(d=>d.id),tips:0,tipT:now},
+             salt:{lvl:TANKS.salt.caps.length-1,owned:true,fish:[],decor:DECOR.salt.map(d=>d.id),tips:0,tipT:now}};
+    for (const id of REGION_FISH.lake) s.tanks.fresh.fish.push(F(id),F(id));
+    for (const id of REGION_FISH.coast) s.tanks.salt.fish.push(F(id),F(id)); }
+  if (st.mastery) for (const id in FISH) s.fish[id]={caught:12,best:0,seen:true};
+  return s;
+}
+/** Runs `n` casts with setup `st` and returns the report. */
+function simulate(st,n){
+  n=n||1000; st=Object.assign({region:'lake',spot:'open',hour:12,rod:'willow',player:'steady'},st);
+  const keep=save, keepTut=S.tut, P=SIM_PLAYERS[st.player]||SIM_PLAYERS.steady;
+  SIMULATING=true; save=simSave(st); MODC.dirty=true;
+  try {
+    const spots=st.spot==='mix'?Object.keys(REG()==='coast'?POOLS_COAST:POOLS):[st.spot];
+    const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0}, perfect:0, coins:0, pbs:0, pbCoins:0, secs:0, fightSecs:0,
+      tiers:{}, species:{}, records:{}};
+    const dt=1/60, io={t:0,holding:true,tut:null,tilt:0,reeling:false,ev:[],why:''};
+    for (let c=0;c<n;c++){
+      const spot=spots[c%spots.length], lucky=!!st.lucky, depth=((SIM_SPOTS[REG()]||{})[spot]||[0,.5])[1];
+      let t=1.6;                                                   // aim, drag and the cast's flight
+      // the quiet, then a fish swims over and nibbles
+      t+=rand(.75,2.1)*modMul('wait')*(spot==='deep'?1.2:1)/(spot==='reeds'?modMul('reedBite',{spot}):1);
+      const id=pickW(poolFor(spot,lucky)), F=FISH[id], y=lerp(G.near,HZ+26,depth);
+      t+=Math.max(.4,(rand(85,150)-10-F.len*.2)/((20+F.len*.35)*sc(y)*(F.beh==='sleeper'?.5:1))*1.2);
+      const nib=F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3));
+      t+=rand(.5,1.1); for (let i=0;i<nib;i++) t+=F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4);
+      // the bite
+      const r=P.react(); t+=r;
+      if (r>F.window*modMul('hook',{fish:id})){ out.lost.slow++; out.secs+=t+.7; continue; }
+      const perfect=r<=.3*modMul('perfect',{fish:id}); if (perfect) out.perfect++;
+      // the fight, through the game's own fight step
+      const R=newFight(id,perfect,{x:W*.5,y},lucky,false);
+      let ft=0, end=null, easeT=0, tilt=0, swellT=REG()==='coast'?rand(0,7.5):Infinity, plan={dive:false,tug:false};
+      io.steer=(R,dt)=>R.fam?lerp(io.tilt,R.dir,Math.min(1,dt*8)):lerp(io.tilt,R.dir+Math.sin(ft*1.7)*.12,Math.min(1,dt*P.track));
+      while (!end && ft<150){
+        ft+=dt; io.t=ft; io.ev.length=0;
+        if (R.jump && !plan.jumpSet){ plan.jumpSet=true; plan.jump=Math.random()<P.jumps; } if (!R.jump) plan.jumpSet=false;
+        if (R.jump && plan.jump && !R.jump.tapped && R.jump.t>=.3) fightTap(R);
+        if (R.warn>0 && !plan.diveSet){ plan.diveSet=true; plan.dive=Math.random()<P.dives; } if (R.dive<=0 && R.warn<=0) plan.diveSet=false;
+        if (R.tug && !plan.tugSet){ plan.tugSet=true; plan.tug=Math.random()<P.tugs; } if (!R.tug) plan.tugSet=false;
+        if (R.tension>P.easeAt) easeT=P.easeFor;
+        easeT-=dt;
+        io.holding=!(easeT>0 || (plan.dive && (R.dive>0 || R.warn>0 && R.warn<.35)) || (plan.tug && R.tug && R.beat%1.15>.12));
+        swellT-=dt; if (swellT<=0){ swellT+=7.5; if (Math.random()>=P.swells && io.holding) R.tension+=.3*modMul('swell'); }
+        end=fightStep(R,dt,io);
+      }
+      t+=ft; out.fightSecs+=ft;
+      if (end!=='land'){ out.secs+=t+.7; if (end==='snap') out.lost.snap++; else if (!end) out.lost.tired++; else if (/jump/.test(io.why)) out.lost.jump++; else out.lost.slack++; continue; }
+      // landed: the game's own catch roll, then the card
+      const k=catchRoll(id,perfect), rar=F.rarity, prev=out.records[id];
+      out.landed++; out.coins+=k.value; out.tiers[rar]=(out.tiers[rar]||0)+1; out.species[id]=(out.species[id]||0)+1;
+      if (prev!=null && k.w>prev){ out.pbs++; const b=Math.max(3,Math.round(F.value*.5)); out.pbCoins+=b; out.coins+=b; }
+      if (prev==null || k.w>prev) out.records[id]=k.w;
+      t+=RAR[rar].land*(rar==='rare'||rar==='legendary'?1.03:1)+(rar==='common'?2.2:3.2);
+      out.secs+=t;
+    }
+    const hours=out.secs/3600, pct=x=>Math.round(x*1000)/10;
+    out.coinsPerHour=Math.round(out.coins/hours); out.catchesPerHour=Math.round(out.landed/hours);
+    out.secsPerCast=Math.round(out.secs/n*10)/10; out.fightAvg=Math.round(out.fightSecs/Math.max(1,n-out.lost.slow)*10)/10;
+    out.coinsPerCatch=Math.round(out.coins/Math.max(1,out.landed)*10)/10; out.landRate=pct(out.landed/n); out.perfectRate=pct(out.perfect/Math.max(1,n-out.lost.slow));
+    out.luck={points:Math.round(luckPoints({spot:spots[0],lucky:!!st.lucky})*100)/100,
+      tiers:Object.fromEntries(Object.keys(RAR).filter(r=>RAR[r].luckCap).map(r=>[r,Math.round(tierMul(r,{spot:spots[0],lucky:!!st.lucky})*100)/100]))};
+    out.reach={rod:modBase('reach'), ok:spots.every(sp=>((SIM_SPOTS[REG()]||{})[sp]||[0])[0]<=modBase('reach')+.001)};
+    out.bonuses=modList().filter(m=>m.src!=='base' && m.stat!=='reach' && m.stat!=='snag').map(m=>({src:m.src,name:m.name,stat:m.stat,v:m.v,when:m.when||null,omen:!!m.omen}));
+    delete out.records; return out;
+  } finally { save=keep; S.tut=keepTut; SIMULATING=false; MODC.dirty=true; }
+}
+
+/* ---------- Playtest > Balance: run the simulator on any setup and read the report ---------- */
+const BAL={form:null, last:null, prev:null};
+const BAL_TIMES=[[6.5,'Dawn'],[12,'Noon'],[18.5,'Dusk'],[22,'Night']];
+function balMine(){ const m=save.meal, on=m && m.id!=='mush' && (m.casts||m.last) && RECIPES[m.id];
+  return {region:REG(), spot:'open', hour:BAL_TIMES.reduce((a,t)=>Math.abs(t[0]-save.clock)<Math.abs(a-save.clock)?t[0]:a,12), rod:save.rod,
+    meal:on?m.id:'', stars:on?m.stars:3, sets:setsDone().length?'all':'none', parts:(save.parts||[]).length?'all':'none',
+    mastery:Object.keys(FISH).some(id=>(save.fish[id]||{}).caught>=10)?'yes':'no', lucky:'no', player:'steady', n:1000}; }
+function balanceFormHTML(){
+  const f=BAL.form||(BAL.form=balMine());
+  const sel=(id,label,opts,v)=>'<label for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(([k,l])=>'<option value="'+k+'"'+(String(k)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
+  const spots=Object.keys(f.region==='coast'?POOLS_COAST:POOLS).map(sp=>[sp,f.region==='coast'&&sp==='deep'?'Dark trench':SPOT_NAME[sp]]);
+  let h='<p class="note">Plays casts with the game’s own odds, fights and catch rolls. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps.</p>'+
+    '<div class="bal-form">'+
+    sel('bRegion','Water',Object.keys(REGION_NAME).map(r=>[r,REGION_NAME[r]]),f.region)+
+    sel('bSpot','Spot',[...spots,['mix','Every spot']],f.spot)+
+    sel('bHour','Time',BAL_TIMES.map(([h,l])=>[h,l]),f.hour)+
+    sel('bRod','Rod',[...ROD_ORDER,...SEA_RODS].map(id=>[id,RODS[id].name]),f.rod)+
+    sel('bMeal','Meal',[['','None'],...RECIPE_ORDER.map(id=>[id,RECIPES[id].name])],f.meal)+
+    sel('bStars','Meal stars',[[1,'★'],[2,'★★'],[3,'★★★']],f.stars)+
+    sel('bSets','Tank sets',[['none','None'],['all','Every set']],f.sets)+
+    sel('bParts','Boat parts',[['none','None'],['all','Every part']],f.parts)+
+    sel('bMastery','Mastery',[['no','None'],['yes','Every fish']],f.mastery)+
+    sel('bLucky','Gull Luck',[['no','No'],['yes','In a lucky splash']],f.lucky)+
+    sel('bPlayer','Player',[['steady','Steady'],['new','New']],f.player)+
+    sel('bN','Casts',[[1000,'1,000'],[5000,'5,000']],f.n)+
+    '</div><div class="row bal-go"><button class="btn" id="bRun" type="button">Run '+Number(f.n).toLocaleString()+' casts</button><button class="btn ghost" id="bMine" type="button">Use my setup</button></div>'+
+    '<div id="bOut">'+(BAL.last?balanceResultHTML(BAL.last,BAL.prev):'')+'</div>';
+  return h;
+}
+function balSetup(f){ return {region:f.region, spot:f.spot, hour:+f.hour, rod:f.rod, meal:f.meal?{id:f.meal,stars:+f.stars}:null, sets:f.sets,
+  parts:f.parts==='all'?Object.keys(PARTS):[], mastery:f.mastery==='yes', lucky:f.lucky==='yes', player:f.player}; }
+function bindBalance(){
+  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bLucky:'lucky',bPlayer:'player',bN:'n'};
+  for (const [id,k] of Object.entries(ids)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
+    if (k==='region'){ BAL.form.spot='open'; const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; }
+    if (k==='n') $('bRun').textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts'; });
+  $('bMine').addEventListener('click',()=>{ BAL.form=balMine(); const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; });
+  $('bRun').addEventListener('click',()=>{ const b=$('bRun'); b.disabled=true; b.textContent='Casting…';
+    setTimeout(()=>{ const res=simulate(balSetup(BAL.form),+BAL.form.n); BAL.prev=BAL.last; BAL.last=res;
+      $('bOut').innerHTML=balanceResultHTML(res,BAL.prev); b.disabled=false; b.textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts';
+      $('bOut').scrollIntoView({behavior:REDUCED?'auto':'smooth',block:'start'}); },30); });
+}
+function balanceResultHTML(r,prev){
+  const st=r.setup, fmt=n=>Math.round(n).toLocaleString();
+  const delta=(k)=>{ if (!prev) return ''; const a=prev[k], b=r[k]; if (!a) return ''; const d=Math.round((b-a)/a*100);
+    return '<em class="'+(d>0?'up':d<0?'down':'')+'">'+(d===0?'same as last run':(d>0?'▲ ':'▼ ')+Math.abs(d)+'% vs last run')+'</em>'; };
+  const title=REGION_NAME[st.region]+' · '+(st.spot==='mix'?'every spot':(st.region==='coast'&&st.spot==='deep'?'the trench':SPOT_NAME[st.spot].toLowerCase()))+' · '+BAL_TIMES.find(t=>t[0]===st.hour)[1].toLowerCase()+' · '+RODS[st.rod].name+(st.meal?' · '+RECIPES[st.meal.id].name+' '+'★'.repeat(st.meal.stars):'');
+  let h='<section class="bal-res" aria-live="polite"><h3>'+r.casts.toLocaleString()+' casts: '+title+'</h3>';
+  if (!r.reach.ok) h+='<p class="bal-warn">'+RODS[st.rod].name+' can’t reach this spot (it casts '+Math.round(r.reach.rod*100)+'% of the way out). These numbers assume it could.</p>';
+  h+='<div class="stats bal-stats">'+
+    '<div><b>'+fmt(r.coinsPerHour)+'</b><span>Coins an hour</span>'+delta('coinsPerHour')+'</div>'+
+    '<div><b>'+fmt(r.catchesPerHour)+'</b><span>Fish an hour</span>'+delta('catchesPerHour')+'</div>'+
+    '<div><b>'+r.coinsPerCatch.toLocaleString()+'</b><span>Coins a fish</span>'+delta('coinsPerCatch')+'</div>'+
+    '<div><b>'+r.landRate+'%</b><span>Landed</span></div><div><b>'+r.perfectRate+'%</b><span>Perfect hooks</span></div><div><b>'+r.pbs+'</b><span>Records beaten</span></div></div>';
+  // the rarity mix, as one bar
+  const tiers=Object.keys(RAR).filter(k=>r.tiers[k]), tot=r.landed||1;
+  h+='<div class="bal-mix" role="img" aria-label="Rarity mix">'+tiers.map(k=>'<i style="width:'+(r.tiers[k]/tot*100)+'%;background:'+RAR[k].color+'"></i>').join('')+'</div>'+
+    '<div class="bal-legend">'+tiers.map(k=>'<span><i style="background:'+RAR[k].color+'"></i>'+RAR[k].label+' '+(Math.round(r.tiers[k]/tot*1000)/10)+'%</span>').join('')+'</div>';
+  const sp=Object.entries(r.species).sort((a,b)=>b[1]-a[1]);
+  h+='<table class="bal-tab"><thead><tr><th>Fish</th><th>Share</th><th>One in</th></tr></thead><tbody>'+sp.map(([id,n])=>'<tr><td><span><i style="background:'+RAR[FISH[id].rarity].color+'"></i>'+FISH[id].name+'</span></td><td>'+(Math.round(n/tot*1000)/10)+'%</td><td>'+(r.casts/n<1.5?'every cast':Math.round(r.casts/n).toLocaleString()+' casts')+'</td></tr>').join('')+'</tbody></table>';
+  const L=r.luck, lostBits=[['slow','too slow'],['jump','shook off mid-jump'],['slack','slipped on a slack line'],['snap','snapped'],['tired','outlasted the player']].filter(([k])=>r.lost[k]).map(([k,w])=>r.lost[k]+' '+w);
+  h+='<p class="note bal-notes">Luck '+modValueText('luck',L.points)+': '+Object.entries(L.tiers).map(([k,v])=>RAR[k].label+' ×'+v).join(', ')+'. '+
+    'A cast takes '+r.secsPerCast+' s on average, and a fight '+r.fightAvg+' s. '+(lostBits.length?'Lost: '+lostBits.join(', ')+'. ':'')+
+    (r.pbCoins?'Record bonuses paid '+fmt(r.pbCoins)+' coins. ':'')+'</p></section>';
+  return h;
+}
+
 /* ---------- Playtest tools (the wrench, or a long press on the clock) ---------- */
-$('labBtn').addEventListener('click',()=>{
+let PTAB='tools';
+$('labBtn').addEventListener('click',()=>openPlaytest());
+function openPlaytest(tab){ if (tab) PTAB=tab;
+  const head='<div class="panel-head"><div><h2>Playtest</h2><p>Build '+BUILD+' · numbers for tuning</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
+    '<div class="seg" role="tablist">'+[['tools','Tools'],['balance','Balance']].map(([k,l])=>'<button type="button" role="tab" data-pt="'+k+'" aria-selected="'+(PTAB===k)+'" class="'+(PTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+  if (PTAB==='balance'){ openSheet(head+balanceFormHTML()); bindPlaytestTabs(); bindBalance(); return; }
   const s=save.stats, rate=s.casts?Math.round(s.catches/s.casts*100):0, t=save.tune;
   const sl=(id,label,v,hint)=>'<label for="'+id+'">'+label+'<output id="'+id+'O">'+v.toFixed(2)+'×</output><input type="range" id="'+id+'" min="0.5" max="1.6" step="0.05" value="'+v+'"><span class="note" style="grid-column:1/-1;margin:0">'+hint+'</span></label>';
-  openSheet('<div class="panel-head"><div><h2>Playtest</h2><p>Build '+BUILD+' · numbers for tuning</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
+  openSheet(head+
     '<div class="stats"><div><b>'+s.casts+'</b><span>Casts</span></div><div><b>'+s.catches+'</b><span>Catches</span></div><div><b>'+rate+'%</b><span>Land rate</span></div><div><b>'+s.perfect+'</b><span>Perfect hooks</span></div><div><b>'+s.escapes+'</b><span>Got away</span></div><div><b>'+s.snaps+'</b><span>Snapped</span></div></div>'+
     '<div class="tune">'+sl('tHook','Hook window',t.hook,'Higher is more forgiving when the bobber plunges.')+sl('tTension','Tension build',t.tension,'Higher makes the line strain faster while reeling.')+sl('tWait','Bite wait',t.wait,'Higher means longer quiet time before a fish shows up.')+
     '<label for="tClock">Time of day<output id="tClockO">'+clockText(save.clock)+'</output><input type="range" id="tClock" min="0" max="23.75" step="0.25" value="'+save.clock.toFixed(2)+'"><span class="note" style="grid-column:1/-1;margin:0">One in-game hour passes every real minute. Lantern Carp only rise at night; the Mayor favors dawn.</span></label></div>'+
-    '<p class="note">Gate for this phase: with no art at all, testers ask for one more cast on their own. Watch for where they hesitate.</p>'+
+    '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
     '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
-  $('closeS').addEventListener('click',closeSheet);
+  bindPlaytestTabs();
   [['tHook','hook'],['tTension','tension'],['tWait','wait']].forEach(([id,k])=>{ $(id).addEventListener('input',e=>{ save.tune[k]=+e.target.value; $(id+'O').textContent=(+e.target.value).toFixed(2)+'×'; persist(); }); });
   $('tClock').addEventListener('input',e=>{ save.clock=+e.target.value; $('tClockO').textContent=clockText(save.clock); buildBg(); persist(); });
   $('coinBtn').addEventListener('click',()=>{ addCoins(1000); });
@@ -4206,10 +4545,12 @@ $('labBtn').addEventListener('click',()=>{
     for (const id of ids){ if (save.net.length>=netCap()) break; const F=FISH[id]; rec(id).seen=true; if (!rec(id).caught){ rec(id).caught=1; rec(id).best=F.size[0]; } const sz=Math.round(lerp(F.size[0],F.size[1],Math.random()*.8)*10)/10, wg=Math.round(weighFish(id,sz,rollBuild())); save.net.push({id,size:sz,w:wg,stars:qualityOf(id,sz,false),value:F.value,t:now,reg:REGION_FISH.coast.includes(id)?'coast':'lake',spot:'open',hr:save.clock,rod:save.rod}); }
     if (!save.kitchenOpen){ save.tutorialDone=true; save.stats.catches=Math.max(5,save.stats.catches); } persist(); closeSheet(); updateHud(); kitchenUnlockCheck(); news('Keepnet stocked','good'); });
   $('replayTut').addEventListener('click',()=>{ save.tutorialDone=false; persist(); closeSheet(); setState('idle'); });
-  $('resetT').addEventListener('click',()=>{ save.tune={hook:1,tension:1,wait:1}; persist(); closeSheet(); $('labBtn').click(); });
+  $('resetT').addEventListener('click',()=>{ save.tune={hook:1,tension:1,wait:1}; persist(); openPlaytest('tools'); });
   let armed=false; $('resetAll').addEventListener('click',e=>{ if (!armed){ armed=true; e.target.textContent='Tap again to erase'; return; }
     snapshot('Before erasing',true); const snd=save.sound; save=fresh(); save.sound=snd; persist(); coinShown=0; $('coins').textContent='0'; updateHud(); closeSheet(); setState('idle'); news('Progress erased',''); });
-});
+}
+function bindPlaytestTabs(){ $('closeS').addEventListener('click',closeSheet);
+  document.querySelectorAll('#panel [data-pt]').forEach(b=>b.addEventListener('click',()=>{ tone(900,.04,{vol:.04,type:'triangle'}); openPlaytest(b.dataset.pt); $('panel').scrollTop=0; })); }
 
 /* ---------- Boot ---------- */
 function boot(data){

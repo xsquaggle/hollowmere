@@ -8,7 +8,7 @@
    good  'up' when more is better, 'down' when less is better.  tune:true stats only come from Playtest tuning.
    hint  the plain sentence the Bonuses page shows under the stat. */
 const STATS={
-  luck:     {name:'Rarity luck', kind:'luck', good:'up', hint:'Rarer fish bite more often. Luck has diminishing returns, and each rarity has a ceiling.'},
+  luck:     {name:'Rarity luck', kind:'luck', good:'up', hint:'Rarer fish bite more often.'},
   value:    {name:'Fish value', kind:'mul', good:'up', hint:'Coins for every fish you sell.'},
   reel:     {name:'Reel speed', kind:'mul', good:'up', hint:'How fast a hooked fish comes in while you hold.'},
   line:     {name:'Line strength', kind:'mul', good:'up', hint:'Tension builds more slowly, so the line snaps less.'},

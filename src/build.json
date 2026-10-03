@@ -9,7 +9,9 @@
     "styles/news.css",
     "styles/kitchen.css",
     "styles/card.css",
-    "styles/sheets.css"
+    "styles/bonuses.css",
+    "styles/sheets.css",
+    "styles/balance.css"
   ],
   "js": [
     "game/core.js",
@@ -57,8 +59,11 @@
     "game/loop.js",
     "game/input.js",
     "game/buttons.js",
+    "game/bonuses.js",
     "game/journal.js",
     "game/shops.js",
+    "game/sim.js",
+    "game/balance.js",
     "game/playtest.js",
     "game/boot.js"
   ],

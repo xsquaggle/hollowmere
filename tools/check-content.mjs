@@ -32,8 +32,8 @@ const noDupes = (where, list) => { const seen = new Set(); for (const x of list)
 const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, SPOT_NAME, REGION_FISH, REGION_NAME, MAP_PLACES,
   RODS, ROD_ORDER, SEA_RODS, PARTS, PAINTS, OTT_LINES, BAR_LINES, BANQUET_LINES, LETTER,
   TANKS, TIP_BASE, DECOR, TANK_SETS, SPICES, SPICE_ORDER, SIDES, FLESH, COOK_NAME, RECIPES, RECIPE_ORDER, MUSH, MEAL_STR, MEAL_CASTS,
-  CHORD, MOODS, MOTIF, AMB_LV } = D;
-for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH }))
+  CHORD, MOODS, MOTIF, AMB_LV, STATS } = D;
+for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS }))
   if (!v) { console.error('Missing table ' + n + ' in src/data/.'); process.exit(1); }
 
 /* ---------- fish ---------- */
@@ -106,7 +106,7 @@ for (const s of TANK_SETS) { const w = 'TANK_SETS.' + s.id; need(w, s, { name: '
 
 /* ---------- kitchen ---------- */
 const FORMS = ['fillet', 'skewer', 'wrap', 'steak'], DISHES = ['bowl', 'plate', 'pie'];                         // drawn in game/kitchen-art.js
-const BOOSTS = ['value', 'reel', 'tug', 'night', 'hook', 'perfect', 'luck', 'swell', 'line'];                     // read through mealMul() in the game
+const BOOSTS = keys(STATS).filter(k => STATS[k].kind === 'mul' || STATS[k].kind === 'luck');                       // meal boosts are modifiers on these stats
 sameSet('SPICE_ORDER', SPICE_ORDER, keys(SPICES), 'SPICE_ORDER and SPICES');
 for (const k of keys(SPICES)) need('SPICES.' + k, SPICES[k], { name: 'str', short: 'str', col: 'hex', glass: 'hex', lid: 'hex' });
 for (const id of FIDS) if (!isHex(FLESH[id])) bad('FLESH', 'no cooked color for ' + id);
@@ -131,6 +131,29 @@ for (const [m, M] of Object.entries(MOODS)) { const w = 'MOODS.' + m; need(w, M,
   for (const [root, ch] of M.prog || []) { if (!(Number.isInteger(root) && root >= 24 && root <= 84)) bad(w, 'chord root ' + root + ' is outside MIDI 24..84'); oneOf(w + '.prog', ch, keys(CHORD), 'chord'); }
   if (!M.silent && !(M.scale || []).length) bad(w, 'a playing mood needs a scale'); }
 (MOTIF || []).forEach(([n, d], i) => (Number.isInteger(n) && d > 0) || bad('MOTIF[' + i + ']', 'should be [midi, beats]'));
+
+/* ---------- stats and modifiers ---------- */
+const KINDS = ['mul', 'luck', 'base', 'add', 'flag'];
+for (const [k, st] of Object.entries(STATS)) { const w = 'STATS.' + k; need(w, st, { name: 'str', hint: 'str' }); oneOf(w + '.kind', st.kind, KINDS, 'stat kind');
+  if (st.kind !== 'flag') oneOf(w + '.good', st.good, ['up', 'down'], 'direction'); if (st.kind === 'add' && !isNum(st.start)) bad(w, 'an add stat needs a start value'); }
+for (const r of RARS) { const c = RAR[r].luckCap; if (r === RARS[0]) { if (c !== undefined) bad('RAR.' + r, 'the commonest tier takes no luck cap (luck shrinks it instead)'); } else if (!(isNum(c) && c > 1)) bad('RAR.' + r, 'luckCap should be a number above 1'); }
+for (let i = 2; i < RARS.length; i++) if (RAR[RARS[i]].luckCap < RAR[RARS[i - 1]].luckCap) bad('RAR.' + RARS[i], 'rarer tiers should have a ceiling at least as high as the tier below');
+const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true], fish: FIDS, rarity: RARS, lucky: [true] };
+const checkMod = (w, m) => {
+  const st = STATS[m.stat]; if (!st) return bad(w, `unknown stat ${JSON.stringify(m.stat)} (see data/stats.js)`);
+  if (st.kind === 'flag') { if (m.v !== undefined) bad(w, m.stat + ' is a flag and takes no v'); }
+  else if (!isNum(m.v)) bad(w, 'v should be a number');
+  else if (st.kind === 'mul' && !(m.v > 0)) bad(w, 'a multiplier should be above 0');
+  if (m.omen && m.stat !== 'luck') bad(w, 'only luck can be an omen');
+  for (const [k, v] of Object.entries(m.when || {})) { if (!WHEN[k]) { bad(w + '.when', 'unknown condition ' + k + ' (region, spot, night, fish, rarity, lucky)'); continue; }
+    for (const x of Array.isArray(v) ? v : [v]) oneOf(w + '.when.' + k, x, WHEN[k], k); }
+  for (const k of keys(m)) if (!['stat', 'v', 'when', 'omen'].includes(k)) bad(w, 'unknown modifier field ' + k);
+};
+for (const id of RIDS) (RODS[id].mods || []).forEach((m, i) => checkMod(`RODS.${id}.mods[${i}]`, m));
+for (const id of keys(PARTS)) (PARTS[id].mods || []).forEach((m, i) => checkMod(`PARTS.${id}.mods[${i}]`, m));
+for (const id of keys(PARTS)) if (!(PARTS[id].mods || []).length) bad('PARTS.' + id, 'a part needs at least one modifier, or it does nothing');
+for (const id of keys(RECIPES)) for (const b of RECIPES[id].boost || []) if (!STATS[b.k]) bad('RECIPES.' + id + '.boost', b.k + ' is not a stat in data/stats.js');
+for (const id of FIDS) if (FISH[id].night !== undefined && FISH[id].night !== true) bad('FISH.' + id, 'night is either true or left out');
 
 /* ---------- every string ---------- */
 let strings = 0;

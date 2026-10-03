@@ -1,0 +1,25 @@
+/* Bonuses: the journal page listing every bonus and its sources */
+.bn-where{margin:0 0 10px;font-size:12.5px;font-weight:700;color:#6B665C}
+.bn-gear{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:0 0 14px;padding:10px 12px;border-radius:10px;background:rgba(43,42,51,.06);font-size:13px}
+.bn-gear dt{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468;padding-top:2px}
+.bn-gear dd{margin:0;color:#3A3832;font-weight:700}
+.bn-card{border:1.5px solid rgba(43,42,51,.18);border-radius:12px;padding:11px 13px 9px;margin:0 0 10px}
+.bn-card header{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.bn-card h3{margin:0;font:400 18px/1.15 var(--display)}
+.bn-card header b{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.bn-card b.up{color:#3E7A35}.bn-card b.down{color:#B2493A}.bn-card b.cond{color:#8A7A52}
+.bn-hint{margin:2px 0 8px;font-size:12.5px;line-height:1.4;color:#6B665C}
+.bn-luck{border:2px solid #C99A2E;background:linear-gradient(#FBF3DF,#F5E9CB)}
+.bn-sum{margin:0 0 6px;font-size:12.5px;font-weight:700;line-height:1.4;color:#55514A}
+.bn-tiers{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 8px;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+.bn-tiers span{display:inline-flex;align-items:center;gap:6px}
+.bn-tiers i{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(43,42,51,.35)}
+.bn-src{list-style:none;margin:0;padding:0;display:grid}
+.bn-src li{display:grid;grid-template-columns:1fr auto;gap:0 10px;padding:6px 0;border-top:1px solid rgba(43,42,51,.1);font-size:13.5px}
+.bn-src li .n{font-weight:800;color:#2B2A33}
+.bn-src li .s{grid-column:1;font-size:12px;color:#7A7468;line-height:1.35}
+.bn-src li b{grid-row:1 / span 2;grid-column:2;align-self:center;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.bn-src li.off{opacity:.5}
+.bn-src li.cond .s{color:#6E5A2E}
+.bn-cap{margin:8px 0 2px;font-size:12px;line-height:1.4;color:#7A7468}
+.bn-list{margin:0 0 4px;font-size:13.5px;font-weight:700;color:#3A3832;line-height:1.45}
