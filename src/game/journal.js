@@ -28,8 +28,8 @@ function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
 }
 function speciesHTML(regs){ let h='<div class="entries">';
   regs.forEach(rg=>{ h+='<h3 class="j-reg">'+REGION_NAME[rg]+'</h3>'; REGION_FISH[rg].forEach(id=>{ const F=FISH[id], r=save.fish[id]||{caught:0,best:0,seen:false};
-    if (r.caught>0){ const m=Math.min(10,r.caught), pb=r.pb;
-      h+='<div class="entry"><canvas data-f="'+id+'"></canvas><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+'</span><h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p><div class="mast"><i style="width:'+m*10+'%"></i></div><p>'+(r.caught>=10?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/10')+'</p></div></div>'; }
+    if (r.caught>0){ const m=Math.min(MASTERY.catches,r.caught), pb=r.pb;
+      h+='<div class="entry"><canvas data-f="'+id+'"></canvas><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+'</span><h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p><div class="mast"><i style="width:'+Math.round(m/MASTERY.catches*100)+'%"></i></div><p>'+(r.caught>=MASTERY.catches?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/'+MASTERY.catches)+'</p></div></div>'; }
     else h+='<div class="entry"><canvas data-f="'+id+'" data-sil="1"></canvas><div><span class="r" style="color:#7A7468">'+(r.seen?'Seen, not caught':'Undiscovered')+'</span><h3>???</h3><p>'+(r.seen?F.hint:'Keep fishing to find this one.')+'</p></div></div>';
   }); });
   return h+'</div>'; }

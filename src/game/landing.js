@@ -1,13 +1,13 @@
 /* ---------- Landing & card ---------- */
 /** How big a landed fish is, what it weighs and what it sells for. The balance simulator rolls catches here too. */
-function catchRoll(id,perfect){ const F=FISH[id];
+function catchRoll(id,perfect,ctx){ const F=FISH[id];
   const u=Math.pow(Math.random(),1.4); let size=lerp(F.size[0],F.size[1],u); if (perfect) size=Math.min(F.size[1]*1.05,size*1.08);
   size=Math.round(size*10)/10; const build=rollBuild(), w=Math.round(weighFish(id,size,build));
   const q=(size-F.size[0])/(F.size[1]-F.size[0]);
-  const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(perfect?1.25:1)*modMul('value',{fish:id})));
+  const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(perfect?1.25:1)*modMul('value',Object.assign({fish:id},ctx))));
   return {size,build,w,value,stars:qualityOf(id,size,perfect)}; }
 function startLand(){
-  humStop(); const R=S.reel, F=R.F, {size,build,w:wgt,value}=catchRoll(R.id,R.perfect);
+  humStop(); const R=S.reel, F=R.F, {size,build,w:wgt,value}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky});
   S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot:(S.bob&&S.bob.spot)||'open',hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0};
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
   sfx.out(F.rarity); buzz(F.rarity==='legendary'?[0,40,60,40,60,120]:40); shake(F.rarity==='legendary'?6:2);
@@ -42,7 +42,7 @@ function showCard(){
   const tags=[]; if (L.lucky) tags.push('Gull luck 2×'); if (L.perfect) tags.push('Perfect hook +25%'); if (L.build>=1.1) tags.push('Chunky');
   if (L.isNew && save.kitchenOpen){ const rid=recipeLearnedBy(L.id); if (rid) tags.push('New recipe: '+RECIPES[rid].name); }
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
-  if (r.caught===10) tags.push('Mastered: reels get easier'); else if (r.caught<10) tags.push('Mastery '+r.caught+'/10');
+  if (r.caught===MASTERY.catches) tags.push('Mastered: reels get easier'); else if (r.caught<MASTERY.catches) tags.push('Mastery '+r.caught+'/'+MASTERY.catches);
   $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]);
   $('cLore').textContent=L.isNew||F.rarity!=='common' ? F.lore : '';
   $('cLore').hidden=!$('cLore').textContent;

@@ -1,7 +1,7 @@
 /* ---------- Reeling ---------- */
 function startReel(id,perfect){
   const F=FISH[id], first=rec(id).caught===0;
-  S.reel=newFight(id,perfect,S.bob,!!(S.wait&&S.wait.lucky),!!S.tut);
+  S.reel=newFight(id,perfect,S.bob,!!(S.wait&&S.wait.lucky),!!S.tut,S.bob.spot);
   S.holding=S.pointers.size>0; S.tilt=0; S.pressX=S.thumbX; S.pressTilt=0; humStart(); setState('reeling');
   if (S.tut){ S.tut='reel1'; coach('Hooked! Now press and hold your finger down to reel it in.','4 of 4'); }
   else if (first && F.beh==='leaper') coachShow('New fish: Leapers jump out of the water. Tap while it’s in the air to keep the line tight.',6);
@@ -11,8 +11,8 @@ function startReel(id,perfect){
   else if (first && F.rarity==='legendary') coachShow('Something huge. Reel in short bursts and let go whenever the ring turns red.',6);
 }
 /** A fresh fight with fish `id`, hooked at `from` (the bobber). */
-function newFight(id,perfect,from,lucky,tut){
-  const F=FISH[id], c={fish:id}, fam=modFlag('autoTilt',c);
+function newFight(id,perfect,from,lucky,tut,spot){
+  const F=FISH[id], c={fish:id,spot,lucky}, fam=modFlag('autoTilt',c);
   // bonuses lock in when the fish is hooked
   const mod={tm:modMul('tension')/modMul('line',c), tug:modMul('tug',c), reel:modMul('reel',c)};
   return {lucky,id,F,perfect,fam,mod,dist:1,dir:0,tgt:0,dirT:tut?99:rand(1.2,1.8),tension:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,

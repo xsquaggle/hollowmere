@@ -7,7 +7,7 @@
    RAR[tier]  how a rarity looks and sounds; luckCap is the most luck can multiply its odds (see game/mods.js).
    ORDER      the lake journal's order.  REGION_FISH  which species live in each region, in journal order.
    POOLS      lake bite weights per spot; POOLS_COAST the same for Gullrock Coast. Night, dawn, rods,
-              meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called. */
+              meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench"). */
 const FISH = {
   perch:   {name:'Copper Perch', rarity:'common', beh:'darter', pull:0.9, reel:2.6, value:2, size:[14,26], len:34, h:.27, color:'#D08A4E', fin:'#A85E2C', window:1.4,
             lore:'Its belly often holds old coins. Nobody knows who keeps dropping them.', hint:'Common in open water.'},
@@ -51,6 +51,7 @@ const POOLS = {
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
+const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench'};
 const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','mossback','mayor'], coast:['sprat','wrasse','kelpeel','bream','grouper','saltjaw']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},

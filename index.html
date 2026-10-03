@@ -614,7 +614,7 @@ const INK='#2B2A33', PAPER='#F3EAD7', BRASS='#C9A15A', DANGER='#D9614C', GOOD='#
    RAR[tier]  how a rarity looks and sounds; luckCap is the most luck can multiply its odds (see game/mods.js).
    ORDER      the lake journal's order.  REGION_FISH  which species live in each region, in journal order.
    POOLS      lake bite weights per spot; POOLS_COAST the same for Gullrock Coast. Night, dawn, rods,
-              meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called. */
+              meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench"). */
 const FISH = {
   perch:   {name:'Copper Perch', rarity:'common', beh:'darter', pull:0.9, reel:2.6, value:2, size:[14,26], len:34, h:.27, color:'#D08A4E', fin:'#A85E2C', window:1.4,
             lore:'Its belly often holds old coins. Nobody knows who keeps dropping them.', hint:'Common in open water.'},
@@ -658,6 +658,7 @@ const POOLS = {
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
+const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench'};
 const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','mossback','mayor'], coast:['sprat','wrasse','kelpeel','bream','grouper','saltjaw']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
@@ -668,31 +669,32 @@ const POOLS_COAST = {
 };
 
 /* Gear: rods, boat parts and hull paint.
-   RODS[id]   name; price; reach (how far it casts, 0..1 of the lake); line, reel, luck, value (multipliers);
+   RODS[id]   name; price; reach (how far it casts, 0..1 of the lake); line, reel, value (multipliers); luck (luck points: .35 is +35 luck);
               snag (chance the reeds catch the line); reedBoost (reed fish bite this much sooner); color; where; perk;
               sea:true for Tacklegram rods; mods, the perk as modifiers (see data/stats.js and game/mods.js).
    ROD_ORDER  Ottilie's shop ladder.  SEA_RODS  the Tacklegram ladder.  PARTS (with their mods), PAINTS  boat upgrades and colors.
    A modifier is {stat, v, when?, omen?}: stat names an entry in STATS; when limits it to a region, spot, time
-   (night:true), fish or rarity; omen:true multiplies luck outside the caps, like Gull Luck. */
+   (night:true), fish, rarity (a list) or rarityMin (that rarity and rarer); omen:true multiplies luck after the
+   ceilings, like Gull Luck. */
 const RODS = {
-  willow:    {name:'Willow Switch', price:0,    reach:.36, line:1,    reel:1,    luck:1,    value:1,    snag:.35, reedBoost:1,   color:'#5A4030', where:'Near shore',
+  willow:    {name:'Willow Switch', price:0,    reach:.36, line:1,    reel:1,    luck:0,    value:1,    snag:.35, reedBoost:1,   color:'#5A4030', where:'Near shore',
               perk:'No perk. Snags in the reeds about 1 cast in 3.'},
-  reedcutter:{name:'Reedcutter', price:75,      reach:.5,  line:1.1,  reel:1.05, luck:1,    value:1,    snag:0,   reedBoost:1.7, color:'#5F7136', where:'Reeds and lily pads',
+  reedcutter:{name:'Reedcutter', price:75,      reach:.5,  line:1.1,  reel:1.05, luck:0,    value:1,    snag:0,   reedBoost:1.7, color:'#5F7136', where:'Reeds and lily pads',
               perk:'Slices through reeds, and reed fish bite sooner.'},
-  ash:       {name:'Ash Caster', price:200,     reach:.7,  line:1.15, reel:1.1,  luck:1.1,  value:1.1,  snag:.25, reedBoost:1,   color:'#9A7A52', where:'The deep pool',
+  ash:       {name:'Ash Caster', price:200,     reach:.7,  line:1.15, reel:1.1,  luck:.1,  value:1.1,  snag:.25, reedBoost:1,   color:'#9A7A52', where:'The deep pool',
               perk:'A twitch draws fish from twice as far.', mods:[{stat:'twitch', v:2}]},
-  heronwood: {name:'Heronwood Long Rod', price:500, reach:.9, line:1.25, reel:1.15, luck:1.2, value:1.15, snag:.15, reedBoost:1, color:'#8E959B', where:'Far water',
+  heronwood: {name:'Heronwood Long Rod', price:500, reach:.9, line:1.25, reel:1.15, luck:.2, value:1.15, snag:.15, reedBoost:1, color:'#8E959B', where:'Far water',
               perk:'Approaching fish flash their rarity color.', mods:[{stat:'reveal'}]},
-  brasscap:  {name:'Brasscap Pro', price:1200,  reach:1,   line:1.4,  reel:1.25, luck:1.35, value:1.25, snag:0,   reedBoost:1.3, color:'#B08D4C', where:'The horizon',
+  brasscap:  {name:'Brasscap Pro', price:1200,  reach:1,   line:1.4,  reel:1.25, luck:.35, value:1.25, snag:0,   reedBoost:1.3, color:'#B08D4C', where:'The horizon',
               perk:'Perfect-hook window 50% wider.', mods:[{stat:'perfect', v:1.5}]},
-  saltline:  {name:'Saltline Rod', price:2500, reach:1, line:1.6, reel:1.3, luck:1.45, value:1.4, snag:0, reedBoost:1.3, color:'#3E6E8A', where:'Open water', sea:true,
+  saltline:  {name:'Saltline Rod', price:2500, reach:1, line:1.6, reel:1.3, luck:.45, value:1.4, snag:0, reedBoost:1.3, color:'#3E6E8A', where:'Open water', sea:true,
               blurb:'Braided salt-cured line on a blue fiberglass blank.', perk:'Swells hit your line half as hard.', mods:[{stat:'swell', v:.5}]},
-  gale:      {name:'Gale Rod', price:6000, reach:1, line:1.8, reel:1.4, luck:1.6, value:1.55, snag:0, reedBoost:1.3, color:'#CFC6B2', where:'Open water', sea:true,
+  gale:      {name:'Gale Rod', price:6000, reach:1, line:1.8, reel:1.4, luck:.6, value:1.55, snag:0, reedBoost:1.3, color:'#CFC6B2', where:'Open water', sea:true,
               blurb:'Light as driftwood, stiff as a mast.', perk:'Casts ride the wind and never wash out. Plus the Saltline’s perk.',
               mods:[{stat:'swell', v:.5}, {stat:'noWashout'}]},
-  deepwater: {name:'Deepwater Caster', price:12000, reach:1, line:2, reel:1.5, luck:1.8, value:1.7, snag:0, reedBoost:1.3, color:'#1F3B57', where:'Open water', sea:true,
+  deepwater: {name:'Deepwater Caster', price:12000, reach:1, line:2, reel:1.5, luck:.8, value:1.7, snag:0, reedBoost:1.3, color:'#1F3B57', where:'Open water', sea:true,
               blurb:'Built for the trench. Heavy, quiet and very patient.', perk:'Rare-and-up fish bite twice as often in the trench. Plus every perk above.',
-              mods:[{stat:'swell', v:.5}, {stat:'noWashout'}, {stat:'luck', omen:true, v:2, when:{region:'coast', spot:'deep', rarity:['rare','legendary']}}]}
+              mods:[{stat:'swell', v:.5}, {stat:'noWashout'}, {stat:'luck', omen:true, v:2, when:{region:'coast', spot:'deep', rarityMin:'rare'}}]}
 };
 const ROD_ORDER=['willow','reedcutter','ash','heronwood','brasscap'];
 const SEA_RODS=['saltline','gale','deepwater'];
@@ -726,7 +728,7 @@ const BAR_LINES=['Ahoy! Barnaby Quill, boats and bait and the odd bit of advice.
 const BANQUET_LINES=[['Ottilie','Your uncle never managed it, you know. Fifty years of dawns.'],['Barnaby','Best pie on the whole coast, and I’ve eaten most of them.'],['Pell','I delivered the forks! Express.'],['The baker','He’s still wearing the chain. Somebody should say something.'],['Ottilie','Well. To the Mayor.']];
 const LETTER=['Kid,','The shack’s yours now.','Rods are by the door, and Ottilie','still owes me a favour.','Don’t fish the deep pool at dawn.','…Or do. I never could stop.'];
 
-/* Aquarium: tanks, the tip rate per rarity (coins per minute), decor, and tank sets.
+/* Aquarium: tanks, the tip rate per rarity (coins per minute), decor, and tank sets. Luck is in luck points (.1 is +10 luck).
    TANK_SETS[].check(fish) gets the tank's fish list and returns true when the set is complete. */
 const TANKS={
   fresh:{name:'Freshwater', water:['#5FA39A','#2F6A66','#1C4644'], sand:'#B79A6E', caps:[6,10,14], costs:[600,1500], unlock:0},
@@ -740,7 +742,7 @@ const DECOR={
     {id:'lilies', name:'Lily Garden', price:400, desc:'Floating pads with pink blooms for leapers to hop between.', eff:'+30% tips from leapers', beh:['leaper'], pct:.30},
     {id:'moss', name:'Lantern Moss', price:600, desc:'Soft glowing moss on the rocks. The tank glows after dark.', eff:'+50% tips from Lantern Carp', ids:['lantern'], pct:.5},
     {id:'rowboat', name:'Sunken Rowboat', price:900, desc:'A little wreck to explore. Every fish gets a bit braver.', eff:'+15% tips from every fish', all:.15},
-    {id:'townhall', name:'Tiny Town Hall', price:1500, desc:'A model of Hollowmere’s old town hall. Its clock is stopped at 3:12.', eff:'The Mayor earns double tips, and +5% rarity luck at the lake', ids:['mayor'], pct:1, luck:{region:'lake',v:1.05}}
+    {id:'townhall', name:'Tiny Town Hall', price:1500, desc:'A model of Hollowmere’s old town hall. Its clock is stopped at 3:12.', eff:'The Mayor earns double tips, and +5 luck at the lake', ids:['mayor'], pct:1, luck:{region:'lake',v:.05}}
   ],
   salt:[
     {id:'airstone', name:'Air Stone', price:150, desc:'A salt-crusted bubbler for a steady current.', eff:'+10% tips from every fish', all:.10},
@@ -754,13 +756,13 @@ const DECOR={
 const TANK_SETS=[
   {id:'sampler', tank:'fresh', name:'Stillwater Sampler', need:'4 different lake species', bonus:'+5% coins from lake fish', region:'lake', value:1.05,
    check:f=>new Set(f.map(x=>x.id)).size>=4},
-  {id:'royalty', tank:'fresh', name:'Lake Royalty', need:'Mayor Bartholomew and 2 other lake fish', bonus:'+10% rarity luck at the lake', region:'lake', luck:1.1,
+  {id:'royalty', tank:'fresh', name:'Lake Royalty', need:'Mayor Bartholomew and 2 other lake fish', bonus:'+10 luck at the lake', region:'lake', luck:.1,
    check:f=>f.some(x=>x.id==='mayor') && f.length>=3},
-  {id:'lights', tank:'fresh', name:'Night Lights', need:'2 Lantern Carp', bonus:'+8% rarity luck at night', region:'any', luck:1.08, night:true,
+  {id:'lights', tank:'fresh', name:'Night Lights', need:'2 Lantern Carp', bonus:'+8 luck at night', region:'any', luck:.08, night:true,
    check:f=>f.filter(x=>x.id==='lantern').length>=2},
   {id:'rockpool', tank:'salt', name:'Rockpool', need:'Silver Sprat, Rock Wrasse and Barnacle Grouper', bonus:'+5% coins from sea fish', region:'coast', value:1.05,
    check:f=>['sprat','wrasse','grouper'].every(id=>f.some(x=>x.id===id))},
-  {id:'trench', tank:'salt', name:'Trench Trophy', need:'A Saltjaw', bonus:'+10% rarity luck at the coast', region:'coast', luck:1.1,
+  {id:'trench', tank:'salt', name:'Trench Trophy', need:'A Saltjaw', bonus:'+10 luck at the coast', region:'coast', luck:.1,
    check:f=>f.some(x=>x.id==='saltjaw')}
 ];
 
@@ -778,7 +780,7 @@ const FLESH={perch:'#F4CDB0', reedwhisker:'#EFD9C2', lantern:'#F7D9A0', leafjack
   sprat:'#EBDCD0', wrasse:'#F6C4AE', kelpeel:'#E8D8C0', bream:'#F5DCB5', grouper:'#F3E3D3', saltjaw:'#ECD6CC'};
 const COOK_NAME={pan:'Pan-fry', grill:'Grill'};
 /* Each recipe: what it needs from the keepnet, how each station plays, and what the meal does.
-   boost: list of {k,v}. Multipliers read through mealMul(k): 1+v*strength. */
+   boost: list of {k,v}: k is a stat in data/stats.js. A meal's modifier is 1+v*strength (luck: v*strength points). */
 const RECIPES={
   chowder:{name:'Odds and Ends Chowder', need:[{rar:'common',n:3}], learn:null, cook:'pan', form:'fillet', dish:'bowl', side:'bread',
     spice:{salt:2,pepper:1,dill:1}, zone:[.56,.8], speed:1, boost:[{k:'value',v:.15}], eff:'Fish are worth 15% more',
@@ -799,13 +801,13 @@ const RECIPES={
     spice:{salt:1,dill:2,pepper:2}, zone:[.6,.78], speed:1.1, boost:[{k:'perfect',v:.5}], eff:'Perfect-hook window 50% wider',
     blurb:'The tiny garden goes in the pot too. The tiny fence does not.'},
   bream:{name:'Smoked Gilt Bream', need:[{id:'bream',n:1}], learn:'bream', cook:'grill', form:'fillet', dish:'plate', side:'potatoes',
-    spice:{salt:2,paprika:1,lemon:1}, zone:[.6,.78], speed:1.1, boost:[{k:'luck',v:.15}], eff:'+15% rarity luck',
+    spice:{salt:2,paprika:1,lemon:1}, zone:[.6,.78], speed:1.1, boost:[{k:'luck',v:.15}], eff:'+15 luck',
     blurb:'Smoked over driftwood until the scales go the color of old coins.'},
   steak:{name:'Barnacle Grouper Steak', need:[{id:'grouper',n:1}], learn:'grouper', cook:'grill', form:'steak', dish:'plate', side:'potatoes',
     spice:{salt:2,pepper:3}, zone:[.62,.78], speed:1.15, boost:[{k:'swell',v:-.5},{k:'line',v:.15}], eff:'Swells hit half as hard, and your line is 15% stronger',
     blurb:'A sailor’s supper. Thick, peppery and good for the sea legs.'},
   pie:{name:'Mayor’s Banquet Pie', need:[{id:'mayor',n:1}], learn:'mayor', cook:'pan', form:'fillet', dish:'pie', side:'greens',
-    spice:{salt:2,pepper:1,dill:2,lemon:1}, zone:[.62,.76], speed:1.2, boost:[{k:'luck',v:.4}], eff:'+40% rarity luck', banquet:true,
+    spice:{salt:2,pepper:1,dill:2,lemon:1}, zone:[.62,.76], speed:1.2, boost:[{k:'luck',v:.4}], eff:'+40 luck', banquet:true,
     blurb:'A stargazy pie fit for a mayor. The whole town will want a slice.'}
 };
 const RECIPE_ORDER=['chowder','fry','gumbo','skewers','wraps','stew','bream','steak','pie'];
@@ -839,7 +841,9 @@ const AMB_LV={ lake_day:{water:.55,wind:.22}, lake_dusk:{water:.5,wind:.14}, lak
          add   amounts add up from a starting value (keepnet space starts at 12)
          flag  on when any source turns it on
    good  'up' when more is better, 'down' when less is better.  tune:true stats only come from Playtest tuning.
-   hint  the plain sentence the Bonuses page shows under the stat. */
+   when  where every bonus to this stat applies, on top of its own conditions (there are no swells at the lake).
+   unit  'x' to show the total as ×2.5 rather than +150%.
+   hint  the plain sentence the Bonuses page shows under the stat. The order here is the order on that page. */
 const STATS={
   luck:     {name:'Rarity luck', kind:'luck', good:'up', hint:'Rarer fish bite more often.'},
   value:    {name:'Fish value', kind:'mul', good:'up', hint:'Coins for every fish you sell.'},
@@ -847,28 +851,32 @@ const STATS={
   line:     {name:'Line strength', kind:'mul', good:'up', hint:'Tension builds more slowly, so the line snaps less.'},
   hook:     {name:'Hook window', kind:'mul', good:'up', hint:'Time to tap after the bobber plunges.'},
   perfect:  {name:'Perfect-hook window', kind:'mul', good:'up', hint:'Tap this fast for a perfect hook: a bigger fish, worth more, that reels faster.'},
-  night:    {name:'Night fish', kind:'mul', good:'up', hint:'Fish that come up after dark bite more often.'},
-  twitch:   {name:'Twitch pull', kind:'mul', good:'up', hint:'A twitch draws a fish in from farther, and brings the next one sooner.'},
-  reedBite: {name:'Reed bites', kind:'mul', good:'up', hint:'Fish in the reeds bite sooner.'},
+  night:    {name:'Night fish', kind:'mul', good:'up', unit:'x', when:{night:true}, hint:'Fish that come up after dark bite more often.'},
+  twitch:   {name:'Twitch pull', kind:'mul', good:'up', unit:'x', hint:'A twitch draws a fish in from farther, and brings the next one sooner.'},
+  reedBite: {name:'Reed bites', kind:'mul', good:'up', when:{spot:'reeds'}, hint:'Fish in the reeds bite sooner.'},
   tug:      {name:'Tugger pull', kind:'mul', good:'down', hint:'Tuggers yank the line less hard.'},
-  swell:    {name:'Swell hits', kind:'mul', good:'down', hint:'A swell spikes your line’s tension less.'},
+  swell:    {name:'Swell hits', kind:'mul', good:'down', when:{region:'coast'}, hint:'A swell spikes your line’s tension less.'},
   tension:  {name:'Tension build-up', kind:'mul', good:'down', tune:true, hint:'Playtest tuning for how fast tension rises.'},
   wait:     {name:'Wait for a bite', kind:'mul', good:'down', tune:true, hint:'Playtest tuning for the quiet before a fish shows up.'},
   reach:    {name:'Reach', kind:'base', good:'up', hint:'How far out you can cast.'},
-  snag:     {name:'Reed snags', kind:'base', good:'down', hint:'Chance a cast into the reeds tangles your line.'},
+  snag:     {name:'Reed snags', kind:'base', good:'down', when:{spot:'reeds'}, hint:'Chance a cast into the reeds tangles your line.'},
   netCap:   {name:'Keepnet space', kind:'add', start:12, good:'up', hint:'Fish the keepnet holds before catches sell straight away.'},
   reveal:   {name:'Rarity reveal', kind:'flag', hint:'Approaching fish flash their rarity color.'},
   sonar:    {name:'Sonar readout', kind:'flag', hint:'A readout names what’s coming before it bites.'},
-  noWashout:{name:'Swell-proof casts', kind:'flag', hint:'Casts never wash out in a swell.'},
+  noWashout:{name:'Swell-proof casts', kind:'flag', when:{region:'coast'}, hint:'Casts never wash out in a swell.'},
   autoTilt: {name:'Rod tracks the fish', kind:'flag', hint:'Your rod follows a mastered fish for you.'}
 };
+/* Mastery: catch this many of a species and it reels in faster, with your rod following it. */
+const MASTERY={catches:10, reel:1.65};
 
 /* ---------- Modifiers: every bonus in the game goes through here ---------- */
 /* Each source (the rod in hand, the meal you ate, tank sets, decor, boat parts, mastery, Gull Luck, playtest
    tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
    stat's total in a context (region, time, spot, fish, rarity, Gull Luck) and only matching modifiers count.
-   STATS (data/stats.js) says how each stat combines. Adding an enchantment or relic later means adding its
-   modifiers to a source; nothing that reads the stats has to change. */
+   STATS (data/stats.js) says how each stat combines and where it can apply at all. Adding an enchantment or
+   a relic later means adding its modifiers to a source; nothing that reads the stats has to change.
+   Sources read only the save, so the balance simulator can swap in a stand-in save. Keep it that way: a
+   future source that needs world state (weather, say) should keep that state in the save too. */
 const MODC={frame:0, at:-1, dirty:true, list:null};
 let SIMULATING=false;   // true while the balance simulator borrows the save (game/sim.js)
 function modSources(){
@@ -877,56 +885,65 @@ function modSources(){
   const R=ROD();
   add('rod',R.name,'reach',R.reach,{base:true}); add('rod',R.name,'snag',R.snag,{base:true});
   for (const k of ['line','reel','value']) if (R[k]!==1) add('rod',R.name,k,R[k]);
-  if (R.reedBoost!==1) add('rod',R.name,'reedBite',R.reedBoost,{when:{spot:'reeds'}});
-  if (R.luck!==1) add('rod',R.name,'luck',R.luck-1);
+  if (R.reedBoost!==1) add('rod',R.name,'reedBite',R.reedBoost);
+  if (R.luck) add('rod',R.name,'luck',R.luck);
   for (const m of R.mods||[]) L.push(Object.assign({src:'rod',name:R.name},m));
   // the meal you ate: each boost scales with its stars
-  const m=save.meal;
-  if (m && m.id!=='mush' && (m.casts||m.last) && RECIPES[m.id]){ const Rc=RECIPES[m.id], s=mealStr(m);
+  if (mealActive()){ const m=save.meal, Rc=RECIPES[m.id], s=mealStr(m);
     for (const b of Rc.boost) add('meal',Rc.name,b.k,b.k==='luck'?b.v*s:Math.max(.2,1+b.v*s),{stars:m.stars}); }
   // completed tank sets, and decor that lends luck while its fish is in the tank
   for (const st of setsDone()){
     const when={}; if (st.region!=='any') when.region=st.region; if (st.night) when.night=true;
-    if (st.luck) add('set',st.name,'luck',st.luck-1,{when});
+    if (st.luck) add('set',st.name,'luck',st.luck,{when});
     if (st.value) add('set',st.name,'value',st.value,{when});
   }
   const T=tanks();
-  for (const k in TANKS) for (const d of decorFor(k)) if (d.luck && T[k].fish.some(f=>d.ids&&d.ids.includes(f.id))) add('decor',d.name,'luck',d.luck.v-1,{when:{region:d.luck.region}});
+  for (const k in TANKS) for (const d of decorFor(k)) if (d.luck && T[k].fish.some(f=>d.ids&&d.ids.includes(f.id))) add('decor',d.name,'luck',d.luck.v,{when:{region:d.luck.region}});
   // boat parts
   for (const id of save.parts||[]){ const P=PARTS[id]; if (P) for (const x of P.mods||[]) L.push(Object.assign({src:'part',name:P.name},x)); }
-  add('base','Keepnet','netCap',STATS.netCap.start,{base:true});
-  // mastery: ten of a species and your rod knows it
-  for (const id in FISH) if ((save.fish[id]||{}).caught>=10){ const n='Mastered '+FISH[id].name;
-    add('mastery',n,'reel',1.65,{when:{fish:id}}); add('mastery',n,'autoTilt',1,{when:{fish:id}}); }
-  // Gull Luck: a lucky splash zone doubles rarity odds while you fish in it
-  add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true}});
+  add('base','Keepnet','netCap',STATS.netCap.start);
+  // mastery: enough of a species and your rod knows it
+  for (const id in FISH) if ((save.fish[id]||{}).caught>=MASTERY.catches){ const n='Mastered '+FISH[id].name;
+    add('mastery',n,'reel',MASTERY.reel,{when:{fish:id}}); add('mastery',n,'autoTilt',undefined,{when:{fish:id}}); }
+  // Gull Luck: a lucky splash zone doubles the odds of every fish above common while you fish in it
+  add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true, rarityMin:'uncommon'}});
   // playtest tuning
-  const t=save.tune||{};
+  const t=Object.assign({hook:1,tension:1,wait:1},save.tune);
   if (t.hook!==1){ add('tune','Playtest tuning','hook',t.hook); add('tune','Playtest tuning','perfect',t.hook); }
   if (t.tension!==1) add('tune','Playtest tuning','tension',t.tension);
   if (t.wait!==1) add('tune','Playtest tuning','wait',t.wait);
+  // a stat's own conditions (no swells at the lake, night boosts only at night) join each modifier's
+  for (const m of L){ const sw=STATS[m.stat].when; if (sw) m.when=Object.assign({},sw,m.when); }
   return L;
 }
 function modList(){ if (MODC.list && MODC.at===MODC.frame && !MODC.dirty) return MODC.list;
   MODC.list=modSources(); MODC.at=MODC.frame; MODC.dirty=false; return MODC.list; }
-/** The context a stat is read in. Region and time come from the game; callers add spot, fish, rarity or lucky. */
-function modCtx(c){ return Object.assign({region:REG(), night:isNight(save.clock)}, c); }
+/** The context a stat is read in. Region and time come from the game; callers add spot, fish, rarity or lucky.
+    A fish brings its rarity along. */
+function modCtx(c){ const x=Object.assign({region:REG(), night:isNight(save.clock)}, c);
+  if (x.fish && !x.rarity) x.rarity=FISH[x.fish].rarity; return x; }
+const rarRank=r=>Object.keys(RAR).indexOf(r);
 function modMatch(m,c){ const w=m.when; if (!w) return true;
-  for (const k in w){ const want=w[k], have=c[k]; if (Array.isArray(want) ? !want.includes(have) : want!==have) return false; } return true; }
+  for (const k in w){ const want=w[k], have=c[k];
+    if (k==='rarityMin'){ if (c.rarity==null || rarRank(c.rarity)<rarRank(want)) return false; continue; }
+    if (Array.isArray(want) ? !want.includes(have) : want!==have) return false; }
+  return true; }
 function modsFor(stat,c){ c=modCtx(c); return modList().filter(m=>m.stat===stat && modMatch(m,c)); }
 function modMul(stat,c){ let v=1; for (const m of modsFor(stat,c)) v*=m.v; return v; }
 function modAdd(stat,c){ let v=0; for (const m of modsFor(stat,c)) v+=m.v; return v; }
-function modBase(stat,c){ const ms=modsFor(stat,c); let v=0, mul=1; for (const m of ms){ if (m.base) v=m.v; else mul*=m.v; } return v*mul; }
+/** A value one source sets (the rod's reach), times any multipliers. Only the rod sets base values today. */
+function modBase(stat,c){ let v=0, mul=1; for (const m of modsFor(stat,c)){ if (m.base) v=m.v; else mul*=m.v; } return v*mul; }
 function modFlag(stat,c){ return modsFor(stat,c).length>0; }
 
-/* Luck. Every luck bonus adds points: +0.35 from a Brasscap Pro, +0.6 from a three-star Banquet Pie.
+/* Luck. Every luck bonus adds points: +35 from a Brasscap Pro (.35), +60 from a three-star Banquet Pie.
    Each rarity turns the total into a multiplier on its fish's bite odds. The curve starts out one for one
-   and flattens toward that rarity's cap (RAR[].luckCap), so one big bonus feels big but stacking everything
-   stops paying long before the odds run away. Omens multiply on top, outside the caps, while they last. */
+   and flattens toward that rarity's ceiling (RAR[].luckCap), so one big bonus feels big but stacking
+   everything stops paying long before the odds run away. Omens (Gull Luck, the Deepwater Caster in the
+   trench) multiply after the ceiling, while they apply. */
 function luckPoints(c){ let p=0; for (const m of modsFor('luck',c)) if (!m.omen) p+=m.v; return p; }
 function luckCurve(p,cap){ return p>=0 ? 1+(cap-1)*Math.tanh(p/(cap-1)) : 1/(1-p); }
-function tierMul(rar,c){ const cap=RAR[rar].luckCap; if (!cap) return 1;
-  c=Object.assign({},c,{rarity:rar}); let v=luckCurve(luckPoints(c),cap);
+function tierMul(rar,c){ c=Object.assign({},c,{rarity:rar}); const cap=RAR[rar].luckCap;
+  let v=cap ? luckCurve(luckPoints(c),cap) : 1;
   for (const m of modsFor('luck',c)) if (m.omen) v*=m.v; return v; }
 
 /* ---------- Bite odds: which fish each spot offers, and the rod in hand ---------- */
@@ -936,9 +953,9 @@ function poolFor(spot,lucky){
   if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
   if (h>=5 && h<8 && w.mayor) w.mayor*=3;
-  // your bonuses: night-fish boosts, then rarity luck per tier (game/mods.js)
-  const c={spot,lucky}, nightMul=night?modMul('night',c):1;
-  for (const k in w){ const F=FISH[k]; if (F.night) w[k]*=nightMul; if (F.rarity!=='common') w[k]*=tierMul(F.rarity,c); }
+  // your bonuses: night-fish boosts (only at night, see STATS.night), then luck per rarity (game/mods.js)
+  const c={spot,lucky}, nightMul=modMul('night',c);
+  for (const k in w){ const F=FISH[k]; if (F.night) w[k]*=nightMul; w[k]*=tierMul(F.rarity,c); }
   return w;
 }
 const ROD = () => RODS[save.rod] || RODS.willow;
@@ -1263,7 +1280,7 @@ function updateCast(dt){
 
 /* ---------- Waiting & bite ---------- */
 function startWaiting(){
-  S.wait={phase:'empty', t:rand(.75,2.1)*modMul('wait')*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1};
+  S.wait={phase:'empty', t:rand(.75,2.1)*modMul('wait',{spot:S.bob.spot})*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1};
   setState('waiting');
   if (S.bob.spot==='reeds') S.wait.t/=modMul('reedBite',{spot:'reeds'});
   if (S.tut){ S.tut='wait'; S.wait.t=.8; coach('Nice cast! Now wait. A fish will swim over to your bobber.','2 of 4'); }
@@ -1316,11 +1333,11 @@ function twitch(){
 }
 function spook(msg){
   const w=S.wait; if (w.sh){ w.sh.flee=true; w.sh.ang+=Math.PI; }
-  w.phase='empty'; w.t=rand(1.65,2.7)*modMul('wait'); w.attract=1; w.tw=[]; toast(msg,'warn');
+  w.phase='empty'; w.t=rand(1.65,2.7)*modMul('wait',{spot:S.bob&&S.bob.spot}); w.attract=1; w.tw=[]; toast(msg,'warn');
 }
 function triggerBite(){
   const w=S.wait, b=S.bob, F=FISH[w.fish];
-  S.bite={t:0, win:F.window*modMul('hook',{fish:w.fish}), fish:w.fish};
+  S.bite={t:0, win:F.window*modMul('hook',{fish:w.fish,spot:b.spot,lucky:w.lucky}), fish:w.fish};
   b.plunge=1; splash(b.x,b.y,9); ripple(b.x,b.y,34); sfx.bite(); buzz(30); pulse(.45);
   toast('Tap!','big'); setState('bite');
   if (S.tut){ S.tut='bite'; coach('It’s biting! Tap anywhere on the screen now!','3 of 4', true); }
@@ -1334,7 +1351,7 @@ function updateBite(dt){
 }
 function hook(){
   const b=S.bite, F=FISH[b.fish], R=RAR[F.rarity];
-  const perfect=b.t<=.3*modMul('perfect',{fish:b.fish});
+  const perfect=b.t<=.3*modMul('perfect',{fish:b.fish,spot:S.bob.spot,lucky:!!(S.wait&&S.wait.lucky)});
   if (perfect){ save.stats.perfect++; toast('Perfect hook!','good'); } else toast('Hooked!','');
   sfx.hook(perfect); buzz(perfect?[0,20,30,20]:25);
   S.freeze=R.hitstop+(perfect?.04:0); shake(F.rarity==='legendary'?10:F.rarity==='rare'?5:2); pulse(perfect?.35:.2);
@@ -1347,7 +1364,7 @@ function hook(){
 /* ---------- Reeling ---------- */
 function startReel(id,perfect){
   const F=FISH[id], first=rec(id).caught===0;
-  S.reel=newFight(id,perfect,S.bob,!!(S.wait&&S.wait.lucky),!!S.tut);
+  S.reel=newFight(id,perfect,S.bob,!!(S.wait&&S.wait.lucky),!!S.tut,S.bob.spot);
   S.holding=S.pointers.size>0; S.tilt=0; S.pressX=S.thumbX; S.pressTilt=0; humStart(); setState('reeling');
   if (S.tut){ S.tut='reel1'; coach('Hooked! Now press and hold your finger down to reel it in.','4 of 4'); }
   else if (first && F.beh==='leaper') coachShow('New fish: Leapers jump out of the water. Tap while it’s in the air to keep the line tight.',6);
@@ -1357,8 +1374,8 @@ function startReel(id,perfect){
   else if (first && F.rarity==='legendary') coachShow('Something huge. Reel in short bursts and let go whenever the ring turns red.',6);
 }
 /** A fresh fight with fish `id`, hooked at `from` (the bobber). */
-function newFight(id,perfect,from,lucky,tut){
-  const F=FISH[id], c={fish:id}, fam=modFlag('autoTilt',c);
+function newFight(id,perfect,from,lucky,tut,spot){
+  const F=FISH[id], c={fish:id,spot,lucky}, fam=modFlag('autoTilt',c);
   // bonuses lock in when the fish is hooked
   const mod={tm:modMul('tension')/modMul('line',c), tug:modMul('tug',c), reel:modMul('reel',c)};
   return {lucky,id,F,perfect,fam,mod,dist:1,dir:0,tgt:0,dirT:tut?99:rand(1.2,1.8),tension:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
@@ -1500,14 +1517,14 @@ function updateLost(dt){
 
 /* ---------- Landing & card ---------- */
 /** How big a landed fish is, what it weighs and what it sells for. The balance simulator rolls catches here too. */
-function catchRoll(id,perfect){ const F=FISH[id];
+function catchRoll(id,perfect,ctx){ const F=FISH[id];
   const u=Math.pow(Math.random(),1.4); let size=lerp(F.size[0],F.size[1],u); if (perfect) size=Math.min(F.size[1]*1.05,size*1.08);
   size=Math.round(size*10)/10; const build=rollBuild(), w=Math.round(weighFish(id,size,build));
   const q=(size-F.size[0])/(F.size[1]-F.size[0]);
-  const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(perfect?1.25:1)*modMul('value',{fish:id})));
+  const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(perfect?1.25:1)*modMul('value',Object.assign({fish:id},ctx))));
   return {size,build,w,value,stars:qualityOf(id,size,perfect)}; }
 function startLand(){
-  humStop(); const R=S.reel, F=R.F, {size,build,w:wgt,value}=catchRoll(R.id,R.perfect);
+  humStop(); const R=S.reel, F=R.F, {size,build,w:wgt,value}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky});
   S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot:(S.bob&&S.bob.spot)||'open',hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0};
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
   sfx.out(F.rarity); buzz(F.rarity==='legendary'?[0,40,60,40,60,120]:40); shake(F.rarity==='legendary'?6:2);
@@ -1542,7 +1559,7 @@ function showCard(){
   const tags=[]; if (L.lucky) tags.push('Gull luck 2×'); if (L.perfect) tags.push('Perfect hook +25%'); if (L.build>=1.1) tags.push('Chunky');
   if (L.isNew && save.kitchenOpen){ const rid=recipeLearnedBy(L.id); if (rid) tags.push('New recipe: '+RECIPES[rid].name); }
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
-  if (r.caught===10) tags.push('Mastered: reels get easier'); else if (r.caught<10) tags.push('Mastery '+r.caught+'/10');
+  if (r.caught===MASTERY.catches) tags.push('Mastered: reels get easier'); else if (r.caught<MASTERY.catches) tags.push('Mastery '+r.caught+'/'+MASTERY.catches);
   $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]);
   $('cLore').textContent=L.isNew||F.rarity!=='common' ? F.lore : '';
   $('cLore').hidden=!$('cLore').textContent;
@@ -3128,12 +3145,14 @@ function pickNet(R){ // cheapest matching fish from the keepnet, without removin
 function haveFor(R){ const n=R.need[0]; return save.net.filter(f=>n.id?f.id===n.id:FISH[f.id].rarity===n.rar).length; }
 function needText(R){ const n=R.need[0]; return n.n+' × '+(n.id?FISH[n.id].name:'any common fish'); }
 function mealStr(m){ return m && m.stars>0 ? MEAL_STR[m.stars-1] : 0; }
+/** A real meal (not Mystery Mush) with casts left, or on its last cast. */
+function mealActive(m){ m=m===undefined?save.meal:m; return !!(m && m.id!=='mush' && (m.casts||m.last) && RECIPES[m.id]); }
 function mealPink(){ const m=save.meal; return !!(m && m.id==='mush' && (m.casts>0||m.last)); }
 function effText(id,stars){ // the boost line, scaled by stars
   if (id==='mush') return MUSH.eff; const R=RECIPES[id], s=MEAL_STR[Math.max(0,stars-1)];
   const pc=v=>Math.round(Math.abs(v)*s*100)+'%';
   return R.boost.map(b=>({reel:'Reel '+pc(b.v)+' faster', tug:'Tuggers pull '+pc(b.v)+' softer', night:'Night fish bite '+(1+b.v*s).toFixed(s===1?0:2).replace(/\.?0+$/,'')+'× as often',
-    hook:'Hook window '+pc(b.v)+' longer', perfect:'Perfect-hook window '+pc(b.v)+' wider', value:'Fish are worth '+pc(b.v)+' more', luck:'+'+pc(b.v)+' rarity luck',
+    hook:'Hook window '+pc(b.v)+' longer', perfect:'Perfect-hook window '+pc(b.v)+' wider', value:'Fish are worth '+pc(b.v)+' more', luck:'+'+Math.round(b.v*s*100)+' luck',
     swell:'Swells hit '+pc(b.v)+' softer', line:'Line '+pc(b.v)+' stronger'}[b.k])).join(' · ');
 }
 function mealName(id){ return id==='mush'?MUSH.name:RECIPES[id].name; }
@@ -3994,7 +4013,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=11, SNAP_KEY=KEY+'-snapshots';
+const BUILD=12, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -4179,78 +4198,91 @@ $('mealChip').addEventListener('click',()=>{ const m=save.meal; if (!m) return; 
 $('journalBtn').addEventListener('click',()=>{ $('journalBtn').classList.remove('pulse'); openJournal(); });
 
 /* ---------- Bonuses: the journal page that shows every bonus and where it comes from ---------- */
-const BONUS_ORDER=['luck','value','reel','line','hook','perfect','night','tug','swell','twitch','reedBite'];
 const SRC_LABEL={rod:'Rod', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', mastery:'Mastery', event:'Event'};
 const trimNum=v=>(Math.round(v*100)/100).toString();
-/** How a modifier reads: +35%, −30%, ×2. */
+/** How a modifier reads: +35 luck, +25%, −30%, ×2.5. Each stat keeps one unit. */
 function modValueText(stat,v,omen){
-  if (STATS[stat].kind==='luck' && !omen){ const p=Math.round(v*100); return (p>=0?'+':'−')+Math.abs(p)+'%'; }
-  if (omen || v>=2) return '×'+trimNum(v);
+  if (omen) return '×'+trimNum(v);
+  if (STATS[stat].kind==='luck'){ const p=Math.round(v*100); return (p>=0?'+':'−')+Math.abs(p)+' luck'; }
+  if (STATS[stat].unit==='x') return '×'+trimNum(v);
   const p=Math.round((v-1)*100); return (p>=0?'+':'−')+Math.abs(p)+'%';
 }
 /** Whether a stat change helps: luck and most stats are better up; tug and swell are better down. */
 const modHelps=(stat,v,omen)=>STATS[stat].kind==='luck'&&!omen ? v>=0 : (STATS[stat].good==='down' ? v<=1 : v>=1);
-/** When a modifier applies, in words: "at night", "in the trench", "for rare and legendary fish". */
+const spotIn=(spot,region)=>SPOT_IN[region+':'+spot]||SPOT_IN[spot]||('at '+SPOT_NAME[spot]);
+/** When a modifier applies, in words: "at night", "in the trench", "for rare fish and rarer". */
 function modWhenText(w){
   if (!w) return '';
-  const out=[], coast=w.region==='coast';
-  if (w.spot){ const n={deep:coast?'the trench':'the deep pool', reeds:'the reeds', pads:'the lily pads', far:'far water', open:'open water', rocks:'the sea stacks', kelp:'the kelp'}[w.spot]||SPOT_NAME[w.spot];
-    out.push('in '+n); }
+  const out=[];
+  if (w.spot) out.push(spotIn(w.spot,w.region||REG()));
   else if (w.region) out.push('at '+REGION_NAME[w.region]);
   if (w.night) out.push('at night');
-  if (w.rarity) out.push('for '+w.rarity.map(r=>RAR[r].label.toLowerCase()).join(' and ')+' fish');
-  if (w.fish) out.push('with '+FISH[w.fish].name);
   if (w.lucky) out.push('while you fish a lucky splash');
+  if (w.rarity) out.push('for '+w.rarity.map(r=>RAR[r].label.toLowerCase()).join(' and ')+' fish');
+  if (w.rarityMin) out.push(w.rarityMin===Object.keys(RAR)[1]?'for every fish above common':'for '+RAR[w.rarityMin].label.toLowerCase()+' fish and rarer');
+  if (w.fish) out.push('with '+FISH[w.fish].name);
   return out.join(', ');
 }
-/** 'on' applies wherever you cast now, 'cond' depends on where or what you catch, 'off' doesn't apply here and now. */
+/** 'on' applies wherever you cast right now; 'cond' depends on where you cast or what bites; 'off-here' and
+    'off-now' can't apply in this water or at this hour. Pass a rarity in `now` to settle rarity conditions too. */
 function modState(m,now){ const w=m.when; if (!w) return 'on';
-  if ((w.region && w.region!==now.region) || (w.night && !now.night)) return 'off';
-  return (w.spot||w.fish||w.rarity||w.lucky) ? 'cond' : 'on'; }
+  const spots=Object.keys(now.region==='coast'?POOLS_COAST:POOLS);
+  if ((w.region && w.region!==now.region) || (w.spot && !spots.includes(w.spot))) return 'off-here';
+  if (w.night && !now.night) return 'off-now';
+  if (now.rarity && ((w.rarity && !w.rarity.includes(now.rarity)) || (w.rarityMin && rarRank(now.rarity)<rarRank(w.rarityMin)))) return 'off-here';
+  const open=w.spot||w.fish||w.lucky||((w.rarity||w.rarityMin)&&!now.rarity);
+  return open ? 'cond' : 'on'; }
+const stateClass=st=>st.startsWith('off')?'off':st;
+const stateNote=st=>st==='off-here'?' · not here':st==='off-now'?' · not now':'';
 function bonusesHTML(){
-  const now=modCtx({}), all=modList().filter(m=>m.src!=='tune' && m.src!=='base'), R=ROD(), meal=save.meal;
+  const now=modCtx({}), all=modList().filter(m=>m.src!=='tune' && m.src!=='base'), R=ROD();
   const where='At '+REGION_NAME[now.region]+(now.night?', at night':', by day');
   // gear: what you're carrying
-  const sets=setsDone(), parts=(save.parts||[]).map(id=>PARTS[id]&&PARTS[id].name).filter(Boolean);
-  const mealOn=meal && meal.id!=='mush' && (meal.casts||meal.last) && RECIPES[meal.id];
+  const sets=setsDone(), parts=(save.parts||[]).map(id=>PARTS[id]&&PARTS[id].name).filter(Boolean), meal=save.meal;
   const reach=modBase('reach'), gear=[['Rod',R.name+(reach>=1?' · casts to the horizon':' · casts '+Math.round(reach*100)+'% of the way out')],
-    ['Meal',mealOn?RECIPES[meal.id].name+' '+'★'.repeat(meal.stars)+' · '+(meal.casts||0)+' casts left':'None. The kitchen cooks meals with boosts.'],
+    ['Meal',mealActive()?RECIPES[meal.id].name+' '+'★'.repeat(meal.stars)+' · '+(meal.casts||0)+' casts left':'None. The kitchen cooks meals with boosts.'],
     ['Tank sets',sets.length?sets.map(s=>s.name).join(', '):'None yet'],
     ['Boat',save.boat?(parts.length?parts.join(', '):'No parts yet'):'No boat yet'],
     ['Keepnet',netCap()+' fish']];
-  let h='<p class="bn-where">'+where+'. Bonuses that depend on where you cast are marked.</p><dl class="bn-gear">'+gear.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('')+'</dl>';
-  const mastered=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=10);
+  let h='<p class="bn-where">'+where+'. Bonuses that depend on where you cast or what bites are marked.</p><dl class="bn-gear">'+gear.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('')+'</dl>';
   const line=(m)=>{ const st=modState(m,now), w=modWhenText(m.when);
-    return '<li class="'+st+'"><span class="n">'+m.name+(m.stars?' '+'★'.repeat(m.stars):'')+'</span><span class="s">'+(SRC_LABEL[m.src]||'')+(w?' · '+w:'')+(st==='off'?' · not here':'')+'</span>'+
+    return '<li class="'+stateClass(st)+'"><span class="n">'+m.name+(m.stars?' '+'★'.repeat(m.stars):'')+'</span><span class="s">'+(SRC_LABEL[m.src]||m.src)+(w?' · '+w:'')+stateNote(st)+'</span>'+
       '<b class="'+(modHelps(m.stat,m.v,m.omen)?'up':'down')+'">'+modValueText(m.stat,m.v,m.omen)+'</b></li>'; };
   let any=false;
-  for (const stat of BONUS_ORDER){
-    const ms=all.filter(m=>m.stat===stat && m.src!=='mastery'); const mast=all.filter(m=>m.stat===stat && m.src==='mastery');
+  const order=Object.keys(STATS).filter(k=>!STATS[k].tune && (STATS[k].kind==='mul'||STATS[k].kind==='luck'));
+  for (const stat of order){
+    const ms=all.filter(m=>m.stat===stat && m.src!=='mastery'), mast=all.filter(m=>m.stat===stat && m.src==='mastery');
     if (!ms.length && !mast.length) continue;
     const S0=STATS[stat];
-    if (stat==='luck'){
-      const real=ms.filter(m=>!m.omen && modState(m,now)==='on'), pts=real.reduce((a,m)=>a+m.v,0);
-      if (!real.length && ms.every(m=>m.src==='event')) continue;    // Gull Luck alone: nothing to show until you have luck of your own
+    if (S0.kind==='luck'){
+      if (ms.every(m=>m.src==='event')) continue;    // Gull Luck alone: nothing to show until you have luck of your own
       any=true;
-      const tiers=Object.keys(RAR).filter(r=>RAR[r].luckCap).map(r=>'<span><i style="background:'+RAR[r].color+'"></i>'+RAR[r].label+' ×'+trimNum(luckCurve(pts,RAR[r].luckCap))+'</span>').join('');
-      const top=Object.keys(RAR).filter(r=>RAR[r].luckCap).at(-1);
+      const tiersK=Object.keys(RAR).filter(r=>RAR[r].luckCap), top=tiersK[tiersK.length-1], omens=ms.filter(m=>m.omen);
+      // the same numbers the odds use: the points that apply here and now for each rarity, through its curve
+      const ptsFor=r=>ms.filter(m=>!m.omen && modState(m,Object.assign({},now,{rarity:r}))==='on').reduce((a,m)=>a+m.v,0);
+      const pts=ptsFor(top);
+      const tiers=tiersK.map(r=>'<span><i style="background:'+RAR[r].color+'"></i>'+RAR[r].label+' ×'+trimNum(luckCurve(ptsFor(r),RAR[r].luckCap))+'</span>').join('');
       h+='<section class="bn-card bn-luck"><header><h3>'+S0.name+'</h3><b class="up">'+modValueText('luck',pts)+'</b></header><p class="bn-hint">'+S0.hint+'</p>'+
-        '<p class="bn-sum">Your luck here adds up to '+modValueText('luck',pts)+'. After diminishing returns, rarer fish bite this much more often:</p>'+
+        '<p class="bn-sum">Your luck here adds up to '+modValueText('luck',pts)+'. Luck has diminishing returns, so rarer fish bite this much more often:</p>'+
         '<div class="bn-tiers">'+tiers+'</div><ul class="bn-src">'+ms.map(line).join('')+'</ul>'+
-        '<p class="bn-cap">'+RAR[top].label+' odds top out at ×'+RAR[top].luckCap+' from luck. Omens like Gull Luck multiply on top while they last.</p></section>';
+        '<p class="bn-cap">From luck alone, '+RAR[top].label.toLowerCase()+' odds top out at ×'+RAR[top].luckCap+'. '+
+        (omens.length?omens.map(m=>m.src==='event'?m.name:'the '+m.name+'’s perk').join(' and ').replace(/^t/,'T')+' multipl'+(omens.length>1?'y':'ies')+' on top of that.':'')+'</p></section>';
       continue;
     }
     any=true;
-    const on=ms.filter(m=>modState(m,now)==='on'), cond=ms.filter(m=>modState(m,now)==='cond');
+    const states=ms.map(m=>modState(m,now)), on=ms.filter((m,i)=>states[i]==='on'), cond=ms.filter((m,i)=>states[i]==='cond');
     const tot=(on.length?on:cond).reduce((a,m)=>a*m.v,1), totCls=on.length?(modHelps(stat,tot)?'up':'down'):'cond';
     let lines=ms.map(line).join('');
     if (mast.length) lines+='<li class="cond"><span class="n">Mastered fish</span><span class="s">Mastery · with your '+mast.length+' mastered species</span><b class="up">'+modValueText(stat,mast[0].v)+'</b></li>';
     h+='<section class="bn-card"><header><h3>'+S0.name+'</h3><b class="'+totCls+'">'+(tot===1?'—':modValueText(stat,tot))+'</b></header><p class="bn-hint">'+S0.hint+'</p><ul class="bn-src">'+lines+'</ul></section>';
   }
-  const flags=['reveal','sonar','noWashout'].map(st=>({st,ms:all.filter(m=>m.stat===st)})).filter(x=>x.ms.length);
-  if (flags.length){ any=true; h+='<section class="bn-card"><header><h3>Perks</h3></header><ul class="bn-src">'+flags.map(({st,ms})=>{ const m=ms[0], state=modState(m,now), w=modWhenText(m.when);
-    return '<li class="'+state+'"><span class="n">'+STATS[st].name+'</span><span class="s">'+ms.map(x=>x.name).join(', ')+(w?' · '+w:'')+(state==='off'?' · not here':'')+'</span><b class="'+(state==='off'?'':'up')+'">'+(state==='off'?'—':'On')+'</b></li>'; }).join('')+'</ul></section>'; }
-  if (mastered.length){ any=true; h+='<section class="bn-card"><header><h3>Mastery</h3><b>'+mastered.length+'</b></header><p class="bn-hint">Catch ten of a species and it reels in 65% faster, with your rod following it for you.</p><p class="bn-list">'+mastered.map(id=>FISH[id].name).join(', ')+'</p></section>'; }
+  const flagStats=Object.keys(STATS).filter(k=>STATS[k].kind==='flag' && k!=='autoTilt');
+  const flags=flagStats.map(st=>({st,ms:all.filter(m=>m.stat===st)})).filter(x=>x.ms.length);
+  if (flags.length){ any=true; h+='<section class="bn-card"><header><h3>Perks</h3></header><ul class="bn-src">'+flags.map(({st,ms})=>{
+      const sts=ms.map(m=>modState(m,now)), best=sts.includes('on')?'on':sts.includes('cond')?'cond':sts[0], m=ms[sts.indexOf(best)], w=modWhenText(m.when);
+      return '<li class="'+stateClass(best)+'"><span class="n">'+STATS[st].name+'</span><span class="s">'+ms.map(x=>x.name).join(', ')+(w?' · '+w:'')+stateNote(best)+'</span><b class="'+(best.startsWith('off')?'':'up')+'">'+(best.startsWith('off')?'—':'On')+'</b></li>'; }).join('')+'</ul></section>'; }
+  const mastered=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=MASTERY.catches);
+  if (mastered.length){ any=true; h+='<section class="bn-card"><header><h3>Mastery</h3><b>'+mastered.length+'</b></header><p class="bn-hint">Catch '+MASTERY.catches+' of a species and it reels in '+Math.round((MASTERY.reel-1)*100)+'% faster, with your rod following it for you.</p><p class="bn-list">'+mastered.map(id=>FISH[id].name).join(', ')+'</p></section>'; }
   if (!any) h+='<p class="note">No bonuses yet. Better rods, meals from the kitchen, tank sets in the aquarium and boat parts all add up here.</p>';
   return h;
 }
@@ -4285,8 +4317,8 @@ function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
 }
 function speciesHTML(regs){ let h='<div class="entries">';
   regs.forEach(rg=>{ h+='<h3 class="j-reg">'+REGION_NAME[rg]+'</h3>'; REGION_FISH[rg].forEach(id=>{ const F=FISH[id], r=save.fish[id]||{caught:0,best:0,seen:false};
-    if (r.caught>0){ const m=Math.min(10,r.caught), pb=r.pb;
-      h+='<div class="entry"><canvas data-f="'+id+'"></canvas><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+'</span><h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p><div class="mast"><i style="width:'+m*10+'%"></i></div><p>'+(r.caught>=10?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/10')+'</p></div></div>'; }
+    if (r.caught>0){ const m=Math.min(MASTERY.catches,r.caught), pb=r.pb;
+      h+='<div class="entry"><canvas data-f="'+id+'"></canvas><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+'</span><h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p><div class="mast"><i style="width:'+Math.round(m/MASTERY.catches*100)+'%"></i></div><p>'+(r.caught>=MASTERY.catches?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/'+MASTERY.catches)+'</p></div></div>'; }
     else h+='<div class="entry"><canvas data-f="'+id+'" data-sil="1"></canvas><div><span class="r" style="color:#7A7468">'+(r.seen?'Seen, not caught':'Undiscovered')+'</span><h3>???</h3><p>'+(r.seen?F.hint:'Keep fishing to find this one.')+'</p></div></div>';
   }); });
   return h+'</div>'; }
@@ -4362,59 +4394,74 @@ function openShop(){
 /* ---------- Balance simulator: the 1,000-cast report ---------- */
 /* Plays casts with any setup without drawing anything, using the game's own odds (poolFor), fights
    (fightStep), catch rolls (catchRoll) and bonuses (game/mods.js), so the report can't drift from the game.
+   Reed snags, coastal washouts, twitching, swells and Playtest tuning count too.
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
-   the fish, eases off when the ring turns red, and handles most dives, tugs and jumps; a new player is
-   slower and handles fewer. The setup lives in a stand-in
-   save for the run, then the real save comes back untouched. */
+   the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
+   dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
+   Not modeled: aiming (every cast reaches its spot), keeping fish (every catch sells), the aquarium, the
+   kitchen, and Barnaby or the mail boat. The setup lives in a stand-in save for the run, then the real save
+   comes back untouched. */
 const SIM_PLAYERS={
-  steady:{name:'Steady player', react:()=>.2+.38*Math.pow(Math.random(),1.6), track:5, easeAt:.8, easeFor:.45, dives:.8, tugs:.7, jumps:.85, swells:.5},
-  new:   {name:'New player', react:()=>.28+.6*Math.pow(Math.random(),1.3), track:3, easeAt:.92, easeFor:.35, dives:.4, tugs:.35, jumps:.5, swells:.15}
+  steady:{name:'Steady player', react:()=>.2+.38*Math.pow(Math.random(),1.6), easeReact:()=>rand(.12,.32), track:5, easeAt:.8, easeFor:.45,
+          twitch:true, dives:.8, tugs:.7, jumps:.85, swells:.5},
+  new:   {name:'New player', react:()=>.28+.6*Math.pow(Math.random(),1.3), easeReact:()=>rand(.25,.6), track:3, easeAt:.9, easeFor:.35,
+          twitch:false, dives:.4, tugs:.35, jumps:.5, swells:.15}
 };
 /* Where each spot sits on the cast's 0 (shore) to 1 (horizon) scale: [nearest edge, middle]. The rod's reach
    has to cover the nearest edge. Worked out from the layout in game/layout.js and game/regions.js on a
    390 by 844 phone; keep in step if spots move. */
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
                  coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]}};
+/** A stand-in save for a setup. tanks, parts and fish can be copied from a real save ("Use my setup"). */
 function simSave(st){
-  const s=fresh(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
+  const s=fresh(), now=Date.now(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
   s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.clock=st.hour==null?12:st.hour;
   s.rod=st.rod||'willow'; s.rods=[s.rod]; s.parts=st.parts==='all'?Object.keys(PARTS):(st.parts||[]).slice();
+  s.tune=Object.assign(fresh().tune,st.tune||save.tune);
   if (st.meal && st.meal.id) s.meal={id:st.meal.id,stars:st.meal.stars||3,casts:1e9};
-  if (st.sets==='all'){ const now=Date.now(), F=id=>({id,size:FISH[id].size[1],value:FISH[id].value,t:now});
-    // every species twice: enough for every tank set to complete
+  if (st.tanks) s.tanks=JSON.parse(JSON.stringify(st.tanks));
+  else if (st.sets==='all'){ const F=id=>({id,size:FISH[id].size[1],value:FISH[id].value,t:now});
+    // every species twice in every tank, with every decor: enough for every tank set to complete
     s.tanks={fresh:{lvl:TANKS.fresh.caps.length-1,owned:true,fish:[],decor:DECOR.fresh.map(d=>d.id),tips:0,tipT:now},
              salt:{lvl:TANKS.salt.caps.length-1,owned:true,fish:[],decor:DECOR.salt.map(d=>d.id),tips:0,tipT:now}};
     for (const id of REGION_FISH.lake) s.tanks.fresh.fish.push(F(id),F(id));
     for (const id of REGION_FISH.coast) s.tanks.salt.fish.push(F(id),F(id)); }
-  if (st.mastery) for (const id in FISH) s.fish[id]={caught:12,best:0,seen:true};
+  if (st.fish) for (const id in st.fish) s.fish[id]={caught:st.fish[id].caught||0,best:0,seen:true};
+  else if (st.mastery) for (const id in FISH) s.fish[id]={caught:MASTERY.catches+2,best:0,seen:true};
   return s;
 }
 /** Runs `n` casts with setup `st` and returns the report. */
 function simulate(st,n){
   n=n||1000; st=Object.assign({region:'lake',spot:'open',hour:12,rod:'willow',player:'steady'},st);
-  const keep=save, keepTut=S.tut, P=SIM_PLAYERS[st.player]||SIM_PLAYERS.steady;
-  SIMULATING=true; save=simSave(st); MODC.dirty=true;
+  const keep=save, P=SIM_PLAYERS[st.player]||SIM_PLAYERS.steady;
   try {
-    const spots=st.spot==='mix'?Object.keys(REG()==='coast'?POOLS_COAST:POOLS):[st.spot];
-    const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0}, perfect:0, coins:0, pbs:0, pbCoins:0, secs:0, fightSecs:0,
+    SIMULATING=true; save=simSave(st); MODC.dirty=true;
+    const reg=REG(), spots=st.spot==='mix'?Object.keys(reg==='coast'?POOLS_COAST:POOLS):[st.spot];
+    const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0,snag:0,washout:0}, perfect:0, hooked:0, coins:0, pbs:0, pbCoins:0, secs:0, fightSecs:0,
       tiers:{}, species:{}, records:{}};
     const dt=1/60, io={t:0,holding:true,tut:null,tilt:0,reeling:false,ev:[],why:''};
     for (let c=0;c<n;c++){
-      const spot=spots[c%spots.length], lucky=!!st.lucky, depth=((SIM_SPOTS[REG()]||{})[spot]||[0,.5])[1];
+      const spot=spots[c%spots.length], lucky=!!st.lucky, depth=((SIM_SPOTS[reg]||{})[spot]||[0,.5])[1], y=lerp(G.near,HZ+26,depth), cx={spot,lucky};
       let t=1.6;                                                   // aim, drag and the cast's flight
-      // the quiet, then a fish swims over and nibbles
-      t+=rand(.75,2.1)*modMul('wait')*(spot==='deep'?1.2:1)/(spot==='reeds'?modMul('reedBite',{spot}):1);
-      const id=pickW(poolFor(spot,lucky)), F=FISH[id], y=lerp(G.near,HZ+26,depth);
-      t+=Math.max(.4,(rand(85,150)-10-F.len*.2)/((20+F.len*.35)*sc(y)*(F.beh==='sleeper'?.5:1))*1.2);
+      // the cast can tangle in the reeds or wash out in a swell
+      if (spot==='reeds' && Math.random()<modBase('snag',cx)){ out.lost.snag++; out.secs+=t+.7; continue; }
+      if (reg==='coast' && !modFlag('noWashout',cx) && Math.random()<(4.6/7.5)*(68*sc(y))/(H-118-HZ-8)*(1-P.swells)){ out.lost.washout++; out.secs+=t+.7; continue; }
+      // the quiet, then a fish swims over and nibbles; a steady player twitches once to hurry it
+      const tw=modMul('twitch',cx), id=pickW(poolFor(spot,lucky)), F=FISH[id];
+      let wait=rand(.75,2.1)*modMul('wait',cx)*(spot==='deep'?1.2:1)/modMul('reedBite',cx);
+      if (P.twitch) wait=Math.max(.3,wait*(.65-.2*(tw-1)));
+      const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
+      t+=wait+Math.max(.4,(rand(85,150)-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1))*1.2);
       const nib=F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3));
       t+=rand(.5,1.1); for (let i=0;i<nib;i++) t+=F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4);
       // the bite
-      const r=P.react(); t+=r;
-      if (r>F.window*modMul('hook',{fish:id})){ out.lost.slow++; out.secs+=t+.7; continue; }
-      const perfect=r<=.3*modMul('perfect',{fish:id}); if (perfect) out.perfect++;
+      const fc={fish:id,spot,lucky}, r=P.react(); t+=r;
+      if (r>F.window*modMul('hook',fc)){ out.lost.slow++; out.secs+=t+.7; continue; }
+      const perfect=r<=.3*modMul('perfect',fc); if (perfect) out.perfect++; out.hooked++;
       // the fight, through the game's own fight step
-      const R=newFight(id,perfect,{x:W*.5,y},lucky,false);
-      let ft=0, end=null, easeT=0, tilt=0, swellT=REG()==='coast'?rand(0,7.5):Infinity, plan={dive:false,tug:false};
+      const R=newFight(id,perfect,{x:W*.5,y},lucky,false,spot);
+      let ft=0, end=null, easeAt=null, easeUntil=0, swellT=reg==='coast'?rand(0,7.5):Infinity;
+      const plan={}; io.tilt=0;
       io.steer=(R,dt)=>R.fam?lerp(io.tilt,R.dir,Math.min(1,dt*8)):lerp(io.tilt,R.dir+Math.sin(ft*1.7)*.12,Math.min(1,dt*P.track));
       while (!end && ft<150){
         ft+=dt; io.t=ft; io.ev.length=0;
@@ -4422,16 +4469,17 @@ function simulate(st,n){
         if (R.jump && plan.jump && !R.jump.tapped && R.jump.t>=.3) fightTap(R);
         if (R.warn>0 && !plan.diveSet){ plan.diveSet=true; plan.dive=Math.random()<P.dives; } if (R.dive<=0 && R.warn<=0) plan.diveSet=false;
         if (R.tug && !plan.tugSet){ plan.tugSet=true; plan.tug=Math.random()<P.tugs; } if (!R.tug) plan.tugSet=false;
-        if (R.tension>P.easeAt) easeT=P.easeFor;
-        easeT-=dt;
-        io.holding=!(easeT>0 || (plan.dive && (R.dive>0 || R.warn>0 && R.warn<.35)) || (plan.tug && R.tug && R.beat%1.15>.12));
-        swellT-=dt; if (swellT<=0){ swellT+=7.5; if (Math.random()>=P.swells && io.holding) R.tension+=.3*modMul('swell'); }
+        // the red ring: the player notices after a moment, then lets go for a beat
+        if (R.tension>P.easeAt && easeAt==null && ft>=easeUntil) easeAt=ft+P.easeReact();
+        if (easeAt!=null && ft>=easeAt){ easeUntil=ft+P.easeFor; easeAt=null; }
+        io.holding=!(ft<easeUntil || (plan.dive && (R.dive>0 || R.warn>0 && R.warn<.35)) || (plan.tug && R.tug && R.beat%1.15>.12));
+        swellT-=dt; if (swellT<=0){ swellT+=7.5; if (Math.random()>=P.swells && io.holding) R.tension+=.3*modMul('swell',fc); }
         end=fightStep(R,dt,io);
       }
       t+=ft; out.fightSecs+=ft;
       if (end!=='land'){ out.secs+=t+.7; if (end==='snap') out.lost.snap++; else if (!end) out.lost.tired++; else if (/jump/.test(io.why)) out.lost.jump++; else out.lost.slack++; continue; }
       // landed: the game's own catch roll, then the card
-      const k=catchRoll(id,perfect), rar=F.rarity, prev=out.records[id];
+      const k=catchRoll(id,perfect,{spot,lucky}), rar=F.rarity, prev=out.records[id];
       out.landed++; out.coins+=k.value; out.tiers[rar]=(out.tiers[rar]||0)+1; out.species[id]=(out.species[id]||0)+1;
       if (prev!=null && k.w>prev){ out.pbs++; const b=Math.max(3,Math.round(F.value*.5)); out.pbCoins+=b; out.coins+=b; }
       if (prev==null || k.w>prev) out.records[id]=k.w;
@@ -4440,28 +4488,31 @@ function simulate(st,n){
     }
     const hours=out.secs/3600, pct=x=>Math.round(x*1000)/10;
     out.coinsPerHour=Math.round(out.coins/hours); out.catchesPerHour=Math.round(out.landed/hours);
-    out.secsPerCast=Math.round(out.secs/n*10)/10; out.fightAvg=Math.round(out.fightSecs/Math.max(1,n-out.lost.slow)*10)/10;
-    out.coinsPerCatch=Math.round(out.coins/Math.max(1,out.landed)*10)/10; out.landRate=pct(out.landed/n); out.perfectRate=pct(out.perfect/Math.max(1,n-out.lost.slow));
-    out.luck={points:Math.round(luckPoints({spot:spots[0],lucky:!!st.lucky})*100)/100,
-      tiers:Object.fromEntries(Object.keys(RAR).filter(r=>RAR[r].luckCap).map(r=>[r,Math.round(tierMul(r,{spot:spots[0],lucky:!!st.lucky})*100)/100]))};
-    out.reach={rod:modBase('reach'), ok:spots.every(sp=>((SIM_SPOTS[REG()]||{})[sp]||[0])[0]<=modBase('reach')+.001)};
+    out.secsPerCast=Math.round(out.secs/n*10)/10; out.fightAvg=Math.round(out.fightSecs/Math.max(1,out.hooked)*10)/10;
+    out.coinsPerCatch=Math.round(out.coins/Math.max(1,out.landed)*10)/10; out.landRate=pct(out.landed/n); out.perfectRate=pct(out.perfect/Math.max(1,out.hooked));
+    const lc={spot:spots[0],lucky:!!st.lucky};
+    out.luck={points:Math.round(luckPoints(lc)*100)/100,
+      tiers:Object.fromEntries(Object.keys(RAR).filter(r=>RAR[r].luckCap).map(r=>[r,Math.round(tierMul(r,lc)*100)/100]))};
+    out.reach={rod:modBase('reach'), ok:spots.every(sp=>((SIM_SPOTS[reg]||{})[sp]||[0])[0]<=modBase('reach')+.001)};
     out.bonuses=modList().filter(m=>m.src!=='base' && m.stat!=='reach' && m.stat!=='snag').map(m=>({src:m.src,name:m.name,stat:m.stat,v:m.v,when:m.when||null,omen:!!m.omen}));
     delete out.records; return out;
-  } finally { save=keep; S.tut=keepTut; SIMULATING=false; MODC.dirty=true; }
+  } finally { save=keep; SIMULATING=false; MODC.dirty=true; }
 }
 
 /* ---------- Playtest > Balance: run the simulator on any setup and read the report ---------- */
 const BAL={form:null, last:null, prev:null};
 const BAL_TIMES=[[6.5,'Dawn'],[12,'Noon'],[18.5,'Dusk'],[22,'Night']];
-function balMine(){ const m=save.meal, on=m && m.id!=='mush' && (m.casts||m.last) && RECIPES[m.id];
-  return {region:REG(), spot:'open', hour:BAL_TIMES.reduce((a,t)=>Math.abs(t[0]-save.clock)<Math.abs(a-save.clock)?t[0]:a,12), rod:save.rod,
-    meal:on?m.id:'', stars:on?m.stars:3, sets:setsDone().length?'all':'none', parts:(save.parts||[]).length?'all':'none',
-    mastery:Object.keys(FISH).some(id=>(save.fish[id]||{}).caught>=10)?'yes':'no', lucky:'no', player:'steady', n:1000}; }
+/** The time of day the clock is in: dawn (the Mayor's hours), dusk, night or the middle of the day. */
+const balTime=h=>h>=5&&h<8?6.5:isNight(h)?22:h>=17?18.5:12;
+function balMine(){ const m=save.meal;
+  return {region:REG(), spot:'open', hour:balTime(save.clock), rod:save.rod, meal:mealActive()?m.id:'', stars:mealActive()?m.stars:3,
+    sets:'mine', parts:'mine', mastery:'mine', lucky:'no', player:'steady', n:1000}; }
 function balanceFormHTML(){
   const f=BAL.form||(BAL.form=balMine());
   const sel=(id,label,opts,v)=>'<label for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(([k,l])=>'<option value="'+k+'"'+(String(k)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
   const spots=Object.keys(f.region==='coast'?POOLS_COAST:POOLS).map(sp=>[sp,f.region==='coast'&&sp==='deep'?'Dark trench':SPOT_NAME[sp]]);
-  let h='<p class="note">Plays casts with the game’s own odds, fights and catch rolls. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps.</p>'+
+  const mySets=setsDone().length, myParts=(save.parts||[]).length, myMast=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=MASTERY.catches).length;
+  let h='<p class="note">Plays casts with the game’s own odds, fights, catch rolls, snags, swells and tuning. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps. Every catch is sold; aiming, the aquarium and the kitchen aren’t played.</p>'+
     '<div class="bal-form">'+
     sel('bRegion','Water',Object.keys(REGION_NAME).map(r=>[r,REGION_NAME[r]]),f.region)+
     sel('bSpot','Spot',[...spots,['mix','Every spot']],f.spot)+
@@ -4469,9 +4520,9 @@ function balanceFormHTML(){
     sel('bRod','Rod',[...ROD_ORDER,...SEA_RODS].map(id=>[id,RODS[id].name]),f.rod)+
     sel('bMeal','Meal',[['','None'],...RECIPE_ORDER.map(id=>[id,RECIPES[id].name])],f.meal)+
     sel('bStars','Meal stars',[[1,'★'],[2,'★★'],[3,'★★★']],f.stars)+
-    sel('bSets','Tank sets',[['none','None'],['all','Every set']],f.sets)+
-    sel('bParts','Boat parts',[['none','None'],['all','Every part']],f.parts)+
-    sel('bMastery','Mastery',[['no','None'],['yes','Every fish']],f.mastery)+
+    sel('bSets','Tank sets',[['mine','Yours ('+mySets+')'],['none','None'],['all','Every set']],f.sets)+
+    sel('bParts','Boat parts',[['mine','Yours ('+myParts+')'],['none','None'],['all','Every part']],f.parts)+
+    sel('bMastery','Mastery',[['mine','Yours ('+myMast+')'],['none','None'],['all','Every fish']],f.mastery)+
     sel('bLucky','Gull Luck',[['no','No'],['yes','In a lucky splash']],f.lucky)+
     sel('bPlayer','Player',[['steady','Steady'],['new','New']],f.player)+
     sel('bN','Casts',[[1000,'1,000'],[5000,'5,000']],f.n)+
@@ -4479,8 +4530,11 @@ function balanceFormHTML(){
     '<div id="bOut">'+(BAL.last?balanceResultHTML(BAL.last,BAL.prev):'')+'</div>';
   return h;
 }
-function balSetup(f){ return {region:f.region, spot:f.spot, hour:+f.hour, rod:f.rod, meal:f.meal?{id:f.meal,stars:+f.stars}:null, sets:f.sets,
-  parts:f.parts==='all'?Object.keys(PARTS):[], mastery:f.mastery==='yes', lucky:f.lucky==='yes', player:f.player}; }
+function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:f.rod, meal:f.meal?{id:f.meal,stars:+f.stars}:null,
+    parts:f.parts==='all'?'all':f.parts==='mine'?(save.parts||[]).slice():[], lucky:f.lucky==='yes', player:f.player};
+  if (f.sets==='mine') st.tanks=tanks(); else st.sets=f.sets;
+  if (f.mastery==='mine') st.fish=save.fish; else st.mastery=f.mastery==='all';
+  return st; }
 function bindBalance(){
   const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bLucky:'lucky',bPlayer:'player',bN:'n'};
   for (const [id,k] of Object.entries(ids)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
@@ -4488,9 +4542,10 @@ function bindBalance(){
     if (k==='n') $('bRun').textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts'; });
   $('bMine').addEventListener('click',()=>{ BAL.form=balMine(); const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; });
   $('bRun').addEventListener('click',()=>{ const b=$('bRun'); b.disabled=true; b.textContent='Casting…';
-    setTimeout(()=>{ const res=simulate(balSetup(BAL.form),+BAL.form.n); BAL.prev=BAL.last; BAL.last=res;
-      $('bOut').innerHTML=balanceResultHTML(res,BAL.prev); b.disabled=false; b.textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts';
-      $('bOut').scrollIntoView({behavior:REDUCED?'auto':'smooth',block:'start'}); },30); });
+    setTimeout(()=>{ try { const res=simulate(balSetup(BAL.form),+BAL.form.n); BAL.prev=BAL.last; BAL.last=res;
+        $('bOut').innerHTML=balanceResultHTML(res,BAL.prev); $('bOut').scrollIntoView({behavior:REDUCED?'auto':'smooth',block:'start'}); }
+      catch(e){ $('bOut').innerHTML='<p class="bal-warn">The simulator hit a problem: '+String(e.message||e)+'</p>'; }
+      b.disabled=false; b.textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts'; },30); });
 }
 function balanceResultHTML(r,prev){
   const st=r.setup, fmt=n=>Math.round(n).toLocaleString();
@@ -4510,8 +4565,8 @@ function balanceResultHTML(r,prev){
     '<div class="bal-legend">'+tiers.map(k=>'<span><i style="background:'+RAR[k].color+'"></i>'+RAR[k].label+' '+(Math.round(r.tiers[k]/tot*1000)/10)+'%</span>').join('')+'</div>';
   const sp=Object.entries(r.species).sort((a,b)=>b[1]-a[1]);
   h+='<table class="bal-tab"><thead><tr><th>Fish</th><th>Share</th><th>One in</th></tr></thead><tbody>'+sp.map(([id,n])=>'<tr><td><span><i style="background:'+RAR[FISH[id].rarity].color+'"></i>'+FISH[id].name+'</span></td><td>'+(Math.round(n/tot*1000)/10)+'%</td><td>'+(r.casts/n<1.5?'every cast':Math.round(r.casts/n).toLocaleString()+' casts')+'</td></tr>').join('')+'</tbody></table>';
-  const L=r.luck, lostBits=[['slow','too slow'],['jump','shook off mid-jump'],['slack','slipped on a slack line'],['snap','snapped'],['tired','outlasted the player']].filter(([k])=>r.lost[k]).map(([k,w])=>r.lost[k]+' '+w);
-  h+='<p class="note bal-notes">Luck '+modValueText('luck',L.points)+': '+Object.entries(L.tiers).map(([k,v])=>RAR[k].label+' ×'+v).join(', ')+'. '+
+  const L=r.luck, lostBits=[['slow','too slow'],['snag','snagged in the reeds'],['washout','washed out by a swell'],['jump','shook off mid-jump'],['slack','slipped on a slack line'],['snap','snapped'],['tired','outlasted the player']].filter(([k])=>r.lost[k]).map(([k,w])=>r.lost[k]+' '+w);
+  h+='<p class="note bal-notes">'+(L.points?modValueText('luck',L.points)+': ':'No luck bonuses: ')+Object.entries(L.tiers).map(([k,v])=>RAR[k].label+' ×'+v).join(', ')+'. '+
     'A cast takes '+r.secsPerCast+' s on average, and a fight '+r.fightAvg+' s. '+(lostBits.length?'Lost: '+lostBits.join(', ')+'. ':'')+
     (r.pbCoins?'Record bonuses paid '+fmt(r.pbCoins)+' coins. ':'')+'</p></section>';
   return h;

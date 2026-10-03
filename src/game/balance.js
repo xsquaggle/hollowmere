@@ -1,15 +1,17 @@
 /* ---------- Playtest > Balance: run the simulator on any setup and read the report ---------- */
 const BAL={form:null, last:null, prev:null};
 const BAL_TIMES=[[6.5,'Dawn'],[12,'Noon'],[18.5,'Dusk'],[22,'Night']];
-function balMine(){ const m=save.meal, on=m && m.id!=='mush' && (m.casts||m.last) && RECIPES[m.id];
-  return {region:REG(), spot:'open', hour:BAL_TIMES.reduce((a,t)=>Math.abs(t[0]-save.clock)<Math.abs(a-save.clock)?t[0]:a,12), rod:save.rod,
-    meal:on?m.id:'', stars:on?m.stars:3, sets:setsDone().length?'all':'none', parts:(save.parts||[]).length?'all':'none',
-    mastery:Object.keys(FISH).some(id=>(save.fish[id]||{}).caught>=10)?'yes':'no', lucky:'no', player:'steady', n:1000}; }
+/** The time of day the clock is in: dawn (the Mayor's hours), dusk, night or the middle of the day. */
+const balTime=h=>h>=5&&h<8?6.5:isNight(h)?22:h>=17?18.5:12;
+function balMine(){ const m=save.meal;
+  return {region:REG(), spot:'open', hour:balTime(save.clock), rod:save.rod, meal:mealActive()?m.id:'', stars:mealActive()?m.stars:3,
+    sets:'mine', parts:'mine', mastery:'mine', lucky:'no', player:'steady', n:1000}; }
 function balanceFormHTML(){
   const f=BAL.form||(BAL.form=balMine());
   const sel=(id,label,opts,v)=>'<label for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(([k,l])=>'<option value="'+k+'"'+(String(k)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
   const spots=Object.keys(f.region==='coast'?POOLS_COAST:POOLS).map(sp=>[sp,f.region==='coast'&&sp==='deep'?'Dark trench':SPOT_NAME[sp]]);
-  let h='<p class="note">Plays casts with the game’s own odds, fights and catch rolls. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps.</p>'+
+  const mySets=setsDone().length, myParts=(save.parts||[]).length, myMast=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=MASTERY.catches).length;
+  let h='<p class="note">Plays casts with the game’s own odds, fights, catch rolls, snags, swells and tuning. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps. Every catch is sold; aiming, the aquarium and the kitchen aren’t played.</p>'+
     '<div class="bal-form">'+
     sel('bRegion','Water',Object.keys(REGION_NAME).map(r=>[r,REGION_NAME[r]]),f.region)+
     sel('bSpot','Spot',[...spots,['mix','Every spot']],f.spot)+
@@ -17,9 +19,9 @@ function balanceFormHTML(){
     sel('bRod','Rod',[...ROD_ORDER,...SEA_RODS].map(id=>[id,RODS[id].name]),f.rod)+
     sel('bMeal','Meal',[['','None'],...RECIPE_ORDER.map(id=>[id,RECIPES[id].name])],f.meal)+
     sel('bStars','Meal stars',[[1,'★'],[2,'★★'],[3,'★★★']],f.stars)+
-    sel('bSets','Tank sets',[['none','None'],['all','Every set']],f.sets)+
-    sel('bParts','Boat parts',[['none','None'],['all','Every part']],f.parts)+
-    sel('bMastery','Mastery',[['no','None'],['yes','Every fish']],f.mastery)+
+    sel('bSets','Tank sets',[['mine','Yours ('+mySets+')'],['none','None'],['all','Every set']],f.sets)+
+    sel('bParts','Boat parts',[['mine','Yours ('+myParts+')'],['none','None'],['all','Every part']],f.parts)+
+    sel('bMastery','Mastery',[['mine','Yours ('+myMast+')'],['none','None'],['all','Every fish']],f.mastery)+
     sel('bLucky','Gull Luck',[['no','No'],['yes','In a lucky splash']],f.lucky)+
     sel('bPlayer','Player',[['steady','Steady'],['new','New']],f.player)+
     sel('bN','Casts',[[1000,'1,000'],[5000,'5,000']],f.n)+
@@ -27,8 +29,11 @@ function balanceFormHTML(){
     '<div id="bOut">'+(BAL.last?balanceResultHTML(BAL.last,BAL.prev):'')+'</div>';
   return h;
 }
-function balSetup(f){ return {region:f.region, spot:f.spot, hour:+f.hour, rod:f.rod, meal:f.meal?{id:f.meal,stars:+f.stars}:null, sets:f.sets,
-  parts:f.parts==='all'?Object.keys(PARTS):[], mastery:f.mastery==='yes', lucky:f.lucky==='yes', player:f.player}; }
+function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:f.rod, meal:f.meal?{id:f.meal,stars:+f.stars}:null,
+    parts:f.parts==='all'?'all':f.parts==='mine'?(save.parts||[]).slice():[], lucky:f.lucky==='yes', player:f.player};
+  if (f.sets==='mine') st.tanks=tanks(); else st.sets=f.sets;
+  if (f.mastery==='mine') st.fish=save.fish; else st.mastery=f.mastery==='all';
+  return st; }
 function bindBalance(){
   const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bLucky:'lucky',bPlayer:'player',bN:'n'};
   for (const [id,k] of Object.entries(ids)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
@@ -36,9 +41,10 @@ function bindBalance(){
     if (k==='n') $('bRun').textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts'; });
   $('bMine').addEventListener('click',()=>{ BAL.form=balMine(); const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; });
   $('bRun').addEventListener('click',()=>{ const b=$('bRun'); b.disabled=true; b.textContent='Casting…';
-    setTimeout(()=>{ const res=simulate(balSetup(BAL.form),+BAL.form.n); BAL.prev=BAL.last; BAL.last=res;
-      $('bOut').innerHTML=balanceResultHTML(res,BAL.prev); b.disabled=false; b.textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts';
-      $('bOut').scrollIntoView({behavior:REDUCED?'auto':'smooth',block:'start'}); },30); });
+    setTimeout(()=>{ try { const res=simulate(balSetup(BAL.form),+BAL.form.n); BAL.prev=BAL.last; BAL.last=res;
+        $('bOut').innerHTML=balanceResultHTML(res,BAL.prev); $('bOut').scrollIntoView({behavior:REDUCED?'auto':'smooth',block:'start'}); }
+      catch(e){ $('bOut').innerHTML='<p class="bal-warn">The simulator hit a problem: '+String(e.message||e)+'</p>'; }
+      b.disabled=false; b.textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts'; },30); });
 }
 function balanceResultHTML(r,prev){
   const st=r.setup, fmt=n=>Math.round(n).toLocaleString();
@@ -58,8 +64,8 @@ function balanceResultHTML(r,prev){
     '<div class="bal-legend">'+tiers.map(k=>'<span><i style="background:'+RAR[k].color+'"></i>'+RAR[k].label+' '+(Math.round(r.tiers[k]/tot*1000)/10)+'%</span>').join('')+'</div>';
   const sp=Object.entries(r.species).sort((a,b)=>b[1]-a[1]);
   h+='<table class="bal-tab"><thead><tr><th>Fish</th><th>Share</th><th>One in</th></tr></thead><tbody>'+sp.map(([id,n])=>'<tr><td><span><i style="background:'+RAR[FISH[id].rarity].color+'"></i>'+FISH[id].name+'</span></td><td>'+(Math.round(n/tot*1000)/10)+'%</td><td>'+(r.casts/n<1.5?'every cast':Math.round(r.casts/n).toLocaleString()+' casts')+'</td></tr>').join('')+'</tbody></table>';
-  const L=r.luck, lostBits=[['slow','too slow'],['jump','shook off mid-jump'],['slack','slipped on a slack line'],['snap','snapped'],['tired','outlasted the player']].filter(([k])=>r.lost[k]).map(([k,w])=>r.lost[k]+' '+w);
-  h+='<p class="note bal-notes">Luck '+modValueText('luck',L.points)+': '+Object.entries(L.tiers).map(([k,v])=>RAR[k].label+' ×'+v).join(', ')+'. '+
+  const L=r.luck, lostBits=[['slow','too slow'],['snag','snagged in the reeds'],['washout','washed out by a swell'],['jump','shook off mid-jump'],['slack','slipped on a slack line'],['snap','snapped'],['tired','outlasted the player']].filter(([k])=>r.lost[k]).map(([k,w])=>r.lost[k]+' '+w);
+  h+='<p class="note bal-notes">'+(L.points?modValueText('luck',L.points)+': ':'No luck bonuses: ')+Object.entries(L.tiers).map(([k,v])=>RAR[k].label+' ×'+v).join(', ')+'. '+
     'A cast takes '+r.secsPerCast+' s on average, and a fight '+r.fightAvg+' s. '+(lostBits.length?'Lost: '+lostBits.join(', ')+'. ':'')+
     (r.pbCoins?'Record bonuses paid '+fmt(r.pbCoins)+' coins. ':'')+'</p></section>';
   return h;

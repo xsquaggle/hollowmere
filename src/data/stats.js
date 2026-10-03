@@ -6,7 +6,9 @@
          add   amounts add up from a starting value (keepnet space starts at 12)
          flag  on when any source turns it on
    good  'up' when more is better, 'down' when less is better.  tune:true stats only come from Playtest tuning.
-   hint  the plain sentence the Bonuses page shows under the stat. */
+   when  where every bonus to this stat applies, on top of its own conditions (there are no swells at the lake).
+   unit  'x' to show the total as ×2.5 rather than +150%.
+   hint  the plain sentence the Bonuses page shows under the stat. The order here is the order on that page. */
 const STATS={
   luck:     {name:'Rarity luck', kind:'luck', good:'up', hint:'Rarer fish bite more often.'},
   value:    {name:'Fish value', kind:'mul', good:'up', hint:'Coins for every fish you sell.'},
@@ -14,18 +16,20 @@ const STATS={
   line:     {name:'Line strength', kind:'mul', good:'up', hint:'Tension builds more slowly, so the line snaps less.'},
   hook:     {name:'Hook window', kind:'mul', good:'up', hint:'Time to tap after the bobber plunges.'},
   perfect:  {name:'Perfect-hook window', kind:'mul', good:'up', hint:'Tap this fast for a perfect hook: a bigger fish, worth more, that reels faster.'},
-  night:    {name:'Night fish', kind:'mul', good:'up', hint:'Fish that come up after dark bite more often.'},
-  twitch:   {name:'Twitch pull', kind:'mul', good:'up', hint:'A twitch draws a fish in from farther, and brings the next one sooner.'},
-  reedBite: {name:'Reed bites', kind:'mul', good:'up', hint:'Fish in the reeds bite sooner.'},
+  night:    {name:'Night fish', kind:'mul', good:'up', unit:'x', when:{night:true}, hint:'Fish that come up after dark bite more often.'},
+  twitch:   {name:'Twitch pull', kind:'mul', good:'up', unit:'x', hint:'A twitch draws a fish in from farther, and brings the next one sooner.'},
+  reedBite: {name:'Reed bites', kind:'mul', good:'up', when:{spot:'reeds'}, hint:'Fish in the reeds bite sooner.'},
   tug:      {name:'Tugger pull', kind:'mul', good:'down', hint:'Tuggers yank the line less hard.'},
-  swell:    {name:'Swell hits', kind:'mul', good:'down', hint:'A swell spikes your line’s tension less.'},
+  swell:    {name:'Swell hits', kind:'mul', good:'down', when:{region:'coast'}, hint:'A swell spikes your line’s tension less.'},
   tension:  {name:'Tension build-up', kind:'mul', good:'down', tune:true, hint:'Playtest tuning for how fast tension rises.'},
   wait:     {name:'Wait for a bite', kind:'mul', good:'down', tune:true, hint:'Playtest tuning for the quiet before a fish shows up.'},
   reach:    {name:'Reach', kind:'base', good:'up', hint:'How far out you can cast.'},
-  snag:     {name:'Reed snags', kind:'base', good:'down', hint:'Chance a cast into the reeds tangles your line.'},
+  snag:     {name:'Reed snags', kind:'base', good:'down', when:{spot:'reeds'}, hint:'Chance a cast into the reeds tangles your line.'},
   netCap:   {name:'Keepnet space', kind:'add', start:12, good:'up', hint:'Fish the keepnet holds before catches sell straight away.'},
   reveal:   {name:'Rarity reveal', kind:'flag', hint:'Approaching fish flash their rarity color.'},
   sonar:    {name:'Sonar readout', kind:'flag', hint:'A readout names what’s coming before it bites.'},
-  noWashout:{name:'Swell-proof casts', kind:'flag', hint:'Casts never wash out in a swell.'},
+  noWashout:{name:'Swell-proof casts', kind:'flag', when:{region:'coast'}, hint:'Casts never wash out in a swell.'},
   autoTilt: {name:'Rod tracks the fish', kind:'flag', hint:'Your rod follows a mastered fish for you.'}
 };
+/* Mastery: catch this many of a species and it reels in faster, with your rod following it. */
+const MASTERY={catches:10, reel:1.65};

@@ -19,13 +19,14 @@ module.exports = [
       await openGame(page, { save: veteran(stacked(Date.now())) });
       const v = await page.evaluate(() => { const h = window.__hm; return {
         value: h.modMul('value'), reel: h.modMul('reel'), reelPerch: h.modMul('reel', { fish: 'perch' }), perfect: h.modMul('perfect'),
-        swellLake: h.modMul('swell'), points: h.luckPoints({}), legendary: h.tierMul('legendary', {}), lucky: h.tierMul('legendary', { lucky: true }),
+        swellLake: h.modMul('swell'), swellCoast: h.modMul('swell', { region: 'coast' }), points: h.luckPoints({}), legendary: h.tierMul('legendary', {}), lucky: h.tierMul('legendary', { lucky: true }),
         common: h.tierMul('common', {}), sources: [...new Set(h.modList().map(m => m.src))].sort() }; });
       near(v.value, 1.25 * 1.05, 'value: Brasscap ×1.25 and the Stillwater Sampler ×1.05');
       near(v.reel, 1.25, 'reel: the rod alone');
       near(v.reelPerch, 1.25 * 1.65, 'reel with a mastered perch adds mastery');
       near(v.perfect, 1.5, 'the Brasscap perk widens the perfect-hook window');
-      near(v.swellLake, 0.5, 'the keel softens swells');
+      near(v.swellCoast, 0.5, 'the keel softens swells at the coast');
+      near(v.swellLake, 1, 'and there are no swells at the lake');
       near(v.points, 0.35 + 0.6 + 0.1 + 0.08 + 0.05, 'luck points add: rod, pie, Royalty, Night Lights, Town Hall');
       near(v.lucky, v.legendary * 2, 'Gull Luck doubles on top of the curve');
       assert.equal(v.common, 1, 'luck never boosts common fish directly');
@@ -59,10 +60,10 @@ module.exports = [
       await page.click('#journalBtn'); await page.waitForTimeout(400);
       await page.click('[data-jt="bonuses"]'); await page.waitForTimeout(400);
       const text = await page.textContent('#panel');
-      for (const s of ['Rarity luck', 'Brasscap Pro', 'Mayor’s Banquet Pie', '+60%', 'Lake Royalty', 'Night Lights', 'Tiny Town Hall', 'Gull Luck', '×2',
+      for (const s of ['Rarity luck', 'Brasscap Pro', 'Mayor’s Banquet Pie', '+60 luck', '+118 luck', 'Lake Royalty', 'Night Lights', 'Tiny Town Hall', 'Gull Luck', '×2',
         'Fish value', 'Perfect-hook window', 'Swell hits', 'Stabilizer Keel', 'Mastery', 'Copper Perch', 'Mayor Bartholomew']) assert.ok(text.includes(s), 'shows ' + s);
       const off = await page.$$eval('.bn-src li.off .n', els => els.map(e => e.textContent));
-      assert.ok(off.includes('Stabilizer Keel') === false && off.includes('Rarity reveal'), 'the sonar’s reveal is marked as not here at the lake: ' + off.join(', '));
+      assert.deepEqual(off.sort(), ['Rarity reveal', 'Sonar readout', 'Stabilizer Keel'], 'coast-only bonuses are marked not here at the lake');
       assert.match(await page.textContent('.bn-luck .bn-tiers'), /Legendary ×2\.1/);
     },
   },

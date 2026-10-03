@@ -63,7 +63,7 @@ for (const [name, pools, reg] of regionOfPools) for (const spot of keys(pools)) 
 const RIDS = keys(RODS);
 for (const id of RIDS) {
   const R = RODS[id], w = 'RODS.' + id;
-  need(w, R, { name: 'str', price: 'num0', line: 'num+', reel: 'num+', luck: 'num+', value: 'num+', snag: '01', reedBoost: 'num+', color: 'hex', where: 'str', perk: 'str' });
+  need(w, R, { name: 'str', price: 'num0', line: 'num+', reel: 'num+', luck: 'num0', value: 'num+', snag: '01', reedBoost: 'num+', color: 'hex', where: 'str', perk: 'str' });
   if (!(R.reach > 0 && R.reach <= 1)) bad(w, 'reach should be in (0, 1]');
   if (R.sea && !isStr(R.blurb)) bad(w, 'Tacklegram rods need a blurb');
 }
@@ -95,12 +95,12 @@ const decorIds = keys(DECOR).flatMap(k => DECOR[k].map(d => d.id)); noDupes('DEC
 for (const k of keys(DECOR)) for (const d of DECOR[k]) { const w = `DECOR.${k}.${d.id}`; need(w, d, { id: 'str', name: 'str', price: 'num+', desc: 'str', eff: 'str' });
   if (!(d.all || d.jar || ((d.beh || d.ids || d.rar) && d.pct))) bad(w, 'needs an effect: all, jar, or beh/ids/rar with pct');
   (d.beh || []).forEach(b => oneOf(w + '.beh', b, BEHS, 'behavior')); (d.ids || []).forEach(id => oneOf(w + '.ids', id, FIDS, 'fish')); (d.rar || []).forEach(r => oneOf(w + '.rar', r, RARS, 'rarity'));
-  if (d.luck) oneOf(w + '.luck.region', d.luck.region, REGIONS, 'region'); }
+  if (d.luck) { oneOf(w + '.luck.region', d.luck.region, REGIONS, 'region'); if (!(d.luck.v > 0 && d.luck.v < 1)) bad(w + '.luck.v', 'luck points, like .05 for +5 luck'); } }
 noDupes('TANK_SETS ids', TANK_SETS.map(s => s.id));
 const tankFish = { fresh: REGION_FISH.lake || [], salt: REGION_FISH.coast || [] };
 for (const s of TANK_SETS) { const w = 'TANK_SETS.' + s.id; need(w, s, { name: 'str', need: 'str', bonus: 'str', check: 'fn' });
   oneOf(w + '.tank', s.tank, TK, 'tank'); oneOf(w + '.region', s.region, [...REGIONS, 'any'], 'region');
-  if (!(s.value > 1 || s.luck > 1)) bad(w, 'needs a value or luck bonus above 1');
+  if (!(s.value > 1 || s.luck > 0)) bad(w, 'needs a value bonus above 1 or luck points above 0');
   if (typeof s.check === 'function') { const full = (tankFish[s.tank] || []).flatMap(id => [{ id }, { id }]);
     if (s.check([])) bad(w, 'is complete with an empty tank'); if (!s.check(full)) bad(w, `can never be completed from the ${s.tank} tank's fish`); } }
 
@@ -134,11 +134,9 @@ for (const [m, M] of Object.entries(MOODS)) { const w = 'MOODS.' + m; need(w, M,
 
 /* ---------- stats and modifiers ---------- */
 const KINDS = ['mul', 'luck', 'base', 'add', 'flag'];
-for (const [k, st] of Object.entries(STATS)) { const w = 'STATS.' + k; need(w, st, { name: 'str', hint: 'str' }); oneOf(w + '.kind', st.kind, KINDS, 'stat kind');
-  if (st.kind !== 'flag') oneOf(w + '.good', st.good, ['up', 'down'], 'direction'); if (st.kind === 'add' && !isNum(st.start)) bad(w, 'an add stat needs a start value'); }
 for (const r of RARS) { const c = RAR[r].luckCap; if (r === RARS[0]) { if (c !== undefined) bad('RAR.' + r, 'the commonest tier takes no luck cap (luck shrinks it instead)'); } else if (!(isNum(c) && c > 1)) bad('RAR.' + r, 'luckCap should be a number above 1'); }
 for (let i = 2; i < RARS.length; i++) if (RAR[RARS[i]].luckCap < RAR[RARS[i - 1]].luckCap) bad('RAR.' + RARS[i], 'rarer tiers should have a ceiling at least as high as the tier below');
-const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true], fish: FIDS, rarity: RARS, lucky: [true] };
+const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true], fish: FIDS, rarity: RARS, rarityMin: RARS, lucky: [true] };
 const checkMod = (w, m) => {
   const st = STATS[m.stat]; if (!st) return bad(w, `unknown stat ${JSON.stringify(m.stat)} (see data/stats.js)`);
   if (st.kind === 'flag') { if (m.v !== undefined) bad(w, m.stat + ' is a flag and takes no v'); }
@@ -146,9 +144,13 @@ const checkMod = (w, m) => {
   else if (st.kind === 'mul' && !(m.v > 0)) bad(w, 'a multiplier should be above 0');
   if (m.omen && m.stat !== 'luck') bad(w, 'only luck can be an omen');
   for (const [k, v] of Object.entries(m.when || {})) { if (!WHEN[k]) { bad(w + '.when', 'unknown condition ' + k + ' (region, spot, night, fish, rarity, lucky)'); continue; }
+    if (k === 'rarity' && !Array.isArray(v)) bad(w + '.when.rarity', 'a list of rarities; use rarityMin for "this rarity and rarer"');
     for (const x of Array.isArray(v) ? v : [v]) oneOf(w + '.when.' + k, x, WHEN[k], k); }
   for (const k of keys(m)) if (!['stat', 'v', 'when', 'omen'].includes(k)) bad(w, 'unknown modifier field ' + k);
 };
+for (const [k, st] of Object.entries(STATS)) { const w = 'STATS.' + k; need(w, st, { name: 'str', hint: 'str' }); oneOf(w + '.kind', st.kind, KINDS, 'stat kind');
+  if (st.unit !== undefined) oneOf(w + '.unit', st.unit, ['x'], 'unit'); if (st.when) checkMod(w + '.when', { stat: k, v: st.kind === 'flag' ? undefined : 1, when: st.when });
+  if (st.kind !== 'flag') oneOf(w + '.good', st.good, ['up', 'down'], 'direction'); if (st.kind === 'add' && !isNum(st.start)) bad(w, 'an add stat needs a start value'); }
 for (const id of RIDS) (RODS[id].mods || []).forEach((m, i) => checkMod(`RODS.${id}.mods[${i}]`, m));
 for (const id of keys(PARTS)) (PARTS[id].mods || []).forEach((m, i) => checkMod(`PARTS.${id}.mods[${i}]`, m));
 for (const id of keys(PARTS)) if (!(PARTS[id].mods || []).length) bad('PARTS.' + id, 'a part needs at least one modifier, or it does nothing');

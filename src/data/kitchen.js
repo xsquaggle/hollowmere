@@ -12,7 +12,7 @@ const FLESH={perch:'#F4CDB0', reedwhisker:'#EFD9C2', lantern:'#F7D9A0', leafjack
   sprat:'#EBDCD0', wrasse:'#F6C4AE', kelpeel:'#E8D8C0', bream:'#F5DCB5', grouper:'#F3E3D3', saltjaw:'#ECD6CC'};
 const COOK_NAME={pan:'Pan-fry', grill:'Grill'};
 /* Each recipe: what it needs from the keepnet, how each station plays, and what the meal does.
-   boost: list of {k,v}. Multipliers read through mealMul(k): 1+v*strength. */
+   boost: list of {k,v}: k is a stat in data/stats.js. A meal's modifier is 1+v*strength (luck: v*strength points). */
 const RECIPES={
   chowder:{name:'Odds and Ends Chowder', need:[{rar:'common',n:3}], learn:null, cook:'pan', form:'fillet', dish:'bowl', side:'bread',
     spice:{salt:2,pepper:1,dill:1}, zone:[.56,.8], speed:1, boost:[{k:'value',v:.15}], eff:'Fish are worth 15% more',
@@ -33,13 +33,13 @@ const RECIPES={
     spice:{salt:1,dill:2,pepper:2}, zone:[.6,.78], speed:1.1, boost:[{k:'perfect',v:.5}], eff:'Perfect-hook window 50% wider',
     blurb:'The tiny garden goes in the pot too. The tiny fence does not.'},
   bream:{name:'Smoked Gilt Bream', need:[{id:'bream',n:1}], learn:'bream', cook:'grill', form:'fillet', dish:'plate', side:'potatoes',
-    spice:{salt:2,paprika:1,lemon:1}, zone:[.6,.78], speed:1.1, boost:[{k:'luck',v:.15}], eff:'+15% rarity luck',
+    spice:{salt:2,paprika:1,lemon:1}, zone:[.6,.78], speed:1.1, boost:[{k:'luck',v:.15}], eff:'+15 luck',
     blurb:'Smoked over driftwood until the scales go the color of old coins.'},
   steak:{name:'Barnacle Grouper Steak', need:[{id:'grouper',n:1}], learn:'grouper', cook:'grill', form:'steak', dish:'plate', side:'potatoes',
     spice:{salt:2,pepper:3}, zone:[.62,.78], speed:1.15, boost:[{k:'swell',v:-.5},{k:'line',v:.15}], eff:'Swells hit half as hard, and your line is 15% stronger',
     blurb:'A sailor’s supper. Thick, peppery and good for the sea legs.'},
   pie:{name:'Mayor’s Banquet Pie', need:[{id:'mayor',n:1}], learn:'mayor', cook:'pan', form:'fillet', dish:'pie', side:'greens',
-    spice:{salt:2,pepper:1,dill:2,lemon:1}, zone:[.62,.76], speed:1.2, boost:[{k:'luck',v:.4}], eff:'+40% rarity luck', banquet:true,
+    spice:{salt:2,pepper:1,dill:2,lemon:1}, zone:[.62,.76], speed:1.2, boost:[{k:'luck',v:.4}], eff:'+40 luck', banquet:true,
     blurb:'A stargazy pie fit for a mayor. The whole town will want a slice.'}
 };
 const RECIPE_ORDER=['chowder','fry','gumbo','skewers','wraps','stew','bream','steak','pie'];

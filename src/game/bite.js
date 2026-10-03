@@ -1,6 +1,6 @@
 /* ---------- Waiting & bite ---------- */
 function startWaiting(){
-  S.wait={phase:'empty', t:rand(.75,2.1)*modMul('wait')*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1};
+  S.wait={phase:'empty', t:rand(.75,2.1)*modMul('wait',{spot:S.bob.spot})*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1};
   setState('waiting');
   if (S.bob.spot==='reeds') S.wait.t/=modMul('reedBite',{spot:'reeds'});
   if (S.tut){ S.tut='wait'; S.wait.t=.8; coach('Nice cast! Now wait. A fish will swim over to your bobber.','2 of 4'); }
@@ -53,11 +53,11 @@ function twitch(){
 }
 function spook(msg){
   const w=S.wait; if (w.sh){ w.sh.flee=true; w.sh.ang+=Math.PI; }
-  w.phase='empty'; w.t=rand(1.65,2.7)*modMul('wait'); w.attract=1; w.tw=[]; toast(msg,'warn');
+  w.phase='empty'; w.t=rand(1.65,2.7)*modMul('wait',{spot:S.bob&&S.bob.spot}); w.attract=1; w.tw=[]; toast(msg,'warn');
 }
 function triggerBite(){
   const w=S.wait, b=S.bob, F=FISH[w.fish];
-  S.bite={t:0, win:F.window*modMul('hook',{fish:w.fish}), fish:w.fish};
+  S.bite={t:0, win:F.window*modMul('hook',{fish:w.fish,spot:b.spot,lucky:w.lucky}), fish:w.fish};
   b.plunge=1; splash(b.x,b.y,9); ripple(b.x,b.y,34); sfx.bite(); buzz(30); pulse(.45);
   toast('Tap!','big'); setState('bite');
   if (S.tut){ S.tut='bite'; coach('It’s biting! Tap anywhere on the screen now!','3 of 4', true); }
@@ -71,7 +71,7 @@ function updateBite(dt){
 }
 function hook(){
   const b=S.bite, F=FISH[b.fish], R=RAR[F.rarity];
-  const perfect=b.t<=.3*modMul('perfect',{fish:b.fish});
+  const perfect=b.t<=.3*modMul('perfect',{fish:b.fish,spot:S.bob.spot,lucky:!!(S.wait&&S.wait.lucky)});
   if (perfect){ save.stats.perfect++; toast('Perfect hook!','good'); } else toast('Hooked!','');
   sfx.hook(perfect); buzz(perfect?[0,20,30,20]:25);
   S.freeze=R.hitstop+(perfect?.04:0); shake(F.rarity==='legendary'?10:F.rarity==='rare'?5:2); pulse(perfect?.35:.2);

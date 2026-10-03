@@ -38,7 +38,13 @@ npm run check    # check the content tables
 npm run build    # build the web app and build/cast-lab.html
 npm test         # check, build, then play every test (about 3 minutes)
 npm run verify   # confirm the committed web app matches src/
+npm run sim      # the 1,000-cast balance report (also in the game: Playtest > Balance)
+npm run sim -- --rod brasscap --spot deep --hour 6.5 --meal pie:3 --sets all
 ```
+
+**Bonuses.** Every bonus is a modifier in `src/game/mods.js`: a stat from `src/data/stats.js`, a value, and
+where it applies. A new rod perk, enchantment or relic is a list of modifiers in its data; the game, the
+journal's Bonuses page and the balance simulator all pick it up.
 
 **Adding content.** A new fish is an entry in `src/data/fish.js` plus its region list and bite weights.
 The checker catches a misspelled id, a size range upside down, a rod that costs less than the one before it,
