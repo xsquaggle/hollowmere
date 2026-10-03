@@ -12,8 +12,8 @@ function sewCost(){ const FS=findsState(); return FS.pockets>=POCKETS.max?null:P
 function sewPocket(){ const FS=findsState(), cost=sewCost(); if (cost==null || save.coins<cost) return false;
   addCoins(-cost); FS.pockets++; persist(); sfx.out('uncommon'); buzz([0,20,30,20]); news('Ottilie sewed on another pocket','gold'); return true; }
 const ownerHas = who => Object.keys(FINDS).filter(id=>FINDS[id].owner===who && hasFind(id) && !findsState().returned[id]);
-function foundWhere(h){ if (!h) return ''; const src=h.src==='return'?'A thank-you gift':LOOT_TIERS.includes(h.src)?'From '+aOrAn(CRATES[h.src].name.toLowerCase()):h.src==='playtest'?'From Playtest':'Pulled up loose';
-  return src+(h.reg?' · '+(h.spot&&h.src!=='return'?spotLabel(h.reg,h.spot):REGION_NAME[h.reg]):'')+(h.t?' · '+whenLabel(h.t,h.hr):''); }
+function foundWhere(h){ if (!h) return ''; const src=h.src==='return'?'A thank-you gift':h.src==='town'?'A gift from the town':LOOT_TIERS.includes(h.src)?'From '+aOrAn(CRATES[h.src].name.toLowerCase()):h.src==='playtest'?'From Playtest':'Pulled up loose';
+  return src+(h.reg?' · '+(h.spot&&h.src!=='return'&&h.src!=='town'?spotLabel(h.reg,h.spot):REGION_NAME[h.reg]):'')+(h.t?' · '+whenLabel(h.t,h.hr):''); }
 function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(hasFind), keeps=findList('keepsake').filter(hasFind);
   const all=Object.keys(FINDS), got=all.filter(hasFind).length, cost=sewCost();
   let h='<p class="fd-count"><b>'+got+'</b> of '+all.length+' finds'+(FS.treasure?' · '+FS.treasure+' treasure'+(FS.treasure===1?'':'s')+' pulled up':'')+'</p>';
@@ -41,7 +41,7 @@ function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(ha
 const rarInk = r => ({common:'#7A7468', uncommon:'#4E7B3E', rare:'#3B78B0', epic:'#7448A8', legendary:'#9A7322', exotic:'#24857A', mythic:'#3A3848', godly:'#9A7A22'})[r]||'#7A7468';
 function letterState(id){ const s=findsState().letters[id]; return s==='delivered'?'Delivered':s==='waiting'?'Waiting for Pell':'Not delivered'; }
 function findDetailHTML(id){ if (!id || !FINDS[id]) return ''; const D=FINDS[id], FS=findsState(), have=hasFind(id);
-  if (!have) return '<div class="fd-detail none"><h4>Not found yet</h4><p>'+(D.from==='return'?'Someone in town might give you this, if you find what they lost.':
+  if (!have) return '<div class="fd-detail none"><h4>Not found yet</h4><p>'+(D.from==='return'?'Someone in town might give you this, if you find what they lost.':D.from==='town'?'The town might give you this one day, if your cooking wins them over.':
     aOrAn(RAR[D.rarity].label.toLowerCase()+' '+D.kind).replace(/^a/,'A')+(rarRank(D.rarity)>=rarRank('exotic')?', only ever found in '+LOOT_TIERS.slice(rarRank(D.rarity)).map(cratesOf).join(' and ')+'.':D.region==='any'?'. It could turn up anywhere.':', somewhere around '+REGION_NAME[D.region]+'.'))+'</p></div>';
   const owed=D.owner && !FS.returned[id], O=D.owner&&OWNERS[D.owner];
   return '<div class="fd-detail rf" data-r="'+D.rarity+'"><canvas data-find="'+id+'" class="big"></canvas><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+D.kind+'</span><h4>'+D.name+'</h4><p class="lore">'+D.lore+'</p>'+

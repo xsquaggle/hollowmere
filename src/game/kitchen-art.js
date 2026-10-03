@@ -14,9 +14,13 @@ function drawSpecks(c,specks,L,h){ for (const s of specks){ const x=s.u*L, y=s.v
   else if (s.k==='pepper'){ c.fillStyle='#2E2924'; c.beginPath(); c.arc(0,0,1.7*r,0,Math.PI*2); c.fill(); }
   else if (s.k==='dill'){ c.strokeStyle='#4E8A3E'; c.lineWidth=1.4*r; c.lineCap='round'; c.beginPath(); c.moveTo(-3*r,0); c.lineTo(3*r,0); c.moveTo(0,0); c.lineTo(1.6*r,-2*r); c.stroke(); }
   else if (s.k==='lemon'){ c.strokeStyle='#E9C23A'; c.lineWidth=1.5*r; c.lineCap='round'; c.beginPath(); c.arc(0,0,2.6*r,0,Math.PI*1.2); c.stroke(); }
+  else if (s.k==='garlic'){ c.fillStyle='#F6F0DE'; c.beginPath(); c.ellipse(0,0,2.6*r,1.3*r,0,0,Math.PI*2); c.fill(); c.strokeStyle='rgba(150,130,90,.6)'; c.lineWidth=.6; c.stroke(); }
+  else if (s.k==='fennel'){ c.fillStyle='#8E9A4E'; c.beginPath(); c.ellipse(0,0,2.2*r,.9*r,0,0,Math.PI*2); c.fill(); c.strokeStyle='rgba(70,60,30,.6)'; c.lineWidth=.5; c.beginPath(); c.moveTo(-1.8*r,0); c.lineTo(1.8*r,0); c.stroke(); }
   else { c.fillStyle='rgba(200,85,61,.85)'; c.beginPath(); c.arc(0,0,2.1*r,0,Math.PI*2); c.fill(); }
   c.restore(); } }
-/* o: {fid, L, top: doneness shown on the visible face, edge: browning creeping up from the pan, marks: grill marks 0..1, specks, form} */
+/** The fish's flesh, raw: its own color, or a smoked fish's amber. */
+function fleshOf(o){ const raw=FLESH[o.fid]||'#F1D3BC'; if (!o.smoked) return raw; const A=hexRGB(raw), B=hexRGB('#B87445'); return '#'+A.map((v,i)=>Math.round(lerp(v,B[i],.55)).toString(16).padStart(2,'0')).join(''); }
+/* o: {fid, L, top: doneness shown on the visible face, edge: browning creeping up from the pan, marks: grill marks 0..1, specks, form, smoked} */
 function drawFood(c,o){
   const form=o.form||'fillet';
   if (form==='skewer') return drawSkewer(c,o);
@@ -25,7 +29,7 @@ function drawFood(c,o){
   if (form==='wrap' && o.wrapped) drawWrapLeaf(c,o);
 }
 function drawFilletBody(c,o){
-  const L=o.L, h=L*.36, F=FISH[o.fid], raw=FLESH[o.fid]||'#F1D3BC', top=o.top||0, p=filletPath(L);
+  const L=o.L, h=L*.36, F=FISH[o.fid], raw=fleshOf(o), top=o.top||0, p=filletPath(L);
   c.save(); c.fillStyle='rgba(40,20,10,.22)'; c.translate(L*.012,L*.024); c.fill(p); c.restore();
   c.fillStyle=cookCol(raw,top); c.fill(p);
   c.save(); c.clip(p);
@@ -51,7 +55,7 @@ function drawWrapLeaf(c,o){
   c.restore();
 }
 function drawSkewer(c,o){
-  const L=o.L, raw=FLESH[o.fid]||'#F1D3BC', top=o.top||0, cs=L*.2;
+  const L=o.L, raw=fleshOf(o), top=o.top||0, cs=L*.2;
   c.save(); c.lineCap='round';
   c.strokeStyle=INK; c.lineWidth=L*.035+2.4; c.beginPath(); c.moveTo(-L*.58,0); c.lineTo(L*.6,0); c.stroke();
   c.strokeStyle='#C99B62'; c.lineWidth=L*.035; c.stroke();
@@ -68,7 +72,7 @@ function drawSkewer(c,o){
   c.restore();
 }
 function drawSteak(c,o){
-  const L=o.L, F=FISH[o.fid], raw=FLESH[o.fid]||'#F1D3BC', top=o.top||0, rx=L*.4, ry=L*.31;
+  const L=o.L, F=FISH[o.fid], raw=fleshOf(o), top=o.top||0, rx=L*.4, ry=L*.31;
   c.save(); c.fillStyle='rgba(40,20,10,.22)'; c.beginPath(); c.ellipse(L*.012,L*.026,rx,ry,0,0,Math.PI*2); c.fill();
   c.beginPath(); c.ellipse(0,0,rx,ry,0,0,Math.PI*2); c.fillStyle=cookCol(raw,top); c.fill(); c.save(); c.clip();
   c.strokeStyle=mixHex(F.color,'#3A2A24',top*.7); c.lineWidth=L*.06; c.stroke();
@@ -101,7 +105,7 @@ function drawPlate(c,R){
   c.beginPath(); c.arc(0,0,R*.74,0,Math.PI*2); c.fillStyle=g; c.fill(); c.strokeStyle='rgba(43,42,51,.14)'; c.lineWidth=1.5; c.stroke();
   c.restore();
 }
-const BROTH={gumbo:'#B4613C', stew:'#9C8D4E', chowder:'#EAD9B4'};
+const BROTH={gumbo:'#B4613C', stew:'#9C8D4E', chowder:'#EAD9B4', kedgeree:'#E7C25E', pepperpot:'#9E3B26'};
 function drawBowl(c,R,o){ // o: {rid, fid, top, filled, t}
   c.save(); c.fillStyle='rgba(30,15,5,.28)'; c.beginPath(); c.ellipse(4,8,R*1.04,R,0,0,Math.PI*2); c.fill();
   c.beginPath(); c.arc(0,0,R,0,Math.PI*2); c.fillStyle='#3F6C8A'; c.fill(); c.lineWidth=2; c.strokeStyle=INK; c.stroke();
@@ -109,7 +113,7 @@ function drawBowl(c,R,o){ // o: {rid, fid, top, filled, t}
   c.fillStyle='#F4EEE2'; for (let i=0;i<12;i++){ const a=i/12*Math.PI*2; c.beginPath(); c.arc(Math.cos(a)*R*.93,Math.sin(a)*R*.93,R*.025,0,Math.PI*2); c.fill(); }
   if (o && o.filled){ const r=R*.76, col=BROTH[o.rid]||'#D9A35E'; c.beginPath(); c.arc(0,0,r,0,Math.PI*2);
     const g=c.createRadialGradient(-r*.3,-r*.3,r*.1,0,0,r); g.addColorStop(0,mixHex(col,'#FFFFFF',.25)); g.addColorStop(1,mixHex(col,'#2B2A33',.18)); c.fillStyle=g; c.fill();
-    c.save(); c.clip(); const rnd=seeded(o.rid+'b'), raw=FLESH[o.fid]||'#F1D3BC';
+    c.save(); c.clip(); const rnd=seeded(o.rid+'b'), raw=fleshOf(o);
     for (let i=0;i<7;i++){ const a=rnd()*Math.PI*2, d=rnd()*r*.62, x=Math.cos(a)*d, y=Math.sin(a)*d, s=r*(.16+rnd()*.08);
       c.save(); c.translate(x,y); c.rotate(rnd()*3); rrect(c,-s/2,-s*.4,s,s*.8,s*.3); c.fillStyle=cookCol(raw,Math.min(.75,(o.top||.6))); c.fill(); c.strokeStyle='rgba(43,42,51,.55)'; c.lineWidth=1.2; c.stroke(); c.restore(); }
     for (let i=0;i<14;i++){ const a=rnd()*Math.PI*2, d=rnd()*r*.8; c.fillStyle=['#4E8A3E','#E9C23A','#C8553D'][i%3]; c.globalAlpha=.8; c.beginPath(); c.arc(Math.cos(a)*d,Math.sin(a)*d,1.6,0,Math.PI*2); c.fill(); }

@@ -8,6 +8,7 @@
 //   node tools/simulate.mjs --rod ash --ench swift,magpie   runes etched onto the rod (data/enchant.js)
 //   node tools/simulate.mjs --runes                   every rune against none, where each one shows what it does
 //   node tools/simulate.mjs --idle                    what traps and the smoke rack earn, beside active fishing
+//   node tools/simulate.mjs --orders                  what supper orders pay beside active fishing, and how long the standings take
 //   node tools/simulate.mjs --compare-luck           the standard report, before and after step 12's luck curve
 //   node tools/simulate.mjs --json                   machine-readable output
 import { existsSync } from 'node:fs';
@@ -83,6 +84,38 @@ function runeRuns() { const rows = [];
 const runs = opt.tackle ? tackleRuns() : opt.runes ? runeRuns() : Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'lucky', 'player', 'reel', 'line', 'bait', 'ench'].includes(k)) ? custom() : STANDARD;
 const casts = +(opt.casts || 1000);
 if (opt.idle) { await idleReport(); process.exit(0); }
+if (opt.orders) { await ordersReport(); process.exit(0); }
+/** Supper orders: the tips a typical ticket pays at a few stages, per minute of cooking, beside active fishing; and
+    the Town reputation a steady cook earns, evening by evening, to each standing. */
+async function ordersReport() {
+  const browser = await chromium.launch(); const p = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await p.goto('file://' + page + '?nointro'); await p.waitForTimeout(500);
+  const r = await p.evaluate((casts) => { const hm = window.__hm, O = hm.orders, out = { stages: [], rep: [] }, MIN = 1.25;   // a cook takes about 75 seconds
+    const worth = rid => { const n = hm.RECIPES[rid].need[0]; return n.id ? hm.FISH[n.id].value * n.n : n.rar === 'common' ? 2.6 * n.n : 9 * n.n; };
+    const stages = [['Willow Switch · lake open, noon', { rod: 'willow' }, ['chowder', 'fry', 'gumbo', 'wraps']], ['Ash Caster · lake deep, dusk', { rod: 'ash', spot: 'deep', hour: 18.5 }, ['chowder', 'fry', 'gumbo', 'wraps', 'skewers', 'stew']],
+      ['Saltline · coast, every spot', { rod: 'saltline', region: 'coast', spot: 'mix' }, ['chowder', 'gumbo', 'stew', 'bream', 'steak', 'skewers']], ['Deepwater · coast, every spot', { rod: 'deepwater', region: 'coast', spot: 'mix' }, ['stew', 'bream', 'steak', 'pepperpot', 'kedgeree']]];
+    for (const [label, st, rids] of stages) { const a = hm.simulate(st, casts), perMin = a.coinsPerHour / 60 * .5; hm.save.stats.catchAvg = a.coinsPerCatch;   // tips keep pace with what a catch is worth
+      const tip = s => rids.reduce((t, rid) => t + O.tip({ who: 'ottilie', kind: 'dish', rid, tw: ['done:well', 'more:pepper'] }, s, rid === 'kedgeree' ? hm.FISH.mossback.value * 1.4 : worth(rid)), 0) / rids.length;
+      const fish = rids.reduce((t, rid) => t + (rid === 'kedgeree' ? hm.FISH.mossback.value * 1.4 : worth(rid)), 0) / rids.length;
+      out.stages.push({ label, t2: Math.round(tip(2)), t3: Math.round(tip(3)), fish: Math.round(fish), perMin: Math.round(tip(3) / MIN), active: Math.round(perMin), share: Math.round(tip(3) / MIN / perMin * 100), share2: Math.round(tip(2) / MIN / perMin * 100) }); }
+    // reputation: a steady cook gets two or three stars, with the standing's usual twists, and does every ticket
+    let rep = 0, ev = 0; const per = st => { const [lo, hi] = hm.ORDERS.twists[st], tw = (lo + hi) / 2, n = hm.ORDERS.count[st >= 1 ? 1 : 0];
+      return n * ((hm.ORDERS.rep.stars[2] + hm.ORDERS.rep.stars[3]) / 2 + tw * hm.ORDERS.rep.twist) + (st >= 1 ? hm.ORDERS.grey.chance * hm.ORDERS.rep.grey : 0) + (st >= 2 ? (hm.ORDERS.delicacy.chance * .5 + hm.ORDERS.smoked.chance * .2) * hm.ORDERS.rep.special : 0); };   // a Delicacy around half the evenings, a smoked fish of the right kind a fifth
+    for (let i = 1; i < hm.STANDINGS.length; i++){ while (rep < hm.STANDINGS[i].at){ let st = 0; while (st + 1 < hm.STANDINGS.length && rep >= hm.STANDINGS[st + 1].at) st++; rep += per(st); ev++; }
+      out.rep.push({ name: hm.STANDINGS[i].name, at: hm.STANDINGS[i].at, evenings: ev, hours: Math.round(ev * 24 / 60 * 10) / 10 }); }
+    // a Delicacy order beside selling the Delicacy: the tip replaces the sale, so what it adds is the difference
+    out.del = []; const hrs = hm.SMOKE.delicacy.hours;
+    for (const id of ['mossback', 'grouper', 'mayor', 'saltjaw']) { const v = hm.FISH[id].value, worth = Math.round(v * hm.SMOKE.delicacy.x), T = { who: 'ottilie', kind: 'delicacy', side: 'bread', tw: [] };
+      const t2 = O.tip(T, 2, worth), t3 = O.tip(T, 3, worth); out.del.push({ id, v, worth, t2, t3, extra: Math.round((t3 - worth) / hrs) }); }
+    return out; }, casts);
+  await browser.close();
+  console.log('\nWhat a typical ticket tips (two twists), beside active fishing at a real player\'s pace (half the simulator\'s). A cook takes about 75 seconds:\n\n| Stage | Fish used, worth | Tips at 2 stars | Tips at 3 stars | Tips a minute of cooking (3 stars) | Active coins a minute | Share at 3 stars | at 2 stars |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |');
+  for (const s of r.stages) console.log(`| ${s.label} | ${s.fish} | ${s.t2} | ${s.t3} | ${s.perMin} | ${s.active} | ${s.share}% | ${s.share2}% |`);
+  console.log('\nTown reputation, doing every ticket at two or three stars (an in-game evening is 24 minutes of play):\n\n| Standing | Reputation | Evenings | Hours of play |\n| --- | ---: | ---: | ---: |');
+  for (const x of r.rep) console.log(`| ${x.name} | ${x.at} | ${x.evenings} | ${x.hours} |`);
+  console.log('\nA Delicacy order (Ottilie, plate only) beside selling the Delicacy. It takes the Delicacy, so it adds the difference, per hook-hour of smoking:\n\n| Fish (fresh) | Delicacy sells for | Order at 2 stars | at 3 stars | Adds per hook-hour at 3 stars |\n| --- | ---: | ---: | ---: | ---: |');
+  for (const d of r.del) console.log(`| ${d.id} (${d.v}) | ${d.worth} | ${d.t2} | ${d.t3} | +${d.extra} |`);
+}
 /** Traps and the smoke rack, worked out from the tables, beside what active fishing earns at a few stages. */
 async function idleReport() {
   const browser = await chromium.launch(); const p = await browser.newPage({ viewport: { width: 390, height: 844 } });

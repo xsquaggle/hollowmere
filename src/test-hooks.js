@@ -12,7 +12,7 @@ window.__hm={ get save(){ return save; }, FISH, RODS, REGION_FISH, RECIPES, DECO
       for (let i=0;i<4;i++) drawHeronFlying(60+i*90,340,1.6,1,i*.2);
       drawGreyWading(60,470,1.4,1); drawTrapOnDeck(ctx,'lake',190,460,1.4,1,true); drawTrapOnDeck(ctx,'coast',300,460,1.4,1,false);
       return cv.toDataURL('image/png'); },
-    drawFish:(...a)=>drawFish(...a), drawSmokedFish:(...a)=>drawSmokedFish(...a), drawTackle:(...a)=>drawTackle(...a), drawRig:(...a)=>drawRig(...a), drawGeode:(...a)=>drawGeode(...a), drawRune:(...a)=>drawRune(...a), drawGlimGem:(...a)=>drawGlimGem(...a) }, openShop:t=>openShop(t),
+    drawPortrait:(...a)=>drawPortrait(...a), drawFish:(...a)=>drawFish(...a), drawSmokedFish:(...a)=>drawSmokedFish(...a), drawTackle:(...a)=>drawTackle(...a), drawRig:(...a)=>drawRig(...a), drawGeode:(...a)=>drawGeode(...a), drawRune:(...a)=>drawRune(...a), drawGlimGem:(...a)=>drawGlimGem(...a) }, openShop:t=>openShop(t),
   ENCH, GLIMMER, ench:{ state:()=>enchState(), forRod:r=>enchFor(r||save.rod), on:id=>enchOn(id), etch:(id,at)=>etchRune(id,at), socket:(id,at)=>socketRune(id,at), unsocket:at=>unsocketRune(at),
     glimmer:(n,o)=>addGlimmer(n,o), wander:r=>wanderCount(r||REG()), echo:()=>S.echo },
   TRAPS, FITTINGS, SMOKE, AWAY, idleReport:{ trapExpect:(...a)=>trapExpect(...a), trapsPerHour:(...a)=>trapsPerHour(...a), hookPerHour:(...a)=>hookPerHour(...a) },
@@ -22,6 +22,13 @@ window.__hm={ get save(){ return save; }, FISH, RODS, REGION_FISH, RECIPES, DECO
     shift(ms){ for (const T of trapState().list) T.t-=ms; for (const h of smokeState().hooks) if (h) h.t-=ms; if (save.lastPlayed) save.lastPlayed-=ms; },
     away:ms=>applyAway(ms), smoke:()=>smokeState(), hang:i=>hangFish(i), down:(k,sell)=>takeDown(k,sell), smokeValue:k=>{ smokeTick(); return smokeValue(smokeState().hooks[k]); }, grey:()=>S.grey&&{phase:S.grey.phase,n:S.grey.T.n}, gull:()=>!!S.gullPot },
   setState:s=>setState(s), persist:()=>persist(), realNow:()=>realNow(),
+  ORDERS, TOWNSFOLK, STANDINGS, UPGRADES, VISITS,
+  orders:{ state:()=>ordersState(), open:()=>ordersOpen(), tick:()=>ordersTick(), batch:()=>makeBatch(), make:(who,st,del)=>makeTicket(who,st==null?standing():st,[],del), standing:()=>standing(), hasUp:id=>hasUp(id),
+    tip:(T,st,w)=>orderTip(T,st,w), rep:(T,st)=>orderRep(T,st), serve:(T,st,w)=>serveOrder(T,st,w), spice:T=>ticketSpice(T), zone:T=>ticketZone(T), lines:T=>ticketLines(T), worth:T=>ticketWorth(T),
+    pick:T=>pickOrder(T), cook:id=>{ const T=ordersState().list.find(o=>o.id===id); if (T) startCooking(null,T); return !!T; }, spices:()=>spicesOn(), hooks:()=>smokeHooks(), delicacyHours:()=>delicacyHours(),
+    k:()=>({mode:K.mode, sts:kSts(), order:K.order&&K.order.id, smoked:K.smoked, st:K.st&&K.st.kind, zone:kR()&&kZone(), spice:kR()&&kSpice(), jars:K.st&&K.st.jars&&K.st.jars.map(j=>j.k)}),
+    // finish the station in hand with these scores, as if played (for tests that aren't about the stations themselves)
+    finish:sc=>{ for (const k of kSts()) K.scores[k]=sc; showResult(); }, jump:k=>{ for (const q of kSts()){ if (q===k) break; K.scores[q]=K.scores[q]||85; } ({clean:startClean,season:startSeason,cook:startCook,plate:startPlate})[k](); }, visit:()=>ORDK.visit&&{who:ORDK.visit.who, key:ORDK.visit.key, line:ORDK.visit.line}, grey:()=>greyPick(), want:()=>ordersWant(), restore:()=>kRestore() },
   hud:{ coins:n=>addCoins(n), eat:(id,stars)=>eatMeal(id,stars||3), lv:()=>HUD.lv, refit:()=>{ HUD.sig=''; fitHud(); return HUD.lv; } },
   treasure(o){ TREASURE_CTL.off=o===false; TREASURE_CTL.force=o&&o.kind?o:null; }, findsState:()=>findsState(), rollTreasure:c=>rollTreasure(c||{spot:'open'}),
   rollCrateTier:c=>rollCrateTier(c||{spot:'open'}), treasureChance:c=>treasureChance(c||{spot:'open'}), openLoot:(l,c)=>openLoot(l,c||{spot:'open'}), modAdd:(s,c)=>modAdd(s,c), castReach:()=>castReach(), gullMul:()=>gullMul(),

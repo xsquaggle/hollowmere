@@ -1,16 +1,20 @@
 /* ---------- The smoke rack in the kitchen (data/idle.js: SMOKE) ---------- */
 /* save.smoke = {hooks:[{f (the keepnet fish), t (last counted, ms), ms (time smoked)} or null, one per hook]}.
    A fish gains value as it smokes, on an ease-out curve up to SMOKE.gain at SMOKE.full hours. A fish of
-   SMOKE.delicacy.rarityMin or rarer left SMOKE.delicacy.hours becomes a Hollowmere Delicacy. Time counts in real time,
+   SMOKE.delicacy.rarityMin or rarer left SMOKE.delicacy.hours (fewer with the better smoker) becomes a Hollowmere Delicacy. Time counts in real time,
    playing or not, at most AWAY.cap hours at a stretch, and a clock set backwards gives nothing. */
 let SMOKE_OK=null;   // the save object smokeState last tidied
-function smokeState(){ if (SMOKE_OK===save && isObj(save.smoke)) return save.smoke; SMOKE_OK=save; if (!isObj(save.smoke)) save.smoke={}; const s=save.smoke; if (!Array.isArray(s.hooks)) s.hooks=[];
-  s.hooks=s.hooks.slice(0,SMOKE.hooks).map(h=>isObj(h) && isObj(h.f) && FISH[h.f.id] ? h : null); while (s.hooks.length<SMOKE.hooks) s.hooks.push(null);
+/** Hooks on the rack, and the hours to a Delicacy: SMOKE's, or the better smoker's once the town gives you one (data/orders.js). */
+const smokeHooks = () => SMOKE.hooks+(hasUp('smoker')?UPGRADES.smoker.hooks:0);
+const delicacyHours = () => hasUp('smoker')?UPGRADES.smoker.delicacyHours:SMOKE.delicacy.hours;
+function smokeState(){ if (SMOKE_OK===save && isObj(save.smoke)) return save.smoke; SMOKE_OK=save; if (!isObj(save.smoke)) save.smoke={}; const s=save.smoke, n=smokeHooks(); if (!Array.isArray(s.hooks)) s.hooks=[];
+  // a fish on a hook past the count stays on (it can't be lost); only empty hooks beyond it go
+  s.hooks=s.hooks.map(h=>isObj(h) && isObj(h.f) && FISH[h.f.id] ? h : null); while (s.hooks.length>n && !s.hooks[s.hooks.length-1]) s.hooks.pop(); while (s.hooks.length<n) s.hooks.push(null);
   for (const h of s.hooks) if (h){ if (typeof h.t!=='number' || !isFinite(h.t)) h.t=realNow(); if (!(h.ms>=0)) h.ms=0; } return s; }
 /** Brings the rack up to now. Like a trap, a clock set backwards waits for real time to catch up (save.js: realNow). */
 function smokeTick(now){ now=now||realNow(); for (const h of smokeState().hooks) if (h){ const dt=now-h.t; if (dt>0){ h.t=now; h.ms+=Math.min(dt,AWAY.cap*3600000); } else if (dt<-CLOCK_FIX) h.t=now; } }
 const smokeHours = h => h.ms/3600000;
-function isDelicacy(h){ const D=SMOKE.delicacy; return rarRank(FISH[h.f.id].rarity)>=rarRank(D.rarityMin) && smokeHours(h)>=D.hours; }
+function isDelicacy(h){ const D=SMOKE.delicacy; return rarRank(FISH[h.f.id].rarity)>=rarRank(D.rarityMin) && smokeHours(h)>=delicacyHours(); }
 const canDelicacy = f => rarRank(FISH[f.id].rarity)>=rarRank(SMOKE.delicacy.rarityMin);
 /** How much more a fish is worth after `hrs` of smoke (1 to 1+gain), before it turns Delicacy. */
 function smokeGain(hrs){ const u=clamp(hrs/SMOKE.full,0,1); return 1+SMOKE.gain*(1-(1-u)*(1-u)); }
@@ -34,11 +38,11 @@ function rackReady(){ smokeTick(); return smokeState().hooks.filter(h=>h && smok
 /* ---------- in the kitchen ---------- */
 function smokeLine(h){ const hrs=smokeHours(h), del=isDelicacy(h), pct=Math.round((smokeMul(h)-1)*100);
   if (del) return 'A Hollowmere Delicacy · '+(SMOKE.delicacy.x)+'× its fresh value';
-  const next=canDelicacy(h.f) ? (hrs<SMOKE.delicacy.hours?' · a Delicacy in '+fmtMins((SMOKE.delicacy.hours-hrs)*60):'') : (hrs<SMOKE.full?' · best at '+SMOKE.full+' h':' · as smoked as it gets');
+  const next=canDelicacy(h.f) ? (hrs<delicacyHours()?' · a Delicacy in '+fmtMins((delicacyHours()-hrs)*60):'') : (hrs<SMOKE.full?' · best at '+SMOKE.full+' h':' · as smoked as it gets');
   return (hrs<1/60?'Just hung':'Smoked '+fmtMins(hrs*60))+(pct?' · +'+pct+'%':'')+next; }
-function smokeBarPct(h){ const goal=canDelicacy(h.f)?SMOKE.delicacy.hours:SMOKE.full; return Math.round(Math.min(1,smokeHours(h)/goal)*100); }
+function smokeBarPct(h){ const goal=canDelicacy(h.f)?delicacyHours():SMOKE.full; return Math.round(Math.min(1,smokeHours(h)/goal)*100); }
 function rackHTML(){ smokeTick(); const s=smokeState(), n=s.hooks.filter(Boolean).length;
-  let h='<h3 class="k-h">Smoke rack <span>'+n+'/'+SMOKE.hooks+'</span></h3><div class="k-rack">';
+  let h='<h3 class="k-h">Smoke rack <span>'+n+'/'+s.hooks.length+'</span></h3><div class="k-rack">';
   s.hooks.forEach((hk,i)=>{ if (!hk){ h+='<div class="k-hook empty"><span class="k-hook-ic" aria-hidden="true"></span><div><h4>Empty hook</h4><p>Hang a fish from your keepnet. It sells for more the longer it smokes.</p></div><button class="btn" data-hang="'+i+'" type="button"'+(save.net.some(smokable)?'':' disabled')+'>'+(save.net.some(smokable)?'Hang a fish':save.net.length?'Nothing to hang':'Keepnet empty')+'</button></div>'; return; }
     const F=FISH[hk.f.id], v=smokeValue(hk), del=isDelicacy(hk);
     h+='<div class="k-hook'+(del?' del':'')+'"><canvas data-smoked="'+hk.f.id+'" data-u="'+smokeBarPct(hk)+'"'+(del?' data-del="1"':'')+' aria-hidden="true"></canvas><div><h4>'+(del?'Delicacy: ':'Smoked ')+F.name+'</h4><p>'+smokeLine(hk)+'</p><p class="k-casts"><i style="width:'+smokeBarPct(hk)+'%"></i></p></div>'+
@@ -50,7 +54,7 @@ function bindRack(el){
   el.querySelectorAll('[data-keephook]').forEach(b=>b.addEventListener('click',()=>{ const r=takeDown(+b.dataset.keephook,false); if (!r) return; sfx.plop(); news(r.delicacy?'A Delicacy, into the keepnet':'Into the keepnet, smoked','good'); kBook(); })); }
 /** Picking a keepnet fish to hang: the list, best first. */
 function openHangPicker(){ const el=$('kBook'); const list=save.net.map((f,i)=>({f,i})).filter(o=>smokable(o.f)).sort((a,b)=>b.f.value-a.f.value);
-  let h='<section class="k-now k-pick-head"><div><span class="k-lab">Smoke rack</span><h4>Hang which fish?</h4><p>A rare fish or rarer, left '+SMOKE.delicacy.hours+' hours, becomes a Hollowmere Delicacy.</p></div><button class="btn" id="kPickBack" type="button">Back</button></section><h3 class="k-h">Your keepnet</h3><div class="k-picks">';
+  let h='<section class="k-now k-pick-head"><div><span class="k-lab">Smoke rack</span><h4>Hang which fish?</h4><p>A rare fish or rarer, left '+delicacyHours()+' hours, becomes a Hollowmere Delicacy.</p></div><button class="btn" id="kPickBack" type="button">Back</button></section><h3 class="k-h">Your keepnet</h3><div class="k-picks">';
   for (const {f,i} of list){ const F=FISH[f.id]; h+='<button type="button" class="k-pick" data-pick="'+i+'"><canvas data-f="'+f.id+'" aria-hidden="true"></canvas><span><b>'+F.name+'</b><small style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+(canDelicacy(f)?' · can become a Delicacy':'')+'</small></span><em>'+f.value+'</em></button>'; }
   el.innerHTML=h+'</div>'; el.scrollTop=0;
   el.querySelectorAll('canvas[data-f]').forEach(c=>{ const r=layoutBox(c), d=Math.min(window.devicePixelRatio||1,2); c.width=r.width*d; c.height=r.height*d; const x=c.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); drawFish(x,c.dataset.f,r.width*.8,false); });

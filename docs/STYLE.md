@@ -56,6 +56,11 @@ Step 16, the art pass, brought everything older up to this bar: the scene in par
   - Grey wades beside a full trap with the shoreline heron's own drawing, and flies home with swept wings and spread primaries. A gull sits on a full sea pot.
   - Hauling one up lifts the trap out on its line, tips the catch out in a bounce, and sends coins up to the coin chip.
   - Smoked fish come from the species' own drawing, recolored toward amber at its own lightness and darkened as it smokes, with slanted smoke marks and a glaze. A Delicacy is glazed gold with soft four-point glints. The ink outline always stays ink.
+- **Order art** lives in `src/game/portrait-art.js` and `src/styles/orders.css`.
+  - Portraits are head and shoulders in the townsfolk's own colors (the same people as on the dock), shaded in 3–4 values with ink outlines, over the lake at this hour. They have four moods: waiting, pleased, put out, and talking (for visits).
+  - Tickets are cream paper with a red pin and a dashed rule, each a touch askew, and drop in with a small bounce. During Season the order's ticket hangs top right; when it would reach the jars it goes two columns ("none, please" underneath), and if even that does, the jars come down a little.
+  - The customer waits in the kitchen window, behind the glass and the glazing bars (dimmed at night, with the curtains drawn over), and hops when it's good.
+  - The served card shows their face and words, the tips and reputation, and the standing bar filling. A new standing glows gold.
 - **Fish up close:** past 44 px a fish gets a gill line, a side fin, a darker back, a mouth and a glint in its eye; past 80 px, fin rays, a lateral line and scales. Catfish, eels, and fish whose pattern already reads as scales don't get extra scales.
 
 ## Rarity kit

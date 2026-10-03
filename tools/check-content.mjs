@@ -18,6 +18,7 @@ const bad = (where, msg) => problems.push(where + ': ' + msg);
 const isNum = v => typeof v === 'number' && Number.isFinite(v);
 const isStr = v => typeof v === 'string' && v.trim().length > 0;
 const isHex = v => typeof v === 'string' && /^#[0-9A-Fa-f]{6}$/.test(v);
+const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
 const keys = o => Object.keys(o || {});
 const need = (where, obj, spec) => {           // spec: {field: 'str'|'num+'|'num0'|'hex'|'bool'|'fn'|'arr'|'01'}
   for (const [k, t] of Object.entries(spec)) {
@@ -33,8 +34,9 @@ const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, SPOT_NAME, REGION_FI
   RODS, ROD_ORDER, SEA_RODS, PARTS, PAINTS, OTT_LINES, BAR_LINES, BANQUET_LINES, LETTER,
   TANKS, TIP_BASE, DECOR, TANK_SETS, SPICES, SPICE_ORDER, SIDES, FLESH, COOK_NAME, RECIPES, RECIPE_ORDER, MUSH, MEAL_STR, MEAL_CASTS,
   CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER,
-  TRAPS, TRAP_UNLOCK, FITTINGS, FITTING_ORDER, TRAP_GLIMMER, SMOKE, AWAY } = D;
-for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER, TRAPS, FITTINGS, FITTING_ORDER, SMOKE, AWAY }))
+  TRAPS, TRAP_UNLOCK, FITTINGS, FITTING_ORDER, TRAP_GLIMMER, SMOKE, AWAY,
+  SPICE_MORE, ORDERS, TOWNSFOLK, TOWNSFOLK_ORDER, STANDINGS, UPGRADES, VISITS, PLATTER } = D;
+for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER, TRAPS, FITTINGS, FITTING_ORDER, SMOKE, AWAY, ORDERS, TOWNSFOLK, STANDINGS, UPGRADES, VISITS, PLATTER }))
   if (!v) { console.error('Missing table ' + n + ' in src/data/.'); process.exit(1); }
 
 /* ---------- fish ---------- */
@@ -111,17 +113,19 @@ for (const s of TANK_SETS) { const w = 'TANK_SETS.' + s.id; need(w, s, { name: '
     if (s.check([])) bad(w, 'is complete with an empty tank'); if (!s.check(full)) bad(w, `can never be completed from the ${s.tank} tank's fish`); } }
 
 /* ---------- kitchen ---------- */
-const FORMS = ['fillet', 'skewer', 'wrap', 'steak'], DISHES = ['bowl', 'plate', 'pie'];                         // drawn in game/kitchen-art.js
+const FORMS = ['fillet', 'skewer', 'wrap', 'steak', 'whole'], DISHES = ['bowl', 'plate', 'pie'];                         // drawn in game/kitchen-art.js
 const BOOSTS = keys(STATS).filter(k => STATS[k].kind === 'mul' || STATS[k].kind === 'luck');                       // meal boosts are modifiers on these stats
-sameSet('SPICE_ORDER', SPICE_ORDER, keys(SPICES), 'SPICE_ORDER and SPICES');
+sameSet('SPICE_ORDER', [...SPICE_ORDER, ...(SPICE_MORE || [])], keys(SPICES), 'SPICE_ORDER and SPICE_MORE, and SPICES'); noDupes('SPICE_ORDER', [...SPICE_ORDER, ...(SPICE_MORE || [])]);
 for (const k of keys(SPICES)) need('SPICES.' + k, SPICES[k], { name: 'str', short: 'str', col: 'hex', glass: 'hex', lid: 'hex' });
 for (const id of FIDS) if (!isHex(FLESH[id])) bad('FLESH', 'no cooked color for ' + id);
 noDupes('RECIPE_ORDER', RECIPE_ORDER); sameSet('RECIPE_ORDER', RECIPE_ORDER, keys(RECIPES), 'RECIPE_ORDER and RECIPES');
 for (const id of keys(RECIPES)) { const R = RECIPES[id], w = 'RECIPES.' + id;
   need(w, R, { name: 'str', eff: 'str', blurb: 'str', speed: 'num+', need: 'arr', boost: 'arr', zone: 'arr' });
   if (R.learn !== null) oneOf(w + '.learn', R.learn, FIDS, 'fish');
+  if (R.rep !== undefined && !(Number.isInteger(R.rep) && R.rep > 0 && R.rep < STANDINGS.length && R.learn === null)) bad(w + '.rep', 'a standing in STANDINGS (above 0), for a recipe no fish teaches');
+  if (R.rep && Object.keys(R.spice || {}).some(sp => (SPICE_MORE || []).includes(sp)) && R.rep < STANDINGS.findIndex(St => St.up === 'spices')) bad(w, 'uses a spice from the bigger spice rack before the town gives it to you');
   oneOf(w + '.cook', R.cook, keys(COOK_NAME), 'cooking method'); oneOf(w + '.form', R.form, FORMS, 'form'); oneOf(w + '.dish', R.dish, DISHES, 'dish'); oneOf(w + '.side', R.side, keys(SIDES), 'side');
-  for (const n of R.need || []) { if (n.id) oneOf(w + '.need', n.id, FIDS, 'fish'); else if (n.rar) oneOf(w + '.need', n.rar, RARS, 'rarity'); else bad(w + '.need', 'each need names an id or a rar'); if (!(Number.isInteger(n.n) && n.n > 0)) bad(w + '.need', 'n should be a whole number'); }
+  for (const n of R.need || []) { if (n.id) oneOf(w + '.need', n.id, FIDS, 'fish'); else if (n.rar) oneOf(w + '.need', n.rar, RARS, 'rarity'); else if (!n.smoked) bad(w + '.need', 'each need names an id, a rar, or smoked:true'); if (!(Number.isInteger(n.n) && n.n > 0)) bad(w + '.need', 'n should be a whole number'); }
   for (const [sp, c] of Object.entries(R.spice || {})) { oneOf(w + '.spice', sp, keys(SPICES), 'spice'); if (!(Number.isInteger(c) && c > 0 && c <= 4)) bad(w + '.spice.' + sp, 'pinches should be 1 to 4'); }
   if (!(R.zone && R.zone[0] > 0 && R.zone[0] < R.zone[1] && R.zone[1] < 1)) bad(w, 'zone should be [start, end] inside 0..1');
   for (const b of R.boost || []) { oneOf(w + '.boost', b.k, BOOSTS, 'meal boost'); if (!isNum(b.v) || b.v === 0) bad(w + '.boost.' + b.k, 'v should be a nonzero number'); }
@@ -193,13 +197,13 @@ for (const id of keys(FINDS)) { const F = FINDS[id], w = 'FINDS.' + id;
   need(w, F, { name: 'str', lore: 'str' }); oneOf(w + '.kind', F.kind, FKINDS, 'find kind'); oneOf(w + '.rarity', F.rarity, CT, 'crate tier'); oneOf(w + '.region', F.region, [...REGIONS, 'any'], 'region');
   if (F.kind === 'curio') { if (F.mods || F.eff) bad(w, 'curios do nothing: no mods or eff'); }
   else { need(w, F, { eff: 'str', mods: 'arr' }); if (!(F.mods || []).length) bad(w, 'an artifact or keepsake needs at least one modifier'); (F.mods || []).forEach((m, i) => checkMod(`${w}.mods[${i}]`, m)); if (F.down !== undefined && !isStr(F.down)) bad(w + '.down', 'empty'); }
-  if (F.from !== undefined) { oneOf(w + '.from', F.from, ['return'], 'source'); if (F.kind !== 'keepsake') bad(w, 'only keepsakes come as rewards'); }
+  if (F.from !== undefined) { oneOf(w + '.from', F.from, ['return', 'town'], 'source'); if (F.kind !== 'keepsake') bad(w, 'only keepsakes come as rewards'); }
   if (F.owner !== undefined) { oneOf(w + '.owner', F.owner, keys(OWNERS), 'owner'); if (F.kind !== 'curio') bad(w, 'only curios can belong to someone'); const R = F.reward || {};
     if (!isStr(R.line)) bad(w + '.reward', 'a returned find needs the owner’s line'); if (!(R.coins > 0)) bad(w + '.reward', 'coins should be above 0');
     if (R.keepsake !== undefined) { if (!FINDS[R.keepsake] || FINDS[R.keepsake].kind !== 'keepsake' || FINDS[R.keepsake].from !== 'return') bad(w + '.reward', R.keepsake + ' should be a keepsake with from:"return"'); } }
-  if (rank(F.rarity) > rank('legendary') && F.from === 'return') bad(w, 'Exotic and rarer finds come in crates'); }
+  if (rank(F.rarity) > rank('legendary') && F.from) bad(w, 'Exotic and rarer finds come in crates'); }
 for (const id of keys(FINDS).filter(id => FINDS[id].from === 'return')) if (keys(FINDS).filter(o => (FINDS[o].reward || {}).keepsake === id).length !== 1) bad('FINDS.' + id, 'a reward keepsake should be given by exactly one returned find');
-for (const t of CT) if (rank(t) > 0 && !keys(FINDS).some(id => FINDS[id].rarity === t && FINDS[id].from !== 'return')) bad('FINDS', 'no find of rarity ' + t + ' for its crates');
+for (const t of CT) if (rank(t) > 0 && !keys(FINDS).some(id => FINDS[id].rarity === t && !FINDS[id].from)) bad('FINDS', 'no find of rarity ' + t + ' for its crates');
 for (const k of keys(OWNERS)) need('OWNERS.' + k, OWNERS[k], { name: 'str' });
 need('POCKETS', POCKETS, { start: 'num+', max: 'num+', costs: 'arr' });
 if (POCKETS.costs.length !== POCKETS.max - POCKETS.start) bad('POCKETS.costs', 'one price per pocket after the first');
@@ -331,6 +335,41 @@ if (!(AWAY.cap > 0 && AWAY.clock >= 0 && AWAY.welcome >= 0)) bad('AWAY', 'cap ab
 { const F = AWAY.fresh || {}; if (!(F.hours > 0 && Number.isInteger(F.casts) && F.casts > 0 && F.x > 1)) bad('AWAY.fresh', 'hours above 0, a whole number of casts, and x above 1');
   if (!(F.hours <= AWAY.cap)) bad('AWAY.fresh.hours', 'can\'t be longer than the time away that counts'); }
 
+/* ---------- supper orders and Town reputation ---------- */
+{ const O = ORDERS; if (!(O.hour >= 0 && O.hour < 24)) bad('ORDERS.hour', 'an hour of the in-game day');
+  if (!(O.count.length === 2 && O.count.every(n => Number.isInteger(n) && n > 0 && n <= 4))) bad('ORDERS.count', 'two counts, 1 to 4 tickets');
+  if (O.twists.length !== STANDINGS.length) bad('ORDERS.twists', 'one [fewest, most] for each standing');
+  O.twists.forEach((r, i) => { if (!(r.length === 2 && r[0] >= 0 && r[1] >= r[0] && r[1] <= 3)) bad('ORDERS.twists[' + i + ']', '[fewest, most], 0 to 3'); });
+  for (const k of ['catches', 'delicacy']) if (!(O.tip[k].length === 4 && O.tip[k].every((v, i, a) => v >= 0 && (!i || v > a[i - 1])))) bad('ORDERS.tip.' + k, 'four values, rising with the stars');
+  if (!(O.tip.fish >= 1)) bad('ORDERS.tip.fish', 'an order pays at least what its fish would sell for');
+  if (!(O.rep.stars.length === 4 && O.rep.stars.every((v, i, a) => v > 0 && (!i || v > a[i - 1])))) bad('ORDERS.rep.stars', 'four values, rising with the stars');
+  if (!(O.done.light < 0 && O.done.well > 0)) bad('ORDERS.done', 'lightly done moves the zone down, well done up');
+  for (const k of ['smoked', 'delicacy', 'grey']) if (!(O[k].from >= 0 && O[k].from < STANDINGS.length && O[k].chance > 0 && O[k].chance < 1)) bad('ORDERS.' + k, 'a standing to start from, and a chance in (0, 1)'); }
+sameSet('TOWNSFOLK_ORDER', [...TOWNSFOLK_ORDER, 'grey'], keys(TOWNSFOLK), 'TOWNSFOLK_ORDER (and Grey) and TOWNSFOLK');
+const TWIST_OK = x => /^(more|less|none):/.test(x) ? !!SPICES[x.split(':')[1]] : ['done:light', 'done:well', 'garnish:none', 'garnish:lots'].includes(x);
+for (const id of keys(TOWNSFOLK)) { const P = TOWNSFOLK[id], w = 'TOWNSFOLK.' + id; need(w, P, { name: 'str', title: 'str' });
+  if (!isObj(P.say) || !Array.isArray(P.say.any) || !P.say.any.length) bad(w + '.say', 'needs some things to say on any ticket (any)');
+  if (!Array.isArray(P.served) || P.served.length !== (P.raw ? 1 : 4)) bad(w + '.served', P.raw ? 'one line' : 'one line for each of 0 to 3 stars');
+  if (P.raw) continue;
+  for (const r of P.likes || []) { oneOf(w + '.likes', r, keys(RECIPES), 'recipe'); if (r === 'pie') bad(w + '.likes', 'the Banquet Pie is never ordered'); }
+  for (const x of P.twists || []) if (!TWIST_OK(x)) bad(w + '.twists', JSON.stringify(x) + ' is not a twist');
+  for (const k of keys(P.say)) if (k !== 'any' && k !== 'delicacy' && !TWIST_OK(k)) bad(w + '.say', JSON.stringify(k) + ' is not a twist they could have');
+  if (P.side) oneOf(w + '.side', P.side, keys(SIDES), 'side');
+  if (!(P.tip > 0)) bad(w + '.tip', 'a tip multiplier above 0'); }
+STANDINGS.forEach((St, i) => { const w = 'STANDINGS[' + i + ']'; need(w, St, { name: 'str', as: 'str', brings: 'str' }); if (!/[.!]$/.test(St.brings || '')) bad(w + '.brings', 'a whole sentence');
+  if (i ? !(St.at > STANDINGS[i - 1].at) : St.at !== 0) bad(w + '.at', 'the first is 0, and each needs more than the one before');
+  if (St.up) oneOf(w + '.up', St.up, keys(UPGRADES), 'upgrade'); if (St.visit) oneOf(w + '.visit', St.visit, keys(VISITS), 'visit'); });
+for (const id of keys(UPGRADES)) { const U = UPGRADES[id], w = 'UPGRADES.' + id; need(w, U, { name: 'str', eff: 'str' }); if (!/[.!]$/.test(U.eff || '')) bad(w + '.eff', 'a whole sentence');
+  if (!STANDINGS.some(St => St.up === id)) bad(w, 'no standing brings it');
+  if (U.keepsake && !(FINDS[U.keepsake] && FINDS[U.keepsake].kind === 'keepsake' && FINDS[U.keepsake].from === 'town')) bad(w + '.keepsake', 'a keepsake in FINDS that only comes from the town (from:\'town\')'); }
+if (UPGRADES.smoker && !(UPGRADES.smoker.delicacyHours < SMOKE.delicacy.hours && UPGRADES.smoker.delicacyHours >= SMOKE.full && UPGRADES.smoker.hooks >= 1)) bad('UPGRADES.smoker', 'more hooks, and a Delicacy sooner (but still after full smoke)');
+for (const id of keys(VISITS)) { const V = VISITS[id], w = 'VISITS.' + id; oneOf(w + '.who', V.who, keys(TOWNSFOLK).filter(k => !TOWNSFOLK[k].raw), 'townsfolk');
+  if (!Array.isArray(V.lines) || V.lines.length < 2 || V.lines.some(l => typeof l !== 'string' || !/[.!?…”]$/.test(l))) bad(w + '.lines', 'two or more lines, each a whole sentence');
+  if (V.when !== undefined && V.when !== 'barnaby') bad(w + '.when', "only 'barnaby' (someone you've met)");
+  if (V.when && !(VISITS[V.else] && !VISITS[V.else].when)) bad(w + '.else', 'a visit that plays instead, with no condition of its own');
+  if (!STANDINGS.some(St => St.visit === id) && !keys(VISITS).some(k => VISITS[k].else === id)) bad(w, 'no standing plays it'); }
+need('PLATTER', PLATTER, { name: 'str', dish: 'str', side: 'str', zone: 'arr' }); if (PLATTER.form !== 'whole') bad('PLATTER.form', 'a Delicacy is served whole');
+
 /* ---------- every string ---------- */
 let strings = 0;
 const walk = (v, w) => { if (typeof v === 'string') { strings++; if (v !== v.trim() && !(w.startsWith('LETTER'))) bad(w, 'leading or trailing space'); if (/ {2}/.test(v)) bad(w, 'double space'); }
@@ -338,4 +377,4 @@ const walk = (v, w) => { if (typeof v === 'string') { strings++; if (v !== v.tri
 for (const n of Object.keys(D)) walk(D[n], n);
 
 if (problems.length) { console.error(problems.length + ' content problem(s):\n  ' + problems.join('\n  ')); process.exit(1); }
-console.log(`Content OK: ${FIDS.length} fish in ${REGIONS.length} regions, ${RIDS.length} rods, ${keys(RECIPES).length} recipes, ${decorIds.length} decor, ${TANK_SETS.length} tank sets, ${keys(FINDS).length} finds, ${TK_IDS.length} tackle, ${EIDS.length} runes, ${keys(TRAPS).reduce((a, r) => a + TRAPS[r].traps.length, 0)} traps, ${keys(NOTES).length} notes, ${keys(MOODS).length} moods, ${strings} strings checked.`);
+console.log(`Content OK: ${FIDS.length} fish in ${REGIONS.length} regions, ${RIDS.length} rods, ${keys(RECIPES).length} recipes, ${decorIds.length} decor, ${TANK_SETS.length} tank sets, ${keys(FINDS).length} finds, ${TK_IDS.length} tackle, ${EIDS.length} runes, ${keys(TRAPS).reduce((a, r) => a + TRAPS[r].traps.length, 0)} traps, ${keys(TOWNSFOLK).length} townsfolk, ${STANDINGS.length} standings, ${keys(NOTES).length} notes, ${keys(MOODS).length} moods, ${strings} strings checked.`);

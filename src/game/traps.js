@@ -54,9 +54,10 @@ function trapFullIn(T){ const left=trapCap(T)-T.fish.length; if (left<=0) return
 function trapFish(id,reg,spot){ const F=FISH[id], u=Math.pow(Math.random(),1.4), size=Math.round(lerp(F.size[0],F.size[1],u)*10)/10, build=rollBuild();
   return {id, size, w:Math.round(weighFish(id,size,build)), stars:qualityOf(id,size,false), value:Math.max(1,Math.round(F.value*(.85+.3*u))), perfect:false, lucky:false,
     t:Date.now(), reg, spot, hr:save.clock, rod:null, trap:true}; }
-/** How many more of a species your known recipes still need (beyond what's in the keepnet). */
+/** How many more of a species your known recipes, or a supper order, still need (beyond what's in the keepnet). */
 function recipeShort(fid){ if (!save.kitchenOpen) return 0; let n=0;
-  for (const id of RECIPE_ORDER){ const R=RECIPES[id], need=R.need[0]; if (need.id===fid && knownRecipe(id)) n=Math.max(n,need.n-haveFor(R)); } return n; }
+  for (const id of RECIPE_ORDER){ const R=RECIPES[id], need=R.need[0]; if (need.id===fid && knownRecipe(id)) n=Math.max(n,need.n-haveFor(R)); }
+  return Math.max(n,orderShort(fid).n); }   // and what a supper order pinned up needs
 /** Hauls a trap up: keeps what your recipes still need (while the keepnet has room), sells the rest.
     Returns {fish:[trapped fish], kept:[...], coins, glimmer}. The save is up to date when it returns. */
 function haulTrap(T){ trapFill(T); const sp=trapSpot(T), out={fish:[], kept:[], coins:0, glimmer:T.g};

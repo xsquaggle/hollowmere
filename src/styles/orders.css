@@ -1,0 +1,62 @@
+/* Supper orders: Town reputation, the paper tickets in the kitchen book, the served card, and visits at the window */
+.order-badge{background:#F3EAD7;color:var(--ink)}
+/* Town reputation */
+.k-town{background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:14px;padding:10px 12px 11px;box-shadow:0 3px 0 #2B1D14;margin-bottom:2px}
+.k-town-top{display:flex;align-items:baseline;gap:8px}
+.k-town-top b{font:400 17px/1.15 var(--display)}.k-town-top em{margin-left:auto;font-style:normal;font-weight:800;font-size:12px;color:#8A6A3A;font-variant-numeric:tabular-nums}
+.k-town-bar{height:9px!important;margin:6px 0 0!important}.k-town-bar i{background:linear-gradient(90deg,#E9C98A,#C9A15A);transition:width 1.1s cubic-bezier(.3,.9,.3,1) .5s}
+.k-town-next{margin:6px 0 0;font-size:12.5px;line-height:1.35;color:#55514A;font-weight:700}.k-town-next b{color:var(--ink)}
+.k-tk-intro{margin:-2px 2px 10px;font-size:12.5px;line-height:1.4;color:rgba(243,234,215,.86);font-weight:700}
+.k-tk-none{margin:0 2px;padding:12px 14px;border:2px dashed rgba(243,234,215,.3);border-radius:12px;color:rgba(243,234,215,.75);font-weight:800;font-size:13px;text-align:center}
+/* the tickets: cream paper, a red pin, each a touch askew */
+.k-tickets{display:grid;gap:14px;padding-top:6px}
+.k-tk{position:relative;display:grid;grid-template-columns:62px minmax(0,1fr);grid-template-rows:auto auto;column-gap:12px;background:#FBF6EA;color:var(--ink);border:2px solid var(--ink);border-radius:6px 6px 12px 12px;padding:12px 12px 10px;box-shadow:0 4px 0 #2B1D14;transform:rotate(var(--tilt,0deg))}
+.k-tk::before{content:"";position:absolute;top:-8px;left:50%;width:13px;height:13px;margin-left:-6px;border-radius:50%;background:#D9614C;border:2px solid var(--ink);box-shadow:inset -2px -2px 0 rgba(0,0,0,.18)}
+.k-tk::after{content:"";position:absolute;left:10px;right:10px;top:7px;border-top:1.5px dashed rgba(43,42,51,.18)}
+.k-tk.new{animation:tkIn .45s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes tkIn{from{opacity:0;transform:translateY(-14px) rotate(-4deg)}}
+.k-tk-pt{grid-row:1;width:62px;height:62px;margin-top:8px;border:2px solid var(--ink);border-radius:10px;background:linear-gradient(#BFD9DF,#E7EFE9 70%,#D9C9A6 71%,#C9B48A)}
+.k-tk-body{min-width:0;padding-top:4px}
+.k-tk-who{margin:0;font:800 10.5px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:#8A6A3A}.k-tk-who span{letter-spacing:.06em;color:#A4927A;font-weight:700;text-transform:none;font-size:11px}
+.k-tk h4{margin:4px 0 3px;font:400 17px/1.15 var(--display)}
+.k-tk ul{margin:2px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px 5px}
+.k-tk li{padding:3px 8px;border-radius:999px;background:rgba(201,161,90,.22);font-size:12px;font-weight:800;color:#5A4426}
+.k-tk-say{margin:6px 0 0;font-size:12.5px;line-height:1.35;font-style:italic;color:#6E6A60}
+.k-tk .k-need{margin:6px 0 0;font-size:12px}
+.k-tk-foot{grid-column:1/-1;display:flex;align-items:center;gap:10px;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1.5px dashed rgba(43,42,51,.2)}
+.k-tk-tip{font-size:12.5px;font-weight:800;color:#6E6A60}.k-tk-tip b{color:#7A5A22;font-size:14px}
+.k-tk-foot .btn{padding:8px 14px;font-size:13.5px}
+/* the order's spice ticket during Season */
+.k-ticket .k-tk-who{display:block;margin-bottom:2px;font-size:9.5px}
+/* the ticket only shows what's wanted (taps go through it to the jars), and when it would reach the jars it goes wider
+   and lays its spices out in two columns (kitchen-stations.js: kTicketFit) */
+.k-ticket{pointer-events:none}
+.k-ticket.tight{width:min(64vw,250px);padding:8px 10px 7px;font-size:12px;display:grid;grid-template-columns:1fr 1fr;column-gap:10px}
+.k-ticket.tight b{grid-column:1/-1;margin-bottom:3px;padding-bottom:4px;font-size:13.5px} .k-ticket.tight p{margin-top:2px;gap:4px} .k-ticket.tight .dots i{width:8px;height:8px} .k-ticket.tight p span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .k-ticket.tight p.no,.k-ticket.tight p.bad{grid-column:1/-1;order:2}   /* the spices wanted fill the two columns; "none, please" and any mistakes go under them */
+.k-ticket p.no{color:#6E6A60}.k-ticket p.no em{color:#6E6A60;font-weight:800}
+/* the served card */
+.k-result.k-res-order{max-height:calc(100% - 96px);overflow-y:auto;overscroll-behavior:contain;gap:8px}
+.k-served{display:grid;grid-template-columns:66px 1fr;gap:12px;align-items:center}
+.k-served-pt{width:66px;height:66px;border:2px solid var(--ink);border-radius:12px;background:linear-gradient(#BFD9DF,#E7EFE9 70%,#D9C9A6 71%,#C9B48A)}
+.k-served h3{text-align:left!important;font-size:19px!important;margin:3px 0 0!important}
+.k-served .k-stars{margin:4px 0 0;justify-content:flex-start}.k-served .k-star,.k-served .k-star svg{width:28px;height:28px}.k-served .k-star:nth-child(2){transform:none}
+.k-served-say{margin:0;text-align:center;font-style:italic;font-size:14px;line-height:1.35;color:#55514A}
+.k-pay{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.k-pay span{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-weight:800;font-size:13.5px;border:1.5px solid rgba(43,42,51,.25)}
+.k-pay-coins{background:#FFF1C9;color:#6A4E14}.k-pay-coins .coin{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#F7DD92,#C9A15A 70%);box-shadow:0 0 0 1.5px var(--ink)}
+.k-pay-rep{background:#E8F0DD;color:#3D6A3A}
+.k-town-mini{box-shadow:none;border-width:1.5px;padding:7px 10px 9px;margin:0}.k-town-mini .k-town-top b{font-size:15px}
+.k-town-mini.up{background:#FFF4D9;border-color:#E2B84E;animation:upGlow 1.2s ease 1.5s both}
+@keyframes upGlow{0%{box-shadow:0 0 0 0 rgba(226,184,78,.0)}40%{box-shadow:0 0 0 6px rgba(226,184,78,.45)}100%{box-shadow:0 0 0 0 rgba(226,184,78,0)}}
+.k-levelup{margin:7px 0 0;font-size:13px;line-height:1.35;font-weight:700;color:#5A4426;animation:appIn .4s ease 1.5s both}
+/* visits */
+.k-visit{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:16px;background:rgba(20,12,6,.62);animation:appIn .3s ease}
+.k-visit-card{width:min(100%,400px);box-sizing:border-box;display:grid;gap:10px;justify-items:center;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:16px;padding:16px 16px 14px;box-shadow:0 5px 0 #2B1D14}
+.k-visit-card canvas{width:min(62vw,220px);aspect-ratio:1;border:2px solid var(--ink);border-radius:14px;background:linear-gradient(#BFD9DF,#E7EFE9 70%,#D9C9A6 71%,#C9B48A)}
+.k-visit-who{margin:0;font:400 20px/1.1 var(--display)}.k-visit-who span{font:700 12px/1 var(--body);color:#8A6A3A;letter-spacing:.04em}
+.k-visit-line{margin:0;min-height:4.2em;font-size:15px;line-height:1.4;text-align:center}
+.k-visit-gift{width:100%;box-sizing:border-box;display:grid;gap:3px;padding:10px 12px;border-radius:12px;background:#FFF4D9;border:2px solid #E2B84E;text-align:center;animation:appIn .35s ease}
+.k-visit-gift b{font:400 16px/1.2 var(--display)}.k-visit-gift p{margin:0;font-size:12.5px;line-height:1.35;color:#55514A}
+.k-visit .row{width:100%}.k-visit .btn{flex:1;font-size:15px;padding:11px 14px}
+@media (max-width:370px){ .k-tk{grid-template-columns:52px minmax(0,1fr)} .k-tk-pt{width:52px;height:52px} .k-tk-foot{flex-wrap:wrap} .k-tk-foot .btn{flex:1} }
+@media (prefers-reduced-motion: reduce){ .k-tk.new,.k-levelup,.k-visit,.k-visit-gift,.k-town-mini.up{animation-duration:.01s!important;animation-delay:0s!important} .k-town-bar i{transition:none} }

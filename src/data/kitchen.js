@@ -4,14 +4,21 @@ const SPICES={
   pepper: {name:'Pepper',     short:'PEPPER',  col:'#3A3530', glass:'#7A6A5A', lid:'#2B2A33'},
   dill:   {name:'Dill',       short:'DILL',    col:'#7FB069', glass:'#A7C78A', lid:'#4E7B4C'},
   lemon:  {name:'Lemon zest', short:'LEMON',   col:'#F2D45C', glass:'#F1E2A2', lid:'#C9A15A'},
-  paprika:{name:'Paprika',    short:'PAPRIKA', col:'#C8553D', glass:'#DB9A7E', lid:'#8A3A2A'}
+  paprika:{name:'Paprika',    short:'PAPRIKA', col:'#C8553D', glass:'#DB9A7E', lid:'#8A3A2A'},
+  // the bigger spice rack (data/orders.js: UPGRADES.spices)
+  garlic: {name:'Garlic',     short:'GARLIC',  col:'#F1E8D2', glass:'#E3D9BF', lid:'#9C8B6E'},
+  fennel: {name:'Fennel seed',short:'FENNEL',  col:'#9AA65A', glass:'#CBD09B', lid:'#6F7A3A'}
 };
-const SPICE_ORDER=['salt','pepper','dill','lemon','paprika'];
+/* SPICE_ORDER: the jars on the counter; SPICE_MORE: the two the bigger spice rack adds. */
+const SPICE_ORDER=['salt','pepper','dill','lemon','paprika'], SPICE_MORE=['garlic','fennel'];
 const SIDES={chips:'Chips', rice:'Rice', greens:'Garden greens', bread:'Rye bread', potatoes:'Roast potatoes', corn:'Grilled corn'};
 const FLESH={perch:'#F4CDB0', reedwhisker:'#EFD9C2', lantern:'#F7D9A0', leafjack:'#EEDDB8', mossback:'#E9CDB2', mayor:'#F0D2B6',
   sprat:'#EBDCD0', wrasse:'#F6C4AE', kelpeel:'#E8D8C0', bream:'#F5DCB5', grouper:'#F3E3D3', saltjaw:'#ECD6CC'};
 const COOK_NAME={pan:'Pan-fry', grill:'Grill'};
 /* Each recipe: what it needs from the keepnet, how each station plays, and what the meal does.
+   need: [{id or rar, n}]; smoked:true takes a smoked fish of any kind from the keepnet (it skips the Clean station).
+   learn: the fish that teaches it when you catch one; rep: the Town reputation standing that teaches it instead
+   (data/orders.js: STANDINGS).
    boost: list of {k,v}: k is a stat in data/stats.js. A meal's modifier is 1+v*strength (luck: v*strength points). */
 const RECIPES={
   chowder:{name:'Odds and Ends Chowder', need:[{rar:'common',n:3}], learn:null, cook:'pan', form:'fillet', dish:'bowl', side:'bread',
@@ -38,10 +45,16 @@ const RECIPES={
   steak:{name:'Barnacle Grouper Steak', need:[{id:'grouper',n:1}], learn:'grouper', cook:'grill', form:'steak', dish:'plate', side:'potatoes',
     spice:{salt:2,pepper:3}, zone:[.62,.78], speed:1.15, boost:[{k:'swell',v:-.5},{k:'line',v:.15}], eff:'Swells hit half as hard, and your line is 15% stronger',
     blurb:'A sailor’s supper. Thick, peppery and good for the sea legs.'},
+  kedgeree:{name:'Smokehouse Kedgeree', need:[{smoked:true,n:1}], learn:null, rep:1, cook:'pan', form:'fillet', dish:'bowl', side:'rice',
+    spice:{paprika:1,pepper:1,lemon:1,dill:1}, zone:[.5,.74], speed:.95, boost:[{k:'bite',v:-.2}], eff:'Fish bite 20% sooner',
+    blurb:'Smoked fish flaked through buttered rice. Your uncle called it breakfast, whatever the hour.'},
+  pepperpot:{name:'Harbor Pepperpot', need:[{rar:'uncommon',n:2}], learn:null, rep:4, cook:'pan', form:'fillet', dish:'bowl', side:'bread',
+    spice:{pepper:2,garlic:2,fennel:1,paprika:1}, zone:[.6,.8], speed:1.1, boost:[{k:'treasure',v:.25}], eff:'Treasure turns up 25% more often',
+    blurb:'Edie Crane’s, from Lantern Row: pepper, garlic and a whisper of fennel. It warms you right down to the boots.'},
   pie:{name:'Mayor’s Banquet Pie', need:[{id:'mayor',n:1}], learn:'mayor', cook:'pan', form:'fillet', dish:'pie', side:'greens',
     spice:{salt:2,pepper:1,dill:2,lemon:1}, zone:[.62,.76], speed:1.2, boost:[{k:'luck',v:.4}], eff:'+40 luck', banquet:true,
     blurb:'A stargazy pie fit for a mayor. The whole town will want a slice.'}
 };
-const RECIPE_ORDER=['chowder','fry','gumbo','skewers','wraps','stew','bream','steak','pie'];
+const RECIPE_ORDER=['chowder','fry','gumbo','skewers','wraps','stew','bream','steak','kedgeree','pepperpot','pie'];
 const MUSH={name:'Mystery Mush', eff:'Your bobber turns pink. Fish find it hilarious.', casts:10};
 const MEAL_STR=[1,1.25,1.5], MEAL_CASTS=[20,30,40];

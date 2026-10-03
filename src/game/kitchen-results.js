@@ -1,10 +1,14 @@
 /* ---------- Smokehouse kitchen: results, book, banquet ---------- */
-function starsFor(total){ const p=total/400; return p>=.85?3:p>=.62?2:p>=.3?1:0; }
-function showResult(){ sizzleStop(); const total=STATIONS.reduce((a,k)=>a+(K.scores[k]||0),0), stars=starsFor(total), mush=stars===0, R=RECIPES[K.rid];
+/** Stars for a cook: the stations' scores against 100 each (four stations, or fewer for a smoked fish or a Delicacy). */
+function starsFor(total,n){ const p=total/(100*(n||4)); return p>=.85?3:p>=.62?2:p>=.3?1:0; }
+function showResult(){ sizzleStop(); save.stats.cooks=(save.stats.cooks||0)+1; if (K.order){ showServed(); return; }
+  const total=kSts().reduce((a,k)=>a+(K.scores[k]||0),0), stars=starsFor(total,kSts().length), mush=stars===0, R=RECIPES[K.rid];
+  // the fish are cooked now: what's kept, should the page close before you choose, is the meal (into the pantry)
+  if (mush) delete save.cooking; else save.cooking={meal:{id:K.rid, stars}}; persist();
   K.mode='result'; K.res={total,stars,mush,t:0,rays:0}; K.st=null; K.used=[]; kTopUI(); kPips(); kSay(''); $('kBottom').hidden=true; $('kTicket').hidden=true;
-  const el=$('kResult'), meal=save.meal&&save.meal.casts>0?save.meal:null, pantryFull=(save.pantry||[]).length>=3;
+  const el=$('kResult'), meal=save.meal&&save.meal.casts>0?save.meal:null, pantryFull=(save.pantry||[]).length>=3; el.classList.remove('k-res-order');
   grantGear(KITCHEN_BAIT,1);   // the scraps from every cook go into a tin of chum (data/tackle.js)
-  const bars=STATIONS.map(k=>'<div class="k-sb"><span>'+STATION_NAME[k]+'</span><i><b style="width:'+(K.scores[k]||0)+'%"></b></i><em>'+(K.scores[k]||0)+'</em></div>').join('');
+  const bars=kSts().map(k=>'<div class="k-sb"><span>'+STATION_NAME[k]+'</span><i><b style="width:'+(K.scores[k]||0)+'%"></b></i><em>'+(K.scores[k]||0)+'</em></div>').join('');
   const SP='<path d="M12 2.6 l2.9 6 6.5 .8 -4.8 4.5 1.2 6.5 -5.8 -3.2 -5.8 3.2 1.2 -6.5 -4.8 -4.5 6.5 -.8 Z"/>';
   const starHtml=[0,1,2].map(i=>'<span class="k-star'+(i<stars?' on':'')+'"><svg class="bg" viewBox="0 0 24 24">'+SP+'</svg>'+(i<stars?'<svg class="fg" viewBox="0 0 24 24" style="animation-delay:'+(.35+i*.32)+'s">'+SP+'</svg>':'')+'</span>').join('');
   el.innerHTML='<div class="k-stars">'+starHtml+'</div>'+
@@ -16,29 +20,31 @@ function showResult(){ sizzleStop(); const total=STATIONS.reduce((a,k)=>a+(K.sco
     (meal?'<p class="k-note" id="kNote">You’re still on '+mealName(meal.id)+' ('+meal.casts+' casts left). Eating this replaces it.</p>':'')+
     '<p class="k-scraps"><canvas data-gear="'+KITCHEN_BAIT+'" aria-hidden="true"></canvas><span>The scraps went into a tin of '+TACKLE[KITCHEN_BAIT].name.toLowerCase()+'. It’s in your tackle bag.</span></p>';
   el.hidden=false; paintTiles(el.querySelectorAll('canvas[data-gear]'));
-  musicDuck(.35,2.4); for (let i=0;i<stars;i++) setTimeout(()=>{ if (!K.open) return; tone([784,988,1319][i],.3,{vol:.1,type:'triangle'}); tone([1568,1976,2637][i],.2,{vol:.04,delay:.03}); buzz(10); K.res.pop=1; },350+i*320);
+  musicDuck(.35,2.4); for (let i=0;i<stars;i++) setTimeout(()=>{ if (!K.open || !K.res) return; tone([784,988,1319][i],.3,{vol:.1,type:'triangle'}); tone([1568,1976,2637][i],.2,{vol:.04,delay:.03}); buzz(10); if (K.res) K.res.pop=1; },350+i*320);
   if (mush) setTimeout(()=>{ tone(330,.35,{to:220,vol:.09,type:'triangle'}); tone(262,.4,{to:180,vol:.07,type:'triangle',delay:.25}); },300);
   else if (stars===3) setTimeout(()=>{ if (K.open){ kBurst(0,-60,40,'#F2D47E',{v0:120,v1:360,g:260,l0:.8,l1:1.4,r0:2,r1:4,kind:'conf'}); } },1300);
-  $('kEat').addEventListener('click',()=>{ const sid=mush?'mush':K.rid; eatMeal(sid,stars); kAfterEat(sid,stars); });
+  $('kEat').addEventListener('click',()=>{ const sid=mush?'mush':K.rid; delete save.cooking; eatMeal(sid,stars); kAfterEat(sid,stars); });
   if (mush) $('kToss').addEventListener('click',()=>{ news('The heron took it. No regrets.',''); kToBook(); });
-  else $('kSave').addEventListener('click',()=>{ save.pantry=save.pantry||[]; if (save.pantry.length>=3) return; save.pantry.push({id:K.rid,stars}); persist(); news('Saved to the pantry','good'); kToBook(); });
+  else $('kSave').addEventListener('click',()=>{ save.pantry=save.pantry||[]; if (save.pantry.length>=3) return; delete save.cooking; save.pantry.push({id:K.rid,stars}); persist(); news('Saved to the pantry','good'); kToBook(); });
 }
 function kAfterEat(id,stars){ sfx.coin(2); const R=RECIPES[id];
   if (R && R.banquet){ startBanquet(); return; }
   toast(id==='mush'?'Hmm. Pink.':'Delicious!',id==='mush'?'':'good'); kToBook(); }
-function kToBook(){ K.mode='book'; K.st=null; K.res=null; K.rid=null; K.used=[]; K.scores={}; K.specks=[]; K.parts=[]; K.floats=[]; $('kResult').hidden=true; $('kBottom').hidden=true; $('kTicket').hidden=true; $('kBanquet').hidden=true; kTopUI(); kLayout(); kBook(); }
-function kTopUI(){ const cooking=K.mode==='station'; $('kPips').hidden=!(cooking||K.mode==='result'); $('kTitle').textContent=K.mode==='book'?'Smokehouse kitchen':K.mode==='banquet'?'The Mayor’s Banquet':RECIPES[K.rid]?RECIPES[K.rid].name:'';
+function kToBook(){ if (save.cooking){ delete save.cooking; persist(); } K.mode='book'; K.st=null; K.res=null; K.rid=null; K.used=[]; K.scores={}; K.specks=[]; K.parts=[]; K.floats=[]; kOrderClear(); $('kResult').hidden=true; $('kBottom').hidden=true; $('kTicket').hidden=true; $('kBanquet').hidden=true; kTopUI(); kLayout(); kBook(); kVisitNext(); }
+function kTopUI(){ const cooking=K.mode==='station'; $('kPips').hidden=!(cooking||K.mode==='result'); $('kTitle').textContent=K.mode==='book'?'Smokehouse kitchen':K.mode==='banquet'?'The Mayor’s Banquet':K.order?(K.order.kind==='delicacy'?PLATTER.name:ticketTitle(K.order)):RECIPES[K.rid]?RECIPES[K.rid].name:'';
   $('kSub').textContent=K.mode==='book'?'Cook your catch into meals.':''; $('kSub').hidden=K.mode!=='book'; $('kConfirm').hidden=true; K.confirm=false; $('kClose').textContent=cooking?'Leave':'Close'; $('kClose').hidden=K.mode==='result'||K.mode==='banquet'; }
 /* ---- recipe book ---- */
 function kBook(){ const el=$('kBook'); el.hidden=false; const m=save.meal&&save.meal.casts>0?save.meal:null, pan=save.pantry||[];
   const stars=n=>'<span class="k-mini-stars">'+'★'.repeat(n)+'<s>'+'★'.repeat(3-n)+'</s></span>';
   let h='<section class="k-now">'+(m?'<canvas class="k-dish" data-dish="'+m.id+'" data-stars="'+m.stars+'"></canvas><div><span class="k-lab">Now eating</span><h4>'+mealName(m.id)+' '+(m.id==='mush'?'':stars(m.stars))+'</h4><p>'+effText(m.id,m.stars)+'</p><p class="k-casts"><i style="width:'+Math.round(Math.min(1,m.casts/(m.full||(m.id==='mush'?MUSH.casts:MEAL_CASTS[m.stars-1])))*100)+'%"></i><span>'+m.casts+' casts left</span></p></div>'
     :'<div><span class="k-lab">Nothing on the go</span><p>A meal lasts a number of casts, not minutes, so stepping away never wastes it. One meal at a time.</p></div>')+'</section>';
+  h='<div id="kOrdersSec">'+ordersHTML()+'</div>'+h;
   h+='<h3 class="k-h">Pantry <span>'+pan.length+'/3</span></h3><div class="k-pantry">';
   for (let i=0;i<3;i++){ const p=pan[i]; h+=p?'<div class="k-jar"><canvas class="k-dish" data-dish="'+p.id+'" data-stars="'+p.stars+'"></canvas><b>'+RECIPES[p.id].name+'</b>'+stars(p.stars)+'<button class="btn" data-eat="'+i+'" type="button">Eat</button></div>':'<div class="k-jar empty"><span>Empty shelf</span></div>'; }
   h+='</div>'+rackHTML()+'<h3 class="k-h">Recipes</h3><div class="k-recipes">';
   const ids=RECIPE_ORDER.slice().sort((a,b)=>{ const sc=id=>knownRecipe(id)?(pickNet(RECIPES[id]).ok?0:1):2; return sc(a)-sc(b); });
   for (const id of ids){ const R=RECIPES[id], known=knownRecipe(id), have=haveFor(R), need=R.need[0].n, ok=known&&have>=need;
+    if (!known && R.rep){ if (ordersOpen()) h+='<div class="k-rec locked"><canvas class="k-dish" data-dish="'+id+'" data-sil="1"></canvas><div><h4>A town recipe</h4><p>Someone in town will share it once you’re '+STANDINGS[R.rep].as+'.</p></div></div>'; continue; }
     if (!known){ const F=FISH[R.learn], seen=(save.fish[R.learn]||{}).seen;
       h+='<div class="k-rec locked"><canvas class="k-dish" data-dish="'+id+'" data-sil="1"></canvas><div><h4>Unknown recipe</h4><p>Catch '+(seen?'a '+F.name:'a fish you haven’t met yet')+' to learn it.</p>'+(seen?'<p class="k-hint">'+F.hint+'</p>':'')+'</div></div>'; continue; }
     h+='<div class="k-rec'+(ok?' ok':'')+'"><canvas class="k-dish" data-dish="'+id+'"></canvas><div><h4>'+R.name+'</h4><p class="k-need'+(ok?' have':'')+'">'+needText(R)+' · you have '+have+'</p><p class="k-meta">'+cookVerb(R)+' · '+SIDES[R.side]+'</p><p class="k-boost">'+R.eff+'</p></div>'+
@@ -48,6 +54,7 @@ function kBook(){ const el=$('kBook'); el.hidden=false; const m=save.meal&&save.
   el.querySelectorAll('canvas.k-dish').forEach(cv2=>drawDishIcon(cv2));
   el.querySelectorAll('canvas[data-smoked]').forEach(paintSmoked); bindRack(el);
   el.querySelectorAll('[data-cook]').forEach(b=>b.addEventListener('click',()=>startCooking(b.dataset.cook)));
+  bindOrders(el);
   el.querySelectorAll('[data-eat]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.eat, p=pan[i];
     if (m && !b.dataset.sure){ b.dataset.sure='1'; b.textContent='Replace?'; return; }
     pan.splice(i,1); save.pantry=pan; eatMeal(p.id,p.stars); persist(); kAfterEat(p.id,p.stars); }));
@@ -57,11 +64,11 @@ function drawDishIcon(cv2){ const r=cv2.getBoundingClientRect(), d=Math.min(wind
   if (id==='mush'){ drawPlate(c,130); drawMush(c,0); return; }
   const R=RECIPES[id], fid=R.need[0].id||'perch', G=plateGuides(R.dish); c.translate(0,38);
   if (cv2.dataset.sil){ c.globalAlpha=.35; drawPlate(c,130); c.globalAlpha=1; c.font='400 120px "Young Serif", Georgia, serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillStyle='rgba(43,42,51,.55)'; c.fillText('?',0,-30); return; }
-  const save2={fid:K.fid,food:K.food,rid:K.rid}; K.fid=fid; K.food={top:.68,marks:R.cook==='grill'?.7:0}; K.rid=id;
+  const save2={fid:K.fid,food:K.food,rid:K.rid,R:K.R,smoked:K.smoked}; K.fid=fid; K.food={top:.68,marks:R.cook==='grill'?.7:0}; K.rid=id; K.R=null; K.smoked=!!R.need[0].smoked;
   drawDish(c,G,R.dish,true);
   const main={k:'main',x:G.main.x,y:G.main.y,placed:true}, side={k:'side',x:G.side.x,y:G.side.y,placed:true}, lem={k:'lemon',x:G.lemon.x,y:G.lemon.y,placed:true};
   K.st=K.st||null; const keepSt=K.st; K.st={kind:'icon',ty:999,drag:null}; [main,side,lem].forEach(it=>drawItem(c,it,G,R.dish)); K.st=keepSt;
-  K.fid=save2.fid; K.food=save2.food; K.rid=save2.rid; }
+  K.fid=save2.fid; K.food=save2.food; K.rid=save2.rid; K.R=save2.R; K.smoked=save2.smoked; }
 function drawMush(c,t){ c.save(); c.fillStyle='rgba(30,15,5,.2)'; c.beginPath(); c.ellipse(4,8,86,58,0,0,6.28); c.fill();
   const p=new Path2D(); for (let i=0;i<=24;i++){ const a=i/24*Math.PI*2, r=70+Math.sin(a*3+t*2)*8+Math.sin(a*5)*5; const x=Math.cos(a)*r*1.1, y=Math.sin(a)*r*.72; i?p.lineTo(x,y):p.moveTo(x,y); } p.closePath();
   const g=c.createRadialGradient(-20,-20,10,0,0,90); g.addColorStop(0,'#D9B4B8'); g.addColorStop(1,'#9C8890'); c.fillStyle=g; c.fill(p); c.strokeStyle=INK; c.lineWidth=2; c.stroke(p);
@@ -69,12 +76,26 @@ function drawMush(c,t){ c.save(); c.fillStyle='rgba(30,15,5,.2)'; c.beginPath();
   c.beginPath(); c.arc(8,-4,13,0,6.28); c.fillStyle='#FFF8E8'; c.fill(); c.strokeStyle=INK; c.lineWidth=1.6; c.stroke(); c.beginPath(); c.arc(10+Math.sin(t*1.3)*3,-2,5.5,0,6.28); c.fillStyle=INK; c.fill();
   c.strokeStyle=INK; c.lineWidth=2; c.beginPath(); c.moveTo(48,-20); c.quadraticCurveTo(58,-36,52,-50); c.stroke(); c.restore(); }
 /* ---- starting a cook ---- */
-function startCooking(id){ const R=RECIPES[id], pk=pickNet(R); if (!pk.ok){ news('Not enough fish in your keepnet','warn'); return; }
-  audioInit(); const idx=pk.picks.slice().sort((a,b)=>b-a); K.used=idx.map(i=>save.net[i]); idx.forEach(i=>save.net.splice(i,1)); persist();
-  K.rid=id; K.fid=K.used[K.used.length-1].id; K.scores={}; K.specks=[]; K.food=null; K.parts=[]; K.floats=[]; K.mode='station';
-  $('kBook').hidden=true; $('kBottom').hidden=false; kTopUI(); K.st={kind:'clean'}; kPips(); kLayout(); startClean(); tone(523,.12,{vol:.06,type:'triangle'}); tone(784,.16,{vol:.06,type:'triangle',delay:.08}); }
+/** Starts cooking recipe id, or the ticket T's order (game/order-kitchen.js). A smoked fish skips the Clean station
+    (it was cleaned before it went on the rack), and a Delicacy order is plate-only. */
+function startCooking(id,T){ const R=T?ticketRecipe(T):RECIPES[id], pk=T?pickOrder(T):pickNet(R); if (!pk.ok){ news('Not enough fish in your keepnet','warn'); return; }
+  audioInit(); const idx=pk.picks.slice().sort((a,b)=>b-a); K.used=idx.map(i=>save.net[i]); idx.forEach(i=>save.net.splice(i,1));
+  // the fish in the pan stay in the save until the cook is done, so a page closed mid-cook hands them back (kRestore)
+  save.cooking={fish:K.used.slice()}; persist();
+  kOrderClear(); if (T) kOrderSet(T);
+  K.rid=T&&T.kind==='delicacy'?null:id||T.rid; K.fid=K.used[K.used.length-1].id; K.smoked=K.used.every(f=>f.smoked); K.scores={}; K.specks=[]; K.food=null; K.parts=[]; K.floats=[]; K.mode='station';
+  K.sts=T&&T.kind==='delicacy'?['plate']:K.smoked?['season','cook','plate']:STATIONS;
+  $('kBook').hidden=true; $('kBottom').hidden=false; kTopUI(); K.st={kind:K.sts[0]}; kPips(); kLayout();
+  ({clean:startClean,season:startSeason,plate:startPlate})[K.sts[0]](); tone(523,.12,{vol:.06,type:'triangle'}); tone(784,.16,{vol:.06,type:'triangle',delay:.08}); }
 function kLeave(){ // walk away mid-cook: the fish go back in the keepnet
-  sizzleStop(); if (K.used.length){ save.net.push(...K.used); K.used=[]; persist(); news('The fish went back in your keepnet',''); } kToBook(); }
+  sizzleStop(); if (K.used.length){ save.net.push(...K.used); K.used=[]; delete save.cooking; persist(); news('The fish went back in your keepnet',''); } kToBook(); }
+/** At load: a cook the page closed in the middle of. The fish go back in the keepnet; a meal that was done but not
+    yet eaten or saved goes in the pantry (if there's room; if not, the heron has it). */
+function kRestore(){ const c=save.cooking; if (c===undefined) return; delete save.cooking; let say='';
+  if (isObj(c) && Array.isArray(c.fish)){ const back=c.fish.filter(f=>isObj(f) && FISH[f.id] && typeof f.value==='number'); if (back.length){ save.net.push(...back); say='The fish you were cooking went back in your keepnet'; } }
+  else if (isObj(c) && isObj(c.meal) && RECIPES[c.meal.id]){ const st=clamp(Math.round(+c.meal.stars||1),1,3); save.pantry=Array.isArray(save.pantry)?save.pantry:[];
+    if (save.pantry.length<3){ save.pantry.push({id:c.meal.id, stars:st}); say='The '+RECIPES[c.meal.id].name+' you cooked is waiting in your pantry'; } else say='Grey had the '+RECIPES[c.meal.id].name+' you left on the stove'; }
+  persist(); if (say) setTimeout(()=>whenPlaying(()=>news(say,'')),900); }
 /* ---- banquet ---- */
 function startBanquet(){ K.mode='banquet'; K.bq={t:0,line:0,lineT:0}; $('kResult').hidden=true; $('kBottom').hidden=true; kTopUI(); const el=$('kBanquet'); el.hidden=false;
   el.innerHTML='<p class="k-bq-line" id="kBqLine"></p><button class="btn primary" id="kBqDone" type="button">Thank everyone</button>';

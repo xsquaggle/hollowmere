@@ -70,11 +70,18 @@ a long while, gives Fresh water for a few casts. Every rate is in `src/data/idle
 last save, so a clock set back can't pay twice. `npm run sim -- --idle` reports what traps and the rack earn beside
 active play. Playtest > Tools has "Pass an hour" to see it without waiting.
 
+**Supper orders.** Once you've cooked, the townsfolk pin supper orders at the kitchen window each evening
+(`src/game/orders.js`, in the kitchen in `src/game/order-kitchen.js`, faces in `src/game/portrait-art.js`). A ticket's
+twists change what the stations score; serving pays tips and Town reputation, and its standings bring recipes,
+upgrades and visits. Every number and line is in `src/data/orders.js`. `npm run sim -- --orders` reports tips beside
+active fishing, Delicacy orders, and the hours to each standing.
+
 **Adding content.** A new fish is an entry in `src/data/fish.js` plus its region list and bite weights.
 A new find is an entry in `src/data/treasure.js` plus its drawing in `src/game/loot-art.js`.
 A new reel, line or bait is an entry in `src/data/tackle.js` plus its drawing in `src/game/tackle-art.js`.
 A new rune is an entry in `src/data/enchant.js` plus its glyph in `RUNE_GLYPH` (`src/game/enchant-art.js`).
 A new trap or fitting is an entry in `src/data/idle.js` (a fitting also needs its icon in `drawFittingIcon`, `src/game/trap-art.js`).
+A new customer is an entry in `TOWNSFOLK` and `TOWNSFOLK_ORDER` (`src/data/orders.js`) plus their portrait in `drawPortrait` (`src/game/portrait-art.js`).
 The checker catches a misspelled id, a size range upside down, a rod that costs less than the one before it,
 a recipe that needs a fish that doesn't exist, a tank set nobody could complete, or a crate tier with nothing to hold.
 

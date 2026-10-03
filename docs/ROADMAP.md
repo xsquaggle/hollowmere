@@ -15,13 +15,13 @@ each build.
 | 16 | Art pass. Part one: the angler, the dock and its props, the townsfolk and their boats, the coast's rocks, kelp and skiff (build 16). Part two: the aquarium room, tank and decor, fish up close, the kitchen's stove, board, wall and counter, and rod drawings in the shops (build 17) |
 | 17 | Glimmer and the first six enchantments, etched onto rods from the tackle bag (build 18) |
 | 18 | Idle play: fish traps with fittings, the smoke rack and Hollowmere Delicacies, and coming back to a moved-on clock, Grey by a full trap and Fresh water (build 19) |
+| 19 | Supper orders and Town reputation: tickets at the kitchen window each evening, tips and six standings, with Kedgeree and Pepperpot, a better smoker, a second burner, the spice rack, the ladle, and visits at the window (build 20) |
 
 ## Next
 
 13 waits for friends to be available; the rest go in order.
 
 - **13.** Friend playtest, and the bottom-bar regroup.
-- **19.** Supper orders and Town reputation.
 - **20.** Weather.
 - **21.** Rarity in full.
 - **22.** Story relics.

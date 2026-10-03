@@ -44,6 +44,7 @@ function showCard(){
   const L=S.land, F=L.F, r=rec(L.id);
   const prevW=r.bw||0; L.prev=r.pb?Object.assign({},r.pb):null;
   r.caught++; r.best=Math.max(r.best,L.size); r.seen=true; save.stats.catches++;
+  save.stats.catchAvg=save.stats.catchAvg>0?save.stats.catchAvg*.95+(L.value||0)*.05:(L.value||0);   // what a catch is worth lately (supper tips keep pace with it)
   save.stats.landed=(save.stats.landed||0)+L.w; if (L.stars===3) save.stats.trophies=(save.stats.trophies||0)+1;
   L.pbBeat=!L.isNew && !!L.prev && L.w>prevW; L.pbGlim=L.pbBeat?(GLIMMER.record[F.rarity]||2):0;   // records pay Glimmer, kept now and counted up at the stamp
   if (L.pbGlim){ save.glimmer=(save.glimmer||0)+L.pbGlim; save.stats.glimmer=(save.stats.glimmer||0)+L.pbGlim; }
@@ -58,6 +59,7 @@ function showCard(){
   const tags=[]; if (L.lucky) tags.push('Gull luck '+trimNum(gullMul())+'×'); if (L.perfect) tags.push('Perfect hook +25%'); if (L.build>=1.1) tags.push('Chunky');
   if (L.isNew && save.kitchenOpen){ const rid=recipeLearnedBy(L.id); if (rid) tags.push('New recipe: '+RECIPES[rid].name); }
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
+  const ord=!L.needFor && orderShort(L.id); L.orderFor=ord&&ord.n>0?ord.T:null; if (L.orderFor && !L.isNew) tags.push('For '+TOWNSFOLK[L.orderFor.who].name+'’s supper order');
   if (r.caught===MASTERY.catches) tags.push('Mastered: reels get easier'); else if (r.caught<MASTERY.catches) tags.push('Mastery '+r.caught+'/'+MASTERY.catches);
   $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]);
   // runes that did something for this catch
@@ -67,8 +69,8 @@ function showCard(){
   $('cLore').textContent=L.isNew||F.rarity!=='common' ? F.lore : '';
   $('cLore').hidden=!$('cLore').textContent;
   const full=save.net.length>=netCap();
-  S.cardDefault=(L.isNew || F.rarity!=='common' || L.pbBeat || L.stars===3 || L.needFor) && !full ? 'keep' : 'sell';
-  S.cardAuto=F.rarity==='common' && !L.isNew && !L.pbBeat && L.stars<3 && !L.needFor;
+  S.cardDefault=(L.isNew || F.rarity!=='common' || L.pbBeat || L.stars===3 || L.needFor || L.orderFor) && !full ? 'keep' : 'sell';
+  S.cardAuto=F.rarity==='common' && !L.isNew && !L.pbBeat && L.stars<3 && !L.needFor && !L.orderFor;
   $('cSell').textContent='Sell · +'+L.value; $('cKeep').textContent=full?'Keepnet full':'Keep';
   $('cKeep').disabled=full; $('cTank').hidden=!(save.tutorialDone && tankRoom(L.id));
   $('cSell').classList.toggle('primary',S.cardDefault==='sell'); $('cKeep').classList.toggle('primary',S.cardDefault==='keep');
@@ -135,6 +137,6 @@ window.addEventListener('resize',fitHud);
 if (document.fonts) document.fonts.ready.then(()=>{ HUD.sig=''; fitHud(); });   // the display font changes every width
 function updateHud(){
   const all=REGION_FISH.lake.concat(save.boat?REGION_FISH.coast:[]), n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
-  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('aquaBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; $('kitchenBtn').hidden=!save.kitchenOpen; $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
+  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('aquaBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; $('kitchenBtn').hidden=!save.kitchenOpen; ordersBadge(); $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
   updateGlimChip(); fitHud(); $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
 }

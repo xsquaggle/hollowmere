@@ -18,7 +18,8 @@
               (always works once you have it). rarity, region (lake, coast or any: where it can turn up loose),
               lore; artifacts and keepsakes have eff (what it does, one sentence), down (its catch, if any) and
               mods (modifiers, as on rods: see data/stats.js). A curio with an owner can be returned for a reward:
-              {coins, keepsake, line}. from:'return' keepsakes only come as rewards. Exotic and Mythic finds only
+              {coins, keepsake, line}. from:'return' keepsakes only come as rewards for returned curios, from:'town' ones from the
+              town (data/orders.js). Exotic and Mythic finds only
               come in crates. Drawn in game/loot-art.js.
    OWNERS     who in town lost things (you give them back from the journal's Finds page).  POCKETS  the vest: pockets you start with, the most, and what Ottilie
               charges to sew each one after the first.
@@ -106,7 +107,10 @@ const FINDS={
   stamp:   {name:'Postmark Stamp', kind:'keepsake', rarity:'rare', region:'any', from:'return', lore:'It prints HOLLOWMERE and a date that changes when you aren’t looking.',
             eff:'Coins from treasure are worth 25% more.', mods:[{stat:'loot', v:1.25}]},
   boots:   {name:'Barnaby’s Sea Boots', kind:'keepsake', rarity:'epic', region:'any', from:'return', lore:'Two sizes too big and somehow exactly right.',
-            eff:'Swells hit your line 25% softer.', mods:[{stat:'swell', v:.75}]}
+            eff:'Swells hit your line 25% softer.', mods:[{stat:'swell', v:.75}]},
+  // from the town, when you're its guest of honor (data/orders.js: UPGRADES.ladle)
+  ladle:   {name:'Uncle’s Ladle', kind:'keepsake', rarity:'epic', region:'any', from:'town', lore:'Copper, dented, the handle worn smooth where he held it. It still smells faintly of smoke and pepper.',
+            eff:'Meals last 25% longer.', mods:[{stat:'mealCasts', v:1.25}]}
 };
 const NOTES={
   pads:    {kind:'bottle', lines:['To whoever finds this:','the lily pads drift, and the','fish under them drift too.','Follow the pads.','— B.']},

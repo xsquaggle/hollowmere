@@ -919,6 +919,68 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 .k-pick em{font-style:normal;font-weight:800;font-size:13px;color:#7A5A22}
 .k-pick:active{transform:translateY(2px);box-shadow:0 1px 0 #2B1D14}
 @media (max-width:370px){ .k-hook{grid-template-columns:52px minmax(0,1fr)} .k-hook canvas,.k-hook-ic{width:52px} .k-hook-btns{grid-column:1/-1;grid-template-columns:1fr 1fr} }
+/* Supper orders: Town reputation, the paper tickets in the kitchen book, the served card, and visits at the window */
+.order-badge{background:#F3EAD7;color:var(--ink)}
+/* Town reputation */
+.k-town{background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:14px;padding:10px 12px 11px;box-shadow:0 3px 0 #2B1D14;margin-bottom:2px}
+.k-town-top{display:flex;align-items:baseline;gap:8px}
+.k-town-top b{font:400 17px/1.15 var(--display)}.k-town-top em{margin-left:auto;font-style:normal;font-weight:800;font-size:12px;color:#8A6A3A;font-variant-numeric:tabular-nums}
+.k-town-bar{height:9px!important;margin:6px 0 0!important}.k-town-bar i{background:linear-gradient(90deg,#E9C98A,#C9A15A);transition:width 1.1s cubic-bezier(.3,.9,.3,1) .5s}
+.k-town-next{margin:6px 0 0;font-size:12.5px;line-height:1.35;color:#55514A;font-weight:700}.k-town-next b{color:var(--ink)}
+.k-tk-intro{margin:-2px 2px 10px;font-size:12.5px;line-height:1.4;color:rgba(243,234,215,.86);font-weight:700}
+.k-tk-none{margin:0 2px;padding:12px 14px;border:2px dashed rgba(243,234,215,.3);border-radius:12px;color:rgba(243,234,215,.75);font-weight:800;font-size:13px;text-align:center}
+/* the tickets: cream paper, a red pin, each a touch askew */
+.k-tickets{display:grid;gap:14px;padding-top:6px}
+.k-tk{position:relative;display:grid;grid-template-columns:62px minmax(0,1fr);grid-template-rows:auto auto;column-gap:12px;background:#FBF6EA;color:var(--ink);border:2px solid var(--ink);border-radius:6px 6px 12px 12px;padding:12px 12px 10px;box-shadow:0 4px 0 #2B1D14;transform:rotate(var(--tilt,0deg))}
+.k-tk::before{content:"";position:absolute;top:-8px;left:50%;width:13px;height:13px;margin-left:-6px;border-radius:50%;background:#D9614C;border:2px solid var(--ink);box-shadow:inset -2px -2px 0 rgba(0,0,0,.18)}
+.k-tk::after{content:"";position:absolute;left:10px;right:10px;top:7px;border-top:1.5px dashed rgba(43,42,51,.18)}
+.k-tk.new{animation:tkIn .45s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes tkIn{from{opacity:0;transform:translateY(-14px) rotate(-4deg)}}
+.k-tk-pt{grid-row:1;width:62px;height:62px;margin-top:8px;border:2px solid var(--ink);border-radius:10px;background:linear-gradient(#BFD9DF,#E7EFE9 70%,#D9C9A6 71%,#C9B48A)}
+.k-tk-body{min-width:0;padding-top:4px}
+.k-tk-who{margin:0;font:800 10.5px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:#8A6A3A}.k-tk-who span{letter-spacing:.06em;color:#A4927A;font-weight:700;text-transform:none;font-size:11px}
+.k-tk h4{margin:4px 0 3px;font:400 17px/1.15 var(--display)}
+.k-tk ul{margin:2px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px 5px}
+.k-tk li{padding:3px 8px;border-radius:999px;background:rgba(201,161,90,.22);font-size:12px;font-weight:800;color:#5A4426}
+.k-tk-say{margin:6px 0 0;font-size:12.5px;line-height:1.35;font-style:italic;color:#6E6A60}
+.k-tk .k-need{margin:6px 0 0;font-size:12px}
+.k-tk-foot{grid-column:1/-1;display:flex;align-items:center;gap:10px;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1.5px dashed rgba(43,42,51,.2)}
+.k-tk-tip{font-size:12.5px;font-weight:800;color:#6E6A60}.k-tk-tip b{color:#7A5A22;font-size:14px}
+.k-tk-foot .btn{padding:8px 14px;font-size:13.5px}
+/* the order's spice ticket during Season */
+.k-ticket .k-tk-who{display:block;margin-bottom:2px;font-size:9.5px}
+/* the ticket only shows what's wanted (taps go through it to the jars), and when it would reach the jars it goes wider
+   and lays its spices out in two columns (kitchen-stations.js: kTicketFit) */
+.k-ticket{pointer-events:none}
+.k-ticket.tight{width:min(64vw,250px);padding:8px 10px 7px;font-size:12px;display:grid;grid-template-columns:1fr 1fr;column-gap:10px}
+.k-ticket.tight b{grid-column:1/-1;margin-bottom:3px;padding-bottom:4px;font-size:13.5px} .k-ticket.tight p{margin-top:2px;gap:4px} .k-ticket.tight .dots i{width:8px;height:8px} .k-ticket.tight p span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .k-ticket.tight p.no,.k-ticket.tight p.bad{grid-column:1/-1;order:2}   /* the spices wanted fill the two columns; "none, please" and any mistakes go under them */
+.k-ticket p.no{color:#6E6A60}.k-ticket p.no em{color:#6E6A60;font-weight:800}
+/* the served card */
+.k-result.k-res-order{max-height:calc(100% - 96px);overflow-y:auto;overscroll-behavior:contain;gap:8px}
+.k-served{display:grid;grid-template-columns:66px 1fr;gap:12px;align-items:center}
+.k-served-pt{width:66px;height:66px;border:2px solid var(--ink);border-radius:12px;background:linear-gradient(#BFD9DF,#E7EFE9 70%,#D9C9A6 71%,#C9B48A)}
+.k-served h3{text-align:left!important;font-size:19px!important;margin:3px 0 0!important}
+.k-served .k-stars{margin:4px 0 0;justify-content:flex-start}.k-served .k-star,.k-served .k-star svg{width:28px;height:28px}.k-served .k-star:nth-child(2){transform:none}
+.k-served-say{margin:0;text-align:center;font-style:italic;font-size:14px;line-height:1.35;color:#55514A}
+.k-pay{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.k-pay span{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-weight:800;font-size:13.5px;border:1.5px solid rgba(43,42,51,.25)}
+.k-pay-coins{background:#FFF1C9;color:#6A4E14}.k-pay-coins .coin{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#F7DD92,#C9A15A 70%);box-shadow:0 0 0 1.5px var(--ink)}
+.k-pay-rep{background:#E8F0DD;color:#3D6A3A}
+.k-town-mini{box-shadow:none;border-width:1.5px;padding:7px 10px 9px;margin:0}.k-town-mini .k-town-top b{font-size:15px}
+.k-town-mini.up{background:#FFF4D9;border-color:#E2B84E;animation:upGlow 1.2s ease 1.5s both}
+@keyframes upGlow{0%{box-shadow:0 0 0 0 rgba(226,184,78,.0)}40%{box-shadow:0 0 0 6px rgba(226,184,78,.45)}100%{box-shadow:0 0 0 0 rgba(226,184,78,0)}}
+.k-levelup{margin:7px 0 0;font-size:13px;line-height:1.35;font-weight:700;color:#5A4426;animation:appIn .4s ease 1.5s both}
+/* visits */
+.k-visit{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:16px;background:rgba(20,12,6,.62);animation:appIn .3s ease}
+.k-visit-card{width:min(100%,400px);box-sizing:border-box;display:grid;gap:10px;justify-items:center;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:16px;padding:16px 16px 14px;box-shadow:0 5px 0 #2B1D14}
+.k-visit-card canvas{width:min(62vw,220px);aspect-ratio:1;border:2px solid var(--ink);border-radius:14px;background:linear-gradient(#BFD9DF,#E7EFE9 70%,#D9C9A6 71%,#C9B48A)}
+.k-visit-who{margin:0;font:400 20px/1.1 var(--display)}.k-visit-who span{font:700 12px/1 var(--body);color:#8A6A3A;letter-spacing:.04em}
+.k-visit-line{margin:0;min-height:4.2em;font-size:15px;line-height:1.4;text-align:center}
+.k-visit-gift{width:100%;box-sizing:border-box;display:grid;gap:3px;padding:10px 12px;border-radius:12px;background:#FFF4D9;border:2px solid #E2B84E;text-align:center;animation:appIn .35s ease}
+.k-visit-gift b{font:400 16px/1.2 var(--display)}.k-visit-gift p{margin:0;font-size:12.5px;line-height:1.35;color:#55514A}
+.k-visit .row{width:100%}.k-visit .btn{flex:1;font-size:15px;padding:11px 14px}
+@media (max-width:370px){ .k-tk{grid-template-columns:52px minmax(0,1fr)} .k-tk-pt{width:52px;height:52px} .k-tk-foot{flex-wrap:wrap} .k-tk-foot .btn{flex:1} }
+@media (prefers-reduced-motion: reduce){ .k-tk.new,.k-levelup,.k-visit,.k-visit-gift,.k-town-mini.up{animation-duration:.01s!important;animation-delay:0s!important} .k-town-bar i{transition:none} }
 /* Sheets */
 #sheet{position:fixed;inset:0;background:rgba(10,13,22,.55);display:flex;align-items:flex-end;justify-content:center;z-index:5}
 .panel{width:min(480px,100%);max-height:82%;overflow:auto;background:var(--paper);color:var(--ink);border-radius:16px 16px 0 0;
@@ -995,7 +1057,7 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 <div id="hint" aria-live="polite"></div>
 <div id="coach" hidden aria-live="polite"><span id="coachStep">1 of 4</span><p id="coachText"></p></div>
 <div id="toast" aria-live="assertive"></div>
-<div class="corner center"><button class="book-peek" id="journalBtn" type="button" aria-label="Open journal"><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><rect x="6" y="4" width="44" height="44" rx="5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.8"/><rect x="10" y="4" width="40" height="44" rx="4" fill="#7E5439"/><path d="M10 4 V48" stroke="#4A3022" stroke-width="2"/><rect x="16" y="12" width="28" height="18" rx="3" fill="none" stroke="#C9A15A" stroke-width="1.4"/><path d="M23 21 q6 -6 13 0 q-7 6 -13 0 Z M36 21 l4 -3 v6 Z" fill="#C9A15A"/><rect x="46" y="20" width="8" height="10" rx="2" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><path d="M8 47 H50" stroke="#F1E4C6" stroke-width="2"/></svg></button><button class="bag-peek" id="bagBtn" type="button" aria-label="Open tackle bag" hidden><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><path d="M15 19 L3 3" stroke="#2B2A33" stroke-width="4.4" stroke-linecap="round"/><path d="M15 19 L3 3" stroke="#8A5E3C" stroke-width="2.2" stroke-linecap="round"/><circle cx="3" cy="3" r="1.5" fill="#C9A15A" stroke="#2B2A33" stroke-width=".8"/><path d="M12 21 C12 6 44 6 44 21" fill="none" stroke="#2B2A33" stroke-width="5.4" stroke-linecap="round"/><path d="M12 21 C12 6 44 6 44 21" fill="none" stroke="#6B4630" stroke-width="3" stroke-linecap="round"/><rect x="5" y="17" width="46" height="31" rx="7" fill="#8A8352" stroke="#2B2A33" stroke-width="1.8"/><rect x="11" y="34" width="34" height="11" rx="3" fill="#7A7447" stroke="#2B2A33" stroke-width="1.2"/><path d="M14 37 H42" stroke="#F1E4C6" stroke-width=".9" stroke-dasharray="1.6 1.6" opacity=".45"/><path d="M5 23 C5 19.5 8 17 12 17 H44 C48 17 51 19.5 51 23 V27 C51 32 46 34.5 40 34.5 H16 C10 34.5 5 32 5 27 Z" fill="#6E6840" stroke="#2B2A33" stroke-width="1.8"/><path d="M9 21.5 H47" stroke="#F1E4C6" stroke-width="1" stroke-dasharray="2 2" opacity=".55"/><path d="M8 26 q2 5 8 6" stroke="#fff" stroke-width="1.3" opacity=".22" fill="none" stroke-linecap="round"/><rect x="25" y="25" width="6" height="15" rx="1.5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.2"/><rect x="22.6" y="29.5" width="10.8" height="7.4" rx="1.6" fill="none" stroke="#2B2A33" stroke-width="3.6"/><rect x="22.6" y="29.5" width="10.8" height="7.4" rx="1.6" fill="none" stroke="#C9A15A" stroke-width="1.9"/><path d="M28 30 V36.4" stroke="#E3C27A" stroke-width="1.2"/></svg><span class="pk-badge bait-tag" id="bagBait" hidden></span></button><button class="bowl-peek" id="aquaBtn" type="button" aria-label="Open aquarium" hidden><svg width="58" height="50" viewBox="0 0 58 50" aria-hidden="true"><path d="M14 8 H44 C55 14 57 30 50 40 C46 46 40 48 29 48 C18 48 12 46 8 40 C1 30 3 14 14 8 Z" fill="rgba(210,235,240,.35)" stroke="#2B2A33" stroke-width="1.8"/><path d="M6 22 C10 20 16 24 22 22 C28 20 34 24 40 22 C46 20 50 23 52 22 C54 30 52 38 48 42 C44 46 38 48 29 48 C20 48 14 46 10 42 C6 38 4 30 6 22 Z" fill="#4E8F9E" opacity=".85"/><path d="M22 33 q7 -7 15 0 q-8 7 -15 0 Z M37 33 l5 -4 v8 Z" fill="#E08A3E" stroke="#2B2A33" stroke-width="1.2"/><circle cx="25.5" cy="32" r="1.2" fill="#2B2A33"/><path d="M14 46 q3 -10 8 -12 M16 46 q-2 -8 -1 -11" fill="none" stroke="#5E8F4E" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="16" r="2" fill="none" stroke="#F6F1E6" stroke-width="1"/><circle cx="43" cy="11" r="1.4" fill="none" stroke="#F6F1E6" stroke-width="1"/><path d="M12 8 H46" stroke="#2B2A33" stroke-width="3" stroke-linecap="round"/><path d="M12 14 C10 22 10 30 13 36" fill="none" stroke="#fff" stroke-width="1.6" opacity=".55" stroke-linecap="round"/></svg><span class="pk-badge coin-badge" id="aquaTips" hidden></span></button><button class="pan-peek" id="kitchenBtn" type="button" aria-label="Open kitchen" hidden><svg width="60" height="50" viewBox="0 0 60 50" aria-hidden="true"><path d="M41 17 L56 6" stroke="#2B2A33" stroke-width="8" stroke-linecap="round"/><path d="M41 17 L56 6" stroke="#6E4A33" stroke-width="4.5" stroke-linecap="round"/><ellipse cx="26" cy="33" rx="23" ry="16" fill="#2F2C31" stroke="#2B2A33" stroke-width="1.8"/><ellipse cx="26" cy="32" rx="18" ry="11.5" fill="#4A454D"/><path d="M14 33 q10 -10 22 -2 q-10 9 -22 2 Z" fill="#E8B866" stroke="#2B2A33" stroke-width="1.2"/><path d="M19 30 l3 4 M24 28 l3 5 M29 28 l2.5 5" stroke="#B9762F" stroke-width="1.3" stroke-linecap="round"/><path d="M21 15 q-3 -4 0 -8 M29 14 q-3 -4 0 -8" fill="none" stroke="#F6F1E6" stroke-width="1.7" stroke-linecap="round" opacity=".85"/><path d="M9 28 q3 -6 9 -8" fill="none" stroke="#fff" stroke-width="1.4" opacity=".3" stroke-linecap="round"/></svg></button><button class="map-peek" id="mapBtn" type="button" aria-label="Open map" hidden><svg width="66" height="50" viewBox="0 0 66 50" aria-hidden="true"><rect x="9" y="9" width="48" height="34" fill="#F1E4C6" stroke="#2B2A33" stroke-width="1.6"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43 L57 43 L57 9 Z" fill="#C3D9D7"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43" fill="none" stroke="#2B2A33" stroke-width="1"/><ellipse cx="21" cy="34" rx="7" ry="4.5" fill="#AFCDD2" stroke="#2B2A33" stroke-width="1"/><path d="M26 32 C32 26 36 22 44 17" fill="none" stroke="#B4584A" stroke-width="1.6" stroke-dasharray="2.5 2"/><circle cx="44" cy="17" r="2.4" fill="#C9A15A" stroke="#2B2A33" stroke-width="1"/><path d="M14 20 l3 -5 l3 5 Z M19 20 l3 -6 l3 6 Z" fill="#E4D6B6" stroke="#2B2A33" stroke-width=".8"/><rect x="4" y="4" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="4" y="41" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/></svg></button><button class="phone-peek" id="phoneBtn" type="button" aria-label="Open phone" hidden><span class="pk-glow"><span class="pk-logo"></span></span><span class="pk-notch"></span><span class="pk-badge" id="phoneBadge" hidden>1</span></button></div>
+<div class="corner center"><button class="book-peek" id="journalBtn" type="button" aria-label="Open journal"><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><rect x="6" y="4" width="44" height="44" rx="5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.8"/><rect x="10" y="4" width="40" height="44" rx="4" fill="#7E5439"/><path d="M10 4 V48" stroke="#4A3022" stroke-width="2"/><rect x="16" y="12" width="28" height="18" rx="3" fill="none" stroke="#C9A15A" stroke-width="1.4"/><path d="M23 21 q6 -6 13 0 q-7 6 -13 0 Z M36 21 l4 -3 v6 Z" fill="#C9A15A"/><rect x="46" y="20" width="8" height="10" rx="2" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><path d="M8 47 H50" stroke="#F1E4C6" stroke-width="2"/></svg></button><button class="bag-peek" id="bagBtn" type="button" aria-label="Open tackle bag" hidden><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><path d="M15 19 L3 3" stroke="#2B2A33" stroke-width="4.4" stroke-linecap="round"/><path d="M15 19 L3 3" stroke="#8A5E3C" stroke-width="2.2" stroke-linecap="round"/><circle cx="3" cy="3" r="1.5" fill="#C9A15A" stroke="#2B2A33" stroke-width=".8"/><path d="M12 21 C12 6 44 6 44 21" fill="none" stroke="#2B2A33" stroke-width="5.4" stroke-linecap="round"/><path d="M12 21 C12 6 44 6 44 21" fill="none" stroke="#6B4630" stroke-width="3" stroke-linecap="round"/><rect x="5" y="17" width="46" height="31" rx="7" fill="#8A8352" stroke="#2B2A33" stroke-width="1.8"/><rect x="11" y="34" width="34" height="11" rx="3" fill="#7A7447" stroke="#2B2A33" stroke-width="1.2"/><path d="M14 37 H42" stroke="#F1E4C6" stroke-width=".9" stroke-dasharray="1.6 1.6" opacity=".45"/><path d="M5 23 C5 19.5 8 17 12 17 H44 C48 17 51 19.5 51 23 V27 C51 32 46 34.5 40 34.5 H16 C10 34.5 5 32 5 27 Z" fill="#6E6840" stroke="#2B2A33" stroke-width="1.8"/><path d="M9 21.5 H47" stroke="#F1E4C6" stroke-width="1" stroke-dasharray="2 2" opacity=".55"/><path d="M8 26 q2 5 8 6" stroke="#fff" stroke-width="1.3" opacity=".22" fill="none" stroke-linecap="round"/><rect x="25" y="25" width="6" height="15" rx="1.5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.2"/><rect x="22.6" y="29.5" width="10.8" height="7.4" rx="1.6" fill="none" stroke="#2B2A33" stroke-width="3.6"/><rect x="22.6" y="29.5" width="10.8" height="7.4" rx="1.6" fill="none" stroke="#C9A15A" stroke-width="1.9"/><path d="M28 30 V36.4" stroke="#E3C27A" stroke-width="1.2"/></svg><span class="pk-badge bait-tag" id="bagBait" hidden></span></button><button class="bowl-peek" id="aquaBtn" type="button" aria-label="Open aquarium" hidden><svg width="58" height="50" viewBox="0 0 58 50" aria-hidden="true"><path d="M14 8 H44 C55 14 57 30 50 40 C46 46 40 48 29 48 C18 48 12 46 8 40 C1 30 3 14 14 8 Z" fill="rgba(210,235,240,.35)" stroke="#2B2A33" stroke-width="1.8"/><path d="M6 22 C10 20 16 24 22 22 C28 20 34 24 40 22 C46 20 50 23 52 22 C54 30 52 38 48 42 C44 46 38 48 29 48 C20 48 14 46 10 42 C6 38 4 30 6 22 Z" fill="#4E8F9E" opacity=".85"/><path d="M22 33 q7 -7 15 0 q-8 7 -15 0 Z M37 33 l5 -4 v8 Z" fill="#E08A3E" stroke="#2B2A33" stroke-width="1.2"/><circle cx="25.5" cy="32" r="1.2" fill="#2B2A33"/><path d="M14 46 q3 -10 8 -12 M16 46 q-2 -8 -1 -11" fill="none" stroke="#5E8F4E" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="16" r="2" fill="none" stroke="#F6F1E6" stroke-width="1"/><circle cx="43" cy="11" r="1.4" fill="none" stroke="#F6F1E6" stroke-width="1"/><path d="M12 8 H46" stroke="#2B2A33" stroke-width="3" stroke-linecap="round"/><path d="M12 14 C10 22 10 30 13 36" fill="none" stroke="#fff" stroke-width="1.6" opacity=".55" stroke-linecap="round"/></svg><span class="pk-badge coin-badge" id="aquaTips" hidden></span></button><button class="pan-peek" id="kitchenBtn" type="button" aria-label="Open kitchen" hidden><svg width="60" height="50" viewBox="0 0 60 50" aria-hidden="true"><path d="M41 17 L56 6" stroke="#2B2A33" stroke-width="8" stroke-linecap="round"/><path d="M41 17 L56 6" stroke="#6E4A33" stroke-width="4.5" stroke-linecap="round"/><ellipse cx="26" cy="33" rx="23" ry="16" fill="#2F2C31" stroke="#2B2A33" stroke-width="1.8"/><ellipse cx="26" cy="32" rx="18" ry="11.5" fill="#4A454D"/><path d="M14 33 q10 -10 22 -2 q-10 9 -22 2 Z" fill="#E8B866" stroke="#2B2A33" stroke-width="1.2"/><path d="M19 30 l3 4 M24 28 l3 5 M29 28 l2.5 5" stroke="#B9762F" stroke-width="1.3" stroke-linecap="round"/><path d="M21 15 q-3 -4 0 -8 M29 14 q-3 -4 0 -8" fill="none" stroke="#F6F1E6" stroke-width="1.7" stroke-linecap="round" opacity=".85"/><path d="M9 28 q3 -6 9 -8" fill="none" stroke="#fff" stroke-width="1.4" opacity=".3" stroke-linecap="round"/></svg><span class="pk-badge order-badge" id="kitchenOrders" hidden></span></button><button class="map-peek" id="mapBtn" type="button" aria-label="Open map" hidden><svg width="66" height="50" viewBox="0 0 66 50" aria-hidden="true"><rect x="9" y="9" width="48" height="34" fill="#F1E4C6" stroke="#2B2A33" stroke-width="1.6"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43 L57 43 L57 9 Z" fill="#C3D9D7"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43" fill="none" stroke="#2B2A33" stroke-width="1"/><ellipse cx="21" cy="34" rx="7" ry="4.5" fill="#AFCDD2" stroke="#2B2A33" stroke-width="1"/><path d="M26 32 C32 26 36 22 44 17" fill="none" stroke="#B4584A" stroke-width="1.6" stroke-dasharray="2.5 2"/><circle cx="44" cy="17" r="2.4" fill="#C9A15A" stroke="#2B2A33" stroke-width="1"/><path d="M14 20 l3 -5 l3 5 Z M19 20 l3 -6 l3 6 Z" fill="#E4D6B6" stroke="#2B2A33" stroke-width=".8"/><rect x="4" y="4" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="4" y="41" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/></svg></button><button class="phone-peek" id="phoneBtn" type="button" aria-label="Open phone" hidden><span class="pk-glow"><span class="pk-logo"></span></span><span class="pk-notch"></span><span class="pk-badge" id="phoneBadge" hidden>1</span></button></div>
 <div id="phone" hidden></div>
 <div id="aqua" hidden></div>
 <div id="intro" hidden></div>
@@ -1226,14 +1288,21 @@ const SPICES={
   pepper: {name:'Pepper',     short:'PEPPER',  col:'#3A3530', glass:'#7A6A5A', lid:'#2B2A33'},
   dill:   {name:'Dill',       short:'DILL',    col:'#7FB069', glass:'#A7C78A', lid:'#4E7B4C'},
   lemon:  {name:'Lemon zest', short:'LEMON',   col:'#F2D45C', glass:'#F1E2A2', lid:'#C9A15A'},
-  paprika:{name:'Paprika',    short:'PAPRIKA', col:'#C8553D', glass:'#DB9A7E', lid:'#8A3A2A'}
+  paprika:{name:'Paprika',    short:'PAPRIKA', col:'#C8553D', glass:'#DB9A7E', lid:'#8A3A2A'},
+  // the bigger spice rack (data/orders.js: UPGRADES.spices)
+  garlic: {name:'Garlic',     short:'GARLIC',  col:'#F1E8D2', glass:'#E3D9BF', lid:'#9C8B6E'},
+  fennel: {name:'Fennel seed',short:'FENNEL',  col:'#9AA65A', glass:'#CBD09B', lid:'#6F7A3A'}
 };
-const SPICE_ORDER=['salt','pepper','dill','lemon','paprika'];
+/* SPICE_ORDER: the jars on the counter; SPICE_MORE: the two the bigger spice rack adds. */
+const SPICE_ORDER=['salt','pepper','dill','lemon','paprika'], SPICE_MORE=['garlic','fennel'];
 const SIDES={chips:'Chips', rice:'Rice', greens:'Garden greens', bread:'Rye bread', potatoes:'Roast potatoes', corn:'Grilled corn'};
 const FLESH={perch:'#F4CDB0', reedwhisker:'#EFD9C2', lantern:'#F7D9A0', leafjack:'#EEDDB8', mossback:'#E9CDB2', mayor:'#F0D2B6',
   sprat:'#EBDCD0', wrasse:'#F6C4AE', kelpeel:'#E8D8C0', bream:'#F5DCB5', grouper:'#F3E3D3', saltjaw:'#ECD6CC'};
 const COOK_NAME={pan:'Pan-fry', grill:'Grill'};
 /* Each recipe: what it needs from the keepnet, how each station plays, and what the meal does.
+   need: [{id or rar, n}]; smoked:true takes a smoked fish of any kind from the keepnet (it skips the Clean station).
+   learn: the fish that teaches it when you catch one; rep: the Town reputation standing that teaches it instead
+   (data/orders.js: STANDINGS).
    boost: list of {k,v}: k is a stat in data/stats.js. A meal's modifier is 1+v*strength (luck: v*strength points). */
 const RECIPES={
   chowder:{name:'Odds and Ends Chowder', need:[{rar:'common',n:3}], learn:null, cook:'pan', form:'fillet', dish:'bowl', side:'bread',
@@ -1260,11 +1329,17 @@ const RECIPES={
   steak:{name:'Barnacle Grouper Steak', need:[{id:'grouper',n:1}], learn:'grouper', cook:'grill', form:'steak', dish:'plate', side:'potatoes',
     spice:{salt:2,pepper:3}, zone:[.62,.78], speed:1.15, boost:[{k:'swell',v:-.5},{k:'line',v:.15}], eff:'Swells hit half as hard, and your line is 15% stronger',
     blurb:'A sailor’s supper. Thick, peppery and good for the sea legs.'},
+  kedgeree:{name:'Smokehouse Kedgeree', need:[{smoked:true,n:1}], learn:null, rep:1, cook:'pan', form:'fillet', dish:'bowl', side:'rice',
+    spice:{paprika:1,pepper:1,lemon:1,dill:1}, zone:[.5,.74], speed:.95, boost:[{k:'bite',v:-.2}], eff:'Fish bite 20% sooner',
+    blurb:'Smoked fish flaked through buttered rice. Your uncle called it breakfast, whatever the hour.'},
+  pepperpot:{name:'Harbor Pepperpot', need:[{rar:'uncommon',n:2}], learn:null, rep:4, cook:'pan', form:'fillet', dish:'bowl', side:'bread',
+    spice:{pepper:2,garlic:2,fennel:1,paprika:1}, zone:[.6,.8], speed:1.1, boost:[{k:'treasure',v:.25}], eff:'Treasure turns up 25% more often',
+    blurb:'Edie Crane’s, from Lantern Row: pepper, garlic and a whisper of fennel. It warms you right down to the boots.'},
   pie:{name:'Mayor’s Banquet Pie', need:[{id:'mayor',n:1}], learn:'mayor', cook:'pan', form:'fillet', dish:'pie', side:'greens',
     spice:{salt:2,pepper:1,dill:2,lemon:1}, zone:[.62,.76], speed:1.2, boost:[{k:'luck',v:.4}], eff:'+40 luck', banquet:true,
     blurb:'A stargazy pie fit for a mayor. The whole town will want a slice.'}
 };
-const RECIPE_ORDER=['chowder','fry','gumbo','skewers','wraps','stew','bream','steak','pie'];
+const RECIPE_ORDER=['chowder','fry','gumbo','skewers','wraps','stew','bream','steak','kedgeree','pepperpot','pie'];
 const MUSH={name:'Mystery Mush', eff:'Your bobber turns pink. Fish find it hilarious.', casts:10};
 const MEAL_STR=[1,1.25,1.5], MEAL_CASTS=[20,30,40];
 
@@ -1307,7 +1382,8 @@ const AMB_LV={ lake_day:{water:.55,wind:.22}, lake_dusk:{water:.5,wind:.14}, lak
               (always works once you have it). rarity, region (lake, coast or any: where it can turn up loose),
               lore; artifacts and keepsakes have eff (what it does, one sentence), down (its catch, if any) and
               mods (modifiers, as on rods: see data/stats.js). A curio with an owner can be returned for a reward:
-              {coins, keepsake, line}. from:'return' keepsakes only come as rewards. Exotic and Mythic finds only
+              {coins, keepsake, line}. from:'return' keepsakes only come as rewards for returned curios, from:'town' ones from the
+              town (data/orders.js). Exotic and Mythic finds only
               come in crates. Drawn in game/loot-art.js.
    OWNERS     who in town lost things (you give them back from the journal's Finds page).  POCKETS  the vest: pockets you start with, the most, and what Ottilie
               charges to sew each one after the first.
@@ -1395,7 +1471,10 @@ const FINDS={
   stamp:   {name:'Postmark Stamp', kind:'keepsake', rarity:'rare', region:'any', from:'return', lore:'It prints HOLLOWMERE and a date that changes when you aren’t looking.',
             eff:'Coins from treasure are worth 25% more.', mods:[{stat:'loot', v:1.25}]},
   boots:   {name:'Barnaby’s Sea Boots', kind:'keepsake', rarity:'epic', region:'any', from:'return', lore:'Two sizes too big and somehow exactly right.',
-            eff:'Swells hit your line 25% softer.', mods:[{stat:'swell', v:.75}]}
+            eff:'Swells hit your line 25% softer.', mods:[{stat:'swell', v:.75}]},
+  // from the town, when you're its guest of honor (data/orders.js: UPGRADES.ladle)
+  ladle:   {name:'Uncle’s Ladle', kind:'keepsake', rarity:'epic', region:'any', from:'town', lore:'Copper, dented, the handle worn smooth where he held it. It still smells faintly of smoke and pepper.',
+            eff:'Meals last 25% longer.', mods:[{stat:'mealCasts', v:1.25}]}
 };
 const NOTES={
   pads:    {kind:'bottle', lines:['To whoever finds this:','the lily pads drift, and the','fish under them drift too.','Follow the pads.','— B.']},
@@ -1523,6 +1602,94 @@ const FITTING_ORDER=['bait','mesh','lantern'];
 const TRAP_GLIMMER=.2;
 const SMOKE={hooks:3, gain:.6, full:6, delicacy:{hours:8, rarityMin:'rare', x:2.5}};
 const AWAY={cap:8, clock:2, welcome:20, fresh:{hours:2, casts:5, x:2}};
+
+/* Supper orders and Town reputation (game/orders.js, cooked in the kitchen's stations, drawn in game/portrait-art.js).
+   Once you've cooked your first meal, the townsfolk pin supper orders at the kitchen window each in-game evening.
+   Cooking to the ticket earns tips and Town reputation; the standings it climbs bring kitchen upgrades, recipes and
+   visits. Skipping an order costs nothing: the evening's tickets are simply replaced the next evening.
+
+   ORDERS        hour: when an evening's tickets go up (in-game). count: tickets an evening, at standing 0 and from 1 on.
+                 twists: how many twists a ticket has at each standing, [fewest, most].
+                 tip: coins = (worth × fish + a catch × catches[s]) × (1 + twist × twists) × the customer's tip, where
+                 worth is what the fish you used would sell for, a catch is what your catches are worth lately (a
+                 running average, so tips keep pace with your rod), and s the stars (0 to 3). A cook takes about as
+                 long as two or three casts, so three stars pays about what fishing would have. A Delicacy order pays
+                 its worth × delicacy[s] instead: at three stars, half again what selling it would (it took eight hours on
+                 the rack, and the tip is a thank-you, not a second income). rep: reputation for the stars, plus twist for each twist and special for a
+                 smoked or Delicacy order; Grey pays grey and no coins.
+                 done: how far "lightly done" and "well done" move the golden zone. garnish: sprigs of dill that
+                 count as none and as lots (normal is 2 to 4). smoked, delicacy and grey: from which standing those
+                 tickets turn up, and how often (a Delicacy ticket: one an evening at most, and only while you have a
+                 Delicacy, or a fish on the rack on its way to being one).
+   TOWNSFOLK[id] name, title (a few words for the ticket), when (barnaby: only once he's come about the boat),
+                 likes (recipes they order more), twists (the ones they ask for most, as on a ticket), side (what they
+                 want with a Delicacy), tip (×), say (what they write on the ticket: by twist, else any), served (what
+                 they say by stars, 0 to 3). Grey (raw:true) only ever wants a fish, whole.
+   STANDINGS     the Town reputation ladder: name, as (the name in a sentence: "You’re a regular now."), at (reputation), what it brings (up: an upgrade in UPGRADES;
+                 recipes with rep: this standing are learned there; visit: who comes to the window).
+   VISITS[id]    the short scene at the window when you reach a standing: who comes, and their lines, in order. when
+                 and else: a visit that needs someone you've met (barnaby), and the one that plays instead until then.
+   PLATTER       the plate a Delicacy order is served on, standing in for a recipe in the stations. */
+const ORDERS={
+  hour:18, count:[2,3],
+  twists:[[0,1],[1,2],[1,2],[1,3],[2,3],[2,3]],
+  tip:{fish:1.2, catches:[.25,.65,1.3,1.9], twist:.12, delicacy:[.8,1.05,1.3,1.5]},
+  rep:{stars:[1,3,6,9], twist:1, special:5, grey:3},
+  done:{light:-.14, well:.12},
+  garnish:{none:0, lots:5},
+  smoked:{from:2, chance:.3}, delicacy:{from:2, chance:.3}, grey:{from:1, chance:.12}
+};
+const TOWNSFOLK={
+  ottilie:{name:'Ottilie', title:'the ferry', likes:['gumbo','stew','chowder','steak','kedgeree'], twists:['more:pepper','done:well','none:lemon'], side:'bread', tip:1,
+    say:{'more:pepper':'Pepper. More than you think.', 'done:well':'Well done. I’ve eaten enough raw things on that ferry.', 'none:lemon':'No lemon. Lemon is for people who don’t trust their fish.',
+      delicacy:'Something your uncle would have been proud of.', any:['Your uncle made this every Thursday.','Hot, and not too much fuss.']},
+    served:['I’ll take it home for the heron.','It’ll do. Don’t tell anyone I said that.','Not bad at all. You’ve got his hands.','Now that’s a supper. Same time tomorrow?']},
+  barnaby:{name:'Barnaby', title:'the boatyard', when:'barnaby', likes:['steak','bream','chowder','gumbo','pepperpot'], twists:['more:paprika','more:salt','garnish:lots'], side:'potatoes', tip:1.15,
+    say:{'more:paprika':'Paprika! A captain’s spice.', 'more:salt':'Salt it like the sea.', 'garnish:lots':'Heap it up. A sailor eats with his eyes first.',
+      delicacy:'Your finest smoked fish, for a hungry crew of one.', any:['Hearty, if you please. I’ve been at sea since breakfast.','Whatever’s biting. I’m not fussy, only famished.']},
+    served:['Ha! I’ve eaten worse in a gale. Not much worse.','Fills a hold, that does.','Fine cooking, friend. Fine cooking.','By the stacks! Best supper this side of the trench!']},
+  pell:{name:'Pell', title:'the post', likes:['fry','wraps','skewers','kedgeree'], twists:['more:lemon','done:light','less:pepper'], side:'greens', tip:.9,
+    say:{'more:lemon':'Lemon, please. It keeps me sharp.', 'done:light':'Lightly done. I eat it on the move.', 'less:pepper':'Easy on the pepper. It makes me sneeze on the letters.',
+      delicacy:'Something special. It’s my birthday, I think. The stamp says so.', any:['Quick as you can, I’ve a round to finish.','Express, if it’s no trouble!']},
+    served:['Ah. I’ll… post it somewhere.','Delivered! Thank you.','Lovely. Signed for and everything.','First class! Express! Wonderful!']},
+  bram:{name:'Bram', title:'the bakery', likes:['stew','chowder','kedgeree','fry','pepperpot'], twists:['more:salt','more:dill','garnish:lots'], side:'bread', tip:1.05,
+    say:{'more:salt':'A pinch more salt. Bakers know salt.', 'more:dill':'Extra dill. I grow it on the windowsill.', 'garnish:lots':'Dill on top, lots. Like a little garden.',
+      delicacy:'Your best smoked fish, and I’ll bring the bread.', any:['I’ll bring the bread, you bring the fish.','Something warm. The ovens are out tonight.']},
+    served:['Well, you can’t win every loaf.','Honest food. I like honest food.','Oh, that’s good. That’s very good.','I may weep into my rye. Thank you.']},
+  tam:{name:'Tam', title:'with the balloon', likes:['fry','skewers','wraps'], twists:['none:pepper','none:paprika','garnish:none','done:light'], side:'chips', tip:.8,
+    say:{'none:pepper':'NO pepper. Pepper is spicy.', 'none:paprika':'No red powder please.', 'garnish:none':'No green bits on top!', 'done:light':'Not burnt please. Burnt is sad.',
+      any:['Can it glow? The skewer ones glow.','I saved up my pocket money for this.']},
+    served:['Is it… supposed to look like that?','It’s okay! I ate most of it.','Yum! I’m telling everyone.','BEST. SUPPER. EVER. Can I have it again tomorrow?']},
+  grey:{name:'Grey', title:'the heron', raw:true,
+    say:{any:['He taps on the glass with his beak. A fish. Whole. No plate.']},
+    served:['Grey swallows it in one go, and looks at you as if you’d had nothing to do with it.']}
+};
+const TOWNSFOLK_ORDER=['ottilie','barnaby','pell','bram','tam'];
+const STANDINGS=[
+  {name:'New in town', as:'new in town', at:0, brings:'Two supper orders an evening.'},
+  {name:'A familiar face', as:'a familiar face', at:20, brings:'Three orders an evening, and a new recipe: Smokehouse Kedgeree.', visit:'ottilie'},
+  {name:'A regular', as:'a regular', at:60, up:'smoker', brings:'A better smoker, and orders for Delicacies.', visit:'bram'},
+  {name:'The town cook', as:'the town cook', at:130, up:'burner', brings:'A second burner: an order makes a portion for you too.', visit:'marigold'},
+  {name:'Hollowmere’s own', as:'Hollowmere’s own', at:230, up:'spices', brings:'A bigger spice rack, and a new recipe: Harbor Pepperpot.', visit:'pell'},
+  {name:'Guest of honor', as:'the guest of honor', at:380, up:'ladle', brings:'Your uncle’s ladle.', visit:'tam'}
+];
+const UPGRADES={
+  smoker:{name:'A better smoker', eff:'A fourth hook on the smoke rack, and Delicacies in 6 hours instead of 8.', hooks:1, delicacyHours:6},
+  burner:{name:'A second burner', eff:'Cooking an order makes a portion for you too, to eat or save.'},
+  spices:{name:'A bigger spice rack', eff:'Garlic and fennel seed, for the tickets and recipes that ask for them.'},
+  ladle:{name:'Your uncle’s ladle', eff:'A keepsake: meals last 25% longer.', keepsake:'ladle'}
+};
+const VISITS={
+  ottilie:{who:'ottilie', lines:['So. The town’s talking about the shack again.','Your uncle used to cook for us, you know. Every Thursday, whoever turned up.','Smoked fish through rice, mostly. Called it kedgeree, like it was something fancy.','Here. He wrote it on the back of a ferry ticket. I’ve kept it long enough.']},
+  bram:{who:'bram', lines:['Evening! I brought you something. Mind your toes, it’s heavy.','It’s the firebox from my old bread oven. The steadiest heat in Hollowmere.','Your uncle borrowed it every autumn to smoke for the whole town. Never once brought it back on time.','Keep it. The smoke’s been wanting a proper home.']},
+  marigold:{who:'barnaby', when:'barnaby', else:'ferry', lines:['Permission to come aboard? Mind the step.','This here’s a galley burner off the Marigold. Kept a crew of twelve fed through the worst winter on the coast.','She’s resting off the stacks now. I took the burner off her the summer before. Don’t ask me how I knew.','Two burners, two suppers. One for them and one for you. A cook’s got to eat.']},
+  // the same burner, before you've met Barnaby: it comes across on the ferry, with no note
+  ferry:{who:'ottilie', lines:['Something came across on the ferry for you. Heavy. I nearly lost it over the side.','A galley burner, off a boat called the Marigold. No note, only your name chalked on the crate.','Whoever sent it knows the town has a cook again. Word travels on the water.','Two burners, two suppers: one for them and one for you. That’s what the chalk says, anyway.']},
+  pell:{who:'pell', lines:['Parcel for the Keeper of the Bait Shack! Signed for, sealed, slightly damp.','It’s postmarked… hm. That can’t be right. That’s before I started on the round.','Garlic and fennel seed, by the smell. And a card: For the next cook. Pepperpot, the way Edie liked it.','Edie. Edith Crane, from Lantern Row? I’ve a letter for her I can never quite deliver.']},
+  tam:{who:'tam', lines:['Everybody says you’re the town’s cook now. Officially! There was a vote. I voted twice.','Ottilie said to give you this. It was your uncle’s. She said it’s been wanting to stir something.','Also, this was stuck in the window. I didn’t write it. Nobody did.','It says: One supper, for the Keeper. Whenever you’re ready. And it’s signed: the Quarter.']}
+};
+/* A Delicacy order is served whole on a plate, with the customer's side and a wedge of lemon. */
+const PLATTER={name:'Delicacy Platter', cook:'none', form:'whole', dish:'plate', side:'bread', spice:{}, zone:[.5,.7], speed:1};
 
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
@@ -2356,6 +2523,7 @@ function showCard(){
   const L=S.land, F=L.F, r=rec(L.id);
   const prevW=r.bw||0; L.prev=r.pb?Object.assign({},r.pb):null;
   r.caught++; r.best=Math.max(r.best,L.size); r.seen=true; save.stats.catches++;
+  save.stats.catchAvg=save.stats.catchAvg>0?save.stats.catchAvg*.95+(L.value||0)*.05:(L.value||0);   // what a catch is worth lately (supper tips keep pace with it)
   save.stats.landed=(save.stats.landed||0)+L.w; if (L.stars===3) save.stats.trophies=(save.stats.trophies||0)+1;
   L.pbBeat=!L.isNew && !!L.prev && L.w>prevW; L.pbGlim=L.pbBeat?(GLIMMER.record[F.rarity]||2):0;   // records pay Glimmer, kept now and counted up at the stamp
   if (L.pbGlim){ save.glimmer=(save.glimmer||0)+L.pbGlim; save.stats.glimmer=(save.stats.glimmer||0)+L.pbGlim; }
@@ -2370,6 +2538,7 @@ function showCard(){
   const tags=[]; if (L.lucky) tags.push('Gull luck '+trimNum(gullMul())+'×'); if (L.perfect) tags.push('Perfect hook +25%'); if (L.build>=1.1) tags.push('Chunky');
   if (L.isNew && save.kitchenOpen){ const rid=recipeLearnedBy(L.id); if (rid) tags.push('New recipe: '+RECIPES[rid].name); }
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
+  const ord=!L.needFor && orderShort(L.id); L.orderFor=ord&&ord.n>0?ord.T:null; if (L.orderFor && !L.isNew) tags.push('For '+TOWNSFOLK[L.orderFor.who].name+'’s supper order');
   if (r.caught===MASTERY.catches) tags.push('Mastered: reels get easier'); else if (r.caught<MASTERY.catches) tags.push('Mastery '+r.caught+'/'+MASTERY.catches);
   $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]);
   // runes that did something for this catch
@@ -2379,8 +2548,8 @@ function showCard(){
   $('cLore').textContent=L.isNew||F.rarity!=='common' ? F.lore : '';
   $('cLore').hidden=!$('cLore').textContent;
   const full=save.net.length>=netCap();
-  S.cardDefault=(L.isNew || F.rarity!=='common' || L.pbBeat || L.stars===3 || L.needFor) && !full ? 'keep' : 'sell';
-  S.cardAuto=F.rarity==='common' && !L.isNew && !L.pbBeat && L.stars<3 && !L.needFor;
+  S.cardDefault=(L.isNew || F.rarity!=='common' || L.pbBeat || L.stars===3 || L.needFor || L.orderFor) && !full ? 'keep' : 'sell';
+  S.cardAuto=F.rarity==='common' && !L.isNew && !L.pbBeat && L.stars<3 && !L.needFor && !L.orderFor;
   $('cSell').textContent='Sell · +'+L.value; $('cKeep').textContent=full?'Keepnet full':'Keep';
   $('cKeep').disabled=full; $('cTank').hidden=!(save.tutorialDone && tankRoom(L.id));
   $('cSell').classList.toggle('primary',S.cardDefault==='sell'); $('cKeep').classList.toggle('primary',S.cardDefault==='keep');
@@ -2447,7 +2616,7 @@ window.addEventListener('resize',fitHud);
 if (document.fonts) document.fonts.ready.then(()=>{ HUD.sig=''; fitHud(); });   // the display font changes every width
 function updateHud(){
   const all=REGION_FISH.lake.concat(save.boat?REGION_FISH.coast:[]), n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
-  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('aquaBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; $('kitchenBtn').hidden=!save.kitchenOpen; $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
+  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('aquaBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; $('kitchenBtn').hidden=!save.kitchenOpen; ordersBadge(); $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
   updateGlimChip(); fitHud(); $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
 }
 
@@ -2492,7 +2661,7 @@ function rollTreasure(c){
 function rollCrateTier(c){ const w={}; for (const t in CRATES) w[t]=CRATES[t].weight*tierMul(t,c); return pickW(w); }
 
 /* ---------- what can still turn up ---------- */
-const lootable = id => FINDS[id].from!=='return';
+const lootable = id => !FINDS[id].from;   // reward keepsakes (from a returned curio, or from the town) never turn up loose
 /** The next note in a bottle: the uncle's logbook pages come in order (page 1 in the third bottle, page 2
     a few bottles on), the rest in any order, sea notes only at sea. `peek` just asks whether there is one. */
 function nextBottleNote(c,peek){ const FS=findsState(), read=new Set(FS.notes), reg=modCtx(c).region;
@@ -2772,9 +2941,10 @@ function trapFullIn(T){ const left=trapCap(T)-T.fish.length; if (left<=0) return
 function trapFish(id,reg,spot){ const F=FISH[id], u=Math.pow(Math.random(),1.4), size=Math.round(lerp(F.size[0],F.size[1],u)*10)/10, build=rollBuild();
   return {id, size, w:Math.round(weighFish(id,size,build)), stars:qualityOf(id,size,false), value:Math.max(1,Math.round(F.value*(.85+.3*u))), perfect:false, lucky:false,
     t:Date.now(), reg, spot, hr:save.clock, rod:null, trap:true}; }
-/** How many more of a species your known recipes still need (beyond what's in the keepnet). */
+/** How many more of a species your known recipes, or a supper order, still need (beyond what's in the keepnet). */
 function recipeShort(fid){ if (!save.kitchenOpen) return 0; let n=0;
-  for (const id of RECIPE_ORDER){ const R=RECIPES[id], need=R.need[0]; if (need.id===fid && knownRecipe(id)) n=Math.max(n,need.n-haveFor(R)); } return n; }
+  for (const id of RECIPE_ORDER){ const R=RECIPES[id], need=R.need[0]; if (need.id===fid && knownRecipe(id)) n=Math.max(n,need.n-haveFor(R)); }
+  return Math.max(n,orderShort(fid).n); }   // and what a supper order pinned up needs
 /** Hauls a trap up: keeps what your recipes still need (while the keepnet has room), sells the rest.
     Returns {fish:[trapped fish], kept:[...], coins, glimmer}. The save is up to date when it returns. */
 function haulTrap(T){ trapFill(T); const sp=trapSpot(T), out={fish:[], kept:[], coins:0, glimmer:T.g};
@@ -2808,16 +2978,20 @@ function trapGiftCheck(){ const s=trapState(); if (s.gift || !save.tutorialDone 
 /* ---------- The smoke rack in the kitchen (data/idle.js: SMOKE) ---------- */
 /* save.smoke = {hooks:[{f (the keepnet fish), t (last counted, ms), ms (time smoked)} or null, one per hook]}.
    A fish gains value as it smokes, on an ease-out curve up to SMOKE.gain at SMOKE.full hours. A fish of
-   SMOKE.delicacy.rarityMin or rarer left SMOKE.delicacy.hours becomes a Hollowmere Delicacy. Time counts in real time,
+   SMOKE.delicacy.rarityMin or rarer left SMOKE.delicacy.hours (fewer with the better smoker) becomes a Hollowmere Delicacy. Time counts in real time,
    playing or not, at most AWAY.cap hours at a stretch, and a clock set backwards gives nothing. */
 let SMOKE_OK=null;   // the save object smokeState last tidied
-function smokeState(){ if (SMOKE_OK===save && isObj(save.smoke)) return save.smoke; SMOKE_OK=save; if (!isObj(save.smoke)) save.smoke={}; const s=save.smoke; if (!Array.isArray(s.hooks)) s.hooks=[];
-  s.hooks=s.hooks.slice(0,SMOKE.hooks).map(h=>isObj(h) && isObj(h.f) && FISH[h.f.id] ? h : null); while (s.hooks.length<SMOKE.hooks) s.hooks.push(null);
+/** Hooks on the rack, and the hours to a Delicacy: SMOKE's, or the better smoker's once the town gives you one (data/orders.js). */
+const smokeHooks = () => SMOKE.hooks+(hasUp('smoker')?UPGRADES.smoker.hooks:0);
+const delicacyHours = () => hasUp('smoker')?UPGRADES.smoker.delicacyHours:SMOKE.delicacy.hours;
+function smokeState(){ if (SMOKE_OK===save && isObj(save.smoke)) return save.smoke; SMOKE_OK=save; if (!isObj(save.smoke)) save.smoke={}; const s=save.smoke, n=smokeHooks(); if (!Array.isArray(s.hooks)) s.hooks=[];
+  // a fish on a hook past the count stays on (it can't be lost); only empty hooks beyond it go
+  s.hooks=s.hooks.map(h=>isObj(h) && isObj(h.f) && FISH[h.f.id] ? h : null); while (s.hooks.length>n && !s.hooks[s.hooks.length-1]) s.hooks.pop(); while (s.hooks.length<n) s.hooks.push(null);
   for (const h of s.hooks) if (h){ if (typeof h.t!=='number' || !isFinite(h.t)) h.t=realNow(); if (!(h.ms>=0)) h.ms=0; } return s; }
 /** Brings the rack up to now. Like a trap, a clock set backwards waits for real time to catch up (save.js: realNow). */
 function smokeTick(now){ now=now||realNow(); for (const h of smokeState().hooks) if (h){ const dt=now-h.t; if (dt>0){ h.t=now; h.ms+=Math.min(dt,AWAY.cap*3600000); } else if (dt<-CLOCK_FIX) h.t=now; } }
 const smokeHours = h => h.ms/3600000;
-function isDelicacy(h){ const D=SMOKE.delicacy; return rarRank(FISH[h.f.id].rarity)>=rarRank(D.rarityMin) && smokeHours(h)>=D.hours; }
+function isDelicacy(h){ const D=SMOKE.delicacy; return rarRank(FISH[h.f.id].rarity)>=rarRank(D.rarityMin) && smokeHours(h)>=delicacyHours(); }
 const canDelicacy = f => rarRank(FISH[f.id].rarity)>=rarRank(SMOKE.delicacy.rarityMin);
 /** How much more a fish is worth after `hrs` of smoke (1 to 1+gain), before it turns Delicacy. */
 function smokeGain(hrs){ const u=clamp(hrs/SMOKE.full,0,1); return 1+SMOKE.gain*(1-(1-u)*(1-u)); }
@@ -2841,11 +3015,11 @@ function rackReady(){ smokeTick(); return smokeState().hooks.filter(h=>h && smok
 /* ---------- in the kitchen ---------- */
 function smokeLine(h){ const hrs=smokeHours(h), del=isDelicacy(h), pct=Math.round((smokeMul(h)-1)*100);
   if (del) return 'A Hollowmere Delicacy · '+(SMOKE.delicacy.x)+'× its fresh value';
-  const next=canDelicacy(h.f) ? (hrs<SMOKE.delicacy.hours?' · a Delicacy in '+fmtMins((SMOKE.delicacy.hours-hrs)*60):'') : (hrs<SMOKE.full?' · best at '+SMOKE.full+' h':' · as smoked as it gets');
+  const next=canDelicacy(h.f) ? (hrs<delicacyHours()?' · a Delicacy in '+fmtMins((delicacyHours()-hrs)*60):'') : (hrs<SMOKE.full?' · best at '+SMOKE.full+' h':' · as smoked as it gets');
   return (hrs<1/60?'Just hung':'Smoked '+fmtMins(hrs*60))+(pct?' · +'+pct+'%':'')+next; }
-function smokeBarPct(h){ const goal=canDelicacy(h.f)?SMOKE.delicacy.hours:SMOKE.full; return Math.round(Math.min(1,smokeHours(h)/goal)*100); }
+function smokeBarPct(h){ const goal=canDelicacy(h.f)?delicacyHours():SMOKE.full; return Math.round(Math.min(1,smokeHours(h)/goal)*100); }
 function rackHTML(){ smokeTick(); const s=smokeState(), n=s.hooks.filter(Boolean).length;
-  let h='<h3 class="k-h">Smoke rack <span>'+n+'/'+SMOKE.hooks+'</span></h3><div class="k-rack">';
+  let h='<h3 class="k-h">Smoke rack <span>'+n+'/'+s.hooks.length+'</span></h3><div class="k-rack">';
   s.hooks.forEach((hk,i)=>{ if (!hk){ h+='<div class="k-hook empty"><span class="k-hook-ic" aria-hidden="true"></span><div><h4>Empty hook</h4><p>Hang a fish from your keepnet. It sells for more the longer it smokes.</p></div><button class="btn" data-hang="'+i+'" type="button"'+(save.net.some(smokable)?'':' disabled')+'>'+(save.net.some(smokable)?'Hang a fish':save.net.length?'Nothing to hang':'Keepnet empty')+'</button></div>'; return; }
     const F=FISH[hk.f.id], v=smokeValue(hk), del=isDelicacy(hk);
     h+='<div class="k-hook'+(del?' del':'')+'"><canvas data-smoked="'+hk.f.id+'" data-u="'+smokeBarPct(hk)+'"'+(del?' data-del="1"':'')+' aria-hidden="true"></canvas><div><h4>'+(del?'Delicacy: ':'Smoked ')+F.name+'</h4><p>'+smokeLine(hk)+'</p><p class="k-casts"><i style="width:'+smokeBarPct(hk)+'%"></i></p></div>'+
@@ -2857,7 +3031,7 @@ function bindRack(el){
   el.querySelectorAll('[data-keephook]').forEach(b=>b.addEventListener('click',()=>{ const r=takeDown(+b.dataset.keephook,false); if (!r) return; sfx.plop(); news(r.delicacy?'A Delicacy, into the keepnet':'Into the keepnet, smoked','good'); kBook(); })); }
 /** Picking a keepnet fish to hang: the list, best first. */
 function openHangPicker(){ const el=$('kBook'); const list=save.net.map((f,i)=>({f,i})).filter(o=>smokable(o.f)).sort((a,b)=>b.f.value-a.f.value);
-  let h='<section class="k-now k-pick-head"><div><span class="k-lab">Smoke rack</span><h4>Hang which fish?</h4><p>A rare fish or rarer, left '+SMOKE.delicacy.hours+' hours, becomes a Hollowmere Delicacy.</p></div><button class="btn" id="kPickBack" type="button">Back</button></section><h3 class="k-h">Your keepnet</h3><div class="k-picks">';
+  let h='<section class="k-now k-pick-head"><div><span class="k-lab">Smoke rack</span><h4>Hang which fish?</h4><p>A rare fish or rarer, left '+delicacyHours()+' hours, becomes a Hollowmere Delicacy.</p></div><button class="btn" id="kPickBack" type="button">Back</button></section><h3 class="k-h">Your keepnet</h3><div class="k-picks">';
   for (const {f,i} of list){ const F=FISH[f.id]; h+='<button type="button" class="k-pick" data-pick="'+i+'"><canvas data-f="'+f.id+'" aria-hidden="true"></canvas><span><b>'+F.name+'</b><small style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+(canDelicacy(f)?' · can become a Delicacy':'')+'</small></span><em>'+f.value+'</em></button>'; }
   el.innerHTML=h+'</div>'; el.scrollTop=0;
   el.querySelectorAll('canvas[data-f]').forEach(c=>{ const r=layoutBox(c), d=Math.min(window.devicePixelRatio||1,2); c.width=r.width*d; c.height=r.height*d; const x=c.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); drawFish(x,c.dataset.f,r.width*.8,false); });
@@ -3168,6 +3342,17 @@ const FIND_ART={
       c.beginPath(); c.moveTo(-12,-36); c.lineTo(12,-36); c.lineTo(12,18); c.quadraticCurveTo(28,20,28,32); c.lineTo(-14,32); c.quadraticCurveTo(-14,10,-12,-36); c.closePath(); laFill(c,'#E2B13C');
       c.fillStyle='#C6942A'; c.fillRect(-13,-36,26,8); c.strokeRect(-13,-36,26,8); c.fillStyle=INK; c.fillRect(-14,28,42,5); laShine(c,-6,-14,2,10,.4); c.restore(); };
     boot(-14,-.08); boot(14,.06); },
+  // from the town: your uncle's copper ladle, dented, on a worn wooden handle with a leather loop
+  ladle(c){ c.save(); c.rotate(-.62); laInk(c);
+    c.strokeStyle=INK; c.lineWidth=9; c.beginPath(); c.moveTo(0,-2); c.lineTo(0,-50); c.stroke(); c.strokeStyle=LA.brass; c.lineWidth=5; c.stroke(); c.strokeStyle=LA.brassL; c.lineWidth=1.4; c.beginPath(); c.moveTo(-1.4,-6); c.lineTo(-1.4,-24); c.stroke();
+    laInk(c); rrect(c,-6,-66,12,28,5); laFill(c,'#8A5E3C'); c.fillStyle='#A8774C'; c.fillRect(-4.6,-64,3.6,24); c.strokeStyle='rgba(60,40,24,.5)'; c.lineWidth=1; for (let y=-62;y<-40;y+=6){ c.beginPath(); c.moveTo(-5,y); c.quadraticCurveTo(0,y+2,5,y); c.stroke(); }
+    c.strokeStyle=INK; c.lineWidth=4.6; c.beginPath(); c.arc(0,-70,6,Math.PI*.15,Math.PI*.85,true); c.stroke(); c.strokeStyle='#6B4630'; c.lineWidth=2.4; c.stroke();
+    laInk(c); c.beginPath(); c.moveTo(-26,4); c.quadraticCurveTo(-27,34,0,36); c.quadraticCurveTo(27,34,26,4); c.closePath(); laFill(c,'#C47A45');
+    c.save(); c.beginPath(); c.moveTo(-26,4); c.quadraticCurveTo(-27,34,0,36); c.quadraticCurveTo(27,34,26,4); c.closePath(); c.clip();
+    c.fillStyle='#9E5A30'; c.beginPath(); c.ellipse(14,24,18,16,-.4,0,7); c.fill(); c.fillStyle='rgba(255,214,170,.55)'; c.beginPath(); c.ellipse(-14,16,5,11,.3,0,7); c.fill();
+    c.strokeStyle='rgba(90,40,18,.55)'; c.lineWidth=1.4; c.beginPath(); c.arc(8,22,5,3.6,5.6); c.stroke(); c.restore();   // a dent
+    laInk(c,2.8); laEll(c,0,4,26,7); laFill(c,'#D9925A'); laEll(c,0,4,20,4.6); c.fillStyle='#7A4426'; c.fill(); laShine(c,-9,3,5,1.6,.45);
+    c.restore(); },
 };
 /** Draws find `id` centered at the origin, `s` pixels across. */
 function drawFind(c,id,s,t){ const f=FIND_ART[id]; if (!f) return; c.save(); c.scale(s/100,s/100); f(c,s,t||0); c.restore(); }
@@ -6534,18 +6719,24 @@ window.addEventListener('resize',()=>{ if (AQ.open && aqRefit()) aqDraw(); });
 /* ---------- Smokehouse kitchen: meals, boosts and unlocking ---------- */
 
 function cookVerb(R){ return R.dish==='bowl'?'Simmer':R.dish==='pie'?'Bake':COOK_NAME[R.cook]; }
-function knownRecipe(id){ const R=RECIPES[id]; return !R.learn || (save.fish[R.learn]||{}).caught>0; }
+/** A recipe you can cook: no fish to learn it from, or you've caught that fish; a town recipe once your standing is high enough. */
+function knownRecipe(id){ const R=RECIPES[id]; if (R.rep) return ordersOpen() && standing()>=R.rep; return !R.learn || (save.fish[R.learn]||{}).caught>0; }
+/** Does keepnet fish f answer need n: a species (id) or a rarity (rar), fresh unless the need says smoked; a
+    Delicacy for a Delicacy. A smoked fish only ever goes where smoked is asked for. */
+function needMatch(n,f){ if (!f || !FISH[f.id]) return false; if (n.delicacy) return !!f.delicacy; if (n.smoked) return !!f.smoked && (!n.id || f.id===n.id);
+  return !f.smoked && (n.id ? f.id===n.id : FISH[f.id].rarity===n.rar); }
 function pickNet(R){ // cheapest matching fish from the keepnet, without removing them
   const picks=[], taken=new Set();
   for (const n of R.need){
-    const pool=save.net.map((f,i)=>({f,i})).filter(o=>!taken.has(o.i) && !o.f.smoked && (n.id?o.f.id===n.id:FISH[o.f.id].rarity===n.rar)).sort((a,b)=>(isPB(a.f)-isPB(b.f))||(a.f.value-b.f.value));
+    const pool=save.net.map((f,i)=>({f,i})).filter(o=>!taken.has(o.i) && needMatch(n,o.f)).sort((a,b)=>(isPB(a.f)-isPB(b.f))||(a.f.value-b.f.value));
     if (pool.length<n.n) return {ok:false, have:pool.length, need:n.n, picks:[]};
     pool.slice(0,n.n).forEach(o=>{ taken.add(o.i); picks.push(o.i); });
   }
   return {ok:true, picks};
 }
-function haveFor(R){ const n=R.need[0]; return save.net.filter(f=>!f.smoked && (n.id?f.id===n.id:FISH[f.id].rarity===n.rar)).length; }
-function needText(R){ const n=R.need[0]; return n.n+' × '+(n.id?FISH[n.id].name:'any common fish'); }
+function haveFor(R){ const n=R.need[0]; return save.net.filter(f=>needMatch(n,f)).length; }
+function needText(R){ const n=R.need[0];
+  return n.n+' × '+(n.delicacy?'Hollowmere Delicacy':n.smoked?(n.id?'smoked '+FISH[n.id].name:'any smoked fish'):n.id?FISH[n.id].name:'any '+n.rar+' fish'); }
 function mealStr(m){ return m && m.stars>0 ? MEAL_STR[m.stars-1] : 0; }
 /** A real meal (not Mystery Mush) with casts left, or on its last cast. */
 function mealActive(m){ m=m===undefined?save.meal:m; return !!(m && m.id!=='mush' && (m.casts||m.last) && RECIPES[m.id]); }
@@ -6555,7 +6746,7 @@ function effText(id,stars){ // the boost line, scaled by stars
   const pc=v=>Math.round(Math.abs(v)*s*100)+'%';
   return R.boost.map(b=>({reel:'Reel '+pc(b.v)+' faster', tug:'Tuggers pull '+pc(b.v)+' softer', night:'Night fish bite '+(1+b.v*s).toFixed(s===1?0:2).replace(/\.?0+$/,'')+'× as often',
     hook:'Hook window '+pc(b.v)+' longer', perfect:'Perfect-hook window '+pc(b.v)+' wider', value:'Fish are worth '+pc(b.v)+' more', luck:'+'+Math.round(b.v*s*100)+' luck',
-    swell:'Swells hit '+pc(b.v)+' softer', line:'Line '+pc(b.v)+' stronger'}[b.k])).join(' · ');
+    swell:'Swells hit '+pc(b.v)+' softer', line:'Line '+pc(b.v)+' stronger', bite:'Fish bite '+pc(b.v)+' sooner', treasure:'Treasure turns up '+pc(b.v)+' more often'}[b.k])).join(' · ');
 }
 function mealName(id){ return id==='mush'?MUSH.name:RECIPES[id].name; }
 function tickMeal(){ const m=save.meal; if (!m || !m.casts) return; m.casts--; if (m.casts<=0){ m.casts=0; m.last=true; } persist(); updateMealChip(); }
@@ -6571,6 +6762,166 @@ function kitchenUnlockCheck(fromBoot){
   const b=$('kitchenBtn'); b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
   setTimeout(()=>{ if (S.state==='idle' && !K.open) coachFor('Smoke is rising from your uncle’s old smokehouse. Tap the skillet to cook fish from your keepnet into meals.',8); },fromBoot?1500:2400);
 }
+
+/* ---------- Supper orders and Town reputation (data/orders.js) ---------- */
+/* save.orders = {day: the in-game day of the evening whose tickets are pinned now (null before the first), list:[ticket],
+   rep (Town reputation), seen:{standing:1 for each visit played}, visits:[standings whose visit is still to play],
+   next (ticket ids)}.
+   A ticket = {id, who (TOWNSFOLK), kind:'dish'|'delicacy'|'grey', rid (a recipe, for a dish), tw:[twist], smoked (a
+   dish made with a smoked fish), side (a Delicacy's), say (what they wrote on it)}.
+   A twist is a string, as in TOWNSFOLK.twists: 'more:dill' (one more, or a pinch if the recipe has none), 'less:salt'
+   (one fewer), 'none:pepper', 'done:light' or 'done:well' (the golden zone moves), 'garnish:none' or 'garnish:lots'.
+   Everything here reads and writes only the save; the kitchen (game/order-kitchen.js) cooks and serves them. */
+let ORD_OK=null;   // the save object ordersState last tidied
+const TWIST_RE=/^(more|less|none):[a-z]+$|^done:(light|well)$|^garnish:(none|lots)$/;
+function ordersState(){ if (ORD_OK===save && isObj(save.orders)) return save.orders; ORD_OK=save; if (!isObj(save.orders)) save.orders={}; const s=save.orders;
+  if (!Array.isArray(s.list)) s.list=[]; s.rep=Math.max(0,Math.floor(+s.rep||0)); if (!isObj(s.seen)) s.seen={}; if (!Array.isArray(s.visits)) s.visits=[];
+  if (!Number.isInteger(s.day)) s.day=null; if (!(s.next>0)) s.next=1;
+  const ids=new Set(); s.list=s.list.filter(T=>validTicket(T) && !ids.has(T.id) && ids.add(T.id)).slice(0,4);
+  const at=standingOf(s.rep); s.visits=s.visits.filter((i,k,a)=>Number.isInteger(i) && i>0 && i<=at && STANDINGS[i].visit && !s.seen[i] && a.indexOf(i)===k);
+  for (const T of s.list) if (T.id>=s.next) s.next=T.id+1;
+  // a save from before supper orders that has cooked already
+  if (!(save.stats.cooks>0) && (save.meal || (save.pantry||[]).length)) save.stats.cooks=1;
+  return s; }
+function validTicket(T){ if (!isObj(T) || !TOWNSFOLK[T.who] || !Number.isInteger(T.id)) return false;
+  if (!Array.isArray(T.tw)) T.tw=[]; T.tw=T.tw.filter(x=>typeof x==='string' && TWIST_RE.test(x) && (/^(done|garnish):/.test(x) || !!SPICES[x.split(':')[1]]));
+  const P=TOWNSFOLK[T.who], own=Object.values(P.say).flat();
+  if (T.who==='grey' || T.kind==='grey'){ T.kind='grey'; T.tw=[]; }
+  else if (T.kind==='delicacy'){ if (!SIDES[T.side]) T.side='bread'; T.tw=[]; }
+  else { T.kind='dish'; if (!RECIPES[T.rid] || T.rid==='pie') return false;
+    if (!(T.smoked && RECIPES[T.rid].need[0].id && RECIPES[T.rid].need[0].n===1)) delete T.smoked; }
+  // what's written on the ticket is always one of their own lines (it goes into the page as it is)
+  if (!own.includes(T.say)) T.say=sayFor(P,T.kind==='delicacy'?['delicacy']:T.tw);
+  return T.kind!=='grey' || T.who==='grey'; }
+/** Orders begin once the kitchen is open and you've cooked a meal. */
+function ordersOpen(){ ordersState(); return !!save.kitchenOpen && (save.stats.cooks||0)>=1; }
+function standingOf(rep){ let i=0; while (i+1<STANDINGS.length && rep>=STANDINGS[i+1].at) i++; return i; }
+const standing = () => standingOf(ordersState().rep);
+/** An upgrade the town has given you (data/orders.js: UPGRADES), by the standing that brings it. */
+function hasUp(id){ const i=STANDINGS.findIndex(St=>St.up===id); return i>=0 && standing()>=i; }
+const spicesOn = () => hasUp('spices') ? SPICE_ORDER.concat(SPICE_MORE) : SPICE_ORDER;
+/** The in-game day whose evening tickets should be up now: today's from ORDERS.hour, otherwise yesterday's. */
+const ordersDue = () => (save.day||0) - (save.clock>=ORDERS.hour?0:1);
+/** Pins a fresh evening's tickets when one is due. Returns 'first' for the very first batch, true for a later one. */
+function ordersTick(){ if (!ordersOpen()) return false; const s=ordersState(), due=ordersDue();
+  if (s.day!=null && s.day>=due && s.day<=due+1) return false;
+  const first=s.day==null; s.day=due; s.list=makeBatch(); persist(); return first?'first':true; }
+const townsfolkIn = () => TOWNSFOLK_ORDER.filter(id=>{ const w=TOWNSFOLK[id].when; return !w || (w==='barnaby' && save.barnabyCame); });
+/** A Delicacy in the keepnet, or a fish on the rack that will be one: a Delicacy ticket only turns up then. */
+const delicacyNear = () => save.net.some(f=>f && f.delicacy) || smokeState().hooks.some(h=>h && canDelicacy(h.f));
+/** A smoked fish of this kind in the keepnet, or one on the rack. */
+const smokedNear = id => save.net.some(f=>f && f.smoked && f.id===id) || smokeState().hooks.some(h=>h && h.f.id===id);
+function makeBatch(){ const st=standing(), n=ORDERS.count[st>=1?1:0], pool=townsfolkIn().slice(), out=[];
+  // one evening in a few, with a Delicacy around, one of the tickets asks for it
+  const del=st>=ORDERS.delicacy.from && delicacyNear() && Math.random()<ORDERS.delicacy.chance ? Math.floor(Math.random()*Math.min(n,pool.length)) : -1;
+  while (out.length<n && pool.length){ const who=pool.splice(Math.floor(Math.random()*pool.length),1)[0], T=makeTicket(who,st,out,out.length===del); if (T) out.push(T); }
+  // Grey, now and then, after a fish
+  if (st>=ORDERS.grey.from && Math.random()<ORDERS.grey.chance) out.push(makeTicket('grey',st,out));
+  return out; }
+function makeTicket(who,st,batch,del){ const P=TOWNSFOLK[who], s=ordersState(), id=s.next++;
+  if (P.raw) return {id, who, kind:'grey', tw:[], say:sayFor(P,[])};
+  if (del) return {id, who, kind:'delicacy', side:P.side||'bread', tw:[], say:sayFor(P,['delicacy'])};
+  const rid=pickRecipeFor(P,batch); if (!rid) return null; const R=RECIPES[rid];
+  // made with a smoked fish: only for a recipe that takes one fish of a kind (one hook on the rack), and only while
+  // you have that kind smoked, or hanging
+  const smoked=st>=ORDERS.smoked.from && !!R.need[0].id && R.need[0].n===1 && smokedNear(R.need[0].id) && Math.random()<ORDERS.smoked.chance;
+  const tw=pickTwists(P,R,st);
+  return {id, who, kind:'dish', rid, tw, smoked:smoked||undefined, say:sayFor(P,tw)}; }
+/** A recipe you know for this customer: their favorites three times as likely, and not one already on tonight's board. */
+function pickRecipeFor(P,batch){ const w={};
+  for (const id of RECIPE_ORDER){ if (id==='pie' || !knownRecipe(id)) continue; const R=RECIPES[id]; if (Object.keys(R.spice).some(k=>!spicesOn().includes(k))) continue;
+    w[id]=(P.likes.includes(id)?3:1)*(batch.some(T=>T.rid===id)?.2:1); }
+  return Object.keys(w).length ? pickW(w) : null; }
+/** The recipe's spice with these twists (as ticketSpice does for a ticket). */
+function spiceWith(R,tw){ const sp=Object.assign({},R.spice);
+  for (const x of tw){ const [k,v]=x.split(':'); if (!SPICES[v]) continue; if (k==='more') sp[v]=(sp[v]||0)+1; else if (k==='less') sp[v]=Math.max(1,(sp[v]||0)-1); else if (k==='none') delete sp[v]; }
+  return sp; }
+/** Can this twist go on a ticket for R, beside the ones already picked? A "none" never takes the last spice away. */
+function validTwist(x,R,picked){ const [k,v]=x.split(':'), have=R.spice[v]||0;
+  if (k==='more') return spicesOn().includes(v) && have<4; if (k==='less') return have>=2;
+  if (k==='none') return have>=1 && Object.keys(spiceWith(R,[...(picked||[]),x])).length>0;
+  if (k==='done') return R.cook!=='none'; return k==='garnish'; }
+/** The twists on a ticket: how many by standing, the customer's own first. Never two on one spice, two for doneness or two garnishes. */
+function pickTwists(P,R,st){ const [lo,hi]=ORDERS.twists[Math.min(st,ORDERS.twists.length-1)], n=lo+Math.floor(Math.random()*(hi-lo+1)), out=[];
+  const generic=[...spicesOn().map(k=>'more:'+k), ...Object.keys(R.spice).map(k=>'none:'+k), ...Object.keys(R.spice).map(k=>'less:'+k), 'done:light','done:well','garnish:none','garnish:lots'];
+  // never two on one spice, two for doneness or two garnishes; and dill in the seasoning with dill on top ("no dill",
+  // "lots of dill on top") reads as a muddle, so a ticket asks about dill one way or the other
+  const same=(a,b)=>{ const [ka,va]=a.split(':'), [kb,vb]=b.split(':'); return ka==='done'||ka==='garnish' ? ka===kb : (kb!=='done' && kb!=='garnish' && va===vb); };
+  const dill=x=>/^(more|less|none):dill$/.test(x), top=x=>x.startsWith('garnish:');
+  const clash=(a,b)=>same(a,b) || (dill(a)&&top(b)) || (top(a)&&dill(b));
+  while (out.length<n){ const w={}; for (const x of [...P.twists, ...generic]) if (validTwist(x,R,out) && !out.some(o=>o===x || clash(o,x))) w[x]=(w[x]||0)+(P.twists.includes(x)?4:1);
+    if (!Object.keys(w).length) break; out.push(pickW(w)); }
+  return out; }
+function sayFor(P,keys){ for (const k of keys) if (P.say[k] && Math.random()<.7) return P.say[k]; const a=P.say.any||[]; return a[Math.floor(Math.random()*a.length)]||''; }
+
+/* ---------- what a ticket asks for ---------- */
+function ticketRecipe(T){ return T.kind==='delicacy' ? Object.assign({},PLATTER,{side:T.side}) : RECIPES[T.rid]; }
+/** The spice the customer wants: the recipe's, with the ticket's twists. */
+const ticketSpice = T => spiceWith(ticketRecipe(T),T.tw);
+const ticketDone = T => T.tw.includes('done:light')?'light':T.tw.includes('done:well')?'well':null;
+function ticketZone(T){ const z=ticketRecipe(T).zone, d=ORDERS.done[ticketDone(T)]||0; return [clamp(z[0]+d,.06,.86), clamp(z[1]+d,.2,.96)]; }
+const ticketGarnish = T => T.tw.includes('garnish:none')?'none':T.tw.includes('garnish:lots')?'lots':null;
+/** One twist as the customer would write it. */
+function twistText(x,R){ const [k,v]=x.split(':'), S2=SPICES[v], n=S2&&S2.name.toLowerCase();
+  if (k==='more') return R&&R.spice[v]?'extra '+n:'a pinch of '+n; if (k==='less') return 'easy on the '+n; if (k==='none') return 'no '+n;
+  return {'done:light':'lightly done','done:well':'well done','garnish:none':'no dill on top','garnish:lots':'lots of dill on top'}[x]||x; }
+/** What the ticket takes from the keepnet. */
+function ticketNeed(T){ if (T.kind==='grey') return {rar:'common', n:1}; if (T.kind==='delicacy') return {delicacy:true, n:1};
+  const n=RECIPES[T.rid].need[0]; return T.smoked ? {id:n.id, n:n.n, smoked:true} : n; }
+const pickOrder = T => { if (T.kind!=='grey') return pickNet({need:[ticketNeed(T)]}); const i=greyPick(); return i<0 ? {ok:false, have:0, need:1, picks:[]} : {ok:true, picks:[i]}; };
+function ticketTitle(T){ return T.kind==='grey' ? 'A fish, whole' : T.kind==='delicacy' ? 'A Hollowmere Delicacy' : RECIPES[T.rid].name; }
+/** The lines under the dish on a ticket: a smoked fish first, then each twist. */
+function ticketLines(T){ const R=ticketRecipe(T), out=[];
+  if (T.kind==='delicacy') out.push('with '+SIDES[T.side].toLowerCase()+' and lemon');
+  if (T.smoked) out.push('made with smoked '+FISH[RECIPES[T.rid].need[0].id].name);
+  for (const x of T.tw) out.push(twistText(x,R)); return out; }
+
+/* ---------- tips and reputation ---------- */
+/** What one of your catches is worth lately (a running average kept as you land them), or a guess before there is one. */
+function catchWorth(){ const a=save.stats.catchAvg; if (a>0) return a; return spotValue({spot:'open'}); }
+function orderTip(T,stars,worth){ const P=TOWNSFOLK[T.who], O=ORDERS.tip; if (T.kind==='grey') return 0; stars=clamp(stars,0,3);
+  if (T.kind==='delicacy') return Math.round(worth*O.delicacy[stars]*(P.tip||1));
+  return Math.round((worth*O.fish+catchWorth()*O.catches[stars])*(1+O.twist*T.tw.length)*(P.tip||1)); }
+function orderRep(T,stars){ const R=ORDERS.rep; if (T.kind==='grey') return R.grey; stars=clamp(stars,0,3);
+  return R.stars[stars]+R.twist*T.tw.length+(T.kind==='delicacy'||T.smoked?R.special:0); }
+/** What the fish a ticket would take sell for: the keepnet's own if they're there, otherwise a fair guess. */
+function ticketWorth(T){ const n=ticketNeed(T), pk=pickNet({need:[n]});
+  if (pk.ok) return pk.picks.reduce((a,i)=>a+save.net[i].value,0);
+  const typical=id=>FISH[id].value*(n.smoked?1+SMOKE.gain*.6:1);
+  if (n.delicacy){ const rare=Object.keys(FISH).filter(id=>canDelicacy({id}) && (save.fish[id]||{}).caught>0); return Math.round((rare.length?rare.reduce((a,id)=>a+FISH[id].value,0)/rare.length:45)*SMOKE.delicacy.x); }
+  if (n.id) return Math.round(typical(n.id)*n.n);
+  const ids=Object.keys(FISH).filter(id=>FISH[id].rarity===n.rar && (save.fish[id]||{}).caught>0);
+  return Math.round((ids.length?ids.reduce((a,id)=>a+FISH[id].value,0)/ids.length:3)*n.n); }
+/** Pays for a served order and takes its ticket down. Returns {tip, rep, from, to} (standings before and after). */
+function serveOrder(T,stars,worth){ const s=ordersState(), from=standing(), tip=orderTip(T,stars,worth), rep=orderRep(T,stars);
+  s.list=s.list.filter(o=>o.id!==T.id); s.rep+=rep; save.coins+=tip;
+  save.stats.orders=(save.stats.orders||0)+1; save.stats.tips=(save.stats.tips||0)+tip; if (stars>=3) save.stats.orders3=(save.stats.orders3||0)+1;
+  const to=standing(); for (let i=from+1;i<=to;i++) reachStanding(i);
+  persist(); return {tip, rep, from, to}; }
+/** A new standing: its visit waits to play, and its upgrade arrives (the ladle goes on your keepsake shelf). */
+function reachStanding(i){ const s=ordersState(), St=STANDINGS[i]; if (!St) return;
+  if (St.visit && !s.seen[i] && !s.visits.includes(i)) s.visits.push(i);
+  const U=UPGRADES[St.up]; if (U && U.keepsake && FINDS[U.keepsake]){ const FS=findsState(); if (!FS.have[U.keepsake]){ FS.have[U.keepsake]={t:Date.now(),hr:save.clock,reg:REG(),src:'town'}; FS.fresh.push(U.keepsake); } }
+  SMOKE_OK=null; MODC.dirty=true; }
+/** What the dish tickets pinned up need, fresh, between them: by kind ({mossback:2}), and by rarity ('rar:common'). */
+function ordersWant(){ const w={}; if (!ordersOpen()) return w;
+  for (const T of ordersState().list){ if (T.kind!=='dish' || T.smoked) continue; const n=RECIPES[T.rid].need[0], k=n.id||'rar:'+n.rar; w[k]=(w[k]||0)+n.n; }
+  return w; }
+/** The keepnet fish Grey would take: the cheapest common, never a record, and never one a pinned ticket needs. -1 if none. */
+function greyPick(){ const want=ordersWant(), pool=save.net.map((f,i)=>({f,i})).filter(o=>needMatch({rar:'common'},o.f) && !isPB(o.f)), left={};
+  for (const o of pool) left[o.f.id]=(left[o.f.id]||0)+1;
+  const spare=pool.filter(o=>left[o.f.id]>(want[o.f.id]||0)).sort((a,b)=>a.f.value-b.f.value);
+  return spare.length>(want['rar:common']||0) ? spare[0].i : -1; }
+/** Grey's order: a fish he can have, handed over whole. */
+function serveGrey(T){ const i=greyPick(); if (i<0) return null; const f=save.net.splice(i,1)[0]; const out=serveOrder(T,3,0); out.fish=f; return out; }
+/** The next standing up, and how far along you are to it (0 to 1). */
+function standingNext(){ const s=ordersState(), i=standing(), N=STANDINGS[i+1]; if (!N) return {i, next:null, u:1};
+  return {i, next:N, u:clamp((s.rep-STANDINGS[i].at)/(N.at-STANDINGS[i].at),0,1), left:N.at-s.rep}; }
+/** How many more of a species the tickets pinned up need between them, beyond the fresh ones in the keepnet, and the
+    first of those tickets. Two tickets for a Mossback Garden Stew want two mossbacks. */
+function orderShort(fid){ const want=ordersWant()[fid]||0; if (!want) return {n:0, T:null};
+  const n=want-save.net.filter(f=>f.id===fid && !f.smoked).length; if (n<=0) return {n:0, T:null};
+  return {n, T:ordersState().list.find(T=>T.kind==='dish' && !T.smoked && RECIPES[T.rid].need[0].id===fid)}; }
 
 /* ---------- Smokehouse kitchen: drawing ---------- */
 function seeded(str){ let h=2166136261; for (const ch of String(str)) h=Math.imul(h^ch.charCodeAt(0),16777619); return ()=>{ h=Math.imul(h^(h>>>15),2246822507); h=Math.imul(h^(h>>>13),3266489909); h^=h>>>16; return (h>>>0)/4294967296; }; }
@@ -6588,9 +6939,13 @@ function drawSpecks(c,specks,L,h){ for (const s of specks){ const x=s.u*L, y=s.v
   else if (s.k==='pepper'){ c.fillStyle='#2E2924'; c.beginPath(); c.arc(0,0,1.7*r,0,Math.PI*2); c.fill(); }
   else if (s.k==='dill'){ c.strokeStyle='#4E8A3E'; c.lineWidth=1.4*r; c.lineCap='round'; c.beginPath(); c.moveTo(-3*r,0); c.lineTo(3*r,0); c.moveTo(0,0); c.lineTo(1.6*r,-2*r); c.stroke(); }
   else if (s.k==='lemon'){ c.strokeStyle='#E9C23A'; c.lineWidth=1.5*r; c.lineCap='round'; c.beginPath(); c.arc(0,0,2.6*r,0,Math.PI*1.2); c.stroke(); }
+  else if (s.k==='garlic'){ c.fillStyle='#F6F0DE'; c.beginPath(); c.ellipse(0,0,2.6*r,1.3*r,0,0,Math.PI*2); c.fill(); c.strokeStyle='rgba(150,130,90,.6)'; c.lineWidth=.6; c.stroke(); }
+  else if (s.k==='fennel'){ c.fillStyle='#8E9A4E'; c.beginPath(); c.ellipse(0,0,2.2*r,.9*r,0,0,Math.PI*2); c.fill(); c.strokeStyle='rgba(70,60,30,.6)'; c.lineWidth=.5; c.beginPath(); c.moveTo(-1.8*r,0); c.lineTo(1.8*r,0); c.stroke(); }
   else { c.fillStyle='rgba(200,85,61,.85)'; c.beginPath(); c.arc(0,0,2.1*r,0,Math.PI*2); c.fill(); }
   c.restore(); } }
-/* o: {fid, L, top: doneness shown on the visible face, edge: browning creeping up from the pan, marks: grill marks 0..1, specks, form} */
+/** The fish's flesh, raw: its own color, or a smoked fish's amber. */
+function fleshOf(o){ const raw=FLESH[o.fid]||'#F1D3BC'; if (!o.smoked) return raw; const A=hexRGB(raw), B=hexRGB('#B87445'); return '#'+A.map((v,i)=>Math.round(lerp(v,B[i],.55)).toString(16).padStart(2,'0')).join(''); }
+/* o: {fid, L, top: doneness shown on the visible face, edge: browning creeping up from the pan, marks: grill marks 0..1, specks, form, smoked} */
 function drawFood(c,o){
   const form=o.form||'fillet';
   if (form==='skewer') return drawSkewer(c,o);
@@ -6599,7 +6954,7 @@ function drawFood(c,o){
   if (form==='wrap' && o.wrapped) drawWrapLeaf(c,o);
 }
 function drawFilletBody(c,o){
-  const L=o.L, h=L*.36, F=FISH[o.fid], raw=FLESH[o.fid]||'#F1D3BC', top=o.top||0, p=filletPath(L);
+  const L=o.L, h=L*.36, F=FISH[o.fid], raw=fleshOf(o), top=o.top||0, p=filletPath(L);
   c.save(); c.fillStyle='rgba(40,20,10,.22)'; c.translate(L*.012,L*.024); c.fill(p); c.restore();
   c.fillStyle=cookCol(raw,top); c.fill(p);
   c.save(); c.clip(p);
@@ -6625,7 +6980,7 @@ function drawWrapLeaf(c,o){
   c.restore();
 }
 function drawSkewer(c,o){
-  const L=o.L, raw=FLESH[o.fid]||'#F1D3BC', top=o.top||0, cs=L*.2;
+  const L=o.L, raw=fleshOf(o), top=o.top||0, cs=L*.2;
   c.save(); c.lineCap='round';
   c.strokeStyle=INK; c.lineWidth=L*.035+2.4; c.beginPath(); c.moveTo(-L*.58,0); c.lineTo(L*.6,0); c.stroke();
   c.strokeStyle='#C99B62'; c.lineWidth=L*.035; c.stroke();
@@ -6642,7 +6997,7 @@ function drawSkewer(c,o){
   c.restore();
 }
 function drawSteak(c,o){
-  const L=o.L, F=FISH[o.fid], raw=FLESH[o.fid]||'#F1D3BC', top=o.top||0, rx=L*.4, ry=L*.31;
+  const L=o.L, F=FISH[o.fid], raw=fleshOf(o), top=o.top||0, rx=L*.4, ry=L*.31;
   c.save(); c.fillStyle='rgba(40,20,10,.22)'; c.beginPath(); c.ellipse(L*.012,L*.026,rx,ry,0,0,Math.PI*2); c.fill();
   c.beginPath(); c.ellipse(0,0,rx,ry,0,0,Math.PI*2); c.fillStyle=cookCol(raw,top); c.fill(); c.save(); c.clip();
   c.strokeStyle=mixHex(F.color,'#3A2A24',top*.7); c.lineWidth=L*.06; c.stroke();
@@ -6675,7 +7030,7 @@ function drawPlate(c,R){
   c.beginPath(); c.arc(0,0,R*.74,0,Math.PI*2); c.fillStyle=g; c.fill(); c.strokeStyle='rgba(43,42,51,.14)'; c.lineWidth=1.5; c.stroke();
   c.restore();
 }
-const BROTH={gumbo:'#B4613C', stew:'#9C8D4E', chowder:'#EAD9B4'};
+const BROTH={gumbo:'#B4613C', stew:'#9C8D4E', chowder:'#EAD9B4', kedgeree:'#E7C25E', pepperpot:'#9E3B26'};
 function drawBowl(c,R,o){ // o: {rid, fid, top, filled, t}
   c.save(); c.fillStyle='rgba(30,15,5,.28)'; c.beginPath(); c.ellipse(4,8,R*1.04,R,0,0,Math.PI*2); c.fill();
   c.beginPath(); c.arc(0,0,R,0,Math.PI*2); c.fillStyle='#3F6C8A'; c.fill(); c.lineWidth=2; c.strokeStyle=INK; c.stroke();
@@ -6683,7 +7038,7 @@ function drawBowl(c,R,o){ // o: {rid, fid, top, filled, t}
   c.fillStyle='#F4EEE2'; for (let i=0;i<12;i++){ const a=i/12*Math.PI*2; c.beginPath(); c.arc(Math.cos(a)*R*.93,Math.sin(a)*R*.93,R*.025,0,Math.PI*2); c.fill(); }
   if (o && o.filled){ const r=R*.76, col=BROTH[o.rid]||'#D9A35E'; c.beginPath(); c.arc(0,0,r,0,Math.PI*2);
     const g=c.createRadialGradient(-r*.3,-r*.3,r*.1,0,0,r); g.addColorStop(0,mixHex(col,'#FFFFFF',.25)); g.addColorStop(1,mixHex(col,'#2B2A33',.18)); c.fillStyle=g; c.fill();
-    c.save(); c.clip(); const rnd=seeded(o.rid+'b'), raw=FLESH[o.fid]||'#F1D3BC';
+    c.save(); c.clip(); const rnd=seeded(o.rid+'b'), raw=fleshOf(o);
     for (let i=0;i<7;i++){ const a=rnd()*Math.PI*2, d=rnd()*r*.62, x=Math.cos(a)*d, y=Math.sin(a)*d, s=r*(.16+rnd()*.08);
       c.save(); c.translate(x,y); c.rotate(rnd()*3); rrect(c,-s/2,-s*.4,s,s*.8,s*.3); c.fillStyle=cookCol(raw,Math.min(.75,(o.top||.6))); c.fill(); c.strokeStyle='rgba(43,42,51,.55)'; c.lineWidth=1.2; c.stroke(); c.restore(); }
     for (let i=0;i<14;i++){ const a=rnd()*Math.PI*2, d=rnd()*r*.8; c.fillStyle=['#4E8A3E','#E9C23A','#C8553D'][i%3]; c.globalAlpha=.8; c.beginPath(); c.arc(Math.cos(a)*d,Math.sin(a)*d,1.6,0,Math.PI*2); c.fill(); }
@@ -6939,10 +7294,239 @@ function kDrawLantern(c,t){ const s=K.s, x=K.W*.5, y=K.top+26*s, fl=.85+.15*Math
   c.strokeStyle=INK; c.lineWidth=1.2; c.beginPath(); c.moveTo(x,y-14*s); c.lineTo(x,y+14*s); c.stroke();
   c.restore(); }
 
+/* ---------- The townsfolk up close: head-and-shoulders portraits for supper tickets, the kitchen window and visits ---------- */
+/* The same people as on the water (game/folk.js), drawn larger: 3 to 4 values a shape, ink outlines, light from the
+   upper left. drawPortrait(c, who, x, y, size, o) draws one centered at (x, y), size tall, in a 100-unit box.
+   o = {t: time, for the blink and the little motions; mood: 'wait' | 'happy' | 'meh' | 'talk'; talk: 0..1, how open
+   the mouth is while talking; hop: 0..1, a happy bounce}. Each blinks on its own clock. */
+const PORTRAIT={ottilie:{blink:0}, barnaby:{blink:1.3}, pell:{blink:2.1}, bram:{blink:.7}, tam:{blink:1.8}, grey:{blink:2.7}};
+function drawPortrait(c,who,x,y,size,o){ o=o||{}; const k=size/100, t=o.t||0, P=PORTRAIT[who]; if (!P) return;
+  c.save(); c.translate(x,y-(o.hop||0)*6*k); c.scale(k,k); c.lineJoin='round'; c.lineCap='round'; c.lineWidth=2; c.strokeStyle=INK;
+  const blink=((t+P.blink)%4.3)<.13 || (o.mood==='talk' && ((t*1.7+P.blink)%2.9)<.1);
+  ({ottilie:ptOttilie,barnaby:ptBarnaby,pell:ptPell,bram:ptBram,tam:ptTam,grey:ptGrey})[who](c,t,o.mood||'wait',blink,o.talk||0);
+  c.restore(); }
+/** What's behind them: the lake through the window, at this hour, so a portrait always looks like someone come to call. */
+function ptBackdrop(c,w,h,t){ const P=palAt(save.clock), hz=h*.7;
+  const g=c.createLinearGradient(0,0,0,hz); g.addColorStop(0,'rgb('+P.skyTopR+')'); g.addColorStop(.7,'rgb('+P.skyLowR+')'); g.addColorStop(1,'rgb('+P.skyHzR+')'); c.fillStyle=g; c.fillRect(0,0,w,hz);
+  if (P.stars>.2){ const rnd=seeded('ptstars'); c.fillStyle='rgba(255,255,240,'+(P.stars*.8).toFixed(2)+')'; for (let i=0;i<10;i++) c.fillRect(rnd()*w,rnd()*hz*.6,1.2,1.2); }
+  c.fillStyle='rgb('+P.hillFarR+')'; c.beginPath(); c.moveTo(0,hz); c.quadraticCurveTo(w*.25,hz-h*.16,w*.5,hz-h*.06); c.quadraticCurveTo(w*.75,hz-h*.18,w,hz-h*.05); c.lineTo(w,hz); c.closePath(); c.fill();
+  c.fillStyle='rgb('+P.w1R+')'; c.fillRect(0,hz,w,h-hz); c.fillStyle='rgba(255,255,255,.22)'; for (const [x,y,l] of [[.12,.78,.18],[.6,.84,.22],[.3,.92,.14]]) c.fillRect(w*x+Math.sin((t||0)*.8+x*9)*2,h*y,w*l,1.2); }
+/* ---- shared pieces ---- */
+function ptPath(c,pts){ c.beginPath(); c.moveTo(pts[0][0],pts[0][1]); for (let i=1;i<pts.length;i++){ const p=pts[i]; p.length===4?c.quadraticCurveTo(p[0],p[1],p[2],p[3]):c.lineTo(p[0],p[1]); } c.closePath(); }
+/** Fills path fn with base, then a shadow side (right) and a lit edge (left), clipped to it, then inks it. */
+function ptShade(c,fn,base,shadow,light,o){ o=o||{}; fn(); c.fillStyle=base; c.fill();
+  c.save(); fn(); c.clip();
+  if (shadow){ c.fillStyle=shadow; c.beginPath(); c.ellipse(o.sx!=null?o.sx:30,o.sy!=null?o.sy:20,o.sr||46,o.sr2||60,o.sa||-.3,0,6.28); c.fill(); }
+  if (light){ c.fillStyle=light; c.beginPath(); c.ellipse(o.lx!=null?o.lx:-26,o.ly!=null?o.ly:-14,o.lr||16,o.lr2||30,o.la||.35,0,6.28); c.fill(); }
+  c.restore(); fn(); c.lineWidth=o.lw||2; c.strokeStyle=INK; c.stroke(); }
+function ptEyes(c,ex,ey,gap,mood,blink,r){ r=r||2.6;
+  for (const sx of [-1,1]){ const x=ex+sx*gap;
+    if (blink){ c.strokeStyle=INK; c.lineWidth=1.8; c.beginPath(); c.moveTo(x-r-.6,ey); c.quadraticCurveTo(x,ey+1.4,x+r+.6,ey); c.stroke(); continue; }
+    if (mood==='happy'){ c.strokeStyle=INK; c.lineWidth=2; c.beginPath(); c.moveTo(x-r-.8,ey+1); c.quadraticCurveTo(x,ey-r-1.4,x+r+.8,ey+1); c.stroke(); continue; }
+    c.fillStyle=INK; c.beginPath(); c.ellipse(x,ey,r*.82,r,0,0,6.28); c.fill();
+    c.fillStyle='rgba(255,255,255,.95)'; c.beginPath(); c.arc(x-r*.3,ey-r*.38,r*.32,0,6.28); c.fill(); } }
+function ptBrows(c,ex,ey,gap,mood,col,w){ c.strokeStyle=col; c.lineWidth=w||2.4;
+  for (const sx of [-1,1]){ const x=ex+sx*gap, lift=mood==='happy'?-1.2:0, tilt=mood==='meh'?(sx<0?1.6:-1.4):0;
+    c.beginPath(); c.moveTo(x-4.4,ey+tilt*sx*.5+lift+.6); c.quadraticCurveTo(x,ey-2+lift+tilt*.3,x+4.4,ey-tilt*sx*.5+lift+.6); c.stroke(); } }
+function ptMouth(c,x,y,mood,talk,w){ w=w||6; c.strokeStyle=INK; c.lineWidth=1.8;
+  if (mood==='talk' || talk>0){ const h=1.2+4*clamp(talk,0,1); c.fillStyle='#5A2A26'; c.beginPath(); c.ellipse(x,y+h*.4,w*.55,h,0,0,6.28); c.fill(); c.stroke(); return; }
+  if (mood==='happy'){ c.fillStyle='#5A2A26'; c.beginPath(); c.moveTo(x-w,y-1); c.quadraticCurveTo(x,y+w*1.05,x+w,y-1); c.closePath(); c.fill(); c.stroke();
+    c.fillStyle='#E07D72'; c.beginPath(); c.ellipse(x,y+w*.45,w*.42,w*.2,0,0,6.28); c.fill(); return; }
+  if (mood==='meh'){ c.beginPath(); c.moveTo(x-w*.8,y+.8); c.quadraticCurveTo(x,y-.4,x+w*.8,y-1); c.stroke(); return; }
+  c.beginPath(); c.moveTo(x-w*.75,y); c.quadraticCurveTo(x,y+w*.45,x+w*.75,y); c.stroke(); }
+function ptCheeks(c,x,y,gap,a){ c.fillStyle='rgba(220,100,90,'+(a||.32)+')'; for (const sx of [-1,1]){ c.beginPath(); c.ellipse(x+sx*gap,y,4.4,2.8,0,0,6.28); c.fill(); } }
+function ptHead(c,cx,cy,rx,ry,skin,shadow,light){ ptShade(c,()=>{ c.beginPath(); c.ellipse(cx,cy,rx,ry,0,0,6.28); },skin,shadow,light,{sx:cx+rx*.9,sy:cy+ry*.55,sr:rx*.78,sr2:ry*.9,sa:-.5,lx:cx-rx*.55,ly:cy-ry*.45,lr:rx*.32,lr2:ry*.38,la:.5}); }
+function ptEar(c,x,y,skin,shadow){ c.beginPath(); c.ellipse(x,y,3.6,5.4,0,0,6.28); c.fillStyle=skin; c.fill(); c.lineWidth=1.6; c.strokeStyle=INK; c.stroke(); c.strokeStyle=shadow; c.lineWidth=1.2; c.beginPath(); c.arc(x,y,2,-1.2,1.4); c.stroke(); }
+function ptNeck(c,w,top,skin,shadow){ c.beginPath(); c.moveTo(-w,top); c.lineTo(-w,top+16); c.lineTo(w,top+16); c.lineTo(w,top); c.closePath(); c.fillStyle=skin; c.fill();
+  c.fillStyle=shadow; c.fillRect(-w,top,w*2,5); c.strokeStyle=INK; c.lineWidth=1.8; c.beginPath(); c.moveTo(-w,top); c.lineTo(-w,top+16); c.moveTo(w,top); c.lineTo(w,top+16); c.stroke(); }
+/** Shoulders and chest: the bottom of every portrait. */
+function ptBody(c,w,top,base,shadow,light){ ptShade(c,()=>{ c.beginPath(); c.moveTo(-w,52); c.quadraticCurveTo(-w+1,top+10,-w*.5,top+2); c.quadraticCurveTo(0,top-3,w*.5,top+2); c.quadraticCurveTo(w-1,top+10,w,52); c.closePath(); },
+  base,shadow,light,{sx:w*.8,sy:52,sr:w*.62,sr2:30,sa:-.4,lx:-w*.72,ly:top+16,lr:7,lr2:20,la:.3}); }
+function ptGlasses(c,ex,ey,gap,r,col){ c.strokeStyle=col||INK; c.lineWidth=1.6; for (const sx of [-1,1]){ c.beginPath(); c.arc(ex+sx*gap,ey,r,0,6.28); c.stroke(); }
+  c.beginPath(); c.moveTo(ex-gap+r,ey-.6); c.quadraticCurveTo(ex,ey-2.4,ex+gap-r,ey-.6); c.stroke();
+  c.strokeStyle='rgba(255,255,255,.75)'; c.lineWidth=1.2; for (const sx of [-1,1]){ c.beginPath(); c.arc(ex+sx*gap,ey,r-1.6,3.5,4.4); c.stroke(); } }
+
+/* ---- Ottilie: grey bun, spectacles, a moss cardigan and her red scarf, and the pipe ---- */
+function ptOttilie(c,t,mood,blink,talk){
+  ptBody(c,44,20,'#4E6B4E','#3B5440','#66855F');
+  c.save(); c.beginPath(); c.moveTo(-44,52); c.quadraticCurveTo(-43,30,-22,22); c.quadraticCurveTo(0,17,22,22); c.quadraticCurveTo(43,30,44,52); c.closePath(); c.clip();
+  c.strokeStyle='rgba(30,50,34,.35)'; c.lineWidth=1; for (let x=-40;x<=40;x+=4.5){ c.beginPath(); c.moveTo(x,22); c.lineTo(x+1,52); c.stroke(); }   // the knit
+  c.fillStyle='#3B5440'; c.fillRect(-2.4,24,4.8,28);   // the button band
+  c.restore();
+  for (let i=0;i<3;i++){ c.beginPath(); c.arc(0,31+i*8,2.2,0,6.28); c.fillStyle='#E9DCC1'; c.fill(); c.lineWidth=1.2; c.strokeStyle=INK; c.stroke(); }
+  ptNeck(c,7,6,'#E0B08E','#C99A78');
+  // the scarf: a band, a knot on the left, and two fringed tails
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-16,13); c.quadraticCurveTo(0,20,16,13); c.lineTo(17,19); c.quadraticCurveTo(0,27,-17,19); c.closePath(); },'#B4503F','#9A4033',null,{sx:12,sy:24,sr:10,sr2:8});
+  const sw=Math.sin(t*1.6)*1.2;
+  for (const [x0,dx,len] of [[-11,-6,26],[-7,2,22]]){ ptShade(c,()=>{ c.beginPath(); c.moveTo(x0-4,19); c.quadraticCurveTo(x0+dx*.5+sw,19+len*.5,x0+dx+sw,19+len); c.lineTo(x0+dx+7+sw,19+len); c.quadraticCurveTo(x0+dx*.5+8+sw,19+len*.5,x0+5,19); c.closePath(); },'#B4503F','#9A4033',null,{sx:x0+8,sy:30,sr:5,sr2:30});
+    c.strokeStyle='#E9DCC1'; c.lineWidth=1.1; for (let i=0;i<4;i++){ const fx=x0+dx+1+i*1.8+sw; c.beginPath(); c.moveTo(fx,19+len); c.lineTo(fx-.4,19+len+3.4); c.stroke(); } }
+  c.beginPath(); c.ellipse(-9,20,5,4.4,0,0,6.28); c.fillStyle='#A5463A'; c.fill(); c.lineWidth=1.6; c.strokeStyle=INK; c.stroke();
+  // the bun, then the head and her swept-back hair
+  ptShade(c,()=>{ c.beginPath(); c.arc(13,-34,9,0,6.28); },'#B9B2A8','#A29A8E','#D6D0C6',{sx:18,sy:-28,sr:7,sr2:7,lx:9,ly:-38,lr:3,lr2:2.4});
+  c.strokeStyle='#E6E1D8'; c.lineWidth=1.2; c.beginPath(); c.arc(13,-34,5,3.4,5.8); c.stroke();
+  ptEar(c,20,-6,'#E0B08E','#C99A78'); ptEar(c,-20,-6,'#E0B08E','#C99A78');
+  ptHead(c,0,-8,19,21,'#E0B08E','#C99A78','#EBC4A6');
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-20,-6); c.quadraticCurveTo(-22,-30,0,-30); c.quadraticCurveTo(20,-30,20,-8); c.quadraticCurveTo(15,-20,4,-21); c.quadraticCurveTo(-8,-22,-14,-14); c.quadraticCurveTo(-18,-10,-20,-6); c.closePath(); },'#C9C3BA','#ABA397','#E6E1D8',{sx:16,sy:-14,sr:9,sr2:14,lx:-12,ly:-24,lr:7,lr2:4,la:-.3});
+  c.strokeStyle='rgba(120,112,100,.6)'; c.lineWidth=1; for (const [a,b,cx,cy] of [[-14,-16,-6,-27],[-6,-20,4,-28],[4,-21,13,-24]]){ c.beginPath(); c.moveTo(a,b); c.quadraticCurveTo((a+cx)/2-2,(b+cy)/2-2,cx,cy); c.stroke(); }
+  ptBrows(c,0,-14,8,mood,'#A29A8E',2);
+  ptEyes(c,0,-7,8,mood,blink,2.3); ptGlasses(c,0,-7,8,6.4,'#6E5A44');
+  c.strokeStyle='#B98666'; c.lineWidth=1.6; c.beginPath(); c.moveTo(0,-4); c.quadraticCurveTo(-2,2,1.6,2.4); c.stroke();   // the nose
+  ptCheeks(c,0,2,11,.3);
+  ptMouth(c,-2,8,mood,talk,5);
+  // the pipe, and its smoke
+  if (mood!=='talk'){ c.strokeStyle=INK; c.lineWidth=3.6; c.beginPath(); c.moveTo(3,9); c.quadraticCurveTo(12,12,18,10); c.stroke(); c.strokeStyle='#4A3428'; c.lineWidth=2; c.stroke();
+    ptShade(c,()=>{ rrect(c,16,2,7,9,2); },'#5A4030','#3E2A1E',null,{sx:22,sy:8,sr:3,sr2:6,lw:1.6}); c.fillStyle='#2A1C14'; c.fillRect(17,2.4,5,1.6);
+    for (let i=0;i<3;i++){ const u=((t*.45+i/3)%1), a=.45*(1-u); c.fillStyle='rgba(235,232,240,'+a+')'; c.beginPath(); c.arc(20+Math.sin(u*6+i)*3,0-u*26,2+u*4,0,6.28); c.fill(); } }
+}
+/* ---- Barnaby: captain's cap, a big white beard and his yellow fisherman's jumper ---- */
+function ptBarnaby(c,t,mood,blink,talk){
+  ptBody(c,46,18,'#E2B13C','#C9962E','#F0C860');
+  c.save(); c.beginPath(); c.moveTo(-46,52); c.quadraticCurveTo(-45,28,-23,20); c.quadraticCurveTo(0,15,23,20); c.quadraticCurveTo(45,28,46,52); c.closePath(); c.clip();
+  c.strokeStyle='rgba(120,80,20,.38)'; c.lineWidth=1.2; for (let x=-42;x<=42;x+=4){ c.beginPath(); c.moveTo(x,18); c.lineTo(x,52); c.stroke(); } c.restore();   // the rib
+  ptShade(c,()=>{ rrect(c,-14,8,28,12,6); },'#D9A733','#C08E26','#EBC050',{sx:10,sy:18,sr:9,sr2:6,lx:-9,ly:10,lr:4,lr2:2});   // the rolled collar
+  ptEar(c,21,-4,'#D7A98A','#BE8E70'); ptEar(c,-21,-4,'#D7A98A','#BE8E70');
+  ptHead(c,0,-6,20,21,'#D7A98A','#BE8E70','#E6BEA2');
+  // the beard: cheek to chest, with strands
+  const bw=Math.sin(t*1.2)*.6;
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-20,-6); c.quadraticCurveTo(-24,14,-12,26+bw); c.quadraticCurveTo(0,34+bw,12,26+bw); c.quadraticCurveTo(24,14,20,-6); c.quadraticCurveTo(14,4,8,4); c.quadraticCurveTo(0,8,-8,4); c.quadraticCurveTo(-14,4,-20,-6); c.closePath(); },'#F3F0EA','#D9D2C6','#FFFFFF',{sx:12,sy:22,sr:14,sr2:12,lx:-12,ly:4,lr:5,lr2:8});
+  c.strokeStyle='rgba(160,155,148,.7)'; c.lineWidth=1; for (const [x,y,l] of [[-12,8,14],[-5,12,16],[3,12,16],[10,8,14]]){ c.beginPath(); c.moveTo(x,y); c.quadraticCurveTo(x+1,y+l*.5,x-1+(x>0?1:0),y+l); c.stroke(); }
+  if (mood==='happy' || mood==='talk' || talk>0) ptMouth(c,0,12,mood==='talk'?'talk':'happy',talk,5);
+  // the moustache over it
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(0,4); c.quadraticCurveTo(-8,2,-13,7); c.quadraticCurveTo(-6,11,0,8); c.quadraticCurveTo(6,11,13,7); c.quadraticCurveTo(8,2,0,4); c.closePath(); },'#ECE7DE','#D2CABD',null,{sx:8,sy:9,sr:6,sr2:3,lw:1.6});
+  ptShade(c,()=>{ c.beginPath(); c.ellipse(0,0,4.2,3.6,0,0,6.28); },'#D9614C','#B9473A','#EE8B7E',{sx:2,sy:2,sr:3,sr2:2.6,lx:-1.6,ly:-1.4,lr:1.4,lr2:1,lw:1.6});   // the rosy nose
+  ptEyes(c,0,-8,8,mood,blink,2.4);
+  ptBrows(c,0,-14,8,mood,'#F3F0EA',3.6); ptBrows(c,0,-14,8,mood,'rgba(43,42,51,.35)',1);
+  // the cap: white crown, navy band, a glossy brim and a brass anchor
+  ptShade(c,()=>{ c.beginPath(); c.ellipse(0,-30,23,8.5,0,0,6.28); },'#F3F0EA','#D7D0C2','#FFFFFF',{sx:12,sy:-26,sr:12,sr2:5,lx:-10,ly:-33,lr:7,lr2:2});
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-20,-30); c.lineTo(20,-30); c.lineTo(19,-21); c.lineTo(-19,-21); c.closePath(); },'#24324A','#1A2436','#34486A',{sx:14,sy:-24,sr:8,sr2:8,lx:-15,ly:-27,lr:3,lr2:3});
+  c.strokeStyle=BRASS; c.lineWidth=1.4; c.beginPath(); c.moveTo(-19,-24.5); c.lineTo(19,-24.5); c.stroke();
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-21,-21); c.quadraticCurveTo(0,-18,21,-21); c.quadraticCurveTo(14,-14,0,-14); c.quadraticCurveTo(-14,-14,-21,-21); c.closePath(); },'#1A2436','#10172A','#3A4D70',{sx:10,sy:-15,sr:12,sr2:3,lx:-8,ly:-19,lr:6,lr2:1.2,lw:1.8});
+  c.strokeStyle=BRASS; c.lineWidth=1.6; c.beginPath(); c.moveTo(0,-30.5); c.lineTo(0,-24.5); c.moveTo(-2.6,-28.5); c.lineTo(2.6,-28.5); c.stroke(); c.beginPath(); c.arc(0,-26.6,2.6,.3,Math.PI-.3); c.stroke();
+}
+/* ---- Pell: the postman's cap with a letter in its band, round glasses, a moustache and his satchel strap ---- */
+function ptPell(c,t,mood,blink,talk){
+  ptBody(c,43,20,'#2D4870','#22385A','#3B5C8A');
+  // collar, tie and lapels
+  c.fillStyle='#F3EDE2'; c.beginPath(); c.moveTo(-10,18); c.lineTo(0,28); c.lineTo(10,18); c.lineTo(6,16); c.lineTo(0,21); c.lineTo(-6,16); c.closePath(); c.fill(); c.lineWidth=1.4; c.strokeStyle=INK; c.stroke();
+  c.fillStyle='#B4433A'; c.beginPath(); c.moveTo(-2.4,22); c.lineTo(2.4,22); c.lineTo(3.2,40); c.lineTo(0,44); c.lineTo(-3.2,40); c.closePath(); c.fill(); c.stroke();
+  for (const sx of [-1,1]){ c.fillStyle='#22385A'; c.beginPath(); c.moveTo(sx*10,18); c.lineTo(sx*4,36); c.lineTo(sx*18,26); c.closePath(); c.fill(); c.stroke(); }
+  c.fillStyle=BRASS; for (const y of [38,46]){ c.beginPath(); c.arc(-9,y,1.8,0,6.28); c.fill(); c.lineWidth=1; c.stroke(); }
+  // the satchel strap, left shoulder to right hip
+  c.save(); c.beginPath(); c.moveTo(-43,52); c.quadraticCurveTo(-42,28,-21,22); c.quadraticCurveTo(0,17,21,22); c.quadraticCurveTo(42,28,43,52); c.closePath(); c.clip();
+  c.translate(-14,26); c.rotate(.72); c.fillStyle='#E9DCC1'; c.fillRect(-60,-4,120,8); c.strokeStyle=INK; c.lineWidth=1.4; c.strokeRect(-60,-4,120,8);
+  c.strokeStyle='rgba(120,100,70,.6)'; c.setLineDash([2,2]); c.lineWidth=.9; c.beginPath(); c.moveTo(-60,-2); c.lineTo(60,-2); c.moveTo(-60,2); c.lineTo(60,2); c.stroke(); c.setLineDash([]);
+  c.restore();
+  ptNeck(c,6.5,6,'#D7A98A','#BE8E70');
+  ptEar(c,19,-5,'#D7A98A','#BE8E70'); ptEar(c,-19,-5,'#D7A98A','#BE8E70');
+  ptHead(c,0,-7,18,20,'#D7A98A','#BE8E70','#E6BEA2');
+  c.fillStyle='#6B4A32'; for (const sx of [-1,1]){ c.beginPath(); c.moveTo(sx*17,-16); c.quadraticCurveTo(sx*19.5,-9,sx*17,-3); c.lineTo(sx*15,-8); c.closePath(); c.fill(); }   // sideburns
+  ptEyes(c,0,-7,7.5,mood,blink,2.2); ptGlasses(c,0,-7,7.5,5.6,INK);
+  ptBrows(c,0,-14,7.5,mood,'#5A3E2A',2);
+  c.strokeStyle='#B98666'; c.lineWidth=1.6; c.beginPath(); c.moveTo(0,-4); c.quadraticCurveTo(-2,1,1.4,1.8); c.stroke();
+  ptCheeks(c,0,1,10,.25);
+  ptMouth(c,0,11,mood,talk,4.6);
+  // the moustache, a neat brown bar curled at the ends
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(0,4); c.quadraticCurveTo(-6,3,-10,6); c.quadraticCurveTo(-12,4,-12.6,6.6); c.quadraticCurveTo(-6,9,0,6.6); c.quadraticCurveTo(6,9,12.6,6.6); c.quadraticCurveTo(12,4,10,6); c.quadraticCurveTo(6,3,0,4); c.closePath(); },'#4A3428','#33231A','#6B4A32',{sx:6,sy:7,sr:6,sr2:2,lx:-6,ly:4.6,lr:3,lr2:1,lw:1.4});
+  // the cap
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-19,-21); c.quadraticCurveTo(-20,-34,0,-35); c.quadraticCurveTo(20,-34,19,-21); c.closePath(); },'#2D4870','#22385A','#3B5C8A',{sx:12,sy:-24,sr:9,sr2:9,lx:-12,ly:-30,lr:5,lr2:3});
+  c.fillStyle='#1D3150'; c.fillRect(-19,-25.5,38,4.6); c.lineWidth=1.4; c.strokeStyle=INK; c.strokeRect(-19,-25.5,38,4.6);
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-20,-21); c.quadraticCurveTo(0,-18,20,-21); c.quadraticCurveTo(13,-14.6,0,-14.6); c.quadraticCurveTo(-13,-14.6,-20,-21); c.closePath(); },'#1D3150','#13223A','#3A5578',{sx:10,sy:-15,sr:10,sr2:3,lx:-8,ly:-19,lr:5,lr2:1.2,lw:1.6});
+  ptShade(c,()=>{ rrect(c,-3.4,-32,6.8,6.4,1.4); },BRASS,'#A8843E','#E8CC8A',{sx:2,sy:-27,sr:3,sr2:3,lx:-1.6,ly:-31,lr:1.4,lr2:1,lw:1.2});
+  // a letter tucked in the band, its corner waving
+  const lw2=Math.sin(t*2.2)*.08; c.save(); c.translate(12,-25); c.rotate(-.55+lw2); c.fillStyle='#F6F1E6'; c.fillRect(-1,-9,9,12); c.lineWidth=1.2; c.strokeStyle=INK; c.strokeRect(-1,-9,9,12);
+  c.fillStyle='#B4433A'; c.fillRect(3,-8,3.6,3.6); c.strokeStyle='rgba(43,42,51,.4)'; c.lineWidth=.8; c.beginPath(); c.moveTo(0,-2); c.lineTo(6,-2); c.moveTo(0,0); c.lineTo(5,0); c.stroke(); c.restore();
+}
+/* ---- Bram the baker: a tall toque, a curled moustache, a dusting of flour and a red neckerchief ---- */
+function ptBram(c,t,mood,blink,talk){ c.translate(0,5); c.scale(.95,.95);
+  ptBody(c,45,22,'#F7F3EA','#DDD5C6','#FFFFFF');
+  c.fillStyle='#C9C3BA'; for (const sx of [-1,1]) for (let i=0;i<3;i++){ c.beginPath(); c.arc(sx*10,32+i*7,1.9,0,6.28); c.fill(); c.lineWidth=1; c.strokeStyle=INK; c.stroke(); }
+  c.strokeStyle='rgba(150,140,120,.45)'; c.lineWidth=1.2; c.beginPath(); c.moveTo(-4,26); c.quadraticCurveTo(-6,40,-3,52); c.stroke();   // the jacket's overlap
+  ptNeck(c,7.5,8,'#E8B896','#CF9C7C');
+  // the neckerchief, knotted at the front
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-15,16); c.quadraticCurveTo(0,22,15,16); c.lineTo(15,21); c.quadraticCurveTo(0,28,-15,21); c.closePath(); },'#C8553D','#A8402C',null,{sx:10,sy:26,sr:10,sr2:7});
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-4,22); c.lineTo(4,22); c.lineTo(7,33); c.lineTo(0,30); c.lineTo(-7,33); c.closePath(); },'#C8553D','#A8402C',null,{sx:4,sy:30,sr:4,sr2:6,lw:1.6});
+  c.fillStyle='rgba(255,255,255,.55)'; for (const [x,y] of [[-9,19],[-2,21],[6,20],[11,18],[-1,27]]){ c.beginPath(); c.arc(x,y,.9,0,6.28); c.fill(); }   // its white spots
+  ptEar(c,21,-1,'#E8B896','#CF9C7C'); ptEar(c,-21,-1,'#E8B896','#CF9C7C');
+  ptHead(c,0,-2,20,20,'#E8B896','#CF9C7C','#F4CDAE');
+  c.fillStyle='rgba(255,252,244,.6)'; c.beginPath(); c.ellipse(-12,6,4.4,2.6,-.4,0,6.28); c.fill(); c.beginPath(); c.arc(-9,8.4,1.1,0,6.28); c.fill();   // flour on his cheek
+  ptEyes(c,0,-4,8,mood,blink,2.4);
+  ptBrows(c,0,-10,8,mood,'#6B4630',2.4);
+  c.strokeStyle='#C08260'; c.lineWidth=1.6; c.beginPath(); c.moveTo(0,-1); c.quadraticCurveTo(-2.6,5,1.6,5.4); c.stroke();
+  ptCheeks(c,0,5,12,.38);
+  ptMouth(c,0,12,mood,talk,5);
+  // the moustache, curled up at the tips
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(0,7); c.quadraticCurveTo(-7,5.4,-11,8); c.quadraticCurveTo(-15,8,-15,4.6); c.quadraticCurveTo(-13,6.4,-11,5.4); c.quadraticCurveTo(-5,3,0,5.4); c.quadraticCurveTo(5,3,11,5.4); c.quadraticCurveTo(13,6.4,15,4.6); c.quadraticCurveTo(15,8,11,8); c.quadraticCurveTo(7,5.4,0,7); c.closePath(); },'#6B4630','#4E3220','#8A5E3C',{sx:7,sy:8,sr:6,sr2:2,lx:-7,ly:5.6,lr:3,lr2:1,lw:1.4});
+  // the toque: a band, then three puffs; it sways a touch
+  const tw=Math.sin(t*1.1)*.03; c.save(); c.translate(0,-18); c.rotate(tw);
+  for (const [x,y,r] of [[-11,-20,10],[11,-20,10],[0,-25,11.5]]) ptShade(c,()=>{ c.beginPath(); c.arc(x,y,r,0,6.28); },'#FFFFFF','#E6E1D6','#FFFFFF',{sx:x+r*.6,sy:y+r*.5,sr:r*.7,sr2:r*.6,lx:x-r*.5,ly:y-r*.5,lr:r*.25,lr2:r*.2,lw:1.8});
+  c.strokeStyle='rgba(170,160,145,.55)'; c.lineWidth=1.2; for (const x of [-8,0,8]){ c.beginPath(); c.moveTo(x,-14); c.quadraticCurveTo(x+1,-19,x,-24); c.stroke(); }
+  ptShade(c,()=>{ rrect(c,-19,-15,38,13,4); },'#FBF8F1','#E2DCCF','#FFFFFF',{sx:12,sy:-4,sr:10,sr2:5,lx:-13,ly:-12,lr:4,lr2:2});
+  c.strokeStyle='rgba(170,160,145,.5)'; c.lineWidth=1; for (let x=-15;x<=15;x+=5){ c.beginPath(); c.moveTo(x,-14); c.lineTo(x,-3); c.stroke(); }
+  c.restore();
+}
+/* ---- Tam: a red cap worn sideways, freckles, a gap-toothed grin, and the pink balloon ---- */
+function ptTam(c,t,mood,blink,talk){
+  // the balloon behind, bobbing on its string
+  const bx=31+Math.sin(t*1.3)*1.6, by=-30+Math.sin(t*1.9)*2.2;
+  c.strokeStyle='rgba(43,42,51,.7)'; c.lineWidth=1.2; c.beginPath(); c.moveTo(bx,by+13); c.quadraticCurveTo(bx-6,by+30,30,52); c.stroke();
+  ptShade(c,()=>{ c.beginPath(); c.ellipse(bx,by,10,12.5,.1,0,6.28); },'#F4A595','#E07D72','#FFD2C8',{sx:bx+6,sy:by+5,sr:7,sr2:9,lx:bx-4,ly:by-5,lr:2.6,lr2:4,la:.4,lw:1.8});
+  c.fillStyle='#E07D72'; c.beginPath(); c.moveTo(bx-1.6,by+12.4); c.lineTo(bx+1.6,by+12.4); c.lineTo(bx,by+15); c.closePath(); c.fill(); c.lineWidth=1.2; c.stroke();
+  c.fillStyle='rgba(255,255,255,.7)'; c.beginPath(); c.ellipse(bx-4,by-5,1.6,3,.4,0,6.28); c.fill();
+  ptBody(c,36,24,'#5FA3DB','#4A88BF','#7DB8E6');
+  c.save(); c.beginPath(); c.moveTo(-36,52); c.quadraticCurveTo(-35,33,-18,26); c.quadraticCurveTo(0,21,18,26); c.quadraticCurveTo(35,33,36,52); c.closePath(); c.clip();
+  c.fillStyle='rgba(255,255,255,.55)'; for (let y=34;y<52;y+=7) c.fillRect(-40,y,80,2.6); c.restore();   // the stripes
+  c.fillStyle='#F6F1E6'; c.beginPath(); c.moveTo(-9,22); c.lineTo(0,29); c.lineTo(9,22); c.lineTo(6,20); c.lineTo(0,24); c.lineTo(-6,20); c.closePath(); c.fill(); c.lineWidth=1.4; c.strokeStyle=INK; c.stroke();
+  ptNeck(c,6,10,'#F0C3A0','#D8A684');
+  ptEar(c,22,0,'#F0C3A0','#D8A684'); ptEar(c,-22,0,'#F0C3A0','#D8A684');
+  ptHead(c,0,-1,22,22,'#F0C3A0','#D8A684','#F8D6BC');
+  c.fillStyle='#7A4A2A'; for (const [x,y,r] of [[-19,-9,4],[-14,-14,4.4],[18,-10,4]]){ c.beginPath(); c.arc(x,y,r,0,6.28); c.fill(); }   // tufts of hair
+  ptEyes(c,0,-1,8.5,mood,blink,3.1);
+  ptBrows(c,0,-8,8.5,mood,'#7A4A2A',2.2);
+  c.fillStyle='rgba(170,100,60,.55)'; for (const [x,y] of [[-12,5],[-10,7.4],[-14,7],[12,5],[10,7.4],[14,7]]){ c.beginPath(); c.arc(x,y,.9,0,6.28); c.fill(); }   // freckles
+  ptCheeks(c,0,6,13,.34);
+  c.strokeStyle='#D09272'; c.lineWidth=1.6; c.beginPath(); c.arc(0,4,2.2,.4,2.7); c.stroke();
+  if (mood==='happy'){ ptMouth(c,0,10,'happy',0,6.4); c.fillStyle='#FFFFFF'; c.fillRect(-4.6,9.4,3.6,2.6); c.fillRect(1,9.4,3.6,2.6); }   // a gap in the grin
+  else ptMouth(c,0,11,mood,talk,5);
+  // the cap, peak to the left
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-22,-8); c.quadraticCurveTo(-22,-27,0,-27); c.quadraticCurveTo(22,-27,22,-8); c.quadraticCurveTo(0,-13,-22,-8); c.closePath(); },'#D9614C','#B8483A','#EE8670',{sx:14,sy:-10,sr:10,sr2:12,lx:-11,ly:-22,lr:6,lr2:3,la:-.4});
+  c.strokeStyle='rgba(120,40,30,.45)'; c.lineWidth=1.1; c.beginPath(); c.moveTo(0,-27); c.quadraticCurveTo(-3,-18,-4,-10); c.moveTo(0,-27); c.quadraticCurveTo(8,-18,10,-11); c.stroke();
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-14,-10); c.quadraticCurveTo(-30,-12,-38,-6); c.quadraticCurveTo(-26,-3,-12,-6); c.closePath(); },'#C24E3C','#9E3A2C',null,{sx:-24,sy:-4,sr:12,sr2:3,lw:1.8});
+  c.beginPath(); c.arc(0,-27.4,2.4,0,6.28); c.fillStyle='#B8483A'; c.fill(); c.lineWidth=1.2; c.stroke();
+}
+/* ---- Grey the heron: a long neck, black crest plumes, a yellow eye and the dagger of a beak ---- */
+function ptGrey(c,t,mood,blink,talk){
+  const tilt=mood==='happy'?-.08:Math.sin(t*.7)*.03; c.save(); c.rotate(tilt);
+  // the neck, an S of grey with a streaked white front
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-12,52); c.quadraticCurveTo(-18,30,-8,16); c.quadraticCurveTo(2,4,-4,-10); c.lineTo(10,-12); c.quadraticCurveTo(14,4,6,18); c.quadraticCurveTo(-2,32,12,52); c.closePath(); },'#B9C2C9','#98A2AB','#D3DAE0',{sx:14,sy:30,sr:12,sr2:30,lx:-14,ly:20,lr:3,lr2:14});
+  c.strokeStyle='rgba(70,78,90,.7)'; c.lineWidth=1.3; for (const [x,y] of [[-6,22],[-3,28],[-1,34],[2,40],[5,46]]){ c.beginPath(); c.moveTo(x,y); c.lineTo(x+1.6,y+3.6); c.stroke(); }
+  // the head: grey crown, white face, black crest running back into plumes
+  ptShade(c,()=>{ c.beginPath(); c.ellipse(2,-16,12,10,-.15,0,6.28); },'#E9EDF0','#C4CCD3','#FFFFFF',{sx:8,sy:-11,sr:8,sr2:6,lx:-4,ly:-21,lr:4,lr2:3});
+  const pl=Math.sin(t*1.5)*1.4;
+  c.fillStyle='#2B2A33'; c.beginPath(); c.moveTo(-2,-22); c.quadraticCurveTo(-12,-24,-24,-18+pl); c.quadraticCurveTo(-13,-20,-6,-17); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(-3,-19); c.quadraticCurveTo(-14,-18,-28,-11+pl); c.quadraticCurveTo(-14,-15,-5,-15); c.closePath(); c.fill();
+  c.fillStyle='#3A3A44'; c.beginPath(); c.moveTo(-6,-24); c.quadraticCurveTo(2,-28,9,-23); c.quadraticCurveTo(6,-20,1,-20.4); c.quadraticCurveTo(-4,-20.6,-6,-24); c.closePath(); c.fill();
+  // the beak: long, yellow, a little open when he "talks"
+  const op=mood==='talk'?2*clamp(talk,0,1):0;
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(10,-19); c.lineTo(46,-14+op*.3); c.lineTo(10,-13.6); c.closePath(); },'#E2B13C','#C08E26','#F2CF6A',{sx:28,sy:-12,sr:20,sr2:3,lx:22,ly:-17,lr:12,lr2:1,lw:1.8});
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(10,-13.6); c.lineTo(43,-12.6+op); c.lineTo(10,-10.2); c.closePath(); },'#D9A733','#B8862A',null,{sx:26,sy:-10,sr:20,sr2:2,lw:1.6});
+  // the eye: yellow with a hard black pupil
+  if (blink){ c.strokeStyle=INK; c.lineWidth=1.8; c.beginPath(); c.moveTo(3.6,-18.4); c.lineTo(9.4,-18); c.stroke(); }
+  else { c.fillStyle='#F2D45C'; c.beginPath(); c.arc(6.4,-18.4,3,0,6.28); c.fill(); c.lineWidth=1.4; c.strokeStyle=INK; c.stroke();
+    c.fillStyle=INK; c.beginPath(); c.arc(7,-18.4,1.4,0,6.28); c.fill(); c.fillStyle='#FFF'; c.beginPath(); c.arc(6.4,-19.2,.6,0,6.28); c.fill(); }
+  c.restore();
+}
+
 /* ---------- Smokehouse kitchen: stations ---------- */
 const K={open:false, mode:'book', cv:null, ctx:null, W:0, H:0, dpr:1, s:1, CT:0, SY:0, top:0, cb:0, t:0, last:0, bg:null, bgHour:-99,
-  rid:null, used:[], fid:null, scores:{}, st:null, parts:[], floats:[], idle:0, specks:[], food:null, ptr:null, sizzle:null, confirm:false};
+  rid:null, used:[], fid:null, scores:{}, st:null, parts:[], floats:[], idle:0, specks:[], food:null, ptr:null, sizzle:null, confirm:false,
+  // cooking for a supper order (game/order-kitchen.js): the ticket, the recipe it stands for, its stations and targets
+  order:null, R:null, sts:null, spice:null, zone:null, garnish:null, smoked:false};
 const STATIONS=['clean','season','cook','plate'];
+/** What's being cooked: the recipe, or an order's (a Delicacy order stands in PLATTER). */
+const kR = () => K.R || RECIPES[K.rid];
+const kSts = () => K.sts || STATIONS;
+const kSpice = () => K.spice || kR().spice;
+const kZone = () => K.zone || kR().zone;
 const STATION_NAME={clean:'Clean', season:'Season', cook:'Cook', plate:'Plate'};
 function kLayout(){
   // layout sizes, not screen rects: the kitchen opens with a little zoom, and a rect taken mid-zoom would be off
@@ -6961,8 +7545,8 @@ function kBurst(x,y,n,col,o={}){ for (let i=0;i<n;i++){ const a=o.a!=null?o.a+ra
 function kSay(text){ const el=$('kSay'); if (el && el.textContent!==text){ el.textContent=text; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); } }
 function kAct(label,on,primary){ const b=$('kAct'); if (!b) return; b.hidden=!label; if (!label) return; b.textContent=label; b.disabled=!on; b.classList.toggle('primary',!!primary); }
 function kPips(){ const el=$('kPips'); if (!el) return; const cur=K.st?K.st.kind:null;
-  el.innerHTML=STATIONS.map((k,i)=>{ const sc=K.scores[k], on=k===cur; return '<span class="k-pip'+(on?' on':'')+(sc!=null?' done':'')+'"><i>'+(sc!=null?'✓':i+1)+'</i>'+STATION_NAME[k]+(sc!=null?' <b>'+sc+'</b>':'')+'</span>'; }).join(''); }
-function kFormNow(){ const R=RECIPES[K.rid], k=K.st&&K.st.kind; if (R.form==='steak') return (k==='clean'&&K.st.phase!=='lift')?'fish':'steak';
+  el.innerHTML=kSts().map((k,i)=>{ const sc=K.scores[k], on=k===cur; return '<span class="k-pip'+(on?' on':'')+(sc!=null?' done':'')+'"><i>'+(sc!=null?'✓':i+1)+'</i>'+STATION_NAME[k]+(sc!=null?' <b>'+sc+'</b>':'')+'</span>'; }).join(''); }
+function kFormNow(){ const R=kR(), k=K.st&&K.st.kind; if (R.form==='steak') return (k==='clean'&&K.st.phase!=='lift')?'fish':'steak';
   return (k==='cook'||k==='plate'||K.mode==='result')?R.form:'fillet'; }
 /* ===== Clean ===== */
 function startClean(){
@@ -6973,7 +7557,7 @@ function startClean(){
   K.st={kind:'clean', phase:'scale', L, h, gl, total:gl.length, removed:0, t0:null, prev:null, sndT:0, cut:null, lift:0, idleT:0};
   kSay('Swipe back and forth along the fish to scrape off the scales.'); kAct(null); kPips();
 }
-function cutCurve(L,h){ const R=RECIPES[K.rid], pts=[], steak=R.form==='steak';
+function cutCurve(L,h){ const R=kR(), pts=[], steak=R.form==='steak';
   const A=steak?{x:L*.06,y:-h*.92}:{x:L*.27,y:-h*.08}, C=steak?{x:-L*.03,y:0}:{x:0,y:h*.34}, B=steak?{x:L*.06,y:h*.92}:{x:-L*.33,y:h*.02};
   for (let i=0;i<=40;i++){ const t=i/40, u=1-t; pts.push({x:u*u*A.x+2*u*t*C.x+t*t*B.x, y:u*u*A.y+2*u*t*C.y+t*t*B.y}); } return pts; }
 function cleanMove(p,down){
@@ -7002,7 +7586,7 @@ function finishCut(){ const st=K.st, c=st.cut; st.phase='lift'; st.lift=0;
   kFloat(c.score>=88?'Clean fillet!':c.score>=65?'Not bad':'A bit ragged',0,-st.h-46,c.score>=88?'#CFE7B9':'#F5D08A',true); kPips(); }
 function updateClean(dt){ const st=K.st; st.idleT+=dt;
   if (st.phase==='scaled'){ st.armed=false; st.wait-=dt; if (st.wait<=0){ st.phase='cut'; st.cut={pts:cutCurve(st.L,st.h),cur:0,started:false,on:false,stroke:[],dev:0,devN:0,lifts:0}; st.idleT=0;
-      kSay(RECIPES[K.rid].form==='steak'?'Now cut a thick steak: trace the dotted line in one smooth stroke.':'Now fillet it: trace the dotted line in one smooth stroke.'); } }
+      kSay(kR().form==='steak'?'Now cut a thick steak: trace the dotted line in one smooth stroke.':'Now fillet it: trace the dotted line in one smooth stroke.'); } }
   if (st.phase==='lift'){ st.lift+=dt; if (st.lift>=1.5) startSeason(); }
 }
 function knife(c,x,y,ang){ c.save(); c.translate(x,y); c.rotate(ang); c.lineJoin='round';
@@ -7013,7 +7597,7 @@ function knife(c,x,y,ang){ c.save(); c.translate(x,y); c.rotate(ang); c.lineJoin
 function drawClean(c){ const st=K.st, L=st.L, h=st.h;
   drawBoard(c);
   if (st.phase==='lift'){ const u=Math.min(1,st.lift/1.1), e=1-Math.pow(1-u,3);
-    c.save(); c.globalAlpha=Math.min(1,u*2.2); const sc=.86+.14*Math.min(1,u*1.6)+Math.sin(Math.min(1,u*1.4)*Math.PI)*.06; c.scale(sc,sc); drawFood(c,{fid:K.fid,L:L*.82,form:kFormNow(),top:0,specks:[]}); c.restore();
+    c.save(); c.globalAlpha=Math.min(1,u*2.2); const sc=.86+.14*Math.min(1,u*1.6)+Math.sin(Math.min(1,u*1.4)*Math.PI)*.06; c.scale(sc,sc); drawFood(c,{fid:K.fid,L:L*.82,form:kFormNow(),top:0,specks:[],smoked:K.smoked}); c.restore();
     c.save(); c.translate(e*260,-e*340); c.rotate(e*.9); c.globalAlpha=1-Math.max(0,(u-.6)/.4); drawSkeleton(c,K.fid,L); c.restore();
     if (u<.25){ c.save(); c.globalAlpha=1-u/.25; drawBoardFish(c,K.fid,L,true); c.restore(); }
     return; }
@@ -7043,28 +7627,40 @@ function kGhostHand(c,x,y){ c.save(); c.translate(x+6,y+8); c.fillStyle='rgba(24
   c.beginPath(); c.arc(4,-30,10,0,6.28); c.strokeStyle='rgba(243,234,215,.6)'; c.lineWidth=2; c.stroke(); c.restore(); }
 /* ===== Season ===== */
 function startSeason(){
-  const xs=[-152,-76,0,76,152], jy=Math.max(K.cb+52,-250);
-  K.st={kind:'season', count:{}, extra:{}, jars:SPICE_ORDER.map((k,i)=>({k,hx:xs[i],hy:jy,x:xs[i],y:jy,lift:0,shake:0})), drag:null, fly:[], pinches:0, idleT:0, fy:46, L:220};
-  K.specks=[]; kSay('Tap a jar to add a pinch, or drag it over the fish and shake. Match the ticket.'); kAct('Done seasoning',false,true); kPips(); kTicket();
+  // five jars across, or seven once the bigger spice rack is in, a little closer and a little smaller
+  const ks=spicesOn(), n=ks.length, step=n>5?52:76, sc=n>5?.86:1, jy=Math.max(K.cb+52,-250);
+  K.st={kind:'season', count:{}, extra:{}, jars:ks.map((k,i)=>{ const x=(i-(n-1)/2)*step; return {k,hx:x,hy:jy,x,y:jy,lift:0,shake:0,sc}; }), hit:n>5?24:28, drag:null, fly:[], pinches:0, idleT:0, fy:46, L:220, jy0:jy};
+  K.specks=[]; kSay(K.order?TOWNSFOLK[K.order.who].name+'’s ticket is pinned up top. Tap a jar for a pinch, or drag it over the fish and shake.':'Tap a jar to add a pinch, or drag it over the fish and shake. Match the ticket.');
+  kAct('Done seasoning',!Object.keys(kSpice()).length,true); kPips(); kTicket();
 }
 function kTicket(){ const el=$('kTicket'); if (!el) return; const st=K.st; if (!st || st.kind!=='season'){ el.hidden=true; return; }
-  const R=RECIPES[K.rid]; let h='<b>'+R.name+'</b>';
-  for (const k of SPICE_ORDER){ const need=R.spice[k]||0, have=st.count[k]||0; if (!need && !have) continue;
+  const R=kR(), sp=kSpice(), O=K.order, no=O?O.tw.filter(x=>x.startsWith('none:')).map(x=>x.slice(5)):[];
+  let h=O?'<b><span class="k-tk-who">'+TOWNSFOLK[O.who].name+'’s</span> '+ticketTitle(O)+'</b>':'<b>'+R.name+'</b>';
+  for (const k of spicesOn()){ const need=sp[k]||0, have=st.count[k]||0; if (!need && !have && !no.includes(k)) continue;
+    if (!need && no.includes(k)){ h+='<p class="'+(have?'bad':'no')+'"><span>'+SPICES[k].name+'</span><em>'+(have?'+'+have+', and they said none':'none, please')+'</em></p>'; continue; }
     if (!need){ h+='<p class="bad"><span>'+SPICES[k].name+'</span><em>+'+have+' not on the ticket</em></p>'; continue; }
     let dots=''; for (let i=0;i<need;i++) dots+='<i class="'+(i<have?'on':'')+'"></i>'; const over=have-need;
     h+='<p class="'+(have===need?'ok':over>0?'bad':'')+'"><span>'+SPICES[k].name+'</span><span class="dots">'+dots+(over>0?'<em>+'+over+'</em>':'')+'</span></p>'; }
-  el.innerHTML=h; el.hidden=false; }
-function seasonScore(){ const R=RECIPES[K.rid], st=K.st; let pen=0; for (const k of SPICE_ORDER){ const need=R.spice[k]||0, have=st.count[k]||0; pen+=need?Math.abs(have-need)*18:have*22; } return Math.round(clamp(100-pen,0,100)); }
+  el.innerHTML=h; el.hidden=false; kTicketFit(); }
+/** Keeps the ticket clear of the jars below it: its spices in two columns when it would reach them, and if even that
+    does, the jars come down a little (never onto the board). Rows come and go as you season, so this runs each time. */
+function kTicketFit(){ const el=$('kTicket'), st=K.st; if (!el || el.hidden || !st || st.kind!=='season' || !st.jars.length) return;
+  const sc=st.jars[0].sc||1, jarTop=dy=>K.SY+(st.jy0+dy-44*sc)*K.s, bottom=()=>el.offsetTop+el.offsetHeight+6;   // +6 for its tilt
+  el.classList.remove('tight'); if (bottom()>jarTop(0)) el.classList.add('tight');
+  // the board's top edge is 114 above the fish (kitchen-art.js: drawBoard), and a jar reaches 34 below its middle
+  const dy=clamp((bottom()-jarTop(0))/K.s,0,Math.max(0,st.fy-118-34*sc-st.jy0));
+  for (const j of st.jars){ j.hy=st.jy0+dy; if (!(st.drag && st.drag.j===j)) j.y=j.hy; } }
+function seasonScore(){ const sp=kSpice(), st=K.st; let pen=0; for (const k of spicesOn()){ const need=sp[k]||0, have=st.count[k]||0; pen+=need?Math.abs(have-need)*18:have*22; } return Math.round(clamp(100-pen,0,100)); }
 function overFillet(p){ const st=K.st; return Math.abs(p.x)<st.L*.5 && Math.abs(p.y-st.fy)<st.L*.22; }
 function addPinch(k,x,y){ const st=K.st, L=st.L, h=L*.36; st.count[k]=(st.count[k]||0)+1; st.pinches++;
   const u0=clamp(x/L,-.36,.36), v0=clamp((y-st.fy)/(h*2),-.18,.18);
   for (let i=0;i<9;i++) K.specks.push({k,u:u0+rand(-.14,.14),v:v0+rand(-.1,.1),r:rand(.8,1.25),a:rand(0,6.28)});
   kBurst(x,y,7,SPICES[k].col,{v0:20,v1:90,g:200,l0:.25,l1:.5,r0:1.2,r1:2.2});
   noise(.12,{vol:.06,f:7000,type:'highpass'}); tone(rand(2400,2900),.03,{vol:.025,type:'square',delay:.03}); tone(rand(2400,2900),.03,{vol:.02,type:'square',delay:.08}); buzz(5);
-  const R=RECIPES[K.rid], need=R.spice[k]||0, have=st.count[k]; if (!need) kFloat('Not on the ticket',x,y-30,'#F4A595'); else if (have===need) kFloat('✓ '+SPICES[k].name,x,y-30,'#CFE7B9'); else if (have>need) kFloat('Too much!',x,y-30,'#F4A595');
+  const need=kSpice()[k]||0, have=st.count[k]; if (!need) kFloat(K.order&&K.order.tw.includes('none:'+k)?'They said none!':'Not on the ticket',x,y-30,'#F4A595'); else if (have===need) kFloat('✓ '+SPICES[k].name,x,y-30,'#CFE7B9'); else if (have>need) kFloat('Too much!',x,y-30,'#F4A595');
   kAct('Done seasoning',true,true); kTicket(); }
 function seasonDown(p){ const st=K.st; st.idleT=0;
-  for (const j of st.jars){ if (Math.abs(p.x-j.x)<28 && p.y>j.y-40 && p.y<j.y+34){ st.drag={j,ox:p.x-j.x,oy:p.y-j.y,moved:false,sx:p.x,sy:p.y,shakeT:.3,dropped:0}; j.lift=8; tone(700,.04,{vol:.04,type:'triangle'}); return; } } }
+  for (const j of st.jars){ if (Math.abs(p.x-j.x)<(st.hit||28) && p.y>j.y-40 && p.y<j.y+34){ st.drag={j,ox:p.x-j.x,oy:p.y-j.y,moved:false,sx:p.x,sy:p.y,shakeT:.3,dropped:0}; j.lift=8; tone(700,.04,{vol:.04,type:'triangle'}); return; } } }
 function seasonMove(p){ const d=K.st.drag; if (!d) return; d.j.x=p.x-d.ox; d.j.y=p.y-d.oy; if (Math.hypot(p.x-d.sx,p.y-d.sy)>12) d.moved=true; }
 function seasonUp(p){ const st=K.st, d=st.drag; if (!d) return; st.drag=null;
   if (!d.moved){ const tx=rand(-st.L*.3,st.L*.3), ty=st.fy+rand(-st.L*.1,st.L*.1); st.fly.push({k:d.j.k,x0:d.j.hx,y0:d.j.hy-30,x1:tx,y1:ty,t:0}); d.j.shake=.6; noise(.06,{vol:.04,f:5000,type:'highpass'}); }
@@ -7075,33 +7671,35 @@ function updateSeason(dt){ const st=K.st; st.idleT+=dt;
   for (const f of st.fly){ f.t+=dt/.38; if (f.t>=1 && !f.done){ f.done=true; addPinch(f.k,f.x1,f.y1); } } st.fly=st.fly.filter(f=>!f.done);
 }
 function drawSeason(c){ const st=K.st;
-  c.save(); c.translate(0,st.fy); drawBoard(c); drawFood(c,{fid:K.fid,L:st.L,form:kFormNow(),top:0,specks:K.specks}); c.restore();
+  c.save(); c.translate(0,st.fy); drawBoard(c); drawFood(c,{fid:K.fid,L:st.L,form:kFormNow(),top:0,specks:K.specks,smoked:K.smoked}); c.restore();
   for (const f of st.fly){ const u=f.t, x=lerp(f.x0,f.x1,u), y=lerp(f.y0,f.y1,u)-Math.sin(Math.PI*u)*80;
     c.fillStyle=SPICES[f.k].col; c.strokeStyle='rgba(43,42,51,.4)'; for (let i=0;i<6;i++){ c.beginPath(); c.arc(x+Math.sin(i*2.3)*5,y+Math.cos(i*1.7)*4,1.8,0,6.28); c.fill(); c.stroke(); } }
   const order=st.jars.slice().sort((a,b)=>(st.drag&&st.drag.j===a)?1:(st.drag&&st.drag.j===b)?-1:0);
   for (const j of order){ const dragging=st.drag&&st.drag.j===j&&st.drag.moved, over=dragging&&overFillet({x:j.x,y:j.y+44});
-    c.save(); c.translate(j.x,j.y); if (over){ c.translate(0,-10); c.rotate(Math.PI*.82+Math.sin(K.t*26)*.12); } drawJar(c,j.k,j.lift,j.shake?Math.sin(K.t*40)*.12*j.shake:0); c.restore(); }
-  if (st.idleT>3 && !st.pinches){ c.save(); c.globalAlpha=Math.min(1,(st.idleT-3)*2)*.75; const R=RECIPES[K.rid], k=SPICE_ORDER.find(k=>R.spice[k]), j=st.jars.find(q=>q.k===k); kGhostHand(c,j.hx,j.hy+(Math.sin(K.t*6)>0?4:-2)); c.restore(); }
+    c.save(); c.translate(j.x,j.y); if (j.sc && j.sc!==1) c.scale(j.sc,j.sc); if (over){ c.translate(0,-10); c.rotate(Math.PI*.82+Math.sin(K.t*26)*.12); } drawJar(c,j.k,j.lift,j.shake?Math.sin(K.t*40)*.12*j.shake:0); c.restore(); }
+  if (st.idleT>3 && !st.pinches){ const sp=kSpice(), k=spicesOn().find(k=>sp[k]), j=st.jars.find(q=>q.k===k); if (j){ c.save(); c.globalAlpha=Math.min(1,(st.idleT-3)*2)*.75; kGhostHand(c,j.hx,j.hy+(Math.sin(K.t*6)>0?4:-2)); c.restore(); } }
 }
 /* ===== Cook ===== */
-function startCook(){ const R=RECIPES[K.rid];
+function startCook(){ const R=kR();
   K.st={kind:'cook', side:0, p:0, phase:'intro', introT:0, flipT:0, res:[], heat:0, topA:0, marksA:0, idleT:0, steamT:0, spitT:0, smokeT:0, L:R.form==='skewer'?250:R.form==='steak'?210:205, cy:30};
-  kSay((R.dish==='pie'?'Sear the filling. ':R.dish==='bowl'?'Brown it before it goes in the pot. ':R.cook==='grill'?'On the coals. ':'Into the pan. ')+'Flip it when the marker hits the golden zone.'); kAct('Flip',false,true); kPips(); kTicket();
+  const dn=K.order&&ticketDone(K.order), who=K.order&&TOWNSFOLK[K.order.who].name;
+  kSay((R.dish==='pie'?'Sear the filling. ':R.dish==='bowl'?'Brown it before it goes in the pot. ':R.cook==='grill'?'On the coals. ':'Into the pan. ')+(dn?who+' wants it '+(dn==='well'?'well done':'lightly done')+': the zone has moved. Flip it when the marker gets there.':'Flip it when the marker hits the golden zone.'));
+  kAct('Flip',false,true); kPips(); kTicket();
   sizzleStart(); if (R.form==='skewer') kFloat('Cubed and skewered',0,-110,PAPER); else if (R.form==='wrap') kFloat('Wrapped in lily leaves',0,-110,PAPER);
 }
-function zoneScore(p){ const z=RECIPES[K.rid].zone, cen=(z[0]+z[1])/2, half=(z[1]-z[0])/2, d=Math.abs(p-cen); return Math.round(d<=half?100-25*d/half:Math.max(0,75-(d-half)/.22*75)); }
-function zoneWord(p,sc){ const z=RECIPES[K.rid].zone; return sc>=95?['Perfect!','#F2D47E']:sc>=75?['Golden!','#CFE7B9']:p<z[0]?['Underdone','#F5D08A']:['Overdone','#F4A595']; }
+function zoneScore(p){ const z=kZone(), cen=(z[0]+z[1])/2, half=(z[1]-z[0])/2, d=Math.abs(p-cen); return Math.round(d<=half?100-25*d/half:Math.max(0,75-(d-half)/.22*75)); }
+function zoneWord(p,sc){ const z=kZone(); return sc>=95?['Perfect!','#F2D47E']:sc>=75?['Golden!','#CFE7B9']:p<z[0]?['Underdone','#F5D08A']:['Overdone','#F4A595']; }
 function cookTap(){ const st=K.st; if (st.phase!=='cook') return; st.idleT=0;
   const sc=zoneScore(st.p), [w,col]=zoneWord(st.p,sc); st.res.push(sc); kFloat(w,0,st.cy-120,col,true);
   if (sc>=95){ tone(1319,.12,{vol:.08,type:'triangle'}); tone(1760,.18,{vol:.07,type:'triangle',delay:.06}); }
   if (st.side===0) beginFlip(); else beginPull(); }
-function beginFlip(){ const st=K.st, R=RECIPES[K.rid]; st.topA=st.p; st.marksA=R.cook==='grill'?Math.min(1,st.p*1.4):0; st.phase='flip'; st.flipT=0;
+function beginFlip(){ const st=K.st, R=kR(); st.topA=st.p; st.marksA=R.cook==='grill'?Math.min(1,st.p*1.4):0; st.phase='flip'; st.flipT=0;
   noise(.3,{vol:.12,f:900,to:3000,q:.8}); buzz(15); kBurst(0,st.cy,14,'rgba(255,248,220,.9)',{v0:120,v1:280,g:500,l0:.3,l1:.6,r0:1.2,r1:2.4}); kAct('Take it off',false,true); }
 function beginPull(){ const st=K.st; st.topB=st.p; st.phase='done'; st.flipT=0; kAct(null); sizzleSet(0); noise(.2,{vol:.07,f:1500,to:500});
   K.scores.cook=Math.round((st.res[0]+st.res[1])/2); kPips();
-  K.food={top:clamp((st.topA+st.topB)/2,0,1), marks:RECIPES[K.rid].cook==='grill'?Math.min(1,(st.marksA+Math.min(1,st.topB*1.4))/2):0};
+  K.food={top:clamp((st.topA+st.topB)/2,0,1), marks:kR().cook==='grill'?Math.min(1,(st.marksA+Math.min(1,st.topB*1.4))/2):0};
   setTimeout(()=>{ if (K.open && K.st && K.st.kind==='cook') startPlate(); },1100); }
-function updateCook(dt){ const st=K.st, R=RECIPES[K.rid]; st.idleT+=dt;
+function updateCook(dt){ const st=K.st, R=kR(); st.idleT+=dt;
   st.heat=lerp(st.heat,st.phase==='done'?0:1,Math.min(1,dt*(st.phase==='done'?3:2)));
   if (st.phase==='intro'){ st.introT+=dt; if (st.introT>.9){ st.phase='cook'; kAct('Flip',true,true); noise(.4,{vol:.1,f:3500,q:.6}); kBurst(0,st.cy,10,'rgba(255,248,220,.9)',{a:-Math.PI/2,spread:1.2,v0:80,v1:200,g:400}); } }
   else if (st.phase==='cook'){ const rate=(1/3.4)*R.speed*(st.side?1.12:1)*(.7+.6*st.p); st.p+=rate*dt;
@@ -7116,23 +7714,25 @@ function updateCook(dt){ const st=K.st, R=RECIPES[K.rid]; st.idleT+=dt;
   if (R.cook==='pan'){ st.spitT-=dt; if (st.spitT<=0 && st.heat>.5){ st.spitT=rand(.08,.3); const a=rand(0,6.28), d=rand(60,130); kBurst(Math.cos(a)*d,st.cy+Math.sin(a)*d,2,'rgba(255,250,230,.95)',{a:-Math.PI/2,spread:1.4,v0:60,v1:140,g:600,l0:.2,l1:.35,r0:1,r1:1.8}); if (Math.random()<.5) tone(rand(2600,4200),.012,{type:'square',vol:.018}); } }
   if (st.p>.85 && st.phase==='cook'){ st.smokeT-=dt; if (st.smokeT<=0){ st.smokeT=.12; K.parts.push({x:rand(-40,40),y:st.cy,vx:rand(-15,15),vy:rand(-80,-50),g:-10,t:0,max:1.6,r:rand(10,18),col:'rgba(70,65,68,',kind:'smoke'}); } }
 }
-function drawCook(c){ const st=K.st, R=RECIPES[K.rid], cy=st.cy;
-  if (R.cook==='pan'){ drawStove(c); c.save(); c.translate(0,cy); drawPan(c,145,st.heat,K.t); c.restore(); }
+function drawCook(c){ const st=K.st, R=kR(), cy=st.cy;
+  if (R.cook==='pan'){ drawStove(c); if (K.order && hasUp('burner')) drawBackPot(c,K.t,st.heat); c.save(); c.translate(0,cy); drawPan(c,145,st.heat,K.t); c.restore(); }
   else { c.save(); c.translate(0,cy); drawGrill(c,st.heat,K.t); c.restore(); }
   // the food: jumps and turns over on a flip
   let fy=cy, sy=1, rot=0, face=st.side===0?0:st.topA, marks=st.side===0?0:st.marksA, edge=st.phase==='cook'?st.p:st.side?st.p:0;
   if (st.phase==='flip'){ const u=st.flipT; fy=cy-Math.sin(Math.PI*u)*110; sy=Math.cos(Math.PI*u); rot=Math.sin(Math.PI*u)*.35; if (u>.5){ face=st.topA; marks=st.marksA; edge=0; } else { face=0; marks=0; edge=st.topA; } }
   if (st.phase==='done'){ const u=st.flipT; fy=cy-u*30; face=st.topA; marks=st.marksA; edge=st.topB; }
   if (st.phase==='intro'){ const u=Math.min(1,st.introT/.45); fy=cy-(1-u)*(1-u)*160; }
-  c.save(); c.translate(0,fy); c.rotate(rot); c.scale(1,Math.max(.06,Math.abs(sy))*(sy<0?-1:1)); drawFood(c,{fid:K.fid,L:st.L,form:R.form,wrapped:true,top:face,edge:Math.min(1,edge),marks,specks:K.specks}); c.restore();
+  c.save(); c.translate(0,fy); c.rotate(rot); c.scale(1,Math.max(.06,Math.abs(sy))*(sy<0?-1:1)); drawFood(c,{fid:K.fid,L:st.L,form:R.form,wrapped:true,top:face,edge:Math.min(1,edge),marks,specks:K.specks,smoked:K.smoked}); c.restore();
   // doneness meter
-  const my=Math.max(K.cb+28,-176), mx0=-160, mx1=160, z=R.zone;
+  const my=Math.max(K.cb+28,-176), mx0=-160, mx1=160, z=kZone(), dn=K.order&&ticketDone(K.order);
   c.save(); rrect(c,mx0-6,my-14,mx1-mx0+12,40,12); c.fillStyle='rgba(27,24,26,.82)'; c.fill(); c.strokeStyle=INK; c.lineWidth=2; c.stroke();
   const g=c.createLinearGradient(mx0,0,mx1,0); g.addColorStop(0,'#E8A7A0'); g.addColorStop(.45,'#EDC67E'); g.addColorStop(.75,'#CF8E3E'); g.addColorStop(.9,'#6A4028'); g.addColorStop(1,'#2A201C');
   rrect(c,mx0,my-6,mx1-mx0,14,7); c.fillStyle=g; c.fill(); c.strokeStyle=INK; c.lineWidth=1.4; c.stroke();
   const zx0=lerp(mx0,mx1,z[0]), zx1=lerp(mx0,mx1,z[1]); rrect(c,zx0,my-10,zx1-zx0,22,6); c.strokeStyle='#F2D47E'; c.lineWidth=2.6; c.stroke();
   c.fillStyle='rgba(242,212,126,.22)'; c.fill();
-  c.font='800 9px Nunito, system-ui, sans-serif'; c.textAlign='center'; c.fillStyle='rgba(243,234,215,.75)'; c.fillText('RAW',mx0+16,my+21); c.fillText('BURNT',mx1-20,my+21); c.fillStyle='#F2D47E'; c.fillText('GOLDEN',(zx0+zx1)/2,my+21);
+  const zl=dn==='well'?'WELL DONE':dn==='light'?'LIGHTLY DONE':'GOLDEN', zc=(zx0+zx1)/2; c.font='800 9px Nunito, system-ui, sans-serif'; c.textAlign='center'; const zw=c.measureText(zl).width/2+8;
+  // the ends' labels give way to the zone's when it's moved up against them
+  c.fillStyle='rgba(243,234,215,.75)'; if (zc-zw>mx0+30) c.fillText('RAW',mx0+16,my+21); if (zc+zw<mx1-38) c.fillText('BURNT',mx1-20,my+21); c.fillStyle='#F2D47E'; c.fillText(zl,clamp(zc,mx0+zw,mx1-zw),my+21);
   const px=lerp(mx0,mx1,clamp(st.phase==='flip'||st.phase==='intro'?(st.phase==='flip'?st.topA:0):st.p,0,1));
   c.beginPath(); c.moveTo(px,my-6); c.lineTo(px-7,my-17); c.lineTo(px+7,my-17); c.closePath(); c.fillStyle=PAPER; c.fill(); c.strokeStyle=INK; c.lineWidth=1.4; c.stroke();
   c.fillStyle=PAPER; c.fillRect(px-1.5,my-6,3,14);
@@ -7147,44 +7747,52 @@ function sizzleStop(){ const z=K.sizzle; if (!z) return; K.sizzle=null; try { z.
 /* ===== Plate ===== */
 function plateGuides(dish){ if (dish==='plate') return {plate:{x:0,y:-38,R:130}, main:{x:-36,y:-18,r:58}, side:{x:62,y:-76,r:34}, lemon:{x:60,y:30,r:17}};
   return {plate:{x:0,y:-38,R:130}, bowl:{x:-30,y:-38,R:dish==='pie'?84:82}, main:{x:-30,y:-38,r:52}, side:{x:74,y:-80,r:30}, lemon:{x:72,y:26,r:16}}; }
-function startPlate(){ const R=RECIPES[K.rid], G=plateGuides(R.dish), ty=Math.min(K.bot-40,146);
+function startPlate(){ const R=kR(), G=plateGuides(R.dish), ty=Math.min(K.bot-40,146); if (!K.food) K.food={top:.7, marks:0};
   K.st={kind:'plate', G, ty, items:[{k:'main',hx:-110,hy:ty,x:-110,y:ty,placed:false,score:0,moves:0},{k:'side',hx:32,hy:ty,x:32,y:ty,placed:false,score:0,moves:0},{k:'lemon',hx:132,hy:ty,x:132,y:ty,placed:false,score:0,moves:0}],
     drag:null, dill:[], idleT:0, filled:false, served:false};
-  kSay('Drag each piece onto its spot on the plate.'); kAct('Serve',false,true); kPips(); }
+  kSay(R.form==='whole'?'A Delicacy goes on whole. Drag each piece onto its spot on the plate.':'Drag each piece onto its spot on the plate.'); kAct('Serve',false,true); kPips(); }
+/** What to say once everything's on the plate: the dill, as the ticket wants it. */
+function plateDillSay(){ const g=K.order&&ticketGarnish(K.order), who=K.order&&TOWNSFOLK[K.order.who].name;
+  return g==='none'?'No dill for '+who+'. Serve it when you’re ready.':g==='lots'?who+' wants lots of dill: tap the plate for five sprigs or six, then serve.':'Tap the plate to add sprigs of dill, then serve.'; }
+/** The dill's part of the plate score: two to four sprigs is lovely, unless the ticket says otherwise. */
+function dillBonus(n){ const g=K.order&&ticketGarnish(K.order);
+  if (g==='none') return n?-6*n:8; if (g==='lots') return n>=ORDERS.garnish.lots?8:n>=3?2:-6;
+  return n>=2&&n<=4?8:n?4:0; }
 function itemScale(it){ const st=K.st; return it.placed||(st.drag&&st.drag.it===it&&it.y<st.ty-50)?1:.78; }
 function plateDown(p){ const st=K.st; st.idleT=0;
-  for (const it of st.items.slice().reverse()){ const r=it.k==='main'?58:it.k==='side'?40:24; if (Math.hypot(p.x-it.x,p.y-it.y)<r){ if (it.placed && RECIPES[K.rid].dish!=='plate' && it.k==='main') return;
+  for (const it of st.items.slice().reverse()){ const r=it.k==='main'?58:it.k==='side'?40:24; if (Math.hypot(p.x-it.x,p.y-it.y)<r){ if (it.placed && kR().dish!=='plate' && it.k==='main') return;
       st.drag={it,ox:p.x-it.x,oy:p.y-it.y}; if (it.placed){ it.placed=false; } tone(640,.05,{vol:.04,type:'triangle'}); return; } }
   const G=st.G; if (st.items.every(i=>i.placed) && Math.hypot(p.x-G.plate.x,p.y-G.plate.y)<G.plate.R*.92 && st.dill.length<6){ st.dill.push({x:p.x,y:p.y,a:rand(-.8,.8),t:0}); tone(rand(1800,2200),.05,{vol:.04,type:'triangle'}); noise(.05,{vol:.03,f:6000,type:'highpass'}); buzz(4);
     if (st.dill.length===3) kFloat('Lovely',p.x,p.y-30,'#CFE7B9'); } }
 function plateMove(p){ const d=K.st.drag; if (!d) return; d.it.x=p.x-d.ox; d.it.y=p.y-d.oy; }
 function plateUp(){ const st=K.st, d=st.drag; if (!d) return; st.drag=null; const it=d.it, g=st.G[it.k], dist=Math.hypot(it.x-g.x,it.y-g.y);
   if (dist<g.r+40){ it.placed=true; it.moves++; it.score=Math.round(clamp(100-Math.max(0,dist-6)*1.25,0,100)); it.bounce=1;
-    if (RECIPES[K.rid].dish!=='plate' && it.k==='main'){ it.x=g.x; it.y=g.y; st.filled=true; noise(.3,{vol:.08,f:500,type:'lowpass'}); tone(300,.12,{to:200,vol:.06}); }
+    if (kR().dish!=='plate' && it.k==='main'){ it.x=g.x; it.y=g.y; st.filled=true; noise(.3,{vol:.08,f:500,type:'lowpass'}); tone(300,.12,{to:200,vol:.06}); }
     tone(2200,.16,{vol:.07}); tone(3300,.1,{vol:.035,delay:.01}); buzz(8);
     kFloat(it.score>=90?'Neat!':it.score>=65?'Nice':'A bit off',it.x,it.y-46,it.score>=90?'#CFE7B9':'#F5D08A');
-    if (st.items.every(i=>i.placed)){ kAct('Serve',true,true); kSay('Tap the plate to add sprigs of dill, then serve.'); } }
+    if (st.items.every(i=>i.placed)){ kAct('Serve',true,true); kSay(plateDillSay()); } }
   else { it.placed=false; if (Math.hypot(it.x-st.G.plate.x,it.y-st.G.plate.y)<st.G.plate.R) kFloat('Over here',g.x,g.y-g.r-16,'#F5D08A'); } }
 function updatePlate(dt){ const st=K.st; st.idleT+=dt; for (const it of st.items){ if (st.drag&&st.drag.it===it) continue; if (!it.placed){ it.x=lerp(it.x,it.hx,Math.min(1,dt*12)); it.y=lerp(it.y,it.hy,Math.min(1,dt*12)); } it.bounce=Math.max(0,(it.bounce||0)-dt*3); }
   for (const dl of st.dill) dl.t=Math.min(1,dl.t+dt*5); }
 function plateServe(){ const st=K.st; if (!st.items.every(i=>i.placed)) return;
-  const avg=st.items.reduce((a,i)=>a+i.score,0)/3, extra=st.items.reduce((a,i)=>a+Math.max(0,i.moves-1),0)*5, n=st.dill.length, bonus=n>=2&&n<=4?8:n?4:0;
+  const avg=st.items.reduce((a,i)=>a+i.score,0)/3, extra=st.items.reduce((a,i)=>a+Math.max(0,i.moves-1),0)*5, n=st.dill.length, bonus=dillBonus(n);
   K.scores.plate=Math.round(clamp(avg-extra+bonus,0,100)); kPips(); kAct(null);
   tone(1568,.6,{vol:.1}); tone(2093,.5,{vol:.05,delay:.02}); buzz([0,20,40,20]); setTimeout(()=>{ if (K.open) showResult(); },350); }
-function drawItem(c,it,G,dish){ const R=RECIPES[K.rid], s=itemScale(it)*(1+(it.bounce||0)*.06*Math.sin((1-(it.bounce||0))*12));
+function drawItem(c,it,G,dish){ const R=kR(), s=itemScale(it)*(1+(it.bounce||0)*.06*Math.sin((1-(it.bounce||0))*12));
   c.save(); c.translate(it.x,it.y); c.scale(s,s);
-  if (it.k==='main'){ if (it.placed && dish!=='plate'){ c.restore(); return; } const L=R.form==='skewer'?190:R.form==='steak'?150:150; c.rotate(it.placed?-.08:0);
-    drawFood(c,{fid:K.fid,L,form:R.form,wrapped:true,top:K.food.top,marks:K.food.marks,specks:K.specks}); }
+  if (it.k==='main'){ if (it.placed && dish!=='plate'){ c.restore(); return; } c.rotate(it.placed?-.08:0);
+    if (R.form==='whole'){ const F=FISH[K.fid]; drawSmokedFish(c,K.fid,clamp(F.len*2.2,120,170),100,true); }
+    else { const fd=K.food||{top:.7,marks:0}; drawFood(c,{fid:K.fid,L:R.form==='skewer'?190:150,form:R.form,wrapped:true,top:fd.top,marks:fd.marks,specks:K.specks,smoked:K.smoked}); } }
   else if (it.k==='side') drawSide(c,R.side,1); else drawLemon(c,1.1);
   c.restore(); }
-function drawDish(c,G,dish,full){ const R=RECIPES[K.rid]; c.save(); c.translate(G.plate.x,G.plate.y); drawPlate(c,G.plate.R); c.restore();
-  if (dish==='bowl'){ c.save(); c.translate(G.bowl.x,G.bowl.y); drawBowl(c,G.bowl.R,{rid:K.rid,fid:K.fid,top:K.food?K.food.top:.6,filled:full}); c.restore(); }
+function drawDish(c,G,dish,full){ const R=kR(); c.save(); c.translate(G.plate.x,G.plate.y); drawPlate(c,G.plate.R); c.restore();
+  if (dish==='bowl'){ c.save(); c.translate(G.bowl.x,G.bowl.y); drawBowl(c,G.bowl.R,{rid:K.R?null:K.rid,fid:K.fid,top:K.food?K.food.top:.6,filled:full,smoked:K.smoked}); c.restore(); }
   else if (dish==='pie'){ c.save(); c.translate(G.bowl.x,G.bowl.y); drawPie(c,G.bowl.R,{fid:K.fid,filled:full}); c.restore(); } }
 function drawGuide(c,g,k){ c.save(); c.setLineDash([6,6]); c.lineDashOffset=-K.t*10; c.strokeStyle='rgba(43,42,51,.45)'; c.lineWidth=2;
-  if (k==='main' && RECIPES[K.rid].dish==='plate'){ c.translate(g.x,g.y); c.rotate(-.08); const f=RECIPES[K.rid].form; if (f==='steak'){ c.beginPath(); c.ellipse(0,0,62,48,0,0,6.28); c.stroke(); } else if (f==='skewer'){ rrect(c,-100,-22,200,44,18); c.stroke(); } else c.stroke(filletPath(150)); }
+  if (k==='main' && kR().dish==='plate'){ c.translate(g.x,g.y); c.rotate(-.08); const f=kR().form; if (f==='steak'){ c.beginPath(); c.ellipse(0,0,62,48,0,0,6.28); c.stroke(); } else if (f==='skewer'){ rrect(c,-100,-22,200,44,18); c.stroke(); } else if (f==='whole'){ c.beginPath(); c.ellipse(0,0,74,40,0,0,6.28); c.stroke(); } else c.stroke(filletPath(150)); }
   else { c.beginPath(); c.arc(g.x,g.y,g.r,0,6.28); c.stroke(); }
   c.restore(); }
-function drawPlateStation(c){ const st=K.st, R=RECIPES[K.rid], G=st.G;
+function drawPlateStation(c){ const st=K.st, R=kR(), G=st.G;
   // gingham towel for the waiting pieces
   c.save(); const ty=st.ty; rrect(c,-190,ty-46,380,96,10); c.fillStyle='#F3EAD7'; c.fill(); c.save(); c.clip(); c.fillStyle='rgba(180,88,74,.38)'; for (let x=-190;x<190;x+=24) c.fillRect(x,ty-46,12,96); for (let y=ty-46;y<ty+50;y+=24) c.fillRect(-190,y,380,12); c.restore(); c.strokeStyle=INK; c.lineWidth=1.6; c.stroke(); c.restore();
   drawDish(c,G,R.dish,st.filled);
@@ -7194,14 +7802,29 @@ function drawPlateStation(c){ const st=K.st, R=RECIPES[K.rid], G=st.G;
   for (const it of st.items) if (!it.placed) drawItem(c,it,G,R.dish);
   if (st.idleT>3 && !st.drag){ const it=st.items.find(i=>!i.placed); if (it){ const g=G[it.k], k=(K.t*.6)%1, e=k<.7?k/.7:1; c.save(); c.globalAlpha=.75*(k<.85?1:(1-k)/.15); kGhostHand(c,lerp(it.hx,g.x,e),lerp(it.hy,g.y,e)); c.restore(); } }
 }
+/** The second burner, at the back of the range: a little saucepan simmering your own portion, its lid ticking. */
+function drawBackPot(c,t,heat){ c.save(); c.translate(150,-104);
+  if (heat>0){ c.save(); c.globalCompositeOperation='lighter'; for (let i=0;i<14;i++){ const a=i/14*Math.PI*2, fl=(5+3*Math.sin(t*15+i*2.1))*heat; c.fillStyle=i%2?'rgba(110,160,255,.55)':'rgba(255,160,80,.45)'; c.beginPath(); c.ellipse(Math.cos(a)*(40+fl*.5),Math.sin(a)*(40+fl*.5)*.9,2.4,fl,a+Math.PI/2,0,6.28); c.fill(); } c.restore(); }
+  c.fillStyle='rgba(10,5,5,.4)'; c.beginPath(); c.ellipse(4,7,40,36,0,0,6.28); c.fill();
+  c.save(); c.rotate(-2.2); c.lineWidth=2; c.strokeStyle=INK; rrect(c,34,-5,26,10,5); c.fillStyle='#2F2C31'; c.fill(); c.stroke(); c.restore();
+  c.beginPath(); c.arc(0,0,38,0,6.28); c.fillStyle='#8E959B'; c.fill(); c.stroke(); c.beginPath(); c.arc(0,0,32,0,6.28); c.fillStyle='#6E7378'; c.fill();
+  const lift=heat>.4?Math.max(0,Math.sin(t*9))*2.6*heat:0; c.save(); c.translate(0,-lift); c.rotate(heat>.4?Math.sin(t*9)*.03:0);
+  c.beginPath(); c.arc(0,0,33,0,6.28); c.fillStyle='#A9AFB4'; c.fill(); c.stroke(); c.strokeStyle='rgba(255,255,255,.4)'; c.lineWidth=2.4; c.beginPath(); c.arc(0,0,27,3.4,4.6); c.stroke();
+  c.beginPath(); c.arc(0,0,7,0,6.28); c.fillStyle='#2F2C31'; c.fill(); c.lineWidth=1.6; c.strokeStyle=INK; c.stroke(); c.restore();
+  c.restore();
+  if (heat>.4 && Math.random()<.12) K.parts.push({x:150+rand(-20,20),y:-122,vx:rand(-6,6),vy:rand(-50,-30),g:-6,t:0,max:rand(.8,1.3),r:rand(5,9),col:'rgba(255,250,240,',kind:'steam'}); }
 
 /* ---------- Smokehouse kitchen: results, book, banquet ---------- */
-function starsFor(total){ const p=total/400; return p>=.85?3:p>=.62?2:p>=.3?1:0; }
-function showResult(){ sizzleStop(); const total=STATIONS.reduce((a,k)=>a+(K.scores[k]||0),0), stars=starsFor(total), mush=stars===0, R=RECIPES[K.rid];
+/** Stars for a cook: the stations' scores against 100 each (four stations, or fewer for a smoked fish or a Delicacy). */
+function starsFor(total,n){ const p=total/(100*(n||4)); return p>=.85?3:p>=.62?2:p>=.3?1:0; }
+function showResult(){ sizzleStop(); save.stats.cooks=(save.stats.cooks||0)+1; if (K.order){ showServed(); return; }
+  const total=kSts().reduce((a,k)=>a+(K.scores[k]||0),0), stars=starsFor(total,kSts().length), mush=stars===0, R=RECIPES[K.rid];
+  // the fish are cooked now: what's kept, should the page close before you choose, is the meal (into the pantry)
+  if (mush) delete save.cooking; else save.cooking={meal:{id:K.rid, stars}}; persist();
   K.mode='result'; K.res={total,stars,mush,t:0,rays:0}; K.st=null; K.used=[]; kTopUI(); kPips(); kSay(''); $('kBottom').hidden=true; $('kTicket').hidden=true;
-  const el=$('kResult'), meal=save.meal&&save.meal.casts>0?save.meal:null, pantryFull=(save.pantry||[]).length>=3;
+  const el=$('kResult'), meal=save.meal&&save.meal.casts>0?save.meal:null, pantryFull=(save.pantry||[]).length>=3; el.classList.remove('k-res-order');
   grantGear(KITCHEN_BAIT,1);   // the scraps from every cook go into a tin of chum (data/tackle.js)
-  const bars=STATIONS.map(k=>'<div class="k-sb"><span>'+STATION_NAME[k]+'</span><i><b style="width:'+(K.scores[k]||0)+'%"></b></i><em>'+(K.scores[k]||0)+'</em></div>').join('');
+  const bars=kSts().map(k=>'<div class="k-sb"><span>'+STATION_NAME[k]+'</span><i><b style="width:'+(K.scores[k]||0)+'%"></b></i><em>'+(K.scores[k]||0)+'</em></div>').join('');
   const SP='<path d="M12 2.6 l2.9 6 6.5 .8 -4.8 4.5 1.2 6.5 -5.8 -3.2 -5.8 3.2 1.2 -6.5 -4.8 -4.5 6.5 -.8 Z"/>';
   const starHtml=[0,1,2].map(i=>'<span class="k-star'+(i<stars?' on':'')+'"><svg class="bg" viewBox="0 0 24 24">'+SP+'</svg>'+(i<stars?'<svg class="fg" viewBox="0 0 24 24" style="animation-delay:'+(.35+i*.32)+'s">'+SP+'</svg>':'')+'</span>').join('');
   el.innerHTML='<div class="k-stars">'+starHtml+'</div>'+
@@ -7213,29 +7836,31 @@ function showResult(){ sizzleStop(); const total=STATIONS.reduce((a,k)=>a+(K.sco
     (meal?'<p class="k-note" id="kNote">You’re still on '+mealName(meal.id)+' ('+meal.casts+' casts left). Eating this replaces it.</p>':'')+
     '<p class="k-scraps"><canvas data-gear="'+KITCHEN_BAIT+'" aria-hidden="true"></canvas><span>The scraps went into a tin of '+TACKLE[KITCHEN_BAIT].name.toLowerCase()+'. It’s in your tackle bag.</span></p>';
   el.hidden=false; paintTiles(el.querySelectorAll('canvas[data-gear]'));
-  musicDuck(.35,2.4); for (let i=0;i<stars;i++) setTimeout(()=>{ if (!K.open) return; tone([784,988,1319][i],.3,{vol:.1,type:'triangle'}); tone([1568,1976,2637][i],.2,{vol:.04,delay:.03}); buzz(10); K.res.pop=1; },350+i*320);
+  musicDuck(.35,2.4); for (let i=0;i<stars;i++) setTimeout(()=>{ if (!K.open || !K.res) return; tone([784,988,1319][i],.3,{vol:.1,type:'triangle'}); tone([1568,1976,2637][i],.2,{vol:.04,delay:.03}); buzz(10); if (K.res) K.res.pop=1; },350+i*320);
   if (mush) setTimeout(()=>{ tone(330,.35,{to:220,vol:.09,type:'triangle'}); tone(262,.4,{to:180,vol:.07,type:'triangle',delay:.25}); },300);
   else if (stars===3) setTimeout(()=>{ if (K.open){ kBurst(0,-60,40,'#F2D47E',{v0:120,v1:360,g:260,l0:.8,l1:1.4,r0:2,r1:4,kind:'conf'}); } },1300);
-  $('kEat').addEventListener('click',()=>{ const sid=mush?'mush':K.rid; eatMeal(sid,stars); kAfterEat(sid,stars); });
+  $('kEat').addEventListener('click',()=>{ const sid=mush?'mush':K.rid; delete save.cooking; eatMeal(sid,stars); kAfterEat(sid,stars); });
   if (mush) $('kToss').addEventListener('click',()=>{ news('The heron took it. No regrets.',''); kToBook(); });
-  else $('kSave').addEventListener('click',()=>{ save.pantry=save.pantry||[]; if (save.pantry.length>=3) return; save.pantry.push({id:K.rid,stars}); persist(); news('Saved to the pantry','good'); kToBook(); });
+  else $('kSave').addEventListener('click',()=>{ save.pantry=save.pantry||[]; if (save.pantry.length>=3) return; delete save.cooking; save.pantry.push({id:K.rid,stars}); persist(); news('Saved to the pantry','good'); kToBook(); });
 }
 function kAfterEat(id,stars){ sfx.coin(2); const R=RECIPES[id];
   if (R && R.banquet){ startBanquet(); return; }
   toast(id==='mush'?'Hmm. Pink.':'Delicious!',id==='mush'?'':'good'); kToBook(); }
-function kToBook(){ K.mode='book'; K.st=null; K.res=null; K.rid=null; K.used=[]; K.scores={}; K.specks=[]; K.parts=[]; K.floats=[]; $('kResult').hidden=true; $('kBottom').hidden=true; $('kTicket').hidden=true; $('kBanquet').hidden=true; kTopUI(); kLayout(); kBook(); }
-function kTopUI(){ const cooking=K.mode==='station'; $('kPips').hidden=!(cooking||K.mode==='result'); $('kTitle').textContent=K.mode==='book'?'Smokehouse kitchen':K.mode==='banquet'?'The Mayor’s Banquet':RECIPES[K.rid]?RECIPES[K.rid].name:'';
+function kToBook(){ if (save.cooking){ delete save.cooking; persist(); } K.mode='book'; K.st=null; K.res=null; K.rid=null; K.used=[]; K.scores={}; K.specks=[]; K.parts=[]; K.floats=[]; kOrderClear(); $('kResult').hidden=true; $('kBottom').hidden=true; $('kTicket').hidden=true; $('kBanquet').hidden=true; kTopUI(); kLayout(); kBook(); kVisitNext(); }
+function kTopUI(){ const cooking=K.mode==='station'; $('kPips').hidden=!(cooking||K.mode==='result'); $('kTitle').textContent=K.mode==='book'?'Smokehouse kitchen':K.mode==='banquet'?'The Mayor’s Banquet':K.order?(K.order.kind==='delicacy'?PLATTER.name:ticketTitle(K.order)):RECIPES[K.rid]?RECIPES[K.rid].name:'';
   $('kSub').textContent=K.mode==='book'?'Cook your catch into meals.':''; $('kSub').hidden=K.mode!=='book'; $('kConfirm').hidden=true; K.confirm=false; $('kClose').textContent=cooking?'Leave':'Close'; $('kClose').hidden=K.mode==='result'||K.mode==='banquet'; }
 /* ---- recipe book ---- */
 function kBook(){ const el=$('kBook'); el.hidden=false; const m=save.meal&&save.meal.casts>0?save.meal:null, pan=save.pantry||[];
   const stars=n=>'<span class="k-mini-stars">'+'★'.repeat(n)+'<s>'+'★'.repeat(3-n)+'</s></span>';
   let h='<section class="k-now">'+(m?'<canvas class="k-dish" data-dish="'+m.id+'" data-stars="'+m.stars+'"></canvas><div><span class="k-lab">Now eating</span><h4>'+mealName(m.id)+' '+(m.id==='mush'?'':stars(m.stars))+'</h4><p>'+effText(m.id,m.stars)+'</p><p class="k-casts"><i style="width:'+Math.round(Math.min(1,m.casts/(m.full||(m.id==='mush'?MUSH.casts:MEAL_CASTS[m.stars-1])))*100)+'%"></i><span>'+m.casts+' casts left</span></p></div>'
     :'<div><span class="k-lab">Nothing on the go</span><p>A meal lasts a number of casts, not minutes, so stepping away never wastes it. One meal at a time.</p></div>')+'</section>';
+  h='<div id="kOrdersSec">'+ordersHTML()+'</div>'+h;
   h+='<h3 class="k-h">Pantry <span>'+pan.length+'/3</span></h3><div class="k-pantry">';
   for (let i=0;i<3;i++){ const p=pan[i]; h+=p?'<div class="k-jar"><canvas class="k-dish" data-dish="'+p.id+'" data-stars="'+p.stars+'"></canvas><b>'+RECIPES[p.id].name+'</b>'+stars(p.stars)+'<button class="btn" data-eat="'+i+'" type="button">Eat</button></div>':'<div class="k-jar empty"><span>Empty shelf</span></div>'; }
   h+='</div>'+rackHTML()+'<h3 class="k-h">Recipes</h3><div class="k-recipes">';
   const ids=RECIPE_ORDER.slice().sort((a,b)=>{ const sc=id=>knownRecipe(id)?(pickNet(RECIPES[id]).ok?0:1):2; return sc(a)-sc(b); });
   for (const id of ids){ const R=RECIPES[id], known=knownRecipe(id), have=haveFor(R), need=R.need[0].n, ok=known&&have>=need;
+    if (!known && R.rep){ if (ordersOpen()) h+='<div class="k-rec locked"><canvas class="k-dish" data-dish="'+id+'" data-sil="1"></canvas><div><h4>A town recipe</h4><p>Someone in town will share it once you’re '+STANDINGS[R.rep].as+'.</p></div></div>'; continue; }
     if (!known){ const F=FISH[R.learn], seen=(save.fish[R.learn]||{}).seen;
       h+='<div class="k-rec locked"><canvas class="k-dish" data-dish="'+id+'" data-sil="1"></canvas><div><h4>Unknown recipe</h4><p>Catch '+(seen?'a '+F.name:'a fish you haven’t met yet')+' to learn it.</p>'+(seen?'<p class="k-hint">'+F.hint+'</p>':'')+'</div></div>'; continue; }
     h+='<div class="k-rec'+(ok?' ok':'')+'"><canvas class="k-dish" data-dish="'+id+'"></canvas><div><h4>'+R.name+'</h4><p class="k-need'+(ok?' have':'')+'">'+needText(R)+' · you have '+have+'</p><p class="k-meta">'+cookVerb(R)+' · '+SIDES[R.side]+'</p><p class="k-boost">'+R.eff+'</p></div>'+
@@ -7245,6 +7870,7 @@ function kBook(){ const el=$('kBook'); el.hidden=false; const m=save.meal&&save.
   el.querySelectorAll('canvas.k-dish').forEach(cv2=>drawDishIcon(cv2));
   el.querySelectorAll('canvas[data-smoked]').forEach(paintSmoked); bindRack(el);
   el.querySelectorAll('[data-cook]').forEach(b=>b.addEventListener('click',()=>startCooking(b.dataset.cook)));
+  bindOrders(el);
   el.querySelectorAll('[data-eat]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.eat, p=pan[i];
     if (m && !b.dataset.sure){ b.dataset.sure='1'; b.textContent='Replace?'; return; }
     pan.splice(i,1); save.pantry=pan; eatMeal(p.id,p.stars); persist(); kAfterEat(p.id,p.stars); }));
@@ -7254,11 +7880,11 @@ function drawDishIcon(cv2){ const r=cv2.getBoundingClientRect(), d=Math.min(wind
   if (id==='mush'){ drawPlate(c,130); drawMush(c,0); return; }
   const R=RECIPES[id], fid=R.need[0].id||'perch', G=plateGuides(R.dish); c.translate(0,38);
   if (cv2.dataset.sil){ c.globalAlpha=.35; drawPlate(c,130); c.globalAlpha=1; c.font='400 120px "Young Serif", Georgia, serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillStyle='rgba(43,42,51,.55)'; c.fillText('?',0,-30); return; }
-  const save2={fid:K.fid,food:K.food,rid:K.rid}; K.fid=fid; K.food={top:.68,marks:R.cook==='grill'?.7:0}; K.rid=id;
+  const save2={fid:K.fid,food:K.food,rid:K.rid,R:K.R,smoked:K.smoked}; K.fid=fid; K.food={top:.68,marks:R.cook==='grill'?.7:0}; K.rid=id; K.R=null; K.smoked=!!R.need[0].smoked;
   drawDish(c,G,R.dish,true);
   const main={k:'main',x:G.main.x,y:G.main.y,placed:true}, side={k:'side',x:G.side.x,y:G.side.y,placed:true}, lem={k:'lemon',x:G.lemon.x,y:G.lemon.y,placed:true};
   K.st=K.st||null; const keepSt=K.st; K.st={kind:'icon',ty:999,drag:null}; [main,side,lem].forEach(it=>drawItem(c,it,G,R.dish)); K.st=keepSt;
-  K.fid=save2.fid; K.food=save2.food; K.rid=save2.rid; }
+  K.fid=save2.fid; K.food=save2.food; K.rid=save2.rid; K.R=save2.R; K.smoked=save2.smoked; }
 function drawMush(c,t){ c.save(); c.fillStyle='rgba(30,15,5,.2)'; c.beginPath(); c.ellipse(4,8,86,58,0,0,6.28); c.fill();
   const p=new Path2D(); for (let i=0;i<=24;i++){ const a=i/24*Math.PI*2, r=70+Math.sin(a*3+t*2)*8+Math.sin(a*5)*5; const x=Math.cos(a)*r*1.1, y=Math.sin(a)*r*.72; i?p.lineTo(x,y):p.moveTo(x,y); } p.closePath();
   const g=c.createRadialGradient(-20,-20,10,0,0,90); g.addColorStop(0,'#D9B4B8'); g.addColorStop(1,'#9C8890'); c.fillStyle=g; c.fill(p); c.strokeStyle=INK; c.lineWidth=2; c.stroke(p);
@@ -7266,12 +7892,26 @@ function drawMush(c,t){ c.save(); c.fillStyle='rgba(30,15,5,.2)'; c.beginPath();
   c.beginPath(); c.arc(8,-4,13,0,6.28); c.fillStyle='#FFF8E8'; c.fill(); c.strokeStyle=INK; c.lineWidth=1.6; c.stroke(); c.beginPath(); c.arc(10+Math.sin(t*1.3)*3,-2,5.5,0,6.28); c.fillStyle=INK; c.fill();
   c.strokeStyle=INK; c.lineWidth=2; c.beginPath(); c.moveTo(48,-20); c.quadraticCurveTo(58,-36,52,-50); c.stroke(); c.restore(); }
 /* ---- starting a cook ---- */
-function startCooking(id){ const R=RECIPES[id], pk=pickNet(R); if (!pk.ok){ news('Not enough fish in your keepnet','warn'); return; }
-  audioInit(); const idx=pk.picks.slice().sort((a,b)=>b-a); K.used=idx.map(i=>save.net[i]); idx.forEach(i=>save.net.splice(i,1)); persist();
-  K.rid=id; K.fid=K.used[K.used.length-1].id; K.scores={}; K.specks=[]; K.food=null; K.parts=[]; K.floats=[]; K.mode='station';
-  $('kBook').hidden=true; $('kBottom').hidden=false; kTopUI(); K.st={kind:'clean'}; kPips(); kLayout(); startClean(); tone(523,.12,{vol:.06,type:'triangle'}); tone(784,.16,{vol:.06,type:'triangle',delay:.08}); }
+/** Starts cooking recipe id, or the ticket T's order (game/order-kitchen.js). A smoked fish skips the Clean station
+    (it was cleaned before it went on the rack), and a Delicacy order is plate-only. */
+function startCooking(id,T){ const R=T?ticketRecipe(T):RECIPES[id], pk=T?pickOrder(T):pickNet(R); if (!pk.ok){ news('Not enough fish in your keepnet','warn'); return; }
+  audioInit(); const idx=pk.picks.slice().sort((a,b)=>b-a); K.used=idx.map(i=>save.net[i]); idx.forEach(i=>save.net.splice(i,1));
+  // the fish in the pan stay in the save until the cook is done, so a page closed mid-cook hands them back (kRestore)
+  save.cooking={fish:K.used.slice()}; persist();
+  kOrderClear(); if (T) kOrderSet(T);
+  K.rid=T&&T.kind==='delicacy'?null:id||T.rid; K.fid=K.used[K.used.length-1].id; K.smoked=K.used.every(f=>f.smoked); K.scores={}; K.specks=[]; K.food=null; K.parts=[]; K.floats=[]; K.mode='station';
+  K.sts=T&&T.kind==='delicacy'?['plate']:K.smoked?['season','cook','plate']:STATIONS;
+  $('kBook').hidden=true; $('kBottom').hidden=false; kTopUI(); K.st={kind:K.sts[0]}; kPips(); kLayout();
+  ({clean:startClean,season:startSeason,plate:startPlate})[K.sts[0]](); tone(523,.12,{vol:.06,type:'triangle'}); tone(784,.16,{vol:.06,type:'triangle',delay:.08}); }
 function kLeave(){ // walk away mid-cook: the fish go back in the keepnet
-  sizzleStop(); if (K.used.length){ save.net.push(...K.used); K.used=[]; persist(); news('The fish went back in your keepnet',''); } kToBook(); }
+  sizzleStop(); if (K.used.length){ save.net.push(...K.used); K.used=[]; delete save.cooking; persist(); news('The fish went back in your keepnet',''); } kToBook(); }
+/** At load: a cook the page closed in the middle of. The fish go back in the keepnet; a meal that was done but not
+    yet eaten or saved goes in the pantry (if there's room; if not, the heron has it). */
+function kRestore(){ const c=save.cooking; if (c===undefined) return; delete save.cooking; let say='';
+  if (isObj(c) && Array.isArray(c.fish)){ const back=c.fish.filter(f=>isObj(f) && FISH[f.id] && typeof f.value==='number'); if (back.length){ save.net.push(...back); say='The fish you were cooking went back in your keepnet'; } }
+  else if (isObj(c) && isObj(c.meal) && RECIPES[c.meal.id]){ const st=clamp(Math.round(+c.meal.stars||1),1,3); save.pantry=Array.isArray(save.pantry)?save.pantry:[];
+    if (save.pantry.length<3){ save.pantry.push({id:c.meal.id, stars:st}); say='The '+RECIPES[c.meal.id].name+' you cooked is waiting in your pantry'; } else say='Grey had the '+RECIPES[c.meal.id].name+' you left on the stove'; }
+  persist(); if (say) setTimeout(()=>whenPlaying(()=>news(say,'')),900); }
 /* ---- banquet ---- */
 function startBanquet(){ K.mode='banquet'; K.bq={t:0,line:0,lineT:0}; $('kResult').hidden=true; $('kBottom').hidden=true; kTopUI(); const el=$('kBanquet'); el.hidden=false;
   el.innerHTML='<p class="k-bq-line" id="kBqLine"></p><button class="btn primary" id="kBqDone" type="button">Thank everyone</button>';
@@ -7318,8 +7958,140 @@ function drawGuest(c,g,t){ c.lineWidth=1.3; c.strokeStyle=INK;
   if (g==='pell'){ c.fillStyle='#2A4F66'; c.beginPath(); c.arc(0,-37,7.5,Math.PI,0); c.fill(); c.stroke(); c.fillRect(-9,-38,18,3); c.fillStyle=BRASS; c.beginPath(); c.arc(0,-40,1.6,0,6.28); c.fill(); }
 }
 
+/* ---------- Supper orders in the kitchen: the tickets in the book, cooking to one, serving it, and visits ---------- */
+/* game/orders.js keeps the tickets and the reputation; this is what you see and tap. While you cook an order, K.order
+   holds its ticket and K.spice, K.zone and K.garnish the targets the stations score against (game/kitchen-stations.js).
+   The customer waits at the kitchen window, behind the glass, and reacts when it's served. */
+const ORDK={flash:false, visit:null, tip:false};
+const ORDERS_TIP='The townsfolk have started pinning supper orders at your kitchen window. Cook to the ticket for tips and the town’s good opinion. Skip any you like.';
+function kOrderClear(){ K.order=null; K.R=null; K.sts=null; K.spice=null; K.zone=null; K.garnish=null; K.smoked=false; }
+function kOrderSet(T){ K.order=T; K.R=T.kind==='delicacy'?ticketRecipe(T):null; K.spice=ticketSpice(T); K.zone=ticketZone(T); K.garnish=ticketGarnish(T); }
+/** The skillet's badge: how many tickets are pinned up. */
+function ordersBadge(){ const el=$('kitchenOrders'); if (!el) return; const n=ordersOpen()?ordersState().list.length:0; el.hidden=!n || !save.kitchenOpen; el.textContent=n;
+  const b=$('kitchenBtn'); if (b) b.setAttribute('aria-label','Open kitchen'+(n?', '+n+(n===1?' supper order':' supper orders')+' waiting':'')); }
+const ORDT={t:0};
+/** Each second: pins the evening's tickets when they're due, and says so. */
+function ordersUpdate(dt){ ORDT.t-=dt; if (ORDT.t>0) return; ORDT.t=1; const r=ordersTick(); if (!r) return; ordersBadge(); ORDK.flash=true;
+  // in the kitchen, the new tickets go up in the book where you are, and nothing else on the page moves; the very
+  // first evening's tip waits until you step out
+  if (K.open){ if (r==='first') ORDK.tip=true; kOrdersRefresh(); return; }
+  const b=$('kitchenBtn'); if (b){ b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); }
+  if (r==='first') whenPlaying(()=>coachFor(ORDERS_TIP,9));
+  else if (!S.tut) news('Supper orders are up at the kitchen window','gold'); }
+/** Stepping out of the kitchen after the first evening's tickets went up while you were in it. */
+function ordersAfterKitchen(){ if (!ORDK.tip) return; ORDK.tip=false; if (save.stats.orders>0) return;
+  const b=$('kitchenBtn'); if (b){ b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); } whenPlaying(()=>coachFor(ORDERS_TIP,9)); }
+/** Redraws just the orders at the top of the book (the rack's picker, a "Replace?" and the scroll stay as they are). */
+function kOrdersRefresh(){ if (K.mode!=='book') return; const sec=$('kOrdersSec'); if (!sec) return; sec.innerHTML=ordersHTML(); bindOrders(sec); }
+
+/* ---------- in the book ---------- */
+function townHTML(){ const s=ordersState(), N=standingNext(), St=STANDINGS[N.i];
+  return '<section class="k-town"><div class="k-town-top"><span class="k-lab">Town reputation</span><b>'+St.name+'</b><em>'+s.rep+'</em></div>'+
+    '<p class="k-casts k-town-bar"><i style="width:'+Math.round(N.u*100)+'%"></i></p>'+
+    (N.next?'<p class="k-town-next">'+N.left+' more to <b>'+N.next.name+'</b>: '+N.next.brings.charAt(0).toLowerCase()+N.next.brings.slice(1)+'</p>':'<p class="k-town-next">The whole town knows your cooking.</p>')+'</section>'; }
+function ordersHTML(){ if (!ordersOpen()) return ''; const s=ordersState(), L=s.list;
+  let h=townHTML()+'<h3 class="k-h">Supper orders <span>'+(L.length?L.length+' pinned up':'')+'</span></h3>';
+  if (!(save.stats.orders>0) && L.length) h+='<p class="k-tk-intro">The townsfolk pin their supper orders here each evening. Cook to the ticket for tips and the town’s good opinion. Skip any you like: they’re replaced the next evening.</p>';
+  if (!L.length) return h+'<p class="k-tk-none">Nothing pinned up. The townsfolk come by from '+fmtHour(ORDERS.hour)+'.</p>';
+  h+='<div class="k-tickets">';
+  L.forEach((T,i)=>{ const P=TOWNSFOLK[T.who], lines=ticketLines(T), n=ticketNeed(T), pk=pickOrder(T), have=save.net.filter(f=>needMatch(n,f)).length;
+    const tip=orderTip(T,3,ticketWorth(T)), ok=pk.ok, grey=T.kind==='grey';
+    // Grey takes the cheapest common you can spare: never a record, and never one another ticket needs
+    const need=grey ? (ok?'He’d take your '+FISH[save.net[pk.picks[0]].id].name:have?'Nothing you can spare: the other tickets need them':'Any common fish · you have none') : (T.kind==='delicacy'?'A Delicacy from your keepnet':needText({need:[n]}))+' · you have '+have;
+    h+='<article class="k-tk'+(ORDK.flash?' new':'')+'" style="--tilt:'+(i%2?.7:-.6)+'deg;animation-delay:'+(i*.08)+'s" data-tk="'+T.id+'">'+
+      '<canvas class="k-tk-pt" data-portrait="'+T.who+'" aria-hidden="true"></canvas><div class="k-tk-body">'+
+      '<p class="k-tk-who">'+P.name+' <span>'+P.title+'</span></p><h4>'+ticketTitle(T)+'</h4>'+
+      (lines.length?'<ul>'+lines.map(l=>'<li>'+l+'</li>').join('')+'</ul>':'')+
+      (T.say?'<p class="k-tk-say">“'+T.say+'”</p>':'')+
+      '<p class="k-need'+(ok?' have':'')+'">'+need+'</p></div>'+
+      '<div class="k-tk-foot">'+(grey?'<span class="k-tk-tip">He pays in goodwill</span>':'<span class="k-tk-tip">Tips up to <b>'+tip.toLocaleString()+'</b></span>')+
+      '<button class="btn'+(ok?' primary':'')+'" data-order="'+T.id+'" type="button"'+(ok?'':' disabled')+'>'+(ok?(grey?'Hand it over':'Cook it'):grey?'Nothing spare':'Need '+(n.n-have)+' more')+'</button></div></article>'; });
+  ORDK.flash=false;
+  return h+'</div>'; }
+const fmtHour = h => (h%12||12)+' '+(h<12?'AM':'PM');
+function bindOrders(el){ el.querySelectorAll('canvas[data-portrait]').forEach(paintPortrait);
+  el.querySelectorAll('[data-order]').forEach(b=>b.addEventListener('click',()=>{ const T=ordersState().list.find(o=>o.id===+b.dataset.order); if (!T) return;
+    if (T.kind==='grey') return handGrey(T); startCooking(null,T); })); }
+function paintPortrait(cv){ const r=layoutBox(cv); if (!r.width) return; const d=Math.min(window.devicePixelRatio||1,2); cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
+  const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); ptBackdrop(x,r.width,r.height,0); drawPortrait(x,cv.dataset.portrait,r.width/2,r.height/2+r.height*.06,r.height*1.02,{t:1.2,mood:cv.dataset.mood||'wait'}); }
+function handGrey(T){ const out=serveGrey(T); if (!out) return; sfx.plop(); tone(380,.18,{to:300,vol:.06,type:'sawtooth'}); buzz(10);
+  news(TOWNSFOLK.grey.served[0],''); setTimeout(()=>news('+'+out.rep+' reputation','good'),400); kBook(); if (out.to>out.from) kVisitNext(); }
+
+/* ---------- serving ---------- */
+function showServed(){ const T=K.order, sts=kSts(), total=sts.reduce((a,k)=>a+(K.scores[k]||0),0), stars=starsFor(total,sts.length), worth=K.used.reduce((a,f)=>a+(f.value||0),0), P=TOWNSFOLK[T.who];
+  delete save.cooking; const repBefore=ordersState().rep, out=serveOrder(T,stars,worth), burner=hasUp('burner') && T.kind==='dish' && stars>0 && STANDINGS.findIndex(St=>St.up==='burner')<=out.from;
+  K.mode='result'; K.res={total,stars,mush:false,t:0,rays:0,order:true,served:out}; K.st=null; K.used=[]; kTopUI(); kPips(); kSay(''); $('kBottom').hidden=true; $('kTicket').hidden=true;
+  const el=$('kResult'), SP='<path d="M12 2.6 l2.9 6 6.5 .8 -4.8 4.5 1.2 6.5 -5.8 -3.2 -5.8 3.2 1.2 -6.5 -4.8 -4.5 6.5 -.8 Z"/>';
+  const starHtml=[0,1,2].map(i=>'<span class="k-star'+(i<stars?' on':'')+'"><svg class="bg" viewBox="0 0 24 24">'+SP+'</svg>'+(i<stars?'<svg class="fg" viewBox="0 0 24 24" style="animation-delay:'+(.35+i*.32)+'s">'+SP+'</svg>':'')+'</span>').join('');
+  const bars=sts.map(k=>'<div class="k-sb"><span>'+STATION_NAME[k]+'</span><i><b style="width:'+(K.scores[k]||0)+'%"></b></i><em>'+(K.scores[k]||0)+'</em></div>').join('');
+  const N=standingNext(), from=STANDINGS[out.from], u0=out.to>out.from?0:clamp((repBefore-from.at)/((STANDINGS[out.from+1]||{at:repBefore+1}).at-from.at),0,1);
+  const up=out.to>out.from;
+  el.innerHTML='<div class="k-served"><canvas class="k-served-pt" data-portrait="'+T.who+'" data-mood="'+(stars>=2?'happy':stars?'wait':'meh')+'" aria-hidden="true"></canvas>'+
+      '<div><span class="k-lab">Served to '+P.name+'</span><h3>'+(T.kind==='delicacy'?PLATTER.name:ticketTitle(T))+'</h3><div class="k-stars">'+starHtml+'</div></div></div>'+
+    '<p class="k-served-say">“'+P.served[stars]+'”</p>'+
+    '<div class="k-bars">'+bars+'</div>'+
+    '<div class="k-pay"><span class="k-pay-coins"><i class="coin" aria-hidden="true"></i>+'+out.tip.toLocaleString()+' in tips</span><span class="k-pay-rep">+'+out.rep+' reputation</span></div>'+
+    '<div class="k-town k-town-mini'+(up?' up':'')+'"><div class="k-town-top"><span class="k-lab">Town reputation</span><b>'+STANDINGS[out.to].name+'</b></div><p class="k-casts k-town-bar"><i id="kRepFill" style="width:'+Math.round(u0*100)+'%"></i></p>'+
+      (up?'<p class="k-levelup">You’re '+STANDINGS[out.to].as+' now. '+STANDINGS[out.to].brings+'</p>':'')+'</div>'+
+    (burner?'<p class="k-note">Your portion, off the second burner: '+effText(K.rid,stars)+'.'+(save.meal&&save.meal.casts>0?' You’re still on '+mealName(save.meal.id)+' ('+save.meal.casts+' casts left): eating this replaces it.':'')+'</p><div class="row"><button class="btn" id="kSave" type="button"'+((save.pantry||[]).length>=3?' disabled':'')+'>'+((save.pantry||[]).length>=3?'Pantry full':'Save for later')+'</button><button class="btn" id="kEat" type="button">Eat it</button></div>':'')+
+    '<div class="row"><button class="btn primary" id="kServedDone" type="button">Back to the kitchen</button></div>';
+  el.classList.add('k-res-order'); el.hidden=false; el.scrollTop=0; el.querySelectorAll('canvas[data-portrait]').forEach(paintPortrait);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ const f=$('kRepFill'); if (f) f.style.width=Math.round(N.u*100)+'%'; }));
+  musicDuck(.35,2.4); for (let i=0;i<stars;i++) setTimeout(()=>{ if (!K.open || !K.res) return; tone([784,988,1319][i],.3,{vol:.1,type:'triangle'}); tone([1568,1976,2637][i],.2,{vol:.04,delay:.03}); buzz(10); K.res&&(K.res.pop=1); },350+i*320);
+  if (out.tip) setTimeout(()=>{ if (!K.open) return; sfx.coin(Math.min(6,2+stars)); kFloat('+'+out.tip.toLocaleString(),0,-200,'#F7DD92',true); },1300);
+  if (out.to>out.from) setTimeout(()=>{ if (!K.open) return; if (!REDUCED) kBurst(0,-60,46,'#F2D47E',{v0:120,v1:360,g:260,l0:.8,l1:1.4,r0:2,r1:4,kind:'conf'}); [523,659,784,1047].forEach((n,i)=>tone(n,.35,{vol:.08,type:'triangle',delay:i*.1})); },1500);
+  else if (stars===3 && !REDUCED) setTimeout(()=>{ if (K.open) kBurst(0,-60,30,'#F2D47E',{v0:120,v1:320,g:260,l0:.7,l1:1.2,r0:2,r1:3.6,kind:'conf'}); },1300);
+  const done=()=>kToBook();
+  $('kServedDone').addEventListener('click',done);
+  if (burner){ $('kEat').addEventListener('click',()=>{ eatMeal(K.rid,stars); sfx.coin(2); toast('Delicious!','good'); done(); });
+    $('kSave').addEventListener('click',()=>{ save.pantry=save.pantry||[]; if (save.pantry.length>=3) return; save.pantry.push({id:K.rid,stars}); persist(); news('Saved to the pantry','good'); done(); }); }
+  grantGear(KITCHEN_BAIT,1); }
+
+/* ---------- the customer at the window ---------- */
+/** Draws whoever you're cooking for in the kitchen window, behind the glass and the glazing bars. */
+function kDrawWindowGuest(c){ const T=K.order, w=K.win; if (!T || !w || !(K.mode==='station'||K.mode==='result')) return; const s=K.s, {wx,wy,ww,wh}=w;
+  let mood='wait', hop=0; if (K.mode==='result' && K.res){ const st=K.res.stars; mood=st>=2?'happy':st?'wait':'meh'; const u=K.res.t; hop=st>=2&&u<1.2&&!REDUCED?Math.abs(Math.sin(u*Math.PI*2.5))*(1-u/1.2):0; }
+  else if (K.st && K.st.kind==='cook' && K.st.p>.85) mood='meh';
+  c.save(); c.beginPath(); c.rect(wx,wy,ww,wh); c.clip();
+  const size=Math.min(wh*1.08,ww*1.15), cx=wx+ww*(T.who==='tam'?.44:.5), cy=wy+wh-size*.38;
+  drawPortrait(c,T.who,cx,cy,size,{t:K.t,mood,hop});
+  const P=PAL; if (P && P.dark>.05){ c.fillStyle='rgba(12,16,40,'+(P.dark*.5).toFixed(2)+')'; c.fillRect(wx,wy,ww,wh); }
+  c.fillStyle='rgba(255,255,255,.06)'; c.fillRect(wx,wy,ww,wh); c.restore();
+  // the glazing bars and the glint go back over them, and the curtains over those
+  c.strokeStyle='#3B281C'; c.lineWidth=5*s; c.beginPath(); c.moveTo(wx+ww/2,wy); c.lineTo(wx+ww/2,wy+wh); c.moveTo(wx,wy+wh*.5); c.lineTo(wx+ww,wy+wh*.5); c.stroke();
+  c.strokeStyle='rgba(255,255,255,.18)'; c.lineWidth=2; c.beginPath(); c.moveTo(wx+6,wy+wh*.42); c.lineTo(wx+ww*.32,wy+6); c.stroke();
+  kDrawCurtains(c,0); }
+
+/* ---------- visits ---------- */
+/** Plays the next visit waiting, if you're looking at the book. */
+function kVisitNext(){ if (!K.open || K.mode!=='book' || ORDK.visit) return; const s=ordersState(), i=s.visits[0]; if (i==null) return;
+  // a visit from someone you haven't met yet plays its stand-in (data/orders.js: VISITS, when and else)
+  let key=STANDINGS[i].visit; if (VISITS[key].when==='barnaby' && !save.barnabyCame) key=VISITS[key].else;
+  const who=VISITS[key].who; ORDK.visit={i, key, who, line:-1, shown:0, t:0, done:false};
+  const el=$('kVisit'); el.hidden=false;
+  el.innerHTML='<div class="k-visit-card" role="dialog" aria-modal="true" aria-labelledby="kVisitWho"><canvas id="kVisitPt" aria-hidden="true"></canvas><p class="k-visit-who" id="kVisitWho">'+TOWNSFOLK[who].name+' <span>'+TOWNSFOLK[who].title+'</span></p>'+
+    '<p class="k-visit-line" id="kVisitLine" aria-hidden="true"></p><p class="sr" id="kVisitSr" aria-live="polite"></p><div class="k-visit-gift" id="kVisitGift" hidden></div><div class="row"><button class="btn primary" id="kVisitNext" type="button">Next</button></div></div>';
+  const cv=$('kVisitPt'), r=layoutBox(cv), d=Math.min(window.devicePixelRatio||1,2); cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); ORDK.visit.cv=cv; ORDK.visit.d=d; ORDK.visit.w=r.width; ORDK.visit.h=r.height;
+  kVisitLine(0); const nb=$('kVisitNext'); nb.addEventListener('click',kVisitTap); try { nb.focus({preventScroll:true}); } catch(e){}
+  tone(660,.12,{vol:.06,type:'triangle'}); tone(880,.16,{vol:.05,type:'triangle',delay:.1}); }
+/** Starts line n of the visit: it types itself out on the card, and a screen reader hears it whole, once. */
+function kVisitLine(n){ const V=ORDK.visit; V.line=n; V.shown=0; const sr=$('kVisitSr'); if (sr) sr.textContent=VISITS[V.key].lines[n]; }
+function kVisitTap(){ const V=ORDK.visit; if (!V) return; const lines=VISITS[V.key].lines, L=lines[V.line];
+  if (V.shown<L.length){ V.shown=L.length; return; }
+  if (V.line<lines.length-1){ kVisitLine(V.line+1); tone(rand(520,620),.05,{vol:.03,type:'triangle'}); return; }
+  if (!V.done){ V.done=true; const St=STANDINGS[V.i], U=UPGRADES[St.up], g=$('kVisitGift');
+    const rec=RECIPE_ORDER.find(id=>RECIPES[id].rep===V.i);
+    g.innerHTML='<span class="k-lab">'+St.name+'</span>'+(U?'<b>'+U.name+'</b><p>'+U.eff+'</p>':'')+(rec?'<b>New recipe: '+RECIPES[rec].name+'</b><p>'+RECIPES[rec].eff+'.</p>':'')+(V.i===1?'<p>Three supper orders an evening from now on.</p>':V.i===2?'<p>Some will ask for a Hollowmere Delicacy.</p>':'');
+    g.hidden=false; const sr=$('kVisitSr'); if (sr) sr.textContent=g.textContent; $('kVisitNext').textContent='Thank you'; sfx.out('rare'); buzz([0,20,30,20]); return; }
+  const s=ordersState(); s.seen[V.i]=1; s.visits=s.visits.filter(i=>i!==V.i); persist(); ORDK.visit=null; $('kVisit').hidden=true; $('kVisit').innerHTML=''; kBook(); setTimeout(kVisitNext,300); }
+/** Each frame while a visit is up: the line types itself out, and they talk while it does. */
+function kVisitFrame(dt){ const V=ORDK.visit; if (!V || !V.cv) return; V.t+=dt; const L=VISITS[V.key].lines[V.line]; if (V.shown<L.length) V.shown=Math.min(L.length,V.shown+dt*(REDUCED?999:46));
+  const el=$('kVisitLine'); if (el){ const txt=L.slice(0,Math.floor(V.shown)); if (el.textContent!==txt) el.textContent=txt; }
+  const c=V.cv.getContext('2d'); c.setTransform(V.d,0,0,V.d,0,0); c.clearRect(0,0,V.w,V.h);
+  const talking=V.shown<L.length; ptBackdrop(c,V.w,V.h,V.t); drawPortrait(c,V.who,V.w/2,V.h/2+V.h*.04,V.h*.98,{t:V.t,mood:talking?'talk':V.done?'happy':'wait',talk:talking?Math.abs(Math.sin(V.t*13)):0}); }
+
 /* ---------- Smokehouse kitchen: loop, input, open/close ---------- */
-function kUpdate(dt){ K.t+=dt;
+function kUpdate(dt){ K.t+=dt; kVisitFrame(dt);
   if (K.mode==='station' && K.st){ ({clean:updateClean,season:updateSeason,cook:updateCook,plate:updatePlate})[K.st.kind](dt); }
   if (K.mode==='result' && K.res){ K.res.t+=dt; K.res.pop=Math.max(0,(K.res.pop||0)-dt*3); }
   if (K.mode==='banquet'){ K.bq.t+=dt; K.bq.lineT+=dt; if (K.bq.lineT>3.2 && K.bq.line<BANQUET_LINES.length-1){ K.bq.lineT=0; K.bq.line++; kBqLine(); } }
@@ -7342,12 +8114,13 @@ function kDrawFloats(c){ for (const f of K.floats){ const u=f.t/1.3, a=u<.15?u/.
 function kDraw(){ const c=K.ctx; c.setTransform(K.dpr,0,0,K.dpr,0,0);
   if (K.mode==='banquet'){ drawBanquet(c); kDrawParts(c,true); return; }
   if (!K.bg) kRoom(); c.drawImage(K.bg,0,0,K.W,K.H);
+  kDrawWindowGuest(c);
   kDrawRack(c,K.t);
   kDrawParts(c,true);
   kDrawLantern(c,K.t); kDrawMoth(c,K.t);
   c.save(); c.translate(K.W/2,K.SY); c.scale(K.s,K.s);
   if (K.mode==='station' && K.st){ ({clean:drawClean,season:drawSeason,cook:drawCook,plate:drawPlateStation})[K.st.kind](c); kDrawParts(c,false); kDrawFloats(c); }
-  else if (K.mode==='result' && K.res){ const R=RECIPES[K.rid], G=plateGuides(R.dish), r=K.res, e=Math.min(1,r.t/.6), sc=lerp(.85,1.08,1-Math.pow(1-e,3))+(r.pop||0)*.03;
+  else if (K.mode==='result' && K.res){ const R=kR(), G=plateGuides(R.dish), r=K.res, e=Math.min(1,r.t/.6), sc=lerp(.85,1.08,1-Math.pow(1-e,3))+(r.pop||0)*.03;
     c.save(); c.translate(0,-80); c.globalCompositeOperation='lighter'; c.rotate(r.t*.15); const rays=r.mush?0:r.stars; for (let i=0;i<12 && rays;i++){ c.rotate(Math.PI/6); c.fillStyle='rgba(255,215,140,'+(.04+.03*rays)+')'; c.beginPath(); c.moveTo(0,0); c.lineTo(-40,-320); c.lineTo(40,-320); c.closePath(); c.fill(); } c.restore();
     c.save(); c.translate(0,-80); c.scale(sc,sc); c.translate(0,38);
     if (r.mush){ drawPlate(c,130); c.translate(0,-38); drawMush(c,K.t); }
@@ -7367,18 +8140,19 @@ function kMove(e){ if (K.mode!=='station' || !K.st) return; const p=kPtr(e), dow
 function kUp(e){ if (!K.ptr) return; K.ptr.down=false; if (K.mode!=='station' || !K.st) return; const k=K.st.kind, p=kPtr(e);
   if (k==='clean') cleanUp(); else if (k==='season') seasonUp(p); else if (k==='plate') plateUp(); }
 function kActClick(){ if (!K.st) return; const k=K.st.kind; audioInit();
-  if (k==='season'){ if (!K.st.pinches) return; K.scores.season=seasonScore(); const sc=K.scores.season; kFloat(sc>=95?'Spot on!':sc>=70?'Tasty':'Hmm, interesting',0,-60,sc>=70?'#CFE7B9':'#F5D08A',true);
+  // (a ticket that wants no spice at all can go straight on)
+  if (k==='season'){ if (!K.st.pinches && Object.keys(kSpice()).length) return; K.scores.season=seasonScore(); const sc=K.scores.season; kFloat(sc>=95?'Spot on!':sc>=70?'Tasty':'Hmm, interesting',0,-60,sc>=70?'#CFE7B9':'#F5D08A',true);
     tone(988,.12,{vol:.07,type:'triangle'}); kPips(); kAct(null); $('kTicket').hidden=true; setTimeout(()=>{ if (K.open && K.st && K.st.kind==='season') startCook(); },700); }
   else if (k==='cook') cookTap(); else if (k==='plate'){ K.dill=K.st.dill.map(d=>({x:d.x-K.st.G.plate.x,y:d.y-K.st.G.plate.y,a:d.a})); plateServe(); } }
-function openKitchen(){ audioInit(); const L=$('kitchen'); ovOpen('kitchen',()=>{ if (K.mode==='station'){ $('kConfirm').hidden=false; $('kClose').hidden=true; return false; } if (K.mode==='result'||K.mode==='banquet') return false; closeKitchen(); });
+function openKitchen(){ audioInit(); const L=$('kitchen'); ovOpen('kitchen',()=>{ if (ORDK.visit) return false; if (K.mode==='station'){ $('kConfirm').hidden=false; $('kClose').hidden=true; return false; } if (K.mode==='result'||K.mode==='banquet') return false; closeKitchen(); });
   L.innerHTML='<canvas id="kCanvas"></canvas>'+
     '<div class="k-top" id="kTop"><div class="k-head"><div><h2 id="kTitle">Smokehouse kitchen</h2><p id="kSub"></p></div><div class="k-confirm" id="kConfirm" hidden><span>Leave? The fish go back in your keepnet.</span><button class="btn" id="kStay" type="button">Keep cooking</button><button class="btn primary" id="kGo" type="button">Leave</button></div><button class="btn" id="kClose" type="button">Close</button></div><div class="k-pips" id="kPips" hidden></div></div>'+
     '<div class="k-ticket" id="kTicket" hidden></div>'+
     '<div class="k-book" id="kBook"></div>'+
     '<div class="k-bottom" id="kBottom" hidden><p class="k-say" id="kSay"></p><button class="btn primary" id="kAct" type="button" hidden></button></div>'+
-    '<div class="k-result" id="kResult" hidden></div><div class="k-banquet" id="kBanquet" hidden></div>';
-  L.hidden=false; K.open=true; K.mode='book'; K.cv=$('kCanvas'); K.ctx=K.cv.getContext('2d'); K.bg=null; K.parts=[]; K.floats=[];
-  kTopUI(); kLayout(); kBook();
+    '<div class="k-result" id="kResult" hidden></div><div class="k-banquet" id="kBanquet" hidden></div><div class="k-visit" id="kVisit" hidden></div>';
+  L.hidden=false; K.open=true; K.mode='book'; ORDK.visit=null; K.cv=$('kCanvas'); K.ctx=K.cv.getContext('2d'); K.bg=null; K.parts=[]; K.floats=[];
+  kTopUI(); kLayout(); kBook(); setTimeout(kVisitNext,500);
   $('kClose').addEventListener('click',()=>{ if (K.mode==='station'){ $('kConfirm').hidden=false; $('kClose').hidden=true; return; } closeKitchen(); });
   $('kStay').addEventListener('click',()=>{ $('kConfirm').hidden=true; $('kClose').hidden=false; });
   $('kGo').addEventListener('click',()=>{ $('kClose').hidden=false; kLeave(); });
@@ -7387,7 +8161,9 @@ function openKitchen(){ audioInit(); const L=$('kitchen'); ovOpen('kitchen',()=>
   K.last=performance.now(); requestAnimationFrame(kLoop);
   if (!save.kitchenSeen){ save.kitchenSeen=true; persist(); }
 }
-function closeKitchen(){ if (!K.open) return; ovClosed('kitchen'); if (K.mode==='station') kLeave(); sizzleStop(); K.open=false; persist(); updateHud(); const L=$('kitchen'); L.classList.add('closing');
+function closeKitchen(){ if (!K.open) return; ovClosed('kitchen'); if (K.mode==='station') kLeave(); sizzleStop(); K.open=false; persist(); updateHud();
+  if (coinShown!==save.coins) coinTally(500);   // tips came in while the HUD was out of sight
+  ordersAfterKitchen(); const L=$('kitchen'); L.classList.add('closing');
   setTimeout(()=>{ L.hidden=true; L.classList.remove('closing'); L.innerHTML=''; },REDUCED?0:250); last=performance.now(); }
 window.addEventListener('resize',()=>{ if (K.open) kLayout(); });
 
@@ -7506,7 +8282,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=19, SNAP_KEY=KEY+'-snapshots';
+const BUILD=20, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -7625,7 +8401,7 @@ if (window.__PWA && 'serviceWorker' in navigator && location.protocol!=='file:')
 let last=performance.now();
 function update(dt,rdt){
   if (S.state==='idle' && save.tutorialDone && save.stats.casts>=12){ S.idleT=(S.idleT||0)+rdt; if (S.idleT>30 && S.idleT-rdt<=30) setHint('Drag back to aim. Release to cast.'); }
-  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt);
+  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt);
   { const nc=save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')); if (nc>=24) save.day=(save.day||0)+1; save.clock=nc%24; } PAL=palAt(save.clock);   // save.day: Wanderer's days
   { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2) buildBg(); }
   const ct=hudClock(save.clock); if (ct!==S.clockShown){ const n=(S.clockShown||'').length; S.clockShown=ct; $('clock').textContent=ct; if (ct.length!==n) fitHud(); }
@@ -7817,8 +8593,8 @@ function sewCost(){ const FS=findsState(); return FS.pockets>=POCKETS.max?null:P
 function sewPocket(){ const FS=findsState(), cost=sewCost(); if (cost==null || save.coins<cost) return false;
   addCoins(-cost); FS.pockets++; persist(); sfx.out('uncommon'); buzz([0,20,30,20]); news('Ottilie sewed on another pocket','gold'); return true; }
 const ownerHas = who => Object.keys(FINDS).filter(id=>FINDS[id].owner===who && hasFind(id) && !findsState().returned[id]);
-function foundWhere(h){ if (!h) return ''; const src=h.src==='return'?'A thank-you gift':LOOT_TIERS.includes(h.src)?'From '+aOrAn(CRATES[h.src].name.toLowerCase()):h.src==='playtest'?'From Playtest':'Pulled up loose';
-  return src+(h.reg?' · '+(h.spot&&h.src!=='return'?spotLabel(h.reg,h.spot):REGION_NAME[h.reg]):'')+(h.t?' · '+whenLabel(h.t,h.hr):''); }
+function foundWhere(h){ if (!h) return ''; const src=h.src==='return'?'A thank-you gift':h.src==='town'?'A gift from the town':LOOT_TIERS.includes(h.src)?'From '+aOrAn(CRATES[h.src].name.toLowerCase()):h.src==='playtest'?'From Playtest':'Pulled up loose';
+  return src+(h.reg?' · '+(h.spot&&h.src!=='return'&&h.src!=='town'?spotLabel(h.reg,h.spot):REGION_NAME[h.reg]):'')+(h.t?' · '+whenLabel(h.t,h.hr):''); }
 function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(hasFind), keeps=findList('keepsake').filter(hasFind);
   const all=Object.keys(FINDS), got=all.filter(hasFind).length, cost=sewCost();
   let h='<p class="fd-count"><b>'+got+'</b> of '+all.length+' finds'+(FS.treasure?' · '+FS.treasure+' treasure'+(FS.treasure===1?'':'s')+' pulled up':'')+'</p>';
@@ -7846,7 +8622,7 @@ function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(ha
 const rarInk = r => ({common:'#7A7468', uncommon:'#4E7B3E', rare:'#3B78B0', epic:'#7448A8', legendary:'#9A7322', exotic:'#24857A', mythic:'#3A3848', godly:'#9A7A22'})[r]||'#7A7468';
 function letterState(id){ const s=findsState().letters[id]; return s==='delivered'?'Delivered':s==='waiting'?'Waiting for Pell':'Not delivered'; }
 function findDetailHTML(id){ if (!id || !FINDS[id]) return ''; const D=FINDS[id], FS=findsState(), have=hasFind(id);
-  if (!have) return '<div class="fd-detail none"><h4>Not found yet</h4><p>'+(D.from==='return'?'Someone in town might give you this, if you find what they lost.':
+  if (!have) return '<div class="fd-detail none"><h4>Not found yet</h4><p>'+(D.from==='return'?'Someone in town might give you this, if you find what they lost.':D.from==='town'?'The town might give you this one day, if your cooking wins them over.':
     aOrAn(RAR[D.rarity].label.toLowerCase()+' '+D.kind).replace(/^a/,'A')+(rarRank(D.rarity)>=rarRank('exotic')?', only ever found in '+LOOT_TIERS.slice(rarRank(D.rarity)).map(cratesOf).join(' and ')+'.':D.region==='any'?'. It could turn up anywhere.':', somewhere around '+REGION_NAME[D.region]+'.'))+'</p></div>';
   const owed=D.owner && !FS.returned[id], O=D.owner&&OWNERS[D.owner];
   return '<div class="fd-detail rf" data-r="'+D.rarity+'"><canvas data-find="'+id+'" class="big"></canvas><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+D.kind+'</span><h4>'+D.name+'</h4><p class="lore">'+D.lore+'</p>'+
@@ -8201,7 +8977,7 @@ function openNet(){
     h+='<div class="entries">';
     save.net.map((f,i)=>({f,i})).sort((a,b)=>b.f.value-a.f.value).forEach(({f,i})=>{ const F=FISH[f.id];
       const tags=[f.delicacy?'Hollowmere Delicacy':f.smoked?'Smoked '+fmtMins((f.smokedH||0)*60):'',f.perfect?'Perfect hook':'',f.lucky?'Gull luck':'',f.trap?'From a trap':''].filter(Boolean).join(' · '), room=!f.smoked && tankRoom(f.id), hook=save.kitchenOpen && smokable(f);
-      h+='<div class="entry" style="grid-template-columns:84px 1fr auto"><canvas data-f="'+f.id+'"'+(f.smoked?' data-sm="'+(f.delicacy?'del':'1')+'" data-u="'+Math.round(Math.min(1,(f.smokedH||0)/(canDelicacy(f)?SMOKE.delicacy.hours:SMOKE.full))*100)+'"':'')+' style="width:84px;height:42px"></canvas><div style="min-width:0"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+'</span><h3>'+F.name+(isPB(f)?'<span class="net-rec">Record</span>':'')+'</h3><p>'+fmtW(fishW(f))+' · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+(tags?'<br>'+tags:'')+'</p></div>'+
+      h+='<div class="entry" style="grid-template-columns:84px 1fr auto"><canvas data-f="'+f.id+'"'+(f.smoked?' data-sm="'+(f.delicacy?'del':'1')+'" data-u="'+Math.round(Math.min(1,(f.smokedH||0)/(canDelicacy(f)?delicacyHours():SMOKE.full))*100)+'"':'')+' style="width:84px;height:42px"></canvas><div style="min-width:0"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+'</span><h3>'+F.name+(isPB(f)?'<span class="net-rec">Record</span>':'')+'</h3><p>'+fmtW(fishW(f))+' · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+(tags?'<br>'+tags:'')+'</p></div>'+
         '<div style="display:grid;gap:6px">'+(f.smoked?'':'<button class="btn" data-tank="'+i+'" type="button"'+(room?'':' disabled')+'>'+(room?'To tank':tanks()[tankOf(f.id)].owned?'Tank full':'No tank')+'</button>')+
         (hook?'<button class="btn" data-hang="'+i+'" type="button"'+(freeHook()>=0?'':' disabled')+'>'+(freeHook()>=0?'Smoke it':'Rack full')+'</button>':'')+'<button class="btn" data-sell="'+i+'" type="button">Sell · +'+f.value+'</button></div></div>'; });
     h+='</div>';
@@ -8622,10 +9398,11 @@ function bindPlaytestTabs(){ $('closeS').addEventListener('click',closeSheet);
 function boot(data){
   if (data && data.save) load(data.save);
   const away=save.lastPlayed?Date.now()-save.lastPlayed:0;   // before anything saves and moves lastPlayed on
-  migrateRecords();
+  migrateRecords(); kRestore();   // a cook the page closed in the middle of (game/kitchen-results.js)
   if ((save.pending||[]).length){ const got=save.pending.splice(0); got.forEach(grant); persist(); setTimeout(()=>news('Your Tacklegram order arrived','gold'),800); }
   if (lettersWaiting()){ MAIL.state='waiting'; MAIL.t=6; }   // a drowned letter still waiting for Pell
   applyAway(away); if (REG()==='lake' && trapGiftCheck()) setTimeout(trapGiftTip,2500);
+  ordersBadge();   // supper orders tick from the loop (game/order-kitchen.js), and announce themselves there
   resize(); coinShown=save.coins; $('coins').textContent=hudNum(save.coins); updateHud(); accrueTips(); setState('idle'); kitchenUnlockCheck(true);
   requestAnimationFrame(t=>{ last=t; requestAnimationFrame(frame); });
   snapshot('Start of a session'); protectStorage(); introStart(); sheetSwipe();

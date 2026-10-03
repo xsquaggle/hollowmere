@@ -4,6 +4,20 @@ Newest first. Each entry records what was decided and why, so later changes don'
 
 ## 2026-10-03
 
+- **The kitchen gets supper orders and Town reputation (build 20).** Once you've cooked a meal, the townsfolk pin two supper orders at the kitchen window each in-game evening at 6, and three once you're a familiar face. Skipping one costs nothing: the next evening's tickets replace them. The aim is a second reason to cook, and a slow social ladder, without a timer to fail.
+  - A ticket names a recipe you know, and its twists: more, less or none of a spice; lightly or well done, which moves the golden zone (−0.14 or +0.12); and no dill or lots of dill on top (none, or 5 sprigs or more). Twists grow from 0–1 a ticket at first to 2–3 at the top, and each customer leans on their own (Tam: no pepper, nothing green).
+  - A ticket never asks for no spice at all, and never asks about dill twice (the review found "no dill" beside "lots of dill on top", which reads as a muddle).
+  - From A regular on, a ticket may ask for the dish made with a smoked fish (only for a recipe that takes one fish of a kind, and only while you have that kind smoked or hanging), or for a Hollowmere Delicacy served whole on a plate (one evening in three, one a night at most, and only while you have a Delicacy or a rare fish on the rack). Grey the heron sometimes taps on the glass for a raw common; he pays in reputation only.
+- **Tips keep pace with the rod, so orders are worth doing all game long.** Tips = (what the fish used would sell for × 1.2 + what a catch is worth lately × 0.25 / 0.65 / 1.3 / 1.9 by stars) × (1 + 0.12 a twist) × the customer's own tip (Pell 0.9 to Barnaby 1.15).
+  - "What a catch is worth lately" is a running average kept as you land fish (95% old, 5% new). A first version tipped from the fish's value alone, and paid 400% of fishing early on and nothing late.
+  - From the simulator: a cook takes about 75 seconds, and three stars then pays about 110–150% of what that time fishing would at a real player's pace (the most early on, with the Willow Switch); two stars, about 80–115%. Cooking well should feel like a fair trade for a break from the rod, not a better job.
+  - A Delicacy order pays the Delicacy's worth × 0.8 / 1.05 / 1.3 / 1.5 by stars, instead of selling it. It was 1.8 at three stars; the review measured that as a second smoke-rack income, so it's now half again the sale, a thank-you.
+- **Town reputation and the standings.** Reputation: 1, 3, 6 or 9 by stars, +1 a twist, +5 for a smoked or Delicacy order, and 3 from Grey. Standings at 0, 20, 60, 130, 230 and 380: New in town, A familiar face, A regular, The town cook, Hollowmere's own, and Guest of honor. Doing every ticket at two or three stars, that's about 0.8, 1.6, 2.4, 3.6 and 5.6 hours of play.
+  - What they bring: Smokehouse Kedgeree (a smoked fish through rice), then a better smoker (a fourth hook, and Delicacies in 6 hours instead of 8), a second burner (an order makes a portion for you too, to eat or save), a bigger spice rack (garlic and fennel seed: seven jars) with Harbor Pepperpot, and your uncle's ladle, a keepsake (meals last 25% longer).
+  - Each new standing plays a short visit at the kitchen window, one line at a time, ending on its gift. Barnaby brings the burner; until you've met him, it comes across on Ottilie's ferry with your name chalked on the crate, so no one visits before you've met them.
+- **Orders are safe for the fish and the save.** Fish a pinned order needs stay out of the sale when you land them and when a trap is hauled. Grey only takes a common you can spare: never a record, never one a ticket needs.
+  - The fish in the pan are kept in the save until a cook is done, so a page closed mid-cook hands them back on the next start, and a meal that was cooked but not yet eaten or saved waits in the pantry.
+  - Old saves that had cooked open orders at once. Ticket data from a save is checked against the tables: unknown people, recipes or twists are dropped, and what's written on a ticket is always one of that person's own lines.
 - **Idle play arrives as fish traps, a smoke rack and a proper welcome back (build 19).** It covers the boring part, the common fish, and leaves everything interesting to active play.
   - Traps catch only commons and uncommons you've already caught, from the bite pool of the spot they sit on. They never discover a species, a rare or a story item.
   - Everything idle runs on real time, playing or not, and counts at most 8 hours at a stretch.
@@ -23,7 +37,7 @@ Newest first. Each entry records what was decided and why, so later changes don'
   - Wide Mesh (800): holds 40 and catches a fish in 0.7 of the time (every 4.2 minutes at the lake), but takes commons only. It's for a long night away.
   - Lantern Cage (1,500): night fish only, worth more, but each fish takes 1.6 times as long.
   - A fitting can't go on a trap that holds more than the fitting allows, so the sheet hauls it up first. No fish is ever lost.
-- **The smoke rack has three hooks in the kitchen.**
+- **The smoke rack has three hooks in the kitchen** (four from step 19, once the town makes you a regular).
   - A fish gains value on an ease-out curve: about +20% after an hour, and +60% at 6 hours.
   - A rare fish or rarer left 8 hours becomes a Hollowmere Delicacy, worth 2.5 times its fresh value.
   - A smoked fish goes back to the keepnet, or sells. It can't be cooked, go in a tank or be smoked again.

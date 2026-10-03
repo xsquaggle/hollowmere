@@ -39,7 +39,7 @@ function rollTreasure(c){
 function rollCrateTier(c){ const w={}; for (const t in CRATES) w[t]=CRATES[t].weight*tierMul(t,c); return pickW(w); }
 
 /* ---------- what can still turn up ---------- */
-const lootable = id => FINDS[id].from!=='return';
+const lootable = id => !FINDS[id].from;   // reward keepsakes (from a returned curio, or from the town) never turn up loose
 /** The next note in a bottle: the uncle's logbook pages come in order (page 1 in the third bottle, page 2
     a few bottles on), the rest in any order, sea notes only at sea. `peek` just asks whether there is one. */
 function nextBottleNote(c,peek){ const FS=findsState(), read=new Set(FS.notes), reg=modCtx(c).region;

@@ -1,5 +1,5 @@
 /* ---------- Smokehouse kitchen: loop, input, open/close ---------- */
-function kUpdate(dt){ K.t+=dt;
+function kUpdate(dt){ K.t+=dt; kVisitFrame(dt);
   if (K.mode==='station' && K.st){ ({clean:updateClean,season:updateSeason,cook:updateCook,plate:updatePlate})[K.st.kind](dt); }
   if (K.mode==='result' && K.res){ K.res.t+=dt; K.res.pop=Math.max(0,(K.res.pop||0)-dt*3); }
   if (K.mode==='banquet'){ K.bq.t+=dt; K.bq.lineT+=dt; if (K.bq.lineT>3.2 && K.bq.line<BANQUET_LINES.length-1){ K.bq.lineT=0; K.bq.line++; kBqLine(); } }
@@ -22,12 +22,13 @@ function kDrawFloats(c){ for (const f of K.floats){ const u=f.t/1.3, a=u<.15?u/.
 function kDraw(){ const c=K.ctx; c.setTransform(K.dpr,0,0,K.dpr,0,0);
   if (K.mode==='banquet'){ drawBanquet(c); kDrawParts(c,true); return; }
   if (!K.bg) kRoom(); c.drawImage(K.bg,0,0,K.W,K.H);
+  kDrawWindowGuest(c);
   kDrawRack(c,K.t);
   kDrawParts(c,true);
   kDrawLantern(c,K.t); kDrawMoth(c,K.t);
   c.save(); c.translate(K.W/2,K.SY); c.scale(K.s,K.s);
   if (K.mode==='station' && K.st){ ({clean:drawClean,season:drawSeason,cook:drawCook,plate:drawPlateStation})[K.st.kind](c); kDrawParts(c,false); kDrawFloats(c); }
-  else if (K.mode==='result' && K.res){ const R=RECIPES[K.rid], G=plateGuides(R.dish), r=K.res, e=Math.min(1,r.t/.6), sc=lerp(.85,1.08,1-Math.pow(1-e,3))+(r.pop||0)*.03;
+  else if (K.mode==='result' && K.res){ const R=kR(), G=plateGuides(R.dish), r=K.res, e=Math.min(1,r.t/.6), sc=lerp(.85,1.08,1-Math.pow(1-e,3))+(r.pop||0)*.03;
     c.save(); c.translate(0,-80); c.globalCompositeOperation='lighter'; c.rotate(r.t*.15); const rays=r.mush?0:r.stars; for (let i=0;i<12 && rays;i++){ c.rotate(Math.PI/6); c.fillStyle='rgba(255,215,140,'+(.04+.03*rays)+')'; c.beginPath(); c.moveTo(0,0); c.lineTo(-40,-320); c.lineTo(40,-320); c.closePath(); c.fill(); } c.restore();
     c.save(); c.translate(0,-80); c.scale(sc,sc); c.translate(0,38);
     if (r.mush){ drawPlate(c,130); c.translate(0,-38); drawMush(c,K.t); }
@@ -47,18 +48,19 @@ function kMove(e){ if (K.mode!=='station' || !K.st) return; const p=kPtr(e), dow
 function kUp(e){ if (!K.ptr) return; K.ptr.down=false; if (K.mode!=='station' || !K.st) return; const k=K.st.kind, p=kPtr(e);
   if (k==='clean') cleanUp(); else if (k==='season') seasonUp(p); else if (k==='plate') plateUp(); }
 function kActClick(){ if (!K.st) return; const k=K.st.kind; audioInit();
-  if (k==='season'){ if (!K.st.pinches) return; K.scores.season=seasonScore(); const sc=K.scores.season; kFloat(sc>=95?'Spot on!':sc>=70?'Tasty':'Hmm, interesting',0,-60,sc>=70?'#CFE7B9':'#F5D08A',true);
+  // (a ticket that wants no spice at all can go straight on)
+  if (k==='season'){ if (!K.st.pinches && Object.keys(kSpice()).length) return; K.scores.season=seasonScore(); const sc=K.scores.season; kFloat(sc>=95?'Spot on!':sc>=70?'Tasty':'Hmm, interesting',0,-60,sc>=70?'#CFE7B9':'#F5D08A',true);
     tone(988,.12,{vol:.07,type:'triangle'}); kPips(); kAct(null); $('kTicket').hidden=true; setTimeout(()=>{ if (K.open && K.st && K.st.kind==='season') startCook(); },700); }
   else if (k==='cook') cookTap(); else if (k==='plate'){ K.dill=K.st.dill.map(d=>({x:d.x-K.st.G.plate.x,y:d.y-K.st.G.plate.y,a:d.a})); plateServe(); } }
-function openKitchen(){ audioInit(); const L=$('kitchen'); ovOpen('kitchen',()=>{ if (K.mode==='station'){ $('kConfirm').hidden=false; $('kClose').hidden=true; return false; } if (K.mode==='result'||K.mode==='banquet') return false; closeKitchen(); });
+function openKitchen(){ audioInit(); const L=$('kitchen'); ovOpen('kitchen',()=>{ if (ORDK.visit) return false; if (K.mode==='station'){ $('kConfirm').hidden=false; $('kClose').hidden=true; return false; } if (K.mode==='result'||K.mode==='banquet') return false; closeKitchen(); });
   L.innerHTML='<canvas id="kCanvas"></canvas>'+
     '<div class="k-top" id="kTop"><div class="k-head"><div><h2 id="kTitle">Smokehouse kitchen</h2><p id="kSub"></p></div><div class="k-confirm" id="kConfirm" hidden><span>Leave? The fish go back in your keepnet.</span><button class="btn" id="kStay" type="button">Keep cooking</button><button class="btn primary" id="kGo" type="button">Leave</button></div><button class="btn" id="kClose" type="button">Close</button></div><div class="k-pips" id="kPips" hidden></div></div>'+
     '<div class="k-ticket" id="kTicket" hidden></div>'+
     '<div class="k-book" id="kBook"></div>'+
     '<div class="k-bottom" id="kBottom" hidden><p class="k-say" id="kSay"></p><button class="btn primary" id="kAct" type="button" hidden></button></div>'+
-    '<div class="k-result" id="kResult" hidden></div><div class="k-banquet" id="kBanquet" hidden></div>';
-  L.hidden=false; K.open=true; K.mode='book'; K.cv=$('kCanvas'); K.ctx=K.cv.getContext('2d'); K.bg=null; K.parts=[]; K.floats=[];
-  kTopUI(); kLayout(); kBook();
+    '<div class="k-result" id="kResult" hidden></div><div class="k-banquet" id="kBanquet" hidden></div><div class="k-visit" id="kVisit" hidden></div>';
+  L.hidden=false; K.open=true; K.mode='book'; ORDK.visit=null; K.cv=$('kCanvas'); K.ctx=K.cv.getContext('2d'); K.bg=null; K.parts=[]; K.floats=[];
+  kTopUI(); kLayout(); kBook(); setTimeout(kVisitNext,500);
   $('kClose').addEventListener('click',()=>{ if (K.mode==='station'){ $('kConfirm').hidden=false; $('kClose').hidden=true; return; } closeKitchen(); });
   $('kStay').addEventListener('click',()=>{ $('kConfirm').hidden=true; $('kClose').hidden=false; });
   $('kGo').addEventListener('click',()=>{ $('kClose').hidden=false; kLeave(); });
@@ -67,6 +69,8 @@ function openKitchen(){ audioInit(); const L=$('kitchen'); ovOpen('kitchen',()=>
   K.last=performance.now(); requestAnimationFrame(kLoop);
   if (!save.kitchenSeen){ save.kitchenSeen=true; persist(); }
 }
-function closeKitchen(){ if (!K.open) return; ovClosed('kitchen'); if (K.mode==='station') kLeave(); sizzleStop(); K.open=false; persist(); updateHud(); const L=$('kitchen'); L.classList.add('closing');
+function closeKitchen(){ if (!K.open) return; ovClosed('kitchen'); if (K.mode==='station') kLeave(); sizzleStop(); K.open=false; persist(); updateHud();
+  if (coinShown!==save.coins) coinTally(500);   // tips came in while the HUD was out of sight
+  ordersAfterKitchen(); const L=$('kitchen'); L.classList.add('closing');
   setTimeout(()=>{ L.hidden=true; L.classList.remove('closing'); L.innerHTML=''; },REDUCED?0:250); last=performance.now(); }
 window.addEventListener('resize',()=>{ if (K.open) kLayout(); });

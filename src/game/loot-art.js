@@ -163,6 +163,17 @@ const FIND_ART={
       c.beginPath(); c.moveTo(-12,-36); c.lineTo(12,-36); c.lineTo(12,18); c.quadraticCurveTo(28,20,28,32); c.lineTo(-14,32); c.quadraticCurveTo(-14,10,-12,-36); c.closePath(); laFill(c,'#E2B13C');
       c.fillStyle='#C6942A'; c.fillRect(-13,-36,26,8); c.strokeRect(-13,-36,26,8); c.fillStyle=INK; c.fillRect(-14,28,42,5); laShine(c,-6,-14,2,10,.4); c.restore(); };
     boot(-14,-.08); boot(14,.06); },
+  // from the town: your uncle's copper ladle, dented, on a worn wooden handle with a leather loop
+  ladle(c){ c.save(); c.rotate(-.62); laInk(c);
+    c.strokeStyle=INK; c.lineWidth=9; c.beginPath(); c.moveTo(0,-2); c.lineTo(0,-50); c.stroke(); c.strokeStyle=LA.brass; c.lineWidth=5; c.stroke(); c.strokeStyle=LA.brassL; c.lineWidth=1.4; c.beginPath(); c.moveTo(-1.4,-6); c.lineTo(-1.4,-24); c.stroke();
+    laInk(c); rrect(c,-6,-66,12,28,5); laFill(c,'#8A5E3C'); c.fillStyle='#A8774C'; c.fillRect(-4.6,-64,3.6,24); c.strokeStyle='rgba(60,40,24,.5)'; c.lineWidth=1; for (let y=-62;y<-40;y+=6){ c.beginPath(); c.moveTo(-5,y); c.quadraticCurveTo(0,y+2,5,y); c.stroke(); }
+    c.strokeStyle=INK; c.lineWidth=4.6; c.beginPath(); c.arc(0,-70,6,Math.PI*.15,Math.PI*.85,true); c.stroke(); c.strokeStyle='#6B4630'; c.lineWidth=2.4; c.stroke();
+    laInk(c); c.beginPath(); c.moveTo(-26,4); c.quadraticCurveTo(-27,34,0,36); c.quadraticCurveTo(27,34,26,4); c.closePath(); laFill(c,'#C47A45');
+    c.save(); c.beginPath(); c.moveTo(-26,4); c.quadraticCurveTo(-27,34,0,36); c.quadraticCurveTo(27,34,26,4); c.closePath(); c.clip();
+    c.fillStyle='#9E5A30'; c.beginPath(); c.ellipse(14,24,18,16,-.4,0,7); c.fill(); c.fillStyle='rgba(255,214,170,.55)'; c.beginPath(); c.ellipse(-14,16,5,11,.3,0,7); c.fill();
+    c.strokeStyle='rgba(90,40,18,.55)'; c.lineWidth=1.4; c.beginPath(); c.arc(8,22,5,3.6,5.6); c.stroke(); c.restore();   // a dent
+    laInk(c,2.8); laEll(c,0,4,26,7); laFill(c,'#D9925A'); laEll(c,0,4,20,4.6); c.fillStyle='#7A4426'; c.fill(); laShine(c,-9,3,5,1.6,.45);
+    c.restore(); },
 };
 /** Draws find `id` centered at the origin, `s` pixels across. */
 function drawFind(c,id,s,t){ const f=FIND_ART[id]; if (!f) return; c.save(); c.scale(s/100,s/100); f(c,s,t||0); c.restore(); }
