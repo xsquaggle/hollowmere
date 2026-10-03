@@ -247,6 +247,8 @@ function paintTile(cv,r,d){ r=r||{width:cv.offsetWidth,height:cv.offsetHeight}; 
   else if (cv.dataset.decor) drawDecorIcon(x,cv.dataset.decor,s);
   else if (cv.dataset.tankicon) drawTankIcon(x,cv.dataset.tankicon,s);
   else if (cv.dataset.rune) drawRune(x,cv.dataset.rune,s*.8,{glow:.9,glowR:s*.5});
+  else if (cv.dataset.trap) drawTrapIcon(x,cv.dataset.trap,s);
+  else if (cv.dataset.fitting) drawFittingIcon(x,cv.dataset.fitting,s);
   else if (cv.dataset.runeempty) drawRune(x,null,s*.8,{empty:true});
   else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
 function drawHullSwatch(c,id,s){ const P=PAINTS[id]; c.save(); c.scale(s/100,s/100); laInk(c);

@@ -8,5 +8,5 @@ function coach(text, step, warn){ const c=$('coach'); $('coachText').textContent
 function coachOff(){ $('coach').hidden=true; $('hint').hidden=false; }
 let coachTimer=0;
 function coachFor(text,secs){ coachLater(text,secs); }
-function setState(s){ S.state=s; document.body.dataset.state=s; updateHint(); if (s==='idle' && save.meal && save.meal.last) mealEnd(); if (s==='idle') baitCheck();
+function setState(s){ S.state=s; document.body.dataset.state=s; updateHint(); if (s==='idle' && save.meal && save.meal.last) mealEnd(); if (s==='idle' && save.freshLast) freshEnd(); if (s==='idle') baitCheck();
   if (s==='idle' && !save.tutorialDone){ S.tut='cast'; coach('Drag down from anywhere, then let go to cast your line.','1 of 4'); } }

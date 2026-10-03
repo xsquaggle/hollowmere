@@ -339,18 +339,19 @@ function kDrawMoth(c,t){ const P=PAL; if (!P || (P.dark||0)<.45) return; const s
   c.save(); c.translate(x,y); c.rotate(Math.cos(t*1.7)*.4); c.fillStyle='rgba(225,210,180,.9)';
   for (const sd of [-1,1]){ c.save(); c.scale(sd,.35+.65*f); c.beginPath(); c.moveTo(0,0); c.quadraticCurveTo(5*s,-5*s,7*s,-1*s); c.quadraticCurveTo(5*s,2*s,0,1*s); c.closePath(); c.fill(); c.restore(); }
   c.fillStyle='#6E5A44'; c.beginPath(); c.ellipse(0,0,1.2*s,3*s,0,0,6.28); c.fill(); c.restore(); }
-function kDrawRack(c,t){ // smoke rack with three smoked fish, gently swaying
-  const s=K.s, x1=K.W*.95, x0=Math.max(K.W*.6,x1-230*s), y=K.top+18*s;
+/** The smoke rack: one hook for each of SMOKE.hooks, with whatever's hanging on it (game/smoke.js), swaying in the smoke. */
+function kDrawRack(c,t){
+  const s=K.s, x1=K.W*.95, x0=Math.max(K.W*.6,x1-230*s), y=K.top+18*s, hooks=smokeState().hooks;
   c.save(); c.strokeStyle=INK; c.lineWidth=2; c.fillStyle='#4A3022';
   for (const x of [x0,x1]){ c.fillRect(x-3,16*s,6,y-16*s+4); }
   rrect(c,x0-6,y-4,x1-x0+12,9,4); c.fillStyle='#6E4A33'; c.fill(); c.stroke();
-  const n=3; for (let i=0;i<n;i++){ const fx=lerp(x0,x1,(i+.5)/n), sw=Math.sin(t*.9+i*1.7)*.06;
+  const n=hooks.length; for (let i=0;i<n;i++){ const hk=hooks[i], fx=lerp(x0,x1,(i+.5)/n), sw=Math.sin(t*.9+i*1.7)*(hk?.06:.1);
     c.save(); c.translate(fx,y+4); c.rotate(sw); c.strokeStyle='#8A6A3A'; c.lineWidth=1.4; c.beginPath(); c.moveTo(0,0); c.lineTo(0,12*s); c.stroke();
-    c.translate(0,12*s+30*s); c.rotate(Math.PI/2); const L=60*s, h=L*.27;
-    const body=fishPath('perch',L); c.save(); c.translate(-L*.36,0); c.translate(L*.36,0); c.fillStyle='#7A4A26'; c.fill(tailPath('perch',L)); c.lineWidth=1.6; c.strokeStyle=INK; c.stroke(tailPath('perch',L)); c.restore();
-    c.fillStyle=['#A86B38','#9C6232','#B0783F'][i]; c.fill(body); c.save(); c.clip(body); c.fillStyle='rgba(60,30,10,.35)'; for (let j=0;j<5;j++) c.fillRect(L*(.25-j*.14),-h,L*.05,h*2);
-    c.fillStyle='rgba(255,220,160,.25)'; c.beginPath(); c.ellipse(L*.05,-h*.4,L*.3,h*.3,0,0,6.28); c.fill(); c.restore(); c.stroke(body);
-    c.fillStyle=INK; c.beginPath(); c.arc(L*.34,-h*.18,1.8,0,6.28); c.fill(); c.restore(); }
+    // an S-hook of dark iron
+    c.strokeStyle='#3A3A44'; c.lineWidth=1.8*s; c.beginPath(); c.arc(0,14.5*s,2.5*s,-Math.PI/2,Math.PI/2); c.arc(0,19.5*s,2.5*s,-Math.PI/2,Math.PI*.9,true); c.stroke();
+    if (hk){ const F=FISH[hk.f.id], L=clamp(F.len*1.15,46,78)*s, del=isDelicacy(hk), u=smokeBarPct(hk);
+      c.translate(0,22*s+L*.5); c.rotate(Math.PI/2); drawSmokedFish(c,hk.f.id,L,u,del); }
+    c.restore(); }
   c.restore();
 }
 function kDrawLantern(c,t){ const s=K.s, x=K.W*.5, y=K.top+26*s, fl=.85+.15*Math.sin(t*7)+.06*Math.sin(t*17);

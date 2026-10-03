@@ -63,10 +63,18 @@ Glimmer, once; after that the rune goes on any rod for free, one of each per rod
 (`src/game/enchant.js`, drawn in `src/game/enchant-art.js`). Runes are modifier sources too:
 `npm run sim -- --runes` compares each against none, and `--ench swift,magpie` adds runes to any run.
 
+**Idle play.** Traps (`src/game/traps.js`, set and hauled in `src/game/trap-scene.js`, drawn in `src/game/trap-art.js`)
+fill in real time with commons you've caught, and the kitchen's smoke rack (`src/game/smoke.js`) makes keepnet fish
+worth more the longer they hang. Coming back (`src/game/away.js`) moves the clock on, puts Grey by a full trap and, after
+a long while, gives Fresh water for a few casts. Every rate is in `src/data/idle.js`, and time never runs earlier than the
+last save, so a clock set back can't pay twice. `npm run sim -- --idle` reports what traps and the rack earn beside
+active play. Playtest > Tools has "Pass an hour" to see it without waiting.
+
 **Adding content.** A new fish is an entry in `src/data/fish.js` plus its region list and bite weights.
 A new find is an entry in `src/data/treasure.js` plus its drawing in `src/game/loot-art.js`.
 A new reel, line or bait is an entry in `src/data/tackle.js` plus its drawing in `src/game/tackle-art.js`.
 A new rune is an entry in `src/data/enchant.js` plus its glyph in `RUNE_GLYPH` (`src/game/enchant-art.js`).
+A new trap or fitting is an entry in `src/data/idle.js` (a fitting also needs its icon in `drawFittingIcon`, `src/game/trap-art.js`).
 The checker catches a misspelled id, a size range upside down, a rod that costs less than the one before it,
 a recipe that needs a fish that doesn't exist, a tank set nobody could complete, or a crate tier with nothing to hold.
 

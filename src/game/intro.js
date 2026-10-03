@@ -7,7 +7,7 @@ function introStart(force){
   const where=REGION_NAME[REG()], when=clockText(save.clock);
   const title='<div class="in-title" id="inTitle"'+(full?' hidden':'')+'><h1 aria-label="Hollowmere">'+[...'Hollowmere'].map((ch,i)=>'<span style="animation-delay:'+(full?i*.07:i*.05)+'s">'+ch+'</span>').join('')+'</h1>'+
     '<svg class="in-orn" viewBox="0 0 180 24" aria-hidden="true"><path d="M8 12 H76 M104 12 H172" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M90 3 V13 a5 5 0 1 1 -8 -3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="90" cy="3" r="1.8" fill="currentColor"/></svg>'+
-    '<p>'+(full?'Every cast pulls up a little more of what the lake is hiding.':'Welcome back. It’s '+when+' at '+where+'.'+introTips())+'</p></div>';
+    '<p>'+(full?'Every cast pulls up a little more of what the lake is hiding.':'Welcome back. It’s '+when+' at '+where+'.'+awayLine(AWAYS.info)+introTips())+'</p></div>';
   L.innerHTML='<div class="in-sky" id="inSky"><canvas id="inStars"></canvas></div><div class="in-shade"></div>'+title+
     '<div class="in-gate" id="inGate">'+(full?'<p class="in-hand">A letter came for you.</p>':'')+'<p class="in-tap">'+(full?'Tap to begin':'Tap to fish')+'</p>'+(full?'<p class="in-sub"><svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M4 12 v-2 a6 6 0 0 1 12 0 v2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="2.5" y="11" width="4" height="6" rx="1.5" fill="currentColor"/><rect x="13.5" y="11" width="4" height="6" rx="1.5" fill="currentColor"/></svg> Best with sound on</p><button class="in-restore" id="inRestore" type="button">Have a backup code?</button>':'')+'</div>'+
     '<div class="in-letter" id="inLetter" hidden><span class="seal" aria-hidden="true">H</span>'+LETTER.map((ln,i)=>'<span class="ln'+(i===0?' first':'')+'">'+ln+'</span>').join('')+'<span class="ln sig">— your uncle</span><button class="btn primary in-go" id="inGo" type="button">Pick up the rod</button></div>'+
@@ -47,6 +47,7 @@ function introEnd(){ if (!INTRO.active) return; const L=$('intro'), letter=$('in
   if (INTRO.full){ save.introSeen=true; persist(); if (letter && !letter.hidden) letter.classList.add('away');
     if (AC){ const t=AC.currentTime+.05; [62,66,69,74,78].forEach((n,i)=>iPluck(mf(n),t+i*.09,{dur:1.6,vol:.07,pan:-.3+i*.15})); } }
   INTRO.quiet=false; if (INTRO.bus && AC) INTRO.bus.gain.setTargetAtTime(0,AC.currentTime+1.2,.6);
+  if (!INTRO.full && AWAYS.info && AWAYS.info.fresh) setTimeout(freshTip,1400);
   L.classList.add('out'); setTimeout(()=>{ document.body.classList.remove('cine'); },INTRO.full?350:150);
   setTimeout(()=>{ L.hidden=true; L.className=''; L.innerHTML=''; INTRO.active=false; INTRO.phase='done'; setIntroOffset(0); cancelAnimationFrame(INTRO.raf); },INTRO.full?900:650); }
 function introFrame(now){ if (!INTRO.active) return; const dt=Math.min(.05,(now-INTRO.last)/1000); INTRO.last=now;

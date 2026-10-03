@@ -882,6 +882,43 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 .btn.etch{display:inline-flex;align-items:center;gap:6px}
 .btn.etch>span{display:inline-flex;align-items:center;gap:3px;font-variant-numeric:tabular-nums}
 .btn.etch .glim{width:11px;height:13px}
+/* Idle play: the trap sheet, the smoke rack in the kitchen book, and the hang-a-fish picker */
+.trap-card{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center;padding:10px 12px;margin:2px 0 8px;border:2px solid var(--ink);border-radius:14px;background:#FFF9EC;box-shadow:0 3px 0 rgba(43,42,51,.85)}
+.trap-card canvas{width:96px;height:64px}
+.trap-fill{margin:0;font-size:14px;font-weight:700;color:#55514A}.trap-fill b{font:400 30px/1 var(--display);color:var(--ink);margin-right:4px;vertical-align:-3px}
+.trap-when{margin:4px 0 0;font-size:13px;font-weight:700;color:#3D5A3A}
+.trap-pool{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.trap-pool span{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:rgba(43,42,51,.08);font-size:12.5px;font-weight:800;color:#4B4842}
+.trap-pool i{font-style:normal;color:#8A6A3A}
+.trap-fits{display:grid;gap:7px;margin-top:6px}
+.trap-fit{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;text-align:left;font:inherit;color:inherit;cursor:pointer;padding:9px 12px;min-height:48px;
+  border:1.5px solid rgba(43,42,51,.22);border-radius:11px;background:var(--paper)}
+.trap-fit canvas{grid-row:1/3;width:40px;height:40px}
+.trap-fit:not(:has(canvas)){grid-template-columns:1fr}
+.trap-fit b{font:400 16px/1.15 var(--display)}.trap-fit small{font-size:12px;line-height:1.3;color:#6E6A60;font-weight:700}
+.trap-fit.on{border:2px solid var(--ink);background:#FFF4D9;box-shadow:inset 0 0 0 2px #E9C98A}
+.trap-fit:active{transform:translateY(1px)}
+.trap-fit:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.tk-entry .tag.wait{display:block;white-space:normal;max-width:96px;text-align:right;line-height:1.3}
+/* the smoke rack in the kitchen book */
+.k-rack{display:grid;gap:8px}
+.k-hook{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:10px;box-shadow:0 3px 0 #2B1D14}
+.k-hook canvas{width:64px;height:40px}
+.k-hook h4{margin:0 0 2px;font:400 16px/1.15 var(--display)}
+.k-hook p{margin:2px 0 0;font-size:12px;line-height:1.35;color:#55514A}
+.k-hook .k-casts{height:7px;margin-top:6px!important}.k-hook .k-casts i{background:linear-gradient(90deg,#C98A4E,#8A4E22)}
+.k-hook.del{background:#FFF4D9;box-shadow:0 3px 0 #2B1D14,inset 0 0 0 2px #E2B84E}.k-hook.del .k-casts i{background:linear-gradient(90deg,#E9C98A,#E2B84E)}
+.k-hook.empty{grid-template-columns:64px minmax(0,1fr) auto;background:rgba(20,12,6,.25);border:2px dashed rgba(243,234,215,.35);color:rgba(243,234,215,.9);box-shadow:none}
+.k-hook.empty p{color:rgba(243,234,215,.7)}
+.k-hook-ic{display:block;width:64px;height:40px;background:no-repeat center/26px 34px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 34'%3E%3Cpath d='M13 1v8' stroke='%23C9B48A' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M13 9a4 4 0 1 1 0 8 6 6 0 1 0 6 6' fill='none' stroke='%23E9DFC8' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E")}
+.k-hook-btns{display:grid;gap:6px}.k-hook-btns .btn{padding:7px 11px;font-size:12.5px;white-space:nowrap}
+.k-now.k-pick-head{grid-template-columns:1fr auto}
+.k-picks{display:grid;gap:7px}
+.k-pick{display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;text-align:left;font:inherit;cursor:pointer;padding:8px 12px;min-height:52px;border:2px solid var(--ink);border-radius:12px;background:var(--paper);color:var(--ink);box-shadow:0 3px 0 #2B1D14}
+.k-pick canvas{width:72px;height:36px}.k-pick span{display:grid;gap:2px;min-width:0}.k-pick b{font:400 15px/1.15 var(--display)}.k-pick small{font-size:11.5px;font-weight:800}
+.k-pick em{font-style:normal;font-weight:800;font-size:13px;color:#7A5A22}
+.k-pick:active{transform:translateY(2px);box-shadow:0 1px 0 #2B1D14}
+@media (max-width:370px){ .k-hook{grid-template-columns:52px minmax(0,1fr)} .k-hook canvas,.k-hook-ic{width:52px} .k-hook-btns{grid-column:1/-1;grid-template-columns:1fr 1fr} }
 /* Sheets */
 #sheet{position:fixed;inset:0;background:rgba(10,13,22,.55);display:flex;align-items:flex-end;justify-content:center;z-index:5}
 .panel{width:min(480px,100%);max-height:82%;overflow:auto;background:var(--paper);color:var(--ink);border-radius:16px 16px 0 0;
@@ -1445,6 +1482,48 @@ const GLIMMER={
   crate:{common:[3,5], uncommon:[6,9], rare:[10,15], epic:[18,26], legendary:[32,45], exotic:[55,75], mythic:[90,120]}
 };
 
+/* Idle play: fish traps, the smoke rack and coming back after time away (game/traps.js, game/smoke.js, game/away.js).
+   Idle covers the boring part, the common fish, and leaves everything interesting to active play. All of it runs on
+   real time, playing or not, capped at AWAY.cap; a clock set backwards gives nothing.
+
+   TRAPS[region]  the traps you can own in that water, in the order you get them. name; price (coins at Ottilie's; 0 is
+                  a gift); gift (when it turns up: catches). spots: the three marked places a trap can sit, as fractions of
+                  the screen's width (x) and of the water's height below the horizon (y), each with the bite pool it draws
+                  from (pool: a spot in data/fish.js), its name, and where that is in a sentence (at). A spot never sits
+                  lower than TRAP_LOW px above the bottom of the screen, clear of the dock, Ottilie and Barnaby on a
+                  short phone; on the lake none sits right of the middle at that height, where Barnaby docks.
+                  every: minutes per catch. cap: catches it holds.
+   TRAP_UNLOCK    catches before your uncle's trap turns up.
+   FITTINGS[id]   bought once from Ottilie, then set on as many traps as you like, one fitting to a trap: what it does (eff, one sentence), its catch
+                  (down), price. bait: the common you pick is this many times as likely. mesh: holds cap, fills every×
+                  faster, no uncommons. lantern: night fish only, fills every× slower.
+   TRAP_GLIMMER   the chance each trapped fish comes with a speck of Glimmer.
+   SMOKE          the smoke rack in the kitchen. hooks; gain: the most a fish gains (+60%), reached at full hours, on an
+                  ease-out curve (about +20% after an hour); delicacy: a fish of rarity rarityMin or rarer left this many
+                  hours becomes a Hollowmere Delicacy, worth x times its fresh value.
+   AWAY           coming back. cap: hours of real time that count at most. clock: minutes away before the in-game clock
+                  moves on (it keeps its usual pace, an in-game hour a minute). welcome: minutes away before Grey waits by
+                  a full trap. fresh: after this many hours away, rare fish (and rarer) bite x times as often for the next
+                  few casts. */
+const TRAPS={
+  lake:{every:6, cap:20,
+    traps:[{name:'Your uncle’s trap', price:0, gift:true}, {name:'Willow creel', price:300}, {name:'Rush creel', price:900}],
+    spots:[{id:'reeds', name:'Reed edge', at:'at the reed edge', pool:'reeds', x:.25, y:.4}, {id:'pads', name:'Lily pads', at:'by the lily pads', pool:'pads', x:.46, y:.5}, {id:'open', name:'Open water', at:'in open water', pool:'open', x:.3, y:.25}]},
+  coast:{every:7, cap:20,
+    traps:[{name:'Lath pot', price:1500}, {name:'Cedar pot', price:3500}, {name:'Hooped pot', price:7000}],
+    spots:[{id:'rocks', name:'Sea stack', at:'by the sea stack', pool:'rocks', x:.28, y:.6}, {id:'kelp', name:'Kelp beds', at:'in the kelp beds', pool:'kelp', x:.6, y:.56}, {id:'open', name:'Open water', at:'in open water', pool:'open', x:.82, y:.45}]}
+};
+const TRAP_UNLOCK=25, TRAP_LOW=250;
+const FITTINGS={
+  bait:   {name:'Bait Box', price:400, eff:'Pick the common it goes for.', bait:6},
+  mesh:   {name:'Wide Mesh', price:800, eff:'Fills faster and holds 40: more fish and more Glimmer for a long night away.', down:'No uncommons, so they’re worth less.', cap:40, every:.7},
+  lantern:{name:'Lantern Cage', price:1500, eff:'Night fish only, and they’re worth more.', down:'It fills more slowly.', every:1.6}
+};
+const FITTING_ORDER=['bait','mesh','lantern'];
+const TRAP_GLIMMER=.2;
+const SMOKE={hooks:3, gain:.6, full:6, delicacy:{hours:8, rarityMin:'rare', x:2.5}};
+const AWAY={cap:8, clock:2, welcome:20, fresh:{hours:2, casts:5, x:2}};
+
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
          luck  bonuses add up as luck points; each rarity turns the points into odds on a curve that flattens
@@ -1544,6 +1623,8 @@ function modSources(){
     add('mastery',n,'reel',MASTERY.reel,{when:{fish:id}}); add('mastery',n,'autoTilt',undefined,{when:{fish:id}}); }
   // Gull Luck: a lucky splash zone doubles the odds of every fish above common while you fish in it
   add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true, rarityMin:'uncommon'}});
+  // Fresh water: back after a long while, rarer fish bite more often for a few casts (game/away.js)
+  if (save.fresh>0 || save.freshLast) add('event','Fresh water','luck',AWAY.fresh.x,{omen:true, when:{rarityMin:'rare'}, casts:save.fresh>0?save.fresh:undefined, last:!(save.fresh>0)||undefined});
   // playtest tuning
   const t=Object.assign({hook:1,tension:1,wait:1},save.tune);
   if (t.hook!==1){ add('tune','Playtest tuning','hook',t.hook); add('tune','Playtest tuning','perfect',t.hook); }
@@ -1606,8 +1687,21 @@ const KEY = 'hollowmere-castlab-v1';
 const fresh = () => ({coins:0, fish:{}, stats:{casts:0,catches:0,perfect:0,escapes:0,snaps:0}, tune:{hook:1,tension:1,wait:1}, sound:true, firstCast:true, tutorialDone:false, clock:18, rod:'willow', rods:['willow'], metOttilie:false, region:'lake', boat:false, barnabyCame:false, coastSeen:false, parts:[], paint:'blue', paints:['blue'], pending:[], net:[], netSeen:false, tanks:null, aquaSeen:false, kitchenOpen:false, kitchenSeen:false, meal:null, pantry:[], units:null, pbSeen:false, introSeen:false, hideLab:false, vol:null, lastBackup:0, backupHinted:false, lastPlayed:0, finds:null, gear:null});
 let save = fresh();
 function load(d){ if (!d || typeof d!=='object') return; const f=fresh(); save=Object.assign(f,d); save.stats=Object.assign(f.stats,d.stats||{}); save.tune=Object.assign(fresh().tune,d.tune||{}); save.fish=d.fish||{}; if (d.tutorialDone===undefined) save.tutorialDone=save.stats.catches>0; if (typeof d.clock!=='number') save.clock=18; if (!Array.isArray(d.rods)) save.rods=['willow']; if (!Array.isArray(d.net)) save.net=[]; if (!RODS[save.rod]) save.rod='willow'; }
-try { const raw = localStorage.getItem(KEY); if (raw) load(JSON.parse(raw)); } catch(e) {}
-function persist(){ MODC.dirty=true; if (SIMULATING) return; if (typeof APP!=='undefined' && APP && APP.stale) return; try { save.lastPlayed=Date.now(); localStorage.setItem(KEY, JSON.stringify(save)); } catch(e) {} }
+let STORE_LAST=null;   // what this page last read from or wrote to storage (see persistOnLeave)
+try { const raw = localStorage.getItem(KEY); STORE_LAST=raw; if (raw) load(JSON.parse(raw)); } catch(e) {}
+/** Saves. If something else has written the save since this page last read or wrote it (another tab, or this one
+    woken from a long sleep after missing the other tab's news), this page stops saving instead of putting its older
+    game back (game/saves.js: goStale). persistNow is the one deliberate overwrite. */
+function persist(){ MODC.dirty=true; if (SIMULATING) return; const app=typeof APP!=='undefined' && APP; if (app && APP.stale) return;
+  try { if (app && localStorage.getItem(KEY)!==STORE_LAST){ goStale(); return; } save.lastPlayed=realNow(); const s=JSON.stringify(save); localStorage.setItem(KEY, s); STORE_LAST=s; } catch(e) {} }
+/** Now, for everything that runs on real time (traps, the smoke rack, time away): never earlier than the last save,
+    so a clock set backwards just waits for real time to catch up, and setting it forward and back again can't pay
+    twice. A last save more than CLOCK_FIX ahead means a clock that was wrong and has been put right: now is now. */
+const CLOCK_FIX=24*3600000;
+function realNow(){ const n=Date.now(), L=+save.lastPlayed||0; return L>n && L-n<CLOCK_FIX ? L : n; }
+/** Saving as the page goes to the background or closes: only if nothing else has written the save since this page
+    last did (another tab, or a save restored and reloaded), so leaving never puts an older game back. */
+function persistOnLeave(){ try { if (localStorage.getItem(KEY)!==STORE_LAST) return; } catch(e){ return; } persist(); }
 const rec = id => save.fish[id] || (save.fish[id] = {caught:0, best:0, seen:false});
 
 /* ---------- Size, weight and records ---------- */
@@ -1876,7 +1970,7 @@ function coach(text, step, warn){ const c=$('coach'); $('coachText').textContent
 function coachOff(){ $('coach').hidden=true; $('hint').hidden=false; }
 let coachTimer=0;
 function coachFor(text,secs){ coachLater(text,secs); }
-function setState(s){ S.state=s; document.body.dataset.state=s; updateHint(); if (s==='idle' && save.meal && save.meal.last) mealEnd(); if (s==='idle') baitCheck();
+function setState(s){ S.state=s; document.body.dataset.state=s; updateHint(); if (s==='idle' && save.meal && save.meal.last) mealEnd(); if (s==='idle' && save.freshLast) freshEnd(); if (s==='idle') baitCheck();
   if (s==='idle' && !save.tutorialDone){ S.tut='cast'; coach('Drag down from anywhere, then let go to cast your line.','1 of 4'); } }
 
 /* ---------- Effects ---------- */
@@ -1915,12 +2009,14 @@ function updateAim(x,y){
 }
 function release(){
   const a=S.aim; S.aim=null;
+  // a tap: the people and the keepnet first, then a trap's float (a float drawn near them never takes their taps)
   if (a && a.onNet && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openNet(); return; }
   if (a && a.onBar && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openBoatShop(); return; }
   if (a && a.onOtt && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openShop(); return; }
+  if (a && a.onTrap && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); tapTrap(a.onTrap); return; }
   if (!a || !a.target || a.p<.12){ setState('idle'); if (S.tut) coach('Drag a little farther down before you let go.','1 of 4'); else toast('Pull back farther','warn'); return; }
   S.cast={t:0, dur:.4+.42*a.p, from:{x:G.rodBase.x+18,y:G.rodBase.y-88}, to:a.target, p:a.p, th:a.th, spot:a.spot};
-  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal(); tickBait();
+  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal(); tickBait(); S.cast.fresh=freshCast();
   if (save.firstCast){ save.firstCast=false; persist(); }
   setState('casting');
 }
@@ -1946,6 +2042,7 @@ function updateCast(dt){
       S.lost={t:0,pos:{x,y},snapped:false}; setState('lost'); return; }
     S.bob={x,y,spot:c.spot,dip:1,jerk:0,nibble:0,plunge:0};
     splash(x,y,8); ripple(x,y,40); ripple(x,y,24); sfx.plop(); buzz(8);
+    if (c.fresh){ for (let i=0;i<8;i++) S.particles.push({x:x+rand(-14,14)*sc(y),y:y+rand(-4,4),vx:rand(-20,20),vy:rand(-40,-14),g:0,life:0,max:rand(.6,1),r:rand(1.4,2.2),c:'rgba(214,240,255,',glim:true}); }   // Fresh water
     for (const f of S.ambient){ if (Math.hypot(f.x*W-x,f.y*H-y)<90){ f.flee=1.2; f.a=Math.atan2(f.y*H-y,f.x*W-x); } }
     startWaiting();
   }
@@ -2619,6 +2716,221 @@ function updateGlimChip(){ const c=$('glimChip'); if (!c) return; const show=(sa
 const runeTag = (id,text) => '<span class="rtag" style="--rc:'+ENCH[id].color+'"><canvas data-rune="'+id+'" aria-hidden="true"></canvas>'+text+'</span>';
 const glimHTML = n => '<span class="glim" aria-hidden="true"></span>'+n.toLocaleString();
 
+/* ---------- Fish traps (data/idle.js: TRAPS, FITTINGS) ---------- */
+/* save.traps = {list:[trap], fits:{id:1 for each fitting bought}, gift:true once your uncle's trap has turned up}.
+   A trap is {reg, n (which of TRAPS[reg].traps), spot (a spot id, or null while it's on the dock or the deck),
+   t (when it last filled, ms), carry (ms toward the next catch), fish:[species waiting], g (Glimmer waiting),
+   fit (a fitting id or null), bait (the common a Bait Box goes for)}.
+   Traps fill in real time wherever you are, playing or not. Each fill counts the time since the last one, at most
+   AWAY.cap hours, and a clock set backwards gives nothing. Catches are only commons and uncommons you've already
+   caught, from the spot's own bite pool. Everything above the scene part reads only the save. */
+let TRAP_OK=null;   // the save object trapState last tidied, so the per-frame calls don't redo it
+function trapState(){ if (TRAP_OK===save && isObj(save.traps)) return save.traps; TRAP_OK=save; if (!isObj(save.traps)) save.traps={}; const s=save.traps;
+  if (!Array.isArray(s.list)) s.list=[]; if (!isObj(s.fits)) s.fits={};
+  for (const id in s.fits) if (!FITTINGS[id]) delete s.fits[id];
+  const seen={};
+  s.list=s.list.filter(T=>isObj(T) && TRAPS[T.reg] && Number.isInteger(T.n) && T.n>=0 && T.n<TRAPS[T.reg].traps.length && !seen[T.reg+T.n] && (seen[T.reg+T.n]=1));
+  for (const T of s.list){ const spots=TRAPS[T.reg].spots;
+    if (T.spot!=null && (!spots.some(p=>p.id===T.spot) || s.list.some(o=>o!==T && o.reg===T.reg && o.spot===T.spot && s.list.indexOf(o)<s.list.indexOf(T)))) T.spot=null;
+    if (!Array.isArray(T.fish)) T.fish=[]; T.fish=T.fish.filter(id=>FISH[id]).slice(0,trapCap(T));
+    if (typeof T.t!=='number' || !isFinite(T.t)) T.t=realNow(); if (!(T.carry>=0)) T.carry=0; if (!(T.g>=0)) T.g=0;
+    if (T.fit && !(FITTINGS[T.fit] && s.fits[T.fit])) T.fit=null; if (T.bait && !FISH[T.bait]) T.bait=null; }
+  return s; }
+const trapsIn = reg => trapState().list.filter(T=>T.reg===reg);
+const trapName = T => TRAPS[T.reg].traps[T.n].name;
+const trapSpot = T => TRAPS[T.reg].spots.find(p=>p.id===T.spot) || null;
+function trapCap(T){ return T.fit==='mesh' ? FITTINGS.mesh.cap : TRAPS[T.reg].cap; }
+/** Minutes per catch. */
+function trapEvery(T){ const f=FITTINGS[T.fit]; return TRAPS[T.reg].every*(f && f.every || 1); }
+/** What a trap can catch where it sits: {species: weight}. Only commons and uncommons you've already caught;
+    a Lantern Cage takes night fish only, Wide Mesh no uncommons, a Bait Box leans hard on the common you picked. */
+function trapPool(T){ const sp=trapSpot(T); if (!sp) return {};
+  const known=id=>(save.fish[id]||{}).caught>0, low=id=>FISH[id].rarity==='common'||FISH[id].rarity==='uncommon', out={};
+  if (T.fit==='lantern'){ for (const id of REGION_FISH[T.reg]) if (FISH[id].night && low(id) && known(id)) out[id]=1; return out; }
+  const P=(T.reg==='coast'?POOLS_COAST:POOLS)[sp.pool]||{};
+  for (const id in P) if (low(id) && known(id) && !FISH[id].night && !(T.fit==='mesh' && FISH[id].rarity!=='common')) out[id]=P[id];
+  if (T.fit==='bait' && T.bait && out[T.bait]) out[T.bait]*=FITTINGS.bait.bait;
+  return out; }
+/** The commons a Bait Box could go for at this trap. */
+function trapBaitChoices(T){ const sp=trapSpot(T); if (!sp) return []; const P=(T.reg==='coast'?POOLS_COAST:POOLS)[sp.pool]||{};
+  return Object.keys(P).filter(id=>FISH[id].rarity==='common' && (save.fish[id]||{}).caught>0); }
+/** Brings a trap up to now. A clock set backwards fills nothing and moves nothing back: the trap waits for real time
+    to catch up (save.js: realNow), unless it was more than CLOCK_FIX out, a clock put right. */
+function trapFill(T,now){ now=now||realNow(); let dt=now-T.t;
+  if (!(dt>0)){ if (dt<-CLOCK_FIX) T.t=now; return 0; }
+  T.t=now; if (!T.spot) return 0;                                      // on the dock or the deck
+  const cap=trapCap(T), every=trapEvery(T)*60000, pool=trapPool(T);
+  if (T.fish.length>=cap || !Object.keys(pool).length){ T.carry=0; return 0; }
+  dt=Math.min(dt,AWAY.cap*3600000); let total=T.carry+dt, n=0;
+  while (total>=every && T.fish.length<cap){ total-=every; T.fish.push(pickW(pool)); if (Math.random()<TRAP_GLIMMER) T.g++; n++; }
+  T.carry=T.fish.length>=cap?0:total; return n; }
+function fillTraps(now){ let n=0; for (const T of trapState().list) n+=trapFill(T,now); return n; }
+/** How long until a trap is full, in minutes (0 when it is; Infinity when nothing here can go in it yet). */
+function trapFullIn(T){ const left=trapCap(T)-T.fish.length; if (left<=0) return 0; if (!Object.keys(trapPool(T)).length) return Infinity;
+  return Math.max(0,left*trapEvery(T)-T.carry/60000); }
+/** A trapped fish: a size, a weight and what it sells for, as if landed but without the rod's or anyone's bonuses. */
+function trapFish(id,reg,spot){ const F=FISH[id], u=Math.pow(Math.random(),1.4), size=Math.round(lerp(F.size[0],F.size[1],u)*10)/10, build=rollBuild();
+  return {id, size, w:Math.round(weighFish(id,size,build)), stars:qualityOf(id,size,false), value:Math.max(1,Math.round(F.value*(.85+.3*u))), perfect:false, lucky:false,
+    t:Date.now(), reg, spot, hr:save.clock, rod:null, trap:true}; }
+/** How many more of a species your known recipes still need (beyond what's in the keepnet). */
+function recipeShort(fid){ if (!save.kitchenOpen) return 0; let n=0;
+  for (const id of RECIPE_ORDER){ const R=RECIPES[id], need=R.need[0]; if (need.id===fid && knownRecipe(id)) n=Math.max(n,need.n-haveFor(R)); } return n; }
+/** Hauls a trap up: keeps what your recipes still need (while the keepnet has room), sells the rest.
+    Returns {fish:[trapped fish], kept:[...], coins, glimmer}. The save is up to date when it returns. */
+function haulTrap(T){ trapFill(T); const sp=trapSpot(T), out={fish:[], kept:[], coins:0, glimmer:T.g};
+  const want={}; for (const id of new Set(T.fish)) want[id]=recipeShort(id);
+  for (const id of T.fish){ const f=trapFish(id,T.reg,sp?sp.pool:'open'); out.fish.push(f);
+    if (want[id]>0 && save.net.length<netCap()){ want[id]--; save.net.push(f); out.kept.push(f); } else out.coins+=f.value; }
+  T.fish=[]; T.g=0; T.t=Math.max(T.t,realNow());                      // the time toward the next fish carries on
+  save.stats.trapped=(save.stats.trapped||0)+out.fish.length; save.stats.trapHauls=(save.stats.trapHauls||0)+1;
+  if (out.coins) save.coins+=out.coins; if (out.glimmer){ save.glimmer=(save.glimmer||0)+out.glimmer; save.stats.glimmer=(save.stats.glimmer||0)+out.glimmer; }
+  persist(); return out; }
+/** Sets a trap on a marked spot (or back on the dock with spot null). Its clock starts now. */
+function placeTrap(T,spot){ const sp=spot && TRAPS[T.reg].spots.find(p=>p.id===spot); if (spot && !sp) return false;
+  if (spot && trapsIn(T.reg).some(o=>o!==T && o.spot===spot)) return false;
+  trapFill(T); T.spot=spot||null; T.t=Math.max(T.t,realNow()); T.carry=0; persist(); return true; }
+/** The next trap Ottilie sells for a water (the first in order you don't have), or null once you have them all. */
+function nextTrap(reg){ const have=new Set(trapsIn(reg).map(T=>T.n)), L=TRAPS[reg].traps, n=L.findIndex((d,i)=>!have.has(i)); return n>=0 ? {n, ...L[n]} : null; }
+function addTrap(reg){ const nx=nextTrap(reg); if (!nx) return null; const T={reg, n:nx.n, spot:null, t:realNow(), carry:0, fish:[], g:0, fit:null, bait:null};
+  trapState().list.push(T); persist(); return T; }
+function buyTrap(reg){ const nx=nextTrap(reg); if (!nx || save.coins<nx.price) return null; save.coins-=nx.price; return addTrap(reg); }
+function buyFitting(id){ const F=FITTINGS[id], s=trapState(); if (!F || s.fits[id] || save.coins<F.price) return false; save.coins-=F.price; s.fits[id]=1; persist(); return true; }
+/** Puts a fitting you own on a trap (null takes it off). A Bait Box remembers the common you picked. It won't go on
+    if the trap holds more than the new fitting does (the sheet hauls it up first), so no fish is ever lost to a smaller
+    cap; the time toward the next fish carries over, at most one catch's worth at the new pace. */
+function fitTrap(T,id,bait){ if (id && !trapState().fits[id]) return false; trapFill(T); if (T.fish.length>(id==='mesh'?FITTINGS.mesh.cap:TRAPS[T.reg].cap)) return false;
+  T.fit=id||null; if (id==='bait') T.bait=bait||T.bait||trapBaitChoices(T)[0]||null;
+  T.carry=Math.min(T.carry,trapEvery(T)*60000); persist(); return true; }
+/** Your uncle's trap turns up once you've caught enough fish at the lake. */
+function trapGiftCheck(){ const s=trapState(); if (s.gift || !save.tutorialDone || save.stats.catches<TRAP_UNLOCK) return false;
+  s.gift=true; if (!trapsIn('lake').length) addTrap('lake'); persist(); return true; }
+
+/* ---------- The smoke rack in the kitchen (data/idle.js: SMOKE) ---------- */
+/* save.smoke = {hooks:[{f (the keepnet fish), t (last counted, ms), ms (time smoked)} or null, one per hook]}.
+   A fish gains value as it smokes, on an ease-out curve up to SMOKE.gain at SMOKE.full hours. A fish of
+   SMOKE.delicacy.rarityMin or rarer left SMOKE.delicacy.hours becomes a Hollowmere Delicacy. Time counts in real time,
+   playing or not, at most AWAY.cap hours at a stretch, and a clock set backwards gives nothing. */
+let SMOKE_OK=null;   // the save object smokeState last tidied
+function smokeState(){ if (SMOKE_OK===save && isObj(save.smoke)) return save.smoke; SMOKE_OK=save; if (!isObj(save.smoke)) save.smoke={}; const s=save.smoke; if (!Array.isArray(s.hooks)) s.hooks=[];
+  s.hooks=s.hooks.slice(0,SMOKE.hooks).map(h=>isObj(h) && isObj(h.f) && FISH[h.f.id] ? h : null); while (s.hooks.length<SMOKE.hooks) s.hooks.push(null);
+  for (const h of s.hooks) if (h){ if (typeof h.t!=='number' || !isFinite(h.t)) h.t=realNow(); if (!(h.ms>=0)) h.ms=0; } return s; }
+/** Brings the rack up to now. Like a trap, a clock set backwards waits for real time to catch up (save.js: realNow). */
+function smokeTick(now){ now=now||realNow(); for (const h of smokeState().hooks) if (h){ const dt=now-h.t; if (dt>0){ h.t=now; h.ms+=Math.min(dt,AWAY.cap*3600000); } else if (dt<-CLOCK_FIX) h.t=now; } }
+const smokeHours = h => h.ms/3600000;
+function isDelicacy(h){ const D=SMOKE.delicacy; return rarRank(FISH[h.f.id].rarity)>=rarRank(D.rarityMin) && smokeHours(h)>=D.hours; }
+const canDelicacy = f => rarRank(FISH[f.id].rarity)>=rarRank(SMOKE.delicacy.rarityMin);
+/** How much more a fish is worth after `hrs` of smoke (1 to 1+gain), before it turns Delicacy. */
+function smokeGain(hrs){ const u=clamp(hrs/SMOKE.full,0,1); return 1+SMOKE.gain*(1-(1-u)*(1-u)); }
+function smokeMul(h){ return isDelicacy(h) ? SMOKE.delicacy.x : smokeGain(smokeHours(h)); }
+const smokeValue = h => Math.max(1,Math.round(h.f.value*smokeMul(h)));
+const freeHook = () => smokeState().hooks.findIndex(h=>!h);
+/** Can this keepnet fish go on the rack? Not one that's been smoked already. */
+const smokable = f => !!f && !f.smoked;
+/** Hangs keepnet fish number i on a free hook. Returns the hook, or -1 if it can't. */
+function hangFish(i){ const f=save.net[i], k=freeHook(); if (!smokable(f) || k<0) return -1; smokeTick();
+  save.net.splice(i,1); smokeState().hooks[k]={f, t:realNow(), ms:0}; save.stats.hung=(save.stats.hung||0)+1; persist(); return k; }
+/** Takes the fish on hook k down: sold (returns its coins), or back into the keepnet as a smoked fish (if there's room). */
+function takeDown(k,sell){ smokeTick(); const s=smokeState(), h=s.hooks[k]; if (!h) return null; const v=smokeValue(h), del=isDelicacy(h);
+  if (!sell && save.net.length>=netCap()) return null;
+  s.hooks[k]=null; save.stats.smoked=(save.stats.smoked||0)+1; if (del) save.stats.delicacies=(save.stats.delicacies||0)+1;
+  if (sell) save.coins+=v; else save.net.push(Object.assign({},h.f,{value:v, smoked:true, delicacy:del||undefined, smokedH:Math.round(smokeHours(h)*10)/10}));
+  persist(); return {value:v, delicacy:del}; }
+/** What the rack has ready on a return: fish past an hour of smoke. */
+function rackReady(){ smokeTick(); return smokeState().hooks.filter(h=>h && smokeHours(h)>=1).length; }
+
+/* ---------- in the kitchen ---------- */
+function smokeLine(h){ const hrs=smokeHours(h), del=isDelicacy(h), pct=Math.round((smokeMul(h)-1)*100);
+  if (del) return 'A Hollowmere Delicacy · '+(SMOKE.delicacy.x)+'× its fresh value';
+  const next=canDelicacy(h.f) ? (hrs<SMOKE.delicacy.hours?' · a Delicacy in '+fmtMins((SMOKE.delicacy.hours-hrs)*60):'') : (hrs<SMOKE.full?' · best at '+SMOKE.full+' h':' · as smoked as it gets');
+  return (hrs<1/60?'Just hung':'Smoked '+fmtMins(hrs*60))+(pct?' · +'+pct+'%':'')+next; }
+function smokeBarPct(h){ const goal=canDelicacy(h.f)?SMOKE.delicacy.hours:SMOKE.full; return Math.round(Math.min(1,smokeHours(h)/goal)*100); }
+function rackHTML(){ smokeTick(); const s=smokeState(), n=s.hooks.filter(Boolean).length;
+  let h='<h3 class="k-h">Smoke rack <span>'+n+'/'+SMOKE.hooks+'</span></h3><div class="k-rack">';
+  s.hooks.forEach((hk,i)=>{ if (!hk){ h+='<div class="k-hook empty"><span class="k-hook-ic" aria-hidden="true"></span><div><h4>Empty hook</h4><p>Hang a fish from your keepnet. It sells for more the longer it smokes.</p></div><button class="btn" data-hang="'+i+'" type="button"'+(save.net.some(smokable)?'':' disabled')+'>'+(save.net.some(smokable)?'Hang a fish':save.net.length?'Nothing to hang':'Keepnet empty')+'</button></div>'; return; }
+    const F=FISH[hk.f.id], v=smokeValue(hk), del=isDelicacy(hk);
+    h+='<div class="k-hook'+(del?' del':'')+'"><canvas data-smoked="'+hk.f.id+'" data-u="'+smokeBarPct(hk)+'"'+(del?' data-del="1"':'')+' aria-hidden="true"></canvas><div><h4>'+(del?'Delicacy: ':'Smoked ')+F.name+'</h4><p>'+smokeLine(hk)+'</p><p class="k-casts"><i style="width:'+smokeBarPct(hk)+'%"></i></p></div>'+
+      '<div class="k-hook-btns"><button class="btn primary" data-sellhook="'+i+'" type="button">Sell · +'+v.toLocaleString()+'</button><button class="btn" data-keephook="'+i+'" type="button"'+(save.net.length<netCap()?'':' disabled')+'>Keep</button></div></div>'; });
+  return h+'</div>'; }
+function bindRack(el){
+  el.querySelectorAll('[data-hang]').forEach(b=>b.addEventListener('click',()=>openHangPicker()));
+  el.querySelectorAll('[data-sellhook]').forEach(b=>b.addEventListener('click',()=>{ const r=takeDown(+b.dataset.sellhook,true); if (!r) return; coinTally(600); sfx.coin(4); if (r.delicacy) sfx.out('rare'); kFloat('+'+r.value.toLocaleString(),0,-160,'#F7DD92',true); news((r.delicacy?'Sold a Delicacy':'Sold a smoked fish')+' for +'+r.value.toLocaleString(),'good'); kBook(); }));
+  el.querySelectorAll('[data-keephook]').forEach(b=>b.addEventListener('click',()=>{ const r=takeDown(+b.dataset.keephook,false); if (!r) return; sfx.plop(); news(r.delicacy?'A Delicacy, into the keepnet':'Into the keepnet, smoked','good'); kBook(); })); }
+/** Picking a keepnet fish to hang: the list, best first. */
+function openHangPicker(){ const el=$('kBook'); const list=save.net.map((f,i)=>({f,i})).filter(o=>smokable(o.f)).sort((a,b)=>b.f.value-a.f.value);
+  let h='<section class="k-now k-pick-head"><div><span class="k-lab">Smoke rack</span><h4>Hang which fish?</h4><p>A rare fish or rarer, left '+SMOKE.delicacy.hours+' hours, becomes a Hollowmere Delicacy.</p></div><button class="btn" id="kPickBack" type="button">Back</button></section><h3 class="k-h">Your keepnet</h3><div class="k-picks">';
+  for (const {f,i} of list){ const F=FISH[f.id]; h+='<button type="button" class="k-pick" data-pick="'+i+'"><canvas data-f="'+f.id+'" aria-hidden="true"></canvas><span><b>'+F.name+'</b><small style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+(canDelicacy(f)?' · can become a Delicacy':'')+'</small></span><em>'+f.value+'</em></button>'; }
+  el.innerHTML=h+'</div>'; el.scrollTop=0;
+  el.querySelectorAll('canvas[data-f]').forEach(c=>{ const r=layoutBox(c), d=Math.min(window.devicePixelRatio||1,2); c.width=r.width*d; c.height=r.height*d; const x=c.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); drawFish(x,c.dataset.f,r.width*.8,false); });
+  $('kPickBack').addEventListener('click',kBook);
+  el.querySelectorAll('[data-pick]').forEach(b=>b.addEventListener('click',()=>{ const k=hangFish(+b.dataset.pick); if (k<0) return; sfx.rig('bait'); noise(.4,{vol:.05,f:900,to:300,q:.5}); news(FISH[smokeState().hooks[k].f.id].name+' is on the smoke rack','good'); kBook(); })); }
+/** A smoked fish, from the species' own drawing: darkened toward amber as it smokes (u, 0 to 100), with smoke marks
+    across it and a glaze; a Delicacy is glazed gold and glints. One sprite per species, size and tenth of the way. */
+const SMOKED_SPR={};
+function smokedSprite(id,L,u,del){ const step=Math.round(clamp(u,0,100)/10), key=id+':'+Math.round(L)+':'+step+':'+(del?1:0); let s=SMOKED_SPR[key]; if (s) return s;
+  const k=step/10, d=2, w=Math.ceil(L*1.5), hh=Math.ceil(L*1.1), cv=document.createElement('canvas'); cv.width=w*d; cv.height=hh*d;
+  const c=cv.getContext('2d'); c.setTransform(d,0,0,d,w/2*d,hh/2*d); drawFish(c,id,L,false,1,0,true);
+  // the fish's own shape, kept to trim the tint back to it afterwards
+  const m=document.createElement('canvas'); m.width=cv.width; m.height=cv.height; m.getContext('2d').drawImage(cv,0,0);
+  // the colours turn toward amber (a Delicacy toward gold) at the fish's own lightness, then darken a little as it
+  // smokes; both blend modes keep the ink outline ink
+  const mix=(a,b)=>'rgb('+a.map((v,i)=>Math.round(v+(b[i]-v)*k)).join(',')+')';
+  c.setTransform(d,0,0,d,0,0); c.globalCompositeOperation='color';
+  c.fillStyle=del?'rgba(226,164,52,.9)':'rgba(160,88,40,'+(.3+.5*k).toFixed(2)+')'; c.fillRect(0,0,w,hh);
+  c.globalCompositeOperation='multiply'; c.fillStyle=del?'rgb(255,236,196)':mix([250,240,226],[206,160,124]); c.fillRect(0,0,w,hh);
+  c.fillStyle=del?'rgb(232,200,150)':mix([240,228,212],[160,114,84]); for (let j=0;j<5;j++){ const x=w/2+L*(.2-j*.13); c.beginPath(); c.moveTo(x,0); c.lineTo(x+L*.035,0); c.lineTo(x+L*.035-L*.06,hh); c.lineTo(x-L*.06,hh); c.fill(); }
+  c.globalCompositeOperation='source-over';
+  const g=c.createLinearGradient(0,hh*.25,0,hh*.6); g.addColorStop(0,del?'rgba(255,236,168,.55)':'rgba(255,220,160,'+(.1+.16*k).toFixed(2)+')'); g.addColorStop(1,'rgba(255,220,160,0)'); c.fillStyle=g; c.fillRect(0,0,w,hh);
+  c.globalCompositeOperation='destination-in'; c.setTransform(1,0,0,1,0,0); c.drawImage(m,0,0); c.setTransform(d,0,0,d,0,0);
+  c.globalCompositeOperation='source-over';
+  // a Delicacy glints: soft four-point sparkles with curved sides, upright like the rune glints, on the glaze
+  if (del){ c.translate(w/2,hh/2); for (const [px,py,r] of [[-.1,-.16,.075],[.2,-.06,.05],[-.3,.04,.042]]){ const R=r*L, q=R*.18;
+    c.fillStyle='rgba(255,236,170,.35)'; c.beginPath(); c.arc(px*L,py*L,R*.7,0,Math.PI*2); c.fill();
+    c.fillStyle='rgba(255,250,228,.98)'; c.beginPath(); c.moveTo(px*L,py*L-R); c.quadraticCurveTo(px*L+q,py*L-q,px*L+R,py*L); c.quadraticCurveTo(px*L+q,py*L+q,px*L,py*L+R);
+    c.quadraticCurveTo(px*L-q,py*L+q,px*L-R,py*L); c.quadraticCurveTo(px*L-q,py*L-q,px*L,py*L-R); c.fill(); } }
+  s=SMOKED_SPR[key]={cv, w, h:hh}; return s; }
+function drawSmokedFish(c,id,L,u,del){ const s=smokedSprite(id,L,u,del); c.drawImage(s.cv,-s.w/2,-s.h/2,s.w,s.h); }
+function paintSmoked(cv){ const r=layoutBox(cv); if (!r.width) return; const d=Math.min(window.devicePixelRatio||1,2); cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
+  const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); x.rotate(-.12); drawSmokedFish(x,cv.dataset.smoked,r.width*.82,+cv.dataset.u||0,!!cv.dataset.del); }
+
+/* ---------- Coming back after time away (data/idle.js: AWAY) ---------- */
+/* Time away is measured from save.lastPlayed (set on every save, when the game goes to the background, and every
+   half minute while it's open), at most AWAY.cap hours, and a clock set backwards gives nothing. Traps and the smoke
+   rack keep their own times, so they only need bringing up to date. On top of that, coming back:
+   - moves the in-game clock on at its usual pace (an in-game hour a real minute), so the world has turned;
+   - puts Grey by your fullest lake trap, and a gull on your fullest pot at the coast, until you haul them up;
+   - after AWAY.fresh.hours or more, gives Fresh water: rare fish bite more often on your next few casts. */
+const AWAYS={info:null};
+/** Applies `ms` of time away. Returns what's waiting, or null for no time at all. */
+function applyAway(ms){ if (!(ms>0)) return null; ms=Math.min(ms,AWAY.cap*3600000); const mins=ms/60000;
+  fillTraps(); smokeTick();
+  if (mins>=AWAY.clock && !modFlag('timeStop')){ const adv=mins*modMul('clock'), total=save.clock+adv; save.day=(save.day||0)+Math.floor(total/24); save.clock=total%24; PAL=palAt(save.clock); }
+  if (mins>=AWAY.fresh.hours*60 && save.tutorialDone){ save.fresh=AWAY.fresh.casts; save.freshLast=false; }
+  if (mins>=AWAY.welcome) awaitTraps();
+  persist();
+  const L=trapState().list, info={mins, fish:L.reduce((a,T)=>a+T.fish.length,0), full:L.filter(T=>T.spot && T.fish.length>=trapCap(T)).length, rack:rackReady(), fresh:mins>=AWAY.fresh.hours*60 && save.tutorialDone};
+  AWAYS.info=info; return info; }
+/** Grey wades out to the fullest lake trap, and a gull settles on the fullest pot at the coast. */
+function awaitTraps(){ const best=reg=>trapsIn(reg).filter(T=>T.spot && T.fish.length>=Math.ceil(trapCap(T)*.3)).sort((a,b)=>b.fish.length/trapCap(b)-a.fish.length/trapCap(a))[0]||null;
+  const L=best('lake'); S.grey=L?{T:L, phase:'wade', t:0}:null; S.gullPot=best('coast'); }
+/** The welcome back's line about what's waiting (the tip jar has its own). */
+function awayLine(info){ if (!info || info.mins<AWAY.welcome) return ''; const bits=[], set=trapState().list.filter(T=>T.spot).length;
+  const full=info.full===1?(set===1?', and it’s full':', and one is full'):info.full>1?(info.full===set?(set===2?', and both are full':', and all '+set+' are full'):', and '+info.full+' are full'):'';
+  if (info.fish) bits.push((info.fish===1?'One fish in your traps':'Your traps hold '+info.fish+' fish')+full+'.');
+  if (info.rack) bits.push(info.rack===1?'A smoked fish is ready on the rack.':info.rack+' smoked fish are ready on the rack.');
+  return bits.length?'<br>'+bits.join(' '):''; }
+function freshTip(){ coachFor('Fresh water after your time away: rare fish bite twice as often on your next '+AWAY.fresh.casts+' casts.',7); }
+/** Back from the background without a reload (a phone keeps the page asleep): the same, told in a line. */
+function awayResume(ms){ const info=applyAway(ms); if (!info || info.mins<AWAY.welcome) return;
+  const bits=[]; if (info.fish) bits.push('your traps hold '+info.fish+' fish'); if (info.rack) bits.push(info.rack===1?'a smoked fish is ready':info.rack+' smoked fish are ready');
+  news('Welcome back'+(bits.length?': '+bits.join(', '):'')+'','good'); if (info.fresh) setTimeout(freshTip,900); }
+/** A cast in Fresh water uses one of its casts. The last one still counts until that cast is over (freshLast), as a
+    meal's last cast does: its fish is picked after the line goes out. */
+function freshCast(){ if (!(save.fresh>0)) return false; save.fresh--; if (!save.fresh) save.freshLast=true; MODC.dirty=true; return true; }
+/** The last Fresh water cast is over (state.js calls this on the way back to idle). */
+function freshEnd(){ save.freshLast=false; MODC.dirty=true; persist(); setTimeout(()=>news('The fresh water has settled',''),600); }
+document.addEventListener('visibilitychange',()=>{ if (document.hidden){ persistOnLeave(); return; } const last=save.lastPlayed; if (last) awayResume(Date.now()-last); });
+window.addEventListener('pagehide',persistOnLeave);
+
 /* ---------- Drawing ---------- */
 function fishPath(id,len){
   const F=FISH[id], h=len*F.h, p=new Path2D();
@@ -3249,6 +3561,309 @@ function drawRigRunes(c,w,h,L,runes,t,fx){ const pts=rigRunePoints(L,runes.lengt
     if (u>.55){ const v=(u-.55)/.45, k=lerp(RUNE_K[fx.at],1,v), q=L.at(k), E=ENCH[runes[fx.at]]; if (E){ c.save(); c.globalCompositeOperation='lighter';
       const g=c.createRadialGradient(q.x,q.y,0,q.x,q.y,h*.12); g.addColorStop(0,hexA(E.color,.9*(1-v*.6))); g.addColorStop(1,hexA(E.color,0)); c.fillStyle=g; c.beginPath(); c.arc(q.x,q.y,h*.12,0,Math.PI*2); c.fill(); c.restore(); } } } }
 
+/* ---------- Trap art: wicker creels and sea pots, their floats, the marked spots, Grey and the gull ---------- */
+/* A trap is drawn twice: under the water (a dim, blue-tinted shape you can just make out, with fish flickering inside),
+   and hauled up into the air when you collect it (full colour, dripping). Both come from one sprite per kind and size,
+   painted once. Floats ride lower as a trap fills, and their flag pops up when it's full. */
+const TRAP_SPR={};
+/** The trap itself, lying on its side, `L` long, centred: a wicker creel at the lake, a slatted pot at the coast. */
+function drawTrapBody(c,kind,L){ const h=L*.42; c.save(); c.lineJoin='round'; c.lineCap='round';
+  if (kind==='lake'){
+    // a woven barrel: the funnel mouth on the left, tied off on the right, a rope handle on top
+    const body=()=>{ c.beginPath(); c.moveTo(-L*.42,-h*.42); c.bezierCurveTo(-L*.2,-h*.62,L*.2,-h*.62,L*.42,-h*.3); c.quadraticCurveTo(L*.52,0,L*.42,h*.3);
+      c.bezierCurveTo(L*.2,h*.62,-L*.2,h*.62,-L*.42,h*.42); c.closePath(); };
+    body(); c.fillStyle='#B88A52'; c.fill();
+    c.save(); body(); c.clip();
+    c.fillStyle='#8A6436'; c.beginPath(); c.ellipse(L*.05,h*.35,L*.5,h*.32,0,0,Math.PI*2); c.fill();          // shadow underneath
+    c.fillStyle='#D2A86A'; c.beginPath(); c.ellipse(-L*.05,-h*.3,L*.42,h*.14,0,0,Math.PI*2); c.fill();         // light along the top
+    // ribs, bowed to the barrel, and the over-under weave between them
+    c.strokeStyle='rgba(74,48,26,.75)'; c.lineWidth=Math.max(.7,L*.022);
+    const ribs=9; for (let i=1;i<ribs;i++){ const x=lerp(-L*.42,L*.42,i/ribs); c.beginPath(); c.moveTo(x,-h*.6); c.quadraticCurveTo(x+L*.03,0,x,h*.6); c.stroke(); }
+    c.strokeStyle='rgba(236,204,150,.55)'; c.lineWidth=Math.max(.6,L*.018);
+    for (let r=0;r<5;r++){ const y=lerp(-h*.38,h*.38,r/4); for (let i=0;i<ribs;i++){ if ((i+r)%2) continue; const x0=lerp(-L*.42,L*.42,i/ribs), x1=lerp(-L*.42,L*.42,(i+1)/ribs);
+      c.beginPath(); c.moveTo(x0+L*.01,y); c.quadraticCurveTo((x0+x1)/2,y-h*.06,x1-L*.01,y); c.stroke(); } }
+    c.restore();
+    body(); c.strokeStyle=INK; c.lineWidth=Math.max(1,L*.04); c.stroke();
+    // the funnel mouth, dark inside, and the tie at the tail
+    c.fillStyle='#4A3220'; c.beginPath(); c.ellipse(-L*.41,0,L*.07,h*.4,0,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=Math.max(.9,L*.03); c.stroke();
+    c.fillStyle='#1E1611'; c.beginPath(); c.ellipse(-L*.4,0,L*.035,h*.2,0,0,Math.PI*2); c.fill();
+    c.strokeStyle='#C99E62'; c.lineWidth=Math.max(.8,L*.025); c.beginPath(); c.moveTo(L*.43,-h*.12); c.lineTo(L*.5,-h*.2); c.moveTo(L*.43,h*.12); c.lineTo(L*.5,h*.22); c.stroke();
+    c.strokeStyle='#8F7A55'; c.lineWidth=Math.max(1,L*.035); c.beginPath(); c.moveTo(-L*.12,-h*.52); c.quadraticCurveTo(0,-h*.95,L*.12,-h*.5); c.stroke();
+  } else {
+    // a sea pot: a flat base, an arched top of wooden laths, net ends and a rope bridle
+    const top=-h*.55, base=h*.45, arch=()=>{ c.beginPath(); c.moveTo(-L*.46,base); c.lineTo(-L*.46,top*.2); c.bezierCurveTo(-L*.46,top*1.1,L*.46,top*1.1,L*.46,top*.2); c.lineTo(L*.46,base); c.closePath(); };
+    arch(); c.fillStyle='rgba(40,46,44,.85)'; c.fill();
+    c.save(); arch(); c.clip();
+    // netting showing between the laths
+    c.strokeStyle='rgba(225,218,196,.5)'; c.lineWidth=Math.max(.5,L*.012);
+    for (let i=-6;i<=6;i++){ c.beginPath(); c.moveTo(i*L*.08,base); c.lineTo(i*L*.08+L*.3,top); c.stroke(); c.beginPath(); c.moveTo(i*L*.08,base); c.lineTo(i*L*.08-L*.3,top); c.stroke(); }
+    // the laths, arching over
+    for (let i=0;i<6;i++){ const x=lerp(-L*.4,L*.4,i/5), w=L*.07;
+      c.fillStyle=i%2?'#A5865C':'#B39468'; c.beginPath(); c.moveTo(x-w/2,base); c.lineTo(x-w/2,top*.9+Math.abs(x)/L*h*.9); c.lineTo(x+w/2,top*.9+Math.abs(x)/L*h*.9); c.lineTo(x+w/2,base); c.closePath(); c.fill();
+      c.strokeStyle='rgba(43,42,51,.55)'; c.lineWidth=Math.max(.6,L*.015); c.stroke(); }
+    c.fillStyle='rgba(255,240,210,.18)'; c.fillRect(-L*.46,top,L*.92,h*.18);
+    c.restore();
+    c.fillStyle='#7A6040'; c.fillRect(-L*.48,base-h*.12,L*.96,h*.16); c.strokeStyle=INK; c.lineWidth=Math.max(.9,L*.03); c.strokeRect(-L*.48,base-h*.12,L*.96,h*.16);
+    arch(); c.strokeStyle=INK; c.lineWidth=Math.max(1,L*.04); c.stroke();
+    c.strokeStyle='#D8C9A2'; c.lineWidth=Math.max(.9,L*.03); c.beginPath(); c.moveTo(-L*.3,top*.75); c.lineTo(0,top*1.6); c.lineTo(L*.3,top*.75); c.stroke();
+  }
+  c.restore(); }
+/** A cached sprite of a trap: kind, length in px, and whether it's seen through the water. */
+function trapSprite(kind,L,under){ const key=kind+':'+Math.round(L)+':'+(under?1:0)+':'+DPR; let s=TRAP_SPR[key]; if (s) return s;
+  const pad=L*.6, w=Math.ceil((L+pad*2)*DPR), hh=Math.ceil((L*.9+pad*2)*DPR), cv=document.createElement('canvas'); cv.width=w; cv.height=hh;
+  const c=cv.getContext('2d'); c.setTransform(DPR,0,0,DPR,w/2,hh/2); drawTrapBody(c,kind,L);
+  if (under){ c.setTransform(1,0,0,1,0,0); c.globalCompositeOperation='source-atop'; c.fillStyle='rgba(18,70,84,.62)'; c.fillRect(0,0,w,hh); }
+  s=TRAP_SPR[key]={cv, w:w/DPR, h:hh/DPR}; return s; }
+/** Where a spot sits on screen. */
+function trapXY(reg,spotId){ const sp=TRAPS[reg].spots.find(p=>p.id===spotId); return {x:sp.x*W, y:Math.min(HZ+sp.y*(H-HZ),H-TRAP_LOW)}; }
+/** The float (lake) or buoy (coast) bobbing over a trap. fill 0..1 sinks it; full raises the flag. */
+function drawTrapFloat(c,kind,x,y,k,fill,full,t,ph){ const bob=Math.sin(t*2.1+ph)*1.4*k+fill*2.4*k+(Math.random()<.004*fill?2*k:0);
+  const yy=y+bob; c.save(); c.translate(x,yy); c.lineJoin='round'; c.lineCap='round';
+  // the line down to the trap, and a ring on the water
+  c.strokeStyle='rgba(225,238,242,'+(.3+.15*Math.sin(t*1.7+ph)).toFixed(2)+')'; c.lineWidth=1.1; c.beginPath(); c.ellipse(0,2*k,(13+Math.sin(t*1.3+ph))*k,4*k,0,0,Math.PI*2); c.stroke();
+  if (full){ const u=(t*.8+ph)%1; c.strokeStyle='rgba(247,221,146,'+(.55*(1-u)).toFixed(2)+')'; c.lineWidth=1.5; c.beginPath(); c.ellipse(0,2*k,(13+u*16)*k,(4+u*5)*k,0,0,Math.PI*2); c.stroke(); }
+  if (kind==='lake'){
+    const r=9*k;
+    c.fillStyle='rgba(10,26,34,.28)'; c.beginPath(); c.ellipse(0,2*k,r*1.4,r*.45,0,0,Math.PI*2); c.fill();
+    // cork, with a red-painted top half and a few pits
+    c.save(); c.beginPath(); c.rect(-r*2,-r*4,r*4,r*4+r*.25); c.clip();
+    c.fillStyle='#C79A5E'; c.beginPath(); c.ellipse(0,0,r,r*.8,0,0,Math.PI*2); c.fill();
+    c.fillStyle='#C2463A'; c.beginPath(); c.ellipse(0,0,r,r*.8,0,Math.PI,0); c.fill();
+    c.fillStyle='rgba(255,230,200,.35)'; c.beginPath(); c.ellipse(-r*.35,-r*.42,r*.35,r*.16,-.3,0,Math.PI*2); c.fill();
+    c.fillStyle='rgba(80,50,26,.5)'; for (const [px,py] of [[-.4,.2],[.3,.35],[.55,.05]]){ c.beginPath(); c.arc(px*r,py*r,.7*k,0,Math.PI*2); c.fill(); }
+    c.strokeStyle=INK; c.lineWidth=1.2; c.beginPath(); c.ellipse(0,0,r,r*.8,0,0,Math.PI*2); c.stroke(); c.restore();
+    // the stick and its flag: lying flat while the trap fills, standing up when it's full
+    const sh=18*k; c.strokeStyle='#5A3D24'; c.lineWidth=1.8*Math.max(.8,k); c.beginPath(); c.moveTo(0,-r*.7); c.lineTo(0,-r*.7-sh); c.stroke();
+    c.save(); c.translate(0,-r*.7-sh); c.rotate(full?-.08+Math.sin(t*6)*.08:Math.PI*.5); c.fillStyle=full?'#E2B84E':'#F3EAD7';
+    c.beginPath(); c.moveTo(0,0); c.lineTo(11*k,3*k); c.lineTo(0,6.2*k); c.closePath(); c.fill(); c.strokeStyle=INK; c.lineWidth=1; c.stroke(); c.restore();
+  } else {
+    const r=7.5*k, hgt=16*k;
+    c.fillStyle='rgba(10,26,34,.3)'; c.beginPath(); c.ellipse(0,2*k,r*1.5,r*.5,0,0,Math.PI*2); c.fill();
+    c.save(); c.beginPath(); c.rect(-r*3,-hgt*3,r*6,hgt*3+r*.3); c.clip();
+    c.beginPath(); c.moveTo(-r,r*.2); c.lineTo(-r*.85,-hgt); c.quadraticCurveTo(0,-hgt-r*.6,r*.85,-hgt); c.lineTo(r,r*.2); c.closePath(); c.fillStyle='#F1ECE2'; c.fill();
+    c.save(); c.clip(); c.fillStyle='#3E8C8C'; c.fillRect(-r*1.2,-hgt*.62,r*2.4,hgt*.24); c.fillStyle='#C2463A'; c.fillRect(-r*1.2,-hgt-r,r*2.4,hgt*.28+r*.4);
+    c.fillStyle='rgba(43,42,51,.18)'; c.fillRect(r*.3,-hgt-r,r,hgt+r*1.3); c.restore();
+    c.strokeStyle=INK; c.lineWidth=1.2; c.stroke(); c.restore();
+    const sh=15*k; c.strokeStyle='#4E5A60'; c.lineWidth=1.8*Math.max(.8,k); c.beginPath(); c.moveTo(0,-hgt-r*.4); c.lineTo(0,-hgt-r*.4-sh); c.stroke();
+    c.save(); c.translate(0,-hgt-r*.4-sh); c.rotate(full?-.08+Math.sin(t*6)*.08:Math.PI*.5); c.fillStyle=full?'#E2B84E':'#F3EAD7';
+    c.beginPath(); c.moveTo(0,0); c.lineTo(11*k,3*k); c.lineTo(0,6.2*k); c.closePath(); c.fill(); c.strokeStyle=INK; c.lineWidth=1; c.stroke(); c.restore();
+  }
+  c.restore(); return yy; }
+/** A trap seen through the water under its float, with dark shapes of fish turning inside. */
+function drawTrapUnder(c,kind,x,y,k,n,cap,t,ph){ const L=40*k, s=trapSprite(kind,L,true), ty=y+9*k;
+  c.save(); c.globalAlpha=.55; c.drawImage(s.cv,x-s.w/2,ty-s.h/2,s.w,s.h); c.restore();
+  const shown=Math.min(6,Math.ceil(n/3)); if (!shown) return;
+  c.save(); c.beginPath(); c.ellipse(x,ty,L*.4,L*.16,0,0,Math.PI*2); c.clip(); c.fillStyle='rgba(8,24,30,.55)';
+  for (let i=0;i<shown;i++){ const a=t*(.8+i*.13)+i*2.1+ph, fx=x+Math.sin(a)*L*.28, fy=ty+Math.cos(a*1.3)*L*.06, d=Math.cos(a)>0?1:-1, fl=5*k;
+    c.beginPath(); c.ellipse(fx,fy,fl,fl*.38,0,0,Math.PI*2); c.fill(); c.beginPath(); c.moveTo(fx-d*fl,fy); c.lineTo(fx-d*fl*1.6,fy-fl*.35); c.lineTo(fx-d*fl*1.6,fy+fl*.35); c.closePath(); c.fill(); }
+  c.restore(); }
+/** An empty marked spot while you place a trap: a weathered stake with a rope ring, a dashed circle and its name. */
+function drawTrapMarker(c,x,y,k,name,hot,t){ const r=(hot?22:18)*k+Math.sin(t*4)*1.2;
+  c.save(); c.lineCap='round';
+  c.strokeStyle=hot?'rgba(226,184,78,.95)':'rgba(243,234,215,.75)'; c.lineWidth=hot?3:2; c.setLineDash([5,5]); c.lineDashOffset=-t*12;
+  c.beginPath(); c.ellipse(x,y,r*1.4,r*.55,0,0,Math.PI*2); c.stroke(); c.setLineDash([]);
+  if (hot){ c.fillStyle='rgba(226,184,78,.16)'; c.fill(); }
+  c.fillStyle='#5A3D24'; c.strokeStyle=INK; c.lineWidth=1; const sx=x+r*1.15, sh=16*k; c.fillRect(sx-1.5*k,y-sh,3*k,sh); c.strokeRect(sx-1.5*k,y-sh,3*k,sh);
+  c.strokeStyle='#C9B48A'; c.lineWidth=1.2*k; c.beginPath(); c.ellipse(sx,y-sh*.6,2.6*k,1.2*k,0,0,Math.PI*2); c.stroke();
+  const ly=y-r-(hot?46:6);   // when the trap in your hand is over it, the name moves up out of its way
+  c.font='800 '+Math.round(11*Math.max(.85,k))+'px Nunito, system-ui, sans-serif'; c.textAlign='center'; c.lineWidth=3.5; c.strokeStyle='rgba(30,36,48,.75)'; c.strokeText(name.toUpperCase(),x,ly);
+  c.fillStyle=hot?'#F7DD92':PAPER; c.fillText(name.toUpperCase(),x,ly); c.restore(); }
+/** A trap waiting on the dock (or the skiff's deck) to be set: lying on the boards with a coil of its line. */
+function drawTrapOnDeck(c,kind,x,y,s,t,glow){ if (glow){ for (const o of [0,.5]){ const u=((t+o*1.6)%1.6)/1.6; c.strokeStyle='rgba(247,221,146,'+(.9*(1-u)).toFixed(2)+')'; c.lineWidth=2.5; c.beginPath(); c.ellipse(x,y+3,(18+u*16)*s,(7+u*6)*s,0,0,Math.PI*2); c.stroke(); } }
+  c.fillStyle='rgba(20,12,8,.3)'; c.beginPath(); c.ellipse(x,y+6*s,17*s,4*s,0,0,Math.PI*2); c.fill();
+  const sp=trapSprite(kind,34*s,false); c.drawImage(sp.cv,x-sp.w/2,y-sp.h/2,sp.w,sp.h);
+  c.strokeStyle='#C9B48A'; c.lineWidth=1.3*s; for (const rr of [4,6]){ c.beginPath(); c.ellipse(x+15*s,y+4*s,rr*s,rr*.4*s,0,0,Math.PI*2); c.stroke(); } }
+/** Grey wading by a trap, the waterline round its legs. */
+function drawGreyWading(x,y,k,face){ const c=ctx, keep=SC.heron.dir; SC.heron.dir=face; c.save(); c.translate(x,y); c.scale(k,k);
+  c.save(); c.beginPath(); c.rect(-40,-80,80,80); c.clip(); drawHeron(0,6); c.restore();
+  c.strokeStyle='rgba(225,238,242,'+(.4+.15*Math.sin(S.time*2)).toFixed(2)+')'; c.lineWidth=1.2/k; for (const lx of [-2,2]){ c.beginPath(); c.ellipse(lx,0,4+Math.sin(S.time*1.6+lx),1.4,0,0,Math.PI*2); c.stroke(); }
+  c.restore(); SC.heron.dir=keep; }
+/** Grey in flight: neck tucked back, legs trailing, broad rounded wings beating slowly. dir 1 flies right. */
+function drawHeronFlying(x,y,k,dir,t){ const c=ctx, f=Math.sin(t*8); c.save(); c.translate(x,y); c.scale(dir*k,k); c.lineJoin='round'; c.lineCap='round';
+  // a broad, rounded wing swept back, its dark primaries splayed at the tip; seen edge-on mid-beat it's a thin band
+  const wing=(amp,far)=>{ const g=f>=0?Math.max(.18,f):Math.min(-.18,f), ty=-amp*g, sw=-4-Math.abs(g)*6;
+    const path=()=>{ c.beginPath(); c.moveTo(8,-1.5); c.quadraticCurveTo(7,ty*.55,sw+4,ty); c.quadraticCurveTo(sw-6,ty*1.08,sw-14,ty*.78); c.quadraticCurveTo(-14,ty*.35,-8,-.5); c.closePath(); };
+    path(); c.fillStyle=far?'#6E7880':'#8F99A1'; c.fill();
+    c.save(); path(); c.clip();
+    c.fillStyle=far?'#3E444B':'#4A5058'; c.beginPath(); c.moveTo(sw+6,ty*1.2); c.quadraticCurveTo(sw-4,ty*.6,sw-16,ty*.7); c.lineTo(sw-16,ty*1.3); c.closePath(); c.fill();   // primaries
+    c.fillStyle='rgba(255,255,255,.12)'; c.beginPath(); c.ellipse(2,ty*.3,6,Math.abs(ty)*.18+1,0,0,Math.PI*2); c.fill();                                              // coverts catch the light
+    c.strokeStyle='rgba(43,42,51,.5)'; c.lineWidth=.8; for (let q=0;q<4;q++){ c.beginPath(); c.moveTo(sw+3-q*4.5,ty*.98-q*ty*.04); c.lineTo(sw+1-q*4.5,ty*.66); c.stroke(); } c.restore();
+    path(); c.strokeStyle=INK; c.lineWidth=1.1; c.stroke(); };
+  wing(14,true);                                                      // the far wing, behind the body
+  c.strokeStyle='#5A5F66'; c.lineWidth=1.5; c.beginPath(); c.moveTo(-9,1); c.lineTo(-24,2.5); c.moveTo(-9,2.4); c.lineTo(-23,4.6); c.stroke();   // legs trailing
+  c.fillStyle='#A3ACB3'; c.beginPath(); c.ellipse(0,0,11,5,-.05,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=1.2; c.stroke();
+  c.fillStyle='#E4E7EA'; c.beginPath(); c.ellipse(5,2,5.5,2.6,0,0,Math.PI*2); c.fill();
+  // the neck folded back into the shoulders, the head forward, the long yellow bill
+  c.strokeStyle=INK; c.lineWidth=5; c.beginPath(); c.moveTo(8,-1); c.quadraticCurveTo(13,-6,12,-1.5); c.quadraticCurveTo(11,2.5,15.5,1.6); c.stroke(); c.strokeStyle='#D3D8DC'; c.lineWidth=3.4; c.stroke();
+  c.fillStyle='#D3D8DC'; c.beginPath(); c.ellipse(16.6,1.2,3.2,2.5,0,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=.9; c.stroke();
+  c.fillStyle='#2B2A33'; c.beginPath(); c.moveTo(15,-.8); c.quadraticCurveTo(12.5,-1.6,11,-.6); c.lineTo(15,.1); c.closePath(); c.fill();
+  c.strokeStyle=INK; c.lineWidth=2.4; c.beginPath(); c.moveTo(19,1.6); c.lineTo(27.5,3); c.stroke(); c.strokeStyle='#D9A441'; c.lineWidth=1.4; c.stroke();
+  c.fillStyle='#F2CF63'; c.beginPath(); c.arc(17.2,.6,.9,0,Math.PI*2); c.fill(); c.fillStyle=INK; c.beginPath(); c.arc(17.4,.6,.45,0,Math.PI*2); c.fill();
+  wing(22,false);                                                     // the near wing, over the body
+  c.restore(); }
+/** A gull sitting on a buoy at the coast, looking about. */
+function drawGullSitting(x,y,k,t){ const c=ctx, look=Math.sin(t*.6)>0?1:-1; c.save(); c.translate(x,y); c.scale(k*1.15,k*1.15);
+  c.fillStyle='#F2EFE8'; c.beginPath(); c.ellipse(0,0,6.4,3.8,0,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=.9; c.stroke();
+  c.fillStyle='#9AA2A8'; c.beginPath(); c.ellipse(-1.5*look,-.6,4.4,2.3,.2*look,0,Math.PI*2); c.fill(); c.fillStyle='#2B2A33'; c.beginPath(); c.ellipse(-5*look,-.2,1.8,1,0,0,Math.PI*2); c.fill();
+  c.fillStyle='#F2EFE8'; c.beginPath(); c.arc(4.6*look,-3.2+Math.sin(t*.7)*.6,2.6,0,Math.PI*2); c.fill(); c.stroke();
+  c.fillStyle='#E0A43A'; c.fillRect(look>0?6.8:-9.8,-3.6,3,1.3); c.fillStyle=INK; c.beginPath(); c.arc(5.4*look,-3.8,.6,0,Math.PI*2); c.fill(); c.restore(); }
+/** Icons for the shop and the trap sheet: a trap (data-trap="lake"|"coast") or a fitting (data-fit). */
+function drawTrapIcon(c,kind,s){ const sp=trapSprite(kind,s*.9,false); c.drawImage(sp.cv,-sp.w/2,-sp.h/2,sp.w,sp.h); }
+function drawFittingIcon(c,id,s){ c.save(); c.lineJoin='round'; c.lineCap='round'; const k=s/40;
+  c.scale(k,k);
+  if (id==='bait'){ // a small tin bait box with a hinged lid and a worm curling out
+    c.fillStyle='#8A949C'; rrect(c,-14,-6,28,16,3); c.fill(); c.strokeStyle=INK; c.lineWidth=1.6; c.stroke();
+    c.fillStyle='#B6BEC4'; rrect(c,-14,-11,28,6,2); c.fill(); c.stroke(); c.fillStyle='rgba(255,255,255,.35)'; c.fillRect(-11,-9.5,18,1.6);
+    c.fillStyle=BRASS; c.fillRect(-2,-6,4,3); c.strokeStyle='#C47A6A'; c.lineWidth=3; c.beginPath(); c.moveTo(6,-8); c.quadraticCurveTo(12,-16,8,-18); c.stroke();
+    c.strokeStyle=INK; c.lineWidth=.8; c.beginPath(); c.moveTo(-10,4); c.lineTo(10,4); c.stroke(); }
+  else if (id==='mesh'){ // a hoop of wide netting
+    c.fillStyle='rgba(43,42,51,.08)'; c.beginPath(); c.ellipse(0,0,16,16,0,0,Math.PI*2); c.fill();
+    c.save(); c.beginPath(); c.ellipse(0,0,15,15,0,0,Math.PI*2); c.clip(); c.strokeStyle='#C9B48A'; c.lineWidth=1.6;
+    for (let i=-4;i<=4;i++){ c.beginPath(); c.moveTo(i*7-20,-20); c.lineTo(i*7+20,20); c.stroke(); c.beginPath(); c.moveTo(i*7+20,-20); c.lineTo(i*7-20,20); c.stroke(); } c.restore();
+    c.strokeStyle='#8A6A3A'; c.lineWidth=3.4; c.beginPath(); c.ellipse(0,0,16,16,0,0,Math.PI*2); c.stroke(); c.strokeStyle=INK; c.lineWidth=1.2; c.beginPath(); c.ellipse(0,0,17.6,17.6,0,0,Math.PI*2); c.stroke(); }
+  else { // a little caged lantern with a warm glow
+    const g=c.createRadialGradient(0,2,1,0,2,20); g.addColorStop(0,'rgba(255,205,120,.55)'); g.addColorStop(1,'rgba(255,190,100,0)'); c.fillStyle=g; c.beginPath(); c.arc(0,2,20,0,Math.PI*2); c.fill();
+    rrect(c,-8,-8,16,20,3); c.fillStyle='rgba(255,215,140,.9)'; c.fill(); c.strokeStyle=INK; c.lineWidth=1.6; c.stroke();
+    c.fillStyle='#FFF4D2'; c.beginPath(); c.ellipse(0,3,2.6,4.4,0,0,Math.PI*2); c.fill();
+    c.strokeStyle='#2B2A33'; c.lineWidth=1.3; for (const x of [-4,0,4]){ c.beginPath(); c.moveTo(x,-8); c.lineTo(x,12); c.stroke(); }
+    c.fillStyle=BRASS; rrect(c,-10,-12,20,5,2); c.fill(); c.strokeStyle=INK; c.lineWidth=1.2; c.stroke(); rrect(c,-9,11,18,4,2); c.fill(); c.stroke();
+    c.strokeStyle=INK; c.lineWidth=1.4; c.beginPath(); c.arc(0,-15,3.4,Math.PI,0); c.stroke(); }
+  c.restore(); }
+
+/* ---------- Traps in the scene: setting them, watching them fill, hauling them up, the trap sheet ---------- */
+/* S.place = {T, drag:{x,y}|null} while a trap is being set: the free spots show as marked rings. S.trapFx is a haul in
+   progress. S.grey = {T, phase:'wade'|'fly', t, from, to} when Grey waits by a full trap (game/away.js puts him there). */
+const TRAPFX={fillT:0};
+/** Where the trap waiting to be set sits: on the dock at the lake, on the skiff's deck at the coast. */
+function trapDeckPos(){ return REG()==='coast' ? {x:W/2+44, y:H-118+(S.bob_y||0), s:.95} : {x:W/2+46, y:H-128+14, s:1}; }
+const trapWaiting = () => trapsIn(REG()).find(T=>!T.spot) || null;
+function trapFloatPos(T){ const p=trapXY(T.reg,T.spot); return p; }
+/** The placed trap whose float is under (x,y), if any. */
+function trapAt(x,y){ for (const T of trapsIn(REG())){ if (!T.spot) continue; const p=trapFloatPos(T), k=sc(p.y);
+  if (Math.hypot(x-p.x,(y-(p.y-10*k))*1.15)<28*Math.max(.8,k)) return T; } return null; }
+function onTrapProp(x,y){ const T=trapWaiting(); if (!T) return null; const p=trapDeckPos(); return Math.hypot(x-p.x,(y-p.y)*1.3)<30 ? T : null; }
+function freeSpots(reg){ const used=new Set(trapsIn(reg).filter(T=>T.spot).map(T=>T.spot)); return TRAPS[reg].spots.filter(p=>!used.has(p.id)); }
+function spotNear(reg,x,y,r){ let best=null, bd=r; for (const sp of freeSpots(reg)){ const p=trapXY(reg,sp.id), d=Math.hypot(x-p.x,(y-p.y)*1.4); if (d<bd){ bd=d; best=sp; } } return best; }
+
+/* ---------- setting a trap ---------- */
+function startPlacing(T,at){ S.place={T, drag:at?{x:at.x,y:at.y}:null, t:0}; tone(660,.06,{vol:.06,type:'triangle'}); buzz(8);
+  if (!save.stats.trapSet) coachFor('Drag the trap onto a marked spot in the water, or tap one.',7); }
+function placeDown(x,y){ const P=S.place; if (!P) return false;
+  const sp=spotNear(P.T.reg,x,y,46); if (sp){ setTrapAt(P.T,sp.id); return true; }
+  if (onTrapProp(x,y)===P.T || (P.T.spot && trapAt(x,y)===P.T)){ P.drag={x,y}; return true; }
+  S.place=null; if (!P.T.spot) news('Tap the trap on the '+(REG()==='coast'?'deck':'dock')+' to set it later',''); return true; }
+function placeMove(x,y){ if (S.place && S.place.drag){ S.place.drag.x=x; S.place.drag.y=y; } }
+function placeUp(x,y){ const P=S.place; if (!P || !P.drag) return; const sp=spotNear(P.T.reg,x,y,52); P.drag=null; if (sp) setTrapAt(P.T,sp.id); }
+function setTrapAt(T,spot){ if (!placeTrap(T,spot)) return; const p=trapXY(T.reg,spot); S.place=null;
+  splash(p.x,p.y,10); ripple(p.x,p.y,40); ripple(p.x,p.y,24); sfx.plop(); noise(.18,{vol:.08,f:1600,to:700}); buzz(14);
+  const first=!save.stats.trapSet; save.stats.trapSet=(save.stats.trapSet||0)+1; persist();
+  news('Set your '+trapName(T).replace(/^Your /,'').toLowerCase()+' '+trapSpot(T).at,'good'); dropTip('Drag the trap');
+  if (first) coachFor('Traps fill while you fish, and while you’re away. Its flag pops up when it’s full: tap it to haul it up.',8); }
+
+/** Puts away a tip that's done its job (one starting with `prefix`), and lets the next one through. */
+function dropTip(prefix){ if (!$('coach').hidden && $('coachText').textContent.startsWith(prefix)){ clearTimeout(coachTimer); coachTimer=0; coachOff(); setTimeout(coachDrain,700); } }
+/* ---------- filling, Grey, and the haul ---------- */
+/** Runs fn once the opening has handed over to the lake (a tip under the opening would go unseen). */
+function whenPlaying(fn){ if (INTRO.active) setTimeout(()=>whenPlaying(fn),800); else fn(); }
+function trapGiftTip(){ if (INTRO.active) return whenPlaying(trapGiftTip); coachFor('Your uncle’s old fish trap turned up on the dock. Tap it to set it in the water: it fills while you fish, and while you’re away.',9); }
+function updateTraps(dt){ TRAPFX.fillT-=dt; if (TRAPFX.fillT<=0){ TRAPFX.fillT=1; if (REG()==='lake' && S.state==='idle' && trapGiftCheck()) trapGiftTip(); const n=fillTraps(); if (n && !save.stats.trapHauls && trapsIn(REG()).some(T=>T.fish.length>=5) && !save.stats.trapNudge){ save.stats.trapNudge=1; persist(); coachFor('Your trap has fish in it. Tap its float to haul it up, or let it fill.',7); } }
+  if (S.place && (S.state!=='idle' || S.place.T.reg!==REG())) S.place=null;
+  S.place && (S.place.t+=dt);
+  const F=S.trapFx; if (F){ F.t+=dt; trapFxStep(F,dt); }
+  const g=S.grey; if (g){ if (g.T.reg!==REG() || (!g.T.spot && g.phase==='wade')) S.grey=null; else if (g.phase==='fly'){ g.t+=dt; if (g.t>=g.dur) S.grey=null; } } }
+function tapTrap(T){ if (S.trapFx) return;   // one haul at a time: a tap on another trap meanwhile just waits
+  trapFill(T);
+  if (!T.fish.length && !T.g){ openTrapSheet(T); return; }
+  const p=trapFloatPos(T), k=sc(p.y), out=haulTrap(T), kind=T.reg;
+  const fish=out.fish.map((f,i)=>({f, kept:out.kept.includes(f), delay:.32+i*Math.min(.06,.5/Math.max(1,out.fish.length)), born:false}));
+  S.trapFx={T, x:p.x, y:p.y, k, kind, t:0, fish, coins:out.coins, glimmer:out.glimmer, kept:out.kept.length, paid:false, splashes:0, live:[]};
+  sfx.haulOut(0); noise(.3,{vol:.12,f:500,to:1500,q:.7}); buzz([0,20,30,20]);
+  if (S.grey && S.grey.T===T && S.grey.phase==='wade') greyFlyHome();
+  if (S.gullPot===T){ S.gullPot=null; S.gullFly={x:p.x, y:p.y-24*k, k, t:0}; tone(1650,.12,{vol:.05,type:'triangle'}); }
+  if (out.kept.length) setTimeout(()=>news(keptLine(out.kept),'good'),700); }
+function keptLine(kept){ const by={}; for (const f of kept) by[f.id]=(by[f.id]||0)+1;
+  return 'Kept for your recipes: '+Object.entries(by).map(([id,n])=>FISH[id].name+(n>1?' ×'+n:'')).join(', '); }
+/** The haul, step by step: up out of the water, the fish spill out, coins and Glimmer fly up, and down it goes. */
+function trapFxStep(F,dt){ const R=REDUCED;
+  if (F.t>.12 && F.splashes===0){ F.splashes=1; splash(F.x,F.y,14); ripple(F.x,F.y,46); }
+  for (const o of F.fish){ if (o.born || F.t<o.delay) continue; o.born=true;
+    const a=rand(-2.2,-.95), v=rand(150,230)*(R?.6:1), net=netPos();
+    const fx={id:o.f.id, kept:o.kept, x:F.x+rand(-4,4), y:F.y-20*F.k, vx:Math.cos(a)*v*.55, vy:Math.sin(a)*v, life:0, max:o.kept?.8:.6, rot:rand(-1,1), spin:rand(-8,8)};
+    if (o.kept){ const T=.8; fx.vx=(net.x-fx.x)/T; fx.vy=(net.y-30-fx.y)/T-.5*520*T; }
+    F.live.push(fx); if (Math.random()<.6) tone(rand(480,720),.04,{vol:.05,type:'triangle'}); }
+  for (const p of F.live){ p.life+=dt; p.vy+=520*dt; p.x+=p.vx*dt; p.y+=p.vy*dt;
+    if (!p.kept && p.life>=p.max && !p.gone){ p.gone=true; coinMotes(p.x,p.y,1); }
+    if (p.kept && p.life>=p.max && !p.gone){ p.gone=true; SC.netPop=1; sfx.plop(); } }
+  F.live=F.live.filter(p=>!p.gone);
+  if (!F.paid && F.t>.62){ F.paid=true; if (F.coins){ coinTally(Math.max(400,Math.min(1100,400+F.coins*8))); sfx.coin(Math.ceil(F.coins/5)); S.particles.push({x:F.x,y:F.y-46*F.k,vx:0,vy:-26,g:0,life:0,max:1.3,r:0,c:'rgba(0,0,0,',word:'+'+F.coins.toLocaleString()+' coins'}); }
+    if (F.glimmer) glimmerTally(F.glimmer,{x:F.x,y:F.y-30*F.k}); }
+  if (F.t>1.15 && F.splashes===1){ F.splashes=2; splash(F.x,F.y,10); ripple(F.x,F.y,34); sfx.plop(); }
+  if (F.t>1.4 && !F.live.length){ S.trapFx=null; updateHud(); if (!save.stats.trapTip){ save.stats.trapTip=1; persist(); coachFor('Tap an empty trap to move it or give it a fitting. Ottilie sells more traps, and fittings that change what they catch.',8); } } }
+/** Coins flying up to the coin chip. */
+function coinMotes(x,y,n){ const c=$('coins'); if (!c) return; const r=c.parentNode.getBoundingClientRect(), tx=r.left+16, ty=r.top+r.height/2;
+  for (let i=0;i<n;i++) S.particles.push({x:x+rand(-6,6),y:y+rand(-6,6),vx:rand(-60,60),vy:rand(-120,-40),g:0,life:0,max:rand(.9,1.2),r:rand(2.2,3),c:'rgba(226,184,78,',home:{x:tx,y:ty,d:rand(.08,.2)},coin:true}); }
+function greyWadePos(T){ const p=trapFloatPos(T), k=sc(p.y), side=p.x<W/2?1:-1; return {x:p.x+side*26*k, y:p.y+4*k, k:k*.9, face:-side}; }
+function greyFlyHome(){ const g=S.grey, D=dockGeo(); g.from=greyWadePos(g.T); g.phase='fly'; g.t=0; g.dur=REDUCED?.01:1.5; g.to={x:D.rp,y:D.top-25}; tone(380,.18,{to:300,vol:.06,type:'sawtooth'}); noise(.4,{vol:.06,f:400,type:'lowpass'}); }
+
+/* ---------- drawing ---------- */
+function drawTraps(){ const reg=REG(), t=S.time, list=trapsIn(reg), F=S.trapFx;
+  for (const T of list){ if (!T.spot) continue; const p=trapFloatPos(T), k=sc(p.y), ph=TRAPS[reg].spots.findIndex(s=>s.id===T.spot)*1.7, cap=trapCap(T);
+    if (F && F.T===T) continue;
+    drawTrapUnder(ctx,reg,p.x,p.y,k,T.fish.length,cap,t,ph);
+    const sw=reg==='coast'&&swellNear(p.y,60)?Math.sin(t*3)*2:0;
+    drawTrapFloat(ctx,reg,p.x,p.y+sw,k,T.fish.length/cap,T.fish.length>=cap,t,ph);
+    if (S.gullPot===T) drawGullSitting(p.x,p.y-(reg==='coast'?27:20)*k+sw,k,t); }
+  if (F) drawHaul(F);
+  // Grey: wading by the trap he's guarding, or flying home to the dock
+  const g=S.grey; if (g && reg==='lake'){ if (g.phase==='wade'){ const w=greyWadePos(g.T); drawGreyWading(w.x,w.y,w.k,w.face); }
+    else { const u=Math.min(1,g.t/g.dur), e=u*u*(3-2*u), x=lerp(g.from.x,g.to.x,e), y=lerp(g.from.y-30*g.from.k,g.to.y-20,e)-Math.sin(Math.PI*u)*60; drawHeronFlying(x,y,lerp(g.from.k,1,e),g.to.x>g.from.x?1:-1,g.t); } }
+  const gf=S.gullFly; if (gf){ gf.t+=1/60; const u=Math.min(1,gf.t/1.4), gx=gf.x-u*140, gy=gf.y-u*180, w=9*Math.max(.8,gf.k), flap=Math.sin(S.time*14);
+    ctx.strokeStyle='rgba(40,38,58,.95)'; ctx.lineCap='round'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(gx-w,gy-flap*w*.5); ctx.quadraticCurveTo(gx-w*.45,gy-w*.25-flap*w*.65,gx,gy); ctx.quadraticCurveTo(gx+w*.45,gy-w*.25-flap*w*.65,gx+w,gy-flap*w*.5); ctx.stroke();
+    ctx.fillStyle='#F1EEE8'; ctx.beginPath(); ctx.ellipse(gx,gy+1.5,w*.28,w*.16,0,0,Math.PI*2); ctx.fill(); if (u>=1) S.gullFly=null; }
+}
+/** While placing: the free spots, and the trap in your hand, drawn over the reeds and the dock. */
+function drawTrapMarkers(){ const reg=REG(), t=S.time;
+  const P=S.place; if (P && P.T.reg===reg){ const hot=P.drag?spotNear(reg,P.drag.x,P.drag.y,52):null;
+    for (const sp of freeSpots(reg)){ const p=trapXY(reg,sp.id); drawTrapMarker(ctx,p.x,p.y,sc(p.y),sp.name,hot===sp,t); }
+    if (P.drag){ ctx.save(); ctx.translate(P.drag.x,P.drag.y-18); ctx.rotate(Math.sin(t*5)*.06); const sp=trapSprite(reg,40,false); ctx.globalAlpha=.95; ctx.drawImage(sp.cv,-sp.w/2,-sp.h/2,sp.w,sp.h); ctx.restore(); } } }
+function drawHaul(F){ const u=F.t, k=F.k, up=u<.3?u/.3:u<1?1:Math.max(0,1-(u-1)/.3), e=1-Math.pow(1-up,3);
+  const ty=lerp(F.y+9*k,F.y-24*k,e), tilt=u>.3&&u<1?Math.sin((u-.3)/.7*Math.PI)*.5:0, L=40*k, sp=trapSprite(F.kind,L,false);
+  drawTrapFloat(ctx,F.kind,F.x+12*k,F.y,k,0,false,S.time,0);   // the float stays on the water, behind the trap coming up
+  ctx.save(); ctx.strokeStyle='rgba(220,210,180,.9)'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(F.x,F.y); ctx.lineTo(F.x,ty); ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.translate(F.x,ty); ctx.rotate(-tilt); if (up<1){ ctx.beginPath(); ctx.rect(-L,-L,L*2,L+(F.y-ty)+2); ctx.clip(); }
+  ctx.drawImage(sp.cv,-sp.w/2,-sp.h/2,sp.w,sp.h); ctx.restore();
+  if (up>.4) for (let i=0;i<3;i++) if (Math.random()<.4) S.particles.push({x:F.x+rand(-L*.4,L*.4),y:ty+L*.18,vx:0,vy:rand(10,40),g:300,life:0,max:.4,r:rand(1,1.8),c:'rgba(225,238,242,'});
+  for (const p of F.live){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot+p.life*p.spin); drawFish(ctx,p.id,Math.min(26,FISH[p.id].len*.4)*Math.max(.8,k),false,1,Math.sin(p.life*30)); ctx.restore(); }
+}
+/** The trap waiting on the dock or the deck, if there is one. */
+function drawTrapProp(){ const T=trapWaiting(); if (!T) return; const p=trapDeckPos(), P=S.place;
+  if (P && P.T===T && P.drag) return;
+  drawTrapOnDeck(ctx,REG(),p.x,p.y,p.s,S.time,!P); }
+
+/* ---------- the trap sheet: what's in it, when it's full, its fitting, and moving it ---------- */
+/** Minutes as a short time: "under a minute", "40 min", "2 h", "1 h 25 min". Rounded to the minute first, so 119.6 is "2 h". */
+function fmtMins(m){ if (m===Infinity) return ''; if (m<1) return 'under a minute'; m=Math.round(m); return m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+(m%60)+' min':''); }
+function openTrapSheet(T){ trapFill(T); const s=trapState(), sp=trapSpot(T), cap=trapCap(T), full=trapFullIn(T), pool=trapPool(T), tot=Object.values(pool).reduce((a,b)=>a+b,0)||1;
+  let h='<div class="panel-head"><div><h2>'+trapName(T)+'</h2><p>'+(sp?sp.name+' · ':'')+(T.reg==='coast'?'Gullrock Coast':'Stillwater Lake')+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>';
+  h+='<div class="trap-card"><canvas data-trap="'+T.reg+'" aria-hidden="true"></canvas><div><p class="trap-fill"><b>'+T.fish.length+'</b> of '+cap+' fish</p><p class="trap-when">'+(!Object.keys(pool).length?'Nothing it can catch here yet. It takes fish you’ve caught yourself.':full===0?'Full. Tap its float to haul it up.':'Full in about '+fmtMins(full))+'</p></div></div>';
+  if (Object.keys(pool).length) h+='<p class="trap-pool">'+Object.entries(pool).sort((a,b)=>b[1]-a[1]).map(([id,w])=>'<span>'+FISH[id].name+' <i>'+Math.round(w/tot*100)+'%</i></span>').join('')+'</p>';
+  h+='<h3 class="j-reg">Fitting</h3><div class="trap-fits">'+fitBtn(T,null,'No fitting','Catches the spot’s commons and uncommons.');
+  for (const id of FITTING_ORDER){ const Fd=FITTINGS[id]; if (s.fits[id]) h+=fitBtn(T,id,Fd.name,Fd.eff+(Fd.down?' '+Fd.down:'')); }
+  h+='</div>'; if (FITTING_ORDER.some(id=>!s.fits[id])) h+='<p class="note">'+(REG()==='lake'?'Ottilie sells fittings: tap her ferry, then Traps.':'Ottilie sells fittings at the lake.')+'</p>';
+  if (T.fit==='bait'){ const ch=trapBaitChoices(T); h+='<h3 class="j-reg">Bait Box goes for</h3><div class="trap-fits">'+(ch.length?ch.map(id=>'<button type="button" class="trap-fit'+(T.bait===id?' on':'')+'" data-bait="'+id+'" aria-pressed="'+(T.bait===id)+'"><b>'+FISH[id].name+'</b></button>').join(''):'<p class="note">Catch a common fish here first.</p>')+'</div>'; }
+  h+='<div class="row" style="margin-top:14px"><button class="btn" id="trapMove" type="button">Move it</button>'+(T.fish.length?'<button class="btn primary" id="trapHaul" type="button">Haul it up</button>':'')+'</div>';
+  openSheet(h); $('closeS').addEventListener('click',closeSheet);
+  paintTiles(document.querySelectorAll('#panel canvas[data-trap],#panel canvas[data-fitting]'));
+  document.querySelectorAll('#panel [data-fit]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.fit||null; if (id===(T.fit||null)) return; emptyFirst(T); if (!fitTrap(T,id)) return; sfx.rig('reel'); buzz(10); openTrapSheet(T); }));
+  document.querySelectorAll('#panel [data-bait]').forEach(b=>b.addEventListener('click',()=>{ fitTrap(T,'bait',b.dataset.bait); tone(900,.04,{vol:.04,type:'triangle'}); openTrapSheet(T); }));
+  $('trapMove').addEventListener('click',()=>{ closeSheet(); emptyFirst(T); placeTrap(T,null); startPlacing(T,null); });
+  const hb=$('trapHaul'); if (hb) hb.addEventListener('click',()=>{ closeSheet(); tapTrap(T); }); }
+/** Hauls up whatever has gone into a trap (while its sheet was open, say) before it's moved or refitted. */
+function emptyFirst(T){ trapFill(T); if (!T.fish.length && !T.g) return;
+  const out=haulTrap(T); if (out.coins){ coinTally(500); sfx.coin(3); } if (out.glimmer) glimmerTally(out.glimmer,{});
+  news('Emptied it first: '+out.fish.length+' fish'+(out.coins?' for +'+out.coins.toLocaleString()+' coins':'')+(out.kept.length?', '+out.kept.length+' kept for your recipes':''),'good'); updateHud(); }
+function fitBtn(T,id,name,eff){ const on=(T.fit||null)===id; return '<button type="button" class="trap-fit'+(on?' on':'')+'" data-fit="'+(id||'')+'" aria-pressed="'+on+'">'+(id?'<canvas data-fitting="'+id+'" aria-hidden="true"></canvas>':'')+'<b>'+name+'</b><small>'+eff+'</small></button>'; }
+
 /* ---------- Catch card: the fish, the tape measure, and the record moment ---------- */
 const CARD={raf:0,t0:0,L:null,w:0,h:0,d:1,lastTick:null,snapped:false,passed:-1,shownW:''};
 function tapeUnits(){ const uc=imperial()?2.54:1; return {uc}; }
@@ -3567,6 +4182,8 @@ function paintTile(cv,r,d){ r=r||{width:cv.offsetWidth,height:cv.offsetHeight}; 
   else if (cv.dataset.decor) drawDecorIcon(x,cv.dataset.decor,s);
   else if (cv.dataset.tankicon) drawTankIcon(x,cv.dataset.tankicon,s);
   else if (cv.dataset.rune) drawRune(x,cv.dataset.rune,s*.8,{glow:.9,glowR:s*.5});
+  else if (cv.dataset.trap) drawTrapIcon(x,cv.dataset.trap,s);
+  else if (cv.dataset.fitting) drawFittingIcon(x,cv.dataset.fitting,s);
   else if (cv.dataset.runeempty) drawRune(x,null,s*.8,{empty:true});
   else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
 function drawHullSwatch(c,id,s){ const P=PAINTS[id]; c.save(); c.scale(s/100,s/100); laInk(c);
@@ -4121,7 +4738,7 @@ function ropeCoil(x,cx,cy,r){
 
 /* ---------- live parts ---------- */
 function drawDock(){
-  if (REG()==='coast'){ drawSkiffDeck(); drawKeepnet(); return; }
+  if (REG()==='coast'){ drawSkiffDeck(); drawTrapProp(); drawKeepnet(); return; }
   const D=dockGeo(), {cx,top}=D;
   // ripples round the piles first, then the cached deck over them
   ctx.strokeStyle='rgba(225,238,242,'+(.22+.1*Math.sin(S.time*2)).toFixed(3)+')'; ctx.lineWidth=1.3;
@@ -4131,7 +4748,8 @@ function drawDock(){
   drawTackleBox(cx-54,top+50);
   drawPail(cx+48,top+47);
   drawBaitOnDock(cx+30,top+56);
-  drawHeron(D.rp,top-25);
+  drawTrapProp();
+  if (!S.grey) drawHeron(D.rp,top-25);   // unless he's off guarding a trap (game/trap-scene.js)
   drawKeepnet();
   drawOttilie();
   drawDockLantern(D.lp,top);   // in front of Ottilie's punt: the pile stands nearer than her boat
@@ -4597,6 +5215,8 @@ function drawParticles(){
   for (const p of S.particles){ const a=(1-p.life/p.max);
     if (p.word){ ctx.save(); ctx.globalAlpha=a; ctx.font='800 16px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.lineWidth=4; ctx.strokeStyle=INK; ctx.strokeText(p.word,p.x,p.y); ctx.fillStyle='#FDFCF7'; ctx.fillText(p.word,p.x,p.y); ctx.restore(); continue; }
     ctx.fillStyle=p.c+a.toFixed(3)+')';
+    if (p.coin){ ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(226,184,78,'+Math.min(1,a*1.6).toFixed(3)+')'; ctx.fill(); ctx.strokeStyle='rgba(122,90,34,'+Math.min(1,a*1.6).toFixed(3)+')'; ctx.lineWidth=.8; ctx.stroke();
+      ctx.fillStyle='rgba(255,240,190,'+(a*.9).toFixed(3)+')'; ctx.beginPath(); ctx.arc(p.x-p.r*.3,p.y-p.r*.3,p.r*.35,0,Math.PI*2); ctx.fill(); continue; }
     if (p.glim){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.life*6); ctx.fillRect(-p.r*1.6,-p.r*.35,p.r*3.2,p.r*.7); ctx.fillRect(-p.r*.35,-p.r*1.6,p.r*.7,p.r*3.2); ctx.restore(); continue; }
     if (p.rect){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.life*p.spin); ctx.fillRect(-p.r,-p.r*.5,p.r*2,p.r); ctx.restore(); }
     else { ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); } }
@@ -4633,7 +5253,7 @@ function drawAim(){
   ctx.strokeStyle=a.lucky?'#F2D47E':a.spot==='deep'?'#9FC3D6':a.spot==='pads'?'#B9D79A':a.spot==='reeds'?'#D8C48A':a.spot==='rocks'?'#D9CBB8':a.spot==='kelp'?'#B8C97A':PAPER; ctx.lineWidth=2.5;
   ctx.beginPath(); ctx.ellipse(to.x,to.y,pr,pr*.4,0,0,Math.PI*2); ctx.stroke();
   ctx.font='800 12px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=PAPER;
-  ctx.fillText(a.lucky?'GULL LUCK · '+trimNum(gullMul())+'× RARITY':spotName(a.spot).toUpperCase(),to.x,to.y-pr-8);
+  ctx.fillText(a.lucky?'GULL LUCK · '+trimNum(gullMul())+'× RARITY':spotName(a.spot).toUpperCase()+(save.fresh>0?' · FRESH WATER':''),to.x,to.y-pr-8);
 }
 function drawGhostHand(){
   if (S.tut!=='cast' || S.state!=='idle' || INTRO.active) return;
@@ -4687,10 +5307,10 @@ function render(){
   ctx.save();
   if (S.shake>.1) ctx.translate(rand(-1,1)*S.shake,rand(-1,1)*S.shake);
   if (Math.abs(S.zoom-1)>.001){ const cx=W/2, cy=H*.42; ctx.translate(cx,cy); ctx.scale(S.zoom,S.zoom); ctx.translate(-cx,-cy); }
-  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawSwell(); drawActive(); drawBobber();
+  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawTraps(); drawSwell(); drawActive(); drawBobber();
   drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
-  drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
+  drawTrapMarkers(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
   ctx.restore();
   drawOverlays();
 }
@@ -5918,13 +6538,13 @@ function knownRecipe(id){ const R=RECIPES[id]; return !R.learn || (save.fish[R.l
 function pickNet(R){ // cheapest matching fish from the keepnet, without removing them
   const picks=[], taken=new Set();
   for (const n of R.need){
-    const pool=save.net.map((f,i)=>({f,i})).filter(o=>!taken.has(o.i) && (n.id?o.f.id===n.id:FISH[o.f.id].rarity===n.rar)).sort((a,b)=>(isPB(a.f)-isPB(b.f))||(a.f.value-b.f.value));
+    const pool=save.net.map((f,i)=>({f,i})).filter(o=>!taken.has(o.i) && !o.f.smoked && (n.id?o.f.id===n.id:FISH[o.f.id].rarity===n.rar)).sort((a,b)=>(isPB(a.f)-isPB(b.f))||(a.f.value-b.f.value));
     if (pool.length<n.n) return {ok:false, have:pool.length, need:n.n, picks:[]};
     pool.slice(0,n.n).forEach(o=>{ taken.add(o.i); picks.push(o.i); });
   }
   return {ok:true, picks};
 }
-function haveFor(R){ const n=R.need[0]; return save.net.filter(f=>n.id?f.id===n.id:FISH[f.id].rarity===n.rar).length; }
+function haveFor(R){ const n=R.need[0]; return save.net.filter(f=>!f.smoked && (n.id?f.id===n.id:FISH[f.id].rarity===n.rar)).length; }
 function needText(R){ const n=R.need[0]; return n.n+' × '+(n.id?FISH[n.id].name:'any common fish'); }
 function mealStr(m){ return m && m.stars>0 ? MEAL_STR[m.stars-1] : 0; }
 /** A real meal (not Mystery Mush) with casts left, or on its last cast. */
@@ -6293,18 +6913,19 @@ function kDrawMoth(c,t){ const P=PAL; if (!P || (P.dark||0)<.45) return; const s
   c.save(); c.translate(x,y); c.rotate(Math.cos(t*1.7)*.4); c.fillStyle='rgba(225,210,180,.9)';
   for (const sd of [-1,1]){ c.save(); c.scale(sd,.35+.65*f); c.beginPath(); c.moveTo(0,0); c.quadraticCurveTo(5*s,-5*s,7*s,-1*s); c.quadraticCurveTo(5*s,2*s,0,1*s); c.closePath(); c.fill(); c.restore(); }
   c.fillStyle='#6E5A44'; c.beginPath(); c.ellipse(0,0,1.2*s,3*s,0,0,6.28); c.fill(); c.restore(); }
-function kDrawRack(c,t){ // smoke rack with three smoked fish, gently swaying
-  const s=K.s, x1=K.W*.95, x0=Math.max(K.W*.6,x1-230*s), y=K.top+18*s;
+/** The smoke rack: one hook for each of SMOKE.hooks, with whatever's hanging on it (game/smoke.js), swaying in the smoke. */
+function kDrawRack(c,t){
+  const s=K.s, x1=K.W*.95, x0=Math.max(K.W*.6,x1-230*s), y=K.top+18*s, hooks=smokeState().hooks;
   c.save(); c.strokeStyle=INK; c.lineWidth=2; c.fillStyle='#4A3022';
   for (const x of [x0,x1]){ c.fillRect(x-3,16*s,6,y-16*s+4); }
   rrect(c,x0-6,y-4,x1-x0+12,9,4); c.fillStyle='#6E4A33'; c.fill(); c.stroke();
-  const n=3; for (let i=0;i<n;i++){ const fx=lerp(x0,x1,(i+.5)/n), sw=Math.sin(t*.9+i*1.7)*.06;
+  const n=hooks.length; for (let i=0;i<n;i++){ const hk=hooks[i], fx=lerp(x0,x1,(i+.5)/n), sw=Math.sin(t*.9+i*1.7)*(hk?.06:.1);
     c.save(); c.translate(fx,y+4); c.rotate(sw); c.strokeStyle='#8A6A3A'; c.lineWidth=1.4; c.beginPath(); c.moveTo(0,0); c.lineTo(0,12*s); c.stroke();
-    c.translate(0,12*s+30*s); c.rotate(Math.PI/2); const L=60*s, h=L*.27;
-    const body=fishPath('perch',L); c.save(); c.translate(-L*.36,0); c.translate(L*.36,0); c.fillStyle='#7A4A26'; c.fill(tailPath('perch',L)); c.lineWidth=1.6; c.strokeStyle=INK; c.stroke(tailPath('perch',L)); c.restore();
-    c.fillStyle=['#A86B38','#9C6232','#B0783F'][i]; c.fill(body); c.save(); c.clip(body); c.fillStyle='rgba(60,30,10,.35)'; for (let j=0;j<5;j++) c.fillRect(L*(.25-j*.14),-h,L*.05,h*2);
-    c.fillStyle='rgba(255,220,160,.25)'; c.beginPath(); c.ellipse(L*.05,-h*.4,L*.3,h*.3,0,0,6.28); c.fill(); c.restore(); c.stroke(body);
-    c.fillStyle=INK; c.beginPath(); c.arc(L*.34,-h*.18,1.8,0,6.28); c.fill(); c.restore(); }
+    // an S-hook of dark iron
+    c.strokeStyle='#3A3A44'; c.lineWidth=1.8*s; c.beginPath(); c.arc(0,14.5*s,2.5*s,-Math.PI/2,Math.PI/2); c.arc(0,19.5*s,2.5*s,-Math.PI/2,Math.PI*.9,true); c.stroke();
+    if (hk){ const F=FISH[hk.f.id], L=clamp(F.len*1.15,46,78)*s, del=isDelicacy(hk), u=smokeBarPct(hk);
+      c.translate(0,22*s+L*.5); c.rotate(Math.PI/2); drawSmokedFish(c,hk.f.id,L,u,del); }
+    c.restore(); }
   c.restore();
 }
 function kDrawLantern(c,t){ const s=K.s, x=K.W*.5, y=K.top+26*s, fl=.85+.15*Math.sin(t*7)+.06*Math.sin(t*17);
@@ -6612,7 +7233,7 @@ function kBook(){ const el=$('kBook'); el.hidden=false; const m=save.meal&&save.
     :'<div><span class="k-lab">Nothing on the go</span><p>A meal lasts a number of casts, not minutes, so stepping away never wastes it. One meal at a time.</p></div>')+'</section>';
   h+='<h3 class="k-h">Pantry <span>'+pan.length+'/3</span></h3><div class="k-pantry">';
   for (let i=0;i<3;i++){ const p=pan[i]; h+=p?'<div class="k-jar"><canvas class="k-dish" data-dish="'+p.id+'" data-stars="'+p.stars+'"></canvas><b>'+RECIPES[p.id].name+'</b>'+stars(p.stars)+'<button class="btn" data-eat="'+i+'" type="button">Eat</button></div>':'<div class="k-jar empty"><span>Empty shelf</span></div>'; }
-  h+='</div><h3 class="k-h">Recipes</h3><div class="k-recipes">';
+  h+='</div>'+rackHTML()+'<h3 class="k-h">Recipes</h3><div class="k-recipes">';
   const ids=RECIPE_ORDER.slice().sort((a,b)=>{ const sc=id=>knownRecipe(id)?(pickNet(RECIPES[id]).ok?0:1):2; return sc(a)-sc(b); });
   for (const id of ids){ const R=RECIPES[id], known=knownRecipe(id), have=haveFor(R), need=R.need[0].n, ok=known&&have>=need;
     if (!known){ const F=FISH[R.learn], seen=(save.fish[R.learn]||{}).seen;
@@ -6622,6 +7243,7 @@ function kBook(){ const el=$('kBook'); el.hidden=false; const m=save.meal&&save.
   h+='</div><p class="k-foot">Fish come from your keepnet. Cooking uses them up, but they stay in your journal.</p>';
   el.innerHTML=h; el.scrollTop=0;
   el.querySelectorAll('canvas.k-dish').forEach(cv2=>drawDishIcon(cv2));
+  el.querySelectorAll('canvas[data-smoked]').forEach(paintSmoked); bindRack(el);
   el.querySelectorAll('[data-cook]').forEach(b=>b.addEventListener('click',()=>startCooking(b.dataset.cook)));
   el.querySelectorAll('[data-eat]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.eat, p=pan[i];
     if (m && !b.dataset.sure){ b.dataset.sure='1'; b.textContent='Replace?'; return; }
@@ -6778,7 +7400,7 @@ function introStart(force){
   const where=REGION_NAME[REG()], when=clockText(save.clock);
   const title='<div class="in-title" id="inTitle"'+(full?' hidden':'')+'><h1 aria-label="Hollowmere">'+[...'Hollowmere'].map((ch,i)=>'<span style="animation-delay:'+(full?i*.07:i*.05)+'s">'+ch+'</span>').join('')+'</h1>'+
     '<svg class="in-orn" viewBox="0 0 180 24" aria-hidden="true"><path d="M8 12 H76 M104 12 H172" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M90 3 V13 a5 5 0 1 1 -8 -3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="90" cy="3" r="1.8" fill="currentColor"/></svg>'+
-    '<p>'+(full?'Every cast pulls up a little more of what the lake is hiding.':'Welcome back. It’s '+when+' at '+where+'.'+introTips())+'</p></div>';
+    '<p>'+(full?'Every cast pulls up a little more of what the lake is hiding.':'Welcome back. It’s '+when+' at '+where+'.'+awayLine(AWAYS.info)+introTips())+'</p></div>';
   L.innerHTML='<div class="in-sky" id="inSky"><canvas id="inStars"></canvas></div><div class="in-shade"></div>'+title+
     '<div class="in-gate" id="inGate">'+(full?'<p class="in-hand">A letter came for you.</p>':'')+'<p class="in-tap">'+(full?'Tap to begin':'Tap to fish')+'</p>'+(full?'<p class="in-sub"><svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M4 12 v-2 a6 6 0 0 1 12 0 v2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="2.5" y="11" width="4" height="6" rx="1.5" fill="currentColor"/><rect x="13.5" y="11" width="4" height="6" rx="1.5" fill="currentColor"/></svg> Best with sound on</p><button class="in-restore" id="inRestore" type="button">Have a backup code?</button>':'')+'</div>'+
     '<div class="in-letter" id="inLetter" hidden><span class="seal" aria-hidden="true">H</span>'+LETTER.map((ln,i)=>'<span class="ln'+(i===0?' first':'')+'">'+ln+'</span>').join('')+'<span class="ln sig">— your uncle</span><button class="btn primary in-go" id="inGo" type="button">Pick up the rod</button></div>'+
@@ -6818,6 +7440,7 @@ function introEnd(){ if (!INTRO.active) return; const L=$('intro'), letter=$('in
   if (INTRO.full){ save.introSeen=true; persist(); if (letter && !letter.hidden) letter.classList.add('away');
     if (AC){ const t=AC.currentTime+.05; [62,66,69,74,78].forEach((n,i)=>iPluck(mf(n),t+i*.09,{dur:1.6,vol:.07,pan:-.3+i*.15})); } }
   INTRO.quiet=false; if (INTRO.bus && AC) INTRO.bus.gain.setTargetAtTime(0,AC.currentTime+1.2,.6);
+  if (!INTRO.full && AWAYS.info && AWAYS.info.fresh) setTimeout(freshTip,1400);
   L.classList.add('out'); setTimeout(()=>{ document.body.classList.remove('cine'); },INTRO.full?350:150);
   setTimeout(()=>{ L.hidden=true; L.className=''; L.innerHTML=''; INTRO.active=false; INTRO.phase='done'; setIntroOffset(0); cancelAnimationFrame(INTRO.raf); },INTRO.full?900:650); }
 function introFrame(now){ if (!INTRO.active) return; const dt=Math.min(.05,(now-INTRO.last)/1000); INTRO.last=now;
@@ -6883,7 +7506,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=18, SNAP_KEY=KEY+'-snapshots';
+const BUILD=19, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -6915,12 +7538,14 @@ function snapshot(reason,force){ try { const list=snapshots(), last=list[list.le
     if (!force && last && now-last.t<9*60000) return; if (!save.tutorialDone && !force) return;
     list.push({t:now,reason,data:JSON.stringify(save)}); while (list.length>3) list.shift(); localStorage.setItem(SNAP_KEY,JSON.stringify(list)); } catch(e){} }
 function useSave(sv){ snapshot('Before restoring a backup',true); load(sv); save.introSeen=true; persistNow(); setTimeout(()=>location.reload(),350); }
-function persistNow(){ APP.stale=false; try { save.lastPlayed=Date.now(); localStorage.setItem(KEY,JSON.stringify(save)); } catch(e){} }
+function persistNow(){ APP.stale=false; try { save.lastPlayed=realNow(); const s=JSON.stringify(save); localStorage.setItem(KEY,s); STORE_LAST=s; } catch(e){} }
 async function protectStorage(){ try { if (!navigator.storage||!navigator.storage.persist) return; APP.persisted=await navigator.storage.persisted(); if (!APP.persisted && save.tutorialDone) APP.persisted=await navigator.storage.persist(); } catch(e){} }
 // another tab saving the same game: stop writing here so neither copy eats the other
-window.addEventListener('storage',e=>{ if (e.key!==KEY || APP.stale || !e.newValue) return; APP.stale=true;
+window.addEventListener('storage',e=>{ if (e.key!==KEY || APP.stale || !e.newValue) return; goStale(); });
+/** Another tab or window has saved: this one stops saving, and says so. */
+function goStale(){ if (APP.stale) return; APP.stale=true;
   openSheet('<div class="panel-head"><div><h2>Open somewhere else</h2><p>Hollowmere just saved in another tab or window.</p></div></div><p class="note">To keep both copies from overwriting each other, this tab has stopped saving. Reload to pick up the latest game.</p><div class="row"><button class="btn primary" id="staleReload" type="button">Reload</button></div>');
-  $('staleReload').addEventListener('click',()=>location.reload()); });
+  $('staleReload').addEventListener('click',()=>location.reload()); }
 async function copyText(text,btn){ let ok=false; try { await navigator.clipboard.writeText(text); ok=true; } catch(e){
     const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.cssText='position:fixed;opacity:0;top:0'; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,text.length); try { ok=document.execCommand('copy'); } catch(_){} ta.remove(); }
   if (btn){ const o=btn.textContent; btn.textContent=ok?'Copied ✓':'Select and copy it'; setTimeout(()=>{ btn.textContent=o; },1600); } return ok; }
@@ -7000,7 +7625,7 @@ if (window.__PWA && 'serviceWorker' in navigator && location.protocol!=='file:')
 let last=performance.now();
 function update(dt,rdt){
   if (S.state==='idle' && save.tutorialDone && save.stats.casts>=12){ S.idleT=(S.idleT||0)+rdt; if (S.idleT>30 && S.idleT-rdt<=30) setHint('Drag back to aim. Release to cast.'); }
-  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt);
+  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt);
   { const nc=save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')); if (nc>=24) save.day=(save.day||0)+1; save.clock=nc%24; } PAL=palAt(save.clock);   // save.day: Wanderer's days
   { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2) buildBg(); }
   const ct=hudClock(save.clock); if (ct!==S.clockShown){ const n=(S.clockShown||'').length; S.clockShown=ct; $('clock').textContent=ct; if (ct.length!==n) fitHud(); }
@@ -7024,6 +7649,7 @@ function update(dt,rdt){
 }
 function frame(now){
   const dt=clamp((now-last)/1000,0,.05); last=now; MODC.frame++; S.time+=dt; musicFrame(dt);
+  APP.liveT=(APP.liveT||30)-dt; if (APP.liveT<=0){ APP.liveT=30; persist(); }   // keeps lastPlayed close, for time away (game/away.js), in the rooms too
   if (AQ.open||K.open){ update(dt,dt); requestAnimationFrame(frame); return; } // the world keeps turning while you're in a room
   let gdt=dt*(S.tut==='bite'?.35:1); if (S.freeze>0){ S.freeze-=dt; gdt=0; }
   S.tipT=(S.tipT||0)-dt; if (S.tipT<=0){ S.tipT=5; accrueTips(); }
@@ -7036,7 +7662,10 @@ cv.addEventListener('pointerdown',e=>{
   e.preventDefault(); audioInit(); S.pointers.add(e.pointerId); try { cv.setPointerCapture(e.pointerId); } catch(_){}
   const x=e.clientX, y=e.clientY; S.thumbX=x;
   switch(S.state){
-    case 'idle': S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y)}; setState('aiming'); break;
+    case 'idle':
+      if (S.place){ placeDown(x,y); break; }                                       // setting a trap: a marked spot, or the trap itself
+      { const T=onTrapProp(x,y); if (T){ startPlacing(T,{x,y}); break; } }      // the trap waiting on the dock or the deck
+      S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y),onTrap:trapAt(x,y)}; setState('aiming'); break;
     case 'waiting': twitch(); break;
     case 'bite': hook(); break;
     case 'reeling': leapTap(); S.holding=true; S.pressX=x; S.pressTilt=S.tilt; break;
@@ -7047,10 +7676,12 @@ cv.addEventListener('pointerdown',e=>{
 cv.addEventListener('pointermove',e=>{
   if (!S.pointers.has(e.pointerId)) return; S.thumbX=e.clientX;
   if (S.state==='aiming' && S.aim) updateAim(e.clientX,e.clientY);
+  else if (S.place) placeMove(e.clientX,e.clientY);
 });
 function up(e){
   S.pointers.delete(e.pointerId);
   if (S.state==='aiming') release();
+  else if (S.place) placeUp(e.clientX,e.clientY);
   if (S.state==='reeling') S.holding=S.pointers.size>0;
 }
 cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up);
@@ -7128,7 +7759,7 @@ function bonusesHTML(){
   const FS=findsState(); if (Object.keys(FS.have).length) gear.splice(4,0,['Vest',FS.equip.length?FS.equip.map(id=>FINDS[id].name).join(', '):'Nothing in your '+(FS.pockets>1?FS.pockets+' pockets':'pocket')]);
   let h='<p class="bn-where">'+where+'. Bonuses that depend on where you cast or what bites are marked.</p><dl class="bn-gear">'+gear.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('')+'</dl>';
   const line=(m)=>{ const st=modState(m,now), w=modWhenText(m.when);
-    return '<li class="'+stateClass(st)+'"><span class="n">'+m.name+(m.stars?' '+'★'.repeat(m.stars):'')+'</span><span class="s">'+(SRC_LABEL[m.src]||m.src)+(w?' · '+w:'')+stateNote(st)+'</span>'+
+    return '<li class="'+stateClass(st)+'"><span class="n">'+m.name+(m.stars?' '+'★'.repeat(m.stars):'')+'</span><span class="s">'+(SRC_LABEL[m.src]||m.src)+(w?' · '+w:'')+(m.casts?' · '+m.casts+(m.casts===1?' cast':' casts')+' left':m.last?' · last cast':'')+stateNote(st)+'</span>'+
       '<b class="'+(modHelps(m.stat,m.v,m.omen)?'up':'down')+'">'+modValueText(m.stat,m.v,m.omen)+'</b></li>'; };
   let any=false;
   // every stat with a bonus, in STATS order. A base stat (reach) or an add stat (keepnet space) only shows when
@@ -7139,7 +7770,7 @@ function bonusesHTML(){
     if (!ms.length && !mast.length) continue;
     const S0=STATS[stat];
     if (S0.kind==='luck'){
-      if (ms.every(m=>m.src==='event')) continue;    // Gull Luck alone: nothing to show until you have luck of your own
+      if (ms.every(m=>m.src==='event' && !m.casts)) continue;    // Gull Luck alone: nothing to show until you have luck of your own (Fresh water, counting down, shows)
       any=true;
       // only the rarities some fish has: the higher tiers stay off the page until fish arrive for them
       const tiersK=fishTiers(), top=tiersK[tiersK.length-1], omens=ms.filter(m=>m.omen);
@@ -7147,9 +7778,9 @@ function bonusesHTML(){
       const ptsFor=r=>ms.filter(m=>!m.omen && modState(m,Object.assign({},now,{rarity:r}))==='on').reduce((a,m)=>a+m.v,0);
       const pts=ptsFor(top);
       const tiers=tiersK.map(r=>'<span><i style="background:'+RAR[r].color+'"></i>'+RAR[r].label+' ×'+trimNum(luckCurve(ptsFor(r),RAR[r].luckCap))+'</span>').join('');
-      h+='<section class="bn-card bn-luck"><header><h3>'+S0.name+'</h3><b class="up">'+modValueText('luck',pts)+'</b></header><p class="bn-hint">'+S0.hint+'</p>'+
-        '<p class="bn-sum">Your luck here adds up to '+modValueText('luck',pts)+'. Luck has diminishing returns, so rarer fish bite this much more often:</p>'+
-        '<div class="bn-tiers">'+tiers+'</div><ul class="bn-src">'+ms.map(line).join('')+'</ul>'+
+      h+='<section class="bn-card bn-luck"><header><h3>'+S0.name+'</h3><b class="'+(pts?'up':'cond')+'">'+(pts?modValueText('luck',pts):'—')+'</b></header><p class="bn-hint">'+S0.hint+'</p>'+
+        (pts?'<p class="bn-sum">Your luck here adds up to '+modValueText('luck',pts)+'. Luck has diminishing returns, so rarer fish bite this much more often:</p>':'<p class="bn-sum">No luck of your own here yet. These still count:</p>')+
+        (pts?'<div class="bn-tiers">'+tiers+'</div>':'')+'<ul class="bn-src">'+ms.map(line).join('')+'</ul>'+
         '<p class="bn-cap">From luck alone, '+RAR[top].label.toLowerCase()+' odds top out at ×'+RAR[top].luckCap+'. '+
         (omens.length?omens.map(m=>m.src==='rod'?'the '+m.name+'’s perk':m.src==='event'?m.name:'the '+m.name).join(' and ').replace(/^t/,'T')+' multipl'+(omens.length>1?'y':'ies')+' on top of that. ':'')+'Luck lifts better crates too.</p></section>';
       continue;
@@ -7569,15 +8200,18 @@ function openNet(){
     h+='<div class="row" style="margin-bottom:12px"><button class="btn" id="sellCommons" type="button"'+(commons.length?'':' disabled')+'>Sell commons · +'+commons.reduce((a,f)=>a+f.value,0)+'</button><button class="btn" id="sellAll" type="button">Sell all · +'+total.toLocaleString()+'</button></div>';
     h+='<div class="entries">';
     save.net.map((f,i)=>({f,i})).sort((a,b)=>b.f.value-a.f.value).forEach(({f,i})=>{ const F=FISH[f.id];
-      const tags=[f.perfect?'Perfect hook':'',f.lucky?'Gull luck':''].filter(Boolean).join(' · ');
-      h+='<div class="entry" style="grid-template-columns:84px 1fr auto"><canvas data-f="'+f.id+'" style="width:84px;height:42px"></canvas><div style="min-width:0"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+'</span><h3>'+F.name+(isPB(f)?'<span class="net-rec">Record</span>':'')+'</h3><p>'+fmtW(fishW(f))+' · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+(tags?'<br>'+tags:'')+'</p></div>'+
-        '<div style="display:grid;gap:6px"><button class="btn" data-tank="'+i+'" type="button"'+(tankRoom(f.id)?'':' disabled')+'>'+(tankRoom(f.id)?'To tank':tanks()[tankOf(f.id)].owned?'Tank full':'No tank')+'</button><button class="btn" data-sell="'+i+'" type="button">Sell · +'+f.value+'</button></div></div>'; });
+      const tags=[f.delicacy?'Hollowmere Delicacy':f.smoked?'Smoked '+fmtMins((f.smokedH||0)*60):'',f.perfect?'Perfect hook':'',f.lucky?'Gull luck':'',f.trap?'From a trap':''].filter(Boolean).join(' · '), room=!f.smoked && tankRoom(f.id), hook=save.kitchenOpen && smokable(f);
+      h+='<div class="entry" style="grid-template-columns:84px 1fr auto"><canvas data-f="'+f.id+'"'+(f.smoked?' data-sm="'+(f.delicacy?'del':'1')+'" data-u="'+Math.round(Math.min(1,(f.smokedH||0)/(canDelicacy(f)?SMOKE.delicacy.hours:SMOKE.full))*100)+'"':'')+' style="width:84px;height:42px"></canvas><div style="min-width:0"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+'</span><h3>'+F.name+(isPB(f)?'<span class="net-rec">Record</span>':'')+'</h3><p>'+fmtW(fishW(f))+' · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+(tags?'<br>'+tags:'')+'</p></div>'+
+        '<div style="display:grid;gap:6px">'+(f.smoked?'':'<button class="btn" data-tank="'+i+'" type="button"'+(room?'':' disabled')+'>'+(room?'To tank':tanks()[tankOf(f.id)].owned?'Tank full':'No tank')+'</button>')+
+        (hook?'<button class="btn" data-hang="'+i+'" type="button"'+(freeHook()>=0?'':' disabled')+'>'+(freeHook()>=0?'Smoke it':'Rack full')+'</button>':'')+'<button class="btn" data-sell="'+i+'" type="button">Sell · +'+f.value+'</button></div></div>'; });
     h+='</div>';
   }
   h+='<p class="note" style="margin-top:12px">Fish stay fresh in the net, so there’s no rush to sell.'+(hasPart('hold')?'':' A Roomy Keepnet from Tacklegram holds 24.')+'</p>';
   openSheet(h); $('closeS').addEventListener('click',closeSheet);
-  document.querySelectorAll('#panel canvas[data-f]').forEach(c=>{ const r=c.getBoundingClientRect(), d=Math.min(window.devicePixelRatio||1,2);
-    c.width=r.width*d; c.height=r.height*d; const x=c.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); drawFish(x,c.dataset.f,r.width*.8,false); });
+  document.querySelectorAll('#panel canvas[data-f]').forEach(c=>{ const r=layoutBox(c), d=Math.min(window.devicePixelRatio||1,2);
+    c.width=r.width*d; c.height=r.height*d; const x=c.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d);
+    if (c.dataset.sm) drawSmokedFish(x,c.dataset.f,r.width*.78,c.dataset.sm==='del'?100:+c.dataset.u||0,c.dataset.sm==='del'); else drawFish(x,c.dataset.f,r.width*.8,false); });
+  document.querySelectorAll('#panel [data-hang]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.hang, f=save.net[i]; if (!f || hangFish(i)<0) return; sfx.rig('bait'); news(FISH[f.id].name+' is on the smoke rack in the kitchen','good'); openNet(); }));
   const sell=idxs=>{ const set=new Set(idxs); let sum=0; save.net=save.net.filter((f,i)=>{ if (set.has(i)){ sum+=f.value; return false; } return true; }); persist(); if (sum) addCoins(sum); openNet(); };
   document.querySelectorAll('[data-sell]').forEach(b=>b.addEventListener('click',()=>sell([+b.dataset.sell])));
   document.querySelectorAll('#panel [data-tank]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.tank, f=save.net[i]; if (!f || !tankRoom(f.id)) return; save.net.splice(i,1); addToTank(f); persist(); sfx.plop(); news(FISH[f.id].name+' is in the aquarium','good'); openNet(); }));
@@ -7595,6 +8229,7 @@ function openShop(tab){
   const first=!save.metOttilie; save.metOttilie=true; persist();
   if (first) OTT_TAB='rods';
   if (OTT_TAB==='tackle') return openTackleShop();
+  if (OTT_TAB==='traps') return openTrapShop();
   const cur=ROD(), nextId=ROD_ORDER.find(id=>!save.rods.includes(id));
   const greet=first?'So you’re the new keeper. That Willow barely reaches past the dock. Earn some coins and I’ll set you up with something better.'
     : nextId && save.coins>=RODS[nextId].price ? 'Now you’ve got coin. The '+RODS[nextId].name+' will take you farther out.'
@@ -7624,7 +8259,7 @@ function openShop(tab){
 }
 
 /* ---------- Ottilie's tackle: reels and lines she makes herself, and bait by the tin (data/tackle.js) ---------- */
-const ottTabs = () => '<div class="seg" role="tablist">'+[['rods','Rods'],['tackle','Reels, lines & bait']].map(([k,l])=>'<button type="button" role="tab" data-ott="'+k+'" aria-selected="'+(OTT_TAB===k)+'" class="'+(OTT_TAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+const ottTabs = () => '<div class="seg" role="tablist">'+[['rods','Rods'],['tackle','Reels, lines & bait']].concat(trapState().gift?[['traps','Traps']]:[]).map(([k,l])=>'<button type="button" role="tab" data-ott="'+k+'" aria-selected="'+(OTT_TAB===k)+'" class="'+(OTT_TAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
 function bindOttTabs(){ document.querySelectorAll('#panel [data-ott]').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.ott===OTT_TAB) return; tone(900,.04,{vol:.04,type:'triangle'}); openShop(b.dataset.ott); $('panel').scrollTop=0; })); }
 function openTackleShop(){ const g=gearState(), rig=rigFor(save.rod), bait=baitOn();
   let h='<div class="panel-head"><div><h2>Ottilie’s Tackle</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins · On your '+ROD().name+': '+TACKLE[rig.reel].name+', '+TACKLE[rig.line].name+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+ottTabs();
@@ -7644,6 +8279,30 @@ function openTackleShop(){ const g=gearState(), rig=rigFor(save.rod), bait=baitO
   document.querySelectorAll('#panel [data-buyg]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.buyg, T=TACKLE[id]; if (save.coins<T.price) return;
     addCoins(-T.price); grantGear(id); const said=fitNewGear(id); sfx.rig(T.kind); buzz([0,20,30,20]);
     news('Bought '+(T.kind==='bait'&&!isLure(id)?'a tin of '+T.name.toLowerCase():'the '+T.name)+'. '+said,'gold'); openShop('tackle'); })); }
+
+/* ---------- Ottilie's traps: wicker creels for the lake, sea pots for the coast, and fittings (data/idle.js) ---------- */
+function openTrapShop(){ const s=trapState();
+  let h='<div class="panel-head"><div><h2>Ottilie’s Traps</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+ottTabs();
+  h+='<p class="note" style="font-style:italic;font-size:14px;color:#4B4842">“My father wove creels like your uncle’s. Set them where the fish pass and they work while you sleep. They only take the small ones, mind.”</p><div class="entries">';
+  const row=(reg,i)=>{ const D=TRAPS[reg].traps[i], T=trapsIn(reg).find(t=>t.n===i), nx=nextTrap(reg), isNext=nx && nx.n===i, can=save.coins>=D.price;
+    const where=T?(T.spot?'Set '+trapSpot(T).at:'Waiting on your '+(reg==='coast'?'skiff’s deck':'dock')):'';
+    const btn=T?'<span class="tag ok">'+(T.spot?'In the water':'Yours')+'</span>':isNext?'<button class="btn" data-buytrap="'+reg+'" type="button"'+(can?'':' disabled')+'>Buy · '+D.price.toLocaleString()+'</button>':'<span class="tag wait">After the '+TRAPS[reg].traps[i-1].name.replace(/^Your /,'')+'</span>';
+    return '<div class="entry tk-entry"><canvas data-trap="'+reg+'" aria-hidden="true"></canvas><div style="min-width:0"><h3>'+D.name+'</h3><p>'+(where||(reg==='coast'?'Holds '+TRAPS.coast.cap+'. About a fish every '+TRAPS.coast.every+' minutes.':'Holds '+TRAPS.lake.cap+'. About a fish every '+TRAPS.lake.every+' minutes.'))+'</p></div><div>'+btn+'</div></div>'; };
+  h+='<h3 class="j-reg">For the lake</h3>'; for (let i=0;i<TRAPS.lake.traps.length;i++) h+=row('lake',i);
+  h+='<h3 class="j-reg">Sea pots for the coast'+(save.boat?'':' <span>once you have a boat</span>')+'</h3>';
+  if (save.boat) for (let i=0;i<TRAPS.coast.traps.length;i++) h+=row('coast',i);
+  h+='<h3 class="j-reg">Fittings <span>bought once, for any trap</span></h3>';
+  for (const id of FITTING_ORDER){ const F=FITTINGS[id], have=!!s.fits[id], can=save.coins>=F.price;
+    h+='<div class="entry tk-entry"><canvas data-fitting="'+id+'" aria-hidden="true"></canvas><div style="min-width:0"><h3>'+F.name+'</h3><p>'+F.eff+'</p>'+(F.down?'<p class="down">'+F.down+'</p>':'')+'</div><div>'+
+      (have?'<span class="tag ok">Yours</span>':'<button class="btn" data-buyfit="'+id+'" type="button"'+(can?'':' disabled')+'>Buy · '+F.price.toLocaleString()+'</button>')+'</div></div>'; }
+  h+='</div><p class="note" style="margin-top:12px">Tap an empty trap in the water to give it a fitting or move it. A trap keeps what your recipes still need in your keepnet and sells the rest.</p>';
+  openSheet(h); $('closeS').addEventListener('click',closeSheet); bindOttTabs();
+  paintTiles(document.querySelectorAll('#panel canvas[data-trap],#panel canvas[data-fitting]'));
+  document.querySelectorAll('#panel [data-buytrap]').forEach(b=>b.addEventListener('click',()=>{ const reg=b.dataset.buytrap, nx=nextTrap(reg); if (!nx || save.coins<nx.price) return;
+    const T=buyTrap(reg); if (!T) return; coinTally(500); sfx.out('uncommon'); buzz([0,30,40,30]);
+    news('Your '+nx.name.toLowerCase()+' is waiting on your '+(reg==='coast'?'skiff’s deck':'dock')+'. Tap it to set it.','gold'); openShop('traps'); }));
+  document.querySelectorAll('#panel [data-buyfit]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.buyfit; if (!buyFitting(id)) return; coinTally(500); sfx.rig('reel'); buzz([0,20,30,20]);
+    news('Bought the '+FITTINGS[id].name+'. Tap an empty trap to fit it.','gold'); openShop('traps'); })); }
 
 /* ---------- Balance simulator: the 1,000-cast report ---------- */
 /* Plays casts with any setup without drawing anything, using the game's own odds (poolFor), fights
@@ -7805,6 +8464,23 @@ function simulate(st,n){
   } finally { save=keep; SIMULATING=false; TREASURE_CTL.off=ctl; MODC.dirty=true; }
 }
 
+/* ---------- The idle report: what traps and the smoke rack earn, beside active fishing ---------- */
+/* Worked out from the tables (data/idle.js, data/fish.js) rather than played: the expected catch of a trap where it
+   sits, collected every `every` hours, and a hook on the smoke rack. Assumes you know every common and uncommon. */
+function trapExpect(reg,spotId,fit,bait){ const T={reg, spot:spotId, fit:fit||null, bait:bait||null, fish:[], carry:0}, sp=trapSpot(T);
+  const keep=save; save=Object.assign(fresh(),{fish:Object.fromEntries(Object.keys(FISH).map(id=>[id,{caught:1}]))});
+  try { const pool=trapPool(T), tot=Object.values(pool).reduce((a,b)=>a+b,0);
+    if (!tot) return {value:0, perHour:60/trapEvery(T), cap:trapCap(T), glimmer:0, mix:{}};
+    const value=Object.entries(pool).reduce((a,[id,w])=>a+w/tot*FISH[id].value*(.85+.3/2.4),0);
+    return {value, perHour:60/trapEvery(T), cap:trapCap(T), glimmer:TRAP_GLIMMER, mix:Object.fromEntries(Object.entries(pool).map(([id,w])=>[id,Math.round(w/tot*100)]))}; }
+  finally { save=keep; } }
+/** Coins an hour from a full set of traps in a water (one per spot, as fitted), collected every `hrs` hours. */
+function trapsPerHour(reg,hrs,fits){ let coins=0, glim=0, fish=0;
+  TRAPS[reg].spots.forEach((sp,i)=>{ const e=trapExpect(reg,sp.id,fits&&fits[i]); const n=Math.min(e.cap,e.perHour*hrs); fish+=n/hrs; coins+=n*e.value/hrs; glim+=n*e.glimmer/hrs; });
+  return {coins:Math.round(coins), glimmer:Math.round(glim*10)/10, fish:Math.round(fish*10)/10}; }
+/** What one hook on the smoke rack adds an hour, for a fish worth `value`: to SMOKE.full hours, or to a Delicacy. */
+function hookPerHour(value,delicacy){ return delicacy ? value*(SMOKE.delicacy.x-1)/SMOKE.delicacy.hours : value*SMOKE.gain/SMOKE.full; }
+
 /* ---------- Playtest > Balance: run the simulator on any setup and read the report ---------- */
 const BAL={form:null, last:null, prev:null};
 const BAL_TIMES=[[6.5,'Dawn'],[12,'Noon'],[18.5,'Dusk'],[22,'Night']];
@@ -7913,11 +8589,14 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
       [['pouch','A coin pouch'],['geode','A Glimmer geode'],['bottle','A message bottle'],['letter','A drowned letter'],['find','A find']].concat(LOOT_TIERS.map(t=>['crate:'+t,aOrAn(CRATES[t].name.toLowerCase())])).map(([v,l])=>'<option value="'+v+'">'+l+'</option>').join('')+
       '</select><span class="note" style="grid-column:1/-1;margin:0">Treasure turns up on its own about once in 12 casts. This picks the next one, so you can see every crate open.</span></label></div>'+
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
-    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
+    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
   bindPlaytestTabs();
   [['tHook','hook'],['tTension','tension'],['tWait','wait']].forEach(([id,k])=>{ $(id).addEventListener('input',e=>{ save.tune[k]=+e.target.value; $(id+'O').textContent=(+e.target.value).toFixed(2)+'×'; persist(); }); });
   $('tClock').addEventListener('input',e=>{ save.clock=+e.target.value; $('tClockO').textContent=clockText(save.clock); buildBg(); persist(); });
   $('coinBtn').addEventListener('click',()=>{ addCoins(1000); });
+  // traps, the smoke rack and the clock all move on an hour, as if you'd been away (game/away.js)
+  $('hourBtn').addEventListener('click',()=>{ const ms=3600000; trapGiftCheck(); for (const T of trapState().list) T.t-=ms; smokeTick(); for (const h of smokeState().hooks) if (h) h.t-=ms;
+    const info=applyAway(ms); closeSheet(); news('An hour went by'+(info&&info.fish?': your traps hold '+info.fish+' fish':''),'good'); });
   $('tLoot').addEventListener('change',e=>{ const v=e.target.value, [kind,tier]=v.split(':'); TREASURE_CTL.force=v?(tier?{kind,tier}:{kind}):null; $('tLootO').textContent=TREASURE_CTL.force?lootName(TREASURE_CTL.force):'A fish'; });
   $('gearBtn').addEventListener('click',()=>{ for (const id in TACKLE) if (!TACKLE[id].starter) grantGear(id,TACKLE[id].casts?3:1); news('Every reel, line and lure, and three tins of each bait, are in your tackle bag','gold'); });
   $('findsBtn').addEventListener('click',()=>{ const FS=findsState(), now=Date.now(); for (const id in FINDS) if (!FS.have[id]){ FS.have[id]={t:now,hr:save.clock,reg:REG(),src:'playtest'}; FS.fresh.push(id); }
@@ -7942,12 +8621,15 @@ function bindPlaytestTabs(){ $('closeS').addEventListener('click',closeSheet);
 /* ---------- Boot ---------- */
 function boot(data){
   if (data && data.save) load(data.save);
+  const away=save.lastPlayed?Date.now()-save.lastPlayed:0;   // before anything saves and moves lastPlayed on
   migrateRecords();
   if ((save.pending||[]).length){ const got=save.pending.splice(0); got.forEach(grant); persist(); setTimeout(()=>news('Your Tacklegram order arrived','gold'),800); }
   if (lettersWaiting()){ MAIL.state='waiting'; MAIL.t=6; }   // a drowned letter still waiting for Pell
+  applyAway(away); if (REG()==='lake' && trapGiftCheck()) setTimeout(trapGiftTip,2500);
   resize(); coinShown=save.coins; $('coins').textContent=hudNum(save.coins); updateHud(); accrueTips(); setState('idle'); kitchenUnlockCheck(true);
   requestAnimationFrame(t=>{ last=t; requestAnimationFrame(frame); });
   snapshot('Start of a session'); protectStorage(); introStart(); sheetSwipe();
+  if (AWAYS.info && AWAYS.info.fresh && !INTRO.active) setTimeout(freshTip,1500);
 }
 window.claude?.hot?.snapshot?.(()=>({save}));
 const hot=window.claude?.hot;

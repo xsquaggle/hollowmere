@@ -1,5 +1,5 @@
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=18, SNAP_KEY=KEY+'-snapshots';
+const BUILD=19, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -31,12 +31,14 @@ function snapshot(reason,force){ try { const list=snapshots(), last=list[list.le
     if (!force && last && now-last.t<9*60000) return; if (!save.tutorialDone && !force) return;
     list.push({t:now,reason,data:JSON.stringify(save)}); while (list.length>3) list.shift(); localStorage.setItem(SNAP_KEY,JSON.stringify(list)); } catch(e){} }
 function useSave(sv){ snapshot('Before restoring a backup',true); load(sv); save.introSeen=true; persistNow(); setTimeout(()=>location.reload(),350); }
-function persistNow(){ APP.stale=false; try { save.lastPlayed=Date.now(); localStorage.setItem(KEY,JSON.stringify(save)); } catch(e){} }
+function persistNow(){ APP.stale=false; try { save.lastPlayed=realNow(); const s=JSON.stringify(save); localStorage.setItem(KEY,s); STORE_LAST=s; } catch(e){} }
 async function protectStorage(){ try { if (!navigator.storage||!navigator.storage.persist) return; APP.persisted=await navigator.storage.persisted(); if (!APP.persisted && save.tutorialDone) APP.persisted=await navigator.storage.persist(); } catch(e){} }
 // another tab saving the same game: stop writing here so neither copy eats the other
-window.addEventListener('storage',e=>{ if (e.key!==KEY || APP.stale || !e.newValue) return; APP.stale=true;
+window.addEventListener('storage',e=>{ if (e.key!==KEY || APP.stale || !e.newValue) return; goStale(); });
+/** Another tab or window has saved: this one stops saving, and says so. */
+function goStale(){ if (APP.stale) return; APP.stale=true;
   openSheet('<div class="panel-head"><div><h2>Open somewhere else</h2><p>Hollowmere just saved in another tab or window.</p></div></div><p class="note">To keep both copies from overwriting each other, this tab has stopped saving. Reload to pick up the latest game.</p><div class="row"><button class="btn primary" id="staleReload" type="button">Reload</button></div>');
-  $('staleReload').addEventListener('click',()=>location.reload()); });
+  $('staleReload').addEventListener('click',()=>location.reload()); }
 async function copyText(text,btn){ let ok=false; try { await navigator.clipboard.writeText(text); ok=true; } catch(e){
     const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.cssText='position:fixed;opacity:0;top:0'; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,text.length); try { ok=document.execCommand('copy'); } catch(_){} ta.remove(); }
   if (btn){ const o=btn.textContent; btn.textContent=ok?'Copied ✓':'Select and copy it'; setTimeout(()=>{ btn.textContent=o; },1600); } return ok; }

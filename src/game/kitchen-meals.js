@@ -5,13 +5,13 @@ function knownRecipe(id){ const R=RECIPES[id]; return !R.learn || (save.fish[R.l
 function pickNet(R){ // cheapest matching fish from the keepnet, without removing them
   const picks=[], taken=new Set();
   for (const n of R.need){
-    const pool=save.net.map((f,i)=>({f,i})).filter(o=>!taken.has(o.i) && (n.id?o.f.id===n.id:FISH[o.f.id].rarity===n.rar)).sort((a,b)=>(isPB(a.f)-isPB(b.f))||(a.f.value-b.f.value));
+    const pool=save.net.map((f,i)=>({f,i})).filter(o=>!taken.has(o.i) && !o.f.smoked && (n.id?o.f.id===n.id:FISH[o.f.id].rarity===n.rar)).sort((a,b)=>(isPB(a.f)-isPB(b.f))||(a.f.value-b.f.value));
     if (pool.length<n.n) return {ok:false, have:pool.length, need:n.n, picks:[]};
     pool.slice(0,n.n).forEach(o=>{ taken.add(o.i); picks.push(o.i); });
   }
   return {ok:true, picks};
 }
-function haveFor(R){ const n=R.need[0]; return save.net.filter(f=>n.id?f.id===n.id:FISH[f.id].rarity===n.rar).length; }
+function haveFor(R){ const n=R.need[0]; return save.net.filter(f=>!f.smoked && (n.id?f.id===n.id:FISH[f.id].rarity===n.rar)).length; }
 function needText(R){ const n=R.need[0]; return n.n+' × '+(n.id?FISH[n.id].name:'any common fish'); }
 function mealStr(m){ return m && m.stars>0 ? MEAL_STR[m.stars-1] : 0; }
 /** A real meal (not Mystery Mush) with casts left, or on its last cast. */

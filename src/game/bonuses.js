@@ -55,7 +55,7 @@ function bonusesHTML(){
   const FS=findsState(); if (Object.keys(FS.have).length) gear.splice(4,0,['Vest',FS.equip.length?FS.equip.map(id=>FINDS[id].name).join(', '):'Nothing in your '+(FS.pockets>1?FS.pockets+' pockets':'pocket')]);
   let h='<p class="bn-where">'+where+'. Bonuses that depend on where you cast or what bites are marked.</p><dl class="bn-gear">'+gear.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('')+'</dl>';
   const line=(m)=>{ const st=modState(m,now), w=modWhenText(m.when);
-    return '<li class="'+stateClass(st)+'"><span class="n">'+m.name+(m.stars?' '+'★'.repeat(m.stars):'')+'</span><span class="s">'+(SRC_LABEL[m.src]||m.src)+(w?' · '+w:'')+stateNote(st)+'</span>'+
+    return '<li class="'+stateClass(st)+'"><span class="n">'+m.name+(m.stars?' '+'★'.repeat(m.stars):'')+'</span><span class="s">'+(SRC_LABEL[m.src]||m.src)+(w?' · '+w:'')+(m.casts?' · '+m.casts+(m.casts===1?' cast':' casts')+' left':m.last?' · last cast':'')+stateNote(st)+'</span>'+
       '<b class="'+(modHelps(m.stat,m.v,m.omen)?'up':'down')+'">'+modValueText(m.stat,m.v,m.omen)+'</b></li>'; };
   let any=false;
   // every stat with a bonus, in STATS order. A base stat (reach) or an add stat (keepnet space) only shows when
@@ -66,7 +66,7 @@ function bonusesHTML(){
     if (!ms.length && !mast.length) continue;
     const S0=STATS[stat];
     if (S0.kind==='luck'){
-      if (ms.every(m=>m.src==='event')) continue;    // Gull Luck alone: nothing to show until you have luck of your own
+      if (ms.every(m=>m.src==='event' && !m.casts)) continue;    // Gull Luck alone: nothing to show until you have luck of your own (Fresh water, counting down, shows)
       any=true;
       // only the rarities some fish has: the higher tiers stay off the page until fish arrive for them
       const tiersK=fishTiers(), top=tiersK[tiersK.length-1], omens=ms.filter(m=>m.omen);
@@ -74,9 +74,9 @@ function bonusesHTML(){
       const ptsFor=r=>ms.filter(m=>!m.omen && modState(m,Object.assign({},now,{rarity:r}))==='on').reduce((a,m)=>a+m.v,0);
       const pts=ptsFor(top);
       const tiers=tiersK.map(r=>'<span><i style="background:'+RAR[r].color+'"></i>'+RAR[r].label+' ×'+trimNum(luckCurve(ptsFor(r),RAR[r].luckCap))+'</span>').join('');
-      h+='<section class="bn-card bn-luck"><header><h3>'+S0.name+'</h3><b class="up">'+modValueText('luck',pts)+'</b></header><p class="bn-hint">'+S0.hint+'</p>'+
-        '<p class="bn-sum">Your luck here adds up to '+modValueText('luck',pts)+'. Luck has diminishing returns, so rarer fish bite this much more often:</p>'+
-        '<div class="bn-tiers">'+tiers+'</div><ul class="bn-src">'+ms.map(line).join('')+'</ul>'+
+      h+='<section class="bn-card bn-luck"><header><h3>'+S0.name+'</h3><b class="'+(pts?'up':'cond')+'">'+(pts?modValueText('luck',pts):'—')+'</b></header><p class="bn-hint">'+S0.hint+'</p>'+
+        (pts?'<p class="bn-sum">Your luck here adds up to '+modValueText('luck',pts)+'. Luck has diminishing returns, so rarer fish bite this much more often:</p>':'<p class="bn-sum">No luck of your own here yet. These still count:</p>')+
+        (pts?'<div class="bn-tiers">'+tiers+'</div>':'')+'<ul class="bn-src">'+ms.map(line).join('')+'</ul>'+
         '<p class="bn-cap">From luck alone, '+RAR[top].label.toLowerCase()+' odds top out at ×'+RAR[top].luckCap+'. '+
         (omens.length?omens.map(m=>m.src==='rod'?'the '+m.name+'’s perk':m.src==='event'?m.name:'the '+m.name).join(' and ').replace(/^t/,'T')+' multipl'+(omens.length>1?'y':'ies')+' on top of that. ':'')+'Luck lifts better crates too.</p></section>';
       continue;

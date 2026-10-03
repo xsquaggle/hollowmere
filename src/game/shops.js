@@ -8,15 +8,18 @@ function openNet(){
     h+='<div class="row" style="margin-bottom:12px"><button class="btn" id="sellCommons" type="button"'+(commons.length?'':' disabled')+'>Sell commons · +'+commons.reduce((a,f)=>a+f.value,0)+'</button><button class="btn" id="sellAll" type="button">Sell all · +'+total.toLocaleString()+'</button></div>';
     h+='<div class="entries">';
     save.net.map((f,i)=>({f,i})).sort((a,b)=>b.f.value-a.f.value).forEach(({f,i})=>{ const F=FISH[f.id];
-      const tags=[f.perfect?'Perfect hook':'',f.lucky?'Gull luck':''].filter(Boolean).join(' · ');
-      h+='<div class="entry" style="grid-template-columns:84px 1fr auto"><canvas data-f="'+f.id+'" style="width:84px;height:42px"></canvas><div style="min-width:0"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+'</span><h3>'+F.name+(isPB(f)?'<span class="net-rec">Record</span>':'')+'</h3><p>'+fmtW(fishW(f))+' · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+(tags?'<br>'+tags:'')+'</p></div>'+
-        '<div style="display:grid;gap:6px"><button class="btn" data-tank="'+i+'" type="button"'+(tankRoom(f.id)?'':' disabled')+'>'+(tankRoom(f.id)?'To tank':tanks()[tankOf(f.id)].owned?'Tank full':'No tank')+'</button><button class="btn" data-sell="'+i+'" type="button">Sell · +'+f.value+'</button></div></div>'; });
+      const tags=[f.delicacy?'Hollowmere Delicacy':f.smoked?'Smoked '+fmtMins((f.smokedH||0)*60):'',f.perfect?'Perfect hook':'',f.lucky?'Gull luck':'',f.trap?'From a trap':''].filter(Boolean).join(' · '), room=!f.smoked && tankRoom(f.id), hook=save.kitchenOpen && smokable(f);
+      h+='<div class="entry" style="grid-template-columns:84px 1fr auto"><canvas data-f="'+f.id+'"'+(f.smoked?' data-sm="'+(f.delicacy?'del':'1')+'" data-u="'+Math.round(Math.min(1,(f.smokedH||0)/(canDelicacy(f)?SMOKE.delicacy.hours:SMOKE.full))*100)+'"':'')+' style="width:84px;height:42px"></canvas><div style="min-width:0"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+'</span><h3>'+F.name+(isPB(f)?'<span class="net-rec">Record</span>':'')+'</h3><p>'+fmtW(fishW(f))+' · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+(tags?'<br>'+tags:'')+'</p></div>'+
+        '<div style="display:grid;gap:6px">'+(f.smoked?'':'<button class="btn" data-tank="'+i+'" type="button"'+(room?'':' disabled')+'>'+(room?'To tank':tanks()[tankOf(f.id)].owned?'Tank full':'No tank')+'</button>')+
+        (hook?'<button class="btn" data-hang="'+i+'" type="button"'+(freeHook()>=0?'':' disabled')+'>'+(freeHook()>=0?'Smoke it':'Rack full')+'</button>':'')+'<button class="btn" data-sell="'+i+'" type="button">Sell · +'+f.value+'</button></div></div>'; });
     h+='</div>';
   }
   h+='<p class="note" style="margin-top:12px">Fish stay fresh in the net, so there’s no rush to sell.'+(hasPart('hold')?'':' A Roomy Keepnet from Tacklegram holds 24.')+'</p>';
   openSheet(h); $('closeS').addEventListener('click',closeSheet);
-  document.querySelectorAll('#panel canvas[data-f]').forEach(c=>{ const r=c.getBoundingClientRect(), d=Math.min(window.devicePixelRatio||1,2);
-    c.width=r.width*d; c.height=r.height*d; const x=c.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); drawFish(x,c.dataset.f,r.width*.8,false); });
+  document.querySelectorAll('#panel canvas[data-f]').forEach(c=>{ const r=layoutBox(c), d=Math.min(window.devicePixelRatio||1,2);
+    c.width=r.width*d; c.height=r.height*d; const x=c.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d);
+    if (c.dataset.sm) drawSmokedFish(x,c.dataset.f,r.width*.78,c.dataset.sm==='del'?100:+c.dataset.u||0,c.dataset.sm==='del'); else drawFish(x,c.dataset.f,r.width*.8,false); });
+  document.querySelectorAll('#panel [data-hang]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.hang, f=save.net[i]; if (!f || hangFish(i)<0) return; sfx.rig('bait'); news(FISH[f.id].name+' is on the smoke rack in the kitchen','good'); openNet(); }));
   const sell=idxs=>{ const set=new Set(idxs); let sum=0; save.net=save.net.filter((f,i)=>{ if (set.has(i)){ sum+=f.value; return false; } return true; }); persist(); if (sum) addCoins(sum); openNet(); };
   document.querySelectorAll('[data-sell]').forEach(b=>b.addEventListener('click',()=>sell([+b.dataset.sell])));
   document.querySelectorAll('#panel [data-tank]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.tank, f=save.net[i]; if (!f || !tankRoom(f.id)) return; save.net.splice(i,1); addToTank(f); persist(); sfx.plop(); news(FISH[f.id].name+' is in the aquarium','good'); openNet(); }));
@@ -34,6 +37,7 @@ function openShop(tab){
   const first=!save.metOttilie; save.metOttilie=true; persist();
   if (first) OTT_TAB='rods';
   if (OTT_TAB==='tackle') return openTackleShop();
+  if (OTT_TAB==='traps') return openTrapShop();
   const cur=ROD(), nextId=ROD_ORDER.find(id=>!save.rods.includes(id));
   const greet=first?'So you’re the new keeper. That Willow barely reaches past the dock. Earn some coins and I’ll set you up with something better.'
     : nextId && save.coins>=RODS[nextId].price ? 'Now you’ve got coin. The '+RODS[nextId].name+' will take you farther out.'
@@ -63,7 +67,7 @@ function openShop(tab){
 }
 
 /* ---------- Ottilie's tackle: reels and lines she makes herself, and bait by the tin (data/tackle.js) ---------- */
-const ottTabs = () => '<div class="seg" role="tablist">'+[['rods','Rods'],['tackle','Reels, lines & bait']].map(([k,l])=>'<button type="button" role="tab" data-ott="'+k+'" aria-selected="'+(OTT_TAB===k)+'" class="'+(OTT_TAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+const ottTabs = () => '<div class="seg" role="tablist">'+[['rods','Rods'],['tackle','Reels, lines & bait']].concat(trapState().gift?[['traps','Traps']]:[]).map(([k,l])=>'<button type="button" role="tab" data-ott="'+k+'" aria-selected="'+(OTT_TAB===k)+'" class="'+(OTT_TAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
 function bindOttTabs(){ document.querySelectorAll('#panel [data-ott]').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.ott===OTT_TAB) return; tone(900,.04,{vol:.04,type:'triangle'}); openShop(b.dataset.ott); $('panel').scrollTop=0; })); }
 function openTackleShop(){ const g=gearState(), rig=rigFor(save.rod), bait=baitOn();
   let h='<div class="panel-head"><div><h2>Ottilie’s Tackle</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins · On your '+ROD().name+': '+TACKLE[rig.reel].name+', '+TACKLE[rig.line].name+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+ottTabs();
@@ -83,3 +87,27 @@ function openTackleShop(){ const g=gearState(), rig=rigFor(save.rod), bait=baitO
   document.querySelectorAll('#panel [data-buyg]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.buyg, T=TACKLE[id]; if (save.coins<T.price) return;
     addCoins(-T.price); grantGear(id); const said=fitNewGear(id); sfx.rig(T.kind); buzz([0,20,30,20]);
     news('Bought '+(T.kind==='bait'&&!isLure(id)?'a tin of '+T.name.toLowerCase():'the '+T.name)+'. '+said,'gold'); openShop('tackle'); })); }
+
+/* ---------- Ottilie's traps: wicker creels for the lake, sea pots for the coast, and fittings (data/idle.js) ---------- */
+function openTrapShop(){ const s=trapState();
+  let h='<div class="panel-head"><div><h2>Ottilie’s Traps</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+ottTabs();
+  h+='<p class="note" style="font-style:italic;font-size:14px;color:#4B4842">“My father wove creels like your uncle’s. Set them where the fish pass and they work while you sleep. They only take the small ones, mind.”</p><div class="entries">';
+  const row=(reg,i)=>{ const D=TRAPS[reg].traps[i], T=trapsIn(reg).find(t=>t.n===i), nx=nextTrap(reg), isNext=nx && nx.n===i, can=save.coins>=D.price;
+    const where=T?(T.spot?'Set '+trapSpot(T).at:'Waiting on your '+(reg==='coast'?'skiff’s deck':'dock')):'';
+    const btn=T?'<span class="tag ok">'+(T.spot?'In the water':'Yours')+'</span>':isNext?'<button class="btn" data-buytrap="'+reg+'" type="button"'+(can?'':' disabled')+'>Buy · '+D.price.toLocaleString()+'</button>':'<span class="tag wait">After the '+TRAPS[reg].traps[i-1].name.replace(/^Your /,'')+'</span>';
+    return '<div class="entry tk-entry"><canvas data-trap="'+reg+'" aria-hidden="true"></canvas><div style="min-width:0"><h3>'+D.name+'</h3><p>'+(where||(reg==='coast'?'Holds '+TRAPS.coast.cap+'. About a fish every '+TRAPS.coast.every+' minutes.':'Holds '+TRAPS.lake.cap+'. About a fish every '+TRAPS.lake.every+' minutes.'))+'</p></div><div>'+btn+'</div></div>'; };
+  h+='<h3 class="j-reg">For the lake</h3>'; for (let i=0;i<TRAPS.lake.traps.length;i++) h+=row('lake',i);
+  h+='<h3 class="j-reg">Sea pots for the coast'+(save.boat?'':' <span>once you have a boat</span>')+'</h3>';
+  if (save.boat) for (let i=0;i<TRAPS.coast.traps.length;i++) h+=row('coast',i);
+  h+='<h3 class="j-reg">Fittings <span>bought once, for any trap</span></h3>';
+  for (const id of FITTING_ORDER){ const F=FITTINGS[id], have=!!s.fits[id], can=save.coins>=F.price;
+    h+='<div class="entry tk-entry"><canvas data-fitting="'+id+'" aria-hidden="true"></canvas><div style="min-width:0"><h3>'+F.name+'</h3><p>'+F.eff+'</p>'+(F.down?'<p class="down">'+F.down+'</p>':'')+'</div><div>'+
+      (have?'<span class="tag ok">Yours</span>':'<button class="btn" data-buyfit="'+id+'" type="button"'+(can?'':' disabled')+'>Buy · '+F.price.toLocaleString()+'</button>')+'</div></div>'; }
+  h+='</div><p class="note" style="margin-top:12px">Tap an empty trap in the water to give it a fitting or move it. A trap keeps what your recipes still need in your keepnet and sells the rest.</p>';
+  openSheet(h); $('closeS').addEventListener('click',closeSheet); bindOttTabs();
+  paintTiles(document.querySelectorAll('#panel canvas[data-trap],#panel canvas[data-fitting]'));
+  document.querySelectorAll('#panel [data-buytrap]').forEach(b=>b.addEventListener('click',()=>{ const reg=b.dataset.buytrap, nx=nextTrap(reg); if (!nx || save.coins<nx.price) return;
+    const T=buyTrap(reg); if (!T) return; coinTally(500); sfx.out('uncommon'); buzz([0,30,40,30]);
+    news('Your '+nx.name.toLowerCase()+' is waiting on your '+(reg==='coast'?'skiff’s deck':'dock')+'. Tap it to set it.','gold'); openShop('traps'); }));
+  document.querySelectorAll('#panel [data-buyfit]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.buyfit; if (!buyFitting(id)) return; coinTally(500); sfx.rig('reel'); buzz([0,20,30,20]);
+    news('Bought the '+FITTINGS[id].name+'. Tap an empty trap to fit it.','gold'); openShop('traps'); })); }

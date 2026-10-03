@@ -50,6 +50,12 @@ Step 16, the art pass, brought everything older up to this bar: the scene in par
 - **Aquarium art** lives in `src/game/aquarium-art.js`. Each decor piece draws from an anchor on the sand, split into a still part (painted once) and a moving part. The shop's and crates' decor icons come from the same drawings, so they always match the tank.
 - **Kitchen art** lives in `src/game/kitchen-art.js`. The board, the stove and the whole fish on the board are painted once per scale.
 - **Enchantment art** lives in `src/game/enchant-art.js`. A rune is a brass-rimmed slate token with its glyph cut in and lit in the rune's own color, and the same drawing serves the tray, the sockets, the rod and the catch card. Glimmer is a pale blue-violet crystal. A glow is kept inside its canvas, so it never ends in a hard square edge.
+- **Idle art** lives in `src/game/trap-art.js` and `src/game/smoke.js`.
+  - Lake traps are woven willow creels, drawn reed by reed. Sea pots are slatted cedar with rope hoops. Both are drawn once per size and cached.
+  - Lake traps float under a red-and-cream cork with a pennant; sea pots, under a striped buoy. The flag is white and hangs while the trap fills, then pops up gold and flutters when it's full, with a slow ring around the float. Fish silhouettes show through the water inside the trap as it fills.
+  - Grey wades beside a full trap with the shoreline heron's own drawing, and flies home with swept wings and spread primaries. A gull sits on a full sea pot.
+  - Hauling one up lifts the trap out on its line, tips the catch out in a bounce, and sends coins up to the coin chip.
+  - Smoked fish come from the species' own drawing, recolored toward amber at its own lightness and darkened as it smokes, with slanted smoke marks and a glaze. A Delicacy is glazed gold with soft four-point glints. The ink outline always stays ink.
 - **Fish up close:** past 44 px a fish gets a gill line, a side fin, a darker back, a mouth and a glint in its eye; past 80 px, fin rays, a lateral line and scales. Catfish, eels, and fish whose pattern already reads as scales don't get extra scales.
 
 ## Rarity kit

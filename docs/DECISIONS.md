@@ -4,6 +4,43 @@ Newest first. Each entry records what was decided and why, so later changes don'
 
 ## 2026-10-03
 
+- **Idle play arrives as fish traps, a smoke rack and a proper welcome back (build 19).** It covers the boring part, the common fish, and leaves everything interesting to active play.
+  - Traps catch only commons and uncommons you've already caught, from the bite pool of the spot they sit on. They never discover a species, a rare or a story item.
+  - Everything idle runs on real time, playing or not, and counts at most 8 hours at a stretch.
+- **The 30% guardrail is measured in what idle earns, coins and Glimmer, as the design doc says ("offline progress is worth about 30% of active fishing"; "capped at 30% of active income").**
+  - From the simulator, with traps collected every 2 hours and active play at a real player's half pace, traps earn 18% of active coins with the Willow Switch and 2–5% later on. Glimmer runs 8–24%.
+  - In fish, a full lake set catches about 30 an hour, 26–31% of active play. Traps in both waters fill at once, so with both sets it's about 55 an hour, about half of active play, and three-quarters with Wide Mesh on every trap. That's fine, because they're cheap commons, they don't count toward mastery or records, and they sell for little. `npm run sim -- --idle` reports all three shares.
+- **Traps, prices and rates.**
+  - Your uncle's trap turns up on the dock at 25 catches.
+  - Ottilie sells two more for the lake (300 and 900 coins) and three sea pots for the coast once you have a boat (1,500, 3,500 and 7,000).
+  - A trap holds 20 and catches one fish every 6 minutes at the lake and every 7 at the coast, so an empty one is full in 2 to 2⅓ hours.
+  - Each water has three marked spots, one trap to a spot. You set a trap with a tap or a drag from the dock or the deck.
+- **Hauling a trap keeps the fish your known recipes still need, while the keepnet has room, and sells the rest.**
+  - About one fish in five brings a speck of Glimmer.
+  - The time toward the next fish carries over, so hauling often loses nothing.
+- **Fittings are bought once and go on as many traps as you like, one to a trap.**
+  - Bait Box (400): picks the common it goes for, six times as likely.
+  - Wide Mesh (800): holds 40 and catches a fish in 0.7 of the time (every 4.2 minutes at the lake), but takes commons only. It's for a long night away.
+  - Lantern Cage (1,500): night fish only, worth more, but each fish takes 1.6 times as long.
+  - A fitting can't go on a trap that holds more than the fitting allows, so the sheet hauls it up first. No fish is ever lost.
+- **The smoke rack has three hooks in the kitchen.**
+  - A fish gains value on an ease-out curve: about +20% after an hour, and +60% at 6 hours.
+  - A rare fish or rarer left 8 hours becomes a Hollowmere Delicacy, worth 2.5 times its fresh value.
+  - A smoked fish goes back to the keepnet, or sells. It can't be cooked, go in a tank or be smoked again.
+  - Per hook it's a small earner: a Saltjaw adds about 280 coins an hour as a Delicacy.
+- **Coming back.**
+  - Time away is measured from the last save, which happens every 30 seconds while the game is open (in the kitchen and aquarium too), and when it goes to the background or closes.
+  - The in-game clock moves on at its usual pace, an in-game hour a real minute, after 2 minutes away.
+  - After 20 minutes away, Grey waits by your fullest lake trap and a gull sits on your fullest sea pot, once one is 30% full. Hauling it up sends them off.
+  - After 2 hours away there's Fresh water: rare fish and rarer bite twice as often for the next 5 casts. Like a meal's last cast, the fifth still counts until its line comes in.
+- **A clock set backwards never pays twice.**
+  - Real time never runs earlier than the last save, so after the clock goes back, traps, the rack and time away wait for real time to catch up. Setting it forward and back again earns nothing extra.
+  - A last save more than a day ahead means a clock that was wrong and has been put right, so time starts over from now instead of waiting a day.
+- **A tab only saves over storage it last read or wrote itself.**
+  - If anything else has written the save since (another tab, or this one woken from a long sleep after missing the other tab's news), an ordinary save stops and shows "Open somewhere else" instead of putting an older game back.
+  - Leaving the page saves the same way, and restoring a backup is the one deliberate overwrite.
+- **On a short phone (360×640), trap floats never sit lower than 250 px above the bottom of the screen, and the lily-pads spot is left of the middle,** clear of Barnaby's boat. A tap goes to the townsfolk and the keepnet before a float.
+
 - **Glimmer is the second currency (build 18).**
   - It comes from beating a personal record (2 Glimmer for a common fish up to 40 for a godly one), from Glimmer geodes, a new common treasure (4–8 at the lake, 6–12 at the coast), and from every crate (3–5 in a common one, up to 90–120 in a mythic one). Mutations add more in step 21.
   - Records pay Glimmer instead of coins.

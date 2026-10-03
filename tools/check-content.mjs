@@ -32,8 +32,9 @@ const noDupes = (where, list) => { const seen = new Set(); for (const x of list)
 const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, SPOT_NAME, REGION_FISH, REGION_NAME, MAP_PLACES,
   RODS, ROD_ORDER, SEA_RODS, PARTS, PAINTS, OTT_LINES, BAR_LINES, BANQUET_LINES, LETTER,
   TANKS, TIP_BASE, DECOR, TANK_SETS, SPICES, SPICE_ORDER, SIDES, FLESH, COOK_NAME, RECIPES, RECIPE_ORDER, MUSH, MEAL_STR, MEAL_CASTS,
-  CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER } = D;
-for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER }))
+  CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER,
+  TRAPS, TRAP_UNLOCK, FITTINGS, FITTING_ORDER, TRAP_GLIMMER, SMOKE, AWAY } = D;
+for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER, TRAPS, FITTINGS, FITTING_ORDER, SMOKE, AWAY }))
   if (!v) { console.error('Missing table ' + n + ' in src/data/.'); process.exit(1); }
 
 /* ---------- fish ---------- */
@@ -291,6 +292,45 @@ for (const r of keys(GLIMMER.geode)) range('GLIMMER.geode.' + r, GLIMMER.geode[r
 sameSet('GLIMMER.crate', keys(GLIMMER.crate), CT, 'crate tiers with Glimmer and CRATES');
 let prevCr = [0, 0]; for (const t of CT) { const v = GLIMMER.crate[t]; range('GLIMMER.crate.' + t, v); if (Array.isArray(v) && (v[0] < prevCr[0] || v[1] < prevCr[1])) bad('GLIMMER.crate.' + t, 'rarer crates should hold at least as much'); if (Array.isArray(v)) prevCr = v; }
 
+/* ---------- idle play: traps, the smoke rack, time away ---------- */
+sameSet('TRAPS', keys(TRAPS), REGIONS, 'trap waters and REGION_NAME');
+const low = id => FISH[id] && (FISH[id].rarity === 'common' || FISH[id].rarity === 'uncommon');
+for (const reg of keys(TRAPS)) { const T = TRAPS[reg], w = 'TRAPS.' + reg, pools = reg === 'coast' ? POOLS_COAST : POOLS;
+  if (!(isNum(T.every) && T.every > 0)) bad(w + '.every', 'minutes per catch, above 0');
+  if (!(Number.isInteger(T.cap) && T.cap > 0)) bad(w + '.cap', 'a whole number of catches');
+  if (!(Array.isArray(T.traps) && T.traps.length >= 1 && T.traps.length <= 3)) bad(w + '.traps', 'one to three traps, the most a water holds');
+  (T.traps || []).forEach((t, i) => { const tw = w + '.traps[' + i + ']'; need(tw, t, { name: 'str', price: 'num0' });
+    if (t.gift && (i !== 0 || t.price !== 0)) bad(tw, 'only the first trap can be a gift, and a gift is free');
+    if (!t.gift && !(t.price > 0)) bad(tw, 'a trap that isn\'t a gift needs a price');
+    if (i && !(t.price > T.traps[i - 1].price)) bad(tw, 'should cost more than the one before'); });
+  if (!(Array.isArray(T.spots) && T.spots.length === T.traps.length)) bad(w + '.spots', 'one marked spot for each trap');
+  noDupes(w + '.spots', (T.spots || []).map(p => p.id));
+  for (const p of T.spots || []) { const pw = w + '.spots.' + p.id; need(pw, p, { name: 'str', at: 'str', pool: 'str' });
+    if (!(p.x > 0 && p.x < 1 && p.y > 0 && p.y < 1)) bad(pw, 'x and y are fractions of the screen and the water, inside (0, 1)');
+    if (!pools[p.pool]) { bad(pw + '.pool', 'not a bite pool in this water'); continue; }
+    if (!keys(pools[p.pool]).some(id => low(id) && !FISH[id].night)) bad(pw, 'its pool has no commons or uncommons for a trap to catch'); }
+  if (!(REGION_FISH[reg] || []).some(id => low(id) && FISH[id].night)) bad(w, 'no night common or uncommon here for a Lantern Cage'); }
+if (!(TRAPS.lake && TRAPS.lake.traps[0] && TRAPS.lake.traps[0].gift)) bad('TRAPS.lake', 'the first lake trap is your uncle\'s, a gift');
+if (!(Number.isInteger(TRAP_UNLOCK) && TRAP_UNLOCK > 0)) bad('TRAP_UNLOCK', 'a whole number of catches');
+noDupes('FITTING_ORDER', FITTING_ORDER); sameSet('FITTING_ORDER', FITTING_ORDER, keys(FITTINGS), 'FITTING_ORDER and FITTINGS');
+sameSet('FITTINGS', keys(FITTINGS), ['bait', 'mesh', 'lantern'], 'fittings and the ones game/traps.js knows');
+for (const id of keys(FITTINGS)) { const F = FITTINGS[id], w = 'FITTINGS.' + id; need(w, F, { name: 'str', price: 'num+', eff: 'str' });
+  for (const x of [F.eff, F.down]) if (isStr(x) && !/[.!]$/.test(x)) bad(w, 'effects and catches are whole sentences: ' + JSON.stringify(x));
+  if (F.every !== undefined && !(F.every > 0)) bad(w + '.every', 'a multiplier on the minutes per catch, above 0'); }
+if (FITTINGS.mesh && !(FITTINGS.mesh.cap > Math.max(...keys(TRAPS).map(r => TRAPS[r].cap)) && FITTINGS.mesh.every < 1)) bad('FITTINGS.mesh', 'should hold more and fill faster than a plain trap');
+if (FITTINGS.lantern && !(FITTINGS.lantern.every > 1)) bad('FITTINGS.lantern', 'fills more slowly than a plain trap');
+if (FITTINGS.bait && !(FITTINGS.bait.bait > 1)) bad('FITTINGS.bait.bait', 'how many times as likely the chosen common is, above 1');
+if (!(TRAP_GLIMMER >= 0 && TRAP_GLIMMER < 1)) bad('TRAP_GLIMMER', 'a chance in [0, 1)');
+if (!(Number.isInteger(SMOKE.hooks) && SMOKE.hooks >= 1 && SMOKE.hooks <= 6)) bad('SMOKE.hooks', '1 to 6 hooks');
+if (!(SMOKE.gain > 0 && SMOKE.full > 0)) bad('SMOKE', 'gain and full above 0');
+{ const D = SMOKE.delicacy || {}; oneOf('SMOKE.delicacy.rarityMin', D.rarityMin, RARS, 'rarity');
+  if (!(D.hours > SMOKE.full)) bad('SMOKE.delicacy.hours', 'a Delicacy takes longer than the most a fish gains from smoke');
+  if (!(D.x > 1 + SMOKE.gain)) bad('SMOKE.delicacy.x', 'a Delicacy is worth more than the best-smoked fish');
+  if (!(D.hours <= AWAY.cap)) bad('SMOKE.delicacy.hours', 'can\'t be longer than the time away that counts (AWAY.cap), or a night away never makes one'); }
+if (!(AWAY.cap > 0 && AWAY.clock >= 0 && AWAY.welcome >= 0)) bad('AWAY', 'cap above 0, clock and welcome at least 0');
+{ const F = AWAY.fresh || {}; if (!(F.hours > 0 && Number.isInteger(F.casts) && F.casts > 0 && F.x > 1)) bad('AWAY.fresh', 'hours above 0, a whole number of casts, and x above 1');
+  if (!(F.hours <= AWAY.cap)) bad('AWAY.fresh.hours', 'can\'t be longer than the time away that counts'); }
+
 /* ---------- every string ---------- */
 let strings = 0;
 const walk = (v, w) => { if (typeof v === 'string') { strings++; if (v !== v.trim() && !(w.startsWith('LETTER'))) bad(w, 'leading or trailing space'); if (/ {2}/.test(v)) bad(w, 'double space'); }
@@ -298,4 +338,4 @@ const walk = (v, w) => { if (typeof v === 'string') { strings++; if (v !== v.tri
 for (const n of Object.keys(D)) walk(D[n], n);
 
 if (problems.length) { console.error(problems.length + ' content problem(s):\n  ' + problems.join('\n  ')); process.exit(1); }
-console.log(`Content OK: ${FIDS.length} fish in ${REGIONS.length} regions, ${RIDS.length} rods, ${keys(RECIPES).length} recipes, ${decorIds.length} decor, ${TANK_SETS.length} tank sets, ${keys(FINDS).length} finds, ${TK_IDS.length} tackle, ${EIDS.length} runes, ${keys(NOTES).length} notes, ${keys(MOODS).length} moods, ${strings} strings checked.`);
+console.log(`Content OK: ${FIDS.length} fish in ${REGIONS.length} regions, ${RIDS.length} rods, ${keys(RECIPES).length} recipes, ${decorIds.length} decor, ${TANK_SETS.length} tank sets, ${keys(FINDS).length} finds, ${TK_IDS.length} tackle, ${EIDS.length} runes, ${keys(TRAPS).reduce((a, r) => a + TRAPS[r].traps.length, 0)} traps, ${keys(NOTES).length} notes, ${keys(MOODS).length} moods, ${strings} strings checked.`);

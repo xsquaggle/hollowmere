@@ -7,6 +7,7 @@
 //   node tools/simulate.mjs --tackle                  every piece of tackle against the plain rig, where each one matters
 //   node tools/simulate.mjs --rod ash --ench swift,magpie   runes etched onto the rod (data/enchant.js)
 //   node tools/simulate.mjs --runes                   every rune against none, where each one shows what it does
+//   node tools/simulate.mjs --idle                    what traps and the smoke rack earn, beside active fishing
 //   node tools/simulate.mjs --compare-luck           the standard report, before and after step 12's luck curve
 //   node tools/simulate.mjs --json                   machine-readable output
 import { existsSync } from 'node:fs';
@@ -81,6 +82,36 @@ function runeRuns() { const rows = [];
   return rows; }
 const runs = opt.tackle ? tackleRuns() : opt.runes ? runeRuns() : Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'lucky', 'player', 'reel', 'line', 'bait', 'ench'].includes(k)) ? custom() : STANDARD;
 const casts = +(opt.casts || 1000);
+if (opt.idle) { await idleReport(); process.exit(0); }
+/** Traps and the smoke rack, worked out from the tables, beside what active fishing earns at a few stages. */
+async function idleReport() {
+  const browser = await chromium.launch(); const p = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await p.goto('file://' + page + '?nointro'); await p.waitForTimeout(500);
+  const r = await p.evaluate((casts) => { const hm = window.__hm, I = hm.idleReport, out = { traps: [], stages: [], rack: [] };
+    for (const reg of ['lake', 'coast']) for (const fits of [null, ['lantern', 'lantern', 'lantern'], ['mesh', 'mesh', 'mesh']]) for (const hrs of [1, 2, 8]) {
+      const t = I.trapsPerHour(reg, hrs, fits); out.traps.push({ reg, fit: fits ? fits[0] : 'none', hrs, ...t }); }
+    for (const reg of ['lake', 'coast']) for (const sp of hm.TRAPS[reg].spots) { const e = I.trapExpect(reg, sp.id); out.traps.push({ reg, spot: sp.id, each: Math.round(e.value * 10) / 10, mix: e.mix }); }
+    const stages = [['Willow Switch · lake open, noon', { rod: 'willow' }, 'lake'], ['Ash Caster · lake deep, dusk', { rod: 'ash', spot: 'deep', hour: 18.5 }, 'lake'], ['Brasscap Pro · lake, every spot', { rod: 'brasscap', spot: 'mix' }, 'lake'],
+      ['Saltline · coast, every spot', { rod: 'saltline', region: 'coast', spot: 'mix' }, 'coast'], ['Deepwater · coast, every spot', { rod: 'deepwater', region: 'coast', spot: 'mix' }, 'coast']];
+    const pc = (x, y) => Math.round(x / y * 1000) / 10;
+    for (const [label, st, reg] of stages) { const a = hm.simulate(st, casts); const both = reg === 'coast', L = I.trapsPerHour('lake', 2), R = both ? I.trapsPerHour('coast', 2) : { coins: 0, fish: 0, glimmer: 0 };
+      // at the coast the lake's traps keep filling too; the mesh row puts Wide Mesh on every trap you own
+      const M = I.trapsPerHour('lake', 2, ['mesh', 'mesh', 'mesh']), MC = both ? I.trapsPerHour('coast', 2, ['mesh', 'mesh', 'mesh']) : { fish: 0 };
+      const t = L.coins + R.coins, f = L.fish + R.fish, g = L.glimmer + R.glimmer, fm = M.fish + MC.fish;
+      out.stages.push({ label, active: a.coinsPerHour, idle: t, share: pc(t, a.coinsPerHour), real: pc(t, a.coinsPerHour * .5),
+        fish: Math.round(f * 10) / 10, activeFish: a.catchesPerHour, fishReal: pc(f, a.catchesPerHour * .5), meshReal: pc(fm, a.catchesPerHour * .5), glimReal: pc(g, a.glimmerPerHour * .5) }); }
+    for (const [id, v] of [['mossback', 45], ['mayor', 600], ['grouper', 140], ['saltjaw', 1500]]) out.rack.push({ id, v, smoke6: Math.round(I.hookPerHour(v, false)), delicacy: Math.round(I.hookPerHour(v, true)) });
+    return out; }, casts);
+  await browser.close();
+  console.log('\nTraps, a full set in one water (coins and Glimmer an hour, collected every N hours):\n\n| Water | Fitting | Every | Coins/hour | Glimmer/hour | Fish/hour |\n| --- | --- | ---: | ---: | ---: | ---: |');
+  for (const t of r.traps.filter(t => t.hrs)) console.log(`| ${t.reg} | ${t.fit} | ${t.hrs} h | ${t.coins} | ${t.glimmer} | ${t.fish} |`);
+  console.log('\nWhat one trapped fish is worth on average, by spot:\n');
+  for (const t of r.traps.filter(t => t.spot)) console.log(`  ${t.reg} ${t.spot}: ${t.each} coins (${Object.entries(t.mix).map(([k, v]) => k + ' ' + v + '%').join(', ')})`);
+  console.log('\nIdle beside active play (traps collected every 2 h; at the coast, both waters\' traps). "Real pace" halves the simulator\'s active rate.\nThe guardrail is what idle earns (coins, and Glimmer), at most 30% of active play; fish are counted too, for the feel:\n\n| Stage | Active coins/hour | Traps coins/hour | Share | At a real pace | Glimmer at a real pace | Fish/hour, active · traps | Fish at a real pace | All Wide Mesh |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |');
+  for (const s of r.stages) console.log(`| ${s.label} | ${s.active.toLocaleString()} | ${s.idle.toLocaleString()} | ${s.share}% | ${s.real}% | ${s.glimReal}% | ${s.activeFish} · ${s.fish} | ${s.fishReal}% | ${s.meshReal}% |`);
+  console.log('\nOne hook on the smoke rack, coins an hour it adds (to 6 hours, or to a Delicacy at 8):\n');
+  for (const k of r.rack) console.log(`  ${k.id} (${k.v}): +${k.smoke6}/h smoked 6 h, +${k.delicacy}/h as a Delicacy`);
+}
 
 const browser = await chromium.launch(); const p = await browser.newPage({ viewport: { width: 390, height: 844 } });
 const errors = []; p.on('pageerror', e => errors.push(String(e)));

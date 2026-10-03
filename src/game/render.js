@@ -79,6 +79,8 @@ function drawParticles(){
   for (const p of S.particles){ const a=(1-p.life/p.max);
     if (p.word){ ctx.save(); ctx.globalAlpha=a; ctx.font='800 16px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.lineWidth=4; ctx.strokeStyle=INK; ctx.strokeText(p.word,p.x,p.y); ctx.fillStyle='#FDFCF7'; ctx.fillText(p.word,p.x,p.y); ctx.restore(); continue; }
     ctx.fillStyle=p.c+a.toFixed(3)+')';
+    if (p.coin){ ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(226,184,78,'+Math.min(1,a*1.6).toFixed(3)+')'; ctx.fill(); ctx.strokeStyle='rgba(122,90,34,'+Math.min(1,a*1.6).toFixed(3)+')'; ctx.lineWidth=.8; ctx.stroke();
+      ctx.fillStyle='rgba(255,240,190,'+(a*.9).toFixed(3)+')'; ctx.beginPath(); ctx.arc(p.x-p.r*.3,p.y-p.r*.3,p.r*.35,0,Math.PI*2); ctx.fill(); continue; }
     if (p.glim){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.life*6); ctx.fillRect(-p.r*1.6,-p.r*.35,p.r*3.2,p.r*.7); ctx.fillRect(-p.r*.35,-p.r*1.6,p.r*.7,p.r*3.2); ctx.restore(); continue; }
     if (p.rect){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.life*p.spin); ctx.fillRect(-p.r,-p.r*.5,p.r*2,p.r); ctx.restore(); }
     else { ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); } }
@@ -115,7 +117,7 @@ function drawAim(){
   ctx.strokeStyle=a.lucky?'#F2D47E':a.spot==='deep'?'#9FC3D6':a.spot==='pads'?'#B9D79A':a.spot==='reeds'?'#D8C48A':a.spot==='rocks'?'#D9CBB8':a.spot==='kelp'?'#B8C97A':PAPER; ctx.lineWidth=2.5;
   ctx.beginPath(); ctx.ellipse(to.x,to.y,pr,pr*.4,0,0,Math.PI*2); ctx.stroke();
   ctx.font='800 12px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=PAPER;
-  ctx.fillText(a.lucky?'GULL LUCK · '+trimNum(gullMul())+'× RARITY':spotName(a.spot).toUpperCase(),to.x,to.y-pr-8);
+  ctx.fillText(a.lucky?'GULL LUCK · '+trimNum(gullMul())+'× RARITY':spotName(a.spot).toUpperCase()+(save.fresh>0?' · FRESH WATER':''),to.x,to.y-pr-8);
 }
 function drawGhostHand(){
   if (S.tut!=='cast' || S.state!=='idle' || INTRO.active) return;
@@ -169,10 +171,10 @@ function render(){
   ctx.save();
   if (S.shake>.1) ctx.translate(rand(-1,1)*S.shake,rand(-1,1)*S.shake);
   if (Math.abs(S.zoom-1)>.001){ const cx=W/2, cy=H*.42; ctx.translate(cx,cy); ctx.scale(S.zoom,S.zoom); ctx.translate(-cx,-cy); }
-  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawSwell(); drawActive(); drawBobber();
+  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawTraps(); drawSwell(); drawActive(); drawBobber();
   drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
-  drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
+  drawTrapMarkers(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
   ctx.restore();
   drawOverlays();
 }

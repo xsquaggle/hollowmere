@@ -46,6 +46,8 @@ function modSources(){
     add('mastery',n,'reel',MASTERY.reel,{when:{fish:id}}); add('mastery',n,'autoTilt',undefined,{when:{fish:id}}); }
   // Gull Luck: a lucky splash zone doubles the odds of every fish above common while you fish in it
   add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true, rarityMin:'uncommon'}});
+  // Fresh water: back after a long while, rarer fish bite more often for a few casts (game/away.js)
+  if (save.fresh>0 || save.freshLast) add('event','Fresh water','luck',AWAY.fresh.x,{omen:true, when:{rarityMin:'rare'}, casts:save.fresh>0?save.fresh:undefined, last:!(save.fresh>0)||undefined});
   // playtest tuning
   const t=Object.assign({hook:1,tension:1,wait:1},save.tune);
   if (t.hook!==1){ add('tune','Playtest tuning','hook',t.hook); add('tune','Playtest tuning','perfect',t.hook); }

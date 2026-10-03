@@ -36,7 +36,7 @@ function kBook(){ const el=$('kBook'); el.hidden=false; const m=save.meal&&save.
     :'<div><span class="k-lab">Nothing on the go</span><p>A meal lasts a number of casts, not minutes, so stepping away never wastes it. One meal at a time.</p></div>')+'</section>';
   h+='<h3 class="k-h">Pantry <span>'+pan.length+'/3</span></h3><div class="k-pantry">';
   for (let i=0;i<3;i++){ const p=pan[i]; h+=p?'<div class="k-jar"><canvas class="k-dish" data-dish="'+p.id+'" data-stars="'+p.stars+'"></canvas><b>'+RECIPES[p.id].name+'</b>'+stars(p.stars)+'<button class="btn" data-eat="'+i+'" type="button">Eat</button></div>':'<div class="k-jar empty"><span>Empty shelf</span></div>'; }
-  h+='</div><h3 class="k-h">Recipes</h3><div class="k-recipes">';
+  h+='</div>'+rackHTML()+'<h3 class="k-h">Recipes</h3><div class="k-recipes">';
   const ids=RECIPE_ORDER.slice().sort((a,b)=>{ const sc=id=>knownRecipe(id)?(pickNet(RECIPES[id]).ok?0:1):2; return sc(a)-sc(b); });
   for (const id of ids){ const R=RECIPES[id], known=knownRecipe(id), have=haveFor(R), need=R.need[0].n, ok=known&&have>=need;
     if (!known){ const F=FISH[R.learn], seen=(save.fish[R.learn]||{}).seen;
@@ -46,6 +46,7 @@ function kBook(){ const el=$('kBook'); el.hidden=false; const m=save.meal&&save.
   h+='</div><p class="k-foot">Fish come from your keepnet. Cooking uses them up, but they stay in your journal.</p>';
   el.innerHTML=h; el.scrollTop=0;
   el.querySelectorAll('canvas.k-dish').forEach(cv2=>drawDishIcon(cv2));
+  el.querySelectorAll('canvas[data-smoked]').forEach(paintSmoked); bindRack(el);
   el.querySelectorAll('[data-cook]').forEach(b=>b.addEventListener('click',()=>startCooking(b.dataset.cook)));
   el.querySelectorAll('[data-eat]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.eat, p=pan[i];
     if (m && !b.dataset.sure){ b.dataset.sure='1'; b.textContent='Replace?'; return; }

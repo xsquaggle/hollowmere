@@ -74,7 +74,7 @@ function ropeCoil(x,cx,cy,r){
 
 /* ---------- live parts ---------- */
 function drawDock(){
-  if (REG()==='coast'){ drawSkiffDeck(); drawKeepnet(); return; }
+  if (REG()==='coast'){ drawSkiffDeck(); drawTrapProp(); drawKeepnet(); return; }
   const D=dockGeo(), {cx,top}=D;
   // ripples round the piles first, then the cached deck over them
   ctx.strokeStyle='rgba(225,238,242,'+(.22+.1*Math.sin(S.time*2)).toFixed(3)+')'; ctx.lineWidth=1.3;
@@ -84,7 +84,8 @@ function drawDock(){
   drawTackleBox(cx-54,top+50);
   drawPail(cx+48,top+47);
   drawBaitOnDock(cx+30,top+56);
-  drawHeron(D.rp,top-25);
+  drawTrapProp();
+  if (!S.grey) drawHeron(D.rp,top-25);   // unless he's off guarding a trap (game/trap-scene.js)
   drawKeepnet();
   drawOttilie();
   drawDockLantern(D.lp,top);   // in front of Ottilie's punt: the pile stands nearer than her boat
