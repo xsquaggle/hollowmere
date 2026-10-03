@@ -1,0 +1,99 @@
+/* Loot: rarity frames shared by every treasure card, the haul card a crate opens onto, and inked notes */
+/* Rarity frames follow the rarity kit: each tier keeps the one below's weight and adds a layer. Pips repeat the
+   tier as a count, so rarity never rests on color alone. */
+.rf{border:1.5px solid rgba(43,42,51,.2);border-radius:10px;background:rgba(255,255,255,.35);position:relative}
+.rf[data-r="uncommon"]{border:2px solid var(--c-uncommon);border-radius:2px;clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 9px,100% calc(100% - 9px),calc(100% - 9px) 100%,9px 100%,0 calc(100% - 9px),0 9px);background:rgba(127,176,105,.08)}
+.rf[data-r="rare"]{border:3px double var(--c-rare);background:linear-gradient(115deg,rgba(255,255,255,.35) 40%,#E4EDF4 50%,rgba(255,255,255,.35) 60%) 0 0/300% 100%;animation:foil 3s linear infinite}
+.rf[data-r="epic"]{border:3px double var(--c-epic);background:linear-gradient(115deg,rgba(255,255,255,.35) 40%,#EDE3F7 50%,rgba(255,255,255,.35) 60%) 0 0/300% 100%;box-shadow:inset 0 0 14px rgba(132,86,190,.18);animation:foil 2.6s linear infinite}
+.rf[data-r="legendary"]{border:3px solid var(--c-legendary);background:linear-gradient(115deg,#FBF3DF 38%,#F7E3AE 50%,#FBF3DF 62%) 0 0/300% 100%;box-shadow:0 0 0 2px rgba(201,161,90,.3);animation:foil 2.2s linear infinite}
+.rf[data-r="legendary"]::before,.rf[data-r="legendary"]::after{content:'';position:absolute;width:9px;height:9px;border:3px solid #8C6A2E;pointer-events:none}
+.rf[data-r="legendary"]::before{top:-3px;left:-3px;border-right:0;border-bottom:0}.rf[data-r="legendary"]::after{bottom:-3px;right:-3px;border-left:0;border-top:0}
+.rf[data-r="exotic"]{border:3px solid transparent;background:linear-gradient(#F5F2EA,#F5F2EA) padding-box,linear-gradient(90deg,#E07AB8,#F2C14E,#7FD69A,#5CC8E0,#A77BDB,#E07AB8) 0 0/300% 100% border-box;animation:prism 4s linear infinite}
+.rf[data-r="mythic"]{border:2px solid #C4C8D4;border-radius:3px;background:radial-gradient(120% 90% at 50% 0%,#2E2C3A,#16151C);color:#E6E8F0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.6),0 0 16px rgba(196,200,212,.25);
+  clip-path:polygon(0 3px,6% 0,14% 2px,23% 0,31% 3px,40% 0,48% 2px,57% 0,66% 3px,74% 0,83% 2px,92% 0,100% 3px,100% calc(100% - 3px),93% 100%,85% calc(100% - 2px),76% 100%,67% calc(100% - 3px),58% 100%,50% calc(100% - 2px),41% 100%,32% calc(100% - 3px),23% 100%,15% calc(100% - 2px),6% 100%,0 calc(100% - 3px))}
+.rf[data-r="mythic"] h3,.rf[data-r="mythic"] h4,.rf[data-r="mythic"] p{color:#E6E8F0!important}.rf[data-r="mythic"] .k{color:#C4C8D4!important}.rf[data-r="mythic"] .down{color:#E7A9A0!important}
+.rf[data-r="godly"]{border:3px solid #E9D49A;background:radial-gradient(120% 120% at 50% 0%,#FFFDF5,#F6EBC8);box-shadow:0 0 0 3px rgba(255,241,196,.6),0 0 22px rgba(255,236,170,.6)}
+@keyframes prism{to{background-position:0 0,300% 0}}
+.pips{display:inline-flex;gap:3px;align-items:center}
+.pips i{width:7px;height:7px;border-radius:50%;background:rgba(43,42,51,.15);box-shadow:inset 0 0 0 1px rgba(43,42,51,.3)}
+.pips i.on{background:var(--pip,var(--c-common));box-shadow:inset 0 0 0 1px rgba(0,0,0,.3)}
+[data-r="uncommon"] .pips{--pip:var(--c-uncommon)}[data-r="rare"] .pips{--pip:var(--c-rare)}[data-r="epic"] .pips{--pip:var(--c-epic)}[data-r="legendary"] .pips{--pip:var(--c-legendary)}[data-r="exotic"] .pips{--pip:var(--c-exotic)}[data-r="mythic"] .pips{--pip:#C4C8D4}
+
+/* The haul card: rises from the bottom like a catch card, then lays the contents out one at a time */
+#haul{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:min(360px,calc(100% - 32px));max-height:min(72%,600px);overflow-y:auto;overscroll-behavior:contain;
+  transform:translateX(-50%);z-index:4;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:14px;padding:14px 14px 14px;box-sizing:border-box;
+  box-shadow:0 6px 0 var(--ink),0 18px 44px rgba(0,0,0,.5);display:grid;gap:9px;animation:cardIn .5s cubic-bezier(.2,1.4,.4,1)}
+#haul.out{animation:cardOut .25s ease forwards}
+#haul .hl-top{display:flex;align-items:center;gap:8px}
+#haul .rarity{background:var(--c-common)}
+#haul[data-r="uncommon"] .rarity{background:var(--c-uncommon)}#haul[data-r="rare"] .rarity{background:var(--c-rare)}#haul[data-r="epic"] .rarity{background:var(--c-epic)}
+#haul[data-r="legendary"] .rarity{background:var(--c-legendary)}#haul[data-r="exotic"] .rarity{background:linear-gradient(90deg,#E07AB8,#F2C14E,#5CC8E0,#A77BDB) 0 0/300% 100%;animation:prism 3s linear infinite}#haul[data-r="mythic"] .rarity{background:#16151C;color:#E6E8F0;box-shadow:0 0 0 1.5px #C4C8D4}
+#haul[data-r="uncommon"]{border-color:var(--c-uncommon);border-width:3px}
+#haul[data-r="rare"]{border:3px double var(--c-rare)}
+#haul[data-r="epic"]{border:4px double var(--c-epic);box-shadow:0 6px 0 #4A2F70,0 0 30px rgba(132,86,190,.35),0 18px 44px rgba(0,0,0,.5)}
+#haul[data-r="legendary"]{border:4px double var(--c-legendary);background:linear-gradient(115deg,var(--paper) 38%,#F7E3AE 50%,var(--paper) 62%) 0 0/300% 100%;box-shadow:0 6px 0 #7A5A22,0 0 0 6px rgba(201,161,90,.35),0 18px 50px rgba(0,0,0,.5);animation:cardIn .6s cubic-bezier(.2,1.4,.4,1),foil 2s linear infinite}
+#haul[data-r="exotic"]{border:4px solid transparent;background:linear-gradient(var(--paper),var(--paper)) padding-box,linear-gradient(90deg,#E07AB8,#F2C14E,#7FD69A,#5CC8E0,#A77BDB,#E07AB8) 0 0/300% 100% border-box;box-shadow:0 6px 0 #1E3640,0 0 34px rgba(98,210,196,.4),0 18px 50px rgba(0,0,0,.5);animation:cardIn .6s cubic-bezier(.2,1.4,.4,1),prism 4s linear infinite}
+#haul[data-r="mythic"]{border:2px solid #C4C8D4;background:radial-gradient(120% 70% at 50% 0%,#2E2C3A,#121118);color:#E6E8F0;box-shadow:0 6px 0 #000,0 0 40px rgba(196,200,212,.35),0 18px 50px rgba(0,0,0,.6);animation:cardIn .8s cubic-bezier(.2,1.2,.4,1)}
+#haul h2{margin:0;font:400 25px/1.1 var(--display);text-wrap:balance}
+#haul[data-r="mythic"] h2{color:#F2F3F8;letter-spacing:.02em}
+.hl-coins{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;color:#6B665C}
+.hl-coins b{font:400 30px/1 var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
+.hl-coins .coin{width:22px;height:22px}
+#haul[data-r="mythic"] .hl-coins,#haul[data-r="mythic"] .hl-coins b{color:#E6E8F0}
+.hl-items{display:grid;gap:8px}
+/* each item pops into its dashed slot; the pop rides a wrapper so a tier's foil shimmer on the item keeps running */
+.hl-pop{display:grid;animation:hlIn .55s calc(.35s + var(--i,0) * .55s) cubic-bezier(.2,1.5,.4,1) both}
+.hl-pop[data-r="legendary"],.hl-pop[data-r="exotic"],.hl-pop[data-r="mythic"]{animation:hlIn .55s calc(.35s + var(--i,0) * .55s) cubic-bezier(.2,1.5,.4,1) both,hlGlow 1.6s calc(.9s + var(--i,0) * .55s) ease-out both}
+.hl-item{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;padding:10px 10px 10px 8px}
+.hl-slot{border:1.5px dashed rgba(43,42,51,.22);border-radius:10px;min-height:84px;display:grid;animation:slotIn .3s calc(.1s + var(--i,0) * .12s) ease-out both}
+.hl-slot>.hl-pop{margin:-1.5px}
+#haul[data-r="mythic"] .hl-slot{border-color:rgba(196,200,212,.35)}
+@keyframes slotIn{from{opacity:0}}
+.hl-item.spare{grid-template-columns:1fr;border:1.5px dashed rgba(43,42,51,.3);border-radius:10px;background:var(--paper)}
+.hl-item .hl-art{width:64px;height:64px}
+.hl-txt{min-width:0;display:grid;gap:2px}
+.hl-txt .k{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468}
+.hl-txt .k b{color:var(--danger)}
+.hl-txt h3{margin:0;font:400 18px/1.15 var(--display);display:flex;align-items:center;gap:6px}
+.hl-txt p{margin:0;font-size:13px;line-height:1.35;color:#4B4842}
+.hl-txt .down{color:#A04636;font-size:12.5px}
+.hl-txt .owner{color:#6E5A2E;font-style:italic;font-size:12.5px}
+.hl-txt .on{color:#3E7A35;font-weight:800;font-size:12.5px}
+.hl-txt .pk-note{color:#7A7468;font-size:12px}
+.hl-txt .btn{justify-self:start;margin-top:4px}
+.hl-empty{margin:0;font-size:13px;color:#7A7468}
+#hlGo{font-size:15px;padding:12px;animation:hlIn .4s both;position:sticky;bottom:0;z-index:1;box-shadow:0 3px 0 #000,0 -10px 14px 4px var(--paper)}
+#haul[data-r="mythic"] #hlGo{box-shadow:0 3px 0 #000,0 -10px 14px 4px #16151C}
+@keyframes hlIn{from{opacity:0;transform:translateY(16px) scale(.92)}}
+@keyframes hlGlow{0%{filter:brightness(1.6) drop-shadow(0 0 10px rgba(255,236,170,.9))}100%{filter:none}}
+.btn.sm{font-size:12px;padding:7px 10px;box-shadow:0 2px 0 var(--ink)}
+
+/* Notes: paper that inks itself in, line by line, like the uncle's letter in the opening */
+#note{position:fixed;inset:0;z-index:9;background:rgba(8,10,20,.55);animation:inFade .3s both}
+#note.out{animation:noteOut .28s ease forwards}
+@keyframes noteOut{to{opacity:0}}
+.nt-paper{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);width:min(340px,calc(100% - 40px));box-sizing:border-box;padding:24px 22px 18px;border-radius:5px;color:#3A2F28;
+  background:repeating-linear-gradient(transparent 0 27px,rgba(90,110,140,.13) 27px 28px),#F4EBD8;background-position:0 12px,0 0;
+  box-shadow:0 22px 50px rgba(0,0,0,.55),0 2px 0 rgba(0,0,0,.18),inset 0 0 40px rgba(160,120,60,.14);transform:translateX(-50%) rotate(-1.4deg);animation:inLetterIn .8s cubic-bezier(.2,1.15,.4,1) both;
+  font:600 min(21px,5.4vw)/28px 'Caveat','Bradley Hand','Noteworthy','Segoe Print',cursive}
+.nt-paper[data-kind="bottle"]{background:radial-gradient(140% 90% at 80% 100%,rgba(140,110,60,.18),transparent 60%),repeating-linear-gradient(transparent 0 27px,rgba(90,110,140,.1) 27px 28px),#F1E6CC;transform:translateX(-50%) rotate(1.2deg)}
+.nt-paper[data-kind="logbook"]{background:linear-gradient(90deg,transparent 26px,rgba(190,70,60,.35) 26px 27.5px,transparent 27.5px),repeating-linear-gradient(transparent 0 27px,rgba(90,110,140,.16) 27px 28px),#F6EEDC;padding-left:36px}
+.nt-paper[data-kind="letter"]{background:linear-gradient(180deg,rgba(80,50,20,.06),transparent 30%),repeating-linear-gradient(transparent 0 27px,rgba(90,110,140,.12) 27px 28px),#EFE6D2}
+.nt-paper .ln{display:block;white-space:nowrap;clip-path:inset(0 100% 0 0);-webkit-clip-path:inset(0 100% 0 0);animation:ink var(--d,1s) var(--s,0s) linear forwards}
+.nt-paper .ln.first{font-size:1.12em}.nt-paper .ln.sig{text-align:right;margin-top:2px}
+.nt-paper.done .ln{animation:none;clip-path:none;-webkit-clip-path:none}
+.nt-paper.done .nt-go{animation:none;opacity:1}
+.nt-env{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:-6px 0 8px;padding-bottom:8px;border-bottom:1.5px dashed rgba(58,47,40,.3);font:700 12.5px/1.35 var(--body);color:#5A4A3E}
+.nt-to{flex:1}
+.nt-mark{flex:0 0 auto;width:62px;height:62px;border-radius:50%;border:2px solid rgba(160,60,48,.55);color:rgba(160,60,48,.75);font:800 9px/1.25 var(--body);letter-spacing:.06em;display:grid;place-items:center;text-align:center;transform:rotate(-12deg);margin:-8px -6px 0 0}
+.nt-log{font:800 10.5px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:#B4433A;margin:-8px 0 8px}
+.nt-go{display:block;width:100%;margin-top:14px;font-size:15px;padding:12px;animation:inFade .5s both;font-family:var(--body)}
+#journalBtn.dot::after{content:'';position:absolute;right:4px;top:2px;width:11px;height:11px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 2px var(--night)}
+.swatch.crate{opacity:.55}.swatch.crate i{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.18) 0 4px,transparent 4px 8px)!important}
+.swatch.shift i{animation:hueDrift 6s linear infinite}
+@keyframes hueDrift{to{filter:hue-rotate(360deg)}}
+/* reduced motion: shimmering frames hold still; everything that arrives just appears */
+@media (prefers-reduced-motion: reduce){.rf,#haul,#haul .rarity,.swatch.shift i{animation:none!important}.hl-pop,.hl-slot,.nt-paper,.nt-paper .ln,.nt-go,#hlGo,#note{animation-duration:.01s!important;animation-delay:0s!important}}
+#haul[data-r="mythic"] .hl-item:not([data-r="mythic"]){background-color:var(--paper);color:var(--ink)}
+#haul[data-r="mythic"] .hl-item.spare{background:var(--paper)}
+.rf[data-r="mythic"] .btn.primary{background:var(--paper);color:var(--ink);box-shadow:0 2px 0 #000}

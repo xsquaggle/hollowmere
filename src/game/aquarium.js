@@ -7,7 +7,7 @@ function hasDecor(k,id){ return tanks()[k].decor.includes(id); }
 function decorFor(k){ return DECOR[k].filter(d=>hasDecor(k,d.id)); }
 function favorites(k,fid){ const F=FISH[fid]; return decorFor(k).filter(d=>(d.beh&&d.beh.includes(F.beh))||(d.ids&&d.ids.includes(fid))||(d.rar&&d.rar.includes(F.rarity))); }
 function fishTipRate(k,f){ const F=FISH[f.id]; let m=1; for (const d of decorFor(k)){ if (d.all) m+=d.all; if ((d.beh&&d.beh.includes(F.beh))||(d.ids&&d.ids.includes(f.id))||(d.rar&&d.rar.includes(F.rarity))) m+=d.pct; } return TIP_BASE[F.rarity]*m; }
-function tipRate(k){ const t=tanks()[k]; return t.owned?t.fish.reduce((a,f)=>a+fishTipRate(k,f),0):0; }
+function tipRate(k){ const t=tanks()[k]; return t.owned?t.fish.reduce((a,f)=>a+fishTipRate(k,f),0)*modMul('tips'):0; }
 function jarHours(k){ return decorFor(k).some(d=>d.jar)?12:6; }
 function jarCap(k){ return Math.max(20,tipRate(k)*60*jarHours(k)); }
 function accrueTips(){ const now=Date.now(), T=tanks();
@@ -89,6 +89,25 @@ function aqUpdate(dt){
 }
 function aqSplash(x,y){ for (let i=0;i<6;i++) AQ.parts.push({x,y,t:0,vx:rand(-30,30),vy:rand(-60,-20),drop:true}); tone(rand(500,700),.08,{vol:.05,to:200}); }
 
+/** The Tiny Bell Tower: a stone tower with an arch; its bell swings and rings softly when a fish swims through. */
+function drawBellTower(c,x,y,t){ c.save(); c.translate(x,y); c.strokeStyle='#2B2A33'; c.lineWidth=1.4;
+  c.fillStyle='#8E8A80'; c.fillRect(-13,-74,26,74); c.strokeRect(-13,-74,26,74); c.fillStyle='rgba(43,42,51,.18)'; for (let i=0;i<6;i++) c.fillRect(i%2?-13:-2,-70+i*12,11,1.5);
+  c.fillStyle='#6E7A72'; c.beginPath(); c.moveTo(-17,-74); c.lineTo(0,-98); c.lineTo(17,-74); c.closePath(); c.fill(); c.stroke();
+  c.fillStyle='#1E2A2E'; c.beginPath(); c.moveTo(-8,-38); c.lineTo(-8,-56); c.quadraticCurveTo(0,-66,8,-56); c.lineTo(8,-38); c.closePath(); c.fill(); c.stroke();
+  const fish=AQ.fish.some(f=>Math.abs(f.x-x)<12 && Math.abs(f.y-(y-48))<16);
+  if (fish && !(AQ.bellT>0)){ AQ.bellT=3; AQ.bellSwing=1; if (AC) iBell(1568,AC.currentTime,{dur:1.6,vol:.025,dest:master}); }
+  AQ.bellT=Math.max(0,(AQ.bellT||0)-1/60); AQ.bellSwing=Math.max(0,(AQ.bellSwing||0)-1/90);
+  c.save(); c.translate(0,-58); c.rotate(Math.sin(t*9)*.5*(AQ.bellSwing||0)); c.fillStyle='#C9A15A'; c.beginPath(); c.moveTo(-4,0); c.quadraticCurveTo(-5,8,-7,10); c.lineTo(7,10); c.quadraticCurveTo(5,8,4,0); c.closePath(); c.fill(); c.lineWidth=1; c.stroke(); c.restore();
+  c.fillStyle='#F3EDE2'; c.beginPath(); c.arc(0,-24,5.5,0,7); c.fill(); c.lineWidth=1.2; c.stroke(); c.lineWidth=1; c.beginPath(); c.moveTo(0,-24); c.lineTo(2.6,-23); c.moveTo(0,-24); c.lineTo(-.6,-28); c.stroke();
+  c.fillStyle='rgba(110,160,130,.45)'; c.beginPath(); c.ellipse(-9,-6,5,3,0,0,7); c.fill(); c.restore(); }
+/** The Pearl Grotto: a half shell lined with nacre that drifts through the colors, a pearl at its heart. */
+function drawGrotto(c,x,y,t){ c.save(); c.translate(x,y); c.strokeStyle='#2B2A33'; c.lineWidth=1.5;
+  c.fillStyle='#E8C9C0'; c.beginPath(); c.moveTo(-34,0); c.quadraticCurveTo(-34,-46,0,-48); c.quadraticCurveTo(34,-46,34,0); c.closePath(); c.fill(); c.stroke();
+  const g=c.createLinearGradient(-26,-40,26,0); g.addColorStop(0,prismAt(t,0,80)); g.addColorStop(.5,prismAt(t,120,86)); g.addColorStop(1,prismAt(t,240,80));
+  c.fillStyle=g; c.beginPath(); c.moveTo(-24,0); c.quadraticCurveTo(-24,-34,0,-36); c.quadraticCurveTo(24,-34,24,0); c.closePath(); c.fill(); c.lineWidth=1; c.stroke();
+  c.strokeStyle='rgba(160,110,100,.6)'; for (let i=-3;i<=3;i++){ c.beginPath(); c.moveTo(i*4,0); c.lineTo(i*11,-44+Math.abs(i)*3); c.stroke(); }
+  const k=.5+.5*Math.sin(t*1.5); c.fillStyle='rgba(255,255,255,'+(.25+.25*k).toFixed(2)+')'; c.beginPath(); c.arc(0,-8,12,0,7); c.fill();
+  c.fillStyle='#F6F4F8'; c.beginPath(); c.arc(0,-8,6,0,7); c.fill(); c.strokeStyle='#2B2A33'; c.lineWidth=1.2; c.stroke(); c.restore(); }
 function drawDecor(c,k,layer){
   const b=AQ.box, t=AQ.t, sandY=b.y+b.h-26, X=f=>b.x+b.w*f, glow=Math.max(.25,PAL.dark||0);
   if (k==='fresh'){
@@ -113,6 +132,7 @@ function drawDecor(c,k,layer){
         c.fillStyle='rgba(43,42,51,.45)'; [[-4,-3],[3,-1],[-1,2],[5,-5]].forEach(([dx,dy])=>{ c.beginPath(); c.arc(x+dx,sandY-2+dy,1.4,0,Math.PI*2); c.fill(); }); }
       if (hasDecor(k,'moss')) aqGlowDots(c,[[.66,-22],[.7,-34],[.76,-30],[.8,-18],[.72,-12]],sandY,glow);
     }
+    if (layer==='back' && hasDecor(k,'belltower')) drawBellTower(c,X(.7),sandY+2,t);
     if (layer==='front' && hasDecor(k,'lilies')){
       c.strokeStyle='rgba(70,110,60,.6)'; c.lineWidth=1.5; [.22,.34,.46,.6].forEach((fx,i)=>{ c.beginPath(); c.moveTo(X(fx),b.y+6); c.quadraticCurveTo(X(fx)+Math.sin(t+i)*6,b.y+b.h*.3,X(fx)+4,sandY); c.stroke(); });
       [.22,.34,.46,.6].forEach((fx,i)=>{ const x=X(fx)+Math.sin(t*.6+i)*3; c.fillStyle=i%2?'#6E9C57':'#5E8C4D'; c.beginPath(); c.moveTo(x,b.y+4); c.ellipse(x,b.y+4,15,4,0,.3,Math.PI*2-.1); c.closePath(); c.fill(); c.strokeStyle='#2B2A33'; c.lineWidth=1; c.stroke();
@@ -124,6 +144,7 @@ function drawDecor(c,k,layer){
         c.strokeStyle='rgba(60,90,40,.65)'; c.lineWidth=8; c.lineCap='round'; c.beginPath(); c.moveTo(px,sandY+4); c.bezierCurveTo(px+sw,sandY-h*.35,px-sw,sandY-h*.7,px+sw*.6,sandY-h); c.stroke();
         c.fillStyle='rgba(120,110,50,.8)'; c.beginPath(); c.arc(px+sw*.6,sandY-h,3,0,Math.PI*2); c.fill(); } }
     if (layer==='mid'){
+      if (hasDecor(k,'grotto')) drawGrotto(c,X(.84),sandY+2,t);
       if (hasDecor(k,'wreck')){ c.save(); c.translate(X(.52),sandY-2); c.rotate(.12);
         c.fillStyle='#5E4231'; c.beginPath(); c.moveTo(-46,0); c.quadraticCurveTo(-40,-26,-6,-30); c.lineTo(30,-24); c.lineTo(22,-12); c.lineTo(34,-6); c.lineTo(40,0); c.closePath(); c.fill(); c.strokeStyle='#2B2A33'; c.lineWidth=1.6; c.stroke();
         c.strokeStyle='rgba(40,25,18,.6)'; c.lineWidth=1.2; for (let i=0;i<3;i++){ c.beginPath(); c.moveTo(-42,-6-i*7); c.lineTo(30,-6-i*6); c.stroke(); }
@@ -236,6 +257,8 @@ const DECOR_ICON={
   anemone:'<ellipse cx="22" cy="36" rx="12" ry="5" fill="#E58FB0"/><path d="M12 34 Q8 22 12 14 M17 34 Q15 20 18 10 M22 34 V9 M27 34 Q29 20 26 10 M32 34 Q36 22 32 14" stroke="#E58FB0" stroke-width="3" stroke-linecap="round" fill="none"/>',
   kelpwall:'<path d="M10 42 C14 30 6 20 12 4 M22 42 C26 28 18 18 24 2 M34 42 C38 30 30 20 36 6" stroke="#5E7A3C" stroke-width="5" stroke-linecap="round" fill="none"/>',
   gold:'<rect x="8" y="22" width="28" height="16" fill="#8A5A34" stroke="#2B2A33" stroke-width="1.4"/><path d="M8 22 Q22 10 36 22" fill="#E9C46A" stroke="#2B2A33" stroke-width="1.2"/><circle cx="16" cy="18" r="2.5" fill="#F2D896"/><circle cx="26" cy="16" r="2.5" fill="#F2D896"/>',
+  belltower:'<rect x="16" y="12" width="12" height="30" fill="#8E8A80" stroke="#2B2A33" stroke-width="1.4"/><path d="M13 12 L22 2 L31 12 Z" fill="#6E7A72" stroke="#2B2A33" stroke-width="1.4"/><path d="M19 30 V21 Q22 17 25 21 V30 Z" fill="#1E2A2E"/><path d="M20.5 22 h3 l1 4 h-5 Z" fill="#C9A15A"/><circle cx="22" cy="36" r="2.6" fill="#F3EDE2" stroke="#2B2A33"/>',
+  grotto:'<path d="M5 40 Q5 10 22 9 Q39 10 39 40 Z" fill="#E8C9C0" stroke="#2B2A33" stroke-width="1.5"/><path d="M11 40 Q11 18 22 17 Q33 18 33 40 Z" fill="#CFE6EC" stroke="#2B2A33"/><circle cx="22" cy="33" r="4.5" fill="#F6F4F8" stroke="#2B2A33" stroke-width="1.2"/>',
   wreck:'<path d="M4 38 Q8 24 20 22 L38 26 L34 32 L40 38 Z" fill="#5E4231" stroke="#2B2A33" stroke-width="1.4"/><path d="M20 22 L24 4" stroke="#4A3324" stroke-width="3"/><path d="M24 6 L34 10 L26 18 Z" fill="#EFE3CC" opacity=".8"/>'
 };
 function lovedBy(d){ const out=[]; if (d.all) return 'Every fish'; if (d.beh) out.push(...d.beh.map(bh=>BEH[bh]+'s')); if (d.ids) out.push(...d.ids.map(id=>FISH[id].name)); if (d.rar) out.push('Rare and legendary fish'); return out.join(', '); }
@@ -257,9 +280,10 @@ function aqUI(){
       '<button class="btn" data-buy="size"'+(save.coins>=T.costs[tk.lvl]?'':' disabled')+'>'+T.costs[tk.lvl].toLocaleString()+'</button></div>';
     else sh+='<div class="aq-item"><div class="txt"><h4>Biggest tank</h4><p>Room for '+cap+' fish. As big as the shack allows.</p></div></div>';
     sh+='</div><h3 class="aq-shop-sub">Decor</h3><div class="aq-items">';
-    DECOR[k].forEach(d=>{ const own=hasDecor(k,d.id);
+    DECOR[k].forEach(d=>{ const own=hasDecor(k,d.id), found=(tk.stored||[]).includes(d.id);
+      if (d.crate && !own && !found){ sh+='<div class="aq-item crate"><div class="ico"><svg viewBox="0 0 44 44">'+DECOR_ICON[d.id]+'</svg></div><div class="txt"><h4>'+d.name+'</h4><p class="eff">'+d.eff+'</p><p>Not sold anywhere. It turns up in '+cratesOf(d.crate)+'.</p></div><span class="tag">Crates only</span></div>'; return; }
       sh+='<div class="aq-item'+(own?' own':'')+'"><div class="ico"><svg viewBox="0 0 44 44">'+DECOR_ICON[d.id]+'</svg></div><div class="txt"><h4>'+d.name+'</h4><p class="eff">'+d.eff+'</p><p>'+d.desc+'</p><p class="loved">Loved by: '+lovedBy(d)+'</p></div>'+
-        (own?'<span class="tag ok">In your tank</span>':'<button class="btn" data-buy="'+d.id+'"'+(save.coins>=d.price?'':' disabled')+'>'+d.price.toLocaleString()+'</button>')+'</div>'; });
+        (own?'<span class="tag ok">In your tank</span>':found?'<button class="btn primary" data-place="'+d.id+'">Place it</button>':'<button class="btn" data-buy="'+d.id+'"'+(save.coins>=d.price?'':' disabled')+'>'+d.price.toLocaleString()+'</button>')+'</div>'; });
     sh+='</div>';
   }
   sh+='<button class="btn aq-up" id="aqUp" type="button">Back up to the tank ▴</button>';
@@ -273,8 +297,12 @@ function aqUI(){
   $('aqShop').querySelectorAll('[data-buy]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.buy; accrueTips();
     if (id==='size'){ const cost=T.costs[tk.lvl]; if (save.coins<cost) return; addCoins(-cost); tk.lvl++; persist(); sfx.out('uncommon'); toast('Bigger tank: room for '+tankCap(k),'gold'); AQ.sparkle={x:AQ.box.x+AQ.box.w/2,y:AQ.box.y+AQ.box.h/2,t:0}; }
     else { const d=DECOR[k].find(x=>x.id===id); if (!d || save.coins<d.price) return; addCoins(-d.price); tk.decor.push(id); persist(); sfx.out('uncommon'); buzz([0,20,30,20]); toast(d.name+' added','gold');
-      const spots={bubbler:.12,drift:.3,lilies:.34,moss:.72,rowboat:.56,townhall:.86,airstone:.12,coral:.18,anemone:.66,kelpwall:.5,gold:.32,wreck:.52};
+      const spots={bubbler:.12,drift:.3,lilies:.34,moss:.72,rowboat:.56,townhall:.86,airstone:.12,coral:.18,anemone:.66,kelpwall:.5,gold:.32,wreck:.52,belltower:.7,grotto:.84};
       AQ.sparkle={x:AQ.box.x+AQ.box.w*(spots[id]||.5),y:id==='lilies'?AQ.box.y+10:AQ.box.y+AQ.box.h-46,t:0}; AQ.fish.forEach(aqPick); }
+    $('aqua').scrollTo({top:0,behavior:REDUCED?'auto':'smooth'}); aqUI(); }));
+  // decor from a crate goes in for free
+  $('aqShop').querySelectorAll('[data-place]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.place, d=DECOR[k].find(x=>x.id===id); tk.stored=(tk.stored||[]).filter(x=>x!==id); if (!tk.decor.includes(id)) tk.decor.push(id); persist();
+    sfx.out(d.crate); buzz([0,20,30,20]); toast(d.name+' placed','gold'); AQ.sparkle={x:AQ.box.x+AQ.box.w*({belltower:.7,grotto:.84}[id]||.5),y:AQ.box.y+AQ.box.h-56,t:0}; AQ.fish.forEach(aqPick);
     $('aqua').scrollTo({top:0,behavior:REDUCED?'auto':'smooth'}); aqUI(); }));
 }
 function aqCollect(){ accrueTips(); const tk=tanks()[AQ.tank], n=Math.floor(tk.tips); if (n<1) return; tk.tips-=n; persist(); addCoins(n);

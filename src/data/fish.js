@@ -4,7 +4,9 @@
               size [min, max] real length in cm; len and h (drawn length, and body height as a share of it);
               color and fin; window (seconds to strike after the bite); lore; hint (journal line before it is caught);
               night:true for fish that come up after dark (meals that boost night fish boost these).
-   RAR[tier]  how a rarity looks and sounds; luckCap is the most luck can multiply its odds (see game/mods.js).
+   RAR[tier]  how a rarity looks and sounds, in order from common to godly; pips (1 to 8) so rarity never rests on color
+              alone; prism and ink for the tiers whose color shifts or bleeds. luckCap is the most luck can multiply
+              its odds (see game/mods.js); Godly's sits below Mythic's on purpose, so no build makes Godly routine.
    ORDER      the lake journal's order.  REGION_FISH  which species live in each region, in journal order.
    POOLS      lake bite weights per spot; POOLS_COAST the same for Gullrock Coast. Night, dawn, rods,
               meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench"). */
@@ -38,10 +40,14 @@ const ORDER = ['perch','reedwhisker','lantern','leafjack','mossback','mayor'];
 const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper'};
 const BEH_TIP = {darter:'It darts side to side, so follow it.', leaper:'Tap when it jumps clear of the water.', sulker:'When it dives, let go. Reel hard after.', tugger:'Let go on each tug, reel between tugs.', sleeper:'It barely fights. Just reel it in.'};
 const RAR = {
-  common:   {label:'Common', color:'#9C968A', hitstop:0, land:.8, splash:10, notes:[660,880]},
-  uncommon: {label:'Uncommon', color:'#7FB069', hitstop:.035, land:1.0, splash:16, notes:[523,659,784], luckCap:1.6},
-  rare:     {label:'Rare', color:'#5FA3DB', hitstop:.09, land:1.6, splash:26, notes:[523,659,784,1047], luckCap:2.5},
-  legendary:{label:'Legendary', color:'#E2B44F', hitstop:.16, land:2.5, splash:44, notes:[392,523,659,784,1047,1319], luckCap:3.5}
+  common:   {label:'Common', color:'#9C968A', pips:1, hitstop:0, land:.8, splash:10, notes:[660,880]},
+  uncommon: {label:'Uncommon', color:'#7FB069', pips:2, hitstop:.035, land:1.0, splash:16, notes:[523,659,784], luckCap:1.6},
+  rare:     {label:'Rare', color:'#5FA3DB', pips:3, hitstop:.09, land:1.6, splash:26, notes:[523,659,784,1047], luckCap:2.5},
+  epic:     {label:'Epic', color:'#A77BDB', pips:4, hitstop:.12, land:2, splash:34, notes:[523,659,784,988,1175], luckCap:3},
+  legendary:{label:'Legendary', color:'#E2B44F', pips:5, hitstop:.16, land:2.5, splash:44, notes:[392,523,659,784,1047,1319], luckCap:3.5},
+  exotic:   {label:'Exotic', color:'#62D2C4', pips:6, prism:true, hitstop:.2, land:2.8, splash:52, notes:[440,554,659,831,988,1319], luckCap:3.75},
+  mythic:   {label:'Mythic', color:'#D4D8E4', pips:7, ink:true, hitstop:.26, land:3.2, splash:60, notes:[262,311,392,466,622,784], luckCap:4},
+  godly:    {label:'Godly', color:'#FFF1C4', pips:8, hitstop:.34, land:3.6, splash:70, notes:[523,659,784,1047,1319,1568,2093], luckCap:3.5}
 };
 const POOLS = {
   open: {perch:70, reedwhisker:6, leafjack:12, mossback:3},

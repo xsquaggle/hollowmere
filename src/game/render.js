@@ -2,6 +2,7 @@
 function drawActive(){
   if (sonarOn() && (S.state==='waiting'||S.state==='bite') && S.bob){ const u=(S.time%2.4)/2.4, b=S.bob;
     ctx.strokeStyle='rgba(120,240,170,'+(.55*(1-u)).toFixed(3)+')'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(b.x,b.y,8+u*70*sc(b.y),(8+u*70*sc(b.y))*.38,0,0,Math.PI*2); ctx.stroke(); }
+  if ((S.state==='waiting'||S.state==='bite') && S.bob && ((S.wait&&S.wait.phase==='snag') || (S.bite&&S.bite.loot))) drawSnagUnder();
   if ((S.state==='waiting'||S.state==='bite') && S.wait && S.wait.sh){
     const sh=S.wait.sh, F=FISH[S.wait.fish];
     ctx.save(); ctx.translate(sh.x,sh.y); ctx.rotate(sh.ang); ctx.scale(1,.55);
@@ -11,7 +12,8 @@ function drawActive(){
   }
   if (S.state==='reeling'){
     const R=S.reel, F=R.F, diving=R.dive>0||R.warn>0;
-    if (R.jump){
+    if (R.loot){ drawHaulUnder(R); }
+    else if (R.jump){
       const u=R.jump.t/R.jump.dur, hgt=Math.sin(Math.PI*u)*70*sc(R.y);
       ctx.save(); ctx.translate(R.x,R.y); ctx.fillStyle='rgba(10,26,34,.3)'; ctx.beginPath(); ctx.ellipse(0,0,F.len*.4*sc(R.y),5,0,0,Math.PI*2); ctx.fill();
       ctx.translate(0,-hgt); ctx.rotate(-.9+u*1.8); drawFish(ctx,R.id,F.len*sc(R.y)*1.1,false,1,Math.sin(S.time*25));
@@ -105,7 +107,7 @@ function drawAim(){
   ctx.strokeStyle='rgba(243,234,215,.5)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(a.sx,a.sy,14,0,Math.PI*2); ctx.stroke();
   ctx.strokeStyle=a.p>=.12?BRASS:'rgba(243,234,215,.4)'; ctx.lineWidth=4; ctx.beginPath(); ctx.arc(a.sx,a.sy,14,-Math.PI/2,-Math.PI/2+Math.PI*2*a.p); ctx.stroke();
   if (a.p<.12 || !a.target) return;
-  const reach=modBase('reach'); if (reach<1 && a.depth>=reach-.001){ const ry=lerp(G.near,HZ+26,reach);
+  const reach=castReach(); if (reach<1 && a.depth>=reach-.001){ const ry=lerp(G.near,HZ+26,reach);
     ctx.strokeStyle='rgba(243,234,215,.4)'; ctx.lineWidth=1.5; ctx.setLineDash([4,6]); ctx.beginPath(); ctx.moveTo(20,ry); ctx.lineTo(W-20,ry); ctx.stroke(); ctx.setLineDash([]);
     ctx.font='800 10.5px Nunito, system-ui, sans-serif'; ctx.textAlign='left'; ctx.fillStyle='rgba(243,234,215,.75)'; ctx.fillText('MAX REACH · '+ROD().name.toUpperCase(),20,ry-6); }
   const t=rodTip(), to=a.target, lift=70+140*a.p;
@@ -115,7 +117,7 @@ function drawAim(){
   ctx.strokeStyle=a.lucky?'#F2D47E':a.spot==='deep'?'#9FC3D6':a.spot==='pads'?'#B9D79A':a.spot==='reeds'?'#D8C48A':a.spot==='rocks'?'#D9CBB8':a.spot==='kelp'?'#B8C97A':PAPER; ctx.lineWidth=2.5;
   ctx.beginPath(); ctx.ellipse(to.x,to.y,pr,pr*.4,0,0,Math.PI*2); ctx.stroke();
   ctx.font='800 12px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=PAPER;
-  ctx.fillText(a.lucky?'GULL LUCK · 2× RARITY':spotName(a.spot).toUpperCase(),to.x,to.y-pr-8);
+  ctx.fillText(a.lucky?'GULL LUCK · '+trimNum(gullMul())+'× RARITY':spotName(a.spot).toUpperCase(),to.x,to.y-pr-8);
 }
 function drawGhostHand(){
   if (S.tut!=='cast' || S.state!=='idle' || INTRO.active) return;
@@ -136,7 +138,7 @@ function drawGauge(){
   ctx.strokeStyle=m<.2?'rgba(127,176,105,.9)':'rgba(217,97,76,'+(.35+.5*Math.min(1,m)).toFixed(2)+')';
   ctx.beginPath(); ctx.moveTo(tx,cy); ctx.lineTo(fx,cy); ctx.stroke();
   ctx.save(); ctx.translate(fx,cy-26); ctx.fillStyle=RAR[R.F.rarity].color; ctx.beginPath(); ctx.moveTo(0,10); ctx.lineTo(-7,0); ctx.lineTo(7,0); ctx.closePath(); ctx.fill(); ctx.restore();
-  ctx.font='800 10.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='rgba(243,234,215,.7)'; ctx.fillText('FISH',fx,cy-30);
+  ctx.font='800 10.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='rgba(243,234,215,.7)'; ctx.fillText(R.loot?'HAUL':'FISH',fx,cy-30);
   const T=R.tension, col=T>.82?DANGER:T>.55?BRASS:GOOD, rr=17;
   ctx.fillStyle=S.holding?'rgba(243,234,215,.95)':'rgba(243,234,215,.25)'; ctx.beginPath(); ctx.arc(tx,cy,rr-5,0,Math.PI*2); ctx.fill();
   ctx.strokeStyle='rgba(243,234,215,.25)'; ctx.lineWidth=5; ctx.beginPath(); ctx.arc(tx,cy,rr,0,Math.PI*2); ctx.stroke();
@@ -147,12 +149,12 @@ function drawGauge(){
   const off=Math.abs(S.tilt-R.dir)>.32;
   if (!off){ ctx.strokeStyle='rgba(127,176,105,.55)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(tx,cy,rr+7,0,Math.PI*2); ctx.stroke(); }
   let label=!S.holding?'PRESS & HOLD TO REEL':off?(R.dir>S.tilt?'SLIDE RIGHT ▶':'◀ SLIDE LEFT'):'ON IT · KEEP HOLDING', lc=off&&S.holding?'#F5D08A':'rgba(243,234,215,.9)';
-  if (diving){ label=R.warn>0?'DIVE INCOMING · LET GO':'DIVING · LET GO'; lc='#F5D08A'; }
+  if (diving){ label=R.loot?(R.warn>0?'CATCHING ON THE BOTTOM · LET GO':'SNAGGED · LET GO'):R.warn>0?'DIVE INCOMING · LET GO':'DIVING · LET GO'; lc='#F5D08A'; }
   else if (R.jump){ label='TAP NOW'; lc='#F5D08A'; }
   else if (swellNear(R.y,95)){ label='SWELL COMING · EASE OFF'; lc='#F5D08A'; }
   else if (R.tug){ label='TUG · LET GO'; lc='#F5D08A'; }
   else if (R.F.beh==='tugger' && S.holding){ label='REEL BETWEEN TUGS'; lc='#CFE7B9'; }
-  else if (R.surge>0){ label='REEL HARD'; lc='#CFE7B9'; }
+  else if (R.surge>0){ label=R.loot?'FREE · HAUL HARD':'REEL HARD'; lc='#CFE7B9'; }
   else if (T>.82){ label='RED · LIFT YOUR FINGER'; lc='#F4A595'; }
   ctx.font='800 11.5px Nunito, system-ui, sans-serif'; ctx.fillStyle=lc; ctx.fillText(label,cx,cy+40);
 }
@@ -172,7 +174,7 @@ function render(){
   drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawSwell(); drawActive(); drawBobber();
   drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); nightShade();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
-  drawParticles(); drawLanding(); drawAim(); drawGhostHand();
+  drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
   ctx.restore();
   drawOverlays();
 }

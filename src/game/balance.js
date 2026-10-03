@@ -5,13 +5,14 @@ const BAL_TIMES=[[6.5,'Dawn'],[12,'Noon'],[18.5,'Dusk'],[22,'Night']];
 const balTime=h=>h>=5&&h<8?6.5:isNight(h)?22:h>=17?18.5:12;
 function balMine(){ const m=save.meal;
   return {region:REG(), spot:'open', hour:balTime(save.clock), rod:save.rod, meal:mealActive()?m.id:'', stars:mealActive()?m.stars:3,
-    sets:'mine', parts:'mine', mastery:'mine', lucky:'no', player:'steady', n:1000}; }
+    sets:'mine', parts:'mine', mastery:'mine', finds:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000}; }
 function balanceFormHTML(){
   const f=BAL.form||(BAL.form=balMine());
   const sel=(id,label,opts,v)=>'<label for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(([k,l])=>'<option value="'+k+'"'+(String(k)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
   const spots=Object.keys(f.region==='coast'?POOLS_COAST:POOLS).map(sp=>[sp,f.region==='coast'&&sp==='deep'?'Dark trench':SPOT_NAME[sp]]);
   const mySets=setsDone().length, myParts=(save.parts||[]).length, myMast=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=MASTERY.catches).length;
-  let h='<p class="note">Plays casts with the game’s own odds, fights, catch rolls, snags, swells and tuning. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps. Every catch is sold; aiming, the aquarium and the kitchen aren’t played.</p>'+
+  const myArts=findsState().equip.length;
+  let h='<p class="note">Plays casts with the game’s own odds, fights, catch rolls, snags, swells, treasure and tuning. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps. Every catch is sold; aiming, the aquarium and the kitchen aren’t played.</p>'+
     '<div class="bal-form">'+
     sel('bRegion','Water',Object.keys(REGION_NAME).map(r=>[r,REGION_NAME[r]]),f.region)+
     sel('bSpot','Spot',[...spots,['mix','Every spot']],f.spot)+
@@ -22,6 +23,8 @@ function balanceFormHTML(){
     sel('bSets','Tank sets',[['mine','Yours ('+mySets+')'],['none','None'],['all','Every set']],f.sets)+
     sel('bParts','Boat parts',[['mine','Yours ('+myParts+')'],['none','None'],['all','Every part']],f.parts)+
     sel('bMastery','Mastery',[['mine','Yours ('+myMast+')'],['none','None'],['all','Every fish']],f.mastery)+
+    sel('bFinds','Artifacts',[['mine','Your pockets ('+myArts+')'],['none','None']].concat(Object.keys(FINDS).filter(id=>FINDS[id].kind==='artifact').map(id=>[id,FINDS[id].name])),f.finds)+
+    sel('bTreasure','Treasure',[['yes','Turns up'],['no','Left out']],f.treasure)+
     sel('bLucky','Gull Luck',[['no','No'],['yes','In a lucky splash']],f.lucky)+
     sel('bPlayer','Player',[['steady','Steady'],['new','New']],f.player)+
     sel('bN','Casts',[[1000,'1,000'],[5000,'5,000']],f.n)+
@@ -33,9 +36,11 @@ function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:
     parts:f.parts==='all'?'all':f.parts==='mine'?(save.parts||[]).slice():[], lucky:f.lucky==='yes', player:f.player};
   if (f.sets==='mine') st.tanks=tanks(); else st.sets=f.sets;
   if (f.mastery==='mine') st.fish=save.fish; else st.mastery=f.mastery==='all';
+  if (f.finds==='mine') st.finds=findsState(); else if (f.finds!=='none') st.artifacts=[f.finds];
+  if (f.treasure==='no') st.treasure=false;
   return st; }
 function bindBalance(){
-  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bLucky:'lucky',bPlayer:'player',bN:'n'};
+  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bFinds:'finds',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n'};
   for (const [id,k] of Object.entries(ids)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
     if (k==='region'){ BAL.form.spot='open'; const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; }
     if (k==='n') $('bRun').textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts'; });
@@ -64,7 +69,11 @@ function balanceResultHTML(r,prev){
     '<div class="bal-legend">'+tiers.map(k=>'<span><i style="background:'+RAR[k].color+'"></i>'+RAR[k].label+' '+(Math.round(r.tiers[k]/tot*1000)/10)+'%</span>').join('')+'</div>';
   const sp=Object.entries(r.species).sort((a,b)=>b[1]-a[1]);
   h+='<table class="bal-tab"><thead><tr><th>Fish</th><th>Share</th><th>One in</th></tr></thead><tbody>'+sp.map(([id,n])=>'<tr><td><span><i style="background:'+RAR[FISH[id].rarity].color+'"></i>'+FISH[id].name+'</span></td><td>'+(Math.round(n/tot*1000)/10)+'%</td><td>'+(r.casts/n<1.5?'every cast':Math.round(r.casts/n).toLocaleString()+' casts')+'</td></tr>').join('')+'</tbody></table>';
-  const L=r.luck, lostBits=[['slow','too slow'],['snag','snagged in the reeds'],['washout','washed out by a swell'],['jump','shook off mid-jump'],['slack','slipped on a slack line'],['snap','snapped'],['tired','outlasted the player']].filter(([k])=>r.lost[k]).map(([k,w])=>r.lost[k]+' '+w);
+  const T=r.treasure; if (T.rolled){ const cr=LOOT_TIERS.filter(k=>T.crates[k]);
+    h+='<p class="note bal-notes"><b>Treasure:</b> 1 cast in '+T.oneIn+' ('+T.rolled+'), '+T.hauled+' hauled up for '+fmt(T.coins)+' coins'+(T.finds?' and '+T.finds+' new finds':'')+'. '+
+      [['pouch','pouches'],['bottle','bottles'],['letter','letters'],['find','loose finds'],['crate','crates']].filter(([k])=>T.kinds[k]).map(([k,w])=>T.kinds[k]+' '+w).join(', ')+
+      (cr.length?' (crates: '+cr.map(k=>T.crates[k]+' '+RAR[k].label.toLowerCase()).join(', ')+')':'')+'.</p>'; }
+  const L=r.luck, lostBits=[['slow','too slow'],['snag','snagged in the reeds'],['washout','washed out by a swell'],['jump','shook off mid-jump'],['slack','slipped on a slack line'],['snap','snapped'],['tired','outlasted the player'],['eaten','eaten by the Hungry Hook']].filter(([k])=>r.lost[k]).map(([k,w])=>r.lost[k]+' '+w);
   h+='<p class="note bal-notes">'+(L.points?modValueText('luck',L.points)+': ':'No luck bonuses: ')+Object.entries(L.tiers).map(([k,v])=>RAR[k].label+' ×'+v).join(', ')+'. '+
     'A cast takes '+r.secsPerCast+' s on average, and a fight '+r.fightAvg+' s. '+(lostBits.length?'Lost: '+lostBits.join(', ')+'. ':'')+
     (r.pbCoins?'Record bonuses paid '+fmt(r.pbCoins)+' coins. ':'')+'</p></section>';

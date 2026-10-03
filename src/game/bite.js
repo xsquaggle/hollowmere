@@ -1,10 +1,14 @@
 /* ---------- Waiting & bite ---------- */
 function startWaiting(){
-  S.wait={phase:'empty', t:rand(.75,2.1)*modMul('wait',{spot:S.bob.spot})*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1};
+  const lucky=inLucky(S.bob.x,S.bob.y);
+  S.wait={phase:'empty', t:biteWait(S.bob.spot)*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1, lucky,
+    loot:S.tut?null:rollTreasure({spot:S.bob.spot,lucky})};   // one roll per cast: this cast pulls up treasure, or a fish
   setState('waiting');
   if (S.bob.spot==='reeds') S.wait.t/=modMul('reedBite',{spot:'reeds'});
   if (S.tut){ S.tut='wait'; S.wait.t=.8; coach('Nice cast! Now wait. A fish will swim over to your bobber.','2 of 4'); }
 }
+/** The quiet before a fish shows up: Playtest tuning and anything that brings fish over sooner. */
+function biteWait(spot){ const c={spot}; return rand(.75,2.1)*modMul('wait',c)*modMul('bite',c); }
 function spawnApproach(){
   const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.fish=S.tut?'perch':pickW(poolFor(b.spot,w.lucky)); const F=FISH[w.fish];
   const ang=rand(0,Math.PI*2), d=rand(85,150);
@@ -38,12 +42,14 @@ function updateWaiting(dt){
       }
     }
   }
-  if (w.phase==='empty'){ w.t-=dt; if (w.t<=0) spawnApproach(); }
+  if (w.phase==='snag') updateSnag(dt);
+  if (w.phase==='empty'){ w.t-=dt; if (w.t<=0){ if (w.loot) startSnag(w.loot); else spawnApproach(); } }
 }
 function twitch(){
   const w=S.wait, b=S.bob; w.tw=w.tw.filter(t=>S.time-t<2.5); w.tw.push(S.time);
   b.jerk=1; ripple(b.x,b.y,18); sfx.twitch(); buzz(6);
   if (S.tut){ if (w.phase==='nibble') coach('Not yet! Wait until the bobber plunges all the way under.','2 of 4', true); else if (w.phase==='approach') w.attract=Math.min(2.3,w.attract+.45); return; }
+  if (w.phase==='snag') return;                         // treasure doesn't spook
   if (w.fish && w.phase!=='empty' && FISH[w.fish].beh==='sleeper'){ spook('Something sleepy swam off. Some fish hate twitching.'); return; }
   if (w.phase==='nibble'){ spook('Too early! Wait for the plunge.'); return; }
   if (w.tw.length>=4){ spook('Easy. Too much twitching spooks them.'); return; }
@@ -53,7 +59,7 @@ function twitch(){
 }
 function spook(msg){
   const w=S.wait; if (w.sh){ w.sh.flee=true; w.sh.ang+=Math.PI; }
-  w.phase='empty'; w.t=rand(1.65,2.7)*modMul('wait',{spot:S.bob&&S.bob.spot}); w.attract=1; w.tw=[]; toast(msg,'warn');
+  w.phase='empty'; w.t=rand(1.65,2.7)*modMul('wait',{spot:S.bob&&S.bob.spot})*modMul('bite',{spot:S.bob&&S.bob.spot}); w.attract=1; w.tw=[]; toast(msg,'warn');
 }
 function triggerBite(){
   const w=S.wait, b=S.bob, F=FISH[w.fish];
@@ -67,9 +73,10 @@ function updateBite(dt){
   if (b.t>b.win){
     if (S.tut){ S.bob.plunge=0; const w=S.wait; w.phase='nibble'; w.nib=0; w.nibT=1.6; S.tut='wait'; setState('waiting');
       coach('Too slow, but it’s still hungry. Tap the moment the bobber plunges.','2 of 4', true); return; }
-    rec(b.fish).seen=true; lose('Too slow. It got away.'); }
+    if (b.loot) lose('Too slow. It sank back down.'); else { rec(b.fish).seen=true; lose('Too slow. It got away.'); } }
 }
 function hook(){
+  if (S.bite.loot) return hookHaul();
   const b=S.bite, F=FISH[b.fish], R=RAR[F.rarity];
   const perfect=b.t<=.3*modMul('perfect',{fish:b.fish,spot:S.bob.spot,lucky:!!(S.wait&&S.wait.lucky)});
   if (perfect){ save.stats.perfect++; toast('Perfect hook!','good'); } else toast('Hooked!','');

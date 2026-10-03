@@ -3,7 +3,7 @@
 :root{
   --night:#1B2232; --ink:#2B2A33; --paper:#F3EAD7; --paper-2:#E6D9BE; --brass:#C9A15A;
   --danger:#D9614C; --good:#7FB069;
-  --c-common:#9C968A; --c-uncommon:#6E9F5B; --c-rare:#4F8FC9; --c-legendary:#C99A2E;
+  --c-common:#9C968A; --c-uncommon:#6E9F5B; --c-rare:#4F8FC9; --c-epic:#8456BE; --c-legendary:#C99A2E; --c-exotic:#2E9E92; --c-mythic:#3A3848; --c-godly:#D8B860;
   --display:"Young Serif", Georgia, "Times New Roman", serif;
   --body:"Nunito", ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
   color-scheme: dark;

@@ -46,8 +46,14 @@ npm run sim -- --rod brasscap --spot deep --hour 6.5 --meal pie:3 --sets all
 where it applies. A new rod perk, enchantment or relic is a list of modifiers in its data; the game, the
 journal's Bonuses page and the balance simulator all pick it up.
 
+**Treasure.** About one cast in 12 pulls up treasure instead of a fish: coin pouches, message bottles, drowned letters,
+one-of-a-kind finds and loot crates from Common to Mythic (`src/data/treasure.js`). Artifacts work from vest pockets,
+keepsakes always work, and a few curios go back to their owners; the journal's Finds page holds it all.
+Playtest > Tools can pick what the next cast pulls up, to see any crate open.
+
 **Adding content.** A new fish is an entry in `src/data/fish.js` plus its region list and bite weights.
+A new find is an entry in `src/data/treasure.js` plus its drawing in `src/game/loot-art.js`.
 The checker catches a misspelled id, a size range upside down, a rod that costs less than the one before it,
-a recipe that needs a fish that doesn't exist, or a tank set nobody could complete.
+a recipe that needs a fish that doesn't exist, a tank set nobody could complete, or a crate tier with nothing to hold.
 
 **Releasing.** Run `npm test`, then commit the built files with the source. Pages serves `main` from the repo root.

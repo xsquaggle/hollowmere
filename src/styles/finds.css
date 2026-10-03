@@ -1,0 +1,55 @@
+/* Finds: the journal page for treasure, the vest pockets, the collection grid and giving things back */
+.fd-count{margin:0 0 10px;font-size:13px;font-weight:700;color:#6B665C}.fd-count b{font:400 20px/1 var(--display);color:var(--ink)}
+.fd-card{border:1.5px solid rgba(43,42,51,.18);border-radius:12px;padding:11px 12px 10px;margin:0 0 10px;display:grid;gap:8px}
+.fd-card header{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.fd-card h3{margin:0;font:400 18px/1.15 var(--display)}
+.fd-card header span{font-size:12px;font-weight:800;color:#7A7468}
+.fd-card .bn-hint{margin:0}
+.fd-vest{background:linear-gradient(#EFE3C6,#E6D6B2);border-color:#8A6A44}
+.pk-row{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.pk{min-height:72px;border-radius:10px 10px 14px 14px;border:2px dashed rgba(90,62,38,.45);background:rgba(255,248,232,.5);display:grid;align-content:center;justify-items:center;gap:3px;padding:5px 3px;font:800 10.5px/1.15 var(--body);color:#6E5236;text-align:center;box-sizing:border-box;min-width:0}
+.pk span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pk.full{border:2px solid #6E5236;background:#FBF3DF;cursor:pointer;box-shadow:inset 0 -5px 0 rgba(110,82,54,.15)}
+.pk.full canvas{width:40px;height:40px;max-width:100%}
+.pk.empty i{width:26px;height:26px;border-radius:50%;border:2px dashed rgba(90,62,38,.3)}
+.pk.lock{cursor:pointer;border-style:solid;border-color:#8A6A44;background:rgba(43,42,51,.06);font-family:var(--body)}
+.pk.lock b{font:400 22px/1 var(--display)}
+.pk.lock small{display:flex;align-items:center;gap:3px;font-size:10.5px;font-weight:800}.pk.lock small .coin{width:9px;height:9px}
+.pk.lock:disabled{opacity:.55;cursor:default}.pk.lock.dim{opacity:.35;cursor:default}
+.fd-row{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:8px 9px}
+.fd-row canvas{width:52px;height:52px}
+.fd-row h4{margin:0;font:400 16px/1.15 var(--display)}
+.fd-row p{margin:2px 0 0;font-size:12.5px;line-height:1.35;color:#4B4842}
+.fd-row .down{color:#A04636}
+.fd-row .k,.fd-detail .k,.fd-note .k{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+.fd-row .k b{color:var(--danger)}
+.fd-row.eq{box-shadow:inset 4px 0 0 #6E5236}
+.fd-row .tag{font-size:11px}
+.fd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:7px}
+.fd-tile{aspect-ratio:1;padding:4px;cursor:pointer;display:grid;place-items:center;position:relative;min-width:0}
+.fd-tile canvas{width:100%;height:100%}
+.fd-tile.none{background:rgba(43,42,51,.05);border-style:dashed}
+.fd-tile.sel{box-shadow:inset 0 0 0 3px var(--brass)}
+.fd-tile .owed,.fd-tile .nw{position:absolute;top:4px;right:4px;font:800 10.5px/1 var(--body);font-style:normal;color:#fff;background:var(--danger);border-radius:999px;padding:3px 5px}
+.fd-tile .nw{background:#3E7A35;left:4px;right:auto}
+/* the grid and lists stay still; only a haul card shimmers */
+.fd-tile.rf,.fd-row.rf,.fd-detail.rf,.fd-crates .rf{animation:none}
+.fd-detail{display:grid;justify-items:center;text-align:center;gap:3px;padding:12px 12px 12px;margin-top:2px}
+.fd-detail canvas.big{width:110px;height:110px}
+.fd-detail h4{margin:0;font:400 19px/1.15 var(--display)}
+.fd-detail p{margin:0;font-size:13px;line-height:1.4;color:#4B4842}
+.fd-detail .lore{font-style:italic}.fd-detail .eff{font-weight:800;color:#2B2A33}.fd-detail .down{color:#A04636}
+.fd-detail .where{font-size:11.5px;color:#7A7468;margin-top:2px}.fd-detail .owner{color:#6E5A2E;font-weight:700;margin-top:4px}
+.fd-detail .btn{margin-top:6px}
+.fd-detail.none{border:1.5px dashed rgba(43,42,51,.25);border-radius:10px}
+.fd-note{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;width:100%;text-align:left;font:inherit;color:inherit;background:rgba(255,255,255,.4);border:1.5px solid rgba(43,42,51,.15);border-radius:10px;padding:7px 10px;cursor:pointer}
+.fd-note canvas{width:44px;height:44px}.fd-note h4{margin:1px 0 0;font:400 15px/1.2 var(--display)}.fd-note .k{color:#7A7468}.fd-note .go{font-size:12px;font-weight:800;color:#6E5236}
+.fd-crates{display:flex;flex-wrap:wrap;gap:6px}
+.fd-crates span{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;padding:5px 9px}
+.fd-crates i{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(43,42,51,.35)}
+.rt-card{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:center;margin:0 0 12px}
+.rt-face{width:96px;height:96px}
+.rt-line{margin:0;font-size:15px;line-height:1.45;font-style:italic;color:#3A3832}
+.rt-gifts{display:grid;gap:8px;margin:0 0 12px}
+.rt-gift{display:flex;align-items:center;gap:8px;font-weight:800;color:#6B665C}.rt-gift b{font:400 26px/1 var(--display);color:var(--ink)}.rt-gift .coin{width:20px;height:20px}
+.rt-go{width:100%;font-size:15px;padding:12px}

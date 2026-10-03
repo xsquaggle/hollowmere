@@ -1,6 +1,6 @@
 /* ---------- Modifiers: every bonus in the game goes through here ---------- */
-/* Each source (the rod in hand, the meal you ate, tank sets, decor, boat parts, mastery, Gull Luck, playtest
-   tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
+/* Each source (the rod in hand, the meal you ate, tank sets, decor, boat parts, artifacts in your vest pockets,
+   keepsakes, mastery, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
    stat's total in a context (region, time, spot, fish, rarity, Gull Luck) and only matching modifiers count.
    STATS (data/stats.js) says how each stat combines and where it can apply at all. Adding an enchantment or
    a relic later means adding its modifiers to a source; nothing that reads the stats has to change.
@@ -30,6 +30,10 @@ function modSources(){
   for (const k in TANKS) for (const d of decorFor(k)) if (d.luck && T[k].fish.some(f=>d.ids&&d.ids.includes(f.id))) add('decor',d.name,'luck',d.luck.v,{when:{region:d.luck.region}});
   // boat parts
   for (const id of save.parts||[]){ const P=PARTS[id]; if (P) for (const x of P.mods||[]) L.push(Object.assign({src:'part',name:P.name},x)); }
+  // artifacts work while they're in a vest pocket; keepsakes work from the moment you have them
+  const FS=findsState();
+  for (const id of FS.equip){ const D=FINDS[id]; if (D && FS.have[id]) for (const x of D.mods||[]) L.push(Object.assign({src:'artifact',name:D.name},x)); }
+  for (const id in FS.have){ const D=FINDS[id]; if (D && D.kind==='keepsake') for (const x of D.mods||[]) L.push(Object.assign({src:'keepsake',name:D.name},x)); }
   add('base','Keepnet','netCap',STATS.netCap.start);
   // mastery: enough of a species and your rod knows it
   for (const id in FISH) if ((save.fish[id]||{}).caught>=MASTERY.catches){ const n='Mastered '+FISH[id].name;
@@ -62,6 +66,8 @@ function modMul(stat,c){ let v=1; for (const m of modsFor(stat,c)) v*=m.v; retur
 function modAdd(stat,c){ let v=0; for (const m of modsFor(stat,c)) v+=m.v; return v; }
 /** A value one source sets (the rod's reach), times any multipliers. Only the rod sets base values today. */
 function modBase(stat,c){ let v=0, mul=1; for (const m of modsFor(stat,c)){ if (m.base) v=m.v; else mul*=m.v; } return v*mul; }
+/** How far out a cast can land, 0 (the dock) to 1 (the horizon): the rod's reach and anything that adds to it. */
+const castReach = c => Math.min(1,modBase('reach',c));
 function modFlag(stat,c){ return modsFor(stat,c).length>0; }
 
 /* Luck. Every luck bonus adds points: +35 from a Brasscap Pro (.35), +60 from a three-star Banquet Pie.
@@ -69,6 +75,8 @@ function modFlag(stat,c){ return modsFor(stat,c).length>0; }
    and flattens toward that rarity's ceiling (RAR[].luckCap), so one big bonus feels big but stacking
    everything stops paying long before the odds run away. Omens (Gull Luck, the Deepwater Caster in the
    trench) multiply after the ceiling, while they apply. */
+/** What Gull Luck multiplies rarer bites by: 2, or more with the Gull's Wishbone. */
+function gullMul(){ let v=1; for (const m of modsFor('luck',{lucky:true,rarity:'legendary'})) if (m.omen && m.when && m.when.lucky) v*=m.v; return v; }
 function luckPoints(c){ let p=0; for (const m of modsFor('luck',c)) if (!m.omen) p+=m.v; return p; }
 function luckCurve(p,cap){ return p>=0 ? 1+(cap-1)*Math.tanh(p/(cap-1)) : 1/(1-p); }
 function tierMul(rar,c){ c=Object.assign({},c,{rarity:rar}); const cap=RAR[rar].luckCap;

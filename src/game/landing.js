@@ -8,7 +8,9 @@ function catchRoll(id,perfect,ctx){ const F=FISH[id];
   return {size,build,w,value,stars:qualityOf(id,size,perfect)}; }
 function startLand(){
   humStop(); const R=S.reel, F=R.F, {size,build,w:wgt,value}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky});
-  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot:(S.bob&&S.bob.spot)||'open',hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0};
+  // the Hungry Hook takes its share before you can keep the fish
+  const eaten=!S.tut && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
+  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot:(S.bob&&S.bob.spot)||'open',hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0,eaten};
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
   sfx.out(F.rarity); buzz(F.rarity==='legendary'?[0,40,60,40,60,120]:40); shake(F.rarity==='legendary'?6:2);
   if (!REDUCED && (F.rarity==='rare'||F.rarity==='legendary')) S.zoomT=F.rarity==='legendary'?1.12:1.06;
@@ -17,10 +19,19 @@ function startLand(){
 function updateLand(dt){
   const L=S.land, r=L.F.rarity, slow=(r==='rare'||r==='legendary') && !REDUCED && L.p>.3 && L.p<.7 ? .38 : 1;
   L.p=Math.min(1,L.p+dt/RAR[r].land*slow*(r==='rare'||r==='legendary'?1.6:1));
+  if (L.eaten && L.p>.55) return hookEats();
   if (L.p>.5 && !L.burst){ L.burst=true; if (r==='legendary') confetti(L.to.x,L.to.y,70); else if (r==='rare') confetti(L.to.x,L.to.y,24); pulse(r==='common'?.1:.3); }
   if (Math.random()<.5 && L.p<.8){ const p=landPos(); splash(p.x,p.y,1); }
   if (L.p>=1) showCard();
 }
+/** The Hungry Hook eats the catch in midair: no card, no coins, no journal credit. */
+function hookEats(){ const L=S.land, p=landPos(); save.stats.eaten=(save.stats.eaten||0)+1; rec(L.id).seen=true; persist();
+  sfx.chomp(); buzz([0,30,30,60]); shake(4); pulse(.25,'180,67,58');
+  for (let i=0;i<16;i++) S.particles.push({x:p.x,y:p.y,vx:rand(-140,140),vy:rand(-160,40),g:420,life:0,max:rand(.4,.8),r:rand(1.4,3),c:i%3?'rgba('+rgbOf(L.F.color)+',':'rgba(243,234,215,'});
+  S.particles.push({x:p.x,y:p.y-30,vx:0,vy:-30,g:0,life:0,max:1.3,r:0,c:'rgba(0,0,0,',word:'CHOMP!'});
+  news('The Hungry Hook ate your '+L.F.name,'bad');
+  if (!save.stats.eatenTip){ save.stats.eatenTip=true; persist(); coachFor('The Hungry Hook doubles what fish are worth, but now and then it eats one. Take it out of your pocket on the journal’s Finds page.',8); }
+  S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); }
 function landPos(){ const L=S.land, p=L.p, c={x:(L.from.x+L.to.x)/2, y:Math.min(L.from.y,L.to.y)-H*.16};
   const e=1-Math.pow(1-p,2);
   return {x:(1-e)*(1-e)*L.from.x+2*(1-e)*e*c.x+e*e*L.to.x, y:(1-e)*(1-e)*L.from.y+2*(1-e)*e*c.y+e*e*L.to.y, e}; }
@@ -39,7 +50,7 @@ function showCard(){
   const card=$('card'); card.dataset.r=F.rarity; card.classList.remove('out');
   $('cRarity').textContent=RAR[F.rarity].label; $('cNew').hidden=!L.isNew;
   $('cName').textContent=F.name; $('cSize').textContent=fmtLen(L.size); $('cW').textContent=fmtW(L.w); $('cQ').innerHTML=starsHTML(L.stars,'pop'); $('cValue').textContent='+'+L.value; $('cBeh').textContent=BEH[F.beh];
-  const tags=[]; if (L.lucky) tags.push('Gull luck 2×'); if (L.perfect) tags.push('Perfect hook +25%'); if (L.build>=1.1) tags.push('Chunky');
+  const tags=[]; if (L.lucky) tags.push('Gull luck '+trimNum(gullMul())+'×'); if (L.perfect) tags.push('Perfect hook +25%'); if (L.build>=1.1) tags.push('Chunky');
   if (L.isNew && save.kitchenOpen){ const rid=recipeLearnedBy(L.id); if (rid) tags.push('New recipe: '+RECIPES[rid].name); }
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
   if (r.caught===MASTERY.catches) tags.push('Mastered: reels get easier'); else if (r.caught<MASTERY.catches) tags.push('Mastery '+r.caught+'/'+MASTERY.catches);
@@ -83,14 +94,14 @@ $('cKeep').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); dismi
 $('cSell').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); dismissCard('sell'); });
 $('cTank').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); dismissCard('tank'); });
 let coinShown=0;
-function addCoins(n){
-  save.coins+=n; persist(); sfx.coin(Math.ceil(n/5));
-  const start=coinShown, end=save.coins, t0=performance.now(), dur=Math.max(250,Math.min(900,250+Math.abs(n)*40));
+function addCoins(n){ save.coins+=n; persist(); sfx.coin(Math.ceil(n/5)); coinTally(Math.max(250,Math.min(900,250+Math.abs(n)*40))); }
+let coinGoal=0;
+/** The HUD's coin count catches up with the save, counting up (or down). A newer tally takes over an older one. */
+function coinTally(dur){ const start=coinShown, end=save.coins, t0=performance.now(); coinGoal=end;
   const el=$('coins'); el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
-  (function step(now){ const k=Math.min(1,(now-t0)/dur); coinShown=Math.round(lerp(start,end,1-Math.pow(1-k,3))); el.textContent=coinShown.toLocaleString(); if (k<1) requestAnimationFrame(step); })(t0);
-}
+  (function step(now){ if (coinGoal!==end) return; const k=Math.min(1,(now-t0)/dur); coinShown=Math.round(lerp(start,end,1-Math.pow(1-k,3))); el.textContent=coinShown.toLocaleString(); if (k<1) requestAnimationFrame(step); })(t0); }
 function updateHud(){
   const all=REGION_FISH.lake.concat(save.boat?REGION_FISH.coast:[]), n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
   $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('aquaBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; $('kitchenBtn').hidden=!save.kitchenOpen; $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
-  $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)');
+  $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot();
 }

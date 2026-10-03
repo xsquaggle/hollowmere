@@ -4,7 +4,7 @@ function updateAim(x,y){
   const vx=a.sx-x, vy=a.sy-y, len=Math.hypot(vx,vy), maxPull=Math.min(H*.3,230);
   a.p = -vy>4 ? clamp(len/maxPull,0,1) : 0;
   a.th = len>10 ? clamp(Math.atan2(vx,-vy),-.8,.8) : 0;
-  const depth=clamp((a.p-.12)/.88,0,1)*modBase('reach'), ty=lerp(G.near,HZ+26,depth); a.depth=depth;
+  const depth=clamp((a.p-.12)/.88,0,1)*castReach(), ty=lerp(G.near,HZ+26,depth); a.depth=depth;
   const tx=clamp(W/2+Math.tan(a.th)*(G.player.y-ty)*.85,22,W-22);
   a.target={x:tx,y:ty}; a.spot=spotAt(tx,ty); a.lucky=inLucky(tx,ty);
 }

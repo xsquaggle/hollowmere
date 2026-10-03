@@ -62,7 +62,7 @@
 .rbar i{position:absolute;top:-4px;width:3px;height:14px;margin-left:-1.5px;border-radius:2px;background:var(--ink)}
 .rlab{display:flex;justify-content:space-between;font-size:10.5px;font-weight:800;color:#8A847A}
 .net-rec{font:800 10px/1.4 var(--body);letter-spacing:.08em;white-space:nowrap;display:inline-block;text-transform:uppercase;color:#7A5A22;background:#F2D47E;border:1.5px solid #7A5A22;border-radius:5px;padding:1px 5px;margin-left:4px;vertical-align:1px}
-@media (prefers-reduced-motion: reduce){.rec-stamp,#cPB,.qstars.pop svg{animation-duration:.01s!important;animation-delay:0s!important}}
+@media (prefers-reduced-motion: reduce){.rec-stamp,#cPB,.qstars.pop svg{animation-duration:.01s!important;animation-delay:0s!important}#card[data-r]{animation:none!important}}
 
 #cName{font:400 26px/1.1 var(--display);margin:0;text-wrap:balance}
 .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-variant-numeric:tabular-nums}

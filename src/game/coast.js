@@ -78,8 +78,10 @@ function drawSkiffDeck(){
   const cx=W/2, b=S.bob_y||0, tipY=H-200+b, gy=H-62+b;
   ctx.strokeStyle='rgba(235,245,248,.35)'; ctx.lineWidth=2;
   ctx.beginPath(); ctx.moveTo(cx,tipY+4); ctx.quadraticCurveTo(cx-90,H-150+b,cx-150,H); ctx.moveTo(cx,tipY+4); ctx.quadraticCurveTo(cx+90,H-150+b,cx+150,H); ctx.stroke();
-  ctx.fillStyle=(PAINTS[save.paint]||PAINTS.blue).hull; ctx.beginPath(); ctx.moveTo(cx,tipY); ctx.quadraticCurveTo(cx-86,H-150+b,cx-140,H+4); ctx.lineTo(cx+140,H+4); ctx.quadraticCurveTo(cx+86,H-150+b,cx,tipY); ctx.closePath(); ctx.fill();
-  ctx.fillStyle='#EDE6D6'; ctx.beginPath(); ctx.moveTo(cx,tipY+6); ctx.quadraticCurveTo(cx-80,H-150+b,cx-130,H+4); ctx.lineTo(cx-122,H+4); ctx.quadraticCurveTo(cx-74,H-148+b,cx,tipY+14); ctx.quadraticCurveTo(cx+74,H-148+b,cx+122,H+4); ctx.lineTo(cx+130,H+4); ctx.quadraticCurveTo(cx+80,H-150+b,cx,tipY+6); ctx.closePath(); ctx.fill();
+  const PT=PAINTS[save.paint]||PAINTS.blue;
+  ctx.fillStyle=hullColor(); ctx.beginPath(); ctx.moveTo(cx,tipY); ctx.quadraticCurveTo(cx-86,H-150+b,cx-140,H+4); ctx.lineTo(cx+140,H+4); ctx.quadraticCurveTo(cx+86,H-150+b,cx,tipY); ctx.closePath(); ctx.fill();
+  if (PT.stars){ ctx.save(); ctx.clip(); for (let i=0;i<14;i++){ const sx=cx+((i*53)%260)-130, sy=H-130+b+((i*37)%120), tw=.4+.6*Math.abs(Math.sin(S.time*1.3+i)); ctx.fillStyle='rgba(225,230,245,'+tw.toFixed(2)+')'; ctx.beginPath(); ctx.arc(sx,sy,1.3,0,7); ctx.fill(); } ctx.restore(); }
+  ctx.fillStyle=PT.trim||'#EDE6D6'; ctx.beginPath(); ctx.moveTo(cx,tipY+6); ctx.quadraticCurveTo(cx-80,H-150+b,cx-130,H+4); ctx.lineTo(cx-122,H+4); ctx.quadraticCurveTo(cx-74,H-148+b,cx,tipY+14); ctx.quadraticCurveTo(cx+74,H-148+b,cx+122,H+4); ctx.lineTo(cx+130,H+4); ctx.quadraticCurveTo(cx+80,H-150+b,cx,tipY+6); ctx.closePath(); ctx.fill();
   ctx.fillStyle='#7A5D43'; ctx.beginPath(); ctx.moveTo(cx,tipY+16); ctx.quadraticCurveTo(cx-72,H-146+b,cx-118,H+4); ctx.lineTo(cx+118,H+4); ctx.quadraticCurveTo(cx+72,H-146+b,cx,tipY+16); ctx.closePath(); ctx.fill();
   ctx.strokeStyle='rgba(60,40,28,.4)'; ctx.lineWidth=1; for (let i=-3;i<=3;i++){ ctx.beginPath(); ctx.moveTo(cx+i*6,tipY+24); ctx.lineTo(cx+i*34,H+4); ctx.stroke(); }
   ctx.fillStyle='#5E4634'; ctx.fillRect(cx-90,gy,180,12); ctx.strokeStyle=INK; ctx.lineWidth=1.3; ctx.strokeRect(cx-90,gy,180,12);

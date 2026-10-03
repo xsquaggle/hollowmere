@@ -1,5 +1,5 @@
 /* ---------- Buttons & sheets ---------- */
-$('soundBtn').addEventListener('click',()=>{ openSettings(); });
+$('soundBtn').addEventListener('click',()=>{ if (S.state==='loot') return; openSettings(); });   // a treasure moment finishes first
 function openSheet(html){ $('panel').innerHTML=html; $('sheet').hidden=false; ovOpen('sheet',()=>{ closeSheet(); }); }
 function closeSheet(){ if ($('sheet').hidden) return; $('sheet').hidden=true; ovClosed('sheet'); }
 $('sheet').addEventListener('pointerdown',e=>{ if (e.target.id==='sheet') closeSheet(); });

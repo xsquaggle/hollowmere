@@ -2,7 +2,8 @@
    RODS[id]   name; price; reach (how far it casts, 0..1 of the lake); line, reel, value (multipliers); luck (luck points: .35 is +35 luck);
               snag (chance the reeds catch the line); reedBoost (reed fish bite this much sooner); color; where; perk;
               sea:true for Tacklegram rods; mods, the perk as modifiers (see data/stats.js and game/mods.js).
-   ROD_ORDER  Ottilie's shop ladder.  SEA_RODS  the Tacklegram ladder.  PARTS (with their mods), PAINTS  boat upgrades and colors.
+   ROD_ORDER  Ottilie's shop ladder.  SEA_RODS  the Tacklegram ladder.  PARTS (with their mods), PAINTS  boat upgrades and colors
+              (a paint with crate: only comes in loot crates; the rest are sold on Tacklegram).
    A modifier is {stat, v, when?, omen?}: stat names an entry in STATS; when limits it to a region, spot, time
    (night:true), fish, rarity (a list) or rarityMin (that rarity and rarer); omen:true multiplies luck after the
    ceilings, like Gull Luck. */
@@ -38,4 +39,9 @@ const PARTS={
          plus:['Your boat rocks half as much','Swells hit your line half as hard'], mods:[{stat:'swell', v:.5}]}
 };
 const PAINTS={blue:{name:'Harbor Blue',hull:'#3E5A6E',price:0},red:{name:'Lobster Red',hull:'#9E3B32',price:300},green:{name:'Sea-glass Green',hull:'#4E8A78',price:300},
-  yellow:{name:'Sunflower',hull:'#D3A23C',price:300},night:{name:'Midnight',hull:'#22283F',price:300}};
+  yellow:{name:'Sunflower',hull:'#D3A23C',price:300},night:{name:'Midnight',hull:'#22283F',price:300},
+  // only in crates (data/treasure.js): crate names the tier; shift cycles the hull's color, trim and stars dress it up
+  violet:{name:'Violet Dusk',hull:'#5B4A7A',crate:'epic',trim:'#C9B6E8'},
+  gilded:{name:'Gilded',hull:'#A8823A',crate:'legendary',trim:'#F2D47E'},
+  aurora:{name:'Aurora',hull:'#3E7A8A',crate:'exotic',shift:true,trim:'#E8F6F2'},
+  inkwater:{name:'Inkwater',hull:'#1C1B24',crate:'mythic',stars:true,trim:'#C4C8D4'}};

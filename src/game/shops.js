@@ -36,6 +36,8 @@ function openShop(){
     '<div style="position:relative;height:7px;background:rgba(43,42,51,.12);border-radius:4px"><i style="position:absolute;inset:0 auto 0 0;width:'+Math.round(v/max*100)+'%;background:'+(v>cv?'#5E9B4E':v<cv?'#C0705C':'#8A8578')+';border-radius:4px"></i>'+
     '<i style="position:absolute;top:-3px;bottom:-3px;left:calc('+Math.round(cv/max*100)+'% - 1px);width:2px;background:#2B2A33"></i></div></div>';
   let h='<div class="panel-head"><div><h2>Ottilie’s Rods</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins · Equipped: '+cur.name+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>';
+  const mine=ownerHas('ottilie');
+  if (mine.length){ const D=FINDS[mine[0]]; h+='<div class="entry rf ott-ask" data-r="'+D.rarity+'" style="grid-template-columns:64px 1fr"><canvas data-find="'+mine[0]+'" style="width:64px;height:64px"></canvas><div><p style="margin:0;font-style:italic;font-size:14px;color:#4B4842">“Hold on. Is that my '+D.name.toLowerCase().replace(/^tin /,'')+'? Where on earth did you find it?”</p><button class="btn primary" type="button" data-give="'+mine[0]+'" style="margin-top:8px">Give it back</button></div></div>'; }
   h+='<p class="note" style="font-style:italic;font-size:14px;color:#4B4842">“'+greet+'”</p><p class="note" style="margin-top:-6px">Dark line on each bar = your equipped rod.</p><div class="entries">';
   ROD_ORDER.forEach(id=>{ const R=RODS[id], owned=save.rods.includes(id), eq=save.rod===id, can=save.coins>=R.price, isNext=id===nextId;
     const btn=eq?'<span class="r" style="color:#4E7B4C">Equipped</span>':owned?'<button class="btn" data-eq="'+id+'" type="button">Equip</button>'
@@ -46,6 +48,8 @@ function openShop(){
       '<p style="margin:2px 0 0;font-weight:700;color:'+(id==='willow'?'#7A7468':'#3D5A3A')+'">'+(id==='willow'?'':'Perk: ')+R.perk+'</p></div><div>'+btn+'</div></div>'; });
   openSheet(h+'</div>');
   $('closeS').addEventListener('click',closeSheet);
+  paintTiles(document.querySelectorAll('#panel canvas[data-find]'));
+  document.querySelectorAll('#panel [data-give]').forEach(b=>b.addEventListener('click',()=>returnFind(b.dataset.give)));
   document.querySelectorAll('[data-eq]').forEach(b=>b.addEventListener('click',()=>{ save.rod=b.dataset.eq; persist(); sfx.hook(false); news('Equipped '+RODS[save.rod].name,'good'); openShop(); }));
   document.querySelectorAll('[data-buy]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.buy, R=RODS[id]; if (save.coins<R.price) return;
     addCoins(-R.price); save.rods.push(id); save.rod=id; persist(); sfx.out('uncommon'); buzz([0,30,40,30]); toast('New rod: '+R.name+'!','gold'); openShop(); }));

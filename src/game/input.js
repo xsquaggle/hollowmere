@@ -8,6 +8,7 @@ cv.addEventListener('pointerdown',e=>{
     case 'bite': hook(); break;
     case 'reeling': leapTap(); S.holding=true; S.pressX=x; S.pressTilt=S.tilt; break;
     case 'result': if (S.time-S.cardAt>.5) dismissCard(S.cardDefault); break;
+    case 'loot': lootTap(); break;
   }
 });
 cv.addEventListener('pointermove',e=>{

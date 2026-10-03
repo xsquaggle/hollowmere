@@ -8,7 +8,7 @@ function showResult(){ sizzleStop(); const total=STATIONS.reduce((a,k)=>a+(K.sco
   const starHtml=[0,1,2].map(i=>'<span class="k-star'+(i<stars?' on':'')+'"><svg class="bg" viewBox="0 0 24 24">'+SP+'</svg>'+(i<stars?'<svg class="fg" viewBox="0 0 24 24" style="animation-delay:'+(.35+i*.32)+'s">'+SP+'</svg>':'')+'</span>').join('');
   el.innerHTML='<div class="k-stars">'+starHtml+'</div>'+
     '<h3>'+(mush?MUSH.name:R.name)+'</h3>'+
-    '<p class="k-eff'+(mush?' mush':'')+'">'+(mush?'Well, it’s… food? '+MUSH.eff+' Lasts '+MUSH.casts+' casts.':effText(K.rid,stars)+' · lasts '+MEAL_CASTS[stars-1]+' casts')+'</p>'+
+    '<p class="k-eff'+(mush?' mush':'')+'">'+(mush?'Well, it’s… food? '+MUSH.eff+' Lasts '+MUSH.casts+' casts.':effText(K.rid,stars)+' · lasts '+Math.round(MEAL_CASTS[stars-1]*modMul('mealCasts'))+' casts')+'</p>'+
     '<div class="k-bars">'+bars+'</div>'+
     (mush?'<div class="row"><button class="btn" id="kToss" type="button">Give it to the heron</button><button class="btn primary" id="kEat" type="button">Eat it anyway</button></div>'
       :'<div class="row"><button class="btn" id="kSave" type="button"'+(pantryFull?' disabled':'')+'>'+(pantryFull?'Pantry full':'Save for later')+'</button><button class="btn primary" id="kEat" type="button">Eat now</button></div>')+
@@ -30,7 +30,7 @@ function kTopUI(){ const cooking=K.mode==='station'; $('kPips').hidden=!(cooking
 /* ---- recipe book ---- */
 function kBook(){ const el=$('kBook'); el.hidden=false; const m=save.meal&&save.meal.casts>0?save.meal:null, pan=save.pantry||[];
   const stars=n=>'<span class="k-mini-stars">'+'★'.repeat(n)+'<s>'+'★'.repeat(3-n)+'</s></span>';
-  let h='<section class="k-now">'+(m?'<canvas class="k-dish" data-dish="'+m.id+'" data-stars="'+m.stars+'"></canvas><div><span class="k-lab">Now eating</span><h4>'+mealName(m.id)+' '+(m.id==='mush'?'':stars(m.stars))+'</h4><p>'+effText(m.id,m.stars)+'</p><p class="k-casts"><i style="width:'+Math.round(m.casts/(m.id==='mush'?MUSH.casts:MEAL_CASTS[m.stars-1])*100)+'%"></i><span>'+m.casts+' casts left</span></p></div>'
+  let h='<section class="k-now">'+(m?'<canvas class="k-dish" data-dish="'+m.id+'" data-stars="'+m.stars+'"></canvas><div><span class="k-lab">Now eating</span><h4>'+mealName(m.id)+' '+(m.id==='mush'?'':stars(m.stars))+'</h4><p>'+effText(m.id,m.stars)+'</p><p class="k-casts"><i style="width:'+Math.round(Math.min(1,m.casts/(m.full||(m.id==='mush'?MUSH.casts:MEAL_CASTS[m.stars-1])))*100)+'%"></i><span>'+m.casts+' casts left</span></p></div>'
     :'<div><span class="k-lab">Nothing on the go</span><p>A meal lasts a number of casts, not minutes, so stepping away never wastes it. One meal at a time.</p></div>')+'</section>';
   h+='<h3 class="k-h">Pantry <span>'+pan.length+'/3</span></h3><div class="k-pantry">';
   for (let i=0;i<3;i++){ const p=pan[i]; h+=p?'<div class="k-jar"><canvas class="k-dish" data-dish="'+p.id+'" data-stars="'+p.stars+'"></canvas><b>'+RECIPES[p.id].name+'</b>'+stars(p.stars)+'<button class="btn" data-eat="'+i+'" type="button">Eat</button></div>':'<div class="k-jar empty"><span>Empty shelf</span></div>'; }

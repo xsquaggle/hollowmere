@@ -129,7 +129,27 @@ const sfx = {
   dive: () => { tone(160,.4,{to:70,vol:.2,type:'triangle'}); noise(.4,{vol:.12,f:300,type:'lowpass'}); },
   leap: () => noise(.25,{vol:.18,f:1500,to:600}),
   out: r => { noise(.35,{vol:.3,f:1200,to:400}); RAR[r].notes.forEach((n,i)=>tone(n,.35+i*.03,{vol:.13,type:'triangle',delay:.15+i*(r==='legendary'?.12:.08)})); },
-  coin: n => { for (let i=0;i<Math.min(n,6);i++) tone(1500+i*90,.05,{vol:.06,type:'square',delay:i*.05}); }
+  coin: n => { for (let i=0;i<Math.min(n,6);i++) tone(1500+i*90,.05,{vol:.06,type:'square',delay:i*.05}); },
+  // treasure (game/treasure.js, game/loot.js)
+  clunk: () => { tone(150,.2,{to:70,vol:.3,type:'triangle'}); noise(.22,{vol:.2,f:420,type:'lowpass'}); },
+  snagged: () => { tone(110,.28,{to:58,vol:.22,type:'triangle'}); noise(.3,{vol:.12,f:260,type:'lowpass'}); },
+  haulOut: ti => { noise(.45,{vol:.3,f:900,to:280}); tone(190-ti*8,.35,{to:110,vol:.14,type:'triangle'}); },
+  thud: ti => { if (ti<0){ tone(300,.12,{to:160,vol:.16,type:'triangle'}); noise(.12,{vol:.1,f:700,type:'lowpass'}); return; }
+    tone(95-ti*5,.4+ti*.05,{to:42,vol:.42,type:'sine'}); noise(.3,{vol:.24+ti*.03,f:520,type:'lowpass'}); if (ti>=4) tone(70,.6,{to:38,vol:.3,type:'sine',delay:.08}); },
+  rattle: (k,ti) => { for (let i=0;i<3;i++) noise(.04,{vol:.14,f:1100+k*160+i*90,q:4,delay:i*.045}); tone(420+k*70+ti*20,.06,{vol:.05,type:'square'}); },
+  pry: (n,ti) => { noise(.14,{vol:.36,f:2800,type:'highpass'}); tone(180,.14,{to:80,vol:.08,type:'square'});
+    const ch=ti>=6?[262,311,392]:[392,494,587]; tone(ch[n-1]||ch[2],1.4,{vol:.09,type:'sine',delay:.05}); if (n===3) tone(ch[0]*2,1.6,{vol:.06,type:'triangle',delay:.12}); },
+  inkBell: () => { tone(98,3.4,{vol:.26,type:'sine'}); tone(196.6,2.4,{vol:.08,type:'sine'}); tone(294,1.8,{vol:.04,type:'sine'}); noise(1.2,{vol:.06,f:180,type:'lowpass'}); },
+  crateOpen: ti => { noise(.22,{vol:.32,f:1900,to:500}); tone(520,.1,{to:900,vol:.1,type:'triangle'});
+    const r=LOOT_TIERS[ti], N=RAR[r].notes, gap=ti>=4?.13:.08; N.forEach((n,i)=>tone(n,.4+i*.04+ti*.05,{vol:.12,type:ti>=6?'sine':'triangle',delay:.12+i*gap}));
+    if (ti>=4) N.slice(-3).forEach((n,i)=>tone(n,1.6,{vol:.05,type:'sine',delay:.12+N.length*gap+.05})); },
+  pouch: () => { noise(.12,{vol:.18,f:1500}); for (let i=0;i<7;i++) tone(1400+i*110,.05,{vol:.05,type:'square',delay:.06+i*.045}); },
+  glint: () => { tone(1760,.25,{vol:.07,type:'sine'}); tone(2637,.35,{vol:.05,type:'sine',delay:.08}); },
+  uncork: letter => { if (letter){ noise(.1,{vol:.25,f:1500}); tone(700,.05,{vol:.05,type:'triangle'}); } else { tone(900,.09,{to:480,vol:.22,type:'sine'}); noise(.06,{vol:.22,f:3200}); } },
+  paper: () => noise(.35,{vol:.09,f:2400,to:1200,q:.7}),
+  find: r => { const N=RAR[r].notes; N.slice(0,Math.min(N.length,3+rarRank(r))).forEach((n,i)=>tone(n*2,.22,{vol:.06,type:'sine',delay:i*.05})); },
+  pocket: on => { noise(.08,{vol:.12,f:on?1800:900}); tone(on?660:440,.07,{vol:.07,type:'triangle',delay:.03}); },
+  chomp: () => { noise(.12,{vol:.32,f:700}); noise(.12,{vol:.28,f:600,delay:.14}); tone(160,.1,{to:80,vol:.12,type:'square'}); tone(140,.1,{to:70,vol:.1,type:'square',delay:.14}); }
 };
 function humStart(){ if (!AC || hum) return; const o=AC.createOscillator(), f=AC.createBiquadFilter(), g=AC.createGain();
   o.type='sawtooth'; o.frequency.value=90; f.type='lowpass'; f.frequency.value=600; g.gain.value=0; o.connect(f); f.connect(g); g.connect(master); o.start(); hum={o,g}; }

@@ -32,8 +32,8 @@ const noDupes = (where, list) => { const seen = new Set(); for (const x of list)
 const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, SPOT_NAME, REGION_FISH, REGION_NAME, MAP_PLACES,
   RODS, ROD_ORDER, SEA_RODS, PARTS, PAINTS, OTT_LINES, BAR_LINES, BANQUET_LINES, LETTER,
   TANKS, TIP_BASE, DECOR, TANK_SETS, SPICES, SPICE_ORDER, SIDES, FLESH, COOK_NAME, RECIPES, RECIPE_ORDER, MUSH, MEAL_STR, MEAL_CASTS,
-  CHORD, MOODS, MOTIF, AMB_LV, STATS } = D;
-for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS }))
+  CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER } = D;
+for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES }))
   if (!v) { console.error('Missing table ' + n + ' in src/data/.'); process.exit(1); }
 
 /* ---------- fish ---------- */
@@ -49,6 +49,7 @@ for (const id of FIDS) {
 }
 sameSet('BEH_TIP', keys(BEH_TIP), BEHS, 'behaviors with tips and behaviors');
 for (const r of RARS) need('RAR.' + r, RAR[r], { label: 'str', color: 'hex', hitstop: 'num0', land: 'num+', splash: 'num+', notes: 'arr' });
+RARS.forEach((r, i) => { if (RAR[r].pips !== i + 1) bad('RAR.' + r, `pips should count the tier (${i + 1})`); });
 noDupes('ORDER', ORDER);
 for (const r of keys(REGION_FISH)) { oneOf('REGION_FISH.' + r, r, REGIONS, 'region'); noDupes('REGION_FISH.' + r, REGION_FISH[r]); for (const id of REGION_FISH[r]) oneOf('REGION_FISH.' + r, id, FIDS, 'fish'); }
 for (const id of FIDS) { const n = keys(REGION_FISH).filter(r => REGION_FISH[r].includes(id)).length; if (n !== 1) bad('FISH.' + id, `should live in exactly one region, found ${n}`); }
@@ -73,7 +74,9 @@ for (let i = 1; i < ladder.length; i++) { const a = RODS[ladder[i - 1]], b = ROD
   for (const k of ['reach', 'line', 'reel', 'luck', 'value']) if (b[k] < a[k]) bad('RODS.' + ladder[i], `${k} drops below ${ladder[i - 1]}'s (${b[k]} < ${a[k]})`); }
 for (const id of SEA_RODS) if (RODS[id] && !RODS[id].sea) bad('RODS.' + id, 'is on the Tacklegram ladder, so it needs sea:true');
 for (const id of keys(PARTS)) { need('PARTS.' + id, PARTS[id], { name: 'str', price: 'num+', blurb: 'str', plus: 'arr' }); (PARTS[id].plus || []).forEach((p, i) => isStr(p) || bad('PARTS.' + id + '.plus[' + i + ']', 'empty')); }
-for (const id of keys(PAINTS)) need('PAINTS.' + id, PAINTS[id], { name: 'str', hull: 'hex', price: 'num0' });
+for (const id of keys(PAINTS)) { const P = PAINTS[id], w = 'PAINTS.' + id;
+  if (P.crate) { need(w, P, { name: 'str', hull: 'hex' }); oneOf(w + '.crate', P.crate, RARS, 'rarity'); if (P.price !== undefined) bad(w, 'crate paints are never sold, so no price'); if (P.trim && !isHex(P.trim)) bad(w + '.trim', 'not a color'); }
+  else need(w, P, { name: 'str', hull: 'hex', price: 'num0' }); }
 if (keys(PAINTS).filter(id => PAINTS[id].price === 0).length !== 1) bad('PAINTS', 'exactly one paint should be free (the starting hull)');
 
 /* ---------- world and people ---------- */
@@ -92,7 +95,8 @@ sameSet('TIP_BASE', keys(TIP_BASE), RARS, 'tip rarities and rarities');
 for (let i = 1; i < RARS.length; i++) if (!(TIP_BASE[RARS[i]] > TIP_BASE[RARS[i - 1]])) bad('TIP_BASE.' + RARS[i], 'rarer fish should tip more');
 sameSet('DECOR', keys(DECOR), TK, 'decor tanks and tanks');
 const decorIds = keys(DECOR).flatMap(k => DECOR[k].map(d => d.id)); noDupes('DECOR ids', decorIds);
-for (const k of keys(DECOR)) for (const d of DECOR[k]) { const w = `DECOR.${k}.${d.id}`; need(w, d, { id: 'str', name: 'str', price: 'num+', desc: 'str', eff: 'str' });
+for (const k of keys(DECOR)) for (const d of DECOR[k]) { const w = `DECOR.${k}.${d.id}`; need(w, d, { id: 'str', name: 'str', desc: 'str', eff: 'str' });
+  if (d.crate) { oneOf(w + '.crate', d.crate, RARS, 'rarity'); if (d.price !== undefined) bad(w, 'crate decor is never sold, so no price'); } else need(w, d, { price: 'num+' });
   if (!(d.all || d.jar || ((d.beh || d.ids || d.rar) && d.pct))) bad(w, 'needs an effect: all, jar, or beh/ids/rar with pct');
   (d.beh || []).forEach(b => oneOf(w + '.beh', b, BEHS, 'behavior')); (d.ids || []).forEach(id => oneOf(w + '.ids', id, FIDS, 'fish')); (d.rar || []).forEach(r => oneOf(w + '.rar', r, RARS, 'rarity'));
   if (d.luck) { oneOf(w + '.luck.region', d.luck.region, REGIONS, 'region'); if (!(d.luck.v > 0 && d.luck.v < 1)) bad(w + '.luck.v', 'luck points, like .05 for +5 luck'); } }
@@ -135,7 +139,9 @@ for (const [m, M] of Object.entries(MOODS)) { const w = 'MOODS.' + m; need(w, M,
 /* ---------- stats and modifiers ---------- */
 const KINDS = ['mul', 'luck', 'base', 'add', 'flag'];
 for (const r of RARS) { const c = RAR[r].luckCap; if (r === RARS[0]) { if (c !== undefined) bad('RAR.' + r, 'the commonest tier takes no luck cap (luck shrinks it instead)'); } else if (!(isNum(c) && c > 1)) bad('RAR.' + r, 'luckCap should be a number above 1'); }
-for (let i = 2; i < RARS.length; i++) if (RAR[RARS[i]].luckCap < RAR[RARS[i - 1]].luckCap) bad('RAR.' + RARS[i], 'rarer tiers should have a ceiling at least as high as the tier below');
+// ceilings climb with rarity, except Godly's, which sits below Mythic's on purpose (see data/fish.js)
+for (let i = 2; i < RARS.length; i++) if (RARS[i] !== 'godly' && RAR[RARS[i]].luckCap < RAR[RARS[i - 1]].luckCap) bad('RAR.' + RARS[i], 'rarer tiers should have a ceiling at least as high as the tier below');
+for (const r of RARS) if (RAR[r].luckCap > 4) bad('RAR.' + r, 'a luck ceiling above ×4 lets luck run away (the design caps Mythic at ×4)');
 const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true], fish: FIDS, rarity: RARS, rarityMin: RARS, lucky: [true] };
 const checkMod = (w, m) => {
   const st = STATS[m.stat]; if (!st) return bad(w, `unknown stat ${JSON.stringify(m.stat)} (see data/stats.js)`);
@@ -149,13 +155,59 @@ const checkMod = (w, m) => {
   for (const k of keys(m)) if (!['stat', 'v', 'when', 'omen'].includes(k)) bad(w, 'unknown modifier field ' + k);
 };
 for (const [k, st] of Object.entries(STATS)) { const w = 'STATS.' + k; need(w, st, { name: 'str', hint: 'str' }); oneOf(w + '.kind', st.kind, KINDS, 'stat kind');
-  if (st.unit !== undefined) oneOf(w + '.unit', st.unit, ['x'], 'unit'); if (st.when) checkMod(w + '.when', { stat: k, v: st.kind === 'flag' ? undefined : 1, when: st.when });
+  if (st.unit !== undefined) oneOf(w + '.unit', st.unit, ['x', 'chance', 'count'], 'unit'); if (st.when) checkMod(w + '.when', { stat: k, v: st.kind === 'flag' ? undefined : 1, when: st.when });
   if (st.kind !== 'flag') oneOf(w + '.good', st.good, ['up', 'down'], 'direction'); if (st.kind === 'add' && !isNum(st.start)) bad(w, 'an add stat needs a start value'); }
 for (const id of RIDS) (RODS[id].mods || []).forEach((m, i) => checkMod(`RODS.${id}.mods[${i}]`, m));
 for (const id of keys(PARTS)) (PARTS[id].mods || []).forEach((m, i) => checkMod(`PARTS.${id}.mods[${i}]`, m));
 for (const id of keys(PARTS)) if (!(PARTS[id].mods || []).length) bad('PARTS.' + id, 'a part needs at least one modifier, or it does nothing');
 for (const id of keys(RECIPES)) for (const b of RECIPES[id].boost || []) if (!STATS[b.k]) bad('RECIPES.' + id + '.boost', b.k + ' is not a stat in data/stats.js');
 for (const id of FIDS) if (FISH[id].night !== undefined && FISH[id].night !== true) bad('FISH.' + id, 'night is either true or left out');
+
+/* ---------- treasure ---------- */
+const KINDS_T = ['pouch', 'bottle', 'find', 'crate'];
+sameSet('TREASURE.kinds', keys(TREASURE.kinds), KINDS_T, 'treasure kinds and the kinds game/loot.js shows');
+for (const [k, v] of Object.entries(TREASURE.kinds)) if (!(v > 0)) bad('TREASURE.kinds.' + k, 'weight should be above 0');
+if (!(TREASURE.rate > 0 && TREASURE.rate < .5 && TREASURE.firstRate >= TREASURE.rate && TREASURE.firstRate < 1)) bad('TREASURE', 'rate should be in (0, .5) and firstRate at least rate');
+if (!(Number.isInteger(TREASURE.from) && TREASURE.from >= 0)) bad('TREASURE.from', 'a whole number of catches');
+for (const k of ['pouch', 'bottle', 'find', 'letter']) need('TREASURE.haul.' + k, TREASURE.haul[k] || {}, { pull: 'num+', reel: 'num+' });
+if (!(TREASURE.pouch[0] > 0 && TREASURE.pouch[0] <= TREASURE.pouch[1])) bad('TREASURE.pouch', '[least, most] fish worth of coins');
+for (const r of keys(TREASURE.loose)) { oneOf('TREASURE.loose', r, RARS, 'rarity'); if (rank(r) > rank('legendary')) bad('TREASURE.loose.' + r, 'Exotic and rarer finds only come in crates'); }
+const L = TREASURE.letter; oneOf('TREASURE.letter.region', L.region, REGIONS, 'region'); (L.spots || []).forEach(sp => oneOf('TREASURE.letter.spots', sp, keys(SPOT_NAME), 'spot'));
+function rank(r) { return RARS.indexOf(r); }
+const CT = keys(CRATES); CT.forEach((t, i) => { if (t !== RARS[i]) bad('CRATES', `crate tiers follow the rarities in order from common (${t} is in ${RARS[i]}'s place)`); });
+let prevC = null;
+for (const t of CT) { const C = CRATES[t], w = 'CRATES.' + t; need(w, C, { name: 'str', look: 'str', weight: 'num+', pull: 'num+', reel: 'num+', fish: 'num+', floor: 'num+', items: 'arr' });
+  if (!(Number.isInteger(C.snags) && C.snags >= 0 && C.snags <= 3)) bad(w + '.snags', '0 to 3');
+  if (prevC) { for (const k of ['pull', 'reel', 'fish', 'floor']) if (!(C[k] >= prevC[k])) bad(w, `${k} should not drop below the tier before`); if (!(C.weight < prevC.weight)) bad(w, 'rarer crates should be rarer'); }
+  for (const [i, it] of (C.items || []).entries()) { const iw = w + '.items[' + i + ']';
+    for (const k of keys(it)) if (!['lean', 'prize', 'paint', 'note', 'chance'].includes(k)) bad(iw, 'unknown item field ' + k);
+    for (const k of ['lean', 'prize', 'paint']) if (it[k] !== undefined) { oneOf(iw + '.' + k, it[k], RARS, 'rarity'); if (rank(it[k]) > rank(t)) bad(iw, `${k} ${it[k]} is rarer than the crate`); }
+    if (!(it.lean || it.prize || it.paint)) bad(iw, 'needs a lean, prize or paint');
+    for (const k of ['note', 'chance']) if (it[k] !== undefined && !(it[k] > 0 && it[k] <= 1)) bad(iw + '.' + k, 'a chance in (0, 1]'); }
+  prevC = C; }
+const FKINDS = ['curio', 'artifact', 'keepsake'];
+for (const id of keys(FINDS)) { const F = FINDS[id], w = 'FINDS.' + id;
+  if (!/^[a-z][a-z0-9]*$/.test(id)) bad(w, 'ids are lowercase letters and digits');
+  need(w, F, { name: 'str', lore: 'str' }); oneOf(w + '.kind', F.kind, FKINDS, 'find kind'); oneOf(w + '.rarity', F.rarity, CT, 'crate tier'); oneOf(w + '.region', F.region, [...REGIONS, 'any'], 'region');
+  if (F.kind === 'curio') { if (F.mods || F.eff) bad(w, 'curios do nothing: no mods or eff'); }
+  else { need(w, F, { eff: 'str', mods: 'arr' }); if (!(F.mods || []).length) bad(w, 'an artifact or keepsake needs at least one modifier'); (F.mods || []).forEach((m, i) => checkMod(`${w}.mods[${i}]`, m)); if (F.down !== undefined && !isStr(F.down)) bad(w + '.down', 'empty'); }
+  if (F.from !== undefined) { oneOf(w + '.from', F.from, ['return'], 'source'); if (F.kind !== 'keepsake') bad(w, 'only keepsakes come as rewards'); }
+  if (F.owner !== undefined) { oneOf(w + '.owner', F.owner, keys(OWNERS), 'owner'); if (F.kind !== 'curio') bad(w, 'only curios can belong to someone'); const R = F.reward || {};
+    if (!isStr(R.line)) bad(w + '.reward', 'a returned find needs the owner’s line'); if (!(R.coins > 0)) bad(w + '.reward', 'coins should be above 0');
+    if (R.keepsake !== undefined) { if (!FINDS[R.keepsake] || FINDS[R.keepsake].kind !== 'keepsake' || FINDS[R.keepsake].from !== 'return') bad(w + '.reward', R.keepsake + ' should be a keepsake with from:"return"'); } }
+  if (rank(F.rarity) > rank('legendary') && F.from === 'return') bad(w, 'Exotic and rarer finds come in crates'); }
+for (const id of keys(FINDS).filter(id => FINDS[id].from === 'return')) if (keys(FINDS).filter(o => (FINDS[o].reward || {}).keepsake === id).length !== 1) bad('FINDS.' + id, 'a reward keepsake should be given by exactly one returned find');
+for (const t of CT) if (rank(t) > 0 && !keys(FINDS).some(id => FINDS[id].rarity === t && FINDS[id].from !== 'return')) bad('FINDS', 'no find of rarity ' + t + ' for its crates');
+for (const k of keys(OWNERS)) need('OWNERS.' + k, OWNERS[k], { name: 'str' });
+need('POCKETS', POCKETS, { start: 'num+', max: 'num+', costs: 'arr' });
+if (POCKETS.costs.length !== POCKETS.max - POCKETS.start) bad('POCKETS.costs', 'one price per pocket after the first');
+for (let i = 1; i < POCKETS.costs.length; i++) if (!(POCKETS.costs[i] > POCKETS.costs[i - 1])) bad('POCKETS.costs', 'each pocket should cost more than the last');
+for (const id of keys(NOTES)) { const N = NOTES[id], w = 'NOTES.' + id; oneOf(w + '.kind', N.kind, ['bottle', 'logbook', 'letter'], 'note kind');
+  if (!Array.isArray(N.lines) || !N.lines.length) bad(w, 'needs lines'); (N.lines || []).forEach((l, i) => { if (!isStr(l)) bad(w + '.lines[' + i + ']', 'empty'); else if (l.length > 34) bad(w + '.lines[' + i + ']', `${l.length} characters won’t fit on the paper (34 at most)`); });
+  if (N.region !== undefined) oneOf(w + '.region', N.region, REGIONS, 'region');
+  if (N.kind === 'letter' && !isStr(N.to)) bad(w, 'a letter needs an address (to)'); if (N.kind === 'logbook' && !(Number.isInteger(N.page) && N.page > 0)) bad(w, 'a logbook page needs its page number'); }
+sameSet('LETTER_ORDER', LETTER_ORDER, keys(NOTES).filter(id => NOTES[id].kind === 'letter'), 'LETTER_ORDER and the letters in NOTES');
+if (!keys(NOTES).some(id => NOTES[id].kind === 'bottle' && !NOTES[id].region)) bad('NOTES', 'some bottle notes should turn up anywhere');
 
 /* ---------- every string ---------- */
 let strings = 0;
@@ -164,4 +216,4 @@ const walk = (v, w) => { if (typeof v === 'string') { strings++; if (v !== v.tri
 for (const n of Object.keys(D)) walk(D[n], n);
 
 if (problems.length) { console.error(problems.length + ' content problem(s):\n  ' + problems.join('\n  ')); process.exit(1); }
-console.log(`Content OK: ${FIDS.length} fish in ${REGIONS.length} regions, ${RIDS.length} rods, ${keys(RECIPES).length} recipes, ${decorIds.length} decor, ${TANK_SETS.length} tank sets, ${keys(MOODS).length} moods, ${strings} strings checked.`);
+console.log(`Content OK: ${FIDS.length} fish in ${REGIONS.length} regions, ${RIDS.length} rods, ${keys(RECIPES).length} recipes, ${decorIds.length} decor, ${TANK_SETS.length} tank sets, ${keys(FINDS).length} finds, ${keys(NOTES).length} notes, ${keys(MOODS).length} moods, ${strings} strings checked.`);

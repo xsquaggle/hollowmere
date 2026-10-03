@@ -27,7 +27,7 @@ function drawLucky(){
     ctx.fillStyle='#FDFCF7'; ctx.strokeStyle='rgba(43,42,51,.55)'; ctx.lineWidth=1.4;
     ctx.beginPath(); for (let i=0;i<10;i++){ const ang=i/10*Math.PI*2, rr=(i%2?6:10)*s2; ctx.lineTo(Math.cos(ang)*rr,Math.sin(ang)*rr); } ctx.closePath(); ctx.fill(); ctx.stroke();
     ctx.fillStyle='rgba(200,190,160,.6)'; ctx.beginPath(); ctx.arc(2*s2,-1*s2,3*s2,0,Math.PI*2); ctx.fill(); ctx.restore(); }
-  ctx.font='800 11.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#F7DD92'; ctx.fillText('2× RARITY · '+Math.ceil(z.dur-z.t)+'s',z.x,z.y-z.r/2.2-8);
+  ctx.font='800 11.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#F7DD92'; ctx.fillText(trimNum(gullMul())+'× RARITY · '+Math.ceil(z.dur-z.t)+'s',z.x,z.y-z.r/2.2-8);
   if (Math.random()<.15) S.particles.push({x:z.x+rand(-z.r,z.r)*.8,y:z.y+rand(-z.r,z.r)*.3,vx:0,vy:-rand(8,20),g:0,life:0,max:.8,r:rand(1,2),c:'rgba(255,230,150,'});
 }
 function drawCloud(x,y,s){
@@ -211,7 +211,7 @@ function nightShade(){
 const OTT = {say:'', sayT:0, next:14};
 function ottPos(){ return {x:W/2-118, y:H-150}; }
 function onOttilie(x,y){ if (REG()!=='lake') return false; const o=ottPos(); return x>o.x-34 && x<o.x+34 && y>o.y-62 && y<o.y+14; }
-function ottHasNews(){ if (!save.metOttilie) return save.stats.catches>=3; const n=ROD_ORDER.find(id=>!save.rods.includes(id)); return !!n && save.coins>=RODS[n].price; }
+function ottHasNews(){ if (!save.metOttilie) return save.stats.catches>=3; if (ownerHas('ottilie').length) return true; const n=ROD_ORDER.find(id=>!save.rods.includes(id)); return !!n && save.coins>=RODS[n].price; }
 function drawOttilie(){
   const o=ottPos(), bob=Math.sin(S.time*1.4)*1.2, x=o.x, y=o.y+bob;
   ctx.strokeStyle='rgba(225,238,242,.25)'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.ellipse(x,o.y+9,34,5,0,0,Math.PI*2); ctx.stroke();
@@ -309,7 +309,8 @@ function updateScenery(dt){
     for (let i=0;i<n;i++) m.push({dx:i*11+rand(-2,2), dy:(i%2?1:-1)*Math.ceil(i/2)*5+rand(-1,1), ph:rand(0,6.28), s:rand(4.5,6.5)});
     SC.birds.push({x:dir>0?-30:W+30, y:rand(HZ*.15,HZ*.62), dir, sp:rand(22,34), members:m, dropAt:(!SC.lucky && !SC.gull && !S.tut && Math.random()<.45)?rand(W*.25,W*.75):null}); SC.nextBirds=REG()==='coast'?rand(5,10):rand(9,18); }
   for (const f of SC.birds){ f.x+=f.dir*f.sp*dt;
-    if (f.dropAt!=null && f.members.length>1 && (f.dir>0?f.x>=f.dropAt:f.x<=f.dropAt)){ const m=f.members.pop(); f.dropAt=null;
+    // a gull drops out to make a Gull Luck splash, but never during a treasure moment
+    if (f.dropAt!=null && f.members.length>1 && S.state!=='loot' && (f.dir>0?f.x>=f.dropAt:f.x<=f.dropAt)){ const m=f.members.pop(); f.dropAt=null;
       SC.gull={x:f.x+m.dx*f.dir*-1, y:f.y+m.dy, t:0, phase:'stop', dir:f.dir, s:m.s, ph:m.ph}; tone(1650,.12,{vol:.05,type:'triangle'}); } }
   const g=SC.gull;
   if (g){ g.t+=dt;
@@ -322,7 +323,7 @@ function updateScenery(dt){
       SC.lucky={x:d.tx,y:d.ty,r,t:0,dur:25};
       for (let i=0;i<10;i++) S.particles.push({x:d.tx,y:d.ty,vx:rand(-70,70),vy:rand(-90,-20),g:300,life:0,max:rand(.3,.6),r:rand(1.2,2.4),c:'rgba(250,249,244,'});
       ripple(d.tx,d.ty,40); ripple(d.tx,d.ty,24); noise(.2,{vol:.25,f:500,type:'lowpass'}); tone(210,.14,{to:90,vol:.14,type:'triangle'}); buzz(20);
-      toast('Splat! Gull luck: 2× rarity zone','gold'); S.particles.push({x:d.tx+34,y:d.ty-46,vx:6,vy:-18,g:0,life:0,max:1.3,r:0,c:'rgba(0,0,0,',word:'PLOP!'}); } }
+      (S.state==='loot'?news:toast)('Splat! Gull luck: '+trimNum(gullMul())+'× rarity zone','gold'); S.particles.push({x:d.tx+34,y:d.ty-46,vx:6,vy:-18,g:0,life:0,max:1.3,r:0,c:'rgba(0,0,0,',word:'PLOP!'}); } }
   if (SC.lucky){ SC.lucky.t+=dt; if (SC.lucky.t>=SC.lucky.dur) SC.lucky=null; }
   SC.birds=SC.birds.filter(f=>f.x>-120 && f.x<W+120);
   if (SC.boat){ SC.boat.x+=SC.boat.dir*SC.boat.sp*dt; if (SC.boat.x<-60||SC.boat.x>W+60) SC.boat=null; }

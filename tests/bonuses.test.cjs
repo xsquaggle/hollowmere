@@ -77,7 +77,7 @@ module.exports = [
         return { willow: s({ rod: 'willow' }, 1000), brass: s({ rod: 'brasscap' }, 1000), deep: s({ rod: 'ash', spot: 'deep', hour: 6.5 }, 1000), willowDeep: s({ rod: 'willow', spot: 'deep' }, 50), newb: s({ rod: 'brasscap', spot: 'mix', player: 'new' }, 1000) }; });
       for (const [k, x] of Object.entries(r)) {
         const lost = Object.values(x.lost).reduce((a, b) => a + b, 0), tiers = Object.values(x.tiers).reduce((a, b) => a + b, 0);
-        assert.equal(x.landed + lost, x.casts, k + ': every cast lands or is lost');
+        assert.equal(x.landed + lost + x.treasure.rolled, x.casts, k + ': every cast lands, is lost, or pulls up treasure');
         assert.equal(tiers, x.landed, k + ': the rarity mix covers every landed fish');
       }
       assert.ok(r.willow.landRate > 90, 'a steady player lands most fish');

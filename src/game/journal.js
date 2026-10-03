@@ -1,4 +1,4 @@
-/* ---------- Journal: species pages and personal records ---------- */
+/* ---------- Journal: species pages, personal records, finds (game/finds.js) and bonuses ---------- */
 let JTAB='species';
 function recWhere(pb){ if (!pb) return ''; if (!pb.t) return 'Caught before the tape measure, at '+(REGION_NAME[pb.reg]||'the lake');
   return spotLabel(pb.reg,pb.spot)+' · '+whenLabel(pb.t,pb.hr)+(pb.rod&&RODS[pb.rod]?' · '+RODS[pb.rod].name:''); }
@@ -15,9 +15,9 @@ function drawPlaque(x,id,w,h){ const F=FISH[id], pw=Math.min(w*.86,330), ph=h*.9
 function journalRegions(){ return save.boat?[REG(),REG()==='lake'?'coast':'lake']:['lake']; }
 function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
   let h='<div class="panel-head"><div><h2>Journal</h2><p>'+regs.map(r=>REGION_NAME[r]+' '+REGION_FISH[r].filter(id=>(save.fish[id]||{}).caught>0).length+'/'+REGION_FISH[r].length).join(' · ')+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
-    '<div class="seg" role="tablist">'+[['species','Species'],['records','Records'],['bonuses','Bonuses']].map(([k,l])=>'<button type="button" role="tab" data-jt="'+k+'" aria-selected="'+(JTAB===k)+'" class="'+(JTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
-  h+=JTAB==='records'?recordsHTML(regs):JTAB==='bonuses'?bonusesHTML():speciesHTML(regs);
-  openSheet(h); $('closeS').addEventListener('click',closeSheet);
+    '<div class="seg" role="tablist">'+[['species','Species'],['records','Records'],['finds','Finds'+(findsState().fresh.length?' •':'')],['bonuses','Bonuses']].map(([k,l])=>'<button type="button" role="tab" data-jt="'+k+'" aria-selected="'+(JTAB===k)+'" class="'+(JTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+  h+=JTAB==='records'?recordsHTML(regs):JTAB==='bonuses'?bonusesHTML():JTAB==='finds'?findsHTML():speciesHTML(regs);
+  openSheet(h); $('closeS').addEventListener('click',closeSheet); if (JTAB==='finds') bindFinds();
   document.querySelectorAll('#panel [data-jt]').forEach(b=>b.addEventListener('click',()=>{ tone(900,.04,{vol:.04,type:'triangle'}); openJournal(b.dataset.jt); $('panel').scrollTop=0; }));
   document.querySelectorAll('#panel [data-units]').forEach(b=>b.addEventListener('click',()=>{ save.units=b.dataset.units; persist(); openJournal('records'); }));
   document.querySelectorAll('#panel canvas[data-f]').forEach(c=>{ const r=c.getBoundingClientRect(), d=Math.min(window.devicePixelRatio||1,2);

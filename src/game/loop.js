@@ -3,7 +3,7 @@ let last=performance.now();
 function update(dt,rdt){
   if (S.state==='idle' && save.tutorialDone && save.stats.casts>=12){ S.idleT=(S.idleT||0)+rdt; if (S.idleT>30 && S.idleT-rdt<=30) setHint('Drag back to aim. Release to cast.'); }
   updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt);
-  save.clock=(save.clock+rdt/60)%24; PAL=palAt(save.clock);
+  save.clock=(save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')))%24; PAL=palAt(save.clock);
   { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2) buildBg(); }
   const ct=(isNight(save.clock)||PERIOD(save.clock)==='Evening'?'\u263E\uFE0E ':'\u2600\uFE0E ')+clockText(save.clock); if (ct!==S.clockShown){ S.clockShown=ct; $('clock').textContent=ct; }
   for (const p of S.particles){ p.life+=dt; p.vy+=p.g*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; }
@@ -19,6 +19,7 @@ function update(dt,rdt){
     case 'reeling': updateReel(dt); break;
     case 'landing': updateLand(dt); break;
     case 'lost': updateLost(dt); break;
+    case 'loot': updateLoot(dt); break;
   }
 }
 function frame(now){
