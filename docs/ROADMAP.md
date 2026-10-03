@@ -12,13 +12,13 @@ each build.
 | 12 | One modifier pipeline, the balance simulator and the Bonuses page |
 | 14 | Treasure: loot crates from Common to Mythic, finds, artifacts and keepsakes, bottles and letters |
 | 15 | The tackle bag: the rod rig (reel, line and bait), rods, vest pockets, keepsakes, and the first tackle (build 15) |
+| 16 | Scene art pass: the angler, the dock and its props, the townsfolk and their boats, the coast's rocks, kelp and skiff (build 16) |
 
 ## Next
 
 13 waits for friends to be available; the rest go in order.
 
 - **13.** Friend playtest, and the bottom-bar regroup.
-- **16.** Scene art pass: everything on screen brought up to the art bar in `docs/STYLE.md`.
 - **17.** Glimmer and enchantments.
 - **18.** Smoke rack and traps.
 - **19.** Supper orders and Town reputation.

@@ -217,12 +217,16 @@ for (const k of SOCKETS) sameSet('TACKLE_ORDER.' + k, TACKLE_ORDER[k] || [], TK_
 // every piece is drawn in game/tackle-art.js: its tile in TACKLE_ART, and a line's color on the rod in LINE_COL
 const ART = readFileSync(join(ROOT, 'src/game/tackle-art.js'), 'utf8');
 const artKeys = new Set([...(ART.match(/const TACKLE_ART=\{([\s\S]*?)\n\};/) || ['', ''])[1].matchAll(/^ {2}([a-z][a-z0-9]*)\(c/gm)].map(m => m[1]));
+const lineRGB = new Set([...(ART.match(/const LINE_RGB=\{([^;]*)\};/) || ['', ''])[1].matchAll(/([a-z][a-z0-9]*):\[/g)].map(m => m[1]));
+const reelMini = new Set([...(ART.match(/const REEL_MINI=\{([\s\S]*?)\};/) || ['', ''])[1].matchAll(/([a-z][a-z0-9]*):\{/g)].map(m => m[1]));
 const lineCol = new Set([...(ART.match(/const LINE_COL=\{([^}]*)\}/) || ['', ''])[1].matchAll(/([a-z][a-z0-9]*):/g)].map(m => m[1]));
 for (const id of TK_IDS) { const T = TACKLE[id], w = 'TACKLE.' + id;
   if (!/^[a-z][a-z0-9]*$/.test(id)) bad(w, 'ids are lowercase letters and digits');
   for (const k of keys(T)) if (!['kind', 'name', 'eff', 'down', 'mods', 'starter', 'shop', 'price', 'crate', 'kitchen', 'casts', 'tins'].includes(k)) bad(w, 'unknown field ' + k);
   if (!artKeys.has(id)) bad(w, 'no drawing in TACKLE_ART (src/game/tackle-art.js)');
   if (T.kind === 'line' && !lineCol.has(id)) bad(w, 'no color on the rod in LINE_COL (src/game/tackle-art.js)');
+  if (T.kind === 'line' && !lineRGB.has(id)) bad(w, 'no color on the water in LINE_RGB (src/game/tackle-art.js)');
+  if (T.kind === 'reel' && !reelMini.has(id)) bad(w, 'no small drawing on the dock in REEL_MINI (src/game/tackle-art.js)');
   need(w, T, { name: 'str', eff: 'str', mods: 'arr' }); oneOf(w + '.kind', T.kind, SOCKETS, 'socket');
   if (T.down !== undefined && !isStr(T.down)) bad(w + '.down', 'empty');
   (T.mods || []).forEach((m, i) => checkMod(`${w}.mods[${i}]`, m));

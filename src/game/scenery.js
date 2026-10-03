@@ -84,7 +84,7 @@ function layoutScenery(){
   const along=(pts,n,side)=>{ for (let i=0;i<n;i++){ const t=.04+sr()*.86, seg=t*(pts.length-1), k=Math.floor(seg), f=seg-k, p=pts[k], q=pts[k+1];
       const bx=lerp(p[0],q[0],f)+side*(2+sr()*14), by=lerp(p[1],q[1],f)+2+sr()*8;
       SC.tails.push({x:bx,y:by,h:H*(.06+sr()*.1),kind:sr()<.55?'tail':'blade',ph:sr()*6.28,lean:side*(sr()*8-2),col:sr()<.5?'#3C6A45':'#4E7B4C'}); } };
-  along(SC.bank.L,22,-1); along(SC.bank.R,16,1);
+  along(SC.bank.L,22,-1); along(SC.bank.R,16,1); layoutBankDots(); SC.bankArt=null;
   SC.tails.sort((a,b)=>a.y-b.y);
 }
 function drawSky(){

@@ -44,17 +44,6 @@ function drawBobber(){
     ctx.beginPath(); ctx.ellipse(b.x,b.y,22*k+S.bite.t*30,8*k+S.bite.t*10,0,0,Math.PI*2); ctx.stroke();
     ctx.font='800 20px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=PAPER; ctx.fillText('!',b.x,b.y-22*k); }
 }
-function drawPlayer(){
-  const p=G.player, x=p.x, y=p.y;
-  ctx.fillStyle=INK;
-  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x-15,y-46,30,44,9) : ctx.rect(x-15,y-46,30,44); ctx.fill();
-  ctx.fillStyle='#3A3944'; ctx.fillRect(x-12,y-6,9,12); ctx.fillRect(x+3,y-6,9,12);
-  ctx.fillStyle='#4A3A30'; ctx.beginPath(); ctx.arc(x,y-54,10,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#3B5560'; ctx.beginPath(); ctx.ellipse(x,y-58,20,5,0,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(x,y-63,10,8,0,Math.PI,0); ctx.fill();
-  ctx.fillStyle=BRASS; ctx.fillRect(x-10,y-62,20,2.5);
-  ctx.strokeStyle=INK; ctx.lineWidth=7; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(x+12,y-38); ctx.lineTo(G.rodBase.x+2,G.rodBase.y+4); ctx.stroke();
-}
 function rodTip(){
   const b=G.rodBase; let a=.32, L=96, bend=0;
   if (S.state==='aiming' && S.aim){ a=-.5*S.aim.p-.25*S.aim.th; L=96*(1-.22*S.aim.p); bend=-.3*S.aim.p; }
@@ -71,11 +60,14 @@ function drawRodAndLine(){
   ctx.lineCap='round'; ctx.strokeStyle=ROD().color; ctx.lineWidth=save.rod==='reedcutter'?5:save.rod==='heronwood'?3.2:4; ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.quadraticCurveTo(mx,my,t.x,t.y); ctx.stroke();
   ctx.strokeStyle=BRASS; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.lineTo(lerp(b.x,mx,.25),lerp(b.y,my,.25)); ctx.stroke();
   if (!lp || (S.lost && S.lost.snapped)) return;
-  let sag=24, col='rgba(243,234,215,.75)', w=1.2;
+  // the line in the color of whatever line is on the rod; it reddens as tension runs high
+  const lid=rigFor(save.rod).line, LC=LINE_RGB[lid]||LINE_RGB.cotton, base=LC[0].split(',').map(Number);
+  let sag=24, col='rgba('+LC[0]+','+LC[1]+')', w=lid==='silk'||lid==='wire'?1.4:1.2;
   if (S.state==='casting') sag=0;
-  if (S.state==='reeling'){ const T=S.reel.tension; sag=(1-T)*34; if (T>.75){ const k=(T-.75)/.25; col='rgba('+Math.round(lerp(243,230,k))+','+Math.round(lerp(234,90,k))+','+Math.round(lerp(215,70,k))+',.95)'; w=1.2+k; } }
-  ctx.strokeStyle=col; ctx.lineWidth=w; ctx.beginPath(); ctx.moveTo(t.x,t.y);
-  ctx.quadraticCurveTo((t.x+lp.x)/2,(t.y+lp.y)/2+sag,lp.x,lp.y); ctx.stroke();
+  if (S.state==='reeling'){ const T=S.reel.tension; sag=(1-T)*34; if (T>.75){ const k=(T-.75)/.25; col='rgba('+Math.round(lerp(base[0],230,k))+','+Math.round(lerp(base[1],90,k))+','+Math.round(lerp(base[2],70,k))+','+lerp(LC[1],.95,k).toFixed(2)+')'; w+=k; } }
+  const linePath=()=>{ ctx.beginPath(); ctx.moveTo(t.x,t.y); ctx.quadraticCurveTo((t.x+lp.x)/2,(t.y+lp.y)/2+sag,lp.x,lp.y); };
+  if (lid==='glowline' && PAL.dark>.05){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.strokeStyle='rgba(150,240,130,'+(.28*PAL.dark*(.85+.15*Math.sin(S.time*2.4))).toFixed(3)+')'; ctx.lineWidth=5; linePath(); ctx.stroke(); ctx.restore(); }
+  ctx.strokeStyle=col; ctx.lineWidth=w; linePath(); ctx.stroke();
   if (S.state==='casting'){ ctx.fillStyle=DANGER; ctx.beginPath(); ctx.arc(lp.x,lp.y,4,0,Math.PI*2); ctx.fill(); }
 }
 function drawParticles(){
@@ -172,7 +164,7 @@ function render(){
   if (S.shake>.1) ctx.translate(rand(-1,1)*S.shake,rand(-1,1)*S.shake);
   if (Math.abs(S.zoom-1)>.001){ const cx=W/2, cy=H*.42; ctx.translate(cx,cy); ctx.scale(S.zoom,S.zoom); ctx.translate(-cx,-cy); }
   drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawSwell(); drawActive(); drawBobber();
-  drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); nightShade();
+  drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
   drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
   ctx.restore();

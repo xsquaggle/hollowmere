@@ -13,7 +13,7 @@ const KITCHEN_BAIT = Object.keys(TACKLE).find(id=>TACKLE[id].kitchen);
 function gearState(){ if (!isObj(save.gear)) save.gear={}; const g=save.gear;
   for (const k of ['own','rig','left','tins']) if (!isObj(g[k])) g[k]={};
   for (const id in TACKLE) if (TACKLE[id].starter) g.own[id]=1;
-  if (!Array.isArray(g.fresh)) g.fresh=[]; g.fresh=g.fresh.filter(id=>TACKLE[id]);
+  if (!Array.isArray(g.fresh)) g.fresh=[]; if (g.fresh.some(id=>!TACKLE[id])) g.fresh=g.fresh.filter(id=>TACKLE[id]);
   if (g.bait && !TACKLE[g.bait]) g.bait=null; if (g.lastBait && !TACKLE[g.lastBait]) g.lastBait=null; return g; }
 /** The reel and line on rod `rod` (each rod comes with the starter pieces). */
 function rigFor(rod){ const g=gearState(); if (!isObj(g.rig[rod])) g.rig[rod]={reel:GEAR_START.reel, line:GEAR_START.line}; const r=g.rig[rod];

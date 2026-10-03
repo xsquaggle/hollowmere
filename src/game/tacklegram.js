@@ -37,17 +37,7 @@ function updateMail(dt){
 function drawMail(){
   if (MAIL.state==='away' || MAIL.state==='waiting') return;
   const x=MAIL.x, y=H-240+Math.sin(S.time*1.8)*1.2;
-  ctx.strokeStyle='rgba(225,238,242,.3)'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.ellipse(x,H-232,40,5,0,0,Math.PI*2); ctx.stroke();
-  ctx.fillStyle='#B4433A'; ctx.beginPath(); ctx.moveTo(x-38,y-3); ctx.lineTo(x+36,y-5); ctx.quadraticCurveTo(x+42,y-4,x+38,y+4); ctx.quadraticCurveTo(x,y+10,x-34,y+7); ctx.closePath(); ctx.fill(); ctx.strokeStyle=INK; ctx.lineWidth=1.4; ctx.stroke();
-  ctx.strokeStyle='#F3EDE2'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x-35,y+1); ctx.lineTo(x+37,y-1); ctx.stroke();
-  ctx.fillStyle='#EDE6D6'; ctx.fillRect(x-30,y-20,22,15); ctx.strokeStyle=INK; ctx.lineWidth=1.2; ctx.strokeRect(x-30,y-20,22,15);
-  ctx.font='800 6.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#B4433A'; ctx.fillText('POST',x-19,y-10);
-  ctx.fillStyle='#A4774B'; ctx.fillRect(x+16,y-12,10,8); ctx.strokeRect(x+16,y-12,10,8); ctx.fillRect(x+20,y-19,8,7); ctx.strokeRect(x+20,y-19,8,7);
-  ctx.fillStyle='#3B5C8A'; ctx.beginPath(); ctx.roundRect?ctx.roundRect(x+1,y-26,13,20,5):ctx.rect(x+1,y-26,13,20); ctx.fill(); ctx.stroke();
-  ctx.fillStyle='#D7A98A'; ctx.beginPath(); ctx.arc(x+7.5,y-31,6,0,Math.PI*2); ctx.fill(); ctx.stroke();
-  ctx.fillStyle='#4A3428'; ctx.fillRect(x+3.5,y-29.5,8,2);
-  ctx.strokeStyle=INK; ctx.lineWidth=.9; ctx.beginPath(); ctx.arc(x+5.5,y-32.5,1.7,0,Math.PI*2); ctx.arc(x+10,y-32.5,1.7,0,Math.PI*2); ctx.stroke();
-  ctx.fillStyle='#2D4870'; ctx.fillRect(x+.5,y-39.5,14,4); ctx.fillRect(x+3,y-42,9,3);
+  drawMailBoat(x,y);
   if (MAIL.state==='stopped' && MAIL.sayT>0){ ctx.font='700 12px Nunito, system-ui, sans-serif'; const lines=wrapText(MAIL.say,W*.6), bw=Math.max(...lines.map(l=>ctx.measureText(l).width))+18, bh=lines.length*15+12;
     const a=Math.min(1,MAIL.sayT*3,(5-MAIL.sayT)*4), bx=clamp(x-20,16,W-bw-16), by=y-52; ctx.globalAlpha=a; ctx.fillStyle=PAPER; ctx.strokeStyle=INK; ctx.lineWidth=1.5; rrect(ctx,bx,by-bh,bw,bh,8); ctx.fill(); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x+4,by); ctx.lineTo(x+9,by+8); ctx.lineTo(x+14,by); ctx.fillStyle=PAPER; ctx.fill(); ctx.fillStyle=INK; ctx.textAlign='left'; lines.forEach((l,i)=>ctx.fillText(l,bx+9,by-bh+18+i*15)); ctx.globalAlpha=1; }

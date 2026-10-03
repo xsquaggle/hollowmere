@@ -16,27 +16,6 @@ function updateBarnaby(dt){
   else if (BAR.state==='leaving'){ BAR.x+=dt*60; if (BAR.x>W+100) BAR.state='gone'; }
   if (BAR.state!=='gone' && Math.random()<dt*3) SC.smoke.push({x:BAR.x+14,y:H-262,vx:rand(2,6),vy:-rand(8,12),r:2,life:0,max:2.5});
 }
-function drawBarnaby(){
-  if (REG()!=='lake' || BAR.state==='away' || BAR.state==='gone') return;
-  const x=BAR.x, y=H-212+Math.sin(S.time*1.5)*1.5;
-  ctx.strokeStyle='rgba(225,238,242,.3)'; ctx.lineWidth=1.3; ctx.beginPath(); ctx.ellipse(x,H-200,52,6,0,0,Math.PI*2); ctx.stroke();
-  ctx.fillStyle='#2F4A6B'; ctx.beginPath(); ctx.moveTo(x-50,y-4); ctx.lineTo(x+46,y-6); ctx.quadraticCurveTo(x+54,y-6,x+50,y+4); ctx.quadraticCurveTo(x,y+12,x-44,y+8); ctx.closePath(); ctx.fill(); ctx.strokeStyle=INK; ctx.lineWidth=1.5; ctx.stroke();
-  ctx.strokeStyle='#EDE6D6'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x-46,y); ctx.lineTo(x+48,y-2); ctx.stroke();
-  ctx.fillStyle='#D9CFBE'; ctx.fillRect(x+4,y-24,26,18); ctx.strokeStyle=INK; ctx.lineWidth=1.3; ctx.strokeRect(x+4,y-24,26,18);
-  ctx.fillStyle='#9FC6D6'; ctx.fillRect(x+9,y-20,8,7); ctx.fillStyle='#B4584A'; ctx.fillRect(x+3,y-27,28,4);
-  ctx.fillStyle='#2B2A33'; ctx.fillRect(x+12,y-40,5,14);
-  ctx.fillStyle='#E2B13C'; ctx.beginPath(); ctx.roundRect?ctx.roundRect(x-26,y-30,18,26,6):ctx.rect(x-26,y-30,18,26); ctx.fill(); ctx.strokeStyle=INK; ctx.lineWidth=1.3; ctx.stroke();
-  ctx.fillStyle='#D7A98A'; ctx.beginPath(); ctx.arc(x-17,y-36,7,0,Math.PI*2); ctx.fill(); ctx.stroke();
-  ctx.fillStyle='#F3F0EA'; ctx.beginPath(); ctx.moveTo(x-24,y-36); ctx.quadraticCurveTo(x-17,y-20,x-10,y-36); ctx.closePath(); ctx.fill();
-  ctx.fillStyle='#D9614C'; ctx.beginPath(); ctx.arc(x-14,y-37,1.8,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#24324A'; ctx.fillRect(x-25,y-46,16,5); ctx.fillStyle='#F3F0EA'; ctx.fillRect(x-24,y-49,14,3); ctx.fillStyle='#24324A'; ctx.fillRect(x-27,y-42,20,2);
-  if (S.state==='idle' && BAR.state==='docked'){
-    if (BAR.sayT>0){ ctx.font='700 12px Nunito, system-ui, sans-serif'; const lines=wrapText(BAR.say,W*.6), bw=Math.max(...lines.map(l=>ctx.measureText(l).width))+18, bh=lines.length*15+12;
-      const bx=clamp(x-bw+20,16,W-bw-16), by=y-62; ctx.fillStyle=PAPER; ctx.strokeStyle=INK; ctx.lineWidth=1.5; ctx.beginPath(); ctx.roundRect?ctx.roundRect(bx,by-bh,bw,bh,8):ctx.rect(bx,by-bh,bw,bh); ctx.fill(); ctx.stroke();
-      ctx.fillStyle=INK; ctx.textAlign='left'; lines.forEach((l,i)=>ctx.fillText(l,bx+9,by-bh+18+i*15)); }
-    else { const by=y-64+Math.sin(S.time*4)*2; ctx.fillStyle=PAPER; ctx.beginPath(); ctx.arc(x-17,by,9,0,Math.PI*2); ctx.fill(); ctx.strokeStyle=INK; ctx.lineWidth=1.5; ctx.stroke();
-      ctx.font='800 13px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=INK; ctx.fillText('!',x-17,by+4.5); } }
-}
 function openBoatShop(){
   audioInit(); const can=save.coins>=1500;
   let h='<div class="panel-head"><div><h2>Barnaby’s Boats</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>';

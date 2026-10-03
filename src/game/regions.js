@@ -13,7 +13,7 @@ function layoutRegion(){
     G.kelp=[{x:W*.7,y:HZ+(H-HZ)*.56,r:W*.13},{x:W*.24,y:HZ+(H-HZ)*.2,r:W*.08}];
     G.stacks=[{x:W*.11,y:HZ+(H-HZ)*.5,r:W*.09,h:H*.13},{x:W*.9,y:HZ+(H-HZ)*.32,r:W*.07,h:H*.1},{x:W*.63,y:HZ+(H-HZ)*.08,r:W*.035,h:H*.045}];
     G.lantern={x:W/2-64, y:H-150};
-    sseed=77; SC.kelp=G.kelp.map(c=>{ const arr=[]; const n=c.r>W*.1?14:8;
+    sseed=77; SC.kelp=G.kelp.map(c=>{ const arr=[]; const n=c.r>W*.1?20:11;
       for (let i=0;i<n;i++){ const a=sr()*6.28, d=Math.sqrt(sr()); arr.push({ox:Math.cos(a)*d, oy:Math.sin(a)*d, len:.5+sr()*.7, ph:sr()*6.28, bulb:sr()<.5}); } return arr; });
     SC.bank={L:[],R:[]}; SC.tails=[];
   } else {

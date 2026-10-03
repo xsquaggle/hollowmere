@@ -108,6 +108,18 @@ function drawBareHook(c,s){ c.save(); c.scale(s/100,s/100); laInk(c,4.4);
 /** Draws reel, line or bait `id` into a tile `s` across. `t` animates glows and spinning blades. */
 function drawTackle(c,id,s,t){ const f=TACKLE_ART[id]; if (!f) return; c.save(); c.scale(s/100,s/100); f(c,s,t||0); c.restore(); }
 
+/* ---------- the reel as it looks on the rod out on the dock: a few pixels across ---------- */
+const REEL_MINI={clicker:{rim:'#6E737C', plate:'#A4A9B2', knob:'#2F3038'}, brassdrag:{rim:'#8C6A2E', plate:'#C9A15A', knob:'#7A5236'},
+  quickwind:{rim:'#2F5E48', plate:'#4E9273', knob:'#E8E2D2'}, whisper:{rim:'#B5B9C2', plate:'#EFEBE3', knob:'#F4EFF6'}};
+function drawMiniReel(c,id,x,y,r,crank){ const M=REEL_MINI[id]||REEL_MINI.clicker;
+  c.fillStyle=M.rim; c.beginPath(); c.arc(x,y,r,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=1.3; c.stroke();
+  c.fillStyle=M.plate; c.beginPath(); c.arc(x,y,r*.68,0,Math.PI*2); c.fill();
+  c.fillStyle='rgba(255,255,255,.5)'; c.beginPath(); c.arc(x-r*.3,y-r*.3,r*.24,0,Math.PI*2); c.fill();
+  const kx=x+Math.cos(crank)*r*.95, ky=y+Math.sin(crank)*r*.95; c.strokeStyle=INK; c.lineWidth=1.4; c.beginPath(); c.moveTo(x,y); c.lineTo(kx,ky); c.stroke();
+  c.fillStyle=M.knob; c.beginPath(); c.arc(kx,ky,1.5,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=.9; c.stroke(); }
+/** The line's color on the water, as r,g,b and how strongly it shows. */
+const LINE_RGB={cotton:['243,234,215',.75], silk:['230,196,104',.85], wire:['196,202,210',.85], clearwater:['205,236,244',.42], glowline:['168,240,150',.9]};
+
 /* ---------- the rod rig: the rod in hand, its reel and line, and whatever is on the hook ---------- */
 const LINE_COL={cotton:'#EFE8D8', silk:'#E2BE62', wire:'#B9BFC8', clearwater:'rgba(205,236,244,.8)', glowline:'#A8F096'};
 /** The rod's geometry on a w by h drawing: grip end, tip, and where the reel, line and hook sit (the bag puts

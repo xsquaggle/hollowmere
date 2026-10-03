@@ -4,6 +4,11 @@ Newest first. Each entry records what was decided and why, so later changes don'
 
 ## 2026-10-03
 
+- **Scene art pass (build 16).**
+  - The angler is drawn from behind: a mustard oilskin coat, a slate hat with a brass band and a fly, and both hands on the rod. They breathe, glance along the shore, and wind the reel while reeling.
+  - The reel on the rod, and the line's color on the water, follow the tackle that's on it.
+  - The dock, sea stacks, banks and skiff deck are painted once into cached layers. Under the same CPU throttling, the frame rate measured the same as build 15.
+  - The water, sky, far shore and reeds were kept as they were.
 - **The art bar applies from step 15, and step 16 is a scene art pass.**
   - The angler, the dock props, Ottilie's ferry and the coast's rocks and kelp were too plain beside the water and sky.
   - They're redone before more is built around the dock, so new pieces are made to the bar from the start.

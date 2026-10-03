@@ -21,7 +21,7 @@ Its source lives in `src/` as small files, and a build pastes them together.
 | --- | --- |
 | `src/index.html` | The page skeleton: head, markup, and where the styles and scripts go |
 | `src/data/` | Content tables: fish, rods and boat parts, places, people's lines, aquarium, kitchen, music |
-| `src/game/` | The game itself, one file per system (casting, reeling, kitchen stations, saves…) |
+| `src/game/` | The game itself, one file per system (casting, reeling, kitchen stations, saves…). Scene art: `angler.js`, `dock.js`, `folk.js`, `coast.js` |
 | `src/styles/` | Styles, one file per screen |
 | `src/fonts/` | Nunito, Young Serif and Caveat, subset to WOFF, plus their licenses |
 | `src/build.json` | The order files are pasted in. Scripts share one closure, so a file can use anything listed before it |

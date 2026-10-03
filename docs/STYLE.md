@@ -17,7 +17,7 @@ with soft grain, bold ink outlines on characters, fish and props, and atmospheri
 
 Rarity colors (`--c-common` to `--c-godly` in `src/styles/base.css`) are used for rarity and nothing else.
 
-The tackle bag adds its own materials: waxed canvas `#857E4E`, with `#6A643C` for shade and `#9C9563` for light; leather `#6B4630`; and a cloth lining `#F1E6CC`.
+The angler wears a mustard oilskin (`#BF8F3E`, shade `#8F6A2E`, light `#DDB25F`) and a slate hat (`#3B5560`). The tackle bag adds its own materials: waxed canvas `#857E4E`, with `#6A643C` for shade and `#9C9563` for light; leather `#6B4630`; and a cloth lining `#F1E6CC`.
 
 ## Type
 
@@ -43,7 +43,7 @@ Every new or redrawn asset meets these, checked in a phone-sized screenshot befo
 - **Life:** an idle motion wherever the real thing would move, and at least 5 idle animations per scene.
 - **Speed:** static detail is drawn once and cached; only the moving parts redraw each frame.
 
-Assets from before step 15 that fall short are being redone in step 16, the scene art pass.
+Step 16, the scene art pass, brought the earlier scene up to this bar. Scene art lives in `src/game/angler.js`, `dock.js`, `folk.js` and `coast.js`; light comes from the upper left everywhere.
 
 ## Rarity kit
 
