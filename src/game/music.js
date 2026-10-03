@@ -155,6 +155,12 @@ const sfx = {
     else if (k==='line') noise(.16,{vol:.08,f:3200,to:6200,q:2});
     else { tone(330,.08,{to:190,vol:.09,type:'triangle'}); noise(.06,{vol:.05,f:900,type:'lowpass',delay:.03}); } },
   pocket: on => { noise(.08,{vol:.12,f:on?1800:900}); tone(on?660:440,.07,{vol:.07,type:'triangle',delay:.03}); },
+  // Glimmer and runes (game/enchant.js)
+  glimmer: n => { const N=[2093,2637,3136,3951]; for (let i=0;i<Math.min(4,1+Math.floor(n/6));i++) tone(N[i],.32,{vol:.045,type:'sine',delay:i*.06}); tone(4186,.5,{vol:.02,type:'sine',delay:.1}); },
+  geode: () => { noise(.12,{vol:.3,f:2600,type:'highpass'}); tone(240,.12,{to:120,vol:.14,type:'triangle'}); [1568,2093,2637,3136].forEach((n,i)=>tone(n,.45,{vol:.05,type:'sine',delay:.12+i*.05})); },
+  etch: () => { noise(.5,{vol:.06,f:5200,to:2400,q:1.5}); [784,988,1175,1568].forEach((n,i)=>tone(n,.5+i*.08,{vol:.06,type:'triangle',delay:.18+i*.11})); tone(3136,.9,{vol:.03,type:'sine',delay:.62}); },
+  rune: on => { tone(on?1175:880,.12,{vol:.07,type:'triangle'}); tone(on?1760:660,.2,{vol:.04,type:'sine',delay:.05}); },
+  echo: () => { [1318,1318].forEach((n,i)=>tone(n,.3,{vol:i?.035:.07,type:'sine',delay:i*.18})); },
   chomp: () => { noise(.12,{vol:.32,f:700}); noise(.12,{vol:.28,f:600,delay:.14}); tone(160,.1,{to:80,vol:.12,type:'square'}); tone(140,.1,{to:70,vol:.1,type:'square',delay:.14}); }
 };
 function humStart(){ if (!AC || hum) return; const o=AC.createOscillator(), f=AC.createBiquadFilter(), g=AC.createGain();

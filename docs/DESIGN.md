@@ -15,7 +15,7 @@ It's a personal game for the owner and friends: free, with no ads, purchases or 
 
 1. **Fish:** cast, wait for the bite, hook it and reel it in. Each fish has a behavior (darter, leaper, sulker, tugger or sleeper).
 2. **Keep or sell:** keep it in the keepnet or the aquarium, or sell it. Coins buy better rods, tackle, boat parts, tanks and decor.
-3. **Grow:** cook meals with short boosts, and complete tank sets. Collect finds from treasure, put artifacts in vest pockets, and rig each rod with a reel, line and bait.
+3. **Grow:** cook meals with short boosts, and complete tank sets. Collect finds from treasure, put artifacts in vest pockets, and rig each rod with a reel, line and bait. Glimmer, from records, geodes and crates, etches runes onto rods.
 4. **Go further:** reach new water (Stillwater Lake, then Gullrock Coast by boat) with new fish, people and secrets.
 
 Every bonus is a modifier in one pipeline (`src/game/mods.js`). The Bonuses page and the balance simulator read it,

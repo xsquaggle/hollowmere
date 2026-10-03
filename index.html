@@ -826,6 +826,62 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 .fd-vest .btn{min-height:44px}
 /* the bottom bar keeps each button's own width; fitBar scales the whole row instead */
 .corner.center>*{flex-shrink:0}
+/* Glimmer and runes: the HUD chip, the crystal icon, rune badges, and the tackle bag's rune sockets */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.glim{display:inline-block;flex:none;width:13px;height:15px;vertical-align:-2px;filter:drop-shadow(0 0 3px rgba(150,210,255,.55));
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 16'%3E%3Cpath d='M7 .8 13.2 5.4 10.4 15.2H3.6L.8 5.4Z' fill='%23A9E2F4'/%3E%3Cpath d='M7 .8 4.6 5.4H.8Z' fill='%23E9FAFF'/%3E%3Cpath d='M9.4 5.4h3.8l-2.8 9.8H7Z' fill='%237F6FD8'/%3E%3Cpath d='M4.6 5.4h4.8L7 15.2Z' fill='%238FC4EE'/%3E%3Cpath d='M.8 5.4h12.4M7 .8 4.6 5.4 7 15.2 9.4 5.4Z' fill='none' stroke='%232B2A33' stroke-opacity='.5' stroke-width='.6'/%3E%3Cpath d='M7 .8 13.2 5.4 10.4 15.2H3.6L.8 5.4Z' fill='none' stroke='%232B2A33' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.glim-chip{gap:6px}
+.glim-chip.arrive{animation:glimArrive .55s cubic-bezier(.2,1.5,.4,1)}
+.glim-chip.bump #glimmer{animation:gbump .35s ease}
+@keyframes glimArrive{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:none}}
+@keyframes gbump{40%{transform:scale(1.25);color:#BFE8FF}}
+#hud .chip .coin,#hud .chip .glim,#hud .chip svg{flex:none}
+#hud .chip span{white-space:nowrap}#clock{white-space:nowrap}
+#hud.tight{gap:6px}
+#hud.tight .chip{padding:6px 8px;gap:4px}
+#hud.tight #clock{font-size:12px}
+#hud.small{gap:4px}#hud.small .chip{font-size:13px;padding:5px 7px;gap:3px}#hud.small #clock{font-size:11px}#hud.small .chip .coin{width:12px;height:12px}#hud.small .chip .glim{width:11px;height:13px}
+#hud.nolab #labBtn{display:none}
+/* a rune's badge on the catch card and the haul */
+.rtag{display:inline-flex!important;align-items:center;gap:5px;padding:2px 9px 2px 2px!important;background:#2B2A33;color:var(--paper);box-shadow:0 0 0 1.5px var(--rc) inset,0 0 10px -2px var(--rc)}
+.rtag canvas{width:23px;height:23px;flex:none;margin:-2px 0}
+#cTags .rtag{animation:rtagIn .45s cubic-bezier(.2,1.6,.4,1) both;animation-delay:.35s}
+@keyframes rtagIn{from{transform:scale(.4);opacity:0}}
+.hl-glim{display:inline-flex;align-items:center;gap:6px;margin-left:auto}
+.hl-glim .glim{width:20px;height:23px}
+.hl-runes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:-2px 0 4px}
+.hl-runes .rtag{font-size:12px;font-weight:800;border-radius:999px}
+@media (prefers-reduced-motion: reduce){.glim-chip.arrive,.glim-chip.bump #glimmer,#cTags .rtag{animation:none}}
+/* the tackle bag: Glimmer in the head, a row of rune sockets under the rig, and the etching tray */
+.bag-head .bh-glim{display:inline-flex;align-items:center;gap:4px;margin-left:8px}
+.bag-head .bh-glim .glim{width:11px;height:13px}
+.rune-socks{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:7px;margin-top:8px;position:relative;z-index:1}
+.rsock{display:grid;grid-template-columns:42px minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:8px;align-items:center;text-align:left;min-width:0;min-height:58px;padding:7px 9px;font:inherit;color:inherit;cursor:pointer;
+  background:#2E2C38;color:var(--paper);border:2px solid var(--ink);border-radius:12px;box-shadow:0 3px 0 var(--ink),inset 0 0 0 1.5px var(--rc,transparent),inset 0 0 18px -6px var(--rc,transparent)}
+.rsock canvas{grid-row:1/4;width:42px;height:42px}
+.rune-socks:not(.n1) .rsock{grid-template-columns:minmax(0,1fr);grid-template-rows:none;justify-items:center;text-align:center;row-gap:2px;padding:9px 6px 10px;align-content:start}
+.rune-socks:not(.n1) .rsock canvas{grid-row:auto;width:40px;height:40px;margin:-2px 0 1px}
+.rune-socks:not(.n1) .rsock b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-wrap:balance}
+.rsock .k{font:800 9.5px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:rgba(243,234,215,.6)}
+.rsock b{font:400 13.5px/1.15 var(--display);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rsock small{font-size:10.5px;font-weight:700;line-height:1.25;color:rgba(243,234,215,.72);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+.rsock.empty{background:rgba(46,44,56,.75);border-style:dashed}
+.rsock:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.rsock:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.rsock.pop{animation:sockPop .5s cubic-bezier(.2,1.7,.4,1)}
+.rune-hint{margin:7px 2px 0!important}
+.tr-glim{margin:0 0 6px;font-size:12.5px;font-weight:700;color:#55514A;line-height:1.4}
+.tr-glim .bal{display:inline-flex;align-items:center;gap:5px;margin-right:7px;padding:3px 10px 3px 7px;border-radius:999px;background:#2B2A33;color:var(--paper);vertical-align:1px;white-space:nowrap}
+.tr-glim b{font:400 16px/1 var(--display);color:#CFEFFF}
+.tr-row.rune canvas{width:52px;height:52px}
+.tr-row.rune{box-shadow:inset 3px 0 0 var(--rc)}
+.tr-row.rune.on{box-shadow:inset 5px 0 0 var(--rc)}
+.tr-row.rune.unetched .tr-txt h4{opacity:.85}
+.tr-row .need{margin:3px 0 0;font-size:11px;font-weight:800;color:#8A6A3A}
+.btn.etch{display:inline-flex;align-items:center;gap:6px}
+.btn.etch>span{display:inline-flex;align-items:center;gap:3px;font-variant-numeric:tabular-nums}
+.btn.etch .glim{width:11px;height:13px}
 /* Sheets */
 #sheet{position:fixed;inset:0;background:rgba(10,13,22,.55);display:flex;align-items:flex-end;justify-content:center;z-index:5}
 .panel{width:min(480px,100%);max-height:82%;overflow:auto;background:var(--paper);color:var(--ink);border-radius:16px 16px 0 0;
@@ -892,7 +948,7 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 <canvas id="lake" aria-label="Fishing lake. Drag down and release to cast."></canvas>
 
 <div id="hud">
-  <div class="chip"><span class="coin" aria-hidden="true"></span><span id="coins">0</span></div><div class="chip meal-chip" id="mealChip" hidden role="button" tabindex="0" aria-label="Meal"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="10.5" r="6.8" fill="#F3EAD7" stroke="#2B2A33" stroke-width="1.2"/><path d="M5 10.5 q4 -3.6 8 0 q-4 3.6 -8 0 Z" fill="#E8B866" stroke="#2B2A33" stroke-width=".9"/><path d="M6.6 4.6 q-1 -1.6 0 -3.2 M10.6 4.6 q-1 -1.6 0 -3.2" stroke="#F3EAD7" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg><span id="mealCasts">0</span></div>
+  <div class="chip"><span class="coin" aria-hidden="true"></span><span id="coins">0</span></div><div class="chip glim-chip" id="glimChip" hidden><span class="glim" aria-hidden="true"></span><span id="glimmer">0</span><span class="sr"> Glimmer</span></div><div class="chip meal-chip" id="mealChip" hidden role="button" tabindex="0" aria-label="Meal"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="10.5" r="6.8" fill="#F3EAD7" stroke="#2B2A33" stroke-width="1.2"/><path d="M5 10.5 q4 -3.6 8 0 q-4 3.6 -8 0 Z" fill="#E8B866" stroke="#2B2A33" stroke-width=".9"/><path d="M6.6 4.6 q-1 -1.6 0 -3.2 M10.6 4.6 q-1 -1.6 0 -3.2" stroke="#F3EAD7" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg><span id="mealCasts">0</span></div>
   <div class="chip" id="species">Journal 0/6</div>
   <div class="chip" id="clock">6:00 PM</div>
   <div class="spacer"></div>
@@ -1022,29 +1078,30 @@ const POOLS_COAST = {
 /* Gear: rods, boat parts and hull paint.
    RODS[id]   name; price; reach (how far it casts, 0..1 of the lake); line, reel, value (multipliers); luck (luck points: .35 is +35 luck);
               snag (chance the reeds catch the line); reedBoost (reed fish bite this much sooner); color; where; perk;
-              sea:true for Tacklegram rods; mods, the perk as modifiers (see data/stats.js and game/mods.js).
+              sea:true for Tacklegram rods; mods, the perk as modifiers (see data/stats.js and game/mods.js);
+              ench, how many enchantment sockets it has (1 to 3: data/enchant.js).
    ROD_ORDER  Ottilie's shop ladder.  SEA_RODS  the Tacklegram ladder.  PARTS (with their mods), PAINTS  boat upgrades and colors
               (a paint with crate: only comes in loot crates; the rest are sold on Tacklegram).
    A modifier is {stat, v, when?, omen?}: stat names an entry in STATS; when limits it to a region, spot, time
-   (night:true), fish, rarity (a list) or rarityMin (that rarity and rarer); omen:true multiplies luck after the
+   (night:true, or night:false for daytime), fish, rarity (a list) or rarityMin (that rarity and rarer); omen:true multiplies luck after the
    ceilings, like Gull Luck. */
 const RODS = {
-  willow:    {name:'Willow Switch', price:0,    reach:.36, line:1,    reel:1,    luck:0,    value:1,    snag:.35, reedBoost:1,   color:'#5A4030', where:'Near shore',
+  willow:    {name:'Willow Switch', price:0, ench:1,    reach:.36, line:1,    reel:1,    luck:0,    value:1,    snag:.35, reedBoost:1,   color:'#5A4030', where:'Near shore',
               perk:'No perk. Snags in the reeds about 1 cast in 3.'},
-  reedcutter:{name:'Reedcutter', price:75,      reach:.5,  line:1.1,  reel:1.05, luck:0,    value:1,    snag:0,   reedBoost:1.7, color:'#5F7136', where:'Reeds and lily pads',
+  reedcutter:{name:'Reedcutter', price:75, ench:1,      reach:.5,  line:1.1,  reel:1.05, luck:0,    value:1,    snag:0,   reedBoost:1.7, color:'#5F7136', where:'Reeds and lily pads',
               perk:'Slices through reeds, and reed fish bite sooner.'},
-  ash:       {name:'Ash Caster', price:200,     reach:.7,  line:1.15, reel:1.1,  luck:.1,  value:1.1,  snag:.25, reedBoost:1,   color:'#9A7A52', where:'The deep pool',
+  ash:       {name:'Ash Caster', price:200, ench:2,     reach:.7,  line:1.15, reel:1.1,  luck:.1,  value:1.1,  snag:.25, reedBoost:1,   color:'#9A7A52', where:'The deep pool',
               perk:'A twitch draws fish from twice as far.', mods:[{stat:'twitch', v:2}]},
-  heronwood: {name:'Heronwood Long Rod', price:500, reach:.9, line:1.25, reel:1.15, luck:.2, value:1.15, snag:.15, reedBoost:1, color:'#8E959B', where:'Far water',
+  heronwood: {name:'Heronwood Long Rod', price:500, ench:2, reach:.9, line:1.25, reel:1.15, luck:.2, value:1.15, snag:.15, reedBoost:1, color:'#8E959B', where:'Far water',
               perk:'Approaching fish flash their rarity color.', mods:[{stat:'reveal'}]},
-  brasscap:  {name:'Brasscap Pro', price:1200,  reach:1,   line:1.4,  reel:1.25, luck:.35, value:1.25, snag:0,   reedBoost:1.3, color:'#B08D4C', where:'The horizon',
+  brasscap:  {name:'Brasscap Pro', price:1200, ench:2,  reach:1,   line:1.4,  reel:1.25, luck:.35, value:1.25, snag:0,   reedBoost:1.3, color:'#B08D4C', where:'The horizon',
               perk:'Perfect-hook window 50% wider.', mods:[{stat:'perfect', v:1.5}]},
-  saltline:  {name:'Saltline Rod', price:2500, reach:1, line:1.6, reel:1.3, luck:.45, value:1.4, snag:0, reedBoost:1.3, color:'#3E6E8A', where:'Open water', sea:true,
+  saltline:  {name:'Saltline Rod', price:2500, ench:3, reach:1, line:1.6, reel:1.3, luck:.45, value:1.4, snag:0, reedBoost:1.3, color:'#3E6E8A', where:'Open water', sea:true,
               blurb:'Braided salt-cured line on a blue fiberglass blank.', perk:'Swells hit your line half as hard.', mods:[{stat:'swell', v:.5}]},
-  gale:      {name:'Gale Rod', price:6000, reach:1, line:1.8, reel:1.4, luck:.6, value:1.55, snag:0, reedBoost:1.3, color:'#CFC6B2', where:'Open water', sea:true,
+  gale:      {name:'Gale Rod', price:6000, ench:3, reach:1, line:1.8, reel:1.4, luck:.6, value:1.55, snag:0, reedBoost:1.3, color:'#CFC6B2', where:'Open water', sea:true,
               blurb:'Light as driftwood, stiff as a mast.', perk:'Casts ride the wind and never wash out. Plus the Saltline’s perk.',
               mods:[{stat:'swell', v:.5}, {stat:'noWashout'}]},
-  deepwater: {name:'Deepwater Caster', price:12000, reach:1, line:2, reel:1.5, luck:.8, value:1.7, snag:0, reedBoost:1.3, color:'#1F3B57', where:'Open water', sea:true,
+  deepwater: {name:'Deepwater Caster', price:12000, ench:3, reach:1, line:2, reel:1.5, luck:.8, value:1.7, snag:0, reedBoost:1.3, color:'#1F3B57', where:'Open water', sea:true,
               blurb:'Built for the trench. Heavy, quiet and very patient.', perk:'Rare-and-up fish bite twice as often in the trench. Plus every perk above.',
               mods:[{stat:'swell', v:.5}, {stat:'noWashout'}, {stat:'luck', omen:true, v:2, when:{region:'coast', spot:'deep', rarityMin:'rare'}}]}
 };
@@ -1194,7 +1251,8 @@ const AMB_LV={ lake_day:{water:.55,wind:.22}, lake_dusk:{water:.5,wind:.14}, lak
   coast_night:{surf:.8,hiss:.18,wind:.3}, aquarium:{room:.5,water:.12}, kitchen:{room:.75}, banquet:{water:.25,wind:.1}, intro:{water:.4,wind:.3} };
 
 /* Treasure: everything a line pulls up that isn't a fish.
-   TREASURE   how often treasure turns up and which kind (weights); a pouch's size (in catches' worth of coins).
+   TREASURE   how often treasure turns up and which kind (weights); a pouch's size (in catches' worth of coins). A geode holds
+              Glimmer (data/enchant.js: GLIMMER.geode), and every crate holds some (GLIMMER.crate).
               Before the first treasure the odds are firstRate, and that first one is always a Common crate.
    CRATES     one per rarity, Common to Mythic. weight (before luck), pull and reel (the haul), snags (how often
               it catches on the bottom: 0 to 3), coins (fish: this many catches' worth at the spot you cast,
@@ -1220,9 +1278,9 @@ const AMB_LV={ lake_day:{water:.55,wind:.22}, lake_dusk:{water:.5,wind:.14}, lak
               (letter, with to: the address Pell reads out). Lines are written the way they're inked. */
 const TREASURE={
   rate:1/12, firstRate:1/4, from:8,
-  kinds:{pouch:49, bottle:20, find:5, crate:26},
+  kinds:{pouch:35, geode:14, bottle:20, find:5, crate:26},
   letter:{weight:6, region:'lake', spots:['deep','far'], from:25},
-  haul:{pouch:{pull:.55, reel:2.2}, bottle:{pull:.5, reel:2.4}, find:{pull:.75, reel:3}, letter:{pull:.5, reel:2.6}},
+  haul:{pouch:{pull:.55, reel:2.2}, geode:{pull:.7, reel:2.8}, bottle:{pull:.5, reel:2.4}, find:{pull:.75, reel:3}, letter:{pull:.5, reel:2.6}},
   pouch:[1.5,3],
   loose:{common:50, uncommon:30, rare:14, epic:5, legendary:1}
 };
@@ -1356,6 +1414,37 @@ const TACKLE={
 };
 const TACKLE_ORDER={reel:['clicker','brassdrag','quickwind','whisper'], line:['cotton','silk','wire','clearwater','glowline'], bait:['worms','grubs','chum','spinner']};
 
+/* Enchantments and Glimmer.
+   ENCH[id]   a rune etched onto a rod (game/enchant.js). name; eff (what it does, one sentence); short (the same in a
+              few words, for a socket in the tackle bag); down (its catch, one sentence, if it has one); cost (Glimmer, paid once: after that it goes on any rod for free, one of each
+              per rod); color (its glow); mods (modifiers, as on rods: data/stats.js). A mod's when can name wander
+              (the catch is one of the day's first few in its water: ENCH.wanderer.first). Drawn in game/enchant-art.js.
+   ENCH_ORDER the order the etching tray lists them, cheapest first.
+              Each rod's sockets are RODS[id].ench (1 to 3) in data/gear.js.
+   GLIMMER    where Glimmer comes from. record: what beating your record for a species pays, by its rarity.
+              geode: what a Glimmer geode holds, [least, most], by region. crate: Glimmer in each crate, by tier.
+   Storm Knot (weather, step 20), Odd Water (mutations, step 21) and Homebody (Wren's bench, step 25) come later. */
+const ENCH={
+  swift:     {name:'Swift Spool', short:'Reels 30% faster', cost:30, color:'#78C08A', eff:'You reel 30% faster.', down:'Tension rises 30% faster too.',
+              mods:[{stat:'reel', v:1.3}, {stat:'drag', v:1.3}]},
+  magpie:    {name:'Magpie Knot', short:'Treasure twice as often', cost:45, color:'#E2B84E', eff:'Treasure turns up twice as often.', down:'Fish are worth 15% less.',
+              mods:[{stat:'treasure', v:2}, {stat:'value', v:.85}]},
+  deep:      {name:'Lure of the Deep', short:'More rare fish', cost:60, color:'#5C8FD8', eff:'Rare and rarer fish bite more often.', down:'The hook window is 20% shorter.',
+              mods:[{stat:'luck', v:.3, when:{rarityMin:'rare'}}, {stat:'hook', v:.8}]},
+  nightglass:{name:'Nightglass', short:'More night fish', cost:60, color:'#A98BE2', eff:'Night fish bite far more often.', down:'By day, fish bite more slowly.',
+              mods:[{stat:'night', v:2}, {stat:'bite', v:1.25, when:{night:false}}]},
+  wanderer:  {name:'Wanderer', short:'Each day’s first catches ×2', cost:80, color:'#E5975A', first:3, eff:'Each day, your first 3 catches at the lake are worth double, and so are your first 3 at the coast.',
+              mods:[{stat:'value', v:2, when:{wander:true}}]},
+  echo:      {name:'Echo', short:'Perfect hooks echo', cost:110, color:'#58C4C2', eff:'After a perfect hook, another of the same fish sometimes waits there. Cast to the same spot for an instant bite.', down:'Only perfect hooks set it off.',
+              mods:[{stat:'echo', v:.35}]}
+};
+const ENCH_ORDER=['swift','magpie','deep','nightglass','wanderer','echo'];
+const GLIMMER={
+  record:{common:2, uncommon:3, rare:5, epic:8, legendary:12, exotic:18, mythic:26, godly:40},
+  geode:{lake:[4,8], coast:[6,12]},
+  crate:{common:[3,5], uncommon:[6,9], rare:[10,15], epic:[18,26], legendary:[32,45], exotic:[55,75], mythic:[90,120]}
+};
+
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
          luck  bonuses add up as luck points; each rarity turns the points into odds on a curve that flattens
@@ -1388,6 +1477,7 @@ const STATS={
   treasure: {name:'Treasure', kind:'mul', good:'up', hint:'How often your line pulls up something that isn’t a fish.'},
   loot:     {name:'Treasure coins', kind:'mul', good:'up', hint:'Coins in pouches and crates.'},
   eaten:    {name:'Eaten catches', kind:'add', start:0, good:'down', unit:'chance', hint:'Share of landed fish that get eaten before you can keep them.'},
+  echo:     {name:'Echo bites', kind:'add', start:0, good:'up', unit:'chance', hint:'After a perfect hook, how often another of the same fish waits at that spot, for an instant bite on your next cast there.'},
   clock:    {name:'Time of day', kind:'mul', good:'up', unit:'x', hint:'How fast the in-game clock runs while you fish.'},
   tips:     {name:'Tank tips', kind:'mul', good:'up', hint:'How fast the aquarium’s tip jar fills.'},
   mealCasts:{name:'Meal length', kind:'mul', good:'up', hint:'How many casts a meal’s boosts last.'},
@@ -1442,6 +1532,8 @@ function modSources(){
   const rig=rigFor(save.rod);
   for (const id of [rig.reel, rig.line]){ const T=TACKLE[id]; if (T) for (const x of T.mods) L.push(Object.assign({src:'gear',name:T.name},x)); }
   const bait=baitOn(); if (bait) for (const x of TACKLE[bait].mods) L.push(Object.assign({src:'gear',name:TACKLE[bait].name},x));
+  // runes etched onto the rod in hand (game/enchant.js)
+  for (const id of enchFor(save.rod)) if (id) for (const x of ENCH[id].mods) L.push(Object.assign({src:'ench',name:ENCH[id].name},x));
   // artifacts work while they're in a vest pocket; keepsakes work from the moment you have them
   const FS=findsState();
   for (const id of FS.equip){ const D=FINDS[id]; if (D && FS.have[id]) for (const x of D.mods||[]) L.push(Object.assign({src:'artifact',name:D.name},x)); }
@@ -1731,6 +1823,12 @@ const sfx = {
     else if (k==='line') noise(.16,{vol:.08,f:3200,to:6200,q:2});
     else { tone(330,.08,{to:190,vol:.09,type:'triangle'}); noise(.06,{vol:.05,f:900,type:'lowpass',delay:.03}); } },
   pocket: on => { noise(.08,{vol:.12,f:on?1800:900}); tone(on?660:440,.07,{vol:.07,type:'triangle',delay:.03}); },
+  // Glimmer and runes (game/enchant.js)
+  glimmer: n => { const N=[2093,2637,3136,3951]; for (let i=0;i<Math.min(4,1+Math.floor(n/6));i++) tone(N[i],.32,{vol:.045,type:'sine',delay:i*.06}); tone(4186,.5,{vol:.02,type:'sine',delay:.1}); },
+  geode: () => { noise(.12,{vol:.3,f:2600,type:'highpass'}); tone(240,.12,{to:120,vol:.14,type:'triangle'}); [1568,2093,2637,3136].forEach((n,i)=>tone(n,.45,{vol:.05,type:'sine',delay:.12+i*.05})); },
+  etch: () => { noise(.5,{vol:.06,f:5200,to:2400,q:1.5}); [784,988,1175,1568].forEach((n,i)=>tone(n,.5+i*.08,{vol:.06,type:'triangle',delay:.18+i*.11})); tone(3136,.9,{vol:.03,type:'sine',delay:.62}); },
+  rune: on => { tone(on?1175:880,.12,{vol:.07,type:'triangle'}); tone(on?1760:660,.2,{vol:.04,type:'sine',delay:.05}); },
+  echo: () => { [1318,1318].forEach((n,i)=>tone(n,.3,{vol:i?.035:.07,type:'sine',delay:i*.18})); },
   chomp: () => { noise(.12,{vol:.32,f:700}); noise(.12,{vol:.28,f:600,delay:.14}); tone(160,.1,{to:80,vol:.12,type:'square'}); tone(140,.1,{to:70,vol:.1,type:'square',delay:.14}); }
 };
 function humStart(){ if (!AC || hum) return; const o=AC.createOscillator(), f=AC.createBiquadFilter(), g=AC.createGain();
@@ -1856,9 +1954,12 @@ function updateCast(dt){
 /* ---------- Waiting & bite ---------- */
 function startWaiting(){
   const lucky=inLucky(S.bob.x,S.bob.y);
-  S.wait={phase:'empty', t:biteWait(S.bob.spot)*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1, lucky,
-    loot:S.tut?null:rollTreasure({spot:S.bob.spot,lucky})};   // one roll per cast: this cast pulls up treasure, or a fish
+  const loot=S.tut?null:rollTreasure({spot:S.bob.spot,lucky});   // one roll per cast: this cast pulls up treasure, or a fish
+  // Echo: one waits where you hooked the last, and bites at once. If treasure comes up first, it keeps waiting.
+  const E=S.echo, here=!S.tut && !!E && E.reg===REG() && E.spot===S.bob.spot, echo=here && !loot ? E.fish : null; S.echo=here && loot ? E : null;
+  S.wait={phase:'empty', t:echo?.35:biteWait(S.bob.spot)*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1, lucky, echo, loot};
   setState('waiting');
+  if (echo) return;
   if (S.bob.spot==='reeds') S.wait.t/=modMul('reedBite',{spot:'reeds'});
   if (S.tut){ S.tut='wait'; S.wait.t=.8; coach('Nice cast! Now wait. A fish will swim over to your bobber.','2 of 4'); }
 }
@@ -1866,8 +1967,8 @@ function startWaiting(){
     the swim over and the nibbles: spawnApproach). */
 function biteWait(spot){ const c={spot}; return rand(.75,2.1)*modMul('wait',c)*modMul('bite',c); }
 function spawnApproach(){
-  const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.fish=S.tut?'perch':pickW(poolFor(b.spot,w.lucky)); const F=FISH[w.fish];
-  const ang=rand(0,Math.PI*2), d=rand(85,150);
+  const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.fish=S.tut?'perch':w.echo||pickW(poolFor(b.spot,w.lucky)); const F=FISH[w.fish];
+  const ang=rand(0,Math.PI*2), d=w.echo?rand(40,60):rand(85,150);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
   w.sh={x,y,ang:Math.atan2(b.y-y,b.x-x),alpha:0,flee:false};
   w.bm=S.tut?1:modMul('bite',{spot:b.spot,fish:w.fish,lucky:w.lucky});   // bait and the like: a quicker swim over and shorter nibbles
@@ -1883,10 +1984,10 @@ function updateWaiting(dt){
       const F=FISH[w.fish];
       if (w.phase==='approach'){
         const dx=b.x-sh.x, dy=b.y-sh.y, d=Math.hypot(dx,dy);
-        const sp=(20+F.len*.35)*w.attract*sc(sh.y)*(F.beh==='sleeper'?.5:1)/(w.bm||1);
+        const sp=(20+F.len*.35)*w.attract*sc(sh.y)*(F.beh==='sleeper'?.5:1)/(w.bm||1)*(w.echo?2.2:1);
         sh.ang=angLerp(sh.ang, Math.atan2(dy,dx)+Math.sin(S.time*2.2)*.5*Math.min(1,d/70), dt*3);
         sh.x+=Math.cos(sh.ang)*sp*dt; sh.y+=Math.sin(sh.ang)*sp*dt*.6;
-        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3)); w.nibT=S.tut?1.2:rand(.5,1.1)*(w.bm||1); }
+        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:w.echo?0:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3)); w.nibT=S.tut?1.2:w.echo?.15:rand(.5,1.1)*(w.bm||1); }
       } else if (w.phase==='nibble'){
         sh.ang=angLerp(sh.ang,Math.atan2(b.y-sh.y,b.x-sh.x),dt*2);
         const hx=b.x-Math.cos(sh.ang)*F.len*.38*sc(b.y), hy=b.y-Math.sin(sh.ang)*F.len*.2*sc(b.y);
@@ -2121,10 +2222,14 @@ function catchRoll(id,perfect,ctx){ const F=FISH[id];
   const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(perfect?1.25:1)*modMul('value',Object.assign({fish:id},ctx))));
   return {size,build,w,value,stars:qualityOf(id,size,perfect)}; }
 function startLand(){
-  humStop(); const R=S.reel, F=R.F, {size,build,w:wgt,value}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky});
+  humStop(); const R=S.reel, F=R.F, spot=(S.bob&&S.bob.spot)||'open';
   // the Hungry Hook takes its share before you can keep the fish
   const eaten=!S.tut && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
-  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot:(S.bob&&S.bob.spot)||'open',hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0,eaten};
+  const wander=S.tut||eaten?0:wanderCount(REG());   // Wanderer: the day's first catches in this water
+  const {size,build,w:wgt,value}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky,wander:!!wander});
+  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0,eaten,wander};
+  // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast
+  if (R.perfect && !S.tut && !eaten && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
   sfx.out(F.rarity); buzz(F.rarity==='legendary'?[0,40,60,40,60,120]:40); shake(F.rarity==='legendary'?6:2);
   if (!REDUCED && (F.rarity==='rare'||F.rarity==='legendary')) S.zoomT=F.rarity==='legendary'?1.12:1.06;
@@ -2155,7 +2260,8 @@ function showCard(){
   const prevW=r.bw||0; L.prev=r.pb?Object.assign({},r.pb):null;
   r.caught++; r.best=Math.max(r.best,L.size); r.seen=true; save.stats.catches++;
   save.stats.landed=(save.stats.landed||0)+L.w; if (L.stars===3) save.stats.trophies=(save.stats.trophies||0)+1;
-  L.pbBeat=!L.isNew && !!L.prev && L.w>prevW; L.pbBonus=L.pbBeat?Math.max(3,Math.round(F.value*.5)):0;
+  L.pbBeat=!L.isNew && !!L.prev && L.w>prevW; L.pbGlim=L.pbBeat?(GLIMMER.record[F.rarity]||2):0;   // records pay Glimmer, kept now and counted up at the stamp
+  if (L.pbGlim){ save.glimmer=(save.glimmer||0)+L.pbGlim; save.stats.glimmer=(save.stats.glimmer||0)+L.pbGlim; }
   if (L.isNew || L.w>prevW){ r.bw=L.w; r.pb={size:L.size,w:L.w,stars:L.stars,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod,perfect:!!L.perfect}; }
   if (L.pbBeat) save.stats.pbs=(save.stats.pbs||0)+1;
   L.pbMinor=L.pbBeat && (L.w-L.prev.w)/Math.max(1,L.prev.w)<.1 && F.rarity!=='legendary' && L.stars<3;
@@ -2169,6 +2275,10 @@ function showCard(){
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
   if (r.caught===MASTERY.catches) tags.push('Mastered: reels get easier'); else if (r.caught<MASTERY.catches) tags.push('Mastery '+r.caught+'/'+MASTERY.catches);
   $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]);
+  // runes that did something for this catch
+  const runes=[]; if (L.wander) runes.push(runeTag('wanderer','Wanderer ×2 · '+L.wander+' of '+ENCH.wanderer.first)); if (L.echo) runes.push(runeTag('echo','Echo: another waits here'));
+  if (enchOn('deep') && rarRank(F.rarity)>=rarRank('rare')) runes.push(runeTag('deep','Lure of the Deep')); if (enchOn('nightglass') && F.night && isNight(L.hr)) runes.push(runeTag('nightglass','Nightglass'));
+  if (runes.length){ $('cTags').insertAdjacentHTML('afterbegin',runes.join('')); if (L.echo) setTimeout(()=>sfx.echo(),500); }
   $('cLore').textContent=L.isNew||F.rarity!=='common' ? F.lore : '';
   $('cLore').hidden=!$('cLore').textContent;
   const full=save.net.length>=netCap();
@@ -2179,8 +2289,8 @@ function showCard(){
   $('cSell').classList.toggle('primary',S.cardDefault==='sell'); $('cKeep').classList.toggle('primary',S.cardDefault==='keep');
   $('cAuto').hidden=!S.cardAuto; if (S.cardAuto) $('cAuto').innerHTML='Selling in a moment · tap Keep to keep it<span class="bar"><i></i></span>';
   const rs=$('cRec'), pbEl=$('cPB'); rs.hidden=pbEl.hidden=!L.pbBeat; rs.hidden=!L.pbBeat||L.pbMinor; pbEl.classList.toggle('minor',!!L.pbMinor); rs.parentNode.classList.toggle('rec',!!L.pbBeat&&!L.pbMinor); rs.style.animationDelay=pbEl.style.animationDelay=REDUCED?'0s':'';
-  if (L.pbBeat) pbEl.innerHTML='<span class="t">'+(L.pbMinor?'New best, just':'New personal record')+'</span><b id="cPBw">'+fmtW(L.prev.w)+'</b><em>was '+fmtW(L.prev.w)+'</em>'+(L.pbBonus?'<i class="bonus"><span class="coin"></span>+'+L.pbBonus+'</i>':'');
-  card.hidden=false; S.cardAt=S.time; cardScene(L);
+  if (L.pbBeat) pbEl.innerHTML='<span class="t">'+(L.pbMinor?'New best, just':'New personal record')+'</span><b id="cPBw">'+fmtW(L.prev.w)+'</b><em>was '+fmtW(L.prev.w)+'</em>'+(L.pbGlim?'<i class="bonus"><span class="glim" aria-hidden="true"></span>+'+L.pbGlim+'<span class="sr"> Glimmer</span></i>':'');
+  card.hidden=false; S.cardAt=S.time; cardScene(L); paintTiles($('cTags').querySelectorAll('canvas[data-rune]'));   // once the card is laid out
   setState('result');
   if (S.tut){ S.tut='card'; coach('Your first catch! Keep it, or sell it for coins. Every new fish also gets a page in your Journal.','Done'); }
   if (S.cardAuto){ const tok=S.cardAt; setTimeout(()=>{ if (S.state==='result' && S.cardAuto && S.cardAt===tok) dismissCard('sell'); },2200); }
@@ -2189,9 +2299,10 @@ function showCard(){
 function dismissCard(action){
   if (S.state!=='result') return;
   action=action||S.cardDefault||'sell';
+  const L=S.land, card=$('card');
   if (action==='keep' && save.net.length>=netCap()) action='sell';
   if (action==='tank' && !tankRoom(L.id)) action=save.net.length<netCap()?'keep':'sell';
-  const L=S.land, card=$('card'); card.classList.add('out'); setTimeout(()=>{ card.hidden=true; card.classList.remove('out'); },250);
+  card.classList.add('out'); setTimeout(()=>{ card.hidden=true; card.classList.remove('out'); },250);
   if (action==='sell') addCoins(L.value);
   else if (action==='tank'){ addToTank({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod}); sfx.plop(); news('Off to the aquarium','good'); }
   else { save.net.push({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod}); persist();
@@ -2213,18 +2324,41 @@ let coinGoal=0;
 /** The HUD's coin count catches up with the save, counting up (or down). A newer tally takes over an older one. */
 function coinTally(dur){ const start=coinShown, end=save.coins, t0=performance.now(); coinGoal=end;
   const el=$('coins'); el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
-  (function step(now){ if (coinGoal!==end) return; const k=Math.min(1,(now-t0)/dur); coinShown=Math.round(lerp(start,end,1-Math.pow(1-k,3))); el.textContent=coinShown.toLocaleString(); if (k<1) requestAnimationFrame(step); })(t0); }
+  (function step(now){ if (coinGoal!==end) return; const k=Math.min(1,(now-t0)/dur); coinShown=Math.round(lerp(start,end,1-Math.pow(1-k,3))); el.textContent=hudNum(coinShown); if (k<1) requestAnimationFrame(step); else fitHud(); })(t0); }
+/* ---------- fitting the HUD on a narrow phone ---------- */
+/* Coins, Glimmer, the meal, the clock and two buttons share one row. When something in it would be cut off, the row
+   gives way a step at a time, measured rather than guessed from the screen width: 1 tighter chips, 2 the clock drops
+   AM and PM (the sun or moon beside it still tells morning from evening), 3 big numbers shorten (125K), 4 the text
+   gets a size smaller, 5 the Playtest button steps aside (a long press on the clock still opens Playtest). */
+const HUD={lv:0, sig:''};
+/** A count for the HUD: in full, or shortened when the row is at its tightest. */
+function hudNum(n){ if (HUD.lv<3 || n<1e3) return n.toLocaleString();
+  const [d,u]=n<1e6?[1e3,'K']:n<1e9?[1e6,'M']:[1e9,'B'], v=n/d, f=v<100?Math.floor(v*10)/10:Math.floor(v); return f.toLocaleString()+u; }
+const hudClock = h => (isNight(h)||PERIOD(h)==='Evening'?'\u263E\uFE0E ':'\u2600\uFE0E ')+(HUD.lv>=2?clockText(h).replace(/ [AP]M$/,''):clockText(h));
+/** Fits the row to the numbers it will settle on (a count-up in progress ends there), then puts back what's showing. */
+function fitHud(){ const hud=$('hud'); if (!hud) return; const g=save.glimmer||0, m=save.meal;
+  const chips=[...hud.querySelectorAll('.chip')], sig=[innerWidth,save.coins.toLocaleString().length,g.toLocaleString().length,clockText(save.clock).length,m?String(m.casts).length:0]
+    .concat(chips.map(c=>c.hidden?0:1),$('labBtn').hidden?0:1).join();
+  if (sig===HUD.sig) return; HUD.sig=sig;
+  const over=()=>chips.some(c=>!c.hidden && c.scrollWidth>c.clientWidth+1);
+  if (m && !$('mealChip').hidden) $('mealCasts').textContent=m.casts;
+  for (HUD.lv=0; HUD.lv<=5; HUD.lv++){ hud.classList.toggle('tight',HUD.lv>=1); hud.classList.toggle('small',HUD.lv>=4); hud.classList.toggle('nolab',HUD.lv>=5);
+    $('coins').textContent=hudNum(save.coins); $('glimmer').textContent=hudNum(g); S.clockShown=$('clock').textContent=hudClock(save.clock);
+    if (HUD.lv===5 || !over()) break; }
+  $('coins').textContent=hudNum(coinShown); $('glimmer').textContent=hudNum(glimShown); }
+window.addEventListener('resize',fitHud);
+if (document.fonts) document.fonts.ready.then(()=>{ HUD.sig=''; fitHud(); });   // the display font changes every width
 function updateHud(){
   const all=REGION_FISH.lake.concat(save.boat?REGION_FISH.coast:[]), n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
   $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('aquaBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; $('kitchenBtn').hidden=!save.kitchenOpen; $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
-  $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
+  updateGlimChip(); fitHud(); $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
 }
 
 /* ---------- Treasure: the roll, what's inside, and the haul ---------- */
 /* About 1 cast in 12 pulls up treasure instead of a fish (TREASURE in data/treasure.js). The roll happens when
    the quiet before a bite runs out: instead of a fish swimming over, the bobber snags on something heavy. Tap to
    hook it, haul it up like a dead weight (fightStep's 'weight' behavior in game/reeling.js), and it lands as a
-   coin pouch, a message bottle, a drowned letter, a find or a loot crate (game/loot.js shows it).
+   coin pouch, a Glimmer geode, a message bottle, a drowned letter, a find or a loot crate (game/loot.js shows it).
    What's inside is rolled and kept the moment it lands (openLoot), so closing the app mid-celebration never
    loses anything. Luck lifts loose finds and better crates through the same per-rarity curve as fish (tierMul).
    Everything here reads only the save, so the balance simulator rolls treasure with these same functions. */
@@ -2304,18 +2438,20 @@ function spotValue(c){ const w=poolFor(c.spot||'open',!!c.lucky); let s=0, v=0;
     coin counter catches up during the reveal), finds into save.finds. Returns what to show:
     {kind, tier, coins, items:[{type:'find'|'paint'|'decor'|'note'|'spare', id?, n?, rarity?}]}. */
 function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',c);
-  const out={kind:loot.kind, tier:loot.tier||null, coins:0, items:[]};
+  const out={kind:loot.kind, tier:loot.tier||null, coins:0, glimmer:0, items:[]};
+  const glim=([a,b])=>a+Math.floor(Math.random()*(b-a+1));
   const where={t:Date.now(), hr:save.clock, reg:x.region, spot:c.spot||'open', src:loot.kind==='crate'?loot.tier:loot.kind};
   const give=id=>{ FS.have[id]=Object.assign({},where); FS.fresh.push(id); out.items.push({type:'find',id}); };
   const note=id=>{ if (!FS.notes.includes(id)) FS.notes.push(id); out.items.push({type:'note',id}); };
   const spare=r=>{ const n=Math.round(crateCoins(r,c)*.5); out.coins+=n; out.items.push({type:'spare',n,rarity:r}); };   // half a crate of that tier
   FS.treasure++;
   if (loot.kind==='pouch') out.coins=Math.max(5,Math.round(spotValue(c)*rand(TREASURE.pouch[0],TREASURE.pouch[1])*lm));
+  else if (loot.kind==='geode') out.glimmer=glim(GLIMMER.geode[x.region]||GLIMMER.geode.lake);
   else if (loot.kind==='bottle'){ const id=nextBottleNote(c); FS.bottles++; if (id) note(id); else spare('common'); }
   else if (loot.kind==='letter'){ const id=nextLetter(); if (id){ FS.letters[id]='waiting'; note(id); } else spare('uncommon'); }   // Pell collects it on his next stop
   else if (loot.kind==='find'){ const id=pickLoose(c); if (id) give(id); else spare('common'); }
   else if (loot.kind==='crate'){ const C=CRATES[loot.tier]; FS.crates[loot.tier]=(FS.crates[loot.tier]||0)+1;
-    out.coins=crateCoins(loot.tier,c);
+    out.coins=crateCoins(loot.tier,c); out.glimmer=glim(GLIMMER.crate[loot.tier]);
     for (const it of C.items){
       if (it.chance!=null && !(Math.random()<it.chance)) continue;
       if (it.note && Math.random()<it.note){ const id=nextBottleNote(c); if (id){ note(id); continue; } }
@@ -2330,6 +2466,7 @@ function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',
   }
   out.base=out.coins-out.items.reduce((a,it)=>a+(it.type==='spare'?it.n:0),0);   // the coins in it, before any spares
   if (out.coins) save.coins+=out.coins;
+  if (out.glimmer){ save.glimmer=(save.glimmer||0)+out.glimmer; save.stats.glimmer=(save.stats.glimmer||0)+out.glimmer; }   // the HUD counts it up during the reveal
   persist(); return out; }
 /** What a crate of `tier` pays at the spot you cast: that many catches' worth, never less than its floor. */
 function crateCoins(tier,c){ const C=CRATES[tier]; return Math.round(Math.max(C.floor,C.fish*spotValue(c))*rand(.85,1.2)*modMul('loot',c)); }
@@ -2417,6 +2554,70 @@ const gearSource = T => T.shop==='ottilie'?'Ottilie sells it':T.shop==='tacklegr
 /** "Tension −15%", "Reel speed +20%": one chip per modifier, for trays and shops. */
 function gearChips(id){ return (TACKLE[id].mods||[]).map(m=>{ const st=STATS[m.stat], val=st.kind==='flag'?'':st.kind==='base'&&m.v===0?'none':modValueText(m.stat,m.v), w=modWhenText(m.when);
   return {stat:m.stat, text:st.name+(val?' '+val:'')+(w?' '+w:''), up:st.kind==='flag'||modHelps(m.stat,m.v)}; }); }
+
+/* ---------- Enchantments and Glimmer (data/enchant.js) ---------- */
+/* save.glimmer is the Glimmer you have. save.ench = {own:{id:1} for each rune you've etched, rig:{rodId:[id or null,
+   one per socket]}, kit:true once the etching kit has been shown}. An etched rune goes on any rod for free, one of
+   each per rod; the modifiers of the runes on the rod in hand join the pipeline (game/mods.js, src 'ench').
+   save.day counts in-game days (game/loop.js); save.wander = {day, n:{region: catches there that day}} is what
+   Wanderer counts (each water, as the design doc has it, so it pays to travel). S.echo = {fish, reg, spot} is an Echo waiting at a spot for the next cast there.
+   Everything above the HUD part reads only the save, so the balance simulator can lend its own. */
+function enchState(){ if (!isObj(save.ench)) save.ench={}; const e=save.ench;
+  if (!isObj(e.own)) e.own={}; if (!isObj(e.rig)) e.rig={};
+  for (const id in e.own) if (!ENCH[id]) delete e.own[id];
+  if (typeof save.glimmer!=='number' || !isFinite(save.glimmer) || save.glimmer<0) save.glimmer=0;
+  return e; }
+/** The runes on rod `rod`, one entry per socket (null for an empty one): only runes you own, one of each. */
+function enchFor(rod){ const e=enchState(), n=(RODS[rod]||RODS.willow).ench||1; let r=e.rig[rod]; if (!Array.isArray(r)) r=e.rig[rod]=[];
+  const seen=new Set(); for (let i=0;i<r.length;i++){ const id=r[i]; if (!id || !ENCH[id] || !e.own[id] || seen.has(id)) r[i]=null; else seen.add(id); }
+  if (r.length>n) r.length=n; while (r.length<n) r.push(null); return r; }
+const ownsEnch = id => !!enchState().own[id];
+const enchOn = (id,rod) => enchFor(rod||save.rod).includes(id);
+/** Glimmer in (or out). The HUD counts it up unless the simulator is running. */
+function addGlimmer(n,o){ n=Math.round(n)||0; if (!n) return; save.glimmer=Math.max(0,(save.glimmer||0)+n); if (n>0) save.stats.glimmer=(save.stats.glimmer||0)+n; persist(); if (!SIMULATING) glimmerTally(n,o); }
+/** Etches rune `id` into socket `at` of the rod in hand: pays its Glimmer the first time, free after that. */
+function etchRune(id,at){ const e=enchState(), E=ENCH[id]; if (!E || !(at>=0 && at<enchFor(save.rod).length)) return false;
+  if (!e.own[id]){ if ((save.glimmer||0)<E.cost) return false; save.glimmer-=E.cost; e.own[id]=1; save.stats.etched=(save.stats.etched||0)+1; }
+  return socketRune(id,at); }
+/** Puts a rune you own in socket `at` (moving it if it's in another socket on the same rod). */
+function socketRune(id,at,rod){ rod=rod||save.rod; const r=enchFor(rod); if (!ownsEnch(id) || !(at>=0 && at<r.length)) return false;
+  const was=r.indexOf(id); if (was>=0) r[was]=null; r[at]=id; persist(); return true; }
+function unsocketRune(at,rod){ const r=enchFor(rod||save.rod); if (!r[at]) return false; r[at]=null; persist(); return true; }
+
+/* ---------- Wanderer and Echo ---------- */
+/** Counts a landed catch toward the day's catches in its water. If it's one of the first few and Wanderer is on, returns
+    which one (1 to ENCH.wanderer.first), and it's worth double (the value modifier's when:{wander:true}); otherwise 0.
+    Every catch counts, Wanderer or not, so etching it in after fishing a water doesn't pay out there again that day. */
+function wanderCount(reg){ const d=save.day||0; if (!isObj(save.wander) || save.wander.day!==d || !isObj(save.wander.n)) save.wander={day:d,n:{}};
+  const n=save.wander.n[reg]||0; save.wander.n[reg]=n+1; return enchOn('wanderer') && n<ENCH.wanderer.first ? n+1 : 0; }
+/** After a perfect hook, Echo may leave another of the same fish waiting at that spot. */
+function echoRoll(id,spot){ const p=modAdd('echo',{fish:id,spot}); return p>0 && Math.random()<p; }
+
+/* ---------- the HUD's Glimmer ---------- */
+let glimShown=0, glimGoal=0;
+/** The Glimmer chip appears with the first Glimmer and counts up to the save, with a little burst of motes. */
+function glimmerTally(n,o){ const chip=$('glimChip'), el=$('glimmer'); if (!chip||!el) return; o=o||{};
+  const first=chip.hidden; chip.hidden=false; fitHud();
+  const start=glimShown, end=save.glimmer, t0=performance.now(), dur=Math.max(300,Math.min(900,300+Math.abs(n)*30)); glimGoal=end;
+  chip.classList.remove('bump','arrive'); void chip.offsetWidth; chip.classList.add(first?'arrive':'bump');
+  (function step(now){ if (glimGoal!==end) return; const k=Math.min(1,(now-t0)/dur); glimShown=Math.round(lerp(start,end,1-Math.pow(1-k,3))); el.textContent=hudNum(glimShown); if (k<1) requestAnimationFrame(step); else fitHud(); })(t0);
+  if (n>0 && !o.quiet) sfx.glimmer(n);
+  if (n>0 && o.x!=null) glimMotes(o.x,o.y,Math.min(14,4+n));
+  if (n>0) glimFirstSeen(o.delay); }
+/** The first Glimmer: a tip about the etching kit, and a dot on the bag until you open it. */
+function glimFirstSeen(delay){ const e=enchState(); if (e.kit) return; e.kit=true; persist(); updateBagBtn();
+  setTimeout(()=>coachFor('That’s Glimmer. Your uncle left an etching kit in your tackle bag: Glimmer etches runes onto a rod.',8),delay||900); }
+/** Glimmer motes flying from (x,y) on the lake up to the chip. */
+function glimMotes(x,y,n){ const c=$('glimChip'); if (!c) return; const r=c.getBoundingClientRect(), tx=r.left+12, ty=r.top+r.height/2;
+  for (let i=0;i<n;i++) S.particles.push({x:x+rand(-10,10),y:y+rand(-8,8),vx:rand(-90,90),vy:rand(-160,-60),g:0,life:0,max:rand(.7,1.1),r:rand(1.6,2.8),c:'rgba(178,226,255,',home:{x:tx,y:ty,d:rand(.18,.36)},glim:true}); }
+function updateGlimChip(){ const c=$('glimChip'); if (!c) return; const show=(save.glimmer||0)>0 || (save.stats.glimmer||0)>0; c.hidden=!show; fitHud();
+  if (show && glimGoal!==save.glimmer){ glimShown=glimGoal=save.glimmer; $('glimmer').textContent=hudNum(save.glimmer); fitHud(); }
+  if (show) glimFirstSeen(1200); }
+
+/* ---------- shared pieces of text ---------- */
+/** A rune's little badge: its drawing and a word ("Echo!", "Wanderer ×2"), for the catch card and the haul. */
+const runeTag = (id,text) => '<span class="rtag" style="--rc:'+ENCH[id].color+'"><canvas data-rune="'+id+'" aria-hidden="true"></canvas>'+text+'</span>';
+const glimHTML = n => '<span class="glim" aria-hidden="true"></span>'+n.toLocaleString();
 
 /* ---------- Drawing ---------- */
 function fishPath(id,len){
@@ -2899,7 +3100,7 @@ function rigLayout(w,h){ const hx=w*.06, hy=h*.8, tx=w*.88, ty=h*.2, ang=Math.at
   const at=(k,d)=>{ const b=Math.sin(k*Math.PI*.9)*h*.035*k, x=hx+Math.cos(ang)*len*k, y=hy+Math.sin(ang)*len*k+b; return {x:x+ux*(d||0), y:y+uy*(d||0)}; };
   const reel=at(.17,h*.2);
   return {hx,hy,tx,ty,ang,len,at, reel, line:at(.58,h*.06), bait:{x:tx+w*.02, y:h*.7}}; }
-function drawRig(c,w,h,rod,rig,bait,t){ const R=RODS[rod]||RODS.willow, L=rigLayout(w,h), at=L.at, ang=L.ang;
+function drawRig(c,w,h,rod,rig,bait,t,fx){ const R=RODS[rod]||RODS.willow, L=rigLayout(w,h), at=L.at, ang=L.ang;
   c.save(); c.lineCap='round'; c.lineJoin='round';
   const swing=REDUCED?0:Math.sin((t||0)*1.3)*.06, tip=at(1), hook={x:L.bait.x+Math.sin(swing)*h*.3, y:L.bait.y-h*.06}, lc=LINE_COL[rig.line]||LINE_COL.cotton;
   // the blank, tapering to the tip, in the rod's own color
@@ -2907,6 +3108,8 @@ function drawRig(c,w,h,rod,rig,bait,t){ const R=RODS[rod]||RODS.willow, L=rigLay
   for (const pass of [0,1]) for (let i=0;i<segs;i++){ const k0=.06+i/segs*.94, k1=.06+(i+1)/segs*.94, a=at(k0), b=at(k1);
     c.strokeStyle=pass?R.color:INK; c.lineWidth=wAt(i/segs)+(pass?0:2.6); c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); }
   c.strokeStyle='rgba(255,255,255,.25)'; c.lineWidth=1.2; const s0=at(.14,h*.012), s1=at(.8,h*.004); c.beginPath(); c.moveTo(s0.x,s0.y); c.lineTo(s1.x,s1.y); c.stroke();
+  // rune sockets on the blank (game/enchant-art.js): the runes etched on a rod you own, empty seats on one you don't
+  drawRigRunes(c,w,h,L,save.rods.includes(rod)?enchFor(rod):Array((R.ench||1)).fill(null),t,fx);
   // the guides stand on top of the blank; the line runs from the reel through each one to the tip, then down to the hook
   const gk=[.3,.48,.65,.8,.92], ring=i=>lerp(h*.028,h*.015,i/gk.length), guides=gk.map((k,i)=>({base:at(k,wAt(k)*.4), eye:at(k,wAt(k)*.4+ring(i)*2.2), r:ring(i)}));
   for (const g of guides){ c.strokeStyle=INK; c.lineWidth=2; c.beginPath(); c.moveTo(g.base.x,g.base.y); c.lineTo(g.eye.x,g.eye.y); c.stroke(); }
@@ -2938,6 +3141,114 @@ function drawRig(c,w,h,rod,rig,bait,t){ const R=RODS[rod]||RODS.willow, L=rigLay
   else if (bait==='chum'){ laInk(c,2.2); laEll(c,-2,15,8,7); laFill(c,'#B4584A'); c.fillStyle='#E8C9A8'; laEll(c,-5,12,2.6,2); c.fill(); laEll(c,1,18,2,1.6); c.fill(); }
   c.restore(); c.restore(); }
 
+/* ---------- Enchantment art: the runes, Glimmer, the geode, and runes set into a rod ---------- */
+/* A rune is a brass-rimmed slate token with its glyph engraved in its own color (ENCH[].color), glowing softly.
+   Glyphs are drawn in a unit square (-1..1) so the same path serves the tray, the tag on the catch card, the
+   socket on the rig and the etching, where the glyph draws itself stroke by stroke (o.p, 0 to 1). */
+const RUNE_GLYPH={
+  swift(c){ c.moveTo(-.34,-.5); c.lineTo(-.34,.5); c.moveTo(.42,-.5); c.lineTo(.42,.5);
+    for (const y of [-.24,0,.24]){ c.moveTo(-.34,y); c.lineTo(.42,y); }
+    for (const [x0,y,l] of [[-.62,-.3,.18],[-.78,0,.3],[-.62,.3,.18]]){ c.moveTo(x0-l,y); c.lineTo(x0,y); } },
+  magpie(c){ c.moveTo(-.62,.42); c.bezierCurveTo(-.7,-.58,.42,-.66,.2,.06); c.bezierCurveTo(.02,.6,-.66,.22,-.12,-.22); c.bezierCurveTo(.26,-.5,.72,-.18,.56,.46);
+    c.moveTo(.68,-.5); c.arc(.52,-.5,.16,0,Math.PI*2); },
+  deep(c){ c.moveTo(.06,-.42); c.lineTo(.06,.26); c.quadraticCurveTo(.06,.68,-.32,.6); c.quadraticCurveTo(-.6,.5,-.5,.22); c.moveTo(-.5,.22); c.lineTo(-.34,.34);
+    c.moveTo(-.74,-.62); c.quadraticCurveTo(-.56,-.78,-.38,-.62); c.quadraticCurveTo(-.2,-.46,-.02,-.62); c.quadraticCurveTo(.16,-.78,.34,-.62); c.quadraticCurveTo(.52,-.46,.7,-.62); },
+  nightglass(c){ c.moveTo(.6,0); c.arc(0,0,.6,0,Math.PI*2);
+    c.moveTo(.2,-.36); c.arc(-.02,0,.42,-1.05,1.05,true); c.quadraticCurveTo(-.2,0,.2,-.36);
+    c.moveTo(.3,-.06); c.lineTo(.38,-.14); },
+  wanderer(c){ c.moveTo(0,-.8); c.lineTo(.17,-.17); c.lineTo(.8,0); c.lineTo(.17,.17); c.lineTo(0,.8); c.lineTo(-.17,.17); c.lineTo(-.8,0); c.lineTo(-.17,-.17); c.closePath();
+    c.moveTo(.11,0); c.arc(0,0,.11,0,Math.PI*2); },
+  echo(c){ c.moveTo(-.12,0); c.quadraticCurveTo(-.36,-.24,-.62,0); c.quadraticCurveTo(-.36,.24,-.12,0); c.moveTo(-.62,0); c.lineTo(-.82,-.14); c.lineTo(-.82,.14); c.closePath();
+    c.moveTo(.16,-.36); c.quadraticCurveTo(.34,0,.16,.36); c.moveTo(.38,-.58); c.quadraticCurveTo(.66,0,.38,.58); }
+};
+/** A rune token, centred, `s` across. o: {glow 0..1, glowR (how far the glow may reach, so it fades out inside a
+    small canvas instead of being cut off square), p (how much of the glyph is drawn, for etching), empty, dim}. */
+function drawRune(c,id,s,o){ o=o||{}; const r=s/2, E=ENCH[id]; c.save();
+  if (o.glow!==0 && E && !o.empty){ const gr=Math.min(r*1.6,o.glowR||Infinity), g=c.createRadialGradient(0,0,r*.3,0,0,gr), a=.32*(o.glow==null?1:o.glow); g.addColorStop(0,hexA(E.color,a)); g.addColorStop(1,hexA(E.color,0));
+    c.fillStyle=g; c.beginPath(); c.arc(0,0,gr,0,Math.PI*2); c.fill(); }
+  // the brass rim and the slate face
+  c.beginPath(); c.arc(0,0,r,0,Math.PI*2); c.fillStyle='#B48E4E'; c.fill();
+  c.beginPath(); c.arc(0,0,r,Math.PI*.95,Math.PI*1.7); c.strokeStyle='#E8C77E'; c.lineWidth=Math.max(1,r*.12); c.stroke();
+  c.beginPath(); c.arc(0,0,r*.8,0,Math.PI*2); c.fillStyle=o.empty?'#3A3A44':'#262733'; c.fill();
+  c.strokeStyle='rgba(0,0,0,.45)'; c.lineWidth=Math.max(.8,r*.06); c.stroke();
+  c.beginPath(); c.arc(0,0,r,0,Math.PI*2); c.strokeStyle=INK; c.lineWidth=Math.max(1,r*.1); c.stroke();
+  if (o.empty){ c.setLineDash([r*.18,r*.16]); c.beginPath(); c.arc(0,0,r*.5,0,Math.PI*2); c.strokeStyle='rgba(243,234,215,.4)'; c.lineWidth=Math.max(.8,r*.07); c.stroke(); c.setLineDash([]); c.restore(); return; }
+  if (!E){ c.restore(); return; }
+  // the glyph: a dark cut, then the glowing line inside it
+  const k=r*.62, p=o.p==null?1:o.p; c.save(); c.scale(k,k); c.lineCap='round'; c.lineJoin='round';
+  c.beginPath(); RUNE_GLYPH[id](c);
+  if (p<1){ c.setLineDash([6*p+.001,6]); }
+  c.strokeStyle='rgba(0,0,0,.55)'; c.lineWidth=.26; c.stroke();
+  c.strokeStyle=o.dim?hexA(E.color,.55):E.color; c.lineWidth=.13; c.stroke();
+  if (!o.dim){ c.strokeStyle='rgba(255,255,255,.55)'; c.lineWidth=.045; c.stroke(); }
+  c.restore(); c.restore(); }
+/** '#RRGGBB' with an alpha, as rgba(). */
+function hexA(h,a){ const [r,g,b]=hexRGB(h); return 'rgba('+r+','+g+','+b+','+a+')'; }
+/** A cut Glimmer crystal, centred, `s` tall: pale blue facets running to violet, with a spark. */
+function drawGlimGem(c,s,t){ const k=s/16; c.save(); c.scale(k,k); c.translate(-7,-8); c.lineJoin='round';
+  const P=new Path2D('M7 .8 L13.2 5.4 L10.4 15.2 H3.6 L.8 5.4 Z');
+  c.fillStyle='#A9E2F4'; c.fill(P);
+  c.fillStyle='#E9FAFF'; c.beginPath(); c.moveTo(7,.8); c.lineTo(4.6,5.4); c.lineTo(.8,5.4); c.closePath(); c.fill();
+  c.fillStyle='#7F6FD8'; c.beginPath(); c.moveTo(9.4,5.4); c.lineTo(13.2,5.4); c.lineTo(10.4,15.2); c.lineTo(7,15.2); c.closePath(); c.fill();
+  c.fillStyle='#8FC4EE'; c.beginPath(); c.moveTo(4.6,5.4); c.lineTo(9.4,5.4); c.lineTo(7,15.2); c.closePath(); c.fill();
+  c.strokeStyle='rgba(43,42,51,.5)'; c.lineWidth=.6; c.beginPath(); c.moveTo(.8,5.4); c.lineTo(13.2,5.4); c.moveTo(7,.8); c.lineTo(4.6,5.4); c.lineTo(7,15.2); c.lineTo(9.4,5.4); c.lineTo(7,.8); c.stroke();
+  c.strokeStyle=INK; c.lineWidth=1.2; c.stroke(P);
+  const tw=t==null?1:.5+.5*Math.sin(t*3); c.fillStyle='rgba(255,255,255,'+(.9*tw).toFixed(2)+')'; c.save(); c.translate(4.4,3.6); c.rotate(.785); c.fillRect(-1.6,-.35,3.2,.7); c.fillRect(-.35,-1.6,.7,3.2); c.restore();
+  c.restore(); }
+/** A Glimmer geode, `s` across. open 0..1 splits it along its crack: the halves swing apart and show their
+    cut faces, a pale rind round a hollow lined with crystals. Closed, light pulses in the crack. */
+const GEODE_CRACK=[[0,-.86],[.08,-.52],[-.06,-.2],[.07,.14],[-.04,.48],[.02,.84]];
+function geodeRock(c,r){ c.beginPath(); c.moveTo(-r*.04,-r*.86); c.bezierCurveTo(r*.55,-r*.93,r*.99,-r*.44,r*.95,r*.06); c.bezierCurveTo(r*.92,r*.6,r*.46,r*.87,-r*.02,r*.84);
+  c.bezierCurveTo(-r*.52,r*.86,-r*.97,r*.54,-r*.96,r*.02); c.bezierCurveTo(-r*.97,-r*.5,-r*.55,-r*.84,-r*.04,-r*.86); c.closePath(); }
+function geodeCrack(c,r,side){ c.beginPath(); GEODE_CRACK.forEach(([x,y],i)=>i?c.lineTo(x*r,y*r):c.moveTo(x*r,y*r)); if (side){ c.lineTo(side*r*1.3,r*1.3); c.lineTo(side*r*1.3,-r*1.3); c.closePath(); } }
+function drawGeode(c,s,open,t){ const r=s/2, lw=Math.max(1.4,r*.07); c.save(); c.lineJoin='round'; c.lineCap='round';
+  if (open>0){ c.save(); c.globalCompositeOperation='lighter'; const g=c.createRadialGradient(0,0,0,0,0,r*1.5); g.addColorStop(0,'rgba(178,226,255,'+(.6*open).toFixed(2)+')'); g.addColorStop(1,'rgba(178,226,255,0)'); c.fillStyle=g; c.beginPath(); c.arc(0,0,r*1.5,0,Math.PI*2); c.fill(); c.restore(); }
+  if (open<=0){
+    // the closed stone: three values, pocks, an ink outline, and the crack with light pulsing in it
+    geodeRock(c,r); c.fillStyle='#857A70'; c.fill(); c.save(); c.clip();
+    c.fillStyle='#6A6058'; c.beginPath(); c.ellipse(r*.4,r*.5,r*.85,r*.6,-.4,0,Math.PI*2); c.fill();
+    c.fillStyle='#A3988B'; c.beginPath(); c.ellipse(-r*.42,-r*.5,r*.5,r*.3,-.5,0,Math.PI*2); c.fill();
+    c.fillStyle='rgba(40,36,34,.32)'; for (let i=0;i<9;i++){ c.beginPath(); c.arc(r*(-.75+((i*41)%150)/100),r*(-.6+((i*67)%125)/100),r*(.04+.02*(i%2)),0,Math.PI*2); c.fill(); }
+    c.restore(); geodeRock(c,r); c.strokeStyle=INK; c.lineWidth=lw; c.stroke();
+    const gl=.45+.55*Math.max(0,Math.sin((t||0)*4)); geodeCrack(c,r); c.strokeStyle='rgba(30,28,36,.85)'; c.lineWidth=lw*.9; c.stroke();
+    c.strokeStyle='rgba(178,226,255,'+gl.toFixed(2)+')'; c.lineWidth=lw*.35; c.stroke();
+    c.restore(); return; }
+  const sp=open*r*.5;
+  for (const side of [-1,1]){ c.save(); c.translate(side*sp,open*r*.05); c.rotate(side*open*.32);
+    c.save(); geodeCrack(c,r,side); c.clip();
+    // the cut face: stone, a pale rind, and the hollow with crystals pointing in
+    geodeRock(c,r); c.fillStyle=side<0?'#857A70':'#776D64'; c.fill();
+    c.beginPath(); c.ellipse(0,0,r*.76,r*.68,0,0,Math.PI*2); c.fillStyle='#E6DFD1'; c.fill();
+    c.beginPath(); c.ellipse(0,0,r*.64,r*.56,0,0,Math.PI*2); c.fillStyle='#3E3466'; c.fill();
+    const g=c.createRadialGradient(0,0,0,0,0,r*.6); g.addColorStop(0,'rgba(190,235,255,.85)'); g.addColorStop(1,'rgba(120,110,200,0)'); c.fillStyle=g; c.fill();
+    for (let i=0;i<16;i++){ const a=i/16*Math.PI*2, bx=Math.cos(a)*r*.64, by=Math.sin(a)*r*.56, L=.42+.18*((i*5)%3)/2, w=.2;
+      c.fillStyle=['#A9E2F4','#8E7FE0','#E9FAFF','#7FB8EC'][i%4]; c.beginPath();
+      c.moveTo(Math.cos(a-w)*r*.64,Math.sin(a-w)*r*.56); c.lineTo(bx*(1-L),by*(1-L)); c.lineTo(Math.cos(a+w)*r*.64,Math.sin(a+w)*r*.56); c.closePath(); c.fill(); }
+    c.beginPath(); c.ellipse(0,0,r*.64,r*.56,0,0,Math.PI*2); c.strokeStyle='rgba(43,42,51,.45)'; c.lineWidth=lw*.5; c.stroke();
+    geodeRock(c,r); c.strokeStyle=INK; c.lineWidth=lw; c.stroke(); geodeCrack(c,r); c.stroke();
+    c.restore(); c.restore(); }
+  c.restore(); }
+/** Where the rune sockets sit on the rig drawing: on the blank, between the reel and the first guides. */
+const RUNE_K=[.34,.4,.46];
+function rigRunePoints(L,n){ return RUNE_K.slice(0,n).map(k=>L.at(k)); }
+/** The sockets on a rod in the rig drawing: brass collars on the blank, a rune set in each (or an empty seat). fx, while
+    a rune is being etched: {at, p 0..1}. */
+function drawRigRunes(c,w,h,L,runes,t,fx){ const pts=rigRunePoints(L,runes.length), s=h*.11;
+  pts.forEach((p,i)=>{ const id=runes[i], etching=fx && fx.at===i; c.save(); c.translate(p.x,p.y); c.rotate(L.ang);
+    c.fillStyle='#8A6A3A'; c.strokeStyle=INK; c.lineWidth=1.2; c.beginPath(); rrect(c,-s*.36,-s*.42,s*.72,s*.84,s*.12); c.fill(); c.stroke();
+    c.rotate(-L.ang);
+    if (id){ const glow=(etching?Math.min(1,fx.p*1.6):1)*(.7+.3*Math.sin((t||0)*2+i*1.7)); drawRune(c,id,s,{glow,p:etching?Math.min(1,Math.max(0,(fx.p-.25)/.55)):1}); }
+    else drawRune(c,null,s,{empty:true});
+    c.restore(); });
+  // etching: Glimmer motes spiral into the socket, then light runs down the rod to the tip
+  if (fx && pts[fx.at]){ const p=pts[fx.at], u=fx.p;
+    // (on the cream of the bag, so each mote is a blue crystal with a white glint rather than added light)
+    if (u<.6){ c.save(); for (let i=0;i<14;i++){ const a=i/14*Math.PI*2+u*9, rr=(1-u/.6)*h*.4+2, x=p.x+Math.cos(a)*rr, y=p.y+Math.sin(a)*rr*.7, al=1-u/.6*.5, r0=1.7+((i*7)%3)*.55;
+        c.fillStyle='rgba(84,150,222,'+(.9*al).toFixed(2)+')'; c.beginPath(); c.moveTo(x,y-r0*1.5); c.lineTo(x+r0,y); c.lineTo(x,y+r0*1.5); c.lineTo(x-r0,y); c.closePath(); c.fill();
+        c.fillStyle='rgba(255,255,255,'+(.9*al).toFixed(2)+')'; c.beginPath(); c.arc(x-r0*.2,y-r0*.4,r0*.42,0,Math.PI*2); c.fill(); } c.restore(); }
+    if (u>.55){ const v=(u-.55)/.45, k=lerp(RUNE_K[fx.at],1,v), q=L.at(k), E=ENCH[runes[fx.at]]; if (E){ c.save(); c.globalCompositeOperation='lighter';
+      const g=c.createRadialGradient(q.x,q.y,0,q.x,q.y,h*.12); g.addColorStop(0,hexA(E.color,.9*(1-v*.6))); g.addColorStop(1,hexA(E.color,0)); c.fillStyle=g; c.beginPath(); c.arc(q.x,q.y,h*.12,0,Math.PI*2); c.fill(); c.restore(); } } } }
+
 /* ---------- Catch card: the fish, the tape measure, and the record moment ---------- */
 const CARD={raf:0,t0:0,L:null,w:0,h:0,d:1,lastTick:null,snapped:false,passed:-1,shownW:''};
 function tapeUnits(){ const uc=imperial()?2.54:1; return {uc}; }
@@ -2957,12 +3268,12 @@ function hookAt(t){ const L=CARD.L, F=L.F, v0=0, v=L.size, p=L.prev&&!L.isNew?L.
   if (p==null || p>=v){ const k=clamp((t-.45)/1.05,0,1); return t<.45?null:lerp(v0,v,k<1?easeInOut(k):1); }
   if (t<.45) return null; if (t<1.05) return lerp(v0,p,easeInOut((t-.45)/.6)); if (t<1.2) return p; return lerp(p,v,easeBack(clamp((t-1.2)/.3,0,1))); }
 function recordSnap(){ const L=CARD.L; CARD.snapped=true;
-  if (L.pbMinor){ noise(.1,{vol:.14,f:2600,type:'highpass'}); tone(1047,.22,{vol:.08,type:'triangle',delay:.06}); tone(1568,.3,{vol:.06,type:'triangle',delay:.14}); buzz(14); if (L.pbBonus) setTimeout(()=>{ if (S.land===L) addCoins(L.pbBonus); },500); return; }
+  if (L.pbMinor){ noise(.1,{vol:.14,f:2600,type:'highpass'}); tone(1047,.22,{vol:.08,type:'triangle',delay:.06}); tone(1568,.3,{vol:.06,type:'triangle',delay:.14}); buzz(14); if (L.pbGlim) setTimeout(()=>glimmerTally(L.pbGlim,{x:W/2,y:H*.5}),500); return; }
   musicDuck(.3,2.6); noise(.14,{vol:.22,f:2600,type:'highpass'}); tone(150,.16,{to:80,vol:.22,type:'triangle'});
   [523,659,784,1047,1319,1568].forEach((n,i)=>tone(n,.32+i*.04,{vol:.1,type:'triangle',delay:.08+i*.075}));
   tone(2093,.5,{vol:.04,delay:.6}); tone(2637,.45,{vol:.03,delay:.68});
   buzz([0,25,40,25,40,70]); confetti(W/2,H*.52,46); pulse(.25,'242,212,126');
-  if (L.pbBonus) setTimeout(()=>{ if (S.land===L) addCoins(L.pbBonus); },650);
+  if (L.pbGlim) setTimeout(()=>glimmerTally(L.pbGlim,{x:W/2,y:H*.5,delay:2600}),650);
   if (!save.pbSeen){ save.pbSeen=true; persist(); setTimeout(()=>{ if (S.state==='result') coachFor('A new personal record! Your journal keeps the biggest of every species. Open it and tap Records.',7); },900); } }
 function tapeRange(F){ return F.size[1]*1.12; }
 function drawCardScene(t){
@@ -3010,6 +3321,7 @@ function drawCardScene(t){
 /* ---------- The loot moment: treasure lands, opens, and shows what's inside ---------- */
 /* After a haul lands (game/treasure.js has already kept what's inside), the 'loot' state presents it:
      pouch   pops on landing and the coins fly to your purse. No card, so routine casts stay quick.
+     geode   lands, cracks in two, and its Glimmer flies to the Glimmer chip. No card either.
      bottle  lands; tap to uncork it and the note unrolls in ink.  letter  the same, then Pell delivers it.
      find    lands with a glint, then its card.
      crate   thuds down; tap to open. Common to Epic rattle once per tier before the lid pops; Legendary and up
@@ -3051,6 +3363,7 @@ function updateLoot(dt){ const L=S.loot; if (!L) return; L.t+=dt;
     case 'ink': L.it+=dt; L.ink=Math.min(1,L.it/1.3); if (L.it>=2.2) lootPop(); break;
     case 'glint': L.st-=dt; if (L.st<=0) lootReveal(); break;
     case 'pouch': L.st-=dt; if (L.st<=0) lootEnd(); break;
+    case 'geode': L.st-=dt; { const was=L.gopen||0; L.gopen=clamp((1.6-L.st-.3)/.32,0,1); if (was===0 && L.gopen>0) geodeSplit(L); } if (L.st<=0) lootEnd(); break;
     case 'uncork': L.st-=dt; if (L.cork){ L.cork.vy+=700*dt; L.cork.y+=L.cork.vy*dt; L.cork.r+=dt*9; } if (L.st<=0){ L.phase='note'; openNote(L.got.items[0]&&L.got.items[0].id,{fresh:true,letter:L.kind==='letter',done:lootEnd}); } break;
   }
   if (L.phase==='burst' || L.phase==='reveal'){ L.bt+=dt;
@@ -3071,6 +3384,7 @@ function hslToRgba(hsl){ const m=hsl.match(/hsl\((\d+),(\d+)%,(\d+)%\)/); if (!m
   return 'rgba('+Math.round(f(h+1/3)*255)+','+Math.round(f(h)*255)+','+Math.round(f(h-1/3)*255)+','; }
 function lootLand(){ const L=S.loot, k=L.kind; L.x=L.to.x; L.y=L.to.y; L.rot=0; L.landT=L.t; if (!S.tut){ clearTimeout(coachTimer); coachTimer=0; coachOff(); }
   if (k==='pouch'){ coinBurst(L.x,L.y-18,Math.min(18,6+Math.floor(L.got.coins/12))); sfx.pouch(); tallyCoins(); lootWord(L.x,L.y-46,'+'+L.got.coins.toLocaleString()); L.phase='pouch'; L.st=1.1; return; }
+  if (k==='geode'){ sfx.thud(-1); buzz(14); drip(L.x,L.y-8,6); L.phase='geode'; L.st=1.6; L.gopen=0; return; }
   const heavy=k==='crate'; shake(heavy?2.5+L.ti*1.4:1.2); sfx.thud(heavy?L.ti:-1); buzz(heavy?[0,26+L.ti*8]:14);
   drip(L.x,L.y-8,heavy?14+L.ti*2:6); splash(L.x,L.y,heavy?8+L.ti*2:4,'rgba(205,228,236,');
   S.darkT=heavy?.3+L.ti*.04:.22;
@@ -3080,6 +3394,10 @@ function lootLand(){ const L=S.loot, k=L.kind; L.x=L.to.x; L.y=L.to.y; L.rot=0; 
   if (heavy && FS.treasure===1) coachShow('A crate! Tap it to open it.',6);
   else if (heavy && L.ti>=rarRank('legendary') && !save.stats.pried) coachShow('Something this heavy has to be pried open. Tap it three times.',6);
 }
+/** The geode cracks open: a flash, crystal sparks, and its Glimmer flies to the chip. */
+function geodeSplit(L){ const y=L.y-(L.hv||0); sfx.geode(); buzz([0,18,30,12]); pulse(.18,'178,226,255');
+  lootSparks(L.x,y,18,'178,226,255',{v0:60,v1:220,g:160,m0:.4,m1:.9}); lootSparks(L.x,y,8,'142,127,224',{v0:40,v1:160,g:160,m0:.4,m1:.8});
+  lootWord(L.x,y-46,'+'+L.got.glimmer+' Glimmer'); glimmerTally(L.got.glimmer,{x:L.x,y,quiet:true}); }
 function lootTap(){ const L=S.loot; if (!L || L.phase!=='ready') return;
   if (L.kind==='bottle' || L.kind==='letter'){ L.phase='uncork'; L.st=.55; L.cork={y:0,vy:-280,r:0}; sfx.uncork(L.kind==='letter'); buzz(12); return; }
   if (L.kind==='crate'){ coachOff(); if (L.ti>=rarRank('legendary')) lootPry(); else { L.phase='shake'; L.n=0; L.st=0; } } }
@@ -3127,6 +3445,7 @@ function drawLoot(){ const L=S.loot; if (!L) return; const ti=L.ti, R=RAR[L.tier
       if (L.tier==='exotic') drawPrismRays(0,-cw*.62,a,cw*2.6); else drawRays(0,-cw*.62,R.color,a,cw*(1.6+ti*.18)); }
     drawCrate(ctx,L.tier,cw*k,{t:S.time,seam:L.seam,cracks:L.cracks,lid:L.lid,lx:L.lx,ly:L.ly,lr:L.lr,open:L.open,hover,lidA:L.lid?clamp(1-(L.bt-.45)/.4,0,1):1});
   } else if (L.kind==='pouch'){ if (L.phase!=='pouch' || L.st>.8) drawPouch(ctx,60*k); }
+  else if (L.kind==='geode'){ if (L.phase!=='geode' || L.st>.15) { ctx.globalAlpha=L.phase==='geode'?Math.min(1,L.st/.15):1; drawGeode(ctx,58*k,L.gopen||0,S.time); ctx.globalAlpha=1; } }
   else if (L.kind==='bottle'){ drawBottle(ctx,76*k,S.time); if (L.cork){ ctx.save(); ctx.translate(-14,-30+L.cork.y*.3); ctx.rotate(L.cork.r); ctx.fillStyle='#B68A5E'; ctx.fillRect(-5,-4,10,8); ctx.strokeStyle=INK; ctx.lineWidth=1.6; ctx.strokeRect(-5,-4,10,8); ctx.restore(); } }
   else if (L.kind==='letter'){ drawEnvelope(ctx,84*k,!!L.cork); }
   else if (L.kind==='find'){ const it=L.got.items[0], id=it&&it.type==='find'?it.id:null, r=id?FINDS[id].rarity:'common';
@@ -3208,17 +3527,20 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   el.dataset.r=tier; el.dataset.kind=L.kind; el.classList.remove('out');
   let h='<div class="hl-top"><span class="rarity">'+RAR[tier].label+'</span>'+pipsHTML(tier)+'</div><h2>'+haulTitle(L)+'</h2>';
   const base=g.base==null?g.coins:g.base;
-  if (base) h+='<div class="hl-coins"><span class="coin"></span><b id="hlCoins">0</b><span>coins</span></div>';
+  if (enchOn('magpie')) h+='<div class="hl-runes">'+runeTag('magpie','Magpie Knot')+'</div>';
+  if (base||g.glimmer) h+='<div class="hl-coins">'+(base?'<span class="coin"></span><b id="hlCoins">0</b><span>coins</span>':'')+(g.glimmer?'<span class="hl-glim"><span class="glim"></span><b id="hlGlim">0</b><span>Glimmer</span></span>':'')+'</div>';
   h+='<div class="hl-items">'+g.items.map(haulSlotHTML).join('')+'</div>';
-  if (!g.items.length) h+='<p class="hl-empty">Just coins this time.</p>';
+  if (!g.items.length) h+='<p class="hl-empty">'+(base&&g.glimmer?'Coins and Glimmer this time.':g.glimmer?'Just Glimmer this time.':'Just coins this time.')+'</p>';
   const n=g.items.length, last=.35+Math.max(0,n-1)*.55;
   h+='<button class="btn primary" id="hlGo" type="button" style="animation-delay:'+(last+.3).toFixed(2)+'s">Collect</button>';
   el.innerHTML=h; el.hidden=false; ovOpen('haul',()=>{ lootEnd(); });
-  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear],canvas[data-decor]'));
+  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear],canvas[data-decor],canvas[data-rune]'));
   // the coins count up, then each item arrives with its own sound
   if (base){ const b=$('hlCoins'), t0=performance.now(), dur=REDUCED?1:Math.min(1100,350+base*.25); sfx.coin(6);
     (function step(now){ if (!b.isConnected) return; const k=Math.min(1,(now-t0)/dur); b.textContent=Math.round(base*(1-Math.pow(1-k,3))).toLocaleString(); if (k<1) requestAnimationFrame(step); else tallyCoins(); })(t0); }
   else if (g.coins) tallyCoins();
+  if (g.glimmer){ const b=$('hlGlim'), t0=performance.now()+(REDUCED?0:250), dur=REDUCED?1:Math.min(900,350+g.glimmer*12);
+    (function step(now){ if (!b.isConnected) return; const k=clamp((now-t0)/dur,0,1); b.textContent=Math.round(g.glimmer*(1-Math.pow(1-k,3))).toLocaleString(); if (k<1) requestAnimationFrame(step); else glimmerTally(g.glimmer); })(performance.now()); }
   g.items.forEach((it,i)=>setTimeout(()=>{ if (!el.hidden) sfx.find(itemRarity(it)); },REDUCED?0:(350+i*550)));
   $('hlGo').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); lootEnd(); });
   el.querySelectorAll('[data-pocket]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); if (!pocketIt(b.dataset.pocket)) return; b.outerHTML='<p class="on">In a pocket. Working now.</p>';
@@ -3232,9 +3554,11 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
 const itemRarity=it=>it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
 function hideHaul(){ const el=$('haul'); if (el.hidden) return; ovClosed('haul'); el.classList.add('out'); setTimeout(()=>{ el.hidden=true; el.classList.remove('out'); el.innerHTML=''; },REDUCED?0:250); }
 /** Paints tiles in two passes, every size read before any canvas is resized, so the page lays out once. */
-function paintTiles(list){ const d=Math.min(window.devicePixelRatio||1,2), rs=[...list].map(cv=>[cv,cv.getBoundingClientRect()]); for (const [cv,r] of rs) paintTile(cv,r,d); }
+/** Tiles are sized by their layout box, not their box on screen, so a sheet mid-zoom or a badge popping in doesn't
+    paint them at the wrong size. A tile that isn't laid out yet (in a hidden card) is skipped. */
+function paintTiles(list){ const d=Math.min(window.devicePixelRatio||1,2), rs=[...list].map(cv=>[cv,{width:cv.offsetWidth,height:cv.offsetHeight}]); for (const [cv,r] of rs) paintTile(cv,r,d); }
 /** Draws a find, paint, note or tackle tile into a canvas sized by CSS. */
-function paintTile(cv,r,d){ r=r||cv.getBoundingClientRect(); d=d||Math.min(window.devicePixelRatio||1,2); if (!r.width) return;
+function paintTile(cv,r,d){ r=r||{width:cv.offsetWidth,height:cv.offsetHeight}; d=d||Math.min(window.devicePixelRatio||1,2); if (!r.width) return;
   cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); const s=Math.min(r.width,r.height)*.86;
   if (cv.dataset.find){ if (cv.dataset.sil) drawFindSilhouette(x,cv.dataset.find,s); else drawFind(x,cv.dataset.find,s,0); }
   else if (cv.dataset.paint) drawHullSwatch(x,cv.dataset.paint,s);
@@ -3242,6 +3566,8 @@ function paintTile(cv,r,d){ r=r||cv.getBoundingClientRect(); d=d||Math.min(windo
   else if (cv.dataset.hook) drawBareHook(x,s);
   else if (cv.dataset.decor) drawDecorIcon(x,cv.dataset.decor,s);
   else if (cv.dataset.tankicon) drawTankIcon(x,cv.dataset.tankicon,s);
+  else if (cv.dataset.rune) drawRune(x,cv.dataset.rune,s*.8,{glow:.9,glowR:s*.5});
+  else if (cv.dataset.runeempty) drawRune(x,null,s*.8,{empty:true});
   else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
 function drawHullSwatch(c,id,s){ const P=PAINTS[id]; c.save(); c.scale(s/100,s/100); laInk(c);
   c.fillStyle='rgba(60,110,130,.25)'; laEll(c,0,24,44,7); c.fill();
@@ -4251,6 +4577,11 @@ function drawRodAndLine(){
   const mx=(b.x+t.x)/2+bx*t.bend*22, my=(b.y+t.y)/2+by*t.bend*22;
   ctx.lineCap='round'; ctx.strokeStyle=ROD().color; ctx.lineWidth=save.rod==='reedcutter'?5:save.rod==='heronwood'?3.2:4; ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.quadraticCurveTo(mx,my,t.x,t.y); ctx.stroke();
   ctx.strokeStyle=BRASS; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.lineTo(lerp(b.x,mx,.25),lerp(b.y,my,.25)); ctx.stroke();
+  // runes etched on the rod glow softly along the blank
+  const runes=enchFor(save.rod); if (runes.some(Boolean)){ ctx.save(); ctx.globalCompositeOperation='lighter';
+    runes.forEach((id,i)=>{ if (!id) return; const u=.3+i*.07, x=(1-u)*(1-u)*b.x+2*u*(1-u)*mx+u*u*t.x, y=(1-u)*(1-u)*b.y+2*u*(1-u)*my+u*u*t.y, a=.5+.3*Math.sin(S.time*2+i*1.7);
+      ctx.fillStyle=hexA(ENCH[id].color,(.22*a).toFixed(3)); ctx.beginPath(); ctx.arc(x,y,5.5,0,Math.PI*2); ctx.fill(); ctx.fillStyle=hexA(ENCH[id].color,(.85*a).toFixed(3)); ctx.beginPath(); ctx.arc(x,y,1.7,0,Math.PI*2); ctx.fill(); });
+    ctx.restore(); }
   if (!lp || (S.lost && S.lost.snapped)) return;
   // the line in the color of whatever line is on the rod; it reddens as tension runs high
   const lid=rigFor(save.rod).line, LC=LINE_RGB[lid]||LINE_RGB.cotton, base=LC[0].split(',').map(Number);
@@ -4266,6 +4597,7 @@ function drawParticles(){
   for (const p of S.particles){ const a=(1-p.life/p.max);
     if (p.word){ ctx.save(); ctx.globalAlpha=a; ctx.font='800 16px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.lineWidth=4; ctx.strokeStyle=INK; ctx.strokeText(p.word,p.x,p.y); ctx.fillStyle='#FDFCF7'; ctx.fillText(p.word,p.x,p.y); ctx.restore(); continue; }
     ctx.fillStyle=p.c+a.toFixed(3)+')';
+    if (p.glim){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.life*6); ctx.fillRect(-p.r*1.6,-p.r*.35,p.r*3.2,p.r*.7); ctx.fillRect(-p.r*.35,-p.r*1.6,p.r*.7,p.r*3.2); ctx.restore(); continue; }
     if (p.rect){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.life*p.spin); ctx.fillRect(-p.r,-p.r*.5,p.r*2,p.r); ctx.restore(); }
     else { ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); } }
 }
@@ -5608,8 +5940,9 @@ function effText(id,stars){ // the boost line, scaled by stars
 function mealName(id){ return id==='mush'?MUSH.name:RECIPES[id].name; }
 function tickMeal(){ const m=save.meal; if (!m || !m.casts) return; m.casts--; if (m.casts<=0){ m.casts=0; m.last=true; } persist(); updateMealChip(); }
 function mealEnd(){ const m=save.meal; if (!m) return; const n=mealName(m.id); save.meal=null; persist(); updateMealChip(); setTimeout(()=>news(n+' wore off',''),500); }
-function updateMealChip(){ const m=save.meal, ch=$('mealChip'); if (!ch) return; ch.hidden=!(m && (m.casts>0||m.last)); if (ch.hidden) return;
-  $('mealCasts').textContent=m.casts; ch.classList.toggle('mush',m.id==='mush'); ch.setAttribute('aria-label',mealName(m.id)+', '+m.casts+' casts left'); }
+function updateMealChip(){ const m=save.meal, ch=$('mealChip'); if (!ch) return; ch.hidden=!(m && (m.casts>0||m.last));
+  if (!ch.hidden){ $('mealCasts').textContent=m.casts; ch.classList.toggle('mush',m.id==='mush'); ch.setAttribute('aria-label',mealName(m.id)+', '+m.casts+' casts left'); }
+  fitHud(); }
 function eatMeal(id,stars){ const n=Math.round((id==='mush'?MUSH.casts:MEAL_CASTS[stars-1])*modMul('mealCasts')); save.meal={id,stars,casts:n,full:n}; persist(); updateMealChip(); const ch=$('mealChip'); ch.classList.remove('pop'); void ch.offsetWidth; ch.classList.add('pop'); }
 function recipeLearnedBy(fid){ return RECIPE_ORDER.find(id=>RECIPES[id].learn===fid); }
 function kitchenUnlockCheck(fromBoot){
@@ -6550,7 +6883,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=17, SNAP_KEY=KEY+'-snapshots';
+const BUILD=18, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -6668,10 +7001,12 @@ let last=performance.now();
 function update(dt,rdt){
   if (S.state==='idle' && save.tutorialDone && save.stats.casts>=12){ S.idleT=(S.idleT||0)+rdt; if (S.idleT>30 && S.idleT-rdt<=30) setHint('Drag back to aim. Release to cast.'); }
   updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt);
-  save.clock=(save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')))%24; PAL=palAt(save.clock);
+  { const nc=save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')); if (nc>=24) save.day=(save.day||0)+1; save.clock=nc%24; } PAL=palAt(save.clock);   // save.day: Wanderer's days
   { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2) buildBg(); }
-  const ct=(isNight(save.clock)||PERIOD(save.clock)==='Evening'?'\u263E\uFE0E ':'\u2600\uFE0E ')+clockText(save.clock); if (ct!==S.clockShown){ S.clockShown=ct; $('clock').textContent=ct; }
-  for (const p of S.particles){ p.life+=dt; p.vy+=p.g*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; }
+  const ct=hudClock(save.clock); if (ct!==S.clockShown){ const n=(S.clockShown||'').length; S.clockShown=ct; $('clock').textContent=ct; if (ct.length!==n) fitHud(); }
+  for (const p of S.particles){ p.life+=dt;
+    if (p.home && p.life>p.home.d){ const k=Math.min(1,dt*7); p.x=lerp(p.x,p.home.x,k); p.y=lerp(p.y,p.home.y,k); if (Math.abs(p.x-p.home.x)+Math.abs(p.y-p.home.y)<8) p.life=p.max; }   // Glimmer motes fly home to the chip
+    else { if (p.home){ p.vx*=1-dt*2.5; p.vy*=1-dt*2.5; } p.vy+=p.g*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; } }
   S.particles=S.particles.filter(p=>p.life<p.max); if (S.particles.length>260) S.particles.splice(0,S.particles.length-260);
   for (const r of S.ripples){ r.life+=dt*1.4; r.r=lerp(2,r.max,1-Math.pow(1-Math.min(1,r.life),2)); }
   S.ripples=S.ripples.filter(r=>r.life<1);
@@ -6737,7 +7072,7 @@ $('mealChip').addEventListener('click',()=>{ const m=save.meal; if (!m) return; 
 $('journalBtn').addEventListener('click',()=>{ $('journalBtn').classList.remove('pulse'); openJournal(); });
 
 /* ---------- Bonuses: the journal page that shows every bonus and where it comes from ---------- */
-const SRC_LABEL={rod:'Rod', gear:'Tackle', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', event:'Event'};
+const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', event:'Event'};
 /** How a modifier reads: +35 luck, +25%, −30%, ×2.5. Each stat keeps one unit. */
 function modValueText(stat,v,omen){
   if (omen) return '×'+trimNum(v);
@@ -6757,12 +7092,13 @@ function modWhenText(w){
   const out=[];
   if (w.spot) out.push(spotIn(w.spot,w.region||REG()));
   else if (w.region) out.push('at '+REGION_NAME[w.region]);
-  if (w.night) out.push('at night');
+  if (w.night) out.push('at night'); else if (w.night===false) out.push('by day');
   if (w.lucky) out.push('while you fish a lucky splash');
   if (w.rarity) out.push('for '+w.rarity.map(r=>RAR[r].label.toLowerCase()).join(' and ')+' fish');
   if (w.rarityMin) out.push(w.rarityMin===Object.keys(RAR)[1]?'for every fish above common':'for '+RAR[w.rarityMin].label.toLowerCase()+' fish and rarer');
   if (w.fish) out.push('with '+FISH[w.fish].name);
   if (w.beh) out.push('for '+BEH[w.beh].toLowerCase()+'s');
+  if (w.wander) out.push('on the day’s first '+ENCH.wanderer.first+' catches in each water');
   return out.join(', ');
 }
 /** 'on' applies wherever you cast right now; 'cond' depends on where you cast or what bites; 'off-here' and
@@ -6770,9 +7106,9 @@ function modWhenText(w){
 function modState(m,now){ const w=m.when; if (!w) return 'on';
   const spots=Object.keys(now.region==='coast'?POOLS_COAST:POOLS);
   if ((w.region && w.region!==now.region) || (w.spot && !spots.includes(w.spot))) return 'off-here';
-  if (w.night && !now.night) return 'off-now';
+  if ((w.night && !now.night) || (w.night===false && now.night)) return 'off-now';
   if (now.rarity && ((w.rarity && !w.rarity.includes(now.rarity)) || (w.rarityMin && rarRank(now.rarity)<rarRank(w.rarityMin)))) return 'off-here';
-  const open=w.spot||w.fish||w.beh||w.lucky||((w.rarity||w.rarityMin)&&!now.rarity);
+  const open=w.spot||w.fish||w.beh||w.lucky||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
   return open ? 'cond' : 'on'; }
 const stateClass=st=>st.startsWith('off')?'off':st;
 const stateNote=st=>st==='off-here'?' · not here':st==='off-now'?' · not now':'';
@@ -6788,6 +7124,7 @@ function bonusesHTML(){
     ['Tank sets',sets.length?sets.map(s=>s.name).join(', '):'None yet'],
     ['Boat',save.boat?(parts.length?parts.join(', '):'No parts yet'):'No boat yet'],
     ['Keepnet',netCap()+' fish']];
+  const runes=enchFor(save.rod).filter(Boolean); if (enchState().kit) gear.splice(1,0,['Runes',runes.length?runes.map(id=>ENCH[id].name).join(', '):'None on this rod']);
   const FS=findsState(); if (Object.keys(FS.have).length) gear.splice(4,0,['Vest',FS.equip.length?FS.equip.map(id=>FINDS[id].name).join(', '):'Nothing in your '+(FS.pockets>1?FS.pockets+' pockets':'pocket')]);
   let h='<p class="bn-where">'+where+'. Bonuses that depend on where you cast or what bites are marked.</p><dl class="bn-gear">'+gear.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('')+'</dl>';
   const line=(m)=>{ const st=modState(m,now), w=modWhenText(m.when);
@@ -6936,7 +7273,8 @@ const bagCan = () => S.state==='idle' && !!save.tutorialDone;
 const bagTapOK = () => BAG && BAG.phase==='open' && performance.now()-BAG.readyT>250;   // after a skip, the skipping tap can't land on what appears
 /** Opens the bag; `then` ('reel', 'line', 'bait' or 'pocket') opens that tray once it's out. */
 function openBag(then){ if (BAG || !bagCan()) return; audioInit(); const el=$('bag');
-  BAG={phase:'opening', tray:null, raf:0, readyT:Infinity, last:0};
+  BAG={phase:'opening', tray:null, raf:0, readyT:Infinity, last:0, fx:null};
+  { const E=enchState(); if (E.kit && !E.opened){ E.opened=true; persist(); updateBagBtn(); } }
   el.innerHTML=bagFrameHTML(); el.hidden=false; el.className=REDUCED?'reduced':''; el.dataset.open='';
   void el.offsetWidth; el.classList.add('opening');
   ovOpen('bag',()=>{ closeBag(); });
@@ -6953,6 +7291,7 @@ function bagOpened(){ if (!BAG || BAG.phase!=='opening') return; clearTimeout(BA
 function bagRefresh(){ if (!BAG) return; if (BAG.phase==='open' && !BAG.tray) renderBag(); else BAG.dirty=true; }
 function closeBag(){ if (!BAG || BAG.phase==='closing') return; const el=$('bag');
   if (BAG.tray) closeTray(true);
+  if (BAG.fx){ const F=BAG.fx; BAG.fx=null; etchDone(F); }   // closed mid-etch: it's etched all the same
   clearTimeout(BAG.timer); cancelAnimationFrame(BAG.raf); BAG.phase='closing';
   el.classList.remove('opening','open','skip'); void el.offsetWidth; el.classList.add('closing'); el.dataset.open='';
   if (!REDUCED) sfx.flap(true);
@@ -6980,11 +7319,15 @@ function bindBagFrame(){ const el=$('bag');
 
 /* ---------- what's inside ---------- */
 function bagHTML(){ const R=ROD(), rig=rigFor(save.rod), bait=baitOn(), g=gearState(), FS=findsState();
-  let h='<header class="bag-head" style="--i:0"><div><h2>Tackle bag</h2><p><span class="coin"></span>'+save.coins.toLocaleString()+' coins</p></div><button class="btn" id="bagClose" type="button">Close</button></header>';
+  const E=enchState(), runes=enchFor(save.rod), glimOn=E.kit||(save.glimmer||0)>0;
+  let h='<header class="bag-head" style="--i:0"><div><h2>Tackle bag</h2><p><span class="coin"></span>'+save.coins.toLocaleString()+' coins'+(glimOn?'<span class="bh-glim"><span class="glim"></span><b id="bagGlim">'+(save.glimmer||0).toLocaleString()+'</b> Glimmer</span>':'')+'</p></div><button class="btn" id="bagClose" type="button">Close</button></header>';
   // the rod rig
   h+='<section class="bag-card bag-rig" style="--i:1"><header><div><span class="k">In your hand</span><h3>'+R.name+'</h3></div><span class="rig-reach">'+(castReach()>=1?'Casts to the horizon':'Reaches '+R.where.toLowerCase())+'</span></header>'+
-    '<div class="rig-art"><canvas id="rigCv" aria-hidden="true"></canvas>'+SOCKETS.map(k=>'<button type="button" class="rig-hot" data-hot="'+k+'" aria-label="Change the '+SOCK_NAME[k].toLowerCase()+'"></button>').join('')+'</div>'+
-    '<div class="rig-socks">'+SOCKETS.map(k=>sockHTML(k,rig,bait,g)).join('')+'</div></section>';
+    '<div class="rig-art"><canvas id="rigCv" aria-hidden="true"></canvas>'+SOCKETS.map(k=>'<button type="button" class="rig-hot" data-hot="'+k+'" aria-label="Change the '+SOCK_NAME[k].toLowerCase()+'"></button>').join('')+
+      '<button type="button" class="rig-hot" data-hot="rune" aria-label="Runes on this rod"></button></div>'+
+    '<div class="rig-socks">'+SOCKETS.map(k=>sockHTML(k,rig,bait,g)).join('')+'</div>'+
+    '<div class="rune-socks n'+runes.length+'" style="--n:'+runes.length+'">'+runes.map((id,i)=>runeSockHTML(id,i,runes.length)).join('')+'</div>'+
+    (runes.length<3?'<p class="bag-hint rune-hint">'+(runes.length===1?'This rod takes one rune.':'This rod takes two runes.')+' Rods further up the ladder take more.</p>':'')+'</section>';
   // rods you own
   const rods=[...ROD_ORDER,...SEA_RODS].filter(id=>save.rods.includes(id));
   if (rods.length>1) h+='<section class="bag-card bag-rods" style="--i:2"><header><h3>Rods</h3><span>Each keeps its own reel and line</span></header><div class="rod-row">'+rods.map(id=>{ const on=id===save.rod, r=rigFor(id);
@@ -7006,10 +7349,14 @@ function bagHTML(){ const R=ROD(), rig=rigFor(save.rod), bait=baitOn(), g=gearSt
       :'<p class="bag-hint">Keepsakes work from the moment you have them. Some turn up in crates, and people in town give them as thanks.</p>')+'</section>';
   // what it all does
   const lines=setupLines();
-  h+='<section class="bag-card bag-sum" style="--i:5"><header><h3>This setup</h3><span>Tackle, pockets and keepsakes</span></header>'+
+  h+='<section class="bag-card bag-sum" style="--i:5"><header><h3>This setup</h3><span>Tackle, runes, pockets and keepsakes</span></header>'+
     (lines.length?'<ul class="bn-src">'+lines.join('')+'</ul>':'<p class="bag-hint">Nothing extra yet. Your rod has the plain reel and line every rod comes with.</p>')+
     '<button type="button" class="bag-more" id="bagBonuses">Every bonus you have<span aria-hidden="true">›</span></button></section>';
   return h; }
+/** One rune socket on the rod in hand: its rune and what it does, or an empty seat waiting for one. */
+function runeSockHTML(id,i,n){ const E=id&&ENCH[id];
+  return '<button type="button" class="rsock'+(E?'':' empty')+'" data-rsock="'+i+'"'+(E?' style="--rc:'+E.color+'"':'')+' aria-label="Rune socket '+(i+1)+': '+(E?E.name:'empty')+'"><canvas '+(E?'data-rune="'+id+'"':'data-runeempty="1"')+' aria-hidden="true"></canvas>'+
+    '<span class="k">Rune'+(n>1?' '+(i+1):'')+'</span><b>'+(E?E.name:n>1?'Empty':'Empty socket')+'</b><small>'+(E?(n>1?E.short:E.eff):(save.glimmer||0)>=ENCH[ENCH_ORDER[0]].cost||Object.keys(enchState().own).length?'Tap to set a rune':'Etch runes with Glimmer')+'</small></button>'; }
 function sockHTML(k,rig,bait,g){ const id=k==='bait'?bait:rig[k], T=id&&TACKLE[id], fresh=g.fresh.some(f=>TACKLE[f].kind===k);
   const sub=k==='bait'?(id?(isLure(id)?'A lure: never runs out':baitLeftText(id)):'Bare hook'):(T&&T.starter?'Plain':gearChips(id).map(c=>c.text).join(' · '));
   return '<button type="button" class="sock'+(id?'':' bare')+'" data-sock="'+k+'" aria-label="'+SOCK_NAME[k]+': '+(T?T.name:'nothing')+'"><canvas '+(id?'data-gear="'+id+'"':'data-hook="1"')+' aria-hidden="true"></canvas>'+
@@ -7018,7 +7365,7 @@ function sockHTML(k,rig,bait,g){ const id=k==='bait'?bait:rig[k], T=id&&TACKLE[i
 function baitLeftText(id){ const g=gearState(), n=(g.left[id]||0), tins=g.tins[id]||0;
   return (n?n+' cast'+(n===1?'':'s')+' left':'Last cast')+(tins?' · '+tins+' more tin'+(tins===1?'':'s'):''); }
 /** One line per stat that your tackle, pockets and keepsakes change, the way the Bonuses page reads them. */
-function setupLines(){ const now=modCtx({}), all=modList().filter(m=>m.src==='gear'||m.src==='artifact'||m.src==='keepsake'), groups=new Map(), order=Object.keys(STATS);
+function setupLines(){ const now=modCtx({}), all=modList().filter(m=>m.src==='gear'||m.src==='ench'||m.src==='artifact'||m.src==='keepsake'), groups=new Map(), order=Object.keys(STATS);
   for (const m of all){ const key=m.stat+'|'+JSON.stringify(m.when||{})+'|'+(m.omen?1:0); if (!groups.has(key)) groups.set(key,{stat:m.stat, when:m.when, omen:m.omen, ms:[]}); groups.get(key).ms.push(m); }
   return [...groups.values()].sort((a,b)=>order.indexOf(a.stat)-order.indexOf(b.stat)).map(G=>{ const st=STATS[G.stat], flag=st.kind==='flag';
     const add=st.kind==='add'||(st.kind==='luck'&&!G.omen), v=flag?null:G.ms.reduce((a,m)=>add?a+m.v:a*m.v,add?0:1);
@@ -7036,15 +7383,16 @@ function renderBag(){ const box=$('bagIn'); if (!box) return; const y=box.scroll
 /** Canvases are sized by their layout box, not their box on screen, which the opening scales mid-way. */
 const layoutBox = el => ({width:el.offsetWidth, height:el.offsetHeight});
 function paintBag(){ const box=$('bagIn'); if (!box) return; const d=Math.min(window.devicePixelRatio||1,2);
-  box.querySelectorAll('canvas[data-find],canvas[data-gear],canvas[data-hook]').forEach(cv=>paintTile(cv,layoutBox(cv),d));
+  box.querySelectorAll('canvas[data-find],canvas[data-gear],canvas[data-hook],canvas[data-rune],canvas[data-runeempty]').forEach(cv=>paintTile(cv,layoutBox(cv),d));
   box.querySelectorAll('canvas[data-rodcv]').forEach(cv=>{ const r=layoutBox(cv); if (!r.width) return; cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
     const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); const id=cv.dataset.rodcv; drawRig(x,r.width,r.height,id,rigFor(id),id===save.rod?baitOn():null,0); });
   drawRigCv(true); }
 /** The big rig drawing, and the tap targets over its reel, line and hook. */
 function drawRigCv(place){ const cv=$('rigCv'); if (!cv) return; const r=layoutBox(cv); if (!r.width) return; const d=Math.min(window.devicePixelRatio||1,2);
   if (cv.width!==Math.round(r.width*d) || cv.height!==Math.round(r.height*d)){ cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); }
-  const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,r.width,r.height); drawRig(x,r.width,r.height,save.rod,rigFor(save.rod),baitOn(),S.time);
-  if (!place) return; const L=rigLayout(r.width,r.height), at={reel:L.reel, line:L.line, bait:{x:L.bait.x,y:L.bait.y}};
+  let fx=null; if (BAG && BAG.fx){ const F=BAG.fx, p=F.dur?(performance.now()-F.t0)/F.dur:1; if (p>=1 || F.rod!==save.rod){ BAG.fx=null; etchDone(F); } else fx={at:F.at,p}; }
+  const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,r.width,r.height); drawRig(x,r.width,r.height,save.rod,rigFor(save.rod),baitOn(),S.time,fx);
+  if (!place) return; const L=rigLayout(r.width,r.height), at={reel:L.reel, line:L.line, bait:{x:L.bait.x,y:L.bait.y}, rune:L.at(RUNE_K.slice(0,enchFor(save.rod).length).reduce((a,k,i,A)=>a+k/A.length,0))};
   cv.parentNode.querySelectorAll('.rig-hot').forEach(b=>{ const p=at[b.dataset.hot]; b.style.left=Math.round(Math.min(r.width-26,Math.max(26,p.x)))+'px'; b.style.top=Math.round(Math.min(r.height-22,Math.max(22,p.y)))+'px'; }); }
 /** The hook sways, a spinner turns and glow line breathes while the bag is open (about 30 times a second). */
 function rigLoop(){ if (!BAG || REDUCED) return; cancelAnimationFrame(BAG.raf);
@@ -7052,7 +7400,9 @@ function rigLoop(){ if (!BAG || REDUCED) return; cancelAnimationFrame(BAG.raf);
   BAG.raf=requestAnimationFrame(step); }
 function bindBag(){ const box=$('bagIn'); if (!box) return;
   $('bagClose').addEventListener('click',()=>{ if (bagTapOK()) closeBag(); });
-  box.querySelectorAll('[data-sock],[data-hot]').forEach(b=>b.addEventListener('click',()=>{ if (!bagTapOK()) return; tone(900,.04,{vol:.04,type:'triangle'}); openTray(b.dataset.sock||b.dataset.hot,0); }));
+  box.querySelectorAll('[data-sock],[data-hot]').forEach(b=>b.addEventListener('click',()=>{ if (!bagTapOK()) return; tone(900,.04,{vol:.04,type:'triangle'}); const k=b.dataset.sock||b.dataset.hot;
+    if (k==='rune'){ const r=enchFor(save.rod), i=r.indexOf(null); openTray('rune',i<0?0:i); } else openTray(k,0); }));
+  box.querySelectorAll('[data-rsock]').forEach(b=>b.addEventListener('click',()=>{ if (!bagTapOK()) return; tone(900,.04,{vol:.04,type:'triangle'}); openTray('rune',+b.dataset.rsock); }));
   box.querySelectorAll('[data-pk]').forEach(b=>b.addEventListener('click',()=>{ if (!bagTapOK()) return; tone(900,.04,{vol:.04,type:'triangle'}); openTray('pocket',+b.dataset.pk); }));
   box.querySelectorAll('[data-rod]').forEach(b=>b.addEventListener('click',()=>{ if (!bagTapOK()) return; const id=b.dataset.rod; if (id===save.rod) return;
     save.rod=id; persist(); sfx.hook(false); buzz(12); news('Equipped '+RODS[id].name,'good'); renderBag(); bagPop('.bag-rig'); }));
@@ -7067,9 +7417,9 @@ function openTray(kind,at){ if (!BAG) return; const el=$('bagTray'), first=!BAG.
   BAG.tray={kind,at:at||0};
   el.innerHTML='<div class="tray-shade"></div><div class="tray" role="dialog" aria-label="'+trayTitle(kind,at)+'">'+trayHTML(kind,at)+'</div>';
   // having seen what's new for this socket, it isn't new any more (the tray still marks it this time)
-  if (kind!=='pocket'){ const g=gearState(), was=g.fresh.length; g.fresh=g.fresh.filter(id=>TACKLE[id].kind!==kind); if (g.fresh.length!==was){ persist(); BAG.seen=true; } }
+  if (kind!=='pocket' && kind!=='rune'){ const g=gearState(), was=g.fresh.length; g.fresh=g.fresh.filter(id=>TACKLE[id].kind!==kind); if (g.fresh.length!==was){ persist(); BAG.seen=true; } }
   el.hidden=false; el.classList.remove('out'); if (first){ el.classList.remove('in'); void el.offsetWidth; el.classList.add('in'); ovOpen('bagtray',()=>{ closeTray(); }); }
-  const d=Math.min(window.devicePixelRatio||1,2); el.querySelectorAll('canvas[data-find],canvas[data-gear],canvas[data-hook]').forEach(cv=>paintTile(cv,layoutBox(cv),d));
+  const d=Math.min(window.devicePixelRatio||1,2); el.querySelectorAll('canvas[data-find],canvas[data-gear],canvas[data-hook],canvas[data-rune]').forEach(cv=>paintTile(cv,layoutBox(cv),d));
   el.querySelector('.tray-shade').addEventListener('click',()=>closeTray());
   el.querySelector('#trayClose').addEventListener('click',()=>closeTray());
   el.querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click',()=>trayAct(b.dataset.act,b.dataset.id))); }
@@ -7077,11 +7427,32 @@ function closeTray(now){ if (!BAG || !BAG.tray) return; const el=$('bagTray'); B
   if (BAG.seen || BAG.dirty){ BAG.seen=false; BAG.dirty=false; renderBag(); updateBagBtn(); }
   if (now || REDUCED){ el.hidden=true; el.innerHTML=''; return; }
   el.classList.remove('in'); el.classList.add('out'); setTimeout(()=>{ if (BAG && BAG.tray) return; el.hidden=true; el.innerHTML=''; el.classList.remove('out'); },180); }
-function trayTitle(kind,at){ return kind==='pocket'?'Pocket '+(at+1):SOCK_NAME[kind]+' for the '+ROD().name; }
+function trayTitle(kind,at){ return kind==='pocket'?'Pocket '+(at+1):kind==='rune'?'Rune socket '+(at+1)+' on the '+ROD().name:SOCK_NAME[kind]+' for the '+ROD().name; }
 function trayHTML(kind,at){
-  let h='<header><div><span class="k">'+(kind==='pocket'?'Vest pocket '+(at+1):SOCK_NAME[kind]+' · '+ROD().name)+'</span><h3>'+(kind==='pocket'?'Carry an artifact':kind==='bait'?'Choose your bait':'Choose a '+kind)+'</h3></div><button class="btn" id="trayClose" type="button">Done</button></header><div class="tray-list">';
-  if (kind==='pocket') h+=pocketRows(at); else h+=gearRows(kind);
+  const n=enchFor(save.rod).length, head=kind==='pocket'?'Vest pocket '+(at+1):kind==='rune'?'Rune'+(n>1?' socket '+(at+1):'')+' · '+ROD().name:SOCK_NAME[kind]+' · '+ROD().name;
+  const title=kind==='pocket'?'Carry an artifact':kind==='bait'?'Choose your bait':kind==='rune'?(enchFor(save.rod)[at]?'Change the rune':'Etch a rune'):'Choose a '+kind;
+  let h='<header><div><span class="k">'+head+'</span><h3>'+title+'</h3></div><button class="btn" id="trayClose" type="button">Done</button></header><div class="tray-list">';
+  if (kind==='pocket') h+=pocketRows(at); else if (kind==='rune') h+=runeRows(at); else h+=gearRows(kind);
   return h+'</div>'; }
+/** The etching kit: every rune, what it does and its catch. Etching costs Glimmer once; a rune you have goes on any rod for free. */
+function runeRows(at){ const r=enchFor(save.rod), g=save.glimmer||0, own=enchState().own;
+  let h='<p class="tr-glim"><span class="bal"><span class="glim"></span><b>'+g.toLocaleString()+'</b> Glimmer</span>'+(Object.keys(own).length?'A rune you’ve etched goes on any rod for free, one of each per rod.':'Etching a rune costs Glimmer once. After that it goes on any rod for free.')+'</p>';
+  for (const id of ENCH_ORDER){ const E=ENCH[id], have=!!own[id], where=r.indexOf(id), here=where===at;
+    const other=have?[...ROD_ORDER,...SEA_RODS].filter(x=>x!==save.rod && save.rods.includes(x) && enchFor(x).includes(id)).map(x=>RODS[x].name):[];
+    const act=here?'<button class="btn sm" type="button" data-act="runeoff">Take it out</button>'
+      :have?'<button class="btn sm primary" type="button" data-act="runeon" data-id="'+id+'">'+(where>=0?'Move it here':'Set it in')+'</button>'
+      :'<button class="btn sm'+(g>=E.cost?' primary':'')+' etch" type="button" data-act="etch" data-id="'+id+'"'+(g>=E.cost?'':' disabled')+'>Etch<span><span class="glim"></span>'+E.cost+'</span></button>';
+    h+='<div class="tr-row rune'+(here?' on':'')+(have?'':' unetched')+'" style="--rc:'+E.color+'"><canvas data-rune="'+id+'"></canvas><div class="tr-txt"><h4>'+E.name+'</h4><p>'+E.eff+'</p>'+(E.down?'<p class="down">'+E.down+'</p>':'')+
+      (where>=0 && !here?'<p class="also">In socket '+(where+1)+' of this rod</p>':'')+(other.length?'<p class="also">Also on your '+other.join(' and ')+'</p>':'')+
+      (!have && g<E.cost?'<p class="need">'+(E.cost-g)+' more Glimmer to etch it</p>':'')+'</div>'+act+'</div>'; }
+  h+='<p class="tr-sub">Your uncle’s notes mention three more runes he never managed to etch.</p>';
+  return h; }
+/** Etching plays out on the rig: Glimmer streams into the socket, the rune draws itself, light runs to the tip. */
+function startEtch(id,at){ if (BAG.fx){ const F=BAG.fx; BAG.fx=null; etchDone(F); }
+  sfx.etch(); buzz([0,20,40,20,60,30]); BAG.fx={id,at,rod:save.rod,t0:performance.now(),dur:REDUCED?0:1150};
+  renderBag(); const b=$('bagGlim'); if (b){ b.textContent=(save.glimmer||0).toLocaleString(); } updateGlimChip(); bagPop('.bag-rig'); }
+function etchDone(F){ news('Etched '+ENCH[F.id].name+' onto your '+(RODS[F.rod]||ROD()).name,'good'); if (!BAG || BAG.phase==='closing') return;
+  if (F.rod===save.rod) bagPop('.rsock[data-rsock="'+F.at+'"]'); tone(2093,.4,{vol:.05,type:'sine'}); }
 function chipsHTML(id){ return '<div class="chips">'+gearChips(id).map(c=>'<span class="'+(c.up?'up':'down')+'">'+c.text+'</span>').join('')+'</div>'; }
 function gearRows(kind){ const g=gearState(), rig=rigFor(save.rod), on=kind==='bait'?baitOn():rig[kind];
   const ids=TACKLE_ORDER[kind], have=ids.filter(ownsGear), not=ids.filter(id=>!ownsGear(id));
@@ -7113,18 +7484,21 @@ function trayAct(act,id){ if (!BAG || !BAG.tray) return; const {kind,at}=BAG.tra
   else if (act==='bait'){ if (!loadBait(id)) return; sfx.rig('bait'); }
   else if (act==='unbait'){ unloadBait(); sfx.rig('bait'); }
   else if (act==='out'){ unpocket(id); }
+  else if (act==='etch'){ if (!etchRune(id,at)) return; closeTray(true); startEtch(id,at); return; }
+  else if (act==='runeon'){ if (!socketRune(id,at)) return; sfx.rune(true); }
+  else if (act==='runeoff'){ if (!unsocketRune(at)) return; sfx.rune(false); }
   else if (act==='pocket'){ const cur=FS.equip[at]; if (FS.equip.includes(id) || !hasFind(id)) return;
     if (cur){ FS.equip[at]=id; persist(); sfx.pocket(true); news(FINDS[id].name+' is in a pocket','good'); }   // the one it replaces goes back in the bag
     else if (!pocketIt(id)) return; }
-  buzz(12); renderBag(); bagPop(kind==='pocket'?'.bag-vest':'.sock[data-sock="'+kind+'"]'); updateBagBtn();
+  buzz(12); renderBag(); bagPop(kind==='pocket'?'.bag-vest':kind==='rune'?'.rsock[data-rsock="'+at+'"]':'.sock[data-sock="'+kind+'"]'); updateBagBtn();
   setTimeout(()=>closeTray(),REDUCED?0:140); }
 
 /* ---------- the bag on the bottom bar ---------- */
 /** Shows the bag once the tutorial's done, with a dot for new gear and a tag counting the bait left. */
 function updateBagBtn(){ const b=$('bagBtn'); if (!b) return; b.hidden=!save.tutorialDone; const g=gearState(), id=baitOn(), tag=$('bagBait');
-  b.classList.toggle('dot',g.fresh.length>0);
+  const E=enchState(), kitNew=!!E.kit && !E.opened; b.classList.toggle('dot',g.fresh.length>0 || kitNew);
   const n=id&&!isLure(id)?(g.left[id]||0):null; tag.hidden=n==null; if (n!=null){ tag.textContent=n||'!'; tag.classList.toggle('low',n<=3); }
-  b.setAttribute('aria-label','Open tackle bag'+(n!=null?', '+TACKLE[id].name.toLowerCase()+': '+n+' casts left':'')+(g.fresh.length?', new gear inside':''));
+  b.setAttribute('aria-label','Open tackle bag'+(n!=null?', '+TACKLE[id].name.toLowerCase()+': '+n+' casts left':'')+(g.fresh.length?', new gear inside':'')+(kitNew?', an etching kit inside':''));
   fitBar(); }
 /** Until the bottom bar is regrouped (step 13), it shrinks to fit narrow phones rather than running off the edge. */
 function fitBar(){ const bar=document.querySelector('.corner.center'); if (!bar) return; let w=0, n=0;
@@ -7279,7 +7653,8 @@ function openTackleShop(){ const g=gearState(), rig=rigFor(save.rod), bait=baitO
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
-   Tackle counts (reel, line and bait, through the same modifiers); bait never runs out in a run.
+   Tackle counts (reel, line and bait, through the same modifiers); bait never runs out in a run. So do runes:
+   Wanderer's days turn over every 24 minutes of play, and after an Echo the player casts back to its spot.
    Not modeled: aiming (every cast reaches its spot), keeping fish (every catch sells), the aquarium, the
    kitchen, Barnaby or the mail boat, and the clock (an artifact that speeds or stops time doesn't change the
    hour of a run). The setup lives in a stand-in save for the run, then the real save
@@ -7325,6 +7700,10 @@ function simSave(st){
     if (st.bait && TACKLE[st.bait] && TACKLE[st.bait].kind==='bait'){ s.gear.bait=st.bait; if (isLure(st.bait)) own[st.bait]=1; } }
   if (s.gear.bait && !isLure(s.gear.bait)) s.gear.left[s.gear.bait]=1e9;
   s.gear.lastBait=null;
+  // runes: copied from a real save, or the runes named for the run, etched onto the rod
+  if (st.enchSave) s.ench=JSON.parse(JSON.stringify(st.enchSave));
+  else { const ids=(st.ench||[]).filter(id=>ENCH[id]).slice(0,RODS[s.rod].ench||1); s.ench={own:Object.fromEntries(ids.map(id=>[id,1])), rig:{[s.rod]:ids}}; }
+  s.glimmer=0; s.day=0; s.wander=null;
   return s;
 }
 /** Plays one fight (a fish or a haul) through the game's fight step, the way player P would. Returns {end, ft, why}. */
@@ -7354,11 +7733,13 @@ function simulate(st,n){
   try {
     SIMULATING=true; save=simSave(st); MODC.dirty=true; TREASURE_CTL.off=st.treasure===false;
     const reg=REG(), spots=st.spot==='mix'?Object.keys(reg==='coast'?POOLS_COAST:POOLS):[st.spot];
-    const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0,snag:0,washout:0,eaten:0}, perfect:0, hooked:0, coins:0, pbs:0, pbCoins:0, secs:0, fightSecs:0,
+    const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0,snag:0,washout:0,eaten:0}, perfect:0, hooked:0, coins:0, pbs:0, glimmer:0, pbGlimmer:0, echoes:0, wanders:0, secs:0, fightSecs:0,
       tiers:{}, species:{}, records:{}, treasure:{rolled:0,hauled:0,lost:0,coins:0,finds:0,kinds:{},crates:{}}};
     const io={t:0,holding:true,tut:null,tilt:0,reeling:false,ev:[],why:''};
+    let echo=null;                                                   // Echo: the next cast at that spot bites at once
+    const dayLen=modFlag('timeStop')?0:1440/modMul('clock');
     for (let c=0;c<n;c++){
-      const spot=spots[c%spots.length], lucky=!!st.lucky, depth=((SIM_SPOTS[reg]||{})[spot]||[0,.5])[1], y=lerp(G.near,HZ+26,depth), cx={spot,lucky};
+      const spot=echo?echo.spot:spots[c%spots.length], lucky=!!st.lucky, depth=((SIM_SPOTS[reg]||{})[spot]||[0,.5])[1], y=lerp(G.near,HZ+26,depth), cx={spot,lucky};   // an Echo waiting: the player casts back to it
       let t=1.6;                                                   // aim, drag and the cast's flight
       // the cast can tangle in the reeds or wash out in a swell
       if (spot==='reeds' && Math.random()<modBase('snag',cx)){ out.lost.snag++; out.secs+=t+.7; continue; }
@@ -7366,25 +7747,28 @@ function simulate(st,n){
       // the quiet before anything shows up; a steady player twitches once to hurry it
       const tw=modMul('twitch',cx); let wait=biteWait(spot)*(spot==='deep'?1.2:1)/modMul('reedBite',cx);
       if (P.twitch) wait=Math.max(.3,wait*(.65-.2*(tw-1)));
-      // treasure instead of a fish (rolled once per cast, as the bobber lands): a haul through the fight step, and what's inside
-      const loot=rollTreasure(cx);
+      save.day=dayLen?Math.floor(out.secs/dayLen):0;                   // an in-game day is 24 minutes of play, or as artifacts make it
+      // treasure instead of a fish (rolled once per cast, as the bobber lands): a haul through the fight step, and what's inside.
+      // An Echo bites at once instead, unless treasure comes up first: then it keeps waiting.
+      const loot=rollTreasure(cx), pend=echo; echo=loot?pend:null;
+      const ech=!loot && pend ? pend.fish : null; if (ech){ wait=.35; out.echoes++; }
       if (loot){ const T=out.treasure; T.rolled++;
         t+=wait+rand(.9,1.6); const r=P.react(); t+=r;
         if (r>2.2*modMul('hook',cx)){ T.lost++; out.secs+=t+.7; continue; }
         const f=simFight(newHaul(loot,r<=.3*modMul('perfect',cx),{x:W*.5,y},lucky,spot),P,reg,io,cx); t+=f.ft;
         if (f.end!=='land'){ T.lost++; out.secs+=t+.7; continue; }
-        const g=openLoot(loot,cx); T.hauled++; T.coins+=g.coins; T.kinds[loot.kind]=(T.kinds[loot.kind]||0)+1; if (loot.tier) T.crates[loot.tier]=(T.crates[loot.tier]||0)+1;
+        const g=openLoot(loot,cx); T.hauled++; T.coins+=g.coins; out.glimmer+=g.glimmer; T.kinds[loot.kind]=(T.kinds[loot.kind]||0)+1; if (loot.tier) T.crates[loot.tier]=(T.crates[loot.tier]||0)+1;
         T.finds+=g.items.filter(it=>it.type==='find').length;
         // the haul flies in; a pouch pops, anything else waits for a tap and a look at what's inside
-        t+=loot.kind==='pouch'?1.8:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'?3.5:8;
+        t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
-      const id=pickW(poolFor(spot,lucky)), F=FISH[id];
+      const id=ech||pickW(poolFor(spot,lucky)), F=FISH[id];
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
-      t+=wait+Math.max(.4,(rand(85,150)-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm)*1.2);
-      const nib=F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3));
-      t+=rand(.5,1.1)*bm; for (let i=0;i<nib;i++) t+=(F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*bm;
+      t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
+      const nib=ech?0:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3));
+      t+=ech?.15:rand(.5,1.1)*bm; for (let i=0;i<nib;i++) t+=(F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*bm;
       // the bite
       const fc={fish:id,spot,lucky}, r=P.react(); t+=r;
       if (r>F.window*modMul('hook',fc)){ out.lost.slow++; out.secs+=t+.7; continue; }
@@ -7396,16 +7780,18 @@ function simulate(st,n){
       // the Hungry Hook can eat it before it's kept
       if (Math.random()<modAdd('eaten',fc)){ out.lost.eaten++; out.secs+=t+1.2; continue; }
       // landed: the game's own catch roll, then the card
-      const k=catchRoll(id,perfect,{spot,lucky}), rar=F.rarity, prev=out.records[id];
+      const wander=!!wanderCount(reg); if (wander) out.wanders++;
+      const k=catchRoll(id,perfect,{spot,lucky,wander}), rar=F.rarity, prev=out.records[id];
       out.landed++; out.coins+=k.value; out.tiers[rar]=(out.tiers[rar]||0)+1; out.species[id]=(out.species[id]||0)+1;
-      if (prev!=null && k.w>prev){ out.pbs++; const b=Math.max(3,Math.round(F.value*.5)); out.pbCoins+=b; out.coins+=b; }
+      if (prev!=null && k.w>prev){ out.pbs++; const b=GLIMMER.record[rar]||2; out.pbGlimmer+=b; out.glimmer+=b; }   // records pay Glimmer
+      if (perfect && echoRoll(id,spot)) echo={fish:id,spot};
       if (prev==null || k.w>prev) out.records[id]=k.w;
       t+=RAR[rar].land*(rar==='rare'||rar==='legendary'?1.03:1)+(rar==='common'?2.2:3.2);
       out.secs+=t;
     }
     const hours=out.secs/3600, pct=x=>Math.round(x*1000)/10;
     // coins an hour count treasure too; per catch and the land rate are about fish only
-    out.coinsPerHour=Math.round((out.coins+out.treasure.coins)/hours); out.catchesPerHour=Math.round(out.landed/hours);
+    out.coinsPerHour=Math.round((out.coins+out.treasure.coins)/hours); out.catchesPerHour=Math.round(out.landed/hours); out.glimmerPerHour=Math.round(out.glimmer/hours*10)/10;
     out.secsPerCast=Math.round(out.secs/n*10)/10; out.fightAvg=Math.round(out.fightSecs/Math.max(1,out.hooked)*10)/10;
     out.coinsPerCatch=Math.round(out.coins/Math.max(1,out.landed)*10)/10; out.landRate=pct(out.landed/Math.max(1,n-out.treasure.rolled)); out.perfectRate=pct(out.perfect/Math.max(1,out.hooked));
     out.treasure.oneIn=out.treasure.rolled?Math.round(n/out.treasure.rolled*10)/10:null;
@@ -7414,6 +7800,7 @@ function simulate(st,n){
       tiers:Object.fromEntries(fishTiers().map(r=>[r,Math.round(tierMul(r,lc)*100)/100]))};
     out.reach={rod:castReach(), ok:spots.every(sp=>((SIM_SPOTS[reg]||{})[sp]||[0])[0]<=castReach()+.001)};
     out.bonuses=modList().filter(m=>m.src!=='base' && m.stat!=='reach' && m.stat!=='snag').map(m=>({src:m.src,name:m.name,stat:m.stat,v:m.v,when:m.when||null,omen:!!m.omen}));
+    out.runes=enchFor(save.rod).filter(Boolean);
     delete out.records; return out;
   } finally { save=keep; SIMULATING=false; TREASURE_CTL.off=ctl; MODC.dirty=true; }
 }
@@ -7425,13 +7812,13 @@ const BAL_TIMES=[[6.5,'Dawn'],[12,'Noon'],[18.5,'Dusk'],[22,'Night']];
 const balTime=h=>h>=5&&h<8?6.5:isNight(h)?22:h>=17?18.5:12;
 function balMine(){ const m=save.meal, rig=rigFor(save.rod);
   return {region:REG(), spot:'open', hour:balTime(save.clock), rod:save.rod, reel:rig.reel, line:rig.line, bait:baitOn()||'', meal:mealActive()?m.id:'', stars:mealActive()?m.stars:3,
-    sets:'mine', parts:'mine', mastery:'mine', finds:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000}; }
+    sets:'mine', parts:'mine', mastery:'mine', finds:'mine', runes:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000}; }
 function balanceFormHTML(){
   const f=BAL.form||(BAL.form=balMine());
   const sel=(id,label,opts,v)=>'<label for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(([k,l])=>'<option value="'+k+'"'+(String(k)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
   const spots=Object.keys(f.region==='coast'?POOLS_COAST:POOLS).map(sp=>[sp,f.region==='coast'&&sp==='deep'?'Dark trench':SPOT_NAME[sp]]);
   const mySets=setsDone().length, myParts=(save.parts||[]).length, myMast=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=MASTERY.catches).length;
-  const myArts=findsState().equip.length;
+  const myArts=findsState().equip.length, myRunes=enchFor(f.rod).filter(Boolean).length;
   let h='<p class="note">Plays casts with the game’s own odds, fights, catch rolls, snags, swells, treasure, tackle and tuning. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps. Every catch is sold; aiming, the aquarium and the kitchen aren’t played.</p>'+
     '<div class="bal-form">'+
     sel('bRegion','Water',Object.keys(REGION_NAME).map(r=>[r,REGION_NAME[r]]),f.region)+
@@ -7447,6 +7834,7 @@ function balanceFormHTML(){
     sel('bParts','Boat parts',[['mine','Yours ('+myParts+')'],['none','None'],['all','Every part']],f.parts)+
     sel('bMastery','Mastery',[['mine','Yours ('+myMast+')'],['none','None'],['all','Every fish']],f.mastery)+
     sel('bFinds','Artifacts',[['mine','Your pockets ('+myArts+')'],['none','None']].concat(Object.keys(FINDS).filter(id=>FINDS[id].kind==='artifact').map(id=>[id,FINDS[id].name])),f.finds)+
+    sel('bRunes','Runes',[['mine','Yours on that rod ('+myRunes+')'],['none','None']].concat(ENCH_ORDER.map(id=>[id,ENCH[id].name])),f.runes||'mine')+
     sel('bTreasure','Treasure',[['yes','Turns up'],['no','Left out']],f.treasure)+
     sel('bLucky','Gull Luck',[['no','No'],['yes','In a lucky splash']],f.lucky)+
     sel('bPlayer','Player',[['steady','Steady'],['new','New']],f.player)+
@@ -7460,12 +7848,14 @@ function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:
   if (f.sets==='mine') st.tanks=tanks(); else st.sets=f.sets;
   if (f.mastery==='mine') st.fish=save.fish; else st.mastery=f.mastery==='all';
   if (f.finds==='mine') st.finds=findsState(); else if (f.finds!=='none') st.artifacts=[f.finds];
+  if (f.runes==='mine' || !f.runes) st.enchSave=enchState(); else if (f.runes!=='none') st.ench=[f.runes];
   if (f.treasure==='no') st.treasure=false;
   return st; }
 function bindBalance(){
-  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bFinds:'finds',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n'};
+  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bFinds:'finds',bRunes:'runes',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n'};
   for (const [id,k] of Object.entries(ids)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
-    if (k==='region'){ BAL.form.spot='open'; const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; }
+    if (k==='region') BAL.form.spot='open';
+    if (k==='region' || k==='rod'){ const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; }
     if (k==='n') $('bRun').textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts'; });
   $('bMine').addEventListener('click',()=>{ BAL.form=balMine(); const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; });
   $('bRun').addEventListener('click',()=>{ const b=$('bRun'); b.disabled=true; b.textContent='Casting…';
@@ -7478,7 +7868,7 @@ function balanceResultHTML(r,prev){
   const st=r.setup, fmt=n=>Math.round(n).toLocaleString();
   const delta=(k)=>{ if (!prev) return ''; const a=prev[k], b=r[k]; if (!a) return ''; const d=Math.round((b-a)/a*100);
     return '<em class="'+(d>0?'up':d<0?'down':'')+'">'+(d===0?'same as last run':(d>0?'▲ ':'▼ ')+Math.abs(d)+'% vs last run')+'</em>'; };
-  const title=REGION_NAME[st.region]+' · '+(st.spot==='mix'?'every spot':(st.region==='coast'&&st.spot==='deep'?'the trench':SPOT_NAME[st.spot].toLowerCase()))+' · '+BAL_TIMES.find(t=>t[0]===st.hour)[1].toLowerCase()+' · '+RODS[st.rod].name+[st.reel,st.line].filter(id=>id&&!TACKLE[id].starter).map(id=>' · '+TACKLE[id].name).join('')+(st.bait?' · '+TACKLE[st.bait].name:'')+(st.meal?' · '+RECIPES[st.meal.id].name+' '+'★'.repeat(st.meal.stars):'');
+  const title=REGION_NAME[st.region]+' · '+(st.spot==='mix'?'every spot':(st.region==='coast'&&st.spot==='deep'?'the trench':SPOT_NAME[st.spot].toLowerCase()))+' · '+BAL_TIMES.find(t=>t[0]===st.hour)[1].toLowerCase()+' · '+RODS[st.rod].name+[st.reel,st.line].filter(id=>id&&!TACKLE[id].starter).map(id=>' · '+TACKLE[id].name).join('')+(st.bait?' · '+TACKLE[st.bait].name:'')+(st.meal?' · '+RECIPES[st.meal.id].name+' '+'★'.repeat(st.meal.stars):'')+(r.runes||[]).map(id=>' · '+ENCH[id].name).join('');
   let h='<section class="bal-res" aria-live="polite"><h3>'+r.casts.toLocaleString()+' casts: '+title+'</h3>';
   if (!r.reach.ok) h+='<p class="bal-warn">'+RODS[st.rod].name+' can’t reach this spot (it casts '+Math.round(r.reach.rod*100)+'% of the way out). These numbers assume it could.</p>';
   h+='<div class="stats bal-stats">'+
@@ -7494,12 +7884,15 @@ function balanceResultHTML(r,prev){
   h+='<table class="bal-tab"><thead><tr><th>Fish</th><th>Share</th><th>One in</th></tr></thead><tbody>'+sp.map(([id,n])=>'<tr><td><span><i style="background:'+RAR[FISH[id].rarity].color+'"></i>'+FISH[id].name+'</span></td><td>'+(Math.round(n/tot*1000)/10)+'%</td><td>'+(r.casts/n<1.5?'every cast':Math.round(r.casts/n).toLocaleString()+' casts')+'</td></tr>').join('')+'</tbody></table>';
   const T=r.treasure; if (T.rolled){ const cr=LOOT_TIERS.filter(k=>T.crates[k]);
     h+='<p class="note bal-notes"><b>Treasure:</b> 1 cast in '+T.oneIn+' ('+T.rolled+'), '+T.hauled+' hauled up for '+fmt(T.coins)+' coins'+(T.finds?' and '+T.finds+' new finds':'')+'. '+
-      [['pouch','pouches'],['bottle','bottles'],['letter','letters'],['find','loose finds'],['crate','crates']].filter(([k])=>T.kinds[k]).map(([k,w])=>T.kinds[k]+' '+w).join(', ')+
+      [['pouch','pouches'],['geode','geodes'],['bottle','bottles'],['letter','letters'],['find','loose finds'],['crate','crates']].filter(([k])=>T.kinds[k]).map(([k,w])=>T.kinds[k]+' '+w).join(', ')+
       (cr.length?' (crates: '+cr.map(k=>T.crates[k]+' '+RAR[k].label.toLowerCase()).join(', ')+')':'')+'.</p>'; }
   const L=r.luck, lostBits=[['slow','too slow'],['snag','snagged in the reeds'],['washout','washed out by a swell'],['jump','shook off mid-jump'],['slack','slipped on a slack line'],['snap','snapped'],['tired','outlasted the player'],['eaten','eaten by the Hungry Hook']].filter(([k])=>r.lost[k]).map(([k,w])=>r.lost[k]+' '+w);
   h+='<p class="note bal-notes">'+(L.points?modValueText('luck',L.points)+': ':'No luck bonuses: ')+Object.entries(L.tiers).map(([k,v])=>RAR[k].label+' ×'+v).join(', ')+'. '+
     'A cast takes '+r.secsPerCast+' s on average, and a fight '+r.fightAvg+' s. '+(lostBits.length?'Lost: '+lostBits.join(', ')+'. ':'')+
-    (r.pbCoins?'Record bonuses paid '+fmt(r.pbCoins)+' coins. ':'')+'</p></section>';
+    '</p>';
+  if (r.glimmer || r.echoes || r.wanders) h+='<p class="note bal-notes"><b>Glimmer:</b> '+r.glimmerPerHour.toLocaleString()+' an hour ('+fmt(r.glimmer)+' in all: '+fmt(r.pbGlimmer)+' from records, '+fmt(r.glimmer-r.pbGlimmer)+' from treasure).'+
+    (r.wanders?' Wanderer doubled '+r.wanders+' catches.':'')+(r.echoes?' Echo brought '+r.echoes+' instant bites.':'')+'</p>';
+  h+='</section>';
   return h;
 }
 
@@ -7517,7 +7910,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
     '<div class="tune">'+sl('tHook','Hook window',t.hook,'Higher is more forgiving when the bobber plunges.')+sl('tTension','Tension build',t.tension,'Higher makes the line strain faster while reeling.')+sl('tWait','Bite wait',t.wait,'Higher means longer quiet time before a fish shows up.')+
     '<label for="tClock">Time of day<output id="tClockO">'+clockText(save.clock)+'</output><input type="range" id="tClock" min="0" max="23.75" step="0.25" value="'+save.clock.toFixed(2)+'"><span class="note" style="grid-column:1/-1;margin:0">One in-game hour passes every real minute. Lantern Carp only rise at night; the Mayor favors dawn.</span></label>'+
     '<label for="tLoot">Next cast pulls up<output id="tLootO">'+(TREASURE_CTL.force?lootName(TREASURE_CTL.force):'A fish')+'</output><select id="tLoot"><option value="">A fish, as usual</option>'+
-      [['pouch','A coin pouch'],['bottle','A message bottle'],['letter','A drowned letter'],['find','A find']].concat(LOOT_TIERS.map(t=>['crate:'+t,aOrAn(CRATES[t].name.toLowerCase())])).map(([v,l])=>'<option value="'+v+'">'+l+'</option>').join('')+
+      [['pouch','A coin pouch'],['geode','A Glimmer geode'],['bottle','A message bottle'],['letter','A drowned letter'],['find','A find']].concat(LOOT_TIERS.map(t=>['crate:'+t,aOrAn(CRATES[t].name.toLowerCase())])).map(([v,l])=>'<option value="'+v+'">'+l+'</option>').join('')+
       '</select><span class="note" style="grid-column:1/-1;margin:0">Treasure turns up on its own about once in 12 casts. This picks the next one, so you can see every crate open.</span></label></div>'+
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
     '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
@@ -7540,9 +7933,9 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   $('replayTut').addEventListener('click',()=>{ save.tutorialDone=false; persist(); closeSheet(); setState('idle'); });
   $('resetT').addEventListener('click',()=>{ save.tune={hook:1,tension:1,wait:1}; persist(); openPlaytest('tools'); });
   let armed=false; $('resetAll').addEventListener('click',e=>{ if (!armed){ armed=true; e.target.textContent='Tap again to erase'; return; }
-    snapshot('Before erasing',true); const snd=save.sound; save=fresh(); save.sound=snd; persist(); coinShown=0; $('coins').textContent='0'; updateHud(); closeSheet(); setState('idle'); news('Progress erased',''); });
+    snapshot('Before erasing',true); const snd=save.sound; save=fresh(); save.sound=snd; persist(); coinShown=0; $('coins').textContent='0'; glimShown=glimGoal=0; $('glimmer').textContent='0'; updateHud(); closeSheet(); setState('idle'); news('Progress erased',''); });
 }
-const lootName=l=>l.kind==='crate'?CRATES[l.tier].name:{pouch:'Coin pouch',bottle:'Message bottle',letter:'Drowned letter',find:'A find'}[l.kind];
+const lootName=l=>l.kind==='crate'?CRATES[l.tier].name:{pouch:'Coin pouch',geode:'Glimmer geode',bottle:'Message bottle',letter:'Drowned letter',find:'A find'}[l.kind];
 function bindPlaytestTabs(){ $('closeS').addEventListener('click',closeSheet);
   document.querySelectorAll('#panel [data-pt]').forEach(b=>b.addEventListener('click',()=>{ tone(900,.04,{vol:.04,type:'triangle'}); openPlaytest(b.dataset.pt); $('panel').scrollTop=0; })); }
 
@@ -7552,7 +7945,7 @@ function boot(data){
   migrateRecords();
   if ((save.pending||[]).length){ const got=save.pending.splice(0); got.forEach(grant); persist(); setTimeout(()=>news('Your Tacklegram order arrived','gold'),800); }
   if (lettersWaiting()){ MAIL.state='waiting'; MAIL.t=6; }   // a drowned letter still waiting for Pell
-  resize(); coinShown=save.coins; $('coins').textContent=save.coins.toLocaleString(); updateHud(); accrueTips(); setState('idle'); kitchenUnlockCheck(true);
+  resize(); coinShown=save.coins; $('coins').textContent=hudNum(save.coins); updateHud(); accrueTips(); setState('idle'); kitchenUnlockCheck(true);
   requestAnimationFrame(t=>{ last=t; requestAnimationFrame(frame); });
   snapshot('Start of a session'); protectStorage(); introStart(); sheetSwipe();
 }

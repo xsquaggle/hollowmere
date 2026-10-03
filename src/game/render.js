@@ -59,6 +59,11 @@ function drawRodAndLine(){
   const mx=(b.x+t.x)/2+bx*t.bend*22, my=(b.y+t.y)/2+by*t.bend*22;
   ctx.lineCap='round'; ctx.strokeStyle=ROD().color; ctx.lineWidth=save.rod==='reedcutter'?5:save.rod==='heronwood'?3.2:4; ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.quadraticCurveTo(mx,my,t.x,t.y); ctx.stroke();
   ctx.strokeStyle=BRASS; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.lineTo(lerp(b.x,mx,.25),lerp(b.y,my,.25)); ctx.stroke();
+  // runes etched on the rod glow softly along the blank
+  const runes=enchFor(save.rod); if (runes.some(Boolean)){ ctx.save(); ctx.globalCompositeOperation='lighter';
+    runes.forEach((id,i)=>{ if (!id) return; const u=.3+i*.07, x=(1-u)*(1-u)*b.x+2*u*(1-u)*mx+u*u*t.x, y=(1-u)*(1-u)*b.y+2*u*(1-u)*my+u*u*t.y, a=.5+.3*Math.sin(S.time*2+i*1.7);
+      ctx.fillStyle=hexA(ENCH[id].color,(.22*a).toFixed(3)); ctx.beginPath(); ctx.arc(x,y,5.5,0,Math.PI*2); ctx.fill(); ctx.fillStyle=hexA(ENCH[id].color,(.85*a).toFixed(3)); ctx.beginPath(); ctx.arc(x,y,1.7,0,Math.PI*2); ctx.fill(); });
+    ctx.restore(); }
   if (!lp || (S.lost && S.lost.snapped)) return;
   // the line in the color of whatever line is on the rod; it reddens as tension runs high
   const lid=rigFor(save.rod).line, LC=LINE_RGB[lid]||LINE_RGB.cotton, base=LC[0].split(',').map(Number);
@@ -74,6 +79,7 @@ function drawParticles(){
   for (const p of S.particles){ const a=(1-p.life/p.max);
     if (p.word){ ctx.save(); ctx.globalAlpha=a; ctx.font='800 16px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.lineWidth=4; ctx.strokeStyle=INK; ctx.strokeText(p.word,p.x,p.y); ctx.fillStyle='#FDFCF7'; ctx.fillText(p.word,p.x,p.y); ctx.restore(); continue; }
     ctx.fillStyle=p.c+a.toFixed(3)+')';
+    if (p.glim){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.life*6); ctx.fillRect(-p.r*1.6,-p.r*.35,p.r*3.2,p.r*.7); ctx.fillRect(-p.r*.35,-p.r*1.6,p.r*.7,p.r*3.2); ctx.restore(); continue; }
     if (p.rect){ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.life*p.spin); ctx.fillRect(-p.r,-p.r*.5,p.r*2,p.r); ctx.restore(); }
     else { ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); } }
 }

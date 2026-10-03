@@ -6,7 +6,8 @@
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
-   Tackle counts (reel, line and bait, through the same modifiers); bait never runs out in a run.
+   Tackle counts (reel, line and bait, through the same modifiers); bait never runs out in a run. So do runes:
+   Wanderer's days turn over every 24 minutes of play, and after an Echo the player casts back to its spot.
    Not modeled: aiming (every cast reaches its spot), keeping fish (every catch sells), the aquarium, the
    kitchen, Barnaby or the mail boat, and the clock (an artifact that speeds or stops time doesn't change the
    hour of a run). The setup lives in a stand-in save for the run, then the real save
@@ -52,6 +53,10 @@ function simSave(st){
     if (st.bait && TACKLE[st.bait] && TACKLE[st.bait].kind==='bait'){ s.gear.bait=st.bait; if (isLure(st.bait)) own[st.bait]=1; } }
   if (s.gear.bait && !isLure(s.gear.bait)) s.gear.left[s.gear.bait]=1e9;
   s.gear.lastBait=null;
+  // runes: copied from a real save, or the runes named for the run, etched onto the rod
+  if (st.enchSave) s.ench=JSON.parse(JSON.stringify(st.enchSave));
+  else { const ids=(st.ench||[]).filter(id=>ENCH[id]).slice(0,RODS[s.rod].ench||1); s.ench={own:Object.fromEntries(ids.map(id=>[id,1])), rig:{[s.rod]:ids}}; }
+  s.glimmer=0; s.day=0; s.wander=null;
   return s;
 }
 /** Plays one fight (a fish or a haul) through the game's fight step, the way player P would. Returns {end, ft, why}. */
@@ -81,11 +86,13 @@ function simulate(st,n){
   try {
     SIMULATING=true; save=simSave(st); MODC.dirty=true; TREASURE_CTL.off=st.treasure===false;
     const reg=REG(), spots=st.spot==='mix'?Object.keys(reg==='coast'?POOLS_COAST:POOLS):[st.spot];
-    const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0,snag:0,washout:0,eaten:0}, perfect:0, hooked:0, coins:0, pbs:0, pbCoins:0, secs:0, fightSecs:0,
+    const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0,snag:0,washout:0,eaten:0}, perfect:0, hooked:0, coins:0, pbs:0, glimmer:0, pbGlimmer:0, echoes:0, wanders:0, secs:0, fightSecs:0,
       tiers:{}, species:{}, records:{}, treasure:{rolled:0,hauled:0,lost:0,coins:0,finds:0,kinds:{},crates:{}}};
     const io={t:0,holding:true,tut:null,tilt:0,reeling:false,ev:[],why:''};
+    let echo=null;                                                   // Echo: the next cast at that spot bites at once
+    const dayLen=modFlag('timeStop')?0:1440/modMul('clock');
     for (let c=0;c<n;c++){
-      const spot=spots[c%spots.length], lucky=!!st.lucky, depth=((SIM_SPOTS[reg]||{})[spot]||[0,.5])[1], y=lerp(G.near,HZ+26,depth), cx={spot,lucky};
+      const spot=echo?echo.spot:spots[c%spots.length], lucky=!!st.lucky, depth=((SIM_SPOTS[reg]||{})[spot]||[0,.5])[1], y=lerp(G.near,HZ+26,depth), cx={spot,lucky};   // an Echo waiting: the player casts back to it
       let t=1.6;                                                   // aim, drag and the cast's flight
       // the cast can tangle in the reeds or wash out in a swell
       if (spot==='reeds' && Math.random()<modBase('snag',cx)){ out.lost.snag++; out.secs+=t+.7; continue; }
@@ -93,25 +100,28 @@ function simulate(st,n){
       // the quiet before anything shows up; a steady player twitches once to hurry it
       const tw=modMul('twitch',cx); let wait=biteWait(spot)*(spot==='deep'?1.2:1)/modMul('reedBite',cx);
       if (P.twitch) wait=Math.max(.3,wait*(.65-.2*(tw-1)));
-      // treasure instead of a fish (rolled once per cast, as the bobber lands): a haul through the fight step, and what's inside
-      const loot=rollTreasure(cx);
+      save.day=dayLen?Math.floor(out.secs/dayLen):0;                   // an in-game day is 24 minutes of play, or as artifacts make it
+      // treasure instead of a fish (rolled once per cast, as the bobber lands): a haul through the fight step, and what's inside.
+      // An Echo bites at once instead, unless treasure comes up first: then it keeps waiting.
+      const loot=rollTreasure(cx), pend=echo; echo=loot?pend:null;
+      const ech=!loot && pend ? pend.fish : null; if (ech){ wait=.35; out.echoes++; }
       if (loot){ const T=out.treasure; T.rolled++;
         t+=wait+rand(.9,1.6); const r=P.react(); t+=r;
         if (r>2.2*modMul('hook',cx)){ T.lost++; out.secs+=t+.7; continue; }
         const f=simFight(newHaul(loot,r<=.3*modMul('perfect',cx),{x:W*.5,y},lucky,spot),P,reg,io,cx); t+=f.ft;
         if (f.end!=='land'){ T.lost++; out.secs+=t+.7; continue; }
-        const g=openLoot(loot,cx); T.hauled++; T.coins+=g.coins; T.kinds[loot.kind]=(T.kinds[loot.kind]||0)+1; if (loot.tier) T.crates[loot.tier]=(T.crates[loot.tier]||0)+1;
+        const g=openLoot(loot,cx); T.hauled++; T.coins+=g.coins; out.glimmer+=g.glimmer; T.kinds[loot.kind]=(T.kinds[loot.kind]||0)+1; if (loot.tier) T.crates[loot.tier]=(T.crates[loot.tier]||0)+1;
         T.finds+=g.items.filter(it=>it.type==='find').length;
         // the haul flies in; a pouch pops, anything else waits for a tap and a look at what's inside
-        t+=loot.kind==='pouch'?1.8:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'?3.5:8;
+        t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
-      const id=pickW(poolFor(spot,lucky)), F=FISH[id];
+      const id=ech||pickW(poolFor(spot,lucky)), F=FISH[id];
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
-      t+=wait+Math.max(.4,(rand(85,150)-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm)*1.2);
-      const nib=F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3));
-      t+=rand(.5,1.1)*bm; for (let i=0;i<nib;i++) t+=(F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*bm;
+      t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
+      const nib=ech?0:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3));
+      t+=ech?.15:rand(.5,1.1)*bm; for (let i=0;i<nib;i++) t+=(F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*bm;
       // the bite
       const fc={fish:id,spot,lucky}, r=P.react(); t+=r;
       if (r>F.window*modMul('hook',fc)){ out.lost.slow++; out.secs+=t+.7; continue; }
@@ -123,16 +133,18 @@ function simulate(st,n){
       // the Hungry Hook can eat it before it's kept
       if (Math.random()<modAdd('eaten',fc)){ out.lost.eaten++; out.secs+=t+1.2; continue; }
       // landed: the game's own catch roll, then the card
-      const k=catchRoll(id,perfect,{spot,lucky}), rar=F.rarity, prev=out.records[id];
+      const wander=!!wanderCount(reg); if (wander) out.wanders++;
+      const k=catchRoll(id,perfect,{spot,lucky,wander}), rar=F.rarity, prev=out.records[id];
       out.landed++; out.coins+=k.value; out.tiers[rar]=(out.tiers[rar]||0)+1; out.species[id]=(out.species[id]||0)+1;
-      if (prev!=null && k.w>prev){ out.pbs++; const b=Math.max(3,Math.round(F.value*.5)); out.pbCoins+=b; out.coins+=b; }
+      if (prev!=null && k.w>prev){ out.pbs++; const b=GLIMMER.record[rar]||2; out.pbGlimmer+=b; out.glimmer+=b; }   // records pay Glimmer
+      if (perfect && echoRoll(id,spot)) echo={fish:id,spot};
       if (prev==null || k.w>prev) out.records[id]=k.w;
       t+=RAR[rar].land*(rar==='rare'||rar==='legendary'?1.03:1)+(rar==='common'?2.2:3.2);
       out.secs+=t;
     }
     const hours=out.secs/3600, pct=x=>Math.round(x*1000)/10;
     // coins an hour count treasure too; per catch and the land rate are about fish only
-    out.coinsPerHour=Math.round((out.coins+out.treasure.coins)/hours); out.catchesPerHour=Math.round(out.landed/hours);
+    out.coinsPerHour=Math.round((out.coins+out.treasure.coins)/hours); out.catchesPerHour=Math.round(out.landed/hours); out.glimmerPerHour=Math.round(out.glimmer/hours*10)/10;
     out.secsPerCast=Math.round(out.secs/n*10)/10; out.fightAvg=Math.round(out.fightSecs/Math.max(1,out.hooked)*10)/10;
     out.coinsPerCatch=Math.round(out.coins/Math.max(1,out.landed)*10)/10; out.landRate=pct(out.landed/Math.max(1,n-out.treasure.rolled)); out.perfectRate=pct(out.perfect/Math.max(1,out.hooked));
     out.treasure.oneIn=out.treasure.rolled?Math.round(n/out.treasure.rolled*10)/10:null;
@@ -141,6 +153,7 @@ function simulate(st,n){
       tiers:Object.fromEntries(fishTiers().map(r=>[r,Math.round(tierMul(r,lc)*100)/100]))};
     out.reach={rod:castReach(), ok:spots.every(sp=>((SIM_SPOTS[reg]||{})[sp]||[0])[0]<=castReach()+.001)};
     out.bonuses=modList().filter(m=>m.src!=='base' && m.stat!=='reach' && m.stat!=='snag').map(m=>({src:m.src,name:m.name,stat:m.stat,v:m.v,when:m.when||null,omen:!!m.omen}));
+    out.runes=enchFor(save.rod).filter(Boolean);
     delete out.records; return out;
   } finally { save=keep; SIMULATING=false; TREASURE_CTL.off=ctl; MODC.dirty=true; }
 }

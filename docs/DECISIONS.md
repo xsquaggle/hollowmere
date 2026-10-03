@@ -4,6 +4,32 @@ Newest first. Each entry records what was decided and why, so later changes don'
 
 ## 2026-10-03
 
+- **Glimmer is the second currency (build 18).**
+  - It comes from beating a personal record (2 Glimmer for a common fish up to 40 for a godly one), from Glimmer geodes, a new common treasure (4–8 at the lake, 6–12 at the coast), and from every crate (3–5 in a common one, up to 90–120 in a mythic one). Mutations add more in step 21.
+  - Records pay Glimmer instead of coins.
+- **Until Wren's bench (step 25), runes are etched with your uncle's etching kit in the tackle bag.**
+  - Etching a rune costs Glimmer once. After that it goes on any rod for free, one of each per rod, so trying a build costs nothing.
+  - Rods have 1 to 3 sockets, rising up the ladder: one on the Willow Switch and Reedcutter, two on the Ash Caster, Heronwood and Brasscap Pro, three on the sea rods.
+  - The first six are Swift Spool, Magpie Knot, Lure of the Deep, Nightglass, Wanderer and Echo. Storm Knot comes with weather (step 20), Odd Water with mutations (step 21) and Homebody with Wren (step 25).
+- **Wanderer counts each water separately (the lake, the coast), as the design doc's "each location" says,** over an in-game day of 24 minutes.
+  - Every catch counts toward the day, rune or not, so etching it in mid-day doesn't pay twice. A fish the Hungry Hook eats doesn't count.
+  - It pays a fixed number of catches a day, so it's worth more to a slower player, and to one who travels.
+- **An Echo waits at the spot of the perfect hook, for the next cast there.** Casting elsewhere loses it. If treasure comes up first, the Echo keeps waiting, so Echo never costs a treasure roll.
+- **Nightglass's catch is that fish bite more slowly by day,** not the doc's "day-only fish are rarer", because there are no day-only fish yet. Its "and fog fish" half arrives with weather in step 20.
+- **Rune balance, from the simulator** (a steady player, 3,000–5,000 casts; Wanderer's figure is for a nonstop player who never travels):
+
+  | Rune | What it does to a run |
+  | --- | --- |
+  | Lure of the Deep | 5–15% more coins an hour |
+  | Swift Spool | About 6% more fish an hour |
+  | Magpie Knot | Twice the treasure and about twice the Glimmer, coins about the same |
+  | Echo | 5–10% more fish an hour, most of them the kind you just hooked |
+  | Wanderer | 2–3% more coins an hour |
+  | Nightglass | 35% more coins an hour in the trench at night, 9% fewer by day |
+
+  - Glimmer runs about 70–130 an hour in the simulator, mostly from treasure. At a real player's pace, the first rune comes within the first hour, and all six take several hours.
+- **The HUD fits by measuring, not by guessing from the screen width.** When something in the row would be cut off, it gives way a step at a time: tighter chips, then the clock drops AM and PM, then big numbers shorten (125K), then smaller text, and last, the Playtest button steps aside (a long press on the clock still opens Playtest). This also fixed the coin icon, which had been squeezed to nothing on narrow phones.
+- **Tiles in cards and sheets are painted at their layout size, not their size on screen,** so a sheet mid-zoom no longer paints them at the wrong size. The catch card paints its rune badges once it's on screen.
 - **The art pass got a second part for the aquarium and the kitchen (build 17),** at the owner's request. From now on the art bar covers every screen, overlays and icons included, not just the fishing scene.
   - The tank is sized to the space between the tabs and the buttons, so nothing overlaps on a short screen. Rooms measure their layout, not their on-screen size, because they open with a small zoom.
   - Decor icons in the shop and in crates are drawn from the tank's own drawings instead of separate SVGs, so the two can't drift apart.

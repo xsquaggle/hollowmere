@@ -2,7 +2,7 @@
 /* About 1 cast in 12 pulls up treasure instead of a fish (TREASURE in data/treasure.js). The roll happens when
    the quiet before a bite runs out: instead of a fish swimming over, the bobber snags on something heavy. Tap to
    hook it, haul it up like a dead weight (fightStep's 'weight' behavior in game/reeling.js), and it lands as a
-   coin pouch, a message bottle, a drowned letter, a find or a loot crate (game/loot.js shows it).
+   coin pouch, a Glimmer geode, a message bottle, a drowned letter, a find or a loot crate (game/loot.js shows it).
    What's inside is rolled and kept the moment it lands (openLoot), so closing the app mid-celebration never
    loses anything. Luck lifts loose finds and better crates through the same per-rarity curve as fish (tierMul).
    Everything here reads only the save, so the balance simulator rolls treasure with these same functions. */
@@ -82,18 +82,20 @@ function spotValue(c){ const w=poolFor(c.spot||'open',!!c.lucky); let s=0, v=0;
     coin counter catches up during the reveal), finds into save.finds. Returns what to show:
     {kind, tier, coins, items:[{type:'find'|'paint'|'decor'|'note'|'spare', id?, n?, rarity?}]}. */
 function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',c);
-  const out={kind:loot.kind, tier:loot.tier||null, coins:0, items:[]};
+  const out={kind:loot.kind, tier:loot.tier||null, coins:0, glimmer:0, items:[]};
+  const glim=([a,b])=>a+Math.floor(Math.random()*(b-a+1));
   const where={t:Date.now(), hr:save.clock, reg:x.region, spot:c.spot||'open', src:loot.kind==='crate'?loot.tier:loot.kind};
   const give=id=>{ FS.have[id]=Object.assign({},where); FS.fresh.push(id); out.items.push({type:'find',id}); };
   const note=id=>{ if (!FS.notes.includes(id)) FS.notes.push(id); out.items.push({type:'note',id}); };
   const spare=r=>{ const n=Math.round(crateCoins(r,c)*.5); out.coins+=n; out.items.push({type:'spare',n,rarity:r}); };   // half a crate of that tier
   FS.treasure++;
   if (loot.kind==='pouch') out.coins=Math.max(5,Math.round(spotValue(c)*rand(TREASURE.pouch[0],TREASURE.pouch[1])*lm));
+  else if (loot.kind==='geode') out.glimmer=glim(GLIMMER.geode[x.region]||GLIMMER.geode.lake);
   else if (loot.kind==='bottle'){ const id=nextBottleNote(c); FS.bottles++; if (id) note(id); else spare('common'); }
   else if (loot.kind==='letter'){ const id=nextLetter(); if (id){ FS.letters[id]='waiting'; note(id); } else spare('uncommon'); }   // Pell collects it on his next stop
   else if (loot.kind==='find'){ const id=pickLoose(c); if (id) give(id); else spare('common'); }
   else if (loot.kind==='crate'){ const C=CRATES[loot.tier]; FS.crates[loot.tier]=(FS.crates[loot.tier]||0)+1;
-    out.coins=crateCoins(loot.tier,c);
+    out.coins=crateCoins(loot.tier,c); out.glimmer=glim(GLIMMER.crate[loot.tier]);
     for (const it of C.items){
       if (it.chance!=null && !(Math.random()<it.chance)) continue;
       if (it.note && Math.random()<it.note){ const id=nextBottleNote(c); if (id){ note(id); continue; } }
@@ -108,6 +110,7 @@ function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',
   }
   out.base=out.coins-out.items.reduce((a,it)=>a+(it.type==='spare'?it.n:0),0);   // the coins in it, before any spares
   if (out.coins) save.coins+=out.coins;
+  if (out.glimmer){ save.glimmer=(save.glimmer||0)+out.glimmer; save.stats.glimmer=(save.stats.glimmer||0)+out.glimmer; }   // the HUD counts it up during the reveal
   persist(); return out; }
 /** What a crate of `tier` pays at the spot you cast: that many catches' worth, never less than its floor. */
 function crateCoins(tier,c){ const C=CRATES[tier]; return Math.round(Math.max(C.floor,C.fish*spotValue(c))*rand(.85,1.2)*modMul('loot',c)); }

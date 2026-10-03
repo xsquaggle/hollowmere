@@ -129,7 +129,7 @@ function rigLayout(w,h){ const hx=w*.06, hy=h*.8, tx=w*.88, ty=h*.2, ang=Math.at
   const at=(k,d)=>{ const b=Math.sin(k*Math.PI*.9)*h*.035*k, x=hx+Math.cos(ang)*len*k, y=hy+Math.sin(ang)*len*k+b; return {x:x+ux*(d||0), y:y+uy*(d||0)}; };
   const reel=at(.17,h*.2);
   return {hx,hy,tx,ty,ang,len,at, reel, line:at(.58,h*.06), bait:{x:tx+w*.02, y:h*.7}}; }
-function drawRig(c,w,h,rod,rig,bait,t){ const R=RODS[rod]||RODS.willow, L=rigLayout(w,h), at=L.at, ang=L.ang;
+function drawRig(c,w,h,rod,rig,bait,t,fx){ const R=RODS[rod]||RODS.willow, L=rigLayout(w,h), at=L.at, ang=L.ang;
   c.save(); c.lineCap='round'; c.lineJoin='round';
   const swing=REDUCED?0:Math.sin((t||0)*1.3)*.06, tip=at(1), hook={x:L.bait.x+Math.sin(swing)*h*.3, y:L.bait.y-h*.06}, lc=LINE_COL[rig.line]||LINE_COL.cotton;
   // the blank, tapering to the tip, in the rod's own color
@@ -137,6 +137,8 @@ function drawRig(c,w,h,rod,rig,bait,t){ const R=RODS[rod]||RODS.willow, L=rigLay
   for (const pass of [0,1]) for (let i=0;i<segs;i++){ const k0=.06+i/segs*.94, k1=.06+(i+1)/segs*.94, a=at(k0), b=at(k1);
     c.strokeStyle=pass?R.color:INK; c.lineWidth=wAt(i/segs)+(pass?0:2.6); c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); }
   c.strokeStyle='rgba(255,255,255,.25)'; c.lineWidth=1.2; const s0=at(.14,h*.012), s1=at(.8,h*.004); c.beginPath(); c.moveTo(s0.x,s0.y); c.lineTo(s1.x,s1.y); c.stroke();
+  // rune sockets on the blank (game/enchant-art.js): the runes etched on a rod you own, empty seats on one you don't
+  drawRigRunes(c,w,h,L,save.rods.includes(rod)?enchFor(rod):Array((R.ench||1)).fill(null),t,fx);
   // the guides stand on top of the blank; the line runs from the reel through each one to the tip, then down to the hook
   const gk=[.3,.48,.65,.8,.92], ring=i=>lerp(h*.028,h*.015,i/gk.length), guides=gk.map((k,i)=>({base:at(k,wAt(k)*.4), eye:at(k,wAt(k)*.4+ring(i)*2.2), r:ring(i)}));
   for (const g of guides){ c.strokeStyle=INK; c.lineWidth=2; c.beginPath(); c.moveTo(g.base.x,g.base.y); c.lineTo(g.eye.x,g.eye.y); c.stroke(); }

@@ -34,6 +34,8 @@ function modSources(){
   const rig=rigFor(save.rod);
   for (const id of [rig.reel, rig.line]){ const T=TACKLE[id]; if (T) for (const x of T.mods) L.push(Object.assign({src:'gear',name:T.name},x)); }
   const bait=baitOn(); if (bait) for (const x of TACKLE[bait].mods) L.push(Object.assign({src:'gear',name:TACKLE[bait].name},x));
+  // runes etched onto the rod in hand (game/enchant.js)
+  for (const id of enchFor(save.rod)) if (id) for (const x of ENCH[id].mods) L.push(Object.assign({src:'ench',name:ENCH[id].name},x));
   // artifacts work while they're in a vest pocket; keepsakes work from the moment you have them
   const FS=findsState();
   for (const id of FS.equip){ const D=FINDS[id]; if (D && FS.have[id]) for (const x of D.mods||[]) L.push(Object.assign({src:'artifact',name:D.name},x)); }

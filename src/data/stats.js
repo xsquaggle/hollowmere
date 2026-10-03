@@ -30,6 +30,7 @@ const STATS={
   treasure: {name:'Treasure', kind:'mul', good:'up', hint:'How often your line pulls up something that isn’t a fish.'},
   loot:     {name:'Treasure coins', kind:'mul', good:'up', hint:'Coins in pouches and crates.'},
   eaten:    {name:'Eaten catches', kind:'add', start:0, good:'down', unit:'chance', hint:'Share of landed fish that get eaten before you can keep them.'},
+  echo:     {name:'Echo bites', kind:'add', start:0, good:'up', unit:'chance', hint:'After a perfect hook, how often another of the same fish waits at that spot, for an instant bite on your next cast there.'},
   clock:    {name:'Time of day', kind:'mul', good:'up', unit:'x', hint:'How fast the in-game clock runs while you fish.'},
   tips:     {name:'Tank tips', kind:'mul', good:'up', hint:'How fast the aquarium’s tip jar fills.'},
   mealCasts:{name:'Meal length', kind:'mul', good:'up', hint:'How many casts a meal’s boosts last.'},

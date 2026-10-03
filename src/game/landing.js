@@ -7,10 +7,14 @@ function catchRoll(id,perfect,ctx){ const F=FISH[id];
   const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(perfect?1.25:1)*modMul('value',Object.assign({fish:id},ctx))));
   return {size,build,w,value,stars:qualityOf(id,size,perfect)}; }
 function startLand(){
-  humStop(); const R=S.reel, F=R.F, {size,build,w:wgt,value}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky});
+  humStop(); const R=S.reel, F=R.F, spot=(S.bob&&S.bob.spot)||'open';
   // the Hungry Hook takes its share before you can keep the fish
   const eaten=!S.tut && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
-  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot:(S.bob&&S.bob.spot)||'open',hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0,eaten};
+  const wander=S.tut||eaten?0:wanderCount(REG());   // Wanderer: the day's first catches in this water
+  const {size,build,w:wgt,value}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky,wander:!!wander});
+  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0,eaten,wander};
+  // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast
+  if (R.perfect && !S.tut && !eaten && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
   sfx.out(F.rarity); buzz(F.rarity==='legendary'?[0,40,60,40,60,120]:40); shake(F.rarity==='legendary'?6:2);
   if (!REDUCED && (F.rarity==='rare'||F.rarity==='legendary')) S.zoomT=F.rarity==='legendary'?1.12:1.06;
@@ -41,7 +45,8 @@ function showCard(){
   const prevW=r.bw||0; L.prev=r.pb?Object.assign({},r.pb):null;
   r.caught++; r.best=Math.max(r.best,L.size); r.seen=true; save.stats.catches++;
   save.stats.landed=(save.stats.landed||0)+L.w; if (L.stars===3) save.stats.trophies=(save.stats.trophies||0)+1;
-  L.pbBeat=!L.isNew && !!L.prev && L.w>prevW; L.pbBonus=L.pbBeat?Math.max(3,Math.round(F.value*.5)):0;
+  L.pbBeat=!L.isNew && !!L.prev && L.w>prevW; L.pbGlim=L.pbBeat?(GLIMMER.record[F.rarity]||2):0;   // records pay Glimmer, kept now and counted up at the stamp
+  if (L.pbGlim){ save.glimmer=(save.glimmer||0)+L.pbGlim; save.stats.glimmer=(save.stats.glimmer||0)+L.pbGlim; }
   if (L.isNew || L.w>prevW){ r.bw=L.w; r.pb={size:L.size,w:L.w,stars:L.stars,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod,perfect:!!L.perfect}; }
   if (L.pbBeat) save.stats.pbs=(save.stats.pbs||0)+1;
   L.pbMinor=L.pbBeat && (L.w-L.prev.w)/Math.max(1,L.prev.w)<.1 && F.rarity!=='legendary' && L.stars<3;
@@ -55,6 +60,10 @@ function showCard(){
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
   if (r.caught===MASTERY.catches) tags.push('Mastered: reels get easier'); else if (r.caught<MASTERY.catches) tags.push('Mastery '+r.caught+'/'+MASTERY.catches);
   $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]);
+  // runes that did something for this catch
+  const runes=[]; if (L.wander) runes.push(runeTag('wanderer','Wanderer ×2 · '+L.wander+' of '+ENCH.wanderer.first)); if (L.echo) runes.push(runeTag('echo','Echo: another waits here'));
+  if (enchOn('deep') && rarRank(F.rarity)>=rarRank('rare')) runes.push(runeTag('deep','Lure of the Deep')); if (enchOn('nightglass') && F.night && isNight(L.hr)) runes.push(runeTag('nightglass','Nightglass'));
+  if (runes.length){ $('cTags').insertAdjacentHTML('afterbegin',runes.join('')); if (L.echo) setTimeout(()=>sfx.echo(),500); }
   $('cLore').textContent=L.isNew||F.rarity!=='common' ? F.lore : '';
   $('cLore').hidden=!$('cLore').textContent;
   const full=save.net.length>=netCap();
@@ -65,8 +74,8 @@ function showCard(){
   $('cSell').classList.toggle('primary',S.cardDefault==='sell'); $('cKeep').classList.toggle('primary',S.cardDefault==='keep');
   $('cAuto').hidden=!S.cardAuto; if (S.cardAuto) $('cAuto').innerHTML='Selling in a moment · tap Keep to keep it<span class="bar"><i></i></span>';
   const rs=$('cRec'), pbEl=$('cPB'); rs.hidden=pbEl.hidden=!L.pbBeat; rs.hidden=!L.pbBeat||L.pbMinor; pbEl.classList.toggle('minor',!!L.pbMinor); rs.parentNode.classList.toggle('rec',!!L.pbBeat&&!L.pbMinor); rs.style.animationDelay=pbEl.style.animationDelay=REDUCED?'0s':'';
-  if (L.pbBeat) pbEl.innerHTML='<span class="t">'+(L.pbMinor?'New best, just':'New personal record')+'</span><b id="cPBw">'+fmtW(L.prev.w)+'</b><em>was '+fmtW(L.prev.w)+'</em>'+(L.pbBonus?'<i class="bonus"><span class="coin"></span>+'+L.pbBonus+'</i>':'');
-  card.hidden=false; S.cardAt=S.time; cardScene(L);
+  if (L.pbBeat) pbEl.innerHTML='<span class="t">'+(L.pbMinor?'New best, just':'New personal record')+'</span><b id="cPBw">'+fmtW(L.prev.w)+'</b><em>was '+fmtW(L.prev.w)+'</em>'+(L.pbGlim?'<i class="bonus"><span class="glim" aria-hidden="true"></span>+'+L.pbGlim+'<span class="sr"> Glimmer</span></i>':'');
+  card.hidden=false; S.cardAt=S.time; cardScene(L); paintTiles($('cTags').querySelectorAll('canvas[data-rune]'));   // once the card is laid out
   setState('result');
   if (S.tut){ S.tut='card'; coach('Your first catch! Keep it, or sell it for coins. Every new fish also gets a page in your Journal.','Done'); }
   if (S.cardAuto){ const tok=S.cardAt; setTimeout(()=>{ if (S.state==='result' && S.cardAuto && S.cardAt===tok) dismissCard('sell'); },2200); }
@@ -75,9 +84,10 @@ function showCard(){
 function dismissCard(action){
   if (S.state!=='result') return;
   action=action||S.cardDefault||'sell';
+  const L=S.land, card=$('card');
   if (action==='keep' && save.net.length>=netCap()) action='sell';
   if (action==='tank' && !tankRoom(L.id)) action=save.net.length<netCap()?'keep':'sell';
-  const L=S.land, card=$('card'); card.classList.add('out'); setTimeout(()=>{ card.hidden=true; card.classList.remove('out'); },250);
+  card.classList.add('out'); setTimeout(()=>{ card.hidden=true; card.classList.remove('out'); },250);
   if (action==='sell') addCoins(L.value);
   else if (action==='tank'){ addToTank({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod}); sfx.plop(); news('Off to the aquarium','good'); }
   else { save.net.push({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod}); persist();
@@ -99,9 +109,32 @@ let coinGoal=0;
 /** The HUD's coin count catches up with the save, counting up (or down). A newer tally takes over an older one. */
 function coinTally(dur){ const start=coinShown, end=save.coins, t0=performance.now(); coinGoal=end;
   const el=$('coins'); el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
-  (function step(now){ if (coinGoal!==end) return; const k=Math.min(1,(now-t0)/dur); coinShown=Math.round(lerp(start,end,1-Math.pow(1-k,3))); el.textContent=coinShown.toLocaleString(); if (k<1) requestAnimationFrame(step); })(t0); }
+  (function step(now){ if (coinGoal!==end) return; const k=Math.min(1,(now-t0)/dur); coinShown=Math.round(lerp(start,end,1-Math.pow(1-k,3))); el.textContent=hudNum(coinShown); if (k<1) requestAnimationFrame(step); else fitHud(); })(t0); }
+/* ---------- fitting the HUD on a narrow phone ---------- */
+/* Coins, Glimmer, the meal, the clock and two buttons share one row. When something in it would be cut off, the row
+   gives way a step at a time, measured rather than guessed from the screen width: 1 tighter chips, 2 the clock drops
+   AM and PM (the sun or moon beside it still tells morning from evening), 3 big numbers shorten (125K), 4 the text
+   gets a size smaller, 5 the Playtest button steps aside (a long press on the clock still opens Playtest). */
+const HUD={lv:0, sig:''};
+/** A count for the HUD: in full, or shortened when the row is at its tightest. */
+function hudNum(n){ if (HUD.lv<3 || n<1e3) return n.toLocaleString();
+  const [d,u]=n<1e6?[1e3,'K']:n<1e9?[1e6,'M']:[1e9,'B'], v=n/d, f=v<100?Math.floor(v*10)/10:Math.floor(v); return f.toLocaleString()+u; }
+const hudClock = h => (isNight(h)||PERIOD(h)==='Evening'?'\u263E\uFE0E ':'\u2600\uFE0E ')+(HUD.lv>=2?clockText(h).replace(/ [AP]M$/,''):clockText(h));
+/** Fits the row to the numbers it will settle on (a count-up in progress ends there), then puts back what's showing. */
+function fitHud(){ const hud=$('hud'); if (!hud) return; const g=save.glimmer||0, m=save.meal;
+  const chips=[...hud.querySelectorAll('.chip')], sig=[innerWidth,save.coins.toLocaleString().length,g.toLocaleString().length,clockText(save.clock).length,m?String(m.casts).length:0]
+    .concat(chips.map(c=>c.hidden?0:1),$('labBtn').hidden?0:1).join();
+  if (sig===HUD.sig) return; HUD.sig=sig;
+  const over=()=>chips.some(c=>!c.hidden && c.scrollWidth>c.clientWidth+1);
+  if (m && !$('mealChip').hidden) $('mealCasts').textContent=m.casts;
+  for (HUD.lv=0; HUD.lv<=5; HUD.lv++){ hud.classList.toggle('tight',HUD.lv>=1); hud.classList.toggle('small',HUD.lv>=4); hud.classList.toggle('nolab',HUD.lv>=5);
+    $('coins').textContent=hudNum(save.coins); $('glimmer').textContent=hudNum(g); S.clockShown=$('clock').textContent=hudClock(save.clock);
+    if (HUD.lv===5 || !over()) break; }
+  $('coins').textContent=hudNum(coinShown); $('glimmer').textContent=hudNum(glimShown); }
+window.addEventListener('resize',fitHud);
+if (document.fonts) document.fonts.ready.then(()=>{ HUD.sig=''; fitHud(); });   // the display font changes every width
 function updateHud(){
   const all=REGION_FISH.lake.concat(save.boat?REGION_FISH.coast:[]), n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
   $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('aquaBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; $('kitchenBtn').hidden=!save.kitchenOpen; $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
-  $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
+  updateGlimChip(); fitHud(); $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
 }

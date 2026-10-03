@@ -1,5 +1,5 @@
 /* ---------- Bonuses: the journal page that shows every bonus and where it comes from ---------- */
-const SRC_LABEL={rod:'Rod', gear:'Tackle', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', event:'Event'};
+const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', event:'Event'};
 /** How a modifier reads: +35 luck, +25%, −30%, ×2.5. Each stat keeps one unit. */
 function modValueText(stat,v,omen){
   if (omen) return '×'+trimNum(v);
@@ -19,12 +19,13 @@ function modWhenText(w){
   const out=[];
   if (w.spot) out.push(spotIn(w.spot,w.region||REG()));
   else if (w.region) out.push('at '+REGION_NAME[w.region]);
-  if (w.night) out.push('at night');
+  if (w.night) out.push('at night'); else if (w.night===false) out.push('by day');
   if (w.lucky) out.push('while you fish a lucky splash');
   if (w.rarity) out.push('for '+w.rarity.map(r=>RAR[r].label.toLowerCase()).join(' and ')+' fish');
   if (w.rarityMin) out.push(w.rarityMin===Object.keys(RAR)[1]?'for every fish above common':'for '+RAR[w.rarityMin].label.toLowerCase()+' fish and rarer');
   if (w.fish) out.push('with '+FISH[w.fish].name);
   if (w.beh) out.push('for '+BEH[w.beh].toLowerCase()+'s');
+  if (w.wander) out.push('on the day’s first '+ENCH.wanderer.first+' catches in each water');
   return out.join(', ');
 }
 /** 'on' applies wherever you cast right now; 'cond' depends on where you cast or what bites; 'off-here' and
@@ -32,9 +33,9 @@ function modWhenText(w){
 function modState(m,now){ const w=m.when; if (!w) return 'on';
   const spots=Object.keys(now.region==='coast'?POOLS_COAST:POOLS);
   if ((w.region && w.region!==now.region) || (w.spot && !spots.includes(w.spot))) return 'off-here';
-  if (w.night && !now.night) return 'off-now';
+  if ((w.night && !now.night) || (w.night===false && now.night)) return 'off-now';
   if (now.rarity && ((w.rarity && !w.rarity.includes(now.rarity)) || (w.rarityMin && rarRank(now.rarity)<rarRank(w.rarityMin)))) return 'off-here';
-  const open=w.spot||w.fish||w.beh||w.lucky||((w.rarity||w.rarityMin)&&!now.rarity);
+  const open=w.spot||w.fish||w.beh||w.lucky||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
   return open ? 'cond' : 'on'; }
 const stateClass=st=>st.startsWith('off')?'off':st;
 const stateNote=st=>st==='off-here'?' · not here':st==='off-now'?' · not now':'';
@@ -50,6 +51,7 @@ function bonusesHTML(){
     ['Tank sets',sets.length?sets.map(s=>s.name).join(', '):'None yet'],
     ['Boat',save.boat?(parts.length?parts.join(', '):'No parts yet'):'No boat yet'],
     ['Keepnet',netCap()+' fish']];
+  const runes=enchFor(save.rod).filter(Boolean); if (enchState().kit) gear.splice(1,0,['Runes',runes.length?runes.map(id=>ENCH[id].name).join(', '):'None on this rod']);
   const FS=findsState(); if (Object.keys(FS.have).length) gear.splice(4,0,['Vest',FS.equip.length?FS.equip.map(id=>FINDS[id].name).join(', '):'Nothing in your '+(FS.pockets>1?FS.pockets+' pockets':'pocket')]);
   let h='<p class="bn-where">'+where+'. Bonuses that depend on where you cast or what bites are marked.</p><dl class="bn-gear">'+gear.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('')+'</dl>';
   const line=(m)=>{ const st=modState(m,now), w=modWhenText(m.when);

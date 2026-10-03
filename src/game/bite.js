@@ -1,9 +1,12 @@
 /* ---------- Waiting & bite ---------- */
 function startWaiting(){
   const lucky=inLucky(S.bob.x,S.bob.y);
-  S.wait={phase:'empty', t:biteWait(S.bob.spot)*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1, lucky,
-    loot:S.tut?null:rollTreasure({spot:S.bob.spot,lucky})};   // one roll per cast: this cast pulls up treasure, or a fish
+  const loot=S.tut?null:rollTreasure({spot:S.bob.spot,lucky});   // one roll per cast: this cast pulls up treasure, or a fish
+  // Echo: one waits where you hooked the last, and bites at once. If treasure comes up first, it keeps waiting.
+  const E=S.echo, here=!S.tut && !!E && E.reg===REG() && E.spot===S.bob.spot, echo=here && !loot ? E.fish : null; S.echo=here && loot ? E : null;
+  S.wait={phase:'empty', t:echo?.35:biteWait(S.bob.spot)*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1, lucky, echo, loot};
   setState('waiting');
+  if (echo) return;
   if (S.bob.spot==='reeds') S.wait.t/=modMul('reedBite',{spot:'reeds'});
   if (S.tut){ S.tut='wait'; S.wait.t=.8; coach('Nice cast! Now wait. A fish will swim over to your bobber.','2 of 4'); }
 }
@@ -11,8 +14,8 @@ function startWaiting(){
     the swim over and the nibbles: spawnApproach). */
 function biteWait(spot){ const c={spot}; return rand(.75,2.1)*modMul('wait',c)*modMul('bite',c); }
 function spawnApproach(){
-  const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.fish=S.tut?'perch':pickW(poolFor(b.spot,w.lucky)); const F=FISH[w.fish];
-  const ang=rand(0,Math.PI*2), d=rand(85,150);
+  const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.fish=S.tut?'perch':w.echo||pickW(poolFor(b.spot,w.lucky)); const F=FISH[w.fish];
+  const ang=rand(0,Math.PI*2), d=w.echo?rand(40,60):rand(85,150);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
   w.sh={x,y,ang:Math.atan2(b.y-y,b.x-x),alpha:0,flee:false};
   w.bm=S.tut?1:modMul('bite',{spot:b.spot,fish:w.fish,lucky:w.lucky});   // bait and the like: a quicker swim over and shorter nibbles
@@ -28,10 +31,10 @@ function updateWaiting(dt){
       const F=FISH[w.fish];
       if (w.phase==='approach'){
         const dx=b.x-sh.x, dy=b.y-sh.y, d=Math.hypot(dx,dy);
-        const sp=(20+F.len*.35)*w.attract*sc(sh.y)*(F.beh==='sleeper'?.5:1)/(w.bm||1);
+        const sp=(20+F.len*.35)*w.attract*sc(sh.y)*(F.beh==='sleeper'?.5:1)/(w.bm||1)*(w.echo?2.2:1);
         sh.ang=angLerp(sh.ang, Math.atan2(dy,dx)+Math.sin(S.time*2.2)*.5*Math.min(1,d/70), dt*3);
         sh.x+=Math.cos(sh.ang)*sp*dt; sh.y+=Math.sin(sh.ang)*sp*dt*.6;
-        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3)); w.nibT=S.tut?1.2:rand(.5,1.1)*(w.bm||1); }
+        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:w.echo?0:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3)); w.nibT=S.tut?1.2:w.echo?.15:rand(.5,1.1)*(w.bm||1); }
       } else if (w.phase==='nibble'){
         sh.ang=angLerp(sh.ang,Math.atan2(b.y-sh.y,b.x-sh.x),dt*2);
         const hx=b.x-Math.cos(sh.ang)*F.len*.38*sc(b.y), hy=b.y-Math.sin(sh.ang)*F.len*.2*sc(b.y);

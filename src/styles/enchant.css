@@ -1,0 +1,56 @@
+/* Glimmer and runes: the HUD chip, the crystal icon, rune badges, and the tackle bag's rune sockets */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.glim{display:inline-block;flex:none;width:13px;height:15px;vertical-align:-2px;filter:drop-shadow(0 0 3px rgba(150,210,255,.55));
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 16'%3E%3Cpath d='M7 .8 13.2 5.4 10.4 15.2H3.6L.8 5.4Z' fill='%23A9E2F4'/%3E%3Cpath d='M7 .8 4.6 5.4H.8Z' fill='%23E9FAFF'/%3E%3Cpath d='M9.4 5.4h3.8l-2.8 9.8H7Z' fill='%237F6FD8'/%3E%3Cpath d='M4.6 5.4h4.8L7 15.2Z' fill='%238FC4EE'/%3E%3Cpath d='M.8 5.4h12.4M7 .8 4.6 5.4 7 15.2 9.4 5.4Z' fill='none' stroke='%232B2A33' stroke-opacity='.5' stroke-width='.6'/%3E%3Cpath d='M7 .8 13.2 5.4 10.4 15.2H3.6L.8 5.4Z' fill='none' stroke='%232B2A33' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.glim-chip{gap:6px}
+.glim-chip.arrive{animation:glimArrive .55s cubic-bezier(.2,1.5,.4,1)}
+.glim-chip.bump #glimmer{animation:gbump .35s ease}
+@keyframes glimArrive{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:none}}
+@keyframes gbump{40%{transform:scale(1.25);color:#BFE8FF}}
+#hud .chip .coin,#hud .chip .glim,#hud .chip svg{flex:none}
+#hud .chip span{white-space:nowrap}#clock{white-space:nowrap}
+#hud.tight{gap:6px}
+#hud.tight .chip{padding:6px 8px;gap:4px}
+#hud.tight #clock{font-size:12px}
+#hud.small{gap:4px}#hud.small .chip{font-size:13px;padding:5px 7px;gap:3px}#hud.small #clock{font-size:11px}#hud.small .chip .coin{width:12px;height:12px}#hud.small .chip .glim{width:11px;height:13px}
+#hud.nolab #labBtn{display:none}
+/* a rune's badge on the catch card and the haul */
+.rtag{display:inline-flex!important;align-items:center;gap:5px;padding:2px 9px 2px 2px!important;background:#2B2A33;color:var(--paper);box-shadow:0 0 0 1.5px var(--rc) inset,0 0 10px -2px var(--rc)}
+.rtag canvas{width:23px;height:23px;flex:none;margin:-2px 0}
+#cTags .rtag{animation:rtagIn .45s cubic-bezier(.2,1.6,.4,1) both;animation-delay:.35s}
+@keyframes rtagIn{from{transform:scale(.4);opacity:0}}
+.hl-glim{display:inline-flex;align-items:center;gap:6px;margin-left:auto}
+.hl-glim .glim{width:20px;height:23px}
+.hl-runes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:-2px 0 4px}
+.hl-runes .rtag{font-size:12px;font-weight:800;border-radius:999px}
+@media (prefers-reduced-motion: reduce){.glim-chip.arrive,.glim-chip.bump #glimmer,#cTags .rtag{animation:none}}
+/* the tackle bag: Glimmer in the head, a row of rune sockets under the rig, and the etching tray */
+.bag-head .bh-glim{display:inline-flex;align-items:center;gap:4px;margin-left:8px}
+.bag-head .bh-glim .glim{width:11px;height:13px}
+.rune-socks{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:7px;margin-top:8px;position:relative;z-index:1}
+.rsock{display:grid;grid-template-columns:42px minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:8px;align-items:center;text-align:left;min-width:0;min-height:58px;padding:7px 9px;font:inherit;color:inherit;cursor:pointer;
+  background:#2E2C38;color:var(--paper);border:2px solid var(--ink);border-radius:12px;box-shadow:0 3px 0 var(--ink),inset 0 0 0 1.5px var(--rc,transparent),inset 0 0 18px -6px var(--rc,transparent)}
+.rsock canvas{grid-row:1/4;width:42px;height:42px}
+.rune-socks:not(.n1) .rsock{grid-template-columns:minmax(0,1fr);grid-template-rows:none;justify-items:center;text-align:center;row-gap:2px;padding:9px 6px 10px;align-content:start}
+.rune-socks:not(.n1) .rsock canvas{grid-row:auto;width:40px;height:40px;margin:-2px 0 1px}
+.rune-socks:not(.n1) .rsock b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-wrap:balance}
+.rsock .k{font:800 9.5px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:rgba(243,234,215,.6)}
+.rsock b{font:400 13.5px/1.15 var(--display);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rsock small{font-size:10.5px;font-weight:700;line-height:1.25;color:rgba(243,234,215,.72);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+.rsock.empty{background:rgba(46,44,56,.75);border-style:dashed}
+.rsock:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.rsock:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.rsock.pop{animation:sockPop .5s cubic-bezier(.2,1.7,.4,1)}
+.rune-hint{margin:7px 2px 0!important}
+.tr-glim{margin:0 0 6px;font-size:12.5px;font-weight:700;color:#55514A;line-height:1.4}
+.tr-glim .bal{display:inline-flex;align-items:center;gap:5px;margin-right:7px;padding:3px 10px 3px 7px;border-radius:999px;background:#2B2A33;color:var(--paper);vertical-align:1px;white-space:nowrap}
+.tr-glim b{font:400 16px/1 var(--display);color:#CFEFFF}
+.tr-row.rune canvas{width:52px;height:52px}
+.tr-row.rune{box-shadow:inset 3px 0 0 var(--rc)}
+.tr-row.rune.on{box-shadow:inset 5px 0 0 var(--rc)}
+.tr-row.rune.unetched .tr-txt h4{opacity:.85}
+.tr-row .need{margin:3px 0 0;font-size:11px;font-weight:800;color:#8A6A3A}
+.btn.etch{display:inline-flex;align-items:center;gap:6px}
+.btn.etch>span{display:inline-flex;align-items:center;gap:3px;font-variant-numeric:tabular-nums}
+.btn.etch .glim{width:11px;height:13px}

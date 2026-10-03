@@ -3,10 +3,12 @@ let last=performance.now();
 function update(dt,rdt){
   if (S.state==='idle' && save.tutorialDone && save.stats.casts>=12){ S.idleT=(S.idleT||0)+rdt; if (S.idleT>30 && S.idleT-rdt<=30) setHint('Drag back to aim. Release to cast.'); }
   updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt);
-  save.clock=(save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')))%24; PAL=palAt(save.clock);
+  { const nc=save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')); if (nc>=24) save.day=(save.day||0)+1; save.clock=nc%24; } PAL=palAt(save.clock);   // save.day: Wanderer's days
   { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2) buildBg(); }
-  const ct=(isNight(save.clock)||PERIOD(save.clock)==='Evening'?'\u263E\uFE0E ':'\u2600\uFE0E ')+clockText(save.clock); if (ct!==S.clockShown){ S.clockShown=ct; $('clock').textContent=ct; }
-  for (const p of S.particles){ p.life+=dt; p.vy+=p.g*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; }
+  const ct=hudClock(save.clock); if (ct!==S.clockShown){ const n=(S.clockShown||'').length; S.clockShown=ct; $('clock').textContent=ct; if (ct.length!==n) fitHud(); }
+  for (const p of S.particles){ p.life+=dt;
+    if (p.home && p.life>p.home.d){ const k=Math.min(1,dt*7); p.x=lerp(p.x,p.home.x,k); p.y=lerp(p.y,p.home.y,k); if (Math.abs(p.x-p.home.x)+Math.abs(p.y-p.home.y)<8) p.life=p.max; }   // Glimmer motes fly home to the chip
+    else { if (p.home){ p.vx*=1-dt*2.5; p.vy*=1-dt*2.5; } p.vy+=p.g*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; } }
   S.particles=S.particles.filter(p=>p.life<p.max); if (S.particles.length>260) S.particles.splice(0,S.particles.length-260);
   for (const r of S.ripples){ r.life+=dt*1.4; r.r=lerp(2,r.max,1-Math.pow(1-Math.min(1,r.life),2)); }
   S.ripples=S.ripples.filter(r=>r.life<1);

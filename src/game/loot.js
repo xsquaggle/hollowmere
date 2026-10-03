@@ -1,6 +1,7 @@
 /* ---------- The loot moment: treasure lands, opens, and shows what's inside ---------- */
 /* After a haul lands (game/treasure.js has already kept what's inside), the 'loot' state presents it:
      pouch   pops on landing and the coins fly to your purse. No card, so routine casts stay quick.
+     geode   lands, cracks in two, and its Glimmer flies to the Glimmer chip. No card either.
      bottle  lands; tap to uncork it and the note unrolls in ink.  letter  the same, then Pell delivers it.
      find    lands with a glint, then its card.
      crate   thuds down; tap to open. Common to Epic rattle once per tier before the lid pops; Legendary and up
@@ -42,6 +43,7 @@ function updateLoot(dt){ const L=S.loot; if (!L) return; L.t+=dt;
     case 'ink': L.it+=dt; L.ink=Math.min(1,L.it/1.3); if (L.it>=2.2) lootPop(); break;
     case 'glint': L.st-=dt; if (L.st<=0) lootReveal(); break;
     case 'pouch': L.st-=dt; if (L.st<=0) lootEnd(); break;
+    case 'geode': L.st-=dt; { const was=L.gopen||0; L.gopen=clamp((1.6-L.st-.3)/.32,0,1); if (was===0 && L.gopen>0) geodeSplit(L); } if (L.st<=0) lootEnd(); break;
     case 'uncork': L.st-=dt; if (L.cork){ L.cork.vy+=700*dt; L.cork.y+=L.cork.vy*dt; L.cork.r+=dt*9; } if (L.st<=0){ L.phase='note'; openNote(L.got.items[0]&&L.got.items[0].id,{fresh:true,letter:L.kind==='letter',done:lootEnd}); } break;
   }
   if (L.phase==='burst' || L.phase==='reveal'){ L.bt+=dt;
@@ -62,6 +64,7 @@ function hslToRgba(hsl){ const m=hsl.match(/hsl\((\d+),(\d+)%,(\d+)%\)/); if (!m
   return 'rgba('+Math.round(f(h+1/3)*255)+','+Math.round(f(h)*255)+','+Math.round(f(h-1/3)*255)+','; }
 function lootLand(){ const L=S.loot, k=L.kind; L.x=L.to.x; L.y=L.to.y; L.rot=0; L.landT=L.t; if (!S.tut){ clearTimeout(coachTimer); coachTimer=0; coachOff(); }
   if (k==='pouch'){ coinBurst(L.x,L.y-18,Math.min(18,6+Math.floor(L.got.coins/12))); sfx.pouch(); tallyCoins(); lootWord(L.x,L.y-46,'+'+L.got.coins.toLocaleString()); L.phase='pouch'; L.st=1.1; return; }
+  if (k==='geode'){ sfx.thud(-1); buzz(14); drip(L.x,L.y-8,6); L.phase='geode'; L.st=1.6; L.gopen=0; return; }
   const heavy=k==='crate'; shake(heavy?2.5+L.ti*1.4:1.2); sfx.thud(heavy?L.ti:-1); buzz(heavy?[0,26+L.ti*8]:14);
   drip(L.x,L.y-8,heavy?14+L.ti*2:6); splash(L.x,L.y,heavy?8+L.ti*2:4,'rgba(205,228,236,');
   S.darkT=heavy?.3+L.ti*.04:.22;
@@ -71,6 +74,10 @@ function lootLand(){ const L=S.loot, k=L.kind; L.x=L.to.x; L.y=L.to.y; L.rot=0; 
   if (heavy && FS.treasure===1) coachShow('A crate! Tap it to open it.',6);
   else if (heavy && L.ti>=rarRank('legendary') && !save.stats.pried) coachShow('Something this heavy has to be pried open. Tap it three times.',6);
 }
+/** The geode cracks open: a flash, crystal sparks, and its Glimmer flies to the chip. */
+function geodeSplit(L){ const y=L.y-(L.hv||0); sfx.geode(); buzz([0,18,30,12]); pulse(.18,'178,226,255');
+  lootSparks(L.x,y,18,'178,226,255',{v0:60,v1:220,g:160,m0:.4,m1:.9}); lootSparks(L.x,y,8,'142,127,224',{v0:40,v1:160,g:160,m0:.4,m1:.8});
+  lootWord(L.x,y-46,'+'+L.got.glimmer+' Glimmer'); glimmerTally(L.got.glimmer,{x:L.x,y,quiet:true}); }
 function lootTap(){ const L=S.loot; if (!L || L.phase!=='ready') return;
   if (L.kind==='bottle' || L.kind==='letter'){ L.phase='uncork'; L.st=.55; L.cork={y:0,vy:-280,r:0}; sfx.uncork(L.kind==='letter'); buzz(12); return; }
   if (L.kind==='crate'){ coachOff(); if (L.ti>=rarRank('legendary')) lootPry(); else { L.phase='shake'; L.n=0; L.st=0; } } }
@@ -118,6 +125,7 @@ function drawLoot(){ const L=S.loot; if (!L) return; const ti=L.ti, R=RAR[L.tier
       if (L.tier==='exotic') drawPrismRays(0,-cw*.62,a,cw*2.6); else drawRays(0,-cw*.62,R.color,a,cw*(1.6+ti*.18)); }
     drawCrate(ctx,L.tier,cw*k,{t:S.time,seam:L.seam,cracks:L.cracks,lid:L.lid,lx:L.lx,ly:L.ly,lr:L.lr,open:L.open,hover,lidA:L.lid?clamp(1-(L.bt-.45)/.4,0,1):1});
   } else if (L.kind==='pouch'){ if (L.phase!=='pouch' || L.st>.8) drawPouch(ctx,60*k); }
+  else if (L.kind==='geode'){ if (L.phase!=='geode' || L.st>.15) { ctx.globalAlpha=L.phase==='geode'?Math.min(1,L.st/.15):1; drawGeode(ctx,58*k,L.gopen||0,S.time); ctx.globalAlpha=1; } }
   else if (L.kind==='bottle'){ drawBottle(ctx,76*k,S.time); if (L.cork){ ctx.save(); ctx.translate(-14,-30+L.cork.y*.3); ctx.rotate(L.cork.r); ctx.fillStyle='#B68A5E'; ctx.fillRect(-5,-4,10,8); ctx.strokeStyle=INK; ctx.lineWidth=1.6; ctx.strokeRect(-5,-4,10,8); ctx.restore(); } }
   else if (L.kind==='letter'){ drawEnvelope(ctx,84*k,!!L.cork); }
   else if (L.kind==='find'){ const it=L.got.items[0], id=it&&it.type==='find'?it.id:null, r=id?FINDS[id].rarity:'common';
@@ -199,17 +207,20 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   el.dataset.r=tier; el.dataset.kind=L.kind; el.classList.remove('out');
   let h='<div class="hl-top"><span class="rarity">'+RAR[tier].label+'</span>'+pipsHTML(tier)+'</div><h2>'+haulTitle(L)+'</h2>';
   const base=g.base==null?g.coins:g.base;
-  if (base) h+='<div class="hl-coins"><span class="coin"></span><b id="hlCoins">0</b><span>coins</span></div>';
+  if (enchOn('magpie')) h+='<div class="hl-runes">'+runeTag('magpie','Magpie Knot')+'</div>';
+  if (base||g.glimmer) h+='<div class="hl-coins">'+(base?'<span class="coin"></span><b id="hlCoins">0</b><span>coins</span>':'')+(g.glimmer?'<span class="hl-glim"><span class="glim"></span><b id="hlGlim">0</b><span>Glimmer</span></span>':'')+'</div>';
   h+='<div class="hl-items">'+g.items.map(haulSlotHTML).join('')+'</div>';
-  if (!g.items.length) h+='<p class="hl-empty">Just coins this time.</p>';
+  if (!g.items.length) h+='<p class="hl-empty">'+(base&&g.glimmer?'Coins and Glimmer this time.':g.glimmer?'Just Glimmer this time.':'Just coins this time.')+'</p>';
   const n=g.items.length, last=.35+Math.max(0,n-1)*.55;
   h+='<button class="btn primary" id="hlGo" type="button" style="animation-delay:'+(last+.3).toFixed(2)+'s">Collect</button>';
   el.innerHTML=h; el.hidden=false; ovOpen('haul',()=>{ lootEnd(); });
-  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear],canvas[data-decor]'));
+  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear],canvas[data-decor],canvas[data-rune]'));
   // the coins count up, then each item arrives with its own sound
   if (base){ const b=$('hlCoins'), t0=performance.now(), dur=REDUCED?1:Math.min(1100,350+base*.25); sfx.coin(6);
     (function step(now){ if (!b.isConnected) return; const k=Math.min(1,(now-t0)/dur); b.textContent=Math.round(base*(1-Math.pow(1-k,3))).toLocaleString(); if (k<1) requestAnimationFrame(step); else tallyCoins(); })(t0); }
   else if (g.coins) tallyCoins();
+  if (g.glimmer){ const b=$('hlGlim'), t0=performance.now()+(REDUCED?0:250), dur=REDUCED?1:Math.min(900,350+g.glimmer*12);
+    (function step(now){ if (!b.isConnected) return; const k=clamp((now-t0)/dur,0,1); b.textContent=Math.round(g.glimmer*(1-Math.pow(1-k,3))).toLocaleString(); if (k<1) requestAnimationFrame(step); else glimmerTally(g.glimmer); })(performance.now()); }
   g.items.forEach((it,i)=>setTimeout(()=>{ if (!el.hidden) sfx.find(itemRarity(it)); },REDUCED?0:(350+i*550)));
   $('hlGo').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); lootEnd(); });
   el.querySelectorAll('[data-pocket]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); if (!pocketIt(b.dataset.pocket)) return; b.outerHTML='<p class="on">In a pocket. Working now.</p>';
@@ -223,9 +234,11 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
 const itemRarity=it=>it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
 function hideHaul(){ const el=$('haul'); if (el.hidden) return; ovClosed('haul'); el.classList.add('out'); setTimeout(()=>{ el.hidden=true; el.classList.remove('out'); el.innerHTML=''; },REDUCED?0:250); }
 /** Paints tiles in two passes, every size read before any canvas is resized, so the page lays out once. */
-function paintTiles(list){ const d=Math.min(window.devicePixelRatio||1,2), rs=[...list].map(cv=>[cv,cv.getBoundingClientRect()]); for (const [cv,r] of rs) paintTile(cv,r,d); }
+/** Tiles are sized by their layout box, not their box on screen, so a sheet mid-zoom or a badge popping in doesn't
+    paint them at the wrong size. A tile that isn't laid out yet (in a hidden card) is skipped. */
+function paintTiles(list){ const d=Math.min(window.devicePixelRatio||1,2), rs=[...list].map(cv=>[cv,{width:cv.offsetWidth,height:cv.offsetHeight}]); for (const [cv,r] of rs) paintTile(cv,r,d); }
 /** Draws a find, paint, note or tackle tile into a canvas sized by CSS. */
-function paintTile(cv,r,d){ r=r||cv.getBoundingClientRect(); d=d||Math.min(window.devicePixelRatio||1,2); if (!r.width) return;
+function paintTile(cv,r,d){ r=r||{width:cv.offsetWidth,height:cv.offsetHeight}; d=d||Math.min(window.devicePixelRatio||1,2); if (!r.width) return;
   cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); const s=Math.min(r.width,r.height)*.86;
   if (cv.dataset.find){ if (cv.dataset.sil) drawFindSilhouette(x,cv.dataset.find,s); else drawFind(x,cv.dataset.find,s,0); }
   else if (cv.dataset.paint) drawHullSwatch(x,cv.dataset.paint,s);
@@ -233,6 +246,8 @@ function paintTile(cv,r,d){ r=r||cv.getBoundingClientRect(); d=d||Math.min(windo
   else if (cv.dataset.hook) drawBareHook(x,s);
   else if (cv.dataset.decor) drawDecorIcon(x,cv.dataset.decor,s);
   else if (cv.dataset.tankicon) drawTankIcon(x,cv.dataset.tankicon,s);
+  else if (cv.dataset.rune) drawRune(x,cv.dataset.rune,s*.8,{glow:.9,glowR:s*.5});
+  else if (cv.dataset.runeempty) drawRune(x,null,s*.8,{empty:true});
   else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
 function drawHullSwatch(c,id,s){ const P=PAINTS[id]; c.save(); c.scale(s/100,s/100); laInk(c);
   c.fillStyle='rgba(60,110,130,.25)'; laEll(c,0,24,44,7); c.fill();

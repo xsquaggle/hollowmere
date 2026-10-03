@@ -57,9 +57,16 @@ keepsakes. Every rod has a reel and a line socket, and bait rides on whichever r
 every meal you cook. Each piece is a modifier source, so the Bonuses page and the simulator see it too:
 `npm run sim -- --tackle` compares every piece against the plain rig.
 
+**Glimmer and runes.** Glimmer is the second currency (`src/data/enchant.js`). Beating a personal record pays it,
+geodes hold it, and every crate has some. Your uncle's etching kit in the tackle bag etches a rune onto a rod for
+Glimmer, once; after that the rune goes on any rod for free, one of each per rod, in 1 to 3 sockets
+(`src/game/enchant.js`, drawn in `src/game/enchant-art.js`). Runes are modifier sources too:
+`npm run sim -- --runes` compares each against none, and `--ench swift,magpie` adds runes to any run.
+
 **Adding content.** A new fish is an entry in `src/data/fish.js` plus its region list and bite weights.
 A new find is an entry in `src/data/treasure.js` plus its drawing in `src/game/loot-art.js`.
 A new reel, line or bait is an entry in `src/data/tackle.js` plus its drawing in `src/game/tackle-art.js`.
+A new rune is an entry in `src/data/enchant.js` plus its glyph in `RUNE_GLYPH` (`src/game/enchant-art.js`).
 The checker catches a misspelled id, a size range upside down, a rod that costs less than the one before it,
 a recipe that needs a fish that doesn't exist, a tank set nobody could complete, or a crate tier with nothing to hold.
 

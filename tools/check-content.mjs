@@ -32,8 +32,8 @@ const noDupes = (where, list) => { const seen = new Set(); for (const x of list)
 const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, SPOT_NAME, REGION_FISH, REGION_NAME, MAP_PLACES,
   RODS, ROD_ORDER, SEA_RODS, PARTS, PAINTS, OTT_LINES, BAR_LINES, BANQUET_LINES, LETTER,
   TANKS, TIP_BASE, DECOR, TANK_SETS, SPICES, SPICE_ORDER, SIDES, FLESH, COOK_NAME, RECIPES, RECIPE_ORDER, MUSH, MEAL_STR, MEAL_CASTS,
-  CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER, TACKLE, TACKLE_ORDER } = D;
-for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER }))
+  CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER } = D;
+for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER }))
   if (!v) { console.error('Missing table ' + n + ' in src/data/.'); process.exit(1); }
 
 /* ---------- fish ---------- */
@@ -67,11 +67,12 @@ for (const id of RIDS) {
   need(w, R, { name: 'str', price: 'num0', line: 'num+', reel: 'num+', luck: 'num0', value: 'num+', snag: '01', reedBoost: 'num+', color: 'hex', where: 'str', perk: 'str' });
   if (!(R.reach > 0 && R.reach <= 1)) bad(w, 'reach should be in (0, 1]');
   if (R.sea && !isStr(R.blurb)) bad(w, 'Tacklegram rods need a blurb');
+  if (!(Number.isInteger(R.ench) && R.ench >= 1 && R.ench <= 3)) bad(w + '.ench', 'every rod has 1 to 3 rune sockets');
 }
 const ladder = [...ROD_ORDER, ...SEA_RODS]; noDupes('rod ladders', ladder); sameSet('rod ladders', ladder, RIDS, 'ROD_ORDER + SEA_RODS and RODS');
 for (let i = 1; i < ladder.length; i++) { const a = RODS[ladder[i - 1]], b = RODS[ladder[i]]; if (!a || !b) continue;
   if (!(b.price > a.price)) bad('RODS.' + ladder[i], 'should cost more than ' + ladder[i - 1]);
-  for (const k of ['reach', 'line', 'reel', 'luck', 'value']) if (b[k] < a[k]) bad('RODS.' + ladder[i], `${k} drops below ${ladder[i - 1]}'s (${b[k]} < ${a[k]})`); }
+  for (const k of ['reach', 'line', 'reel', 'luck', 'value', 'ench']) if (b[k] < a[k]) bad('RODS.' + ladder[i], `${k} drops below ${ladder[i - 1]}'s (${b[k]} < ${a[k]})`); }
 for (const id of SEA_RODS) if (RODS[id] && !RODS[id].sea) bad('RODS.' + id, 'is on the Tacklegram ladder, so it needs sea:true');
 for (const id of keys(PARTS)) { need('PARTS.' + id, PARTS[id], { name: 'str', price: 'num+', blurb: 'str', plus: 'arr' }); (PARTS[id].plus || []).forEach((p, i) => isStr(p) || bad('PARTS.' + id + '.plus[' + i + ']', 'empty')); }
 for (const id of keys(PAINTS)) { const P = PAINTS[id], w = 'PAINTS.' + id;
@@ -142,14 +143,14 @@ for (const r of RARS) { const c = RAR[r].luckCap; if (r === RARS[0]) { if (c !==
 // ceilings climb with rarity, except Godly's, which sits below Mythic's on purpose (see data/fish.js)
 for (let i = 2; i < RARS.length; i++) if (RARS[i] !== 'godly' && RAR[RARS[i]].luckCap < RAR[RARS[i - 1]].luckCap) bad('RAR.' + RARS[i], 'rarer tiers should have a ceiling at least as high as the tier below');
 for (const r of RARS) if (RAR[r].luckCap > 4) bad('RAR.' + r, 'a luck ceiling above ×4 lets luck run away (the design caps Mythic at ×4)');
-const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true], fish: FIDS, beh: BEHS, rarity: RARS, rarityMin: RARS, lucky: [true] };
+const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true, false], fish: FIDS, beh: BEHS, rarity: RARS, rarityMin: RARS, lucky: [true], wander: [true] };
 const checkMod = (w, m) => {
   const st = STATS[m.stat]; if (!st) return bad(w, `unknown stat ${JSON.stringify(m.stat)} (see data/stats.js)`);
   if (st.kind === 'flag') { if (m.v !== undefined) bad(w, m.stat + ' is a flag and takes no v'); }
   else if (!isNum(m.v)) bad(w, 'v should be a number');
   else if (st.kind === 'mul' && !(m.v > 0)) bad(w, 'a multiplier should be above 0');
   if (m.omen && m.stat !== 'luck') bad(w, 'only luck can be an omen');
-  for (const [k, v] of Object.entries(m.when || {})) { if (!WHEN[k]) { bad(w + '.when', 'unknown condition ' + k + ' (region, spot, night, fish, beh, rarity, rarityMin, lucky)'); continue; }
+  for (const [k, v] of Object.entries(m.when || {})) { if (!WHEN[k]) { bad(w + '.when', 'unknown condition ' + k + ' (' + keys(WHEN).join(', ') + ')'); continue; }
     if (k === 'rarity' && !Array.isArray(v)) bad(w + '.when.rarity', 'a list of rarities; use rarityMin for "this rarity and rarer"');
     for (const x of Array.isArray(v) ? v : [v]) oneOf(w + '.when.' + k, x, WHEN[k], k); }
   for (const k of keys(m)) if (!['stat', 'v', 'when', 'omen'].includes(k)) bad(w, 'unknown modifier field ' + k);
@@ -164,12 +165,12 @@ for (const id of keys(RECIPES)) for (const b of RECIPES[id].boost || []) if (!ST
 for (const id of FIDS) if (FISH[id].night !== undefined && FISH[id].night !== true) bad('FISH.' + id, 'night is either true or left out');
 
 /* ---------- treasure ---------- */
-const KINDS_T = ['pouch', 'bottle', 'find', 'crate'];
+const KINDS_T = ['pouch', 'geode', 'bottle', 'find', 'crate'];
 sameSet('TREASURE.kinds', keys(TREASURE.kinds), KINDS_T, 'treasure kinds and the kinds game/loot.js shows');
 for (const [k, v] of Object.entries(TREASURE.kinds)) if (!(v > 0)) bad('TREASURE.kinds.' + k, 'weight should be above 0');
 if (!(TREASURE.rate > 0 && TREASURE.rate < .5 && TREASURE.firstRate >= TREASURE.rate && TREASURE.firstRate < 1)) bad('TREASURE', 'rate should be in (0, .5) and firstRate at least rate');
 if (!(Number.isInteger(TREASURE.from) && TREASURE.from >= 0)) bad('TREASURE.from', 'a whole number of catches');
-for (const k of ['pouch', 'bottle', 'find', 'letter']) need('TREASURE.haul.' + k, TREASURE.haul[k] || {}, { pull: 'num+', reel: 'num+' });
+for (const k of ['pouch', 'geode', 'bottle', 'find', 'letter']) need('TREASURE.haul.' + k, TREASURE.haul[k] || {}, { pull: 'num+', reel: 'num+' });
 if (!(TREASURE.pouch[0] > 0 && TREASURE.pouch[0] <= TREASURE.pouch[1])) bad('TREASURE.pouch', '[least, most] fish worth of coins');
 for (const r of keys(TREASURE.loose)) { oneOf('TREASURE.loose', r, RARS, 'rarity'); if (rank(r) > rank('legendary')) bad('TREASURE.loose.' + r, 'Exotic and rarer finds only come in crates'); }
 const L = TREASURE.letter; oneOf('TREASURE.letter.region', L.region, REGIONS, 'region'); (L.spots || []).forEach(sp => oneOf('TREASURE.letter.spots', sp, keys(SPOT_NAME), 'spot'));
@@ -262,6 +263,34 @@ if (!artKeys.size) bad('src/game/tackle-art.js', 'could not find TACKLE_ART to c
 for (const t of CT) for (const it of CRATES[t].items) if (it.gear && !TK_IDS.some(id => TACKLE[id].crate && rank(TACKLE[id].crate) <= rank(it.gear))) bad('CRATES.' + t, 'a gear item, but no crate gear of ' + it.gear + ' or commoner');
 for (const id of TK_IDS.filter(id => TACKLE[id].crate)) if (!CT.some(t => CRATES[t].items.some(it => it.gear && rank(it.gear) >= rank(TACKLE[id].crate)))) bad('TACKLE.' + id, 'only comes in crates, but no crate holds gear that rare');
 
+/* ---------- enchantments and Glimmer ---------- */
+const EIDS = keys(ENCH); noDupes('ENCH_ORDER', ENCH_ORDER); sameSet('ENCH_ORDER', ENCH_ORDER, EIDS, 'ENCH_ORDER and ENCH');
+for (let i = 1; i < ENCH_ORDER.length; i++) { const a = ENCH[ENCH_ORDER[i - 1]], b = ENCH[ENCH_ORDER[i]]; if (a && b && b.cost < a.cost) bad('ENCH_ORDER', ENCH_ORDER[i] + ' costs less than ' + ENCH_ORDER[i - 1] + ', but the tray lists them cheapest first'); }
+for (const id of EIDS) { const E = ENCH[id], w = 'ENCH.' + id;
+  need(w, E, { name: 'str', cost: 'num+', color: 'hex', eff: 'str', short: 'str', mods: 'arr' });
+  if (isStr(E.short) && E.short.length > 28) bad(w + '.short', 'a few words for a socket (28 characters at most)');
+  if (!Number.isInteger(E.cost)) bad(w + '.cost', 'a whole amount of Glimmer');
+  if (E.down !== undefined && !isStr(E.down)) bad(w + '.down', 'the catch is a sentence, or left out');
+  for (const s of [E.eff, E.down]) if (isStr(s) && !/[.!]$/.test(s)) bad(w, 'effects and catches are whole sentences: ' + JSON.stringify(s));
+  if (!(E.mods || []).length) bad(w, 'a rune needs at least one modifier, or it does nothing');
+  (E.mods || []).forEach((m, i) => checkMod(w + '.mods[' + i + ']', m));
+  for (const k of keys(E)) if (!['name', 'cost', 'color', 'eff', 'short', 'down', 'mods', 'first'].includes(k)) bad(w, 'unknown field ' + k); }
+if (ENCH.wanderer && !(Number.isInteger(ENCH.wanderer.first) && ENCH.wanderer.first > 0)) bad('ENCH.wanderer.first', 'how many of the day\'s catches it doubles');
+// every rune that names wander, and only those, is what game/enchant.js counts for
+for (const id of EIDS) if ((ENCH[id].mods || []).some(m => m.when && m.when.wander) && id !== 'wanderer') bad('ENCH.' + id, 'only Wanderer counts the day\'s catches (game/enchant.js)');
+const ENCHART = readFileSync(join(ROOT, 'src/game/enchant-art.js'), 'utf8');
+const glyphs = new Set([...(ENCHART.match(/const RUNE_GLYPH=\{([\s\S]*?)\n\};/) || ['', ''])[1].matchAll(/^ {2}([a-z]+)\(c\)/gm)].map(m => m[1]));
+if (!glyphs.size) bad('src/game/enchant-art.js', 'could not find RUNE_GLYPH to check the rune drawings against');
+for (const id of EIDS) if (glyphs.size && !glyphs.has(id)) bad('ENCH.' + id, 'no glyph in RUNE_GLYPH (src/game/enchant-art.js)');
+for (const id of glyphs) if (!ENCH[id]) bad('RUNE_GLYPH.' + id, 'is drawn but not in ENCH');
+const range = (w, v) => { if (!(Array.isArray(v) && v.length === 2 && Number.isInteger(v[0]) && Number.isInteger(v[1]) && v[0] > 0 && v[0] <= v[1])) bad(w, '[least, most], whole numbers above 0'); };
+sameSet('GLIMMER.record', keys(GLIMMER.record), RARS, 'rarities with a record bonus and RAR');
+let prevG = 0; for (const r of RARS) { const g = GLIMMER.record[r]; if (!(Number.isInteger(g) && g > 0)) bad('GLIMMER.record.' + r, 'a whole amount above 0'); else if (g < prevG) bad('GLIMMER.record.' + r, 'rarer records should pay at least as much'); prevG = g || prevG; }
+sameSet('GLIMMER.geode', keys(GLIMMER.geode), REGIONS, 'geode waters and REGION_NAME');
+for (const r of keys(GLIMMER.geode)) range('GLIMMER.geode.' + r, GLIMMER.geode[r]);
+sameSet('GLIMMER.crate', keys(GLIMMER.crate), CT, 'crate tiers with Glimmer and CRATES');
+let prevCr = [0, 0]; for (const t of CT) { const v = GLIMMER.crate[t]; range('GLIMMER.crate.' + t, v); if (Array.isArray(v) && (v[0] < prevCr[0] || v[1] < prevCr[1])) bad('GLIMMER.crate.' + t, 'rarer crates should hold at least as much'); if (Array.isArray(v)) prevCr = v; }
+
 /* ---------- every string ---------- */
 let strings = 0;
 const walk = (v, w) => { if (typeof v === 'string') { strings++; if (v !== v.trim() && !(w.startsWith('LETTER'))) bad(w, 'leading or trailing space'); if (/ {2}/.test(v)) bad(w, 'double space'); }
@@ -269,4 +298,4 @@ const walk = (v, w) => { if (typeof v === 'string') { strings++; if (v !== v.tri
 for (const n of Object.keys(D)) walk(D[n], n);
 
 if (problems.length) { console.error(problems.length + ' content problem(s):\n  ' + problems.join('\n  ')); process.exit(1); }
-console.log(`Content OK: ${FIDS.length} fish in ${REGIONS.length} regions, ${RIDS.length} rods, ${keys(RECIPES).length} recipes, ${decorIds.length} decor, ${TANK_SETS.length} tank sets, ${keys(FINDS).length} finds, ${TK_IDS.length} tackle, ${keys(NOTES).length} notes, ${keys(MOODS).length} moods, ${strings} strings checked.`);
+console.log(`Content OK: ${FIDS.length} fish in ${REGIONS.length} regions, ${RIDS.length} rods, ${keys(RECIPES).length} recipes, ${decorIds.length} decor, ${TANK_SETS.length} tank sets, ${keys(FINDS).length} finds, ${TK_IDS.length} tackle, ${EIDS.length} runes, ${keys(NOTES).length} notes, ${keys(MOODS).length} moods, ${strings} strings checked.`);

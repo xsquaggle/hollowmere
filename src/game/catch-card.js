@@ -17,12 +17,12 @@ function hookAt(t){ const L=CARD.L, F=L.F, v0=0, v=L.size, p=L.prev&&!L.isNew?L.
   if (p==null || p>=v){ const k=clamp((t-.45)/1.05,0,1); return t<.45?null:lerp(v0,v,k<1?easeInOut(k):1); }
   if (t<.45) return null; if (t<1.05) return lerp(v0,p,easeInOut((t-.45)/.6)); if (t<1.2) return p; return lerp(p,v,easeBack(clamp((t-1.2)/.3,0,1))); }
 function recordSnap(){ const L=CARD.L; CARD.snapped=true;
-  if (L.pbMinor){ noise(.1,{vol:.14,f:2600,type:'highpass'}); tone(1047,.22,{vol:.08,type:'triangle',delay:.06}); tone(1568,.3,{vol:.06,type:'triangle',delay:.14}); buzz(14); if (L.pbBonus) setTimeout(()=>{ if (S.land===L) addCoins(L.pbBonus); },500); return; }
+  if (L.pbMinor){ noise(.1,{vol:.14,f:2600,type:'highpass'}); tone(1047,.22,{vol:.08,type:'triangle',delay:.06}); tone(1568,.3,{vol:.06,type:'triangle',delay:.14}); buzz(14); if (L.pbGlim) setTimeout(()=>glimmerTally(L.pbGlim,{x:W/2,y:H*.5}),500); return; }
   musicDuck(.3,2.6); noise(.14,{vol:.22,f:2600,type:'highpass'}); tone(150,.16,{to:80,vol:.22,type:'triangle'});
   [523,659,784,1047,1319,1568].forEach((n,i)=>tone(n,.32+i*.04,{vol:.1,type:'triangle',delay:.08+i*.075}));
   tone(2093,.5,{vol:.04,delay:.6}); tone(2637,.45,{vol:.03,delay:.68});
   buzz([0,25,40,25,40,70]); confetti(W/2,H*.52,46); pulse(.25,'242,212,126');
-  if (L.pbBonus) setTimeout(()=>{ if (S.land===L) addCoins(L.pbBonus); },650);
+  if (L.pbGlim) setTimeout(()=>glimmerTally(L.pbGlim,{x:W/2,y:H*.5,delay:2600}),650);
   if (!save.pbSeen){ save.pbSeen=true; persist(); setTimeout(()=>{ if (S.state==='result') coachFor('A new personal record! Your journal keeps the biggest of every species. Open it and tap Records.',7); },900); } }
 function tapeRange(F){ return F.size[1]*1.12; }
 function drawCardScene(t){

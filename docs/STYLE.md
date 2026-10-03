@@ -32,6 +32,7 @@ The angler wears a mustard oilskin (`#BF8F3E`, shade `#8F6A2E`, light `#DDB25F`)
 - **Characters and fish:** bold, slightly wobbly ink outlines. A silhouette must be readable at 48 px, and recognizable as a pure black shape.
 - **Water** is the hero material: mirrored reflections, gentle wave distortion, drifting light, foam at the shores, and ripples from every interaction.
 - **UI:** cream paper cards, ink-stamp icons and small brass fittings.
+- **The HUD** is one row: coins, Glimmer, the meal, the clock and two buttons. When something would be cut off, the row gives way one step at a time, measured rather than guessed from the width: tighter chips, then the clock drops AM and PM, then big numbers shorten (125K), then smaller text, and last, the Playtest button steps aside.
 
 ## The art bar (from step 15 on)
 
@@ -48,6 +49,7 @@ Step 16, the art pass, brought everything older up to this bar: the scene in par
 - **Scene art** lives in `src/game/angler.js`, `dock.js`, `folk.js` and `coast.js`.
 - **Aquarium art** lives in `src/game/aquarium-art.js`. Each decor piece draws from an anchor on the sand, split into a still part (painted once) and a moving part. The shop's and crates' decor icons come from the same drawings, so they always match the tank.
 - **Kitchen art** lives in `src/game/kitchen-art.js`. The board, the stove and the whole fish on the board are painted once per scale.
+- **Enchantment art** lives in `src/game/enchant-art.js`. A rune is a brass-rimmed slate token with its glyph cut in and lit in the rune's own color, and the same drawing serves the tray, the sockets, the rod and the catch card. Glimmer is a pale blue-violet crystal. A glow is kept inside its canvas, so it never ends in a hard square edge.
 - **Fish up close:** past 44 px a fish gets a gill line, a side fin, a darker back, a mouth and a glint in its eye; past 80 px, fin rays, a lateral line and scales. Catfish, eels, and fish whose pattern already reads as scales don't get extra scales.
 
 ## Rarity kit

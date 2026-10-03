@@ -27,8 +27,9 @@ function effText(id,stars){ // the boost line, scaled by stars
 function mealName(id){ return id==='mush'?MUSH.name:RECIPES[id].name; }
 function tickMeal(){ const m=save.meal; if (!m || !m.casts) return; m.casts--; if (m.casts<=0){ m.casts=0; m.last=true; } persist(); updateMealChip(); }
 function mealEnd(){ const m=save.meal; if (!m) return; const n=mealName(m.id); save.meal=null; persist(); updateMealChip(); setTimeout(()=>news(n+' wore off',''),500); }
-function updateMealChip(){ const m=save.meal, ch=$('mealChip'); if (!ch) return; ch.hidden=!(m && (m.casts>0||m.last)); if (ch.hidden) return;
-  $('mealCasts').textContent=m.casts; ch.classList.toggle('mush',m.id==='mush'); ch.setAttribute('aria-label',mealName(m.id)+', '+m.casts+' casts left'); }
+function updateMealChip(){ const m=save.meal, ch=$('mealChip'); if (!ch) return; ch.hidden=!(m && (m.casts>0||m.last));
+  if (!ch.hidden){ $('mealCasts').textContent=m.casts; ch.classList.toggle('mush',m.id==='mush'); ch.setAttribute('aria-label',mealName(m.id)+', '+m.casts+' casts left'); }
+  fitHud(); }
 function eatMeal(id,stars){ const n=Math.round((id==='mush'?MUSH.casts:MEAL_CASTS[stars-1])*modMul('mealCasts')); save.meal={id,stars,casts:n,full:n}; persist(); updateMealChip(); const ch=$('mealChip'); ch.classList.remove('pop'); void ch.offsetWidth; ch.classList.add('pop'); }
 function recipeLearnedBy(fid){ return RECIPE_ORDER.find(id=>RECIPES[id].learn===fid); }
 function kitchenUnlockCheck(fromBoot){

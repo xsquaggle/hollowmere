@@ -5,6 +5,8 @@
 //   node tools/simulate.mjs --rod brasscap --spot deep --hour 6.5 --meal pie:3 --sets all --casts 5000
 //   node tools/simulate.mjs --rod ash --reel brassdrag --line silk --bait worms   any reel, line and bait (data/tackle.js)
 //   node tools/simulate.mjs --tackle                  every piece of tackle against the plain rig, where each one matters
+//   node tools/simulate.mjs --rod ash --ench swift,magpie   runes etched onto the rod (data/enchant.js)
+//   node tools/simulate.mjs --runes                   every rune against none, where each one shows what it does
 //   node tools/simulate.mjs --compare-luck           the standard report, before and after step 12's luck curve
 //   node tools/simulate.mjs --json                   machine-readable output
 import { existsSync } from 'node:fs';
@@ -38,6 +40,8 @@ const STANDARD = [
 function custom() {
   const st = {};
   for (const k of ['rod', 'spot', 'region', 'sets', 'player', 'reel', 'line', 'bait']) if (opt[k]) st[k] = opt[k];
+  if (opt.ench) st.ench = String(opt.ench).split(',');
+  if (st.ench && st.ench.length > 1 && !opt.rod) console.warn('Note: the Willow Switch takes one rune, so only ' + st.ench[0] + ' is on. Name a rod with more sockets (--rod ash).');
   if (opt.hour) st.hour = +opt.hour;
   if (opt.meal) { const [id, s] = String(opt.meal).split(':'); st.meal = { id, stars: +(s || 3) }; }
   if (opt.parts) st.parts = opt.parts === 'all' ? 'all' : String(opt.parts).split(',');
@@ -60,7 +64,22 @@ function tackleRuns() { const rows = [];
     rows.push(['Plain rig · ' + base.rod + ', ' + (base.region || 'lake') + ' ' + base.spot + ', ' + base.hour + 'h', base]);
     for (const id of ids) rows.push(['  + ' + id, Object.assign({}, base, { [SOCKET_OF[id]]: id })]); }
   return rows; }
-const runs = opt.tackle ? tackleRuns() : Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'lucky', 'player', 'reel', 'line', 'bait'].includes(k)) ? custom() : STANDARD;
+// every rune against none, each where it can show what it does (and, for the ones with a catch, where it costs you).
+// A run stays in one water, so Wanderer's numbers are for a player who never travels; one who fishes both waters
+// each day doubles its share. Nightglass shows its catch by day and its point at night.
+const RUNE_GROUPS = [
+  [{ rod: 'ash', spot: 'deep', hour: 18.5 }, ['swift', 'magpie', 'deep', 'echo', 'wanderer']],
+  [{ rod: 'brasscap', spot: 'mix', hour: 12 }, ['swift', 'magpie', 'deep', 'nightglass', 'wanderer', 'echo']],
+  [{ rod: 'brasscap', spot: 'deep', hour: 22 }, ['nightglass', 'deep']],
+  [{ rod: 'deepwater', region: 'coast', spot: 'mix', hour: 12 }, ['swift', 'magpie', 'deep', 'wanderer', 'echo']],
+  [{ rod: 'deepwater', region: 'coast', spot: 'deep', hour: 22 }, ['nightglass', 'deep']],
+];
+function runeRuns() { const rows = [];
+  for (const [where, ids] of RUNE_GROUPS) { const base = Object.assign({ player: opt.player || 'steady', treasure: !opt['no-treasure'] }, where);
+    rows.push(['No runes · ' + base.rod + ', ' + (base.region || 'lake') + ' ' + base.spot + ', ' + base.hour + 'h', base]);
+    for (const id of ids) rows.push(['  + ' + id, Object.assign({}, base, { ench: [id] })]); }
+  return rows; }
+const runs = opt.tackle ? tackleRuns() : opt.runes ? runeRuns() : Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'lucky', 'player', 'reel', 'line', 'bait', 'ench'].includes(k)) ? custom() : STANDARD;
 const casts = +(opt.casts || 1000);
 
 const browser = await chromium.launch(); const p = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -79,8 +98,8 @@ if (errors.length) { console.error('Page errors:\n  ' + errors.join('\n  ')); pr
 if (opt.json) { console.log(JSON.stringify(results, null, 1)); process.exit(0); }
 
 const pct = (r, t) => r.landed ? (Math.round((r.tiers[t] || 0) / r.landed * 1000) / 10).toFixed(1) : '0.0';
-const head = '| Setup | Coins/hour | Fish/hour | Coins/fish | Landed | Uncommon | Rare | Legendary | Luck |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |';
-const line = (label, r) => `| ${label}${r.reach.ok ? '' : ' (out of reach)'} | ${r.coinsPerHour.toLocaleString()} | ${r.catchesPerHour} | ${r.coinsPerCatch} | ${r.landRate}% | ${pct(r, 'uncommon')}% | ${pct(r, 'rare')}% | ${pct(r, 'legendary')}% | ${r.luck.points ? '+' + Math.round(r.luck.points * 100) + ' luck → ' + Object.entries(r.luck.tiers).map(([k, v]) => k[0].toUpperCase() + ' ×' + v).join(' ') : '—'} |`;
+const head = '| Setup | Coins/hour | Fish/hour | Coins/fish | Landed | Uncommon | Rare | Legendary | Glimmer/hour | Luck |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |';
+const line = (label, r) => `| ${label}${r.reach.ok ? '' : ' (out of reach)'} | ${r.coinsPerHour.toLocaleString()} | ${r.catchesPerHour} | ${r.coinsPerCatch} | ${r.landRate}% | ${pct(r, 'uncommon')}% | ${pct(r, 'rare')}% | ${pct(r, 'legendary')}% | ${r.glimmerPerHour}${r.echoes ? ' (' + r.echoes + ' echoes)' : ''}${r.wanders ? ' (' + r.wanders + ' doubled)' : ''} | ${r.luck.points ? '+' + Math.round(r.luck.points * 100) + ' luck → ' + Object.entries(r.luck.tiers).map(([k, v]) => k[0].toUpperCase() + ' ×' + v).join(' ') : '—'} |`;
 for (const m of modes) {
   if (modes.length > 1) console.log('\n' + (m === 'before' ? 'Before step 12 (every luck bonus multiplied, no ceiling):' : 'After step 12 (luck adds up and flattens toward each rarity\'s ceiling):'));
   console.log(`\n${casts.toLocaleString()} casts each, steady player unless noted.\n\n` + head);

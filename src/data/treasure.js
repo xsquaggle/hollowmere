@@ -1,5 +1,6 @@
 /* Treasure: everything a line pulls up that isn't a fish.
-   TREASURE   how often treasure turns up and which kind (weights); a pouch's size (in catches' worth of coins).
+   TREASURE   how often treasure turns up and which kind (weights); a pouch's size (in catches' worth of coins). A geode holds
+              Glimmer (data/enchant.js: GLIMMER.geode), and every crate holds some (GLIMMER.crate).
               Before the first treasure the odds are firstRate, and that first one is always a Common crate.
    CRATES     one per rarity, Common to Mythic. weight (before luck), pull and reel (the haul), snags (how often
               it catches on the bottom: 0 to 3), coins (fish: this many catches' worth at the spot you cast,
@@ -25,9 +26,9 @@
               (letter, with to: the address Pell reads out). Lines are written the way they're inked. */
 const TREASURE={
   rate:1/12, firstRate:1/4, from:8,
-  kinds:{pouch:49, bottle:20, find:5, crate:26},
+  kinds:{pouch:35, geode:14, bottle:20, find:5, crate:26},
   letter:{weight:6, region:'lake', spots:['deep','far'], from:25},
-  haul:{pouch:{pull:.55, reel:2.2}, bottle:{pull:.5, reel:2.4}, find:{pull:.75, reel:3}, letter:{pull:.5, reel:2.6}},
+  haul:{pouch:{pull:.55, reel:2.2}, geode:{pull:.7, reel:2.8}, bottle:{pull:.5, reel:2.4}, find:{pull:.75, reel:3}, letter:{pull:.5, reel:2.6}},
   pouch:[1.5,3],
   loose:{common:50, uncommon:30, rare:14, epic:5, legendary:1}
 };
