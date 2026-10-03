@@ -4,7 +4,7 @@ function updateAim(x,y){
   const vx=a.sx-x, vy=a.sy-y, len=Math.hypot(vx,vy), maxPull=Math.min(H*.3,230);
   a.p = -vy>4 ? clamp(len/maxPull,0,1) : 0;
   a.th = len>10 ? clamp(Math.atan2(vx,-vy),-.8,.8) : 0;
-  const depth=clamp((a.p-.12)/.88,0,1)*ROD().reach, ty=lerp(G.near,HZ+26,depth); a.depth=depth;
+  const depth=clamp((a.p-.12)/.88,0,1)*modBase('reach'), ty=lerp(G.near,HZ+26,depth); a.depth=depth;
   const tx=clamp(W/2+Math.tan(a.th)*(G.player.y-ty)*.85,22,W-22);
   a.target={x:tx,y:ty}; a.spot=spotAt(tx,ty); a.lucky=inLucky(tx,ty);
 }
@@ -35,7 +35,7 @@ function updateCast(dt){
       splash(x,y,12); ripple(x,y,30); noise(.4,{vol:.18,f:800,to:300,type:'lowpass'}); buzz(20);
       toast('Washed out by the swell!','warn'); coachFor('Cast into the calm water between swells.',4);
       S.lost={t:0,pos:{x,y},snapped:false}; setState('lost'); return; }
-    if (c.spot==='reeds' && !S.tut && Math.random()<ROD().snag){
+    if (c.spot==='reeds' && !S.tut && Math.random()<modBase('snag',{spot:'reeds'})){
       splash(x,y,6); ripple(x,y,18); sfx.snap(); buzz([0,30,30,30]); shake(2);
       toast('Snagged in the reeds!','warn'); coachFor('Reeds snag ordinary rods. Ottilie sells a Reedcutter that slices right through.',5);
       S.lost={t:0,pos:{x,y},snapped:false}; setState('lost'); return; }

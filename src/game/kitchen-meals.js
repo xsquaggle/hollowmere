@@ -14,8 +14,6 @@ function pickNet(R){ // cheapest matching fish from the keepnet, without removin
 function haveFor(R){ const n=R.need[0]; return save.net.filter(f=>n.id?f.id===n.id:FISH[f.id].rarity===n.rar).length; }
 function needText(R){ const n=R.need[0]; return n.n+' × '+(n.id?FISH[n.id].name:'any common fish'); }
 function mealStr(m){ return m && m.stars>0 ? MEAL_STR[m.stars-1] : 0; }
-function mealMul(k){ const m=save.meal; if (!m || m.id==='mush' || (!m.casts && !m.last)) return 1; const R=RECIPES[m.id]; if (!R) return 1;
-  let v=1; for (const b of R.boost) if (b.k===k) v*=Math.max(.2,1+b.v*mealStr(m)); return v; }
 function mealPink(){ const m=save.meal; return !!(m && m.id==='mush' && (m.casts>0||m.last)); }
 function effText(id,stars){ // the boost line, scaled by stars
   if (id==='mush') return MUSH.eff; const R=RECIPES[id], s=MEAL_STR[Math.max(0,stars-1)];

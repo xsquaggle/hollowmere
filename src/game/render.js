@@ -6,7 +6,7 @@ function drawActive(){
     const sh=S.wait.sh, F=FISH[S.wait.fish];
     ctx.save(); ctx.translate(sh.x,sh.y); ctx.rotate(sh.ang); ctx.scale(1,.55);
     drawFish(ctx,S.wait.fish,F.len*sc(sh.y),true,sh.alpha*.9,Math.sin(S.time*(S.wait.phase==='nibble'?9:6))); ctx.restore();
-    if ((save.rod==='heronwood'||sonarOn()) && F.rarity!=='common' && S.wait.phase!=='empty'){ const a=(.5+.5*Math.sin(S.time*6))*sh.alpha; ctx.strokeStyle=RAR[F.rarity].color; ctx.globalAlpha=a; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(sh.x,sh.y,F.len*.55*sc(sh.y),F.len*.22*sc(sh.y),0,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1; }
+    if (modFlag('reveal') && F.rarity!=='common' && S.wait.phase!=='empty'){ const a=(.5+.5*Math.sin(S.time*6))*sh.alpha; ctx.strokeStyle=RAR[F.rarity].color; ctx.globalAlpha=a; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(sh.x,sh.y,F.len*.55*sc(sh.y),F.len*.22*sc(sh.y),0,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1; }
     if (S.wait.fish==='lantern'){ ctx.save(); ctx.globalCompositeOperation='lighter'; for (let i=0;i<3;i++){ const gx=sh.x+Math.cos(sh.ang)*(6-i*7)*sc(sh.y), gy=sh.y+Math.sin(sh.ang)*(6-i*7)*sc(sh.y)*.55; ctx.fillStyle='rgba(255,220,140,'+(.35*sh.alpha*(.6+.4*Math.sin(S.time*3+i))).toFixed(3)+')'; ctx.beginPath(); ctx.arc(gx,gy,3*sc(sh.y),0,Math.PI*2); ctx.fill(); } ctx.restore(); }
   }
   if (S.state==='reeling'){
@@ -105,7 +105,7 @@ function drawAim(){
   ctx.strokeStyle='rgba(243,234,215,.5)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(a.sx,a.sy,14,0,Math.PI*2); ctx.stroke();
   ctx.strokeStyle=a.p>=.12?BRASS:'rgba(243,234,215,.4)'; ctx.lineWidth=4; ctx.beginPath(); ctx.arc(a.sx,a.sy,14,-Math.PI/2,-Math.PI/2+Math.PI*2*a.p); ctx.stroke();
   if (a.p<.12 || !a.target) return;
-  if (ROD().reach<1 && a.depth>=ROD().reach-.001){ const ry=lerp(G.near,HZ+26,ROD().reach);
+  const reach=modBase('reach'); if (reach<1 && a.depth>=reach-.001){ const ry=lerp(G.near,HZ+26,reach);
     ctx.strokeStyle='rgba(243,234,215,.4)'; ctx.lineWidth=1.5; ctx.setLineDash([4,6]); ctx.beginPath(); ctx.moveTo(20,ry); ctx.lineTo(W-20,ry); ctx.stroke(); ctx.setLineDash([]);
     ctx.font='800 10.5px Nunito, system-ui, sans-serif'; ctx.textAlign='left'; ctx.fillStyle='rgba(243,234,215,.75)'; ctx.fillText('MAX REACH · '+ROD().name.toUpperCase(),20,ry-6); }
   const t=rodTip(), to=a.target, lift=70+140*a.p;

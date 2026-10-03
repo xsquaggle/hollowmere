@@ -20,6 +20,8 @@
     "data/aquarium.js",
     "data/kitchen.js",
     "data/music.js",
+    "data/stats.js",
+    "game/mods.js",
     "game/odds.js",
     "game/save.js",
     "game/records.js",

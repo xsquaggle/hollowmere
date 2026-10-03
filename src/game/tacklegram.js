@@ -1,9 +1,8 @@
 /* ---------- Tacklegram: phone shop, sea rods, boat parts, mail boat ---------- */
 const hasPart = id => (save.parts||[]).includes(id);
-const sonarOn = () => REG()==='coast' && hasPart('sonar');
-const rodHas = list => list.includes(save.rod);
-const swellSoftness = () => (rodHas(['saltline','gale','deepwater'])?.5:1)*(hasPart('keel')?.5:1)*mealMul('swell');
-const noWashout = () => rodHas(['gale','deepwater']);
+const sonarOn = () => modFlag('sonar');
+const swellSoftness = () => modMul('swell');
+const noWashout = () => modFlag('noWashout');
 function maxStat(k){ return Math.max(...Object.values(RODS).map(r=>r[k])); }
 function statBar(label,v,k,cv){ const max=maxStat(k);
   return '<div class="sbar"><span>'+label+'</span><div><i style="width:'+Math.round(v/max*100)+'%;background:'+(v>cv+1e-6?'#5E9B4E':v<cv-1e-6?'#C0705C':'#8A8578')+'"></i><b style="left:calc('+Math.round(cv/max*100)+'% - 1px)"></b></div></div>'; }

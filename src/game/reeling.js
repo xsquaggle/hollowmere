@@ -1,6 +1,6 @@
 /* ---------- Reeling ---------- */
 function startReel(id,perfect){
-  const F=FISH[id], fam=rec(id).caught>=10, first=rec(id).caught===0;
+  const F=FISH[id], fam=modFlag('autoTilt',{fish:id}), first=rec(id).caught===0;
   S.reel={lucky:!!(S.wait&&S.wait.lucky),id,F,perfect,fam,dist:1,dir:0,tgt:0,dirT:S.tut?99:rand(1.2,1.8),tension:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
     from:{x:S.bob.x,y:S.bob.y},x:S.bob.x,y:S.bob.y,jump:null,nextJump:rand(2,3),dive:0,warn:0,nextDive:rand(2.4,3.4),surge:0,
     click:0,splashT:0,buzzT:0};
@@ -13,7 +13,7 @@ function startReel(id,perfect){
   else if (first && F.rarity==='legendary') coachShow('Something huge. Reel in short bursts and let go whenever the ring turns red.',6);
 }
 function updateReel(dt){
-  const R=S.reel, F=R.F, tm=save.tune.tension/(ROD().line*mealMul('line')), tut=S.tut;
+  const R=S.reel, F=R.F, tm=modMul('tension')/modMul('line',{fish:R.id}), tut=S.tut;
   const quick=F.rarity==='legendary', calm=F.rarity==='common';
   if (tut==='reel1'||tut==='reel2'){ /* direction is scripted by the tutorial */ }
   else if (F.beh==='darter'){
@@ -53,14 +53,14 @@ function updateReel(dt){
   }
 
   const reeling=S.holding && !airborne;
-  if (reeling && tug){ R.tension+=.75*tm*dt*mealMul('tug'); }
+  if (reeling && tug){ R.tension+=.75*tm*dt*modMul('tug',{fish:R.id}); }
   else if (!reeling && tug){ R.dist=Math.min(1,R.dist+.03*dt); }
   if (tug){ if (!reeling) R.tension=Math.max(0,R.tension-.6*dt); }
   else if (reeling){
     if (diving) R.tension+=1.1*tm*dt;
     else {
       R.tension+=(.04+.05*F.pull+F.pull*.4*m)*tm*dt*(S.tut?.7:1);
-      const spd=(1/F.reel)*ROD().reel*(1-.6*m)*(R.surge>0?2:1)*(F.beh==='tugger'?1.4:1)*(R.fam?1.65:1)*(R.perfect?1.1:1)*mealMul('reel');
+      const spd=(1/F.reel)*(1-.6*m)*(R.surge>0?2:1)*(F.beh==='tugger'?1.4:1)*(R.perfect?1.1:1)*modMul('reel',{fish:R.id});
       R.dist-=spd*dt; R.click+=spd*dt;
     }
   } else if (diving){ R.tension=Math.max(.15,R.tension-.35*dt); R.dist=Math.min(1,R.dist+.015*dt); }

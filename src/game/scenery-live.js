@@ -240,7 +240,7 @@ function drawOttilie(){
 function wrapText(t,max){ const words=t.split(' '), out=[]; let line='';
   for (const w of words){ const test=line?line+' '+w:w; if (ctx.measureText(test).width>max && line){ out.push(line); line=w; } else line=test; }
   if (line) out.push(line); return out; }
-function netCap(){ return hasPart('hold')?24:12; }
+function netCap(){ return modAdd('netCap'); }
 function netPos(){ return REG()==='coast' ? {x:W/2+108, y:H-128+(S.bob_y||0)} : {x:W/2+104, y:H-104}; }
 function onKeepnet(x,y){ const p=netPos(); return x>p.x-26 && x<p.x+26 && y>p.y-34 && y<p.y+26; }
 function drawKeepnet(){

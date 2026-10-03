@@ -22,7 +22,7 @@ function update(dt,rdt){
   }
 }
 function frame(now){
-  const dt=clamp((now-last)/1000,0,.05); last=now; S.time+=dt; musicFrame(dt);
+  const dt=clamp((now-last)/1000,0,.05); last=now; MODC.frame++; S.time+=dt; musicFrame(dt);
   if (AQ.open||K.open){ update(dt,dt); requestAnimationFrame(frame); return; } // the world keeps turning while you're in a room
   let gdt=dt*(S.tut==='bite'?.35:1); if (S.freeze>0){ S.freeze-=dt; gdt=0; }
   S.tipT=(S.tipT||0)-dt; if (S.tipT<=0){ S.tipT=5; accrueTips(); }

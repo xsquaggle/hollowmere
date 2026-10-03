@@ -4,7 +4,7 @@ function startLand(){
   const u=Math.pow(Math.random(),1.4); let size=lerp(F.size[0],F.size[1],u); if (R.perfect) size=Math.min(F.size[1]*1.05,size*1.08);
   size=Math.round(size*10)/10; const build=rollBuild(), wgt=Math.round(weighFish(R.id,size,build));
   const q=(size-F.size[0])/(F.size[1]-F.size[0]);
-  const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(R.perfect?1.25:1)*ROD().value*setValue()*mealMul('value')));
+  const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(R.perfect?1.25:1)*modMul('value',{fish:R.id})));
   S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot:(S.bob&&S.bob.spot)||'open',hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0};
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
   sfx.out(F.rarity); buzz(F.rarity==='legendary'?[0,40,60,40,60,120]:40); shake(F.rarity==='legendary'?6:2);

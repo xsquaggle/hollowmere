@@ -14,9 +14,6 @@ function accrueTips(){ const now=Date.now(), T=tanks();
   for (const k in T){ const t=T[k], mins=Math.max(0,(now-t.tipT)/60000); t.tipT=now; if (!t.owned) continue; t.tips=Math.min(jarCap(k),t.tips+tipRate(k)*mins); }
   const total=Object.values(T).reduce((a,t)=>a+t.tips,0), b=$('aquaTips'); if (b){ b.hidden=total<5; b.textContent=Math.floor(total); } }
 function setsDone(){ const t=tanks(); return TANK_SETS.filter(s=>t[s.tank].owned && s.check(t[s.tank].fish)); }
-function setLuck(){ const r=REG(), n=isNight(save.clock); let l=setsDone().reduce((a,s)=>a*((s.luck && (s.region==='any'||s.region===r) && (!s.night||n))?s.luck:1),1);
-  for (const k in TANKS) for (const d of decorFor(k)) if (d.luck && d.luck.region===r && tanks()[k].fish.some(f=>d.ids&&d.ids.includes(f.id))) l*=d.luck.v; return l; }
-function setValue(){ const r=REG(); return setsDone().reduce((a,s)=>a*((s.value && s.region===r)?s.value:1),1); }
 function addToTank(f){ accrueTips(); const k=tankOf(f.id), before=new Set(setsDone().map(s=>s.id)); tanks()[k].fish.push(f); persist();
   setsDone().forEach(s=>{ if (!before.has(s.id)) setTimeout(()=>{ toast('Tank set: '+s.name,'gold'); coachFor('Tank set complete: '+s.name+'. '+s.bonus+'.',6); sfx.out('rare'); },400); });
   $('aquaBtn').classList.remove('pulse'); void $('aquaBtn').offsetWidth; $('aquaBtn').classList.add('pulse'); }
