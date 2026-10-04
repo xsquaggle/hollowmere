@@ -1,11 +1,11 @@
 /* ---------- Modifiers: every bonus in the game goes through here ---------- */
 /* Each source (the rod in hand and its tackle, the meal you ate, tank sets, decor, boat parts, artifacts in your vest pockets,
-   keepsakes, mastery, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
-   stat's total in a context (region, time, spot, fish, rarity, Gull Luck) and only matching modifiers count.
+   keepsakes, mastery, the weather, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
+   stat's total in a context (region, time, weather, spot, fish, rarity, Gull Luck) and only matching modifiers count.
    STATS (data/stats.js) says how each stat combines and where it can apply at all. Adding an enchantment or
    a relic later means adding its modifiers to a source; nothing that reads the stats has to change.
-   Sources read only the save, so the balance simulator can swap in a stand-in save. Keep it that way: a
-   future source that needs world state (weather, say) should keep that state in the save too. */
+   Sources read only the save, so the balance simulator can swap in a stand-in save. Keep it that way: world state a
+   source needs lives in the save too (the weather comes from the save's day, hour, region and sky seed). */
 const MODC={frame:0, at:-1, dirty:true, list:null};
 let SIMULATING=false;   // true while the balance simulator borrows the save (game/sim.js)
 function modSources(){
@@ -22,7 +22,7 @@ function modSources(){
     for (const b of Rc.boost) add('meal',Rc.name,b.k,b.k==='luck'?b.v*s:Math.max(.2,1+b.v*s),{stars:m.stars}); }
   // completed tank sets, and decor that lends luck while its fish is in the tank
   for (const st of setsDone()){
-    const when={}; if (st.region!=='any') when.region=st.region; if (st.night) when.night=true;
+    const when={}; if (st.region!=='any') when.region=st.region; if (st.night) when.night=true; if (st.wx) when.wx=st.wx;
     if (st.luck) add('set',st.name,'luck',st.luck,{when});
     if (st.value) add('set',st.name,'value',st.value,{when});
   }
@@ -44,6 +44,8 @@ function modSources(){
   // mastery: enough of a species and your rod knows it
   for (const id in FISH) if ((save.fish[id]||{}).caught>=MASTERY.catches){ const n='Mastered '+FISH[id].name;
     add('mastery',n,'reel',MASTERY.reel,{when:{fish:id}}); add('mastery',n,'autoTilt',undefined,{when:{fish:id}}); }
+  // the weather here and now (game/weather.js)
+  { const k=wxNow(), K=WX[k]; for (const x of K.mods) L.push(Object.assign({src:'weather',name:K.name},x,{when:Object.assign({wx:k},x.when)})); }
   // Gull Luck: a lucky splash zone doubles the odds of every fish above common while you fish in it
   add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true, rarityMin:'uncommon'}});
   // Fresh water: back after a long while, rarer fish bite more often for a few casts (game/away.js)
@@ -59,9 +61,9 @@ function modSources(){
 }
 function modList(){ if (MODC.list && MODC.at===MODC.frame && !MODC.dirty) return MODC.list;
   MODC.list=modSources(); MODC.at=MODC.frame; MODC.dirty=false; return MODC.list; }
-/** The context a stat is read in. Region and time come from the game; callers add spot, fish, rarity or lucky.
+/** The context a stat is read in. Region, time and weather come from the game; callers add spot, fish, rarity or lucky.
     A fish brings its rarity along. */
-function modCtx(c){ const x=Object.assign({region:REG(), night:isNight(save.clock)}, c);
+function modCtx(c){ const x=Object.assign({region:REG(), night:isNight(save.clock), wx:wxNow()}, c);
   if (x.fish){ if (!x.rarity) x.rarity=FISH[x.fish].rarity; if (!x.beh) x.beh=FISH[x.fish].beh; } return x; }
 const rarRank=r=>Object.keys(RAR).indexOf(r);
 function modMatch(m,c){ const w=m.when; if (!w) return true;

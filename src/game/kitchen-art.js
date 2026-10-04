@@ -276,6 +276,7 @@ function kRoom(){ // cached wall, window, tiles, shelf and counter
   if (P.sunVis>.3 && P.sunY<1){ c.fillStyle='rgba(255,244,214,.9)'; c.beginPath(); c.arc(wx+ww*.3,wy+wh*(.15+P.sunY*.45),8*s,0,6.28); c.fill(); }
   c.fillStyle='rgb('+P.hillFarR+')'; c.beginPath(); c.moveTo(wx,wy+wh*.72); c.quadraticCurveTo(wx+ww*.35,wy+wh*.52,wx+ww*.6,wy+wh*.68); c.quadraticCurveTo(wx+ww*.85,wy+wh*.6,wx+ww,wy+wh*.7); c.lineTo(wx+ww,wy+wh); c.lineTo(wx,wy+wh); c.fill();
   c.fillStyle='rgb('+P.w1R+')'; c.fillRect(wx,wy+wh*.78,ww,wh*.22); c.fillStyle='rgba(255,255,255,.25)'; c.fillRect(wx+ww*.2,wy+wh*.84,ww*.3,1.5); c.fillRect(wx+ww*.55,wy+wh*.9,ww*.25,1.5);
+  paintWxPane(c,wx,wy,ww,wh,P);   // rain on the glass, or fog beyond it
   c.restore();
   c.strokeStyle='#3B281C'; c.lineWidth=5*s; c.beginPath(); c.moveTo(wx+ww/2,wy); c.lineTo(wx+ww/2,wy+wh); c.moveTo(wx,wy+wh*.5); c.lineTo(wx+ww,wy+wh*.5); c.stroke();
   c.strokeStyle='rgba(255,255,255,.18)'; c.lineWidth=2; c.beginPath(); c.moveTo(wx+6,wy+wh*.42); c.lineTo(wx+ww*.32,wy+6); c.stroke();

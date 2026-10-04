@@ -6,7 +6,7 @@ function drawActive(){
   if ((S.state==='waiting'||S.state==='bite') && S.wait && S.wait.sh){
     const sh=S.wait.sh, F=FISH[S.wait.fish];
     ctx.save(); ctx.translate(sh.x,sh.y); ctx.rotate(sh.ang); ctx.scale(1,.55);
-    drawFish(ctx,S.wait.fish,F.len*sc(sh.y),true,sh.alpha*.9,Math.sin(S.time*(S.wait.phase==='nibble'?9:6))); ctx.restore();
+    drawFish(ctx,S.wait.fish,F.len*sc(sh.y),true,sh.alpha*.9*fogVis(sh.x,sh.y),Math.sin(S.time*(S.wait.phase==='nibble'?9:6))); ctx.restore();   // fog hides it in the far water
     if (modFlag('reveal') && F.rarity!=='common' && S.wait.phase!=='empty'){ const a=(.5+.5*Math.sin(S.time*6))*sh.alpha; ctx.strokeStyle=RAR[F.rarity].color; ctx.globalAlpha=a; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(sh.x,sh.y,F.len*.55*sc(sh.y),F.len*.22*sc(sh.y),0,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1; }
     if (S.wait.fish==='lantern'){ ctx.save(); ctx.globalCompositeOperation='lighter'; for (let i=0;i<3;i++){ const gx=sh.x+Math.cos(sh.ang)*(6-i*7)*sc(sh.y), gy=sh.y+Math.sin(sh.ang)*(6-i*7)*sc(sh.y)*.55; ctx.fillStyle='rgba(255,220,140,'+(.35*sh.alpha*(.6+.4*Math.sin(S.time*3+i))).toFixed(3)+')'; ctx.beginPath(); ctx.arc(gx,gy,3*sc(sh.y),0,Math.PI*2); ctx.fill(); } ctx.restore(); }
   }
@@ -23,16 +23,18 @@ function drawActive(){
       ctx.font='800 15px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=PAPER; ctx.fillText('TAP',R.x,R.y-hgt-30-ring*16);
     } else {
       ctx.save(); ctx.translate(R.x,R.y); ctx.rotate(Math.atan2(R.from.y-R.y, (R.from.x-R.x)+R.dir*40)+Math.PI); ctx.scale(1,.55);
-      const k=diving?.7:1; drawFish(ctx,R.id,F.len*sc(R.y)*k,true,diving?.95:.8,Math.sin(S.time*14)); ctx.restore();
+      const k=diving?.7:1; drawFish(ctx,R.id,F.len*sc(R.y)*k,true,(diving?.95:.8)*ghostA(R),Math.sin(S.time*14)); ctx.restore();
       if (diving && R.dive>0){ for (let i=0;i<2;i++) if (Math.random()<.3) S.particles.push({x:R.x+rand(-6,6),y:R.y,vx:0,vy:-rand(10,30),g:-20,life:0,max:.6,r:rand(1.5,3),c:'rgba(225,238,242,'}); }
     }
   }
 }
+/** How much of a ghost shows mid-fight: it melts away as it fades, stays all but gone, and firms up as it surfaces. */
+function ghostA(R){ if (!(R.fade>0)) return 1; const e=Math.min(GHOST_FADE-R.fade,R.fade); return Math.max(.05,1-e/.3); }
 function drawBobber(){
   if (!S.bob || !(S.state==='waiting'||S.state==='bite')) return;
   const b=S.bob, k=sc(b.y), dt=1/60;
-  b.dip*=.94; b.jerk*=.88; b.nibble=Math.max(0,b.nibble-dt*4);
-  const bobY=Math.sin(S.time*2.4)*1.5 + b.dip*4 + b.nibble*5 + (S.state==='bite'?7*k:0);
+  b.dip*=.94; b.jerk*=.88; b.nibble=Math.max(0,b.nibble-dt*4); b.rd=(b.rd||0)*.86;   // rd: a raindrop landing on it (game/weather-art.js)
+  const bobY=Math.sin(S.time*2.4)*1.5 + b.dip*4 + b.nibble*5 + b.rd*2.4 + (S.state==='bite'?7*k:0);
   const x=b.x - b.jerk*6*k, y=b.y+bobY, r=6*k;
   ctx.fillStyle='rgba(10,26,34,.3)'; ctx.beginPath(); ctx.ellipse(b.x,b.y+2,r*1.6,r*.5,0,0,Math.PI*2); ctx.fill();
   ctx.save(); ctx.beginPath(); ctx.rect(x-r*2,y-r*4,r*4,r*4+ (S.state==='bite'?-r*.2:r*.35)+ (b.y-y)); ctx.clip();
@@ -135,10 +137,10 @@ function drawGauge(){
   ctx.fillStyle='rgba(20,26,38,.55)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(cx-tw-26,cy-46,tw*2+52,82,18) : ctx.rect(cx-tw-26,cy-46,tw*2+52,82); ctx.fill();
   ctx.lineCap='round'; ctx.strokeStyle='rgba(243,234,215,.18)'; ctx.lineWidth=6; ctx.beginPath(); ctx.moveTo(cx-tw,cy); ctx.lineTo(cx+tw,cy); ctx.stroke();
   const fx=cx+R.dir*tw, tx=cx+S.tilt*tw, m=Math.abs(S.tilt-R.dir)/1.3;
-  ctx.strokeStyle=m<.2?'rgba(127,176,105,.9)':'rgba(217,97,76,'+(.35+.5*Math.min(1,m)).toFixed(2)+')';
-  ctx.beginPath(); ctx.moveTo(tx,cy); ctx.lineTo(fx,cy); ctx.stroke();
-  ctx.save(); ctx.translate(fx,cy-26); ctx.fillStyle=RAR[R.F.rarity].color; ctx.beginPath(); ctx.moveTo(0,10); ctx.lineTo(-7,0); ctx.lineTo(7,0); ctx.closePath(); ctx.fill(); ctx.restore();
-  ctx.font='800 10.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='rgba(243,234,215,.7)'; ctx.fillText(R.loot?'HAUL':'FISH',fx,cy-30);
+  if (!(R.fade>0)){ ctx.strokeStyle=m<.2?'rgba(127,176,105,.9)':'rgba(217,97,76,'+(.35+.5*Math.min(1,m)).toFixed(2)+')';   // a faded ghost gives nothing away here
+    ctx.beginPath(); ctx.moveTo(tx,cy); ctx.lineTo(fx,cy); ctx.stroke(); }
+  const ga=ghostA(R); ctx.save(); ctx.globalAlpha=ga; ctx.translate(fx,cy-26); ctx.fillStyle=RAR[R.F.rarity].color; ctx.beginPath(); ctx.moveTo(0,10); ctx.lineTo(-7,0); ctx.lineTo(7,0); ctx.closePath(); ctx.fill(); ctx.restore();
+  ctx.font='800 10.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='rgba(243,234,215,'+(.7*ga).toFixed(3)+')'; ctx.fillText(R.loot?'HAUL':'FISH',fx,cy-30);
   const T=R.tension, col=T>.82?DANGER:T>.55?BRASS:GOOD, rr=17;
   ctx.fillStyle=S.holding?'rgba(243,234,215,.95)':'rgba(243,234,215,.25)'; ctx.beginPath(); ctx.arc(tx,cy,rr-5,0,Math.PI*2); ctx.fill();
   ctx.strokeStyle='rgba(243,234,215,.25)'; ctx.lineWidth=5; ctx.beginPath(); ctx.arc(tx,cy,rr,0,Math.PI*2); ctx.stroke();
@@ -147,10 +149,11 @@ function drawGauge(){
   ctx.fillStyle='rgba(243,234,215,.15)'; ctx.fillRect(cx-tw,cy+22,tw*2,4);
   ctx.fillStyle=PAPER; ctx.fillRect(cx-tw,cy+22,tw*2*(1-R.dist),4);
   const off=Math.abs(S.tilt-R.dir)>.32;
-  if (!off){ ctx.strokeStyle='rgba(127,176,105,.55)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(tx,cy,rr+7,0,Math.PI*2); ctx.stroke(); }
+  if (!off && !(R.fade>0)){ ctx.strokeStyle='rgba(127,176,105,.55)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(tx,cy,rr+7,0,Math.PI*2); ctx.stroke(); }
   let label=!S.holding?'PRESS & HOLD TO REEL':off?(R.dir>S.tilt?'SLIDE RIGHT ▶':'◀ SLIDE LEFT'):'ON IT · KEEP HOLDING', lc=off&&S.holding?'#F5D08A':'rgba(243,234,215,.9)';
   if (diving){ label=R.loot?(R.warn>0?'CATCHING ON THE BOTTOM · LET GO':'SNAGGED · LET GO'):R.warn>0?'DIVE INCOMING · LET GO':'DIVING · LET GO'; lc='#F5D08A'; }
   else if (R.jump){ label='TAP NOW'; lc='#F5D08A'; }
+  else if (R.fade>0){ label='IT FADED · FOLLOW THE LINE'; lc='#D9DEE6'; }
   else if (swellNear(R.y,95)){ label='SWELL COMING · EASE OFF'; lc='#F5D08A'; }
   else if (R.tug){ label='TUG · LET GO'; lc='#F5D08A'; }
   else if (R.F.beh==='tugger' && S.holding){ label='REEL BETWEEN TUGS'; lc='#CFE7B9'; }
@@ -171,8 +174,8 @@ function render(){
   ctx.save();
   if (S.shake>.1) ctx.translate(rand(-1,1)*S.shake,rand(-1,1)*S.shake);
   if (Math.abs(S.zoom-1)>.001){ const cx=W/2, cy=H*.42; ctx.translate(cx,cy); ctx.scale(S.zoom,S.zoom); ctx.translate(-cx,-cy); }
-  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawTraps(); drawSwell(); drawActive(); drawBobber();
-  drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade();
+  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
+  drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade(); drawRain();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
   drawTrapMarkers(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
   ctx.restore();

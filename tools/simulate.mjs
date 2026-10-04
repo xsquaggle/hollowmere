@@ -8,6 +8,8 @@
 //   node tools/simulate.mjs --rod ash --ench swift,magpie   runes etched onto the rod (data/enchant.js)
 //   node tools/simulate.mjs --runes                   every rune against none, where each one shows what it does
 //   node tools/simulate.mjs --idle                    what traps and the smoke rack earn, beside active fishing
+//   node tools/simulate.mjs --rod ash --spot deep --wx rain   in one weather: clear, cloudy, rain or fog (data/weather.js)
+//   node tools/simulate.mjs --weather                 how often each weather comes, and what each one does to a few setups
 //   node tools/simulate.mjs --orders                  what supper orders pay beside active fishing, and how long the standings take
 //   node tools/simulate.mjs --compare-luck           the standard report, before and after step 12's luck curve
 //   node tools/simulate.mjs --json                   machine-readable output
@@ -41,7 +43,7 @@ const STANDARD = [
 ];
 function custom() {
   const st = {};
-  for (const k of ['rod', 'spot', 'region', 'sets', 'player', 'reel', 'line', 'bait']) if (opt[k]) st[k] = opt[k];
+  for (const k of ['rod', 'spot', 'region', 'sets', 'player', 'reel', 'line', 'bait', 'wx']) if (opt[k]) st[k] = opt[k];
   if (opt.ench) st.ench = String(opt.ench).split(',');
   if (st.ench && st.ench.length > 1 && !opt.rod) console.warn('Note: the Willow Switch takes one rune, so only ' + st.ench[0] + ' is on. Name a rod with more sockets (--rod ash).');
   if (opt.hour) st.hour = +opt.hour;
@@ -81,10 +83,11 @@ function runeRuns() { const rows = [];
     rows.push(['No runes · ' + base.rod + ', ' + (base.region || 'lake') + ' ' + base.spot + ', ' + base.hour + 'h', base]);
     for (const id of ids) rows.push(['  + ' + id, Object.assign({}, base, { ench: [id] })]); }
   return rows; }
-const runs = opt.tackle ? tackleRuns() : opt.runes ? runeRuns() : Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'lucky', 'player', 'reel', 'line', 'bait', 'ench'].includes(k)) ? custom() : STANDARD;
+const runs = opt.tackle ? tackleRuns() : opt.runes ? runeRuns() : Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'lucky', 'player', 'reel', 'line', 'bait', 'ench', 'wx'].includes(k)) ? custom() : STANDARD;
 const casts = +(opt.casts || 1000);
 if (opt.idle) { await idleReport(); process.exit(0); }
 if (opt.orders) { await ordersReport(); process.exit(0); }
+if (opt.weather) { await weatherReport(); process.exit(0); }
 /** Supper orders: the tips a typical ticket pays at a few stages, per minute of cooking, beside active fishing; and
     the Town reputation a steady cook earns, evening by evening, to each standing. */
 async function ordersReport() {
@@ -115,6 +118,33 @@ async function ordersReport() {
   for (const x of r.rep) console.log(`| ${x.name} | ${x.at} | ${x.evenings} | ${x.hours} |`);
   console.log('\nA Delicacy order (Ottilie, plate only) beside selling the Delicacy. It takes the Delicacy, so it adds the difference, per hook-hour of smoking:\n\n| Fish (fresh) | Delicacy sells for | Order at 2 stars | at 3 stars | Adds per hook-hour at 3 stars |\n| --- | ---: | ---: | ---: | ---: |');
   for (const d of r.del) console.log(`| ${d.id} (${d.v}) | ${d.worth} | ${d.t2} | ${d.t3} | +${d.extra} |`);
+}
+/** The weather: how much of the time each kind holds in each water (counted over many days of the game's own
+    forecast), then a few setups in each weather beside clear, with the share of the catch the weather's own fish make
+    up, and the Storm Knot over a whole day, weighted by how often it rains. */
+async function weatherReport() {
+  const browser = await chromium.launch(); const p = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  const errors = []; p.on('pageerror', e => errors.push(String(e)));
+  await p.goto('file://' + page + '?nointro'); await p.waitForTimeout(500);
+  const r = await p.evaluate((casts) => { const hm = window.__hm, out = { shares: {}, rows: [], storm: [] }, days = 400;
+    for (const reg of ['lake', 'coast']) { const a = {}; for (const seed of [1, 2, 3]) { const s = hm.wx.shares(reg, days, seed); for (const k in s) a[k] = (a[k] || 0) + s[k] / 3; } out.shares[reg] = a; }
+    const setups = [['Willow Switch · lake open, noon', { rod: 'willow' }, 'lake'], ['Ash Caster · lake deep, 9 AM', { rod: 'ash', spot: 'deep', hour: 9 }, 'lake'], ['Brasscap Pro · lake, every spot', { rod: 'brasscap', spot: 'mix' }, 'lake'],
+      ['Saltline · coast, every spot', { rod: 'saltline', region: 'coast', spot: 'mix' }, 'coast'], ['Deepwater · coast, every spot', { rod: 'deepwater', region: 'coast', spot: 'mix' }, 'coast']];
+    for (const [label, st, reg] of setups) { const base = hm.simulate(Object.assign({ wx: 'clear' }, st), casts), row = { label, reg, clear: base.coinsPerHour, kinds: {} };
+      let day = 0, wet = 0; const sh = out.shares[reg];
+      for (const k of hm.WX_ORDER) { const a = k === 'clear' ? base : hm.simulate(Object.assign({ wx: k }, st), casts), wxIds = Object.keys(hm.FISH).filter(id => hm.FISH[id].wx === k);
+        const n = wxIds.reduce((t, id) => t + (a.species[id] || 0), 0);
+        row.kinds[k] = { cph: a.coinsPerHour, vs: Math.round((a.coinsPerHour / base.coinsPerHour - 1) * 1000) / 10, fish: a.landed ? Math.round(n / a.landed * 1000) / 10 : 0, kinds: Object.keys(a.species).length };
+        day += a.coinsPerHour * sh[k]; if (k === 'rain') { const st2 = Object.assign({ wx: 'rain' }, st), runes = (st2.ench || []).concat('storm'); const b = hm.simulate(Object.assign({}, st2, { ench: runes }), casts); wet = (b.coinsPerHour - a.coinsPerHour) * sh[k]; } }
+      row.day = Math.round(day); row.dayVs = Math.round((day / base.coinsPerHour - 1) * 1000) / 10; row.storm = Math.round(wet / day * 1000) / 10; out.rows.push(row); }
+    return out; }, casts);
+  await browser.close();
+  if (errors.length) { console.error('Page errors:\n  ' + errors.join('\n  ')); process.exit(1); }
+  console.log('\nHow much of the time each weather holds (1,200 days of forecast per water):\n');
+  for (const [reg, a] of Object.entries(r.shares)) console.log(`  ${reg}: ` + Object.entries(a).map(([k, v]) => k + ' ' + Math.round(v * 1000) / 10 + '%').join(', '));
+  console.log(`\n${casts.toLocaleString()} casts each, steady player. Coins/hour in each weather, the change from clear, and the share of the catch that is the weather's own fish:\n\n| Setup | Clear | Overcast | Rain | Fog | Over a whole day | Storm Knot over a day |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: |`);
+  const cell = x => `${x.cph.toLocaleString()} (${x.vs >= 0 ? '+' : ''}${x.vs}%${x.fish ? ', ' + x.fish + '% theirs' : ''}, ${x.kinds} kinds)`;
+  for (const w of r.rows) console.log(`| ${w.label} | ${w.clear.toLocaleString()} | ${cell(w.kinds.cloudy)} | ${cell(w.kinds.rain)} | ${cell(w.kinds.fog)} | ${w.day.toLocaleString()} (${w.dayVs >= 0 ? '+' : ''}${w.dayVs}%) | +${w.storm}% |`);
 }
 /** Traps and the smoke rack, worked out from the tables, beside what active fishing earns at a few stages. */
 async function idleReport() {

@@ -8,6 +8,8 @@
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
    Tackle counts (reel, line and bait, through the same modifiers); bait never runs out in a run. So do runes:
    Wanderer's days turn over every 24 minutes of play, and after an Echo the player casts back to its spot.
+   The weather is pinned for a run (st.wx, clear unless named): its bite speed, its fish, and ghosts fading mid-fight
+   count; fog hiding shadows and raindrops muddling nibbles don't, since the player here reacts to the bite itself.
    Not modeled: aiming (every cast reaches its spot), keeping fish (every catch sells), the aquarium, the
    kitchen, Barnaby or the mail boat, and the clock (an artifact that speeds or stops time doesn't change the
    hour of a run). The setup lives in a stand-in save for the run, then the real save
@@ -57,13 +59,15 @@ function simSave(st){
   if (st.enchSave) s.ench=JSON.parse(JSON.stringify(st.enchSave));
   else { const ids=(st.ench||[]).filter(id=>ENCH[id]).slice(0,RODS[s.rod].ench||1); s.ench={own:Object.fromEntries(ids.map(id=>[id,1])), rig:{[s.rod]:ids}}; }
   s.glimmer=0; s.day=0; s.wander=null;
+  s.wx={seed:7, force:WX_ORDER.includes(st.wx)?st.wx:'clear', seen:{}};      // the weather is pinned for a run: clear unless named
   return s;
 }
 /** Plays one fight (a fish or a haul) through the game's fight step, the way player P would. Returns {end, ft, why}. */
 function simFight(R,P,reg,io,fc){
   const dt=1/60; let ft=0, end=null, easeAt=null, easeUntil=0, swellT=reg==='coast'?rand(0,7.5):Infinity;
   const plan={}; io.tilt=0; io.why='';
-  io.steer=(R,dt)=>R.fam?lerp(io.tilt,R.dir,Math.min(1,dt*8)):lerp(io.tilt,R.dir+Math.sin(ft*1.7)*.12,Math.min(1,dt*P.track));
+  // a faded ghost can only be followed by its line, so the player tracks it more slowly and less surely
+  io.steer=(R,dt)=>R.fam?lerp(io.tilt,R.dir,Math.min(1,dt*8)):R.fade>0?lerp(io.tilt,R.dir+Math.sin(ft*1.3)*.3,Math.min(1,dt*P.track*.4)):lerp(io.tilt,R.dir+Math.sin(ft*1.7)*.12,Math.min(1,dt*P.track));
   while (!end && ft<150){
     ft+=dt; io.t=ft; io.ev.length=0;
     if (R.jump && !plan.jumpSet){ plan.jumpSet=true; plan.jump=Math.random()<P.jumps; } if (!R.jump) plan.jumpSet=false;

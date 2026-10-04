@@ -11,3 +11,7 @@
 .aq-peek{justify-self:center;background:none;border:0;color:rgba(243,234,215,.75);font:800 12px var(--body);letter-spacing:.06em;padding:2px 8px;cursor:pointer;animation:inPulse 3s ease-in-out infinite}
 #cPB.minor{background:#F3E7C8;border-color:#B08D4C}#cPB.minor b{font-size:18px}
 
+/* the weather mark in the clock chip (game/weather.js): sun or moon, cloud, rain or fog, in the chip's paper color */
+#wxIco{display:inline-flex;flex:none;width:1.25em;height:1.25em;margin:-.15em 0}
+#wxIco svg{width:100%;height:100%;overflow:visible;color:rgba(243,234,215,.92)}
+#clock{cursor:pointer}

@@ -81,6 +81,7 @@ function drawPlayer(){ const p=G.player, P=anglerPose(), C=ANG_COL, c=ctx;
   c.fillStyle=C.hatL; c.globalAlpha=.6; c.beginPath(); c.ellipse(-6,-8,2,3.6,.3,0,Math.PI*2); c.fill(); c.globalAlpha=1;
   c.fillStyle=BRASS; c.beginPath(); c.moveTo(-10.2,-2.2); c.quadraticCurveTo(0,0,10.2,-2.2); c.lineTo(10.1,.2); c.quadraticCurveTo(0,2.6,-10.1,.2); c.closePath(); c.fill(); c.strokeStyle=INK; c.lineWidth=1; c.stroke();
   c.save(); c.translate(7.6,-1.6); c.rotate(-.9+Math.sin(S.time*2.2)*.06); c.fillStyle='#C0392B'; c.beginPath(); c.ellipse(0,-3,1.4,3.4,0,0,Math.PI*2); c.fill(); c.fillStyle='#F3EAD7'; c.beginPath(); c.ellipse(1.2,-2.4,.9,2.6,.3,0,Math.PI*2); c.fill(); c.restore();
+  wxDrips(c);   // rain running off the brim (game/weather-art.js)
   c.restore();
   c.restore(); }
 /** Where the rod's grip and reel sit this frame: the grip runs down from the rod's base toward the chest. */

@@ -16,13 +16,13 @@ each build.
 | 17 | Glimmer and the first six enchantments, etched onto rods from the tackle bag (build 18) |
 | 18 | Idle play: fish traps with fittings, the smoke rack and Hollowmere Delicacies, and coming back to a moved-on clock, Grey by a full trap and Fresh water (build 19) |
 | 19 | Supper orders and Town reputation: tickets at the kitchen window each evening, tips and six standings, with Kedgeree and Pepperpot, a better smoker, a second burner, the spice rack, the ladle, and visits at the window (build 20) |
+| 20 | Weather: clear, overcast, rain and fog in each water, worked out from the save so a forecast can come later; four weather fish and the ghost fight; the Storm Knot rune; rain, fog banks, a rainbow, and their sounds (build 21) |
 
 ## Next
 
 13 waits for friends to be available; the rest go in order.
 
 - **13.** Friend playtest, and the bottom-bar regroup.
-- **20.** Weather.
 - **21.** Rarity in full.
 - **22.** Story relics.
 - **23.** Shack upgrades and the trophy wall.

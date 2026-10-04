@@ -13,7 +13,8 @@ const SPICES={
 const SPICE_ORDER=['salt','pepper','dill','lemon','paprika'], SPICE_MORE=['garlic','fennel'];
 const SIDES={chips:'Chips', rice:'Rice', greens:'Garden greens', bread:'Rye bread', potatoes:'Roast potatoes', corn:'Grilled corn'};
 const FLESH={perch:'#F4CDB0', reedwhisker:'#EFD9C2', lantern:'#F7D9A0', leafjack:'#EEDDB8', mossback:'#E9CDB2', mayor:'#F0D2B6',
-  sprat:'#EBDCD0', wrasse:'#F6C4AE', kelpeel:'#E8D8C0', bream:'#F5DCB5', grouper:'#F3E3D3', saltjaw:'#ECD6CC'};
+  sprat:'#EBDCD0', wrasse:'#F6C4AE', kelpeel:'#E8D8C0', bream:'#F5DCB5', grouper:'#F3E3D3', saltjaw:'#ECD6CC',
+  dace:'#F1E0CC', char:'#F4B9A0', mackerel:'#E8C7B4', gurnard:'#F6E6D8'};
 const COOK_NAME={pan:'Pan-fry', grill:'Grill'};
 /* Each recipe: what it needs from the keepnet, how each station plays, and what the meal does.
    need: [{id or rar, n}]; smoked:true takes a smoked fish of any kind from the keepnet (it skips the Clean station).

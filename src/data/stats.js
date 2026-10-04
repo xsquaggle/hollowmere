@@ -8,7 +8,7 @@
    good  'up' when more is better, 'down' when less is better.  tune:true stats only come from Playtest tuning.
    when  where every bonus to this stat applies, on top of its own conditions (there are no swells at the lake).
          A modifier's own when can name a region, spot, night, fish, beh (a kind of fish: leaper, sulker…), rarity,
-         rarityMin or lucky.
+         rarityMin, lucky or wx (the weather here and now, data/weather.js: one kind or a list).
    unit  'x' to show the total as ×2.5 rather than +150%; 'chance' for a chance shown as a share of catches;
          'count' for a number of things (+4 fish).
    hint  the plain sentence the Bonuses page shows under the stat. The order here is the order on that page. */
@@ -22,6 +22,7 @@ const STATS={
   perfect:  {name:'Perfect-hook window', kind:'mul', good:'up', hint:'Tap this fast for a perfect hook: a bigger fish, worth more, that reels faster.'},
   bite:     {name:'Time to a bite', kind:'mul', good:'down', hint:'From your bobber landing to the bite: the quiet, the swim over and the nibbles.'},
   night:    {name:'Night fish', kind:'mul', good:'up', unit:'x', when:{night:true}, hint:'Fish that come up after dark bite more often.'},
+  fog:      {name:'Fog fish', kind:'mul', good:'up', unit:'x', when:{wx:'fog'}, hint:'Fish that come up in fog bite more often.'},
   twitch:   {name:'Twitch pull', kind:'mul', good:'up', unit:'x', hint:'A twitch draws a fish in from farther, and brings the next one sooner.'},
   lure:     {name:'Lure pull', kind:'mul', good:'up', unit:'x', hint:'Some kinds of fish bite more often.'},
   reedBite: {name:'Reed bites', kind:'mul', good:'up', when:{spot:'reeds'}, hint:'Fish in the reeds bite sooner.'},

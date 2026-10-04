@@ -3,11 +3,12 @@
               reel (seconds of steady reeling with the starter rod); value (coins at an average size);
               size [min, max] real length in cm; len and h (drawn length, and body height as a share of it);
               color and fin; window (seconds to strike after the bite); lore; hint (journal line before it is caught);
-              night:true for fish that come up after dark (meals that boost night fish boost these).
+              night:true for fish that come up after dark (meals that boost night fish boost these); wx:'rain' or 'fog' for
+              fish the weather brings up (data/weather.js says where and how often; they're never in a trap).
    RAR[tier]  how a rarity looks and sounds, in order from common to godly; pips (1 to 8) so rarity never rests on color
               alone; prism and ink for the tiers whose color shifts or bleeds. luckCap is the most luck can multiply
               its odds (see game/mods.js); Godly's sits below Mythic's on purpose, so no build makes Godly routine.
-   ORDER      the lake journal's order.  REGION_FISH  which species live in each region, in journal order.
+   ORDER      the lake journal's order, the same fish as REGION_FISH.lake.  REGION_FISH  which species live in each region, in journal order.
    POOLS      lake bite weights per spot; POOLS_COAST the same for Gullrock Coast. Night, dawn, rods,
               meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench"). */
 const FISH = {
@@ -34,11 +35,19 @@ const FISH = {
   saltjaw: {name:'Saltjaw', rarity:'legendary', beh:'darter', night:true, pull:1.85, reel:15, value:1500, size:[140,190], len:92, h:.16, color:'#7E8FA0', fin:'#5A6A7A', window:.7,
             lore:'Coast folk say it follows the lights under the swell.', hint:'Hunts the dark trench, mostly at night.'},
   mayor:   {name:'Mayor Bartholomew', rarity:'legendary', beh:'darter', pull:1.75, reel:14, value:600, size:[110,150], len:86, h:.15, color:'#7D8A63', fin:'#58663F', window:.72,
-            lore:"An ancient pike still wearing the mayor's chain of office.", hint:'Something huge circles the deep pool, most often at dawn.'}
+            lore:"An ancient pike still wearing the mayor's chain of office.", hint:'Something huge circles the deep pool, most often at dawn.'},
+  dace:    {name:'Drizzle Dace', rarity:'uncommon', beh:'leaper', wx:'rain', pull:.95, reel:3.9, value:16, size:[14,26], len:34, h:.24, color:'#A7B8C2', fin:'#6F8794', window:1.15,
+            lore:"Jumps at raindrops. It thinks they're flies, and it's been wrong every time.", hint:'Jumps at raindrops in open water.'},
+  char:    {name:'Mist Char', rarity:'rare', beh:'ghost', wx:'fog', pull:1.25, reel:6.5, value:55, size:[28,56], len:50, h:.26, color:'#97A1A8', fin:'#DD7B50', window:.95,
+            lore:'Pale as the fog it swims in, and warmer in the hand than it looks.', hint:'Glimpsed in the deep pool on foggy mornings.'},
+  mackerel:{name:'Squall Mackerel', rarity:'uncommon', beh:'darter', wx:'rain', pull:1.05, reel:4.2, value:30, size:[26,44], len:44, h:.2, color:'#4F8A8B', fin:'#2F5C60', window:1.05,
+            lore:'Rides in under the squalls, a whole school at a time, and leaves just as fast.', hint:'Rides in under the rain squalls.'},
+  gurnard: {name:'Foghorn Gurnard', rarity:'rare', beh:'ghost', wx:'fog', pull:1.4, reel:7.5, value:160, size:[28,52], len:46, h:.28, color:'#C25A4B', fin:'#E59A5C', window:.9,
+            lore:'Grunts like a foghorn. The lighthouse keepers used to steer by it.', hint:'Grunts from the sea stacks when the fog is in.'}
 };
-const ORDER = ['perch','reedwhisker','lantern','leafjack','mossback','mayor'];
-const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper'};
-const BEH_TIP = {darter:'It darts side to side, so follow it.', leaper:'Tap when it jumps clear of the water.', sulker:'When it dives, let go. Reel hard after.', tugger:'Let go on each tug, reel between tugs.', sleeper:'It barely fights. Just reel it in.'};
+const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','mayor'];
+const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper', ghost:'Ghost'};
+const BEH_TIP = {darter:'It darts side to side, so follow it.', leaper:'Tap when it jumps clear of the water.', sulker:'When it dives, let go. Reel hard after.', tugger:'Let go on each tug, reel between tugs.', sleeper:'It barely fights. Just reel it in.', ghost:'It fades from sight. Follow the line until it surfaces.'};
 const RAR = {
   common:   {label:'Common', color:'#9C968A', pips:1, hitstop:0, land:.8, splash:10, notes:[660,880]},
   uncommon: {label:'Uncommon', color:'#7FB069', pips:2, hitstop:.035, land:1.0, splash:16, notes:[523,659,784], luckCap:1.6},
@@ -58,7 +67,7 @@ const POOLS = {
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
 const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench'};
-const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','mossback','mayor'], coast:['sprat','wrasse','kelpeel','bream','grouper','saltjaw']};
+const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','mayor'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','saltjaw']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:20, bream:6},

@@ -1,6 +1,7 @@
 /* Aquarium: tanks, the tip rate per rarity (coins per minute), decor, and tank sets. Luck is in luck points (.1 is +10 luck).
    Decor with crate: (a rarity) isn't sold: it only comes in loot crates of that tier (data/treasure.js), then waits to be placed.
-   TANK_SETS[].check(fish) gets the tank's fish list and returns true when the set is complete. */
+   TANK_SETS[].check(fish) gets the tank's fish list and returns true when the set is complete. Its bonus applies in its
+   region ('any' for both), and only at night with night:true, or only in the weather wx names (data/weather.js). */
 const TANKS={
   fresh:{name:'Freshwater', water:['#5FA39A','#2F6A66','#1C4644'], sand:'#B79A6E', caps:[6,10,14], costs:[600,1500], unlock:0},
   salt: {name:'Saltwater', water:['#4FA6C4','#2A6F92','#173F5E'], sand:'#E2D3AE', caps:[6,10,14], costs:[800,2000], unlock:1200}
@@ -33,8 +34,12 @@ const TANK_SETS=[
    check:f=>f.some(x=>x.id==='mayor') && f.length>=3},
   {id:'lights', tank:'fresh', name:'Night Lights', need:'2 Lantern Carp', bonus:'+8 luck at night', region:'any', luck:.08, night:true,
    check:f=>f.filter(x=>x.id==='lantern').length>=2},
+  {id:'wetlake', tank:'fresh', name:'Wet Weather', need:'A Drizzle Dace and a Mist Char', bonus:'+10 luck at the lake in rain and fog', region:'lake', luck:.1, wx:['rain','fog'],
+   check:f=>['dace','char'].every(id=>f.some(x=>x.id===id))},
   {id:'rockpool', tank:'salt', name:'Rockpool', need:'Silver Sprat, Rock Wrasse and Barnacle Grouper', bonus:'+5% coins from sea fish', region:'coast', value:1.05,
    check:f=>['sprat','wrasse','grouper'].every(id=>f.some(x=>x.id===id))},
   {id:'trench', tank:'salt', name:'Trench Trophy', need:'A Saltjaw', bonus:'+10 luck at the coast', region:'coast', luck:.1,
-   check:f=>f.some(x=>x.id==='saltjaw')}
+   check:f=>f.some(x=>x.id==='saltjaw')},
+  {id:'squall', tank:'salt', name:'Foul Weather', need:'A Squall Mackerel and a Foghorn Gurnard', bonus:'+10 luck at the coast in rain and fog', region:'coast', luck:.1, wx:['rain','fog'],
+   check:f=>['mackerel','gurnard'].every(id=>f.some(x=>x.id===id))}
 ];

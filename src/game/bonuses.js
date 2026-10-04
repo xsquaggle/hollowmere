@@ -1,5 +1,5 @@
 /* ---------- Bonuses: the journal page that shows every bonus and where it comes from ---------- */
-const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', event:'Event'};
+const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', event:'Event', weather:'Weather'};
 /** How a modifier reads: +35 luck, +25%, −30%, ×2.5. Each stat keeps one unit. */
 function modValueText(stat,v,omen){
   if (omen) return '×'+trimNum(v);
@@ -20,6 +20,7 @@ function modWhenText(w){
   if (w.spot) out.push(spotIn(w.spot,w.region||REG()));
   else if (w.region) out.push('at '+REGION_NAME[w.region]);
   if (w.night) out.push('at night'); else if (w.night===false) out.push('by day');
+  if (w.wx) out.push(wxOnText(w.wx));
   if (w.lucky) out.push('while you fish a lucky splash');
   if (w.rarity) out.push('for '+w.rarity.map(r=>RAR[r].label.toLowerCase()).join(' and ')+' fish');
   if (w.rarityMin) out.push(w.rarityMin===Object.keys(RAR)[1]?'for every fish above common':'for '+RAR[w.rarityMin].label.toLowerCase()+' fish and rarer');
@@ -28,12 +29,15 @@ function modWhenText(w){
   if (w.wander) out.push('on the day’s first '+ENCH.wanderer.first+' catches in each water');
   return out.join(', ');
 }
+/** A weather condition in words: "in the rain", "in rain and fog". */
+function wxOnText(wx){ const L=[].concat(wx); return L.length===1?WX[L[0]].on:'in '+L.map(k=>WX[k].name.toLowerCase()).join(' and '); }
 /** 'on' applies wherever you cast right now; 'cond' depends on where you cast or what bites; 'off-here' and
     'off-now' can't apply in this water or at this hour. Pass a rarity in `now` to settle rarity conditions too. */
 function modState(m,now){ const w=m.when; if (!w) return 'on';
   const spots=Object.keys(now.region==='coast'?POOLS_COAST:POOLS);
   if ((w.region && w.region!==now.region) || (w.spot && !spots.includes(w.spot))) return 'off-here';
   if ((w.night && !now.night) || (w.night===false && now.night)) return 'off-now';
+  if (w.wx && ![].concat(w.wx).includes(now.wx)) return 'off-now';
   if (now.rarity && ((w.rarity && !w.rarity.includes(now.rarity)) || (w.rarityMin && rarRank(now.rarity)<rarRank(w.rarityMin)))) return 'off-here';
   const open=w.spot||w.fish||w.beh||w.lucky||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
   return open ? 'cond' : 'on'; }
@@ -43,7 +47,7 @@ const stateNote=st=>st==='off-here'?' · not here':st==='off-now'?' · not now':
 const fishTiers = () => Object.keys(RAR).filter(r=>RAR[r].luckCap && Object.values(FISH).some(F=>F.rarity===r));
 function bonusesHTML(){
   const now=modCtx({}), all=modList().filter(m=>m.src!=='tune' && m.src!=='base'), R=ROD();
-  const where='At '+REGION_NAME[now.region]+(now.night?', at night':', by day');
+  const where='At '+REGION_NAME[now.region]+(now.night?', at night':', by day')+(now.wx==='clear'?'':', '+WX[now.wx].on);
   // gear: what you're carrying
   const sets=setsDone(), parts=(save.parts||[]).map(id=>PARTS[id]&&PARTS[id].name).filter(Boolean), meal=save.meal;
   const reach=castReach(), gear=[['Rod',R.name+(reach>=1?' · casts to the horizon':' · casts '+Math.round(reach*100)+'% of the way out')],

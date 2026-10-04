@@ -1,4 +1,6 @@
 /* ---------- Scenery: living layers ---------- */
+/** Gulls only fly, and so only drop Gull Luck, in clear or overcast weather. */
+const gullWeather = () => { const k=wxNow(); return k==='clear'||k==='cloudy'; };
 function inLucky(x,y){ const z=SC.lucky; return !!z && Math.hypot(x-z.x,(y-z.y)*2.2)<z.r; }
 function drawGull(){
   const g=SC.gull; if (!g) return; const w=g.s*1.5, flap=Math.sin(S.time*(g.phase==='stop'?22:10)+g.ph);
@@ -30,18 +32,19 @@ function drawLucky(){
   ctx.font='800 11.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#F7DD92'; ctx.fillText(trimNum(gullMul())+'× RARITY · '+Math.ceil(z.dur-z.t)+'s',z.x,z.y-z.r/2.2-8);
   if (Math.random()<.15) S.particles.push({x:z.x+rand(-z.r,z.r)*.8,y:z.y+rand(-z.r,z.r)*.3,vx:0,vy:-rand(8,20),g:0,life:0,max:.8,r:rand(1,2),c:'rgba(255,230,150,'});
 }
-function drawCloud(x,y,s){
+function drawCloud(x,y,s,a=1){
   const blobs=[[0,0,16],[15,-6,13],[-15,-2,12],[29,2,9],[-27,3,8]];
-  ctx.fillStyle=PAL.cloudLit; ctx.globalAlpha=.8; for (const b of blobs){ ctx.beginPath(); ctx.arc(x+b[0]*s,y+b[1]*s+3*s,b[2]*s,0,Math.PI*2); ctx.fill(); }
-  ctx.fillStyle=PAL.cloudBase; ctx.globalAlpha=.95; for (const b of blobs){ ctx.beginPath(); ctx.arc(x+b[0]*s,y+b[1]*s,b[2]*s,0,Math.PI*2); ctx.fill(); }
+  ctx.fillStyle=PAL.cloudLit; ctx.globalAlpha=.8*a; for (const b of blobs){ ctx.beginPath(); ctx.arc(x+b[0]*s,y+b[1]*s+3*s,b[2]*s,0,Math.PI*2); ctx.fill(); }
+  ctx.fillStyle=PAL.cloudBase; ctx.globalAlpha=.95*a; for (const b of blobs){ ctx.beginPath(); ctx.arc(x+b[0]*s,y+b[1]*s,b[2]*s,0,Math.PI*2); ctx.fill(); }
   ctx.globalAlpha=1;
 }
+/** The lighthouse beam sweeping round. It burns in fog by day too, and fog turns it into a broad, soft cone. */
 function drawBeam(){
-  const L=SC.lamp; if (!L || PAL.beam<.03) return; ctx.save(); ctx.globalAlpha=PAL.beam; const a=S.time*.8, d=Math.cos(a), flash=Math.max(0,1-Math.abs(d)*3.5);
-  const len=W*.42*Math.abs(d), dir=d>0?1:-1;
-  if (len>4){ const g=ctx.createLinearGradient(L.x,L.y,L.x+dir*len,L.y); g.addColorStop(0,'rgba(255,228,170,.32)'); g.addColorStop(1,'rgba(255,228,170,0)');
-    ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(L.x,L.y-1.5); ctx.lineTo(L.x+dir*len,L.y-9); ctx.lineTo(L.x+dir*len,L.y+7); ctx.lineTo(L.x,L.y+1.5); ctx.closePath(); ctx.fill(); }
-  const r=5+flash*12; const hg=ctx.createRadialGradient(L.x,L.y,0,L.x,L.y,r); hg.addColorStop(0,'rgba(255,236,190,'+(.55+flash*.45).toFixed(2)+')'); hg.addColorStop(1,'rgba(255,236,190,0)');
+  const L=SC.lamp, fog=wxLook().fog, on=Math.max(PAL.beam,fog*.85); if (!L || on<.03) return; ctx.save(); ctx.globalAlpha=on; const a=S.time*.8, d=Math.cos(a), flash=Math.max(0,1-Math.abs(d)*3.5);
+  const len=W*.42*Math.abs(d)*(1+fog*.35), dir=d>0?1:-1, up=9+fog*14, dn=7+fog*12;
+  if (len>4){ const g=ctx.createLinearGradient(L.x,L.y,L.x+dir*len,L.y); g.addColorStop(0,'rgba(255,228,170,'+(.32-fog*.08).toFixed(3)+')'); g.addColorStop(1,'rgba(255,228,170,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(L.x,L.y-1.5); ctx.lineTo(L.x+dir*len,L.y-up); ctx.lineTo(L.x+dir*len,L.y+dn); ctx.lineTo(L.x,L.y+1.5); ctx.closePath(); ctx.fill(); }
+  const r=5+flash*12+fog*9; const hg=ctx.createRadialGradient(L.x,L.y,0,L.x,L.y,r); hg.addColorStop(0,'rgba(255,236,190,'+(.55+flash*.45).toFixed(2)+')'); hg.addColorStop(1,'rgba(255,236,190,0)');
   ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(L.x,L.y,r,0,Math.PI*2); ctx.fill(); ctx.restore();
 }
 function drawBirds(){
@@ -85,7 +88,7 @@ function drawWater(){
     ctx.fillStyle='rgba(255,240,210,'+a.toFixed(3)+')'; ctx.beginPath(); ctx.moveTo(x,y-r); ctx.lineTo(x+r*.3,y); ctx.lineTo(x,y+r); ctx.lineTo(x-r*.3,y); ctx.closePath(); ctx.fill();
     ctx.fillRect(x-r,y-.4,r*2,.8);
   }
-  drawLucky();
+  drawWxWater(); drawLucky();
   if (SC.jump){ const j=SC.jump, u=j.t/j.dur, k=sc(j.y), hgt=Math.sin(Math.PI*u)*26*k;
     ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
 }
@@ -223,7 +226,7 @@ function updateScenery(dt){
   if (SC.nextBirds<=0 && PAL.dark>.3) SC.nextBirds=4;
   if (SC.nextBirds<=0){ const dir=Math.random()<.5?1:-1, n=2+Math.floor(Math.random()*4), m=[];
     for (let i=0;i<n;i++) m.push({dx:i*11+rand(-2,2), dy:(i%2?1:-1)*Math.ceil(i/2)*5+rand(-1,1), ph:rand(0,6.28), s:rand(4.5,6.5)});
-    SC.birds.push({x:dir>0?-30:W+30, y:rand(HZ*.15,HZ*.62), dir, sp:rand(22,34), members:m, dropAt:(!SC.lucky && !SC.gull && !S.tut && Math.random()<.45)?rand(W*.25,W*.75):null}); SC.nextBirds=REG()==='coast'?rand(5,10):rand(9,18); }
+    SC.birds.push({x:dir>0?-30:W+30, y:rand(HZ*.15,HZ*.62), dir, sp:rand(22,34), members:m, dropAt:(!SC.lucky && !SC.gull && !S.tut && Math.random()<.45 && gullWeather())?rand(W*.25,W*.75):null}); SC.nextBirds=(REG()==='coast'?rand(5,10):rand(9,18))*(gullWeather()?1:3); }
   for (const f of SC.birds){ f.x+=f.dir*f.sp*dt;
     // a gull drops out to make a Gull Luck splash, but never during a treasure moment
     if (f.dropAt!=null && f.members.length>1 && S.state!=='loot' && (f.dir>0?f.x>=f.dropAt:f.x<=f.dropAt)){ const m=f.members.pop(); f.dropAt=null;
@@ -259,12 +262,14 @@ function updateScenery(dt){
   else { f.t-=dt; if (f.croak>0) f.croak-=dt;
     if (f.t<=0){ if (Math.random()<.5){ let to=Math.floor(Math.random()*SC.pads[0].length); if (to===f.pad) to=(to+1)%SC.pads[0].length; f.hop={from:f.pad,to,t:0}; }
       else f.croak=.9; f.t=rand(4,9); } }
-  if (OTT.sayT>0) OTT.sayT-=dt; else { OTT.next-=dt; if (OTT.next<=0 && S.state==='idle'){ OTT.say=OTT_LINES[Math.floor(Math.random()*OTT_LINES.length)]; OTT.sayT=4.5; OTT.next=rand(20,35); } }
+  if (OTT.sayT>0) OTT.sayT-=dt; else { OTT.next-=dt; if (OTT.next<=0 && S.state==='idle'){ const wl=WX_LINES[wxNow()], L=wl && Math.random()<.5 ? wl : OTT_LINES;   // half the time, something about the weather
+    OTT.say=L[Math.floor(Math.random()*L.length)]; OTT.sayT=4.5; OTT.next=rand(20,35); } }
   const h=SC.heron; h.t-=dt; if (h.t<=0){ h.dir*=-1; h.t=rand(2.5,7); }
   for (const d of SC.dfly){
     if (!d.ready){ d.x=Math.random()<.5?W*.1:W*.9; d.y=H*.62; d.tx=d.x; d.ty=d.y; d.ready=true; }
     d.hold-=dt;
-    if (d.hold<=0){ const L=Math.random()<.5; d.tx=L?rand(W*.03,W*.28):rand(W*.74,W*.97); d.ty=rand(H*.5,H*.78); d.hold=rand(1.2,3); }
+    if (wxLook().rain>.4){ d.tx=d.x<W/2?-40:W+40; d.ty=H*.6; d.hold=0; }   // they shelter in the reeds while it rains
+    else if (d.hold<=0){ const L=Math.random()<.5; d.tx=L?rand(W*.03,W*.28):rand(W*.74,W*.97); d.ty=rand(H*.5,H*.78); d.hold=rand(1.2,3); }
     d.x=lerp(d.x,d.tx,Math.min(1,dt*3.2)); d.y=lerp(d.y,d.ty,Math.min(1,dt*3.2));
   }
 }

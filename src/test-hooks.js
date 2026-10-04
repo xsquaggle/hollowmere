@@ -13,6 +13,7 @@ window.__hm={ get save(){ return save; }, FISH, RODS, REGION_FISH, RECIPES, DECO
       drawGreyWading(60,470,1.4,1); drawTrapOnDeck(ctx,'lake',190,460,1.4,1,true); drawTrapOnDeck(ctx,'coast',300,460,1.4,1,false);
       return cv.toDataURL('image/png'); },
     drawPortrait:(...a)=>drawPortrait(...a), drawFish:(...a)=>drawFish(...a), drawSmokedFish:(...a)=>drawSmokedFish(...a), drawTackle:(...a)=>drawTackle(...a), drawRig:(...a)=>drawRig(...a), drawGeode:(...a)=>drawGeode(...a), drawRune:(...a)=>drawRune(...a), drawGlimGem:(...a)=>drawGlimGem(...a) }, openShop:t=>openShop(t),
+  WX, WX_ORDER, pool:(sp,l)=>poolFor(sp,l), reel:id=>{ S.bite=null; startReel(id,false); }, wx:{ now:()=>wxNow(), info:()=>wxInfo(), shares:(r,d,s)=>wxShares(r,d,s), at:(r,B,s)=>wxAt(r,B,s), line:()=>wxLine(), look:()=>wxLook(), state:()=>wxState() },
   ENCH, GLIMMER, ench:{ state:()=>enchState(), forRod:r=>enchFor(r||save.rod), on:id=>enchOn(id), etch:(id,at)=>etchRune(id,at), socket:(id,at)=>socketRune(id,at), unsocket:at=>unsocketRune(at),
     glimmer:(n,o)=>addGlimmer(n,o), wander:r=>wanderCount(r||REG()), echo:()=>S.echo },
   TRAPS, FITTINGS, SMOKE, AWAY, idleReport:{ trapExpect:(...a)=>trapExpect(...a), trapsPerHour:(...a)=>trapsPerHour(...a), hookPerHour:(...a)=>hookPerHour(...a) },

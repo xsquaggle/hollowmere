@@ -237,7 +237,7 @@ function aqCollect(){ accrueTips(); const tk=tanks()[AQ.tank], n=Math.floor(tk.t
 function aqCard(fi){
   const f=fi.ref, F=FISH[f.id], card=$('aqCard'), netRoom=save.net.length<netCap(), d=f.t?new Date(f.t):null, k=AQ.tank, favs=favorites(k,f.id);
   card.innerHTML='<div class="aq-card-top"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+'</span><button class="x" id="aqX" aria-label="Close">×</button></div>'+
-    '<h3>'+F.name+(isPB(f)?' <span class="net-rec">Record</span>':'')+'</h3><p><b>'+fmtW(fishW(f))+'</b> · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+'</p><p>Caught at '+(f.spot?spotLabel(f.reg,f.spot):REGION_NAME[tankOf(f.id)==='salt'?'coast':'lake'])+(d?' · '+whenLabel(f.t,f.hr):'')+
+    '<h3>'+F.name+(isPB(f)?' <span class="net-rec">Record</span>':'')+'</h3><p><b>'+fmtW(fishW(f))+'</b> · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+'</p><p>Caught at '+(f.spot?spotLabel(f.reg,f.spot):REGION_NAME[tankOf(f.id)==='salt'?'coast':'lake'])+(d?' · '+whenLabel(f.t,f.hr,f.wx):'')+
     (f.perfect?' · perfect hook':'')+(f.lucky?' · Gull luck':'')+'</p><p class="tip">Earns about '+fishTipRate(k,f).toFixed(2)+' coins a minute in tips'+(favs.length?' · loves the '+favs.map(x=>x.name).join(' and '):'')+'</p><p class="lore">'+F.lore+'</p>'+
     '<div class="row"><button class="btn" id="aqToNet"'+(netRoom?'':' disabled')+'>'+(netRoom?'Back to keepnet':'Keepnet full')+'</button><button class="btn" id="aqSell">Sell · +'+f.value+'</button></div>';
   card.hidden=false;

@@ -61,7 +61,13 @@ Step 16, the art pass, brought everything older up to this bar: the scene in par
   - Tickets are cream paper with a red pin and a dashed rule, each a touch askew, and drop in with a small bounce. During Season the order's ticket hangs top right; when it would reach the jars it goes two columns ("none, please" underneath), and if even that does, the jars come down a little.
   - The customer waits in the kitchen window, behind the glass and the glazing bars (dimmed at night, with the curtains drawn over), and hops when it's good.
   - The served card shows their face and words, the tips and reputation, and the standing bar filling. A new standing glows gold.
-- **Fish up close:** past 44 px a fish gets a gill line, a side fin, a darker back, a mouth and a glint in its eye; past 80 px, fin rays, a lateral line and scales. Catfish, eels, and fish whose pattern already reads as scales don't get extra scales.
+- **Weather art** lives in `src/game/weather-art.js`.
+  - The tint goes into the palette, so the cached backdrop greys under cloud and the far shore fades into fog; the overcast deck and fog's wash are painted into the backdrop too, and repainted only as the weather changes.
+  - Only the moving parts draw each frame: three depths of rain (one path each), rings where drops land, splashes on the boards and drips off the hat brim, fog banks (one cached strip each, slid sideways), a few heavy clouds and the rainbow.
+  - Fog fades fish shadows in the far water. A ghost's marker and gap line leave the gauge while it's faded, and the label says to follow the line.
+  - The clock chip's weather marks are small ink-line icons in cream: a sun or moon, a cloud, a cloud with rain, and fog bands.
+  - The kitchen and aquarium windows show beads and runs on the glass in rain, and a pale wash in fog.
+- **Fish up close:** past 44 px a fish gets a gill line, a side fin, a darker back, a mouth and a glint in its eye; past 80 px, fin rays, a lateral line and scales. Catfish, eels, and fish whose pattern already reads as scales don't get extra scales. The Foghorn Gurnard's wing-like fan shows at every size, its shadow included, because it's the gurnard's silhouette.
 
 ## Rarity kit
 
@@ -90,4 +96,5 @@ Pips count the tier from 1 to 8.
 ## Sound
 
 Soft, wooden and watery, all procedural (Web Audio): plucks and bells for music, and clicks, splashes and canvas or
-leather for interactions. Each sound is short and slightly varied, so repeats don't grate.
+leather for interactions. The weather has its own beds: rain on the water and the roof, a drop now and then on the
+boards, a foghorn off the coast and a bell under the lake in fog, and the music muffled a little in rain and more in fog. Each sound is short and slightly varied, so repeats don't grate.
