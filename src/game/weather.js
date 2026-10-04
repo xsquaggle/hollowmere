@@ -14,6 +14,8 @@ const WX_REGN={lake:1, coast:2};
 function wxState(){ let w=save.wx; if (!w || typeof w!=='object' || Array.isArray(w)) w=save.wx={};
   if (!Number.isInteger(w.seed) || w.seed<1) w.seed=1+Math.floor(Math.random()*2147483646);
   if (w.force!=null && !WX_ORDER.includes(w.force)) delete w.force;
+  if (w.moon!=null && !(Number.isInteger(w.moon) && w.moon>=0 && w.moon<MOON.cycle)) delete w.moon;
+  if (w.bow!=null && w.bow!==true) delete w.bow;
   if (!w.seen || typeof w.seen!=='object' || Array.isArray(w.seen)) w.seen={};
   return w; }
 /** A number in [0, 1) from three integers: the same three always give the same number. */
@@ -34,7 +36,7 @@ function wxAt(reg,B,seed){ seed=seed||wxState().seed; return wxRoll(reg,wxStart(
     a rainbow, each 0 to 1). Cached until the save, the clock, the region or a pinned kind changes. */
 function wxInfo(){
   const w=wxState(), M=WXM;
-  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.force===w.force && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
+  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
   const reg=REG(), h=(((save.clock%24)+24)%24), into=h%WX_SPELL.hours; let from, to, t;
   if (w.force){ from=to=w.force; t=1; }
   else if (!save.tutorialDone){ from=to='clear'; t=1; }
@@ -45,7 +47,8 @@ function wxInfo(){
   if (kind==='clear'||kind==='cloudy'){ const m=h<DAWN_MIST.from-.5||h>DAWN_MIST.to+1.5?0:h<6?(h-(DAWN_MIST.from-.5))/1.5:1-(h-6)/(DAWN_MIST.to+1.5-6); v.mist=clamp(m,0,1); }
   // a rainbow, by day, in the hour or two after rain gives way
   if (from==='rain' && to!=='rain' && !w.force && h>=7 && h<18.5) v.bow=clamp((t-.5)/.4,0,1)*clamp((2.4-into)/.8,0,1);
-  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,force:w.force,seed:w.seed,tut:save.tutorialDone,v});
+  if (w.bow && !isNight(h)) v.bow=1;                                   // Playtest: a rainbow now
+  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
   return v; }
 /** The weather the fishing uses here and now: 'clear', 'cloudy', 'rain' or 'fog'. */
 const wxNow = () => wxInfo().kind;
@@ -53,6 +56,21 @@ const wxNow = () => wxInfo().kind;
 function wxLook(){ const v=wxInfo(); if (!v.look) v.look={cloud:v.cloud, rain:v.rain, fog:Math.max(v.fog,v.mist*DAWN_MIST.look), mist:v.mist, bow:v.bow}; return v.look; }   // one per answer, not one per call
 /** Whether the dawn mist is on the water for fishing: fog fish rise at a share of their odds. */
 const wxMist = () => { const v=wxInfo(), h=save.clock; return (v.kind==='clear'||v.kind==='cloudy') && h>=DAWN_MIST.from && h<DAWN_MIST.to; };
+/* The moon waxes and wanes over MOON.cycle in-game days. A night belongs to the day it began on: the small hours are
+   still last night. Playtest can pin the phase (save.wx.moon). */
+const moonNightDay = () => (save.day||0)-((((save.clock%24)+24)%24)<12?1:0);
+/** The moon's phase tonight: 0 new, MOON.full full. */
+function moonPhase(){ const w=wxState(); if (w.moon!=null) return w.moon; const c=MOON.cycle; return (((moonNightDay()+MOON.offset)%c)+c)%c; }
+const fullMoon = () => moonPhase()===MOON.full;
+/** Whether a full moon is up and showing: the moonpath lies on the water. Cloud and fog hide it. */
+function moonpathOn(){ return fullMoon() && isNight(save.clock) && (PAL.moonVis==null?1:PAL.moonVis)*(1-Math.max(wxLook().cloud,wxLook().fog))>.25; }
+/** Whether (x, y) is on the moonpath: a column of light under the moon, wider toward the dock. */
+function onMoonpath(x,y){ if (!moonpathOn()) return false; const k=clamp((y-HZ)/(H-HZ),0,1); return Math.abs(x-(SC.moonX||W*.74))<W*lerp(MOON.path[0],MOON.path[1],k); }
+/** Where the rainbow's foot touches the water, and how strongly it shows (0 to 1): on the side away from the sun. */
+function bowFoot(){ const a=wxLook().bow; if (!(a>.01)) return null; const cx=W*(PAL&&PAL.sunX>.5?.32:.68), R=W*.6, dy=W*.2, dx=Math.sqrt(R*R-dy*dy);
+  const x=clamp(cx<W/2?cx+dx:cx-dx,W*.14,W*.86); return {x, y:HZ+(H-HZ)*BOW_FOOT.depth, r:W*BOW_FOOT.r, a}; }
+/** Whether (x, y) is at the rainbow's foot, while the rainbow is bright enough to see. */
+function atBowFoot(x,y){ const f=bowFoot(); return !!f && f.a>.3 && Math.hypot(x-f.x,(y-f.y)*2.4)<f.r; }
 /** What share of the time each kind of weather fills in `reg`, over `days` in-game days of this sky (for the
     balance report and the tests). */
 function wxShares(reg,days,seed){ seed=seed||wxState().seed; const n={}; for (const k of WX_ORDER) n[k]=0;

@@ -193,7 +193,7 @@ const kBlit=(c,S)=>c.drawImage(S.cv,S.x,S.y,S.w,S.h);
 function drawBoard(c){ kBlit(c,kSprite('board',[-182,-114,192,126],paintBoard)); }
 function drawStove(c){ kBlit(c,kSprite('stove',[-196,-188,198,198],paintStove)); }
 /** The whole fish on the board, before and after its scales come off. */
-function drawBoardFish(c,fid,L,bare){ const F=FISH[fid], h=L*F.h, lw=Math.max(1.5,L*.032); kBlit(c,kSprite('fish',[-L*.64,-h*(fid==='mayor'?2.3:1.75)-lw,L*.7,h*1.15+lw],x=>drawFish(x,fid,L,false,1,0,bare),fid+L.toFixed(1)+bare)); }
+function drawBoardFish(c,fid,L,bare){ const F=FISH[fid], h=L*F.h, lw=Math.max(1.5,L*.032); kBlit(c,kSprite('fish',[-L*.64,-h*((DORSAL[fid]||DORSAL0).top+.1)-lw,L*.8,h*(fid==='calf'?2.4:1.15)+lw],x=>drawFish(x,fid,L,false,1,0,bare),fid+L.toFixed(1)+bare)); }
 function paintBoard(c){ c.save(); c.fillStyle='rgba(30,15,5,.3)'; rrect(c,-172,-100,350,222,22); c.fill();
   // the board's thickness along the front, end grain showing
   rrect(c,-178,-100,350,212,22); c.fillStyle='#A7743F'; c.fill(); c.lineWidth=2; c.strokeStyle=INK; c.stroke();
@@ -272,7 +272,7 @@ function kRoom(){ // cached wall, window, tiles, shelf and counter
   c.fillStyle=sky; c.fillRect(wx,wy,ww,wh);
   c.save(); c.beginPath(); c.rect(wx,wy,ww,wh); c.clip();
   if (P.stars>.2){ const rnd=seeded('kstars'); c.fillStyle='rgba(255,255,240,'+P.stars*.8+')'; for (let i=0;i<14;i++) c.fillRect(wx+rnd()*ww,wy+rnd()*wh*.6,1.4,1.4); }
-  if (P.moonVis>.3){ c.fillStyle='rgba(246,241,226,'+P.moonVis+')'; c.beginPath(); c.arc(wx+ww*.72,wy+wh*.25,7*s,0,6.28); c.fill(); }
+  if (P.moonVis>.3) drawMoonPhase(c,wx+ww*.72,wy+wh*.25,7*s,P.moonVis);   // in tonight's phase (game/moon.js)
   if (P.sunVis>.3 && P.sunY<1){ c.fillStyle='rgba(255,244,214,.9)'; c.beginPath(); c.arc(wx+ww*.3,wy+wh*(.15+P.sunY*.45),8*s,0,6.28); c.fill(); }
   c.fillStyle='rgb('+P.hillFarR+')'; c.beginPath(); c.moveTo(wx,wy+wh*.72); c.quadraticCurveTo(wx+ww*.35,wy+wh*.52,wx+ww*.6,wy+wh*.68); c.quadraticCurveTo(wx+ww*.85,wy+wh*.6,wx+ww,wy+wh*.7); c.lineTo(wx+ww,wy+wh); c.lineTo(wx,wy+wh); c.fill();
   c.fillStyle='rgb('+P.w1R+')'; c.fillRect(wx,wy+wh*.78,ww,wh*.22); c.fillStyle='rgba(255,255,255,.25)'; c.fillRect(wx+ww*.2,wy+wh*.84,ww*.3,1.5); c.fillRect(wx+ww*.55,wy+wh*.9,ww*.25,1.5);

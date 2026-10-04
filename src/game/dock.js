@@ -165,7 +165,7 @@ function drawKeepnet(){
   bag(); c.fillStyle='rgba(18,44,52,.38)'; c.fill();
   c.save(); bag(); c.clip();
   c.fillStyle='rgba(60,120,140,.3)'; c.fillRect(-16,18,32,20);   // below the waterline
-  for (let i=0;i<Math.min(n,4);i++){ const f=save.net[n-1-i], F=FISH[f.id]; c.save(); c.translate(-6+i*4.2,8+((i*7)%9)); c.rotate(-1.1+i*.55+Math.sin(S.time*2.4+i)*.12); drawFish(c,f.id,Math.min(18,F.len*.32),false,.95,Math.sin(S.time*5+i)*.4); c.restore(); }
+  for (let i=0;i<Math.min(n,4);i++){ const f=save.net[n-1-i], F=FISH[f.id]; c.save(); c.translate(-6+i*4.2,8+((i*7)%9)); c.rotate(-1.1+i*.55+Math.sin(S.time*2.4+i)*.12); drawFish(c,f.id,Math.min(18,F.len*.32),false,.95,Math.sin(S.time*5+i)*.4,false,f.mut); c.restore(); }
   // the mesh: diamonds, fading where it's under water
   c.strokeStyle='rgba(236,228,206,.82)'; c.lineWidth=.8;
   for (let d=-40;d<=40;d+=5.2){ c.beginPath(); c.moveTo(d,0); c.lineTo(d+36,36); c.stroke(); c.beginPath(); c.moveTo(d,0); c.lineTo(d-36,36); c.stroke(); }

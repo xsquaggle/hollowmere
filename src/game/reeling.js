@@ -3,6 +3,7 @@ function startReel(id,perfect){
   if (S.bite && S.bite.loot) return startHaul(S.bite.loot,perfect);
   const F=FISH[id], first=rec(id).caught===0;
   S.reel=newFight(id,perfect,S.bob,!!(S.wait&&S.wait.lucky),!!S.tut,S.bob.spot);
+  S.reel.bow=!!(S.wait&&S.wait.bow);                                   // hooked at the rainbow's foot: mutations twice as likely
   S.holding=S.pointers.size>0; S.tilt=0; S.pressX=S.thumbX; S.pressTilt=0; humStart(); setState('reeling');
   if (S.tut){ S.tut='reel1'; coach('Hooked! Now press and hold your finger down to reel it in.','4 of 4'); }
   else if (first && F.beh==='leaper') coachShow('New fish: Leapers jump out of the water. Tap while it’s in the air to keep the line tight.',6);

@@ -97,11 +97,11 @@ function drawLanding(){
   if (!S.land) return; const L=S.land, F=L.F, r=F.rarity;
   const pos=S.state==='result'?{x:L.to.x,y:L.to.y+Math.sin(S.time*2)*3,e:1}:landPos();
   const len=lerp(F.len*sc(L.from.y),Math.min(W*.55,F.len*2.4),pos.e);
-  if (r!=='common'){ const a=r==='uncommon'?.25:r==='rare'?.45:.7; drawRays(pos.x,pos.y,RAR[r].color,a*pos.e,len*1.3); }
+  landRays(L,pos,len);
   ctx.save(); ctx.translate(pos.x,pos.y);
   const ang=S.state==='result'?-.08:(L.from.x<L.to.x?1:-1)*(.9-pos.e*.95)+Math.sin(S.time*22)*.25*(1-pos.e);
   ctx.rotate(ang); if (L.from.x>L.to.x && S.state!=='result') ctx.scale(-1,1);
-  drawFish(ctx,L.id,len,false,1,Math.sin(S.time*(S.state==='result'?4:20))*(S.state==='result'?.2:.6)); ctx.restore();
+  drawFish(ctx,L.id,len,false,1,Math.sin(S.time*(S.state==='result'?4:20))*(S.state==='result'?.2:.6),false,L.mut); ctx.restore();
 }
 function drawAim(){
   if (S.state!=='aiming' || !S.aim) return; const a=S.aim;
@@ -174,10 +174,10 @@ function render(){
   ctx.save();
   if (S.shake>.1) ctx.translate(rand(-1,1)*S.shake,rand(-1,1)*S.shake);
   if (Math.abs(S.zoom-1)>.001){ const cx=W/2, cy=H*.42; ctx.translate(cx,cy); ctx.scale(S.zoom,S.zoom); ctx.translate(-cx,-cy); }
-  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
+  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawRfxWater(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
   drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade(); drawRain();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
-  drawTrapMarkers(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
+  drawTrapMarkers(); drawRfxOver(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
   ctx.restore();
   drawOverlays();
 }

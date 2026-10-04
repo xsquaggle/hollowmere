@@ -57,10 +57,10 @@ function buildBg(){
     x.fillStyle=sg; x.fillRect(0,0,W,HZ); x.globalAlpha=P.sunVis; x.fillStyle=P.sunDisc; x.beginPath(); x.arc(sx,sy,W*(P.sunY>.8?.065:.05),0,Math.PI*2); x.fill(); x.globalAlpha=1; }
   const mx=W*.74, my=HZ*.3;
   if (P.moonVis>.01){ const mg=x.createRadialGradient(mx,my,4,mx,my,W*.3); mg.addColorStop(0,'rgba(200,215,255,'+(.3*P.moonVis).toFixed(2)+')'); mg.addColorStop(1,'rgba(200,215,255,0)');
-    x.fillStyle=mg; x.fillRect(0,0,W,HZ); x.globalAlpha=P.moonVis; x.fillStyle='#EEE8D5'; x.beginPath(); x.arc(mx,my,W*.04,0,Math.PI*2); x.fill();
-    x.fillStyle='rgba(180,170,150,.5)'; x.beginPath(); x.arc(mx-4,my-3,3,0,Math.PI*2); x.arc(mx+5,my+4,2.2,0,Math.PI*2); x.arc(mx+2,my-6,1.5,0,Math.PI*2); x.fill(); x.globalAlpha=1; }
+    x.globalAlpha=.25+.75*moonLit(); x.fillStyle=mg; x.fillRect(0,0,W,HZ); x.globalAlpha=1; drawMoonPhase(x,mx,my,W*.04,P.moonVis); }   // in its phase (game/moon.js)
+  SC.moonX=mx;
   paintWxSky(x);   // an overcast deck and fog's wash (game/weather-art.js)
-  const useSun=P.sunVis>=P.moonVis; SC.lightX=useSun?sx:mx; SC.lightRGB=useSun?P.glowR:'210,222,255'; SC.lightA=useSun?P.sunVis*(P.sunY>.7?1:.45):P.moonVis*.7;
+  const useSun=P.sunVis>=P.moonVis; SC.lightX=useSun?sx:mx; SC.lightRGB=useSun?P.glowR:'210,222,255'; SC.lightA=useSun?P.sunVis*(P.sunY>.7?1:.45):P.moonVis*.7*(.25+.75*moonLit());
   drawLand(x,true);
   const ws=REG()==='coast'?[mixP('w0','#94BCCB',.3),mixP('w1','#2F8098',.38),mixP('w2','#1B6276',.38),mixP('w3','#0E3A4A',.3)]:[P.w0,P.w1,P.w2,P.w3];
   const wg=x.createLinearGradient(0,HZ,0,H); wg.addColorStop(0,ws[0]); wg.addColorStop(.1,ws[1]); wg.addColorStop(.45,ws[2]); wg.addColorStop(1,ws[3]);

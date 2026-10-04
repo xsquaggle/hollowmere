@@ -13,7 +13,13 @@
    WX_SOME      where those fish turn up at a share of their weight in other weather: rain fish on overcast days
                 ("there's rain in the air"), fog fish in the dawn mist.
    DAWN_MIST    the hours of the light morning mist on clear and overcast days, and how thick it looks at its thickest.
-   WX_LINES     what Ottilie says about the weather (she picks one of these half the time while it lasts). */
+   WX_LINES     what Ottilie says about the weather (she picks one of these half the time while it lasts).
+   MOON         the moon's phases: cycle in-game days from new to new, the phase that's full (0 is new), and offset, which
+                lines the cycle up so the first full moon rises on the night of day 3. path: the moonpath's half-width on
+                the water as a share of the screen, far and near. breach: how often (a chance per in-game hour) the
+                Moonwhale's mother breaches far out on a full-moon night at the lake.
+   BOW_FOOT     where the rainbow's foot touches the water: how far out (0 at the horizon to 1 at the dock) and how wide
+                its shimmer is, as a share of the screen. */
 const WX={
   clear: {name:'Clear', on:'in clear weather', look:{cloud:0, rain:0, fog:0}, mods:[]},
   cloudy:{name:'Overcast', on:'on overcast days', look:{cloud:1, rain:0, fog:0}, mods:[]},
@@ -40,3 +46,5 @@ const WX_LINES={
   rain:  ['Mind the drops. A raindrop and a nibble look the same from here.','Your uncle fished every storm. Said the lake talks louder in the rain.','Rain brings the dace up. Daft things jump at every drop.'],
   fog:   ['Haven’t seen fog like this since the flood.','Hear that? A bell, under the water. Always in the fog.','Fog hides the far fish. Let them come to you.']
 };
+const MOON={cycle:8, full:4, offset:1, path:[.03,.075], breach:.35};
+const BOW_FOOT={depth:.4, r:.1};

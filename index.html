@@ -1070,7 +1070,7 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 <div id="mapLayer" hidden></div>
 
 <div id="card" hidden role="dialog" aria-label="Catch">
-  <div class="card-top"><span class="rarity" id="cRarity">Common</span><span class="beh" id="cBeh">Darter</span><span class="stamp" id="cNew">NEW</span><span class="spacer"></span><span id="cQ"></span></div>
+  <div class="card-top"><span class="rarity" id="cRarity">Common</span><span id="cPips"></span><span class="beh" id="cBeh">Darter</span><span class="stamp" id="cNew">NEW</span><span class="spacer"></span><span id="cQ"></span></div>
   <canvas id="cFish"></canvas>
   <div class="c-name"><h2 id="cName">Copper Perch</h2><span class="rec-stamp" id="cRec" hidden>Personal<br>record</span></div>
   <p id="cPB" hidden></p>
@@ -1116,9 +1116,20 @@ const INK='#2B2A33', PAPER='#F3EAD7', BRASS='#C9A15A', DANGER='#D9614C', GOOD='#
               color and fin; window (seconds to strike after the bite); lore; hint (journal line before it is caught);
               night:true for fish that come up after dark (meals that boost night fish boost these); wx:'rain' or 'fog' for
               fish the weather brings up (data/weather.js says where and how often; they're never in a trap).
+              extra:true for fish that don't count toward finishing a water (Barnaby never waits on them); secret:true
+              for a fish found by experimenting, whose journal page shows a riddle (hint) once it's been seen; beh2 for a
+              fish that changes how it fights halfway in; noTank:true for one too big for any tank.
    RAR[tier]  how a rarity looks and sounds, in order from common to godly; pips (1 to 8) so rarity never rests on color
               alone; prism and ink for the tiers whose color shifts or bleeds. luckCap is the most luck can multiply
               its odds (see game/mods.js); Godly's sits below Mythic's on purpose, so no build makes Godly routine.
+   RARE_BITES fish no spot pool offers: each is checked first on every cast, at its own chance before luck, only where
+              and when it can bite (game/odds.js: rollFish). region; spots (or any); bow:true at the rainbow's foot;
+              moon:'full' and night:true on full-moon nights; path: how much likelier a cast onto the moonpath makes it.
+   DRY        soft bad-luck protection, up to Legendary only: after `from` casts in a row where a Legendary could have
+              bitten and didn't, its odds creep up, reaching ×max at `to`. Landing a Legendary or rarer starts it over.
+   MUTS       mutations, rolled on landing (game/landing.js: catchRoll) on anything below Mythic: chance per catch before
+              bonuses (STATS.mutation), what it multiplies the value by, Glimmer it pays, and for Giant how far past the
+              species' biggest it grows. MUT_ORDER is the order the journal lists them.
    ORDER      the lake journal's order, the same fish as REGION_FISH.lake.  REGION_FISH  which species live in each region, in journal order.
    POOLS      lake bite weights per spot; POOLS_COAST the same for Gullrock Coast. Night, dawn, rods,
               meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench"). */
@@ -1153,10 +1164,18 @@ const FISH = {
             lore:'Pale as the fog it swims in, and warmer in the hand than it looks.', hint:'Glimpsed in the deep pool on foggy mornings.'},
   mackerel:{name:'Squall Mackerel', rarity:'uncommon', beh:'darter', wx:'rain', pull:1.05, reel:4.2, value:30, size:[26,44], len:44, h:.2, color:'#4F8A8B', fin:'#2F5C60', window:1.05,
             lore:'Rides in under the squalls, a whole school at a time, and leaves just as fast.', hint:'Rides in under the rain squalls.'},
+  gar:     {name:'Steeple Gar', rarity:'epic', beh:'leaper', extra:true, pull:1.55, reel:10, value:260, size:[90,150], len:84, h:.1, color:'#7F866A', fin:'#5B6248', window:.82,
+            lore:'Rests nose-up, like the church steeple it hides behind. The steeple is underwater too.', hint:'Something long and thin hangs nose-up in the deep pool, most of all in the evening.'},
+  angler:  {name:'Gaslight Angler', rarity:'epic', beh:'sulker', night:true, extra:true, pull:1.6, reel:11, value:480, size:[45,80], len:58, h:.4, color:'#5A4E58', fin:'#3D3440', window:.8,
+            lore:'Its lure burns like an old gas lamp. Ships used to steer for it, which is how the trench filled up with ships.', hint:'A small light wanders in the trench after dark.'},
+  shiner:  {name:'Prism Shiner', rarity:'exotic', beh:'darter', secret:true, extra:true, pull:1.15, reel:7.5, value:1200, size:[9,16], len:32, h:.25, color:'#D4E7EA', fin:'#A9CFDA', window:.62,
+            lore:'It swallows the ends of rainbows. That’s why nobody ever reaches one.', hint:'Seen where the colours touch the water.'},
+  calf:    {name:'Moonwhale Calf', rarity:'mythic', beh:'sulker', beh2:'leaper', extra:true, noTank:true, pull:2, reel:22, value:10000, size:[380,520], len:124, h:.3, color:'#5F6F8A', fin:'#45536C', window:.65,
+            lore:'Too big for this lake. Where is its mother?', hint:'Something enormous breaches far out on full-moon nights. It isn’t alone.'},
   gurnard: {name:'Foghorn Gurnard', rarity:'rare', beh:'ghost', wx:'fog', pull:1.4, reel:7.5, value:160, size:[28,52], len:46, h:.28, color:'#C25A4B', fin:'#E59A5C', window:.9,
             lore:'Grunts like a foghorn. The lighthouse keepers used to steer by it.', hint:'Grunts from the sea stacks when the fog is in.'}
 };
-const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','mayor'];
+const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'];
 const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper', ghost:'Ghost'};
 const BEH_TIP = {darter:'It darts side to side, so follow it.', leaper:'Tap when it jumps clear of the water.', sulker:'When it dives, let go. Reel hard after.', tugger:'Let go on each tug, reel between tugs.', sleeper:'It barely fights. Just reel it in.', ghost:'It fades from sight. Follow the line until it surfaces.'};
 const RAR = {
@@ -1172,20 +1191,32 @@ const RAR = {
 const POOLS = {
   open: {perch:70, reedwhisker:6, leafjack:12, mossback:3},
   pads: {leafjack:55, perch:25, mossback:8},
-  deep: {perch:28, mossback:40, leafjack:12, mayor:6},
-  far:  {perch:22, leafjack:30, mossback:26, reedwhisker:4, mayor:3},
+  deep: {perch:28, mossback:40, leafjack:12, gar:5, mayor:6},
+  far:  {perch:22, leafjack:30, mossback:26, reedwhisker:4, gar:3, mayor:3},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
 const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench'};
-const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','mayor'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','saltjaw']};
+const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:20, bream:6},
   kelp: {kelpeel:46, sprat:24, bream:20, grouper:5},
-  deep: {grouper:30, bream:28, sprat:24, kelpeel:10, saltjaw:4},
-  far:  {bream:34, sprat:28, grouper:20, kelpeel:10, saltjaw:2}
+  deep: {grouper:30, bream:28, sprat:24, kelpeel:10, angler:4, saltjaw:4},
+  far:  {bream:34, sprat:28, grouper:20, kelpeel:10, angler:2, saltjaw:2}
 };
+const RARE_BITES={
+  shiner:{region:'lake', bow:true, chance:.1},
+  calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/200, path:2}
+};
+const DRY={from:80, to:200, max:2};
+const MUTS={
+  mossy: {name:'Mossy', value:2, chance:1/90, glimmer:3, desc:'Moss and tiny plants grow along its back.'},
+  glassy:{name:'Glassy', value:3, chance:1/160, glimmer:5, desc:'See-through, with its bones showing.'},
+  twin:  {name:'Twin', value:1, chance:1/110, glimmer:3, desc:'Two on one hook.'},
+  giant: {name:'Giant', value:1, chance:1/130, glimmer:4, size:[1.25,1.55], desc:'Far past the usual size.'}
+};
+const MUT_ORDER=['mossy','glassy','twin','giant'];
 
 /* Gear: rods, boat parts and hull paint.
    RODS[id]   name; price; reach (how far it casts, 0..1 of the lake); line, reel, value (multipliers); luck (luck points: .35 is +35 luck);
@@ -1261,7 +1292,13 @@ const MAP_PLACES={
    WX_SOME      where those fish turn up at a share of their weight in other weather: rain fish on overcast days
                 ("there's rain in the air"), fog fish in the dawn mist.
    DAWN_MIST    the hours of the light morning mist on clear and overcast days, and how thick it looks at its thickest.
-   WX_LINES     what Ottilie says about the weather (she picks one of these half the time while it lasts). */
+   WX_LINES     what Ottilie says about the weather (she picks one of these half the time while it lasts).
+   MOON         the moon's phases: cycle in-game days from new to new, the phase that's full (0 is new), and offset, which
+                lines the cycle up so the first full moon rises on the night of day 3. path: the moonpath's half-width on
+                the water as a share of the screen, far and near. breach: how often (a chance per in-game hour) the
+                Moonwhale's mother breaches far out on a full-moon night at the lake.
+   BOW_FOOT     where the rainbow's foot touches the water: how far out (0 at the horizon to 1 at the dock) and how wide
+                its shimmer is, as a share of the screen. */
 const WX={
   clear: {name:'Clear', on:'in clear weather', look:{cloud:0, rain:0, fog:0}, mods:[]},
   cloudy:{name:'Overcast', on:'on overcast days', look:{cloud:1, rain:0, fog:0}, mods:[]},
@@ -1288,6 +1325,8 @@ const WX_LINES={
   rain:  ['Mind the drops. A raindrop and a nibble look the same from here.','Your uncle fished every storm. Said the lake talks louder in the rain.','Rain brings the dace up. Daft things jump at every drop.'],
   fog:   ['Haven’t seen fog like this since the flood.','Hear that? A bell, under the water. Always in the fog.','Fog hides the far fish. Let them come to you.']
 };
+const MOON={cycle:8, full:4, offset:1, path:[.03,.075], breach:.35};
+const BOW_FOOT={depth:.4, r:.1};
 
 /* People: what Ottilie and Barnaby say, the banquet guests' lines, and the uncle's letter in the opening. */
 const OTT_LINES = ['Fish don’t bite for folks who fidget.','Lantern Carp only come up after dark, kid.','Reeds’ll eat your line. My Reedcutter won’t.','Want to reach the deep pool? You’ll need more rod than that.',
@@ -1601,7 +1640,7 @@ const TACKLE_ORDER={reel:['clicker','brassdrag','quickwind','whisper'], line:['c
               Each rod's sockets are RODS[id].ench (1 to 3) in data/gear.js.
    GLIMMER    where Glimmer comes from. record: what beating your record for a species pays, by its rarity.
               geode: what a Glimmer geode holds, [least, most], by region. crate: Glimmer in each crate, by tier.
-   Odd Water (mutations, step 21) and Homebody (Wren's bench, step 25) come later. */
+   Homebody (Wren's bench, step 25) comes later. */
 const ENCH={
   swift:     {name:'Swift Spool', short:'Reels 30% faster', cost:30, color:'#78C08A', eff:'You reel 30% faster.', down:'Tension rises 30% faster too.',
               mods:[{stat:'reel', v:1.3}, {stat:'drag', v:1.3}]},
@@ -1615,10 +1654,12 @@ const ENCH={
               mods:[{stat:'value', v:1.6, when:{wx:'rain'}}]},
   wanderer:  {name:'Wanderer', short:'Each day’s first catches ×2', cost:80, color:'#E5975A', first:3, eff:'Each day, your first 3 catches at the lake are worth double, and so are your first 3 at the coast.',
               mods:[{stat:'value', v:2, when:{wander:true}}]},
+  odd:       {name:'Odd Water', short:'Mutations twice as often', cost:90, color:'#6CC4A1', eff:'Mossy, Glassy, Twin and Giant catches come up twice as often.',
+              mods:[{stat:'mutation', v:2}]},
   echo:      {name:'Echo', short:'Perfect hooks echo', cost:110, color:'#58C4C2', eff:'After a perfect hook, another of the same fish sometimes waits there. Cast to the same spot for an instant bite.', down:'Only perfect hooks set it off.',
               mods:[{stat:'echo', v:.35}]}
 };
-const ENCH_ORDER=['swift','magpie','deep','nightglass','storm','wanderer','echo'];
+const ENCH_ORDER=['swift','magpie','deep','nightglass','storm','wanderer','odd','echo'];
 const GLIMMER={
   record:{common:2, uncommon:3, rare:5, epic:8, legendary:12, exotic:18, mythic:26, godly:40},
   geode:{lake:[4,8], coast:[6,12]},
@@ -1782,6 +1823,7 @@ const STATS={
   fog:      {name:'Fog fish', kind:'mul', good:'up', unit:'x', when:{wx:'fog'}, hint:'Fish that come up in fog bite more often.'},
   twitch:   {name:'Twitch pull', kind:'mul', good:'up', unit:'x', hint:'A twitch draws a fish in from farther, and brings the next one sooner.'},
   lure:     {name:'Lure pull', kind:'mul', good:'up', unit:'x', hint:'Some kinds of fish bite more often.'},
+  mutation: {name:'Mutations', kind:'mul', good:'up', unit:'x', hint:'Catches come up Mossy, Glassy, Twin or Giant more often.'},
   reedBite: {name:'Reed bites', kind:'mul', good:'up', when:{spot:'reeds'}, hint:'Fish in the reeds bite sooner.'},
   tug:      {name:'Tugger pull', kind:'mul', good:'down', hint:'Tuggers yank the line less hard.'},
   swell:    {name:'Swell hits', kind:'mul', good:'down', when:{region:'coast'}, hint:'A swell spikes your line’s tension less.'},
@@ -1903,12 +1945,14 @@ function tierMul(rar,c){ c=Object.assign({},c,{rarity:rar}); const cap=RAR[rar].
   for (const m of modsFor('luck',c)) if (m.omen) v*=m.v; return v; }
 
 /* ---------- Bite odds: which fish each spot offers, and the rod in hand ---------- */
+/** Each fish's weight in this spot's pool, here and now. */
 function poolFor(spot,lucky){
   const h=save.clock, night=isNight(h), coastal=REG()==='coast', w=Object.assign({},(coastal?POOLS_COAST:POOLS)[spot]||(coastal?POOLS_COAST.open:POOLS.open));
   // the water itself: who comes up at night, and the Mayor's dawns
-  if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
+  if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; if (w.angler) w.angler*=2.5; } }
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
   if (w.mayor && ((h>=5 && h<8) || modFlag('mayorWakes',{spot}))) w.mayor*=3;   // the Mayor's dawns, or the Mayor's Spectacles
+  if (w.gar && h>=17 && h<21) w.gar*=2.5;                                        // the Steeple Gar's evenings
   // the weather (game/weather.js): its own fish come up, the Mossback rises to the pads in rain, and fog brings the
   // night fish up by day. They crowd out the fish no rarer than themselves, never the rarer ones: those keep the share
   // they had, so a wet day never quietly makes the Mayor harder to find.
@@ -1922,8 +1966,30 @@ function poolFor(spot,lucky){
   // your bonuses: night- and fog-fish boosts (only at night and in fog, see STATS), then luck per rarity (game/mods.js)
   const c={spot,lucky}, nightMul=modMul('night',c), fogMul=modMul('fog',c);
   for (const k in w){ const F=FISH[k]; if (F.night) w[k]*=nightMul; if (F.wx==='fog') w[k]*=fogMul; w[k]*=tierMul(F.rarity,c)*modMul('lure',{spot,lucky,fish:k}); }   // a lure draws its kind of fish
+  // soft bad-luck protection: a long dry run lifts the Legendaries a little (DRY)
+  const dm=dryMul(); if (dm>1) for (const k in w) if (FISH[k].rarity==='legendary') w[k]*=dm;
   return w;
 }
+/* ---------- Which fish bites: the rarest first, then the spot's own fish ---------- */
+const RARE_ORDER=Object.keys(RARE_BITES).sort((a,b)=>rarRank(FISH[b].rarity)-rarRank(FISH[a].rarity));
+/** Whether one of the rare bites (RARE_BITES) takes this cast. `at` says where the bobber sits: at the rainbow's
+    foot (bow), on the moonpath (path). Each is checked at its own chance, rarest first, only where and when it can bite;
+    luck lifts it up to its rarity's cap. None of them can bite here and now: the spot's own fish, as always. */
+function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
+  for (const id of RARE_ORDER){ const B=RARE_BITES[id];
+    if (B.region!==reg || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
+    if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock))) continue;
+    if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
+  return null; }
+/** The fish that takes this cast. A long run without a Legendary, where one could have bitten, counts toward DRY. */
+function rollFish(spot,lucky,at){ const hi=rareBite(spot,lucky,at); if (hi) return hi;
+  const w=poolFor(spot,lucky), id=pickW(w);
+  if (rarRank(FISH[id].rarity)<rarRank('legendary') && Object.keys(w).some(k=>FISH[k].rarity==='legendary')) save.stats.dry=(save.stats.dry||0)+1;
+  return id; }
+/** What the dry run multiplies the Legendaries' odds by: 1 until DRY.from casts, rising to DRY.max at DRY.to. */
+function dryMul(){ const d=save.stats.dry||0; return d<=DRY.from?1:1+(DRY.max-1)*Math.min(1,(d-DRY.from)/(DRY.to-DRY.from)); }
+/** Landing a Legendary or rarer ends a dry run. */
+function dryEnd(rar){ if (rarRank(rar)>=rarRank('legendary')) save.stats.dry=0; }
 const ROD = () => RODS[save.rod] || RODS.willow;
 
 /* ---------- Save ---------- */
@@ -1950,7 +2016,7 @@ const rec = id => save.fish[id] || (save.fish[id] = {caught:0, best:0, seen:fals
 
 /* ---------- Size, weight and records ---------- */
 // Weight follows length on each species' growth curve: grams = K·L³/100 (Fulton's condition factor), times a little variation in build.
-const BUILD_K={perch:1.25, reedwhisker:.9, lantern:1.6, leafjack:1.45, mossback:1.15, mayor:.62, sprat:.75, wrasse:1.3, kelpeel:.18, bream:1.7, grouper:1.9, saltjaw:.55, dace:1.0, char:1.05, mackerel:.95, gurnard:1.25};
+const BUILD_K={perch:1.25, reedwhisker:.9, lantern:1.6, leafjack:1.45, mossback:1.15, mayor:.62, sprat:.75, wrasse:1.3, kelpeel:.18, bream:1.7, grouper:1.9, saltjaw:.55, dace:1.0, char:1.05, mackerel:.95, gurnard:1.25, gar:.8, angler:3.5, shiner:1.45, calf:1.6};
 const weighFish=(id,len,build)=>Math.max(4,(BUILD_K[id]||1)*len*len*len/100*(build||1));
 const rollBuild=()=>1+(Math.random()+Math.random()+Math.random()-1.5)*.13;
 function sizePct(id,len){ const F=FISH[id]; return clamp((len-F.size[0])/(F.size[1]-F.size[0]),0,1); }
@@ -2326,12 +2392,13 @@ function startWaiting(){
     the swim over and the nibbles: spawnApproach). */
 function biteWait(spot){ const c={spot}; return rand(.75,2.1)*modMul('wait',c)*modMul('bite',c); }
 function spawnApproach(){
-  const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.fish=S.tut?'perch':w.echo||pickW(poolFor(b.spot,w.lucky)); const F=FISH[w.fish];
+  const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.bow=atBowFoot(b.x,b.y);
+  w.fish=S.tut?'perch':w.echo||rollFish(b.spot,w.lucky,{bow:w.bow, path:onMoonpath(b.x,b.y)}); const F=FISH[w.fish];
   const ang=rand(0,Math.PI*2), d=w.echo?rand(40,60):rand(85,150);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
   w.sh={x,y,ang:Math.atan2(b.y-y,b.x-x),alpha:0,flee:false};
   w.bm=S.tut?1:modMul('bite',{spot:b.spot,fish:w.fish,lucky:w.lucky});   // bait and the like: a quicker swim over and shorter nibbles
-  if (sonarOn() && !S.tut){ setHint('Sonar: '+(F.rarity==='common'?'a common fish':'a '+RAR[F.rarity].label+' fish')+' is coming in.'); if (F.rarity!=='common') tone(1250,.09,{vol:.06,type:'sine'}); }
+  if (sonarOn() && !S.tut){ setHint('Sonar: '+(F.rarity==='common'?'a common fish':(/^[EUA]/.test(RAR[F.rarity].label)?'an ':'a ')+RAR[F.rarity].label+' fish')+' is coming in.'); if (F.rarity!=='common') tone(1250,.09,{vol:.06,type:'sine'}); }
   w.phase='approach'; w.attract=1;
 }
 function updateWaiting(dt){
@@ -2346,7 +2413,7 @@ function updateWaiting(dt){
         const sp=(20+F.len*.35)*w.attract*sc(sh.y)*(F.beh==='sleeper'?.5:1)/(w.bm||1)*(w.echo?2.2:1);
         sh.ang=angLerp(sh.ang, Math.atan2(dy,dx)+Math.sin(S.time*2.2)*.5*Math.min(1,d/70), dt*3);
         sh.x+=Math.cos(sh.ang)*sp*dt; sh.y+=Math.sin(sh.ang)*sp*dt*.6;
-        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:w.echo?0:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3)); w.nibT=S.tut?1.2:w.echo?.15:rand(.5,1.1)*(w.bm||1); }
+        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:w.echo?0:nibbles(F); w.nibT=S.tut?1.2:w.echo?.15:rand(.5,1.1)*(w.bm||1); }
       } else if (w.phase==='nibble'){
         sh.ang=angLerp(sh.ang,Math.atan2(b.y-sh.y,b.x-sh.x),dt*2);
         const hx=b.x-Math.cos(sh.ang)*F.len*.38*sc(b.y), hy=b.y-Math.sin(sh.ang)*F.len*.2*sc(b.y);
@@ -2362,6 +2429,8 @@ function updateWaiting(dt){
   if (w.phase==='snag') updateSnag(dt);
   if (w.phase==='empty'){ w.t-=dt; if (w.t<=0){ if (w.loot) startSnag(w.loot); else spawnApproach(); } }
 }
+/** How many fake nibbles come before the bite: sleepers nibble most, and rarer fish tease more. */
+function nibbles(F){ const r=rarRank(F.rarity); return F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,r>=rarRank('epic')?5:r>=rarRank('rare')?4:3)); }
 function twitch(){
   const w=S.wait, b=S.bob; w.tw=w.tw.filter(t=>S.time-t<2.5); w.tw.push(S.time);
   b.jerk=1; ripple(b.x,b.y,18); sfx.twitch(); buzz(6);
@@ -2398,9 +2467,13 @@ function hook(){
   const perfect=b.t<=.3*modMul('perfect',{fish:b.fish,spot:S.bob.spot,lucky:!!(S.wait&&S.wait.lucky)});
   if (perfect){ save.stats.perfect++; toast('Perfect hook!','good'); } else toast('Hooked!','');
   sfx.hook(perfect); buzz(perfect?[0,20,30,20]:25);
-  S.freeze=R.hitstop+(perfect?.04:0); shake(F.rarity==='legendary'?10:F.rarity==='rare'?5:2); pulse(perfect?.35:.2);
+  const rk=rarRank(F.rarity);
+  S.freeze=R.hitstop+(perfect?.04:0); shake(rk>=rarRank('legendary')?10:rk>=rarRank('epic')?7:rk>=rarRank('rare')?5:2); pulse(perfect?.35:.2);
   splash(S.bob.x,S.bob.y,8+R.splash/3);
-  if (F.rarity==='legendary'){ S.darkT=.5; setTimeout(()=>toast('Something enormous…','gold'),350); }
+  hookMoment(F,perfect);   // Epic and up: the water bulges, shifts colour or inks over (game/rarity-fx.js)
+  if (rk>=rarRank('mythic')){ S.darkT=.7; }
+  else if (rk>=rarRank('legendary')){ S.darkT=.5; setTimeout(()=>toast(F.rarity==='exotic'?'Something strange…':'Something enormous…','gold'),350); }
+  else if (rk>=rarRank('epic')) S.darkT=.3;
   else if (F.rarity==='rare') S.darkT=.18;
   startReel(b.fish,perfect);
 }
@@ -2410,6 +2483,7 @@ function startReel(id,perfect){
   if (S.bite && S.bite.loot) return startHaul(S.bite.loot,perfect);
   const F=FISH[id], first=rec(id).caught===0;
   S.reel=newFight(id,perfect,S.bob,!!(S.wait&&S.wait.lucky),!!S.tut,S.bob.spot);
+  S.reel.bow=!!(S.wait&&S.wait.bow);                                   // hooked at the rainbow's foot: mutations twice as likely
   S.holding=S.pointers.size>0; S.tilt=0; S.pressX=S.thumbX; S.pressTilt=0; humStart(); setState('reeling');
   if (S.tut){ S.tut='reel1'; coach('Hooked! Now press and hold your finger down to reel it in.','4 of 4'); }
   else if (first && F.beh==='leaper') coachShow('New fish: Leapers jump out of the water. Tap while it’s in the air to keep the line tight.',6);
@@ -2582,34 +2656,62 @@ function updateLost(dt){
   if (L.t>.7){ S.lost=null; S.bob=null; S.wait=null; S.bite=null; setState('idle'); }
 }
 
+/* ---------- Mutations: Mossy, Glassy, Twin and Giant ---------- */
+/* Any catch below Mythic can come up mutated (MUTS in data/fish.js), rolled once as it lands (catchRoll). The chance is
+   each mutation's own, times every bonus to STATS.mutation: Odd Water, and casting at the rainbow's foot. A mutated
+   catch pays a little Glimmer, is worth more, and looks mutated wherever it's drawn (drawMutation, from drawFish).
+   Each species' record keeps the mutations found (save.fish[id].muts), for its journal page. */
+/** Which mutation a catch comes up with, or null. ctx: {spot, lucky, bow}. */
+function rollMutation(id,ctx){ const F=FISH[id]; if (rarRank(F.rarity)>=rarRank('mythic')) return null;
+  const m=modMul('mutation',Object.assign({fish:id},ctx)); let x=Math.random();
+  for (const k of MUT_ORDER){ x-=MUTS[k].chance*m; if (x<0) return k; }
+  return null; }
+/** The chance any mutation comes up, with the bonuses here and now (for the Bonuses page and the report). */
+function mutationChance(ctx){ const m=modMul('mutation',ctx||{}); return Math.min(1,MUT_ORDER.reduce((a,k)=>a+MUTS[k].chance*m,0)); }
+/** The mutations found for a species, in journal order. Tidies the record's list on first read. */
+function mutsFound(id){ const r=save.fish[id]; if (!r) return []; if (!Array.isArray(r.muts)) r.muts=[]; r.muts=r.muts.filter((k,i,a)=>MUTS[k] && a.indexOf(k)===i);
+  return MUT_ORDER.filter(k=>r.muts.includes(k)); }
+function noteMutation(id,mut){ if (!mut || !MUTS[mut]) return false; const found=mutsFound(id); if (found.includes(mut)) return false; rec(id).muts.push(mut); return true; }
+/** The catch card's tag for a mutation. */
+function mutTag(k){ return k==='twin'?'Twin: two on one hook':k==='giant'?'Giant':MUTS[k].name+' ×'+MUTS[k].value; }
+/** The first mutation's tip. */
+function mutTip(k){ return 'A '+MUTS[k].name+' '+(k==='twin'?'catch: two fish on one hook!':'fish!')+' Mutations turn up on any kind of fish now and then. They’re worth more, pay a little Glimmer, and your journal keeps the ones you’ve found.'; }
+
 /* ---------- Landing & card ---------- */
 /** How big a landed fish is, what it weighs and what it sells for. The balance simulator rolls catches here too. */
-function catchRoll(id,perfect,ctx){ const F=FISH[id];
+/** How big a landed fish is, what it weighs and what it sells for, and whether it came up mutated (MUTS). A Giant grows
+    past the species' biggest; a Twin is two fish on one hook, so it's worth two. The balance simulator rolls catches
+    here too. ctx.tut: the tutorial's fish is never mutated. */
+function catchRoll(id,perfect,ctx){ const F=FISH[id], mut=ctx&&ctx.tut?null:rollMutation(id,ctx);
   const u=Math.pow(Math.random(),1.4); let size=lerp(F.size[0],F.size[1],u); if (perfect) size=Math.min(F.size[1]*1.05,size*1.08);
+  if (mut==='giant') size=F.size[1]*rand(MUTS.giant.size[0],MUTS.giant.size[1]);
   size=Math.round(size*10)/10; const build=rollBuild(), w=Math.round(weighFish(id,size,build));
   const q=(size-F.size[0])/(F.size[1]-F.size[0]);
-  const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(perfect?1.25:1)*modMul('value',Object.assign({fish:id},ctx))));
-  return {size,build,w,value,stars:qualityOf(id,size,perfect)}; }
+  const value=Math.max(1,Math.round(F.value*(.85+.3*q)*(perfect?1.25:1)*(mut?MUTS[mut].value:1)*(mut==='twin'?2:1)*modMul('value',Object.assign({fish:id},ctx))));
+  return {size,build,w,value,stars:qualityOf(id,size,perfect),mut}; }
 function startLand(){
   humStop(); const R=S.reel, F=R.F, spot=(S.bob&&S.bob.spot)||'open';
   // the Hungry Hook takes its share before you can keep the fish
   const eaten=!S.tut && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
   const wander=S.tut||eaten?0:wanderCount(REG());   // Wanderer: the day's first catches in this water
-  const {size,build,w:wgt,value}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky,wander:!!wander});
-  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,wx:wxNow(),rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0,eaten,wander};
+  const {size,build,w:wgt,value,mut}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky,wander:!!wander,bow:!!R.bow,tut:!!S.tut});
+  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,wx:wxNow(),rod:save.rod,value,mut,burst:false,isNew:rec(R.id).caught===0,eaten,wander};
   // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast
   if (R.perfect && !S.tut && !eaten && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
+  const rk=rarRank(F.rarity), big=rk>=rarRank('legendary');
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
-  sfx.out(F.rarity); buzz(F.rarity==='legendary'?[0,40,60,40,60,120]:40); shake(F.rarity==='legendary'?6:2);
-  if (!REDUCED && (F.rarity==='rare'||F.rarity==='legendary')) S.zoomT=F.rarity==='legendary'?1.12:1.06;
+  sfx.out(F.rarity); buzz(big?[0,40,60,40,60,120]:rk>=rarRank('epic')?[0,30,40,60]:40); shake(big?6:rk>=rarRank('epic')?4:2);
+  if (!REDUCED && rk>=rarRank('rare')) S.zoomT=big?1.12:rk>=rarRank('epic')?1.09:1.06;
+  landMoment(S.land);   // Epic and up: sparks, prismatic rays or the calf's breach (game/rarity-fx.js)
   S.reel=null; S.bob=null; setState('landing');
 }
 function updateLand(dt){
-  const L=S.land, r=L.F.rarity, slow=(r==='rare'||r==='legendary') && !REDUCED && L.p>.3 && L.p<.7 ? .38 : 1;
-  L.p=Math.min(1,L.p+dt/RAR[r].land*slow*(r==='rare'||r==='legendary'?1.6:1));
+  const L=S.land, r=L.F.rarity, rk=rarRank(r), slowmo=rk>=rarRank('rare'), slow=slowmo && !REDUCED && L.p>.3 && L.p<.7 ? .38 : 1;
+  L.p=Math.min(1,L.p+dt/RAR[r].land*slow*(slowmo?1.6:1));
   if (L.eaten && L.p>.55) return hookEats();
-  if (L.p>.5 && !L.burst){ L.burst=true; if (r==='legendary') confetti(L.to.x,L.to.y,70); else if (r==='rare') confetti(L.to.x,L.to.y,24); pulse(r==='common'?.1:.3); }
+  if (L.p>.5 && !L.burst){ L.burst=true; if (rk>=rarRank('legendary')) confetti(L.to.x,L.to.y,70); else if (rk>=rarRank('epic')) confetti(L.to.x,L.to.y,40); else if (r==='rare') confetti(L.to.x,L.to.y,24); pulse(r==='common'?.1:.3); }
   if (Math.random()<.5 && L.p<.8){ const p=landPos(); splash(p.x,p.y,1); }
+  landTrail(L,landPos());
   if (L.p>=1) showCard();
 }
 /** The Hungry Hook eats the catch in midair: no card, no coins, no journal credit. */
@@ -2627,20 +2729,22 @@ function landPos(){ const L=S.land, p=L.p, c={x:(L.from.x+L.to.x)/2, y:Math.min(
 function showCard(){
   const L=S.land, F=L.F, r=rec(L.id);
   const prevW=r.bw||0; L.prev=r.pb?Object.assign({},r.pb):null;
-  r.caught++; r.best=Math.max(r.best,L.size); r.seen=true; save.stats.catches++;
+  r.caught+=L.mut==='twin'?2:1; r.best=Math.max(r.best,L.size); r.seen=true; save.stats.catches++; dryEnd(F.rarity);
+  L.newMut=noteMutation(L.id,L.mut); L.mutGlim=L.mut?MUTS[L.mut].glimmer:0;   // a mutation pays Glimmer, counted up as the card settles
+  if (L.mutGlim){ save.glimmer=(save.glimmer||0)+L.mutGlim; save.stats.glimmer=(save.stats.glimmer||0)+L.mutGlim; save.stats.muts=(save.stats.muts||0)+1; }
   save.stats.catchAvg=save.stats.catchAvg>0?save.stats.catchAvg*.95+(L.value||0)*.05:(L.value||0);   // what a catch is worth lately (supper tips keep pace with it)
   save.stats.landed=(save.stats.landed||0)+L.w; if (L.stars===3) save.stats.trophies=(save.stats.trophies||0)+1;
   L.pbBeat=!L.isNew && !!L.prev && L.w>prevW; L.pbGlim=L.pbBeat?(GLIMMER.record[F.rarity]||2):0;   // records pay Glimmer, kept now and counted up at the stamp
   if (L.pbGlim){ save.glimmer=(save.glimmer||0)+L.pbGlim; save.stats.glimmer=(save.stats.glimmer||0)+L.pbGlim; }
   if (L.isNew || L.w>prevW){ r.bw=L.w; r.pb={size:L.size,w:L.w,stars:L.stars,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,wx:L.wx,rod:L.rod,perfect:!!L.perfect}; }
   if (L.pbBeat) save.stats.pbs=(save.stats.pbs||0)+1;
-  L.pbMinor=L.pbBeat && (L.w-L.prev.w)/Math.max(1,L.prev.w)<.1 && F.rarity!=='legendary' && L.stars<3;
+  L.pbMinor=L.pbBeat && (L.w-L.prev.w)/Math.max(1,L.prev.w)<.1 && rarRank(F.rarity)<rarRank('legendary') && L.stars<3 && L.mut!=='giant';
   persist();
   if (save.stats.catches===3 && !save.metOttilie) setTimeout(()=>{ if (S.state==='idle') coachFor('Ottilie is waving you over. Tap her ferry by the dock to see her rods.',7); },2200);
-  const card=$('card'); card.dataset.r=F.rarity; card.classList.remove('out');
-  $('cRarity').textContent=RAR[F.rarity].label; $('cNew').hidden=!L.isNew;
+  const card=$('card'); card.dataset.r=F.rarity; if (L.mut) card.dataset.mut=L.mut; else delete card.dataset.mut; card.classList.remove('out');
+  $('cRarity').textContent=RAR[F.rarity].label; $('cPips').innerHTML=rarPipsHTML(F.rarity); $('cNew').hidden=!L.isNew;
   $('cName').textContent=F.name; $('cSize').textContent=fmtLen(L.size); $('cW').textContent=fmtW(L.w); $('cQ').innerHTML=starsHTML(L.stars,'pop'); $('cValue').textContent='+'+L.value; $('cBeh').textContent=BEH[F.beh];
-  const tags=[]; if (L.lucky) tags.push('Gull luck '+trimNum(gullMul())+'×'); if (L.perfect) tags.push('Perfect hook +25%'); if (L.build>=1.1) tags.push('Chunky');
+  const tags=[]; if (L.mut) tags.push(mutTag(L.mut)); if (L.lucky) tags.push('Gull luck '+trimNum(gullMul())+'×'); if (L.perfect) tags.push('Perfect hook +25%'); if (L.build>=1.1 && L.mut!=='giant') tags.push('Chunky');
   if (L.wx==='rain'||L.wx==='fog') tags.push('Caught '+WX[L.wx].on);
   if (L.isNew && save.kitchenOpen){ const rid=recipeLearnedBy(L.id); if (rid) tags.push('New recipe: '+RECIPES[rid].name); }
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
@@ -2655,30 +2759,36 @@ function showCard(){
   $('cLore').textContent=L.isNew||F.rarity!=='common' ? F.lore : '';
   $('cLore').hidden=!$('cLore').textContent;
   const full=save.net.length>=netCap();
-  S.cardDefault=(L.isNew || F.rarity!=='common' || L.pbBeat || L.stars===3 || L.needFor || L.orderFor) && !full ? 'keep' : 'sell';
-  S.cardAuto=F.rarity==='common' && !L.isNew && !L.pbBeat && L.stars<3 && !L.needFor && !L.orderFor;
-  $('cSell').textContent='Sell · +'+L.value; $('cKeep').textContent=full?'Keepnet full':'Keep';
+  S.cardDefault=(L.isNew || F.rarity!=='common' || L.mut || L.pbBeat || L.stars===3 || L.needFor || L.orderFor) && !full ? 'keep' : 'sell';
+  S.cardAuto=F.rarity==='common' && !L.mut && !L.isNew && !L.pbBeat && L.stars<3 && !L.needFor && !L.orderFor;
+  S.sellArmed=false; $('cSell').textContent='Sell · +'+L.value.toLocaleString(); $('cKeep').textContent=full?'Keepnet full':'Keep';
   $('cKeep').disabled=full; $('cTank').hidden=!(save.tutorialDone && tankRoom(L.id));
   $('cSell').classList.toggle('primary',S.cardDefault==='sell'); $('cKeep').classList.toggle('primary',S.cardDefault==='keep');
   $('cAuto').hidden=!S.cardAuto; if (S.cardAuto) $('cAuto').innerHTML='Selling in a moment · tap Keep to keep it<span class="bar"><i></i></span>';
   const rs=$('cRec'), pbEl=$('cPB'); rs.hidden=pbEl.hidden=!L.pbBeat; rs.hidden=!L.pbBeat||L.pbMinor; pbEl.classList.toggle('minor',!!L.pbMinor); rs.parentNode.classList.toggle('rec',!!L.pbBeat&&!L.pbMinor); rs.style.animationDelay=pbEl.style.animationDelay=REDUCED?'0s':'';
   if (L.pbBeat) pbEl.innerHTML='<span class="t">'+(L.pbMinor?'New best, just':'New personal record')+'</span><b id="cPBw">'+fmtW(L.prev.w)+'</b><em>was '+fmtW(L.prev.w)+'</em>'+(L.pbGlim?'<i class="bonus"><span class="glim" aria-hidden="true"></span>+'+L.pbGlim+'<span class="sr"> Glimmer</span></i>':'');
   card.hidden=false; S.cardAt=S.time; cardScene(L); paintTiles($('cTags').querySelectorAll('canvas[data-rune]'));   // once the card is laid out
+  cardMoment(L);   // Epic and up: the card's own chord; a Mythic's name inks in (game/rarity-fx.js)
+  if (L.mutGlim) setTimeout(()=>glimmerTally(L.mutGlim,{x:W/2,y:H*.5}),L.pbBeat?3400:900);
+  if (L.mut && !save.stats.mutTip){ save.stats.mutTip=true; persist(); setTimeout(()=>{ if (S.state==='result') coachFor(mutTip(L.mut),8); },1200); }
   setState('result');
   if (S.tut){ S.tut='card'; coach('Your first catch! Keep it, or sell it for coins. Every new fish also gets a page in your Journal.','Done'); }
   if (S.cardAuto){ const tok=S.cardAt; setTimeout(()=>{ if (S.state==='result' && S.cardAuto && S.cardAt===tok) dismissCard('sell'); },2200); }
   else setTimeout(()=>(S.cardDefault==='keep'?$('cKeep'):$('cSell')).focus({preventScroll:true}),400);
 }
+/** A landed fish as the keepnet and the tanks keep it. */
+function keptFish(L){ const f={id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,wx:L.wx,rod:L.rod}; if (L.mut) f.mut=L.mut; return f; }
 function dismissCard(action){
   if (S.state!=='result') return;
   action=action||S.cardDefault||'sell';
   const L=S.land, card=$('card');
   if (action==='keep' && save.net.length>=netCap()) action='sell';
+  if (action==='sell' && rarRank(L.F.rarity)>=rarRank('mythic') && !S.sellArmed){ S.sellArmed=true; $('cSell').textContent='Sell it? Tap again'; $('cSell').classList.add('armed'); return; }   // a Mythic is never sold by accident
   if (action==='tank' && !tankRoom(L.id)) action=save.net.length<netCap()?'keep':'sell';
   card.classList.add('out'); setTimeout(()=>{ card.hidden=true; card.classList.remove('out'); },250);
   if (action==='sell') addCoins(L.value);
-  else if (action==='tank'){ addToTank({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,wx:L.wx,rod:L.rod}); sfx.plop(); news('Off to the aquarium','good'); }
-  else { save.net.push({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,wx:L.wx,rod:L.rod}); persist();
+  else if (action==='tank'){ addToTank(keptFish(L)); sfx.plop(); news('Off to the aquarium','good'); }
+  else { save.net.push(keptFish(L)); persist();
     SC.netPop=1; sfx.plop(); buzz(12); news('Into the keepnet','good');
     if (!save.netSeen){ save.netSeen=true; persist(); setTimeout(()=>coachFor('Kept fish go in your keepnet, hanging '+(REG()==='coast'?'over the side of your boat':'off the dock')+'. Tap it anytime to see them or sell them.',7),700);
       if (!save.aquaSeen) setTimeout(()=>{ if (S.state==='idle') coachFor('Your uncle’s old fish tank still works. Tap the fishbowl at the bottom to visit your aquarium and move fish in.',8); },9000); } }
@@ -3213,34 +3323,61 @@ document.addEventListener('visibilitychange',()=>{ if (document.hidden){ persist
 window.addEventListener('pagehide',persistOnLeave);
 
 /* ---------- Drawing ---------- */
+/* Most fish share one body, shaped by their h (height as a share of length). A few have their own: the Steeple Gar's
+   needle snout, the Gaslight Angler's great head, and the Moonwhale Calf's whale's body and flukes. */
 function fishPath(id,len){
   const F=FISH[id], h=len*F.h, p=new Path2D();
+  if (id==='gar'){ p.moveTo(len*.5,-h*.06); p.lineTo(len*.24,-h*.36); p.bezierCurveTo(len*.12,-h*1.08,-len*.25,-h*1.0,-len*.4,-h*.32);
+    p.lineTo(-len*.4,h*.32); p.bezierCurveTo(-len*.25,h*1.0,len*.12,h*1.08,len*.24,h*.4); p.lineTo(len*.5,h*.06); p.closePath(); return p; }
+  if (id==='angler'){ p.moveTo(len*.5,-h*.12); p.bezierCurveTo(len*.47,-h*1.0,len*.14,-h*1.16,-len*.06,-h*.78); p.bezierCurveTo(-len*.24,-h*.46,-len*.35,-h*.24,-len*.4,0);
+    p.bezierCurveTo(-len*.34,h*.3,-len*.1,h*.72,len*.2,h*.8); p.bezierCurveTo(len*.4,h*.82,len*.53,h*.42,len*.5,-h*.12); p.closePath(); return p; }
+  if (id==='calf'){ p.moveTo(len*.5,h*.08); p.bezierCurveTo(len*.5,-h*.92,len*.2,-h*1.1,-len*.05,-h*.95); p.bezierCurveTo(-len*.25,-h*.78,-len*.34,-h*.3,-len*.42,-h*.12);
+    p.lineTo(-len*.42,h*.12); p.bezierCurveTo(-len*.3,h*.46,-len*.1,h*1.0,len*.2,h*.96); p.bezierCurveTo(len*.42,h*.9,len*.5,h*.6,len*.5,h*.08); p.closePath(); return p; }
   p.moveTo(len*.5,0);
   p.bezierCurveTo(len*.38,-h*1.08,-len*.22,-h*1.02,-len*.4,0);
   p.bezierCurveTo(-len*.22,h*1.02,len*.38,h*1.08,len*.5,0); p.closePath();
   return p;
 }
 function tailPath(id,len){ const F=FISH[id], h=len*F.h, p=new Path2D();
-  p.moveTo(-len*.36,0); p.lineTo(-len*.6,-h*.85); p.quadraticCurveTo(-len*.5,0,-len*.6,h*.85); p.closePath(); return p; }
+  if (id==='gar'){ p.moveTo(-len*.37,0); p.quadraticCurveTo(-len*.44,-h*1.7,-len*.58,-h*.95); p.quadraticCurveTo(-len*.63,0,-len*.58,h*.95); p.quadraticCurveTo(-len*.44,h*1.7,-len*.37,0); p.closePath(); return p; }
+  if (id==='calf'){ p.moveTo(-len*.38,-h*.12); p.quadraticCurveTo(-len*.47,-h*.28,-len*.63,-h*.8); p.quadraticCurveTo(-len*.6,-h*.22,-len*.53,0);
+    p.quadraticCurveTo(-len*.6,h*.22,-len*.63,h*.62); p.quadraticCurveTo(-len*.47,h*.24,-len*.38,h*.12); p.closePath(); return p; }
+  const k=id==='angler'?.62:1;
+  p.moveTo(-len*.36,0); p.lineTo(-len*.6,-h*.85*k); p.quadraticCurveTo(-len*.5,0,-len*.6,h*.85*k); p.closePath(); return p; }
+/** The whole outline, body and tail, as one shape: the Moonwhale's breach far out is just this, filled. */
+function whalePath(c,len){ c.fill(tailPath('calf',len)); c.fill(fishPath('calf',len)); }
+/* Where each fish's dorsal fin sits (a and b: its front and back, as shares of length from the middle; top: its height in
+   body heights; base: where it meets the back), and its eye (x, y as shares of length and height; r as a share of length). */
+const DORSAL={gar:{a:-.17,b:-.33,top:2.7,base:.78}, angler:{a:-.1,b:-.3,top:1.05,base:.6}, calf:{a:-.17,b:-.3,top:1.2,base:.86}, mayor:{a:.14,b:-.22,top:2.2,base:.8}};
+const DORSAL0={a:.14,b:-.22,top:1.65,base:.8};
+const EYE={gar:{x:.21,y:-.12,r:.034}, angler:{x:.3,y:-.6,r:.036}, calf:{x:.33,y:.14,r:.018}};
+const EYE0={x:.34,y:-.18,r:.045};
 /* Up close, fish get more: past 44 px a gill line, a side fin, a darker back, a mouth and a glint in the eye; past 80 px
    fin rays, a lateral line and scales (except the catfish, the eel, and the bream, leafjack and mackerel, whose patterns
    already are their scales). Small fish in the scene stay simple, so they read at a glance. */
-const NO_SCALES=new Set(['reedwhisker','leafjack','kelpeel','bream','mackerel']), OWN_MOUTH=new Set(['grouper','saltjaw']);
+const NO_SCALES=new Set(['reedwhisker','leafjack','kelpeel','bream','mackerel','angler','calf']), OWN_MOUTH=new Set(['grouper','saltjaw','gar','angler','calf']);
 function fishRays(c,lw,pts){ c.strokeStyle='rgba(43,42,51,.32)'; c.lineWidth=clamp(lw*.4,.6,2.2); c.beginPath(); for (let i=0;i<pts.length;i+=4){ c.moveTo(pts[i],pts[i+1]); c.lineTo(pts[i+2],pts[i+3]); } c.stroke(); }
-function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false){
+/* `mut` draws a mutation on the fish (data/fish.js: MUTS): Glassy shows its bones through a clear body, Mossy wears moss
+   and a flower along its back, and a Twin is two fish, the second a touch smaller behind the first. A Giant is just big. */
+function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   const F=FISH[id], h=len*F.h; c.save();
-  if (shadow){ c.globalAlpha=alpha; c.fillStyle='rgba(10,26,34,.55)'; c.save(); c.rotate(tailSwing*.2); c.fill(tailPath(id,len)); c.restore(); const sh=fishPath(id,len); if (id==='gurnard') sh.addPath(gurnardWingPath(len,len*F.h)); c.fill(sh,'nonzero'); c.restore(); return; }
+  if (shadow){ c.globalAlpha=alpha; c.fillStyle='rgba(10,26,34,.55)'; c.save(); c.rotate(tailSwing*.2); c.fill(tailPath(id,len)); c.restore(); const sh=fishPath(id,len); if (id==='gurnard') sh.addPath(gurnardWingPath(len,len*F.h)); c.fill(sh,'nonzero');
+    if (id==='angler') anglerLure(c,len,h,Math.max(1,len*.02),true);   // its lure glows even as a shadow under the water
+    c.restore(); return; }
+  if (mut==='twin'){ c.save(); c.translate(-len*.14,h*1.15); c.scale(.86,.86); drawFish(c,id,len,false,alpha,-tailSwing*.8,bare); c.restore(); }
+  if (alpha<1) c.globalAlpha=alpha;
   const lw=Math.max(1.5,len*.032), det=len>=80?2:len>=44?1:0; c.lineWidth=lw; c.lineJoin='round'; c.strokeStyle=INK;
   c.save(); c.translate(-len*.36,0); c.rotate(tailSwing*.25); c.translate(len*.36,0);
   const t=tailPath(id,len); c.fillStyle=F.fin; c.fill(t);
   if (det>1){ c.save(); c.clip(t); const R=[]; for (let i=-3;i<=3;i++) R.push(-len*.37,i*h*.04,-len*.62,i*h*.3); fishRays(c,lw,R); c.restore(); }
   c.lineWidth=lw; c.strokeStyle=INK; c.stroke(t); c.restore();
-  const dors=new Path2D(); dors.moveTo(len*.14,-h*.8); dors.quadraticCurveTo(-len*.02,-h*(id==='mayor'?2.2:1.65),-len*.22,-h*.75); dors.closePath();
+  const D=DORSAL[id]||DORSAL0, da=len*D.a, db=len*D.b, dm=(da+db)/2+len*.02, dy0=-h*D.base, dy1=-h*(D.base-.05), dors=new Path2D();
+  dors.moveTo(da,dy0); dors.quadraticCurveTo(dm,-h*D.top,db,dy1); dors.closePath();
   c.fillStyle=F.fin; c.fill(dors);
-  if (det>1){ const top=id==='mayor'?2.2:1.65, R=[]; for (let u=.18;u<.86;u+=.14){ const bx=lerp(len*.14,-len*.22,u), q=(1-u)*(1-u)*len*.14+2*u*(1-u)*(-len*.02)+u*u*(-len*.22), qy=(1-u)*(1-u)*(-h*.8)+2*u*(1-u)*(-h*top)+u*u*(-h*.75); R.push(bx,-h*.8,lerp(bx,q,.92),lerp(-h*.8,qy,.92)); } c.save(); c.clip(dors); fishRays(c,lw,R); c.restore(); }
+  if (det>1 && id!=='calf'){ const R=[]; for (let u=.18;u<.86;u+=.14){ const bx=lerp(da,db,u), q=(1-u)*(1-u)*da+2*u*(1-u)*dm+u*u*db, qy=(1-u)*(1-u)*dy0+2*u*(1-u)*(-h*D.top)+u*u*dy1; R.push(bx,lerp(dy0,dy1,u),lerp(bx,q,.92),lerp(lerp(dy0,dy1,u),qy,.92)); } c.save(); c.clip(dors); fishRays(c,lw,R); c.restore(); }
   c.lineWidth=lw; c.strokeStyle=INK; c.stroke(dors);
-  if (det){ c.beginPath(); c.moveTo(-len*.04,h*.5); c.quadraticCurveTo(-len*.1,h*1.12,-len*.25,h*1.0); c.lineTo(-len*.24,h*.4); c.closePath(); c.fillStyle=F.fin; c.fill(); c.lineWidth=lw*.8; c.stroke(); c.lineWidth=lw; }
-  const body=fishPath(id,len); c.fillStyle=F.color; c.fill(body);
+  if (det && id!=='calf'){ c.beginPath(); c.moveTo(-len*.04,h*.5); c.quadraticCurveTo(-len*.1,h*1.12,-len*.25,h*1.0); c.lineTo(-len*.24,h*.4); c.closePath(); c.fillStyle=F.fin; c.fill(); c.lineWidth=lw*.8; c.stroke(); c.lineWidth=lw; }
+  const body=fishPath(id,len), glass=mut==='glassy'; if (glass){ c.globalAlpha=alpha*.42; } c.fillStyle=F.color; c.fill(body);
   c.save(); c.clip(body);
   c.fillStyle='rgba(255,240,210,.28)'; c.beginPath(); c.ellipse(len*.05,h*.55,len*.38,h*.5,0,0,Math.PI*2); c.fill();
   if (det){ c.fillStyle='rgba(18,26,30,.15)'; c.beginPath(); c.ellipse(0,-h*.86,len*.54,h*.52,0,0,Math.PI*2); c.fill(); }
@@ -3268,16 +3405,31 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false){
     c.fillStyle='rgba(235,240,232,.45)'; c.beginPath(); c.ellipse(0,h*.75,len*.5,h*.5,0,0,Math.PI*2); c.fill(); }
   if (id==='gurnard'){ c.fillStyle='rgba(120,30,25,.28)'; c.beginPath(); c.ellipse(len*.02,-h*.75,len*.5,h*.45,0,0,Math.PI*2); c.fill();
     c.fillStyle='rgba(255,220,190,.35)'; for (let i=0;i<7;i++){ c.beginPath(); c.arc(len*(.26-i*.09),-h*.45+(i%2)*h*.15,len*.016,0,Math.PI*2); c.fill(); } }
+  if (id==='gar'){ c.fillStyle='rgba(40,44,28,.42)'; for (let i=0;i<16;i++){ const x=len*(.2-i*.04), y=((i*7)%5/4-.5)*h*1.3; c.beginPath(); c.ellipse(x,y,len*.012,h*.09,0,0,Math.PI*2); c.fill(); } }
+  if (id==='angler'){ c.fillStyle='rgba(30,22,32,.32)'; for (let i=0;i<9;i++){ const x=len*(.32-i*.08), y=((i*5)%4/3-.6)*h*.9; c.beginPath(); c.ellipse(x,y,len*.04,h*.13,i,0,Math.PI*2); c.fill(); }
+    c.fillStyle='rgba(235,210,200,.22)'; c.beginPath(); c.ellipse(len*.12,h*.6,len*.32,h*.35,0,0,Math.PI*2); c.fill(); }
+  if (id==='calf'){ c.fillStyle='#D9DEE8'; c.globalAlpha=(glass?.42:1)*alpha*.85; c.beginPath(); c.ellipse(len*.08,h*.95,len*.44,h*.55,0,0,Math.PI*2); c.fill(); c.globalAlpha=(glass?.42:1)*alpha;   // the pale belly
+    if (det){ c.strokeStyle='rgba(70,82,104,.45)'; c.lineWidth=Math.max(.8,lw*.4); c.beginPath(); for (let i=0;i<5;i++){ const y=h*(.5+i*.09); c.moveTo(len*.44,y); c.quadraticCurveTo(len*.25,y+h*.06,len*.05,y+h*.02); } c.stroke(); }   // throat grooves
+    for (let i=0;i<4;i++){ const x=len*(.08-i*.11), y=-h*(.35-((i%2)*.18)), r=len*.022*(1-i*.12), ph=i/3;   // pale spots along the flank, waxing to full
+      c.fillStyle='rgba(222,228,240,.7)'; c.beginPath(); c.arc(x,y,r,0,Math.PI*2); c.fill(); if (ph<1){ c.fillStyle=F.color; c.beginPath(); c.arc(x-r*(.4+ph*1.2),y,r,0,Math.PI*2); c.fill(); } } }
+  if (id==='shiner'){ const tt=(typeof S!=='undefined' && S.time)||0, g=c.createLinearGradient(-len*.4,-h,len*.5,h);
+    for (let i=0;i<PRISM_TRAIL.length;i++) g.addColorStop(((i/PRISM_TRAIL.length)+tt*.12)%1,PRISM_TRAIL[i]);
+    c.globalAlpha=(glass?.42:1)*alpha*.45; c.fillStyle=g; c.fillRect(-len*.6,-h*1.2,len*1.2,h*2.4); c.globalAlpha=(glass?.42:1)*alpha;
+    c.fillStyle='rgba(255,255,255,.55)'; c.fillRect(-len*.38,-h*.12,len*.78,h*.16); }
+  if (glass){ c.globalAlpha=alpha; c.strokeStyle='rgba(60,70,90,.55)'; c.lineWidth=Math.max(1,lw*.6); c.lineCap='round'; c.beginPath();   // the bones, showing through
+    c.moveTo(len*.3,-h*.05); c.quadraticCurveTo(0,h*.02,-len*.38,0);
+    for (let i=0;i<7;i++){ const x=len*(.2-i*.075); c.moveTo(x,-h*.02); c.lineTo(x-len*.05,-h*.6); c.moveTo(x,0); c.lineTo(x-len*.05,h*.55); } c.stroke();
+    c.fillStyle='rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(len*.05,-h*.45,len*.3,h*.16,-.08,0,Math.PI*2); c.fill(); c.globalAlpha=alpha*.42; }
   if (det>1){ if (!bare && !NO_SCALES.has(id)){ const st=len*.062, r=h*.17; c.strokeStyle='rgba(30,25,20,.13)'; c.lineWidth=clamp(lw*.35,.6,2); c.beginPath();
       for (let x=len*.2,col=0;x>-len*.36;x-=st,col++) for (let row=-3;row<=3;row++){ const y=row*h*.34+(col%2?h*.17:0); c.moveTo(x+Math.cos(Math.PI-.9)*r,y+Math.sin(Math.PI-.9)*r); c.arc(x,y,r,Math.PI-.9,Math.PI+.9); } c.stroke(); }
     const ll=clamp(lw*.22,.7,1.6); c.setLineDash([ll*1.6,ll*2.4]); c.strokeStyle='rgba(30,25,20,.24)'; c.lineWidth=ll; c.beginPath(); c.moveTo(len*.22,-h*.22); c.quadraticCurveTo(-len*.05,-h*.05,-len*.38,-h*.02); c.stroke(); c.setLineDash([]); }
-  c.restore();
+  c.restore(); c.globalAlpha=alpha;
   c.lineWidth=lw; c.strokeStyle=INK; c.stroke(body);
-  if (det){ c.strokeStyle='rgba(43,42,51,.62)'; c.lineWidth=lw*.6; c.beginPath(); c.moveTo(len*.28,-h*.66); c.quadraticCurveTo(len*.19,-h*.02,len*.27,h*.6); c.stroke();
+  if (det){ if (id!=='calf'){ const gx=id==='gar'?.2:id==='angler'?.12:.28; c.strokeStyle='rgba(43,42,51,.62)'; c.lineWidth=lw*.6; c.beginPath(); c.moveTo(len*gx,-h*.66); c.quadraticCurveTo(len*(gx-.09),-h*.02,len*(gx-.01),h*.6); c.stroke(); }
     if (!OWN_MOUTH.has(id)){ c.strokeStyle=INK; c.lineWidth=lw*.55; c.beginPath(); c.moveTo(len*.5,h*.04); c.quadraticCurveTo(len*.465,h*.13,len*.425,h*.11); c.stroke(); }
     if (id==='gurnard'){ gurnardWing(c,len,h,lw,det,tailSwing); } else {
-    c.save(); c.translate(len*.17,h*.24); c.rotate(.45+tailSwing*.2); const pf=new Path2D(); pf.moveTo(0,0); pf.quadraticCurveTo(-len*.05,-h*.34,-len*.17,-h*.08); pf.quadraticCurveTo(-len*.08,h*.2,0,0);
-    c.globalAlpha=.9; c.fillStyle=F.fin; c.fill(pf); c.globalAlpha=1; if (det>1){ c.save(); c.clip(pf); fishRays(c,lw,[0,0,-len*.15,-h*.16, 0,0,-len*.16,-h*.04, 0,0,-len*.12,h*.08]); c.restore(); } c.strokeStyle=INK; c.lineWidth=lw*.6; c.stroke(pf);
+    const fl=id==='calf'?2.1:1; c.save(); c.translate(len*(id==='calf'?.24:.17),h*(id==='calf'?.45:.24)); c.rotate((id==='calf'?.75:.45)+tailSwing*.2); const pf=new Path2D(); pf.moveTo(0,0); pf.quadraticCurveTo(-len*.05*fl,-h*.34,-len*.17*fl,-h*.08*fl); pf.quadraticCurveTo(-len*.08*fl,h*.2,0,0);
+    c.globalAlpha=.9; c.fillStyle=F.fin; c.fill(pf); c.globalAlpha=1; if (det>1 && id!=='calf'){ c.save(); c.clip(pf); fishRays(c,lw,[0,0,-len*.15,-h*.16, 0,0,-len*.16,-h*.04, 0,0,-len*.12,h*.08]); c.restore(); } c.strokeStyle=INK; c.lineWidth=lw*.6; c.stroke(pf);
     if (id==='char'){ c.strokeStyle='#F7F3EA'; c.lineWidth=lw*.45; c.beginPath(); c.moveTo(-len*.012,-h*.03); c.quadraticCurveTo(-len*.05,-h*.31,-len*.15,-h*.1); c.stroke(); } c.restore(); } }
   if (id==='grouper'){ for (let i=0;i<6;i++){ const bx=len*(.18-i*.09), by=-h*.85+Math.abs(i-2.5)*h*.05; c.fillStyle='#E8E2D2'; c.beginPath(); c.arc(bx,by,len*.03,0,Math.PI*2); c.fill(); c.lineWidth=lw*.5; c.strokeStyle=INK; c.stroke(); }
     c.strokeStyle=INK; c.lineWidth=lw*.8; c.beginPath(); c.moveTo(len*.5,h*.05); c.lineTo(len*.36,h*.18); c.stroke(); }
@@ -3295,9 +3447,18 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false){
   if (id==='mayor'){ c.strokeStyle=BRASS; c.lineWidth=lw*.9; c.setLineDash([lw*.9,lw*.9]); c.beginPath(); c.moveTo(len*.3,-h*.95); c.quadraticCurveTo(len*.24,h*.9,len*.14,h*.95); c.stroke(); c.setLineDash([]);
     c.fillStyle=BRASS; c.beginPath(); c.arc(len*.2,h*.9,len*.03,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=lw*.6; c.stroke(); }
   if (id==='gurnard' && !det) gurnardWing(c,len,h,lw,det,tailSwing);
-  c.fillStyle='#FFF8E8'; c.beginPath(); c.arc(len*.34,-h*.18,Math.max(1.6,len*.045),0,Math.PI*2); c.fill(); c.lineWidth=lw*.6; c.strokeStyle=INK; c.stroke();
-  c.fillStyle=INK; c.beginPath(); c.arc(len*.35,-h*.18,Math.max(.8,len*.022),0,Math.PI*2); c.fill();
-  if (det){ c.fillStyle='rgba(255,255,255,.9)'; c.beginPath(); c.arc(len*.343,-h*.18-len*.01,Math.max(.6,len*.008),0,Math.PI*2); c.fill(); }
+  if (id==='gar'){ c.strokeStyle=INK; c.lineWidth=lw*.55; c.beginPath(); c.moveTo(len*.5,h*.02); c.lineTo(len*.25,h*.1); c.stroke();   // the long jaw, and its needle teeth
+    if (det){ c.fillStyle='#F4F1E8'; c.beginPath(); for (let i=0;i<7;i++){ const x=len*(.27+i*.032), y=h*(.1-i*.011); c.moveTo(x,y); c.lineTo(x+len*.008,y+h*.1); c.lineTo(x+len*.016,y); } c.fill(); } }
+  if (id==='angler'){ c.fillStyle='#2E2530'; c.beginPath(); c.moveTo(len*.5,-h*.08); c.quadraticCurveTo(len*.36,h*.2,len*.18,h*.12); c.quadraticCurveTo(len*.36,h*.42,len*.52,h*.14); c.closePath(); c.fill(); c.lineWidth=lw*.6; c.strokeStyle=INK; c.stroke();   // the great jaw
+    c.fillStyle='#F4F1E8'; c.beginPath(); for (let i=0;i<6;i++){ const x=len*(.24+i*.045), y=h*(.13-i*.035); c.moveTo(x,y); c.lineTo(x+len*.012,y-h*.16); c.lineTo(x+len*.024,y); } for (let i=0;i<5;i++){ const x=len*(.27+i*.045), y=h*(.25-i*.02); c.moveTo(x,y); c.lineTo(x+len*.011,y+h*.13); c.lineTo(x+len*.022,y); } c.fill();
+    anglerLure(c,len,h,lw,false); }
+  if (id==='calf'){ c.strokeStyle=INK; c.lineWidth=lw*.55; c.beginPath(); c.moveTo(len*.5,h*.12); c.quadraticCurveTo(len*.4,h*.32,len*.26,h*.22); c.stroke();   // the long smiling mouth, and the blowhole
+    c.lineWidth=lw*.5; c.beginPath(); c.moveTo(len*.2,-h*.9); c.quadraticCurveTo(len*.215,-h*.96,len*.23,-h*.9); c.stroke(); }
+  if (mut==='mossy') drawMoss(c,id,len,h,lw);
+  const E=EYE[id]||EYE0, ex=len*E.x, ey=h*E.y, er=Math.max(1.6,len*E.r);
+  c.fillStyle=id==='angler'?'#F0E3B0':'#FFF8E8'; c.beginPath(); c.arc(ex,ey,er,0,Math.PI*2); c.fill(); c.lineWidth=lw*.6; c.strokeStyle=INK; c.stroke();
+  c.fillStyle=INK; c.beginPath(); c.arc(ex+er*.22,ey,Math.max(.8,er*.49),0,Math.PI*2); c.fill();
+  if (det){ c.fillStyle='rgba(255,255,255,.9)'; c.beginPath(); c.arc(ex+er*.07,ey-er*.22,Math.max(.6,er*.18),0,Math.PI*2); c.fill(); }
   c.restore();
 }
 /** The Foghorn Gurnard's side fin: a wide fan like a wing, scalloped between its rays and edged in blue. It's the
@@ -3313,6 +3474,22 @@ function gurnardWing(c,len,h,lw,det,sw){ const G=GURN_FAN, px=len*G.x, py=len*G.
   if (det){ const Rr=[]; for (let i=1;i<G.n;i++){ const a=G.a0+(G.a1-G.a0)*i/G.n; Rr.push(px,py,px+Math.cos(a)*R,py+Math.sin(a)*R*.85); } fishRays(c,lw,Rr); }
   if (det>1){ c.fillStyle='rgba(43,90,140,.5)'; c.beginPath(); c.arc(px-R*.55,py-R*.05,len*.028,0,Math.PI*2); c.fill(); } c.restore();
   c.strokeStyle=INK; c.lineWidth=lw*.7; c.stroke(P); c.restore(); }
+/** The Gaslight Angler's lure: a stalk off its brow with a lamp at the end, glowing. */
+function anglerLure(c,len,h,lw,shadow){ const tt=(typeof S!=='undefined' && S.time)||0, lx=len*.6, ly=-h*1.3, gl=.75+.25*Math.sin(tt*2.6);
+  c.save(); if (!shadow){ c.strokeStyle=INK; c.lineWidth=Math.max(1,lw*.5); c.beginPath(); c.moveTo(len*.3,-h*.92); c.quadraticCurveTo(len*.48,-h*1.75,lx,ly); c.stroke(); }
+  c.globalCompositeOperation='lighter'; const g=c.createRadialGradient(lx,ly,0,lx,ly,len*.16); g.addColorStop(0,'rgba(255,236,170,'+(.75*gl).toFixed(3)+')'); g.addColorStop(1,'rgba(255,200,120,0)');
+  c.fillStyle=g; c.beginPath(); c.arc(lx,ly,len*.16,0,Math.PI*2); c.fill(); c.globalCompositeOperation='source-over';
+  c.fillStyle='#FFF2C4'; c.beginPath(); c.arc(lx,ly,Math.max(1.2,len*.03),0,Math.PI*2); c.fill(); if (!shadow){ c.lineWidth=Math.max(.8,lw*.4); c.strokeStyle=INK; c.stroke(); } c.restore(); }
+/** The Mossy mutation: soft moss along the back, a few sprigs, and one small flower. */
+function drawMoss(c,id,len,h,lw){ const D=DORSAL[id]||DORSAL0;
+  c.save(); for (let i=0;i<9;i++){ const x=len*(.3-i*.075), y=-h*(.78-Math.abs(i-4)*.025);
+    if (x<len*D.a && x>len*D.b) continue;   // not over the fin
+    c.fillStyle=i%2?'#7FA35B':'#9BBE6E'; c.beginPath(); c.ellipse(x,y,len*.045,h*.2,0,0,Math.PI*2); c.fill(); }
+  c.fillStyle='rgba(120,160,80,.55)'; for (let i=0;i<5;i++){ c.beginPath(); c.arc(len*(.18-i*.12),h*(.05+(i%2)*.2),len*.022,0,Math.PI*2); c.fill(); }
+  c.strokeStyle='#5E7F3E'; c.lineWidth=Math.max(.8,lw*.45); c.lineCap='round'; c.beginPath();
+  for (const sx of [.22,-.02,-.26]){ const x=len*sx, y=-h*.86; c.moveTo(x,y); c.quadraticCurveTo(x+len*.02,y-h*.3,x-len*.01,y-h*.5); } c.stroke();
+  const fx=len*.1, fy=-h*1.0, fr=Math.max(1.4,len*.02); c.fillStyle='#F2E7EE'; for (let i=0;i<5;i++){ const a=i/5*Math.PI*2; c.beginPath(); c.arc(fx+Math.cos(a)*fr,fy+Math.sin(a)*fr,fr*.8,0,Math.PI*2); c.fill(); }
+  c.fillStyle='#E8C25A'; c.beginPath(); c.arc(fx,fy,fr*.7,0,Math.PI*2); c.fill(); c.restore(); }
 
 /* ---------- Loot art: crates, pouches, bottles, letters, every find, and the townsfolk who lost them ---------- */
 /* Everything is drawn in the same field-journal style as the fish: flat fills, one highlight, bold ink outlines.
@@ -4188,6 +4365,88 @@ function emptyFirst(T){ trapFill(T); if (!T.fish.length && !T.g) return;
   news('Emptied it first: '+out.fish.length+' fish'+(out.coins?' for +'+out.coins.toLocaleString()+' coins':'')+(out.kept.length?', '+out.kept.length+' kept for your recipes':''),'good'); updateHud(); }
 function fitBtn(T,id,name,eff){ const on=(T.fit||null)===id; return '<button type="button" class="trap-fit'+(on?' on':'')+'" data-fit="'+(id||'')+'" aria-pressed="'+on+'">'+(id?'<canvas data-fitting="'+id+'" aria-hidden="true"></canvas>':'')+'<b>'+name+'</b><small>'+eff+'</small></button>'; }
 
+/* ---------- The rarity kit on a catch: Epic, Exotic and Mythic ---------- */
+/* Each tier keeps what the one below it has and adds a layer, and every layer shows with the sound off (the design
+   doc's "Feedback scales with rarity"). Rare and Legendary are drawn where they always were (bite.js, landing.js).
+   Hook:    Epic: a freeze, and the water bulges round the bobber with violet sparks.
+            Exotic: the water shifts colour round the line, and keeps shifting while you reel.
+            Mythic: the screen inks over from the edges and the lake goes quiet: no music, no ambience.
+   Landing: Epic: a trail of violet sparks. Exotic: prismatic rays and a rainbow trail. Mythic: the ink draws back
+            from a full moon, and the calf breaches across it.
+   Card:    a chord that climbs with the tier (sfx.out), an iridescent or inked frame (styles/card.css), and a Mythic's
+            name written in by pen, with its own short theme. */
+const RFX={bulge:null, tint:null, ink:null, moon:null};
+const PRISM_TRAIL=['#E06B5B','#E9A05A','#E8D27A','#8CC77E','#6FA9D8','#7A7BCB','#A07AC2'];
+/** A fish's rarity as pips, one per tier (1 to 8), so rarity never rests on colour alone. */
+function rarPipsHTML(r){ const n=RAR[r].pips; return '<span class="pips fishpips" style="--pip:'+RAR[r].color+'" role="img" aria-label="'+RAR[r].label+', '+n+' of 8">'+'<i class="on"></i>'.repeat(n)+'</span>'; }
+/** The lake goes quiet for `secs`: the ambience drops away, then comes back as the volume settings have it. */
+function ambQuiet(secs){ if (!AC || !AMB) return; AMB.gain.setTargetAtTime(.0001,AC.currentTime,.25); clearTimeout(RFX.quietT); RFX.quietT=setTimeout(applyVol,secs*1000); }
+function hookMoment(F,perfect){ const rk=rarRank(F.rarity), b=S.bob; RFX.bulge=RFX.tint=RFX.ink=null; if (rk<rarRank('epic') || !b) return;
+  RFX.bulge={x:b.x, y:b.y, t:0};
+  lootSparks(b.x,b.y-4,REDUCED?8:22,'190,150,240',{up:true,v0:60,v1:200,g:160});
+  tone(196,.5,{to:262,vol:.12,type:'triangle'}); tone(392,.6,{to:523,vol:.06,type:'sine',delay:.05});
+  if (rk>=rarRank('exotic')) RFX.tint={t:0};
+  if (rk>=rarRank('mythic')){ RFX.ink={t:0, hold:true}; musicDuck(0,60); ambQuiet(60); sfx.inkBell(); buzz([0,140]); }
+}
+/** Where the hooked fish is now: the fight, then the landing. */
+function rfxAt(){ if (S.reel) return {x:S.reel.x, y:S.reel.y}; if (S.land){ const p=S.state==='result'?S.land.to:landPos(); return {x:p.x, y:p.y}; } return null; }
+function rfxUpdate(dt){
+  if (RFX.bulge){ RFX.bulge.t+=dt; if (RFX.bulge.t>1.4) RFX.bulge=null; }
+  if (RFX.tint){ RFX.tint.t+=dt; if (!S.reel && !S.land) RFX.tint=null; }
+  if (RFX.ink){ const I=RFX.ink; I.t+=dt; if (!S.reel && !S.land && !RFX.moon){ RFX.ink=null; musicDuck(1,0); MU.duckT=0; applyVol(); } }
+  if (RFX.moon){ RFX.moon.t+=dt; if (S.state!=='landing' && S.state!=='result'){ RFX.moon=null; RFX.ink=null; MU.duckT=0; applyVol(); } }
+}
+/** On the water, under the fish: the bulge, and the colour shifting round the line. */
+function drawRfxWater(){
+  const B=RFX.bulge; if (B){ const u=B.t/1.4, k=sc(B.y), e=1-Math.pow(1-u,3);
+    for (let i=0;i<3;i++){ const r=(14+e*(60+i*22))*k, a=(1-u)*(.5-i*.13); if (a<=0) continue;
+      ctx.strokeStyle='rgba(205,180,245,'+a.toFixed(3)+')'; ctx.lineWidth=(3.5-i)*k; ctx.beginPath(); ctx.ellipse(B.x,B.y,r,r*.36,0,0,Math.PI*2); ctx.stroke(); }
+    const dome=Math.sin(Math.min(1,u*2.2)*Math.PI)*(1-u*.6), g=ctx.createRadialGradient(B.x,B.y,1,B.x,B.y,40*k);   // the swell itself, lit from above
+    g.addColorStop(0,'rgba(235,225,255,'+(.4*dome).toFixed(3)+')'); g.addColorStop(1,'rgba(167,123,219,0)'); ctx.save(); ctx.translate(B.x,B.y); ctx.scale(1,.4); ctx.translate(-B.x,-B.y);
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(B.x,B.y,40*k,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+  const T=RFX.tint, at=T&&rfxAt(); if (T && at){ const a=Math.min(1,T.t*1.5)*(S.state==='result'?.6:1), k=sc(Math.max(HZ+10,at.y)), r=(70+Math.sin(S.time*1.3)*8)*Math.max(.6,k);
+    ctx.save(); ctx.globalCompositeOperation='soft-light'; ctx.translate(at.x,at.y); ctx.scale(1,.42);
+    const g=ctx.createRadialGradient(0,0,4,0,0,r); g.addColorStop(0,prismAt(S.time*1.4,0,62)); g.addColorStop(.55,prismAt(S.time*1.4,140,58)); g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.globalAlpha=.85*a; ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+}
+/** Over everything: the ink closing in, and the full moon a Mythic breaches across. */
+function drawRfxOver(){
+  const M=RFX.moon; if (M){ const L=S.land, a=Math.min(1,M.t/.8), cx=W*.5, cy=H*.3, R=Math.min(W,H)*.2;
+    ctx.save(); ctx.globalAlpha=a; const g=ctx.createRadialGradient(cx,cy,R*.6,cx,cy,R*2.4); g.addColorStop(0,'rgba(225,232,250,.55)'); g.addColorStop(1,'rgba(225,232,250,0)');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H); ctx.fillStyle='#EEF0F6'; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(170,176,196,.35)'; for (const [dx,dy,r] of [[-.3,-.2,.18],[.25,.1,.14],[.05,-.42,.09],[-.12,.34,.11]]){ ctx.beginPath(); ctx.arc(cx+dx*R,cy+dy*R,r*R,0,Math.PI*2); ctx.fill(); }
+    ctx.restore();
+    if (L && S.state==='landing') for (let i=0;i<2;i++) S.particles.push({x:cx+rand(-R,R)*1.3,y:cy+rand(-R,R),vx:rand(-10,10),vy:-rand(8,26),g:-6,life:0,max:rand(1.4,2.4),r:rand(1.2,2.2),c:'rgba(225,230,245,'}); }
+  const I=RFX.ink; if (!I) return;
+  // closing in over 1.2 s, then a heavy vignette while you reel; drawn back as the moon rises, to a soft edge on the card
+  const close=Math.min(1,I.t/1.2), open=M?Math.min(1,M.t/1.1):0, res=S.state==='result';
+  const inner=Math.min(W,H)*lerp(lerp(.9,.05,close), .2, I.hold && S.reel ? Math.min(1,Math.max(0,I.t-1.6)/1) : 0);
+  const rIn=M?lerp(inner,Math.max(W,H)*.75,open):inner, dark=res?.5:.96;
+  const g=ctx.createRadialGradient(W/2,H*.45,rIn,W/2,H*.45,rIn+Math.max(W,H)*.35); g.addColorStop(0,'rgba(11,10,16,0)'); g.addColorStop(1,'rgba(11,10,16,'+dark+')');
+  ctx.fillStyle=g; ctx.fillRect(-20,-20,W+40,H+40);
+}
+/** Landing, Epic and up: what trails the fish through the air, and the Mythic's moon. */
+function landMoment(L){ const rk=rarRank(L.F.rarity); if (rk<rarRank('epic')) return;
+  if (rk>=rarRank('mythic')){ RFX.moon={t:0}; L.to={x:W/2, y:H*.33}; if (RFX.ink) RFX.ink.hold=false; else RFX.ink={t:1.2, hold:false}; tone(147,2.4,{vol:.12,type:'sine'}); tone(220,2,{vol:.06,type:'sine',delay:.4}); } }
+function landTrail(L,p){ const r=L.F.rarity; if (rarRank(r)<rarRank('epic') || REDUCED || L.p>.92) return;
+  if (r==='exotic'){ for (let i=0;i<2;i++){ const c=rgbOf(PRISM_TRAIL[Math.floor(rand(0,PRISM_TRAIL.length))]);
+      S.particles.push({x:p.x+rand(-5,5),y:p.y+rand(-5,5),vx:rand(-16,16),vy:rand(-10,18),g:20,life:0,max:rand(.7,1.2),r:rand(1.6,3),c:'rgba('+c+','}); } return; }
+  const c=r==='epic'?'190,150,240':r==='legendary'?'242,212,126':'225,230,245';
+  if (Math.random()<.8) S.particles.push({x:p.x+rand(-8,8),y:p.y+rand(-8,8),vx:rand(-26,26),vy:rand(-24,24),g:r==='epic'?60:-10,life:0,max:rand(.6,1.2),r:rand(1.2,2.6),c:'rgba('+c+','}); }
+/** The rays behind a fish in the air: its tier's colour, prismatic for Exotic, silver for Mythic. */
+function landRays(L,pos,len){ const r=L.F.rarity; if (r==='common') return;
+  if (r==='exotic') return drawPrismRays(pos.x,pos.y,.75*pos.e,len*1.5);
+  const a=r==='uncommon'?.25:r==='rare'?.45:r==='epic'?.6:.7; drawRays(pos.x,pos.y,r==='mythic'?'#E8ECF6':RAR[r].color,a*pos.e,len*(r==='mythic'?1.1:1.3)); }
+/** The card: a Mythic's name inks in by pen, with the calf's theme; Epic and Exotic get a chord of their own. */
+function cardMoment(L){ const r=L.F.rarity, rk=rarRank(r), nm=$('cName'); nm.classList.remove('inked'); if (rk<rarRank('epic')) return;
+  if (rk>=rarRank('mythic')){ void nm.offsetWidth; nm.classList.add('inked'); calfTheme(); return; }
+  const base=r==='exotic'?[523,659,831,988,1245]:[440,554,659,880];
+  base.forEach((n,i)=>tone(n,.5+i*.05,{vol:.05,type:r==='exotic'?'sine':'triangle',delay:.45+i*.09})); }
+/** The Moonwhale Calf's own theme: a slow call from far down, answered higher up, then a music-box phrase. */
+function calfTheme(){ if (!AC) return; tone(110,1.8,{to:146,vol:.12,type:'sine'}); tone(220,1.4,{to:174,vol:.05,type:'sine',delay:.3});
+  tone(293,1.6,{to:392,vol:.06,type:'sine',delay:1.6}); [587,698,880,784,698,587,523,587].forEach((n,i)=>tone(n,.6,{vol:.05,type:'triangle',delay:2.4+i*.24}));
+  for (let i=0;i<10;i++) noise(.05,{vol:.03,f:3200,type:'highpass',delay:.2+i*.09}); }   // the pen
+
 /* ---------- Catch card: the fish, the tape measure, and the record moment ---------- */
 const CARD={raf:0,t0:0,L:null,w:0,h:0,d:1,lastTick:null,snapped:false,passed:-1,shownW:''};
 function tapeUnits(){ const uc=imperial()?2.54:1; return {uc}; }
@@ -4217,14 +4476,14 @@ function recordSnap(){ const L=CARD.L; CARD.snapped=true;
 function tapeRange(F){ return F.size[1]*1.12; }
 function drawCardScene(t){
   const L=CARD.L, F=L.F, c=$('cFish').getContext('2d'), w=CARD.w, h=CARD.h; c.setTransform(CARD.d,0,0,CARD.d,0,0); c.clearRect(0,0,w,h);
-  const {uc}=tapeUnits(), v1=tapeRange(F), ty=h-27, th=13, xs=36, room=ty-th/2-6, finK=F.h*(L.id==='mayor'?2.9:2.45);
+  const {uc}=tapeUnits(), v1=tapeRange(F), ty=h-27, th=13, xs=36, room=ty-th/2-6, finK=F.h*((DORSAL[L.id]||DORSAL0).top+.8);
   // the tape is as long as the card allows, but never so long that a deep-bodied fish won't fit above it
   const span=Math.min(w-10-xs,room/finK*1.08*v1/L.size), X=v=>xs+span*clamp(v/v1,0,1), xe=xs+span;
   const hv=hookAt(t), hx=hv==null?xs:X(hv), p=L.prev&&!L.isNew?L.prev:null;
   // the fish lies along the tape: tail at zero, nose at its length
   const nose=X(L.size), len=(nose-xs)/1.08, cx=xs+len*.58, fy=ty-th/2-4-len*F.h*1.02, col=RAR[F.rarity].color;
   c.save(); c.fillStyle=col; c.globalAlpha=.15; c.beginPath(); c.ellipse(cx,fy+4,len*.62,Math.max(18,len*F.h*1.6),0,0,6.28); c.fill(); c.restore();
-  c.save(); c.translate(cx,fy); c.rotate(Math.sin(t*1.8)*.012); drawFish(c,L.id,len,false,1,Math.sin(t*6)*(t<1.6?.3:.1)); c.restore();
+  c.save(); c.translate(cx,fy); c.rotate(Math.sin(t*1.8)*.012); drawFish(c,L.id,len,false,1,Math.sin(t*6)*(t<1.6?.3:.1),false,L.mut); c.restore();
   c.save(); c.strokeStyle='rgba(43,42,51,.2)'; c.setLineDash([2,4]); c.lineWidth=1.2; c.beginPath(); c.moveTo(xs,ty); c.lineTo(xe,ty); c.stroke(); c.restore();
   if (hv!=null){
     const g=c.createLinearGradient(0,ty-th/2,0,ty+th/2); g.addColorStop(0,'#F7DC6C'); g.addColorStop(1,'#E9C24A');
@@ -4610,6 +4869,8 @@ const WX_REGN={lake:1, coast:2};
 function wxState(){ let w=save.wx; if (!w || typeof w!=='object' || Array.isArray(w)) w=save.wx={};
   if (!Number.isInteger(w.seed) || w.seed<1) w.seed=1+Math.floor(Math.random()*2147483646);
   if (w.force!=null && !WX_ORDER.includes(w.force)) delete w.force;
+  if (w.moon!=null && !(Number.isInteger(w.moon) && w.moon>=0 && w.moon<MOON.cycle)) delete w.moon;
+  if (w.bow!=null && w.bow!==true) delete w.bow;
   if (!w.seen || typeof w.seen!=='object' || Array.isArray(w.seen)) w.seen={};
   return w; }
 /** A number in [0, 1) from three integers: the same three always give the same number. */
@@ -4630,7 +4891,7 @@ function wxAt(reg,B,seed){ seed=seed||wxState().seed; return wxRoll(reg,wxStart(
     a rainbow, each 0 to 1). Cached until the save, the clock, the region or a pinned kind changes. */
 function wxInfo(){
   const w=wxState(), M=WXM;
-  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.force===w.force && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
+  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
   const reg=REG(), h=(((save.clock%24)+24)%24), into=h%WX_SPELL.hours; let from, to, t;
   if (w.force){ from=to=w.force; t=1; }
   else if (!save.tutorialDone){ from=to='clear'; t=1; }
@@ -4641,7 +4902,8 @@ function wxInfo(){
   if (kind==='clear'||kind==='cloudy'){ const m=h<DAWN_MIST.from-.5||h>DAWN_MIST.to+1.5?0:h<6?(h-(DAWN_MIST.from-.5))/1.5:1-(h-6)/(DAWN_MIST.to+1.5-6); v.mist=clamp(m,0,1); }
   // a rainbow, by day, in the hour or two after rain gives way
   if (from==='rain' && to!=='rain' && !w.force && h>=7 && h<18.5) v.bow=clamp((t-.5)/.4,0,1)*clamp((2.4-into)/.8,0,1);
-  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,force:w.force,seed:w.seed,tut:save.tutorialDone,v});
+  if (w.bow && !isNight(h)) v.bow=1;                                   // Playtest: a rainbow now
+  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
   return v; }
 /** The weather the fishing uses here and now: 'clear', 'cloudy', 'rain' or 'fog'. */
 const wxNow = () => wxInfo().kind;
@@ -4649,6 +4911,21 @@ const wxNow = () => wxInfo().kind;
 function wxLook(){ const v=wxInfo(); if (!v.look) v.look={cloud:v.cloud, rain:v.rain, fog:Math.max(v.fog,v.mist*DAWN_MIST.look), mist:v.mist, bow:v.bow}; return v.look; }   // one per answer, not one per call
 /** Whether the dawn mist is on the water for fishing: fog fish rise at a share of their odds. */
 const wxMist = () => { const v=wxInfo(), h=save.clock; return (v.kind==='clear'||v.kind==='cloudy') && h>=DAWN_MIST.from && h<DAWN_MIST.to; };
+/* The moon waxes and wanes over MOON.cycle in-game days. A night belongs to the day it began on: the small hours are
+   still last night. Playtest can pin the phase (save.wx.moon). */
+const moonNightDay = () => (save.day||0)-((((save.clock%24)+24)%24)<12?1:0);
+/** The moon's phase tonight: 0 new, MOON.full full. */
+function moonPhase(){ const w=wxState(); if (w.moon!=null) return w.moon; const c=MOON.cycle; return (((moonNightDay()+MOON.offset)%c)+c)%c; }
+const fullMoon = () => moonPhase()===MOON.full;
+/** Whether a full moon is up and showing: the moonpath lies on the water. Cloud and fog hide it. */
+function moonpathOn(){ return fullMoon() && isNight(save.clock) && (PAL.moonVis==null?1:PAL.moonVis)*(1-Math.max(wxLook().cloud,wxLook().fog))>.25; }
+/** Whether (x, y) is on the moonpath: a column of light under the moon, wider toward the dock. */
+function onMoonpath(x,y){ if (!moonpathOn()) return false; const k=clamp((y-HZ)/(H-HZ),0,1); return Math.abs(x-(SC.moonX||W*.74))<W*lerp(MOON.path[0],MOON.path[1],k); }
+/** Where the rainbow's foot touches the water, and how strongly it shows (0 to 1): on the side away from the sun. */
+function bowFoot(){ const a=wxLook().bow; if (!(a>.01)) return null; const cx=W*(PAL&&PAL.sunX>.5?.32:.68), R=W*.6, dy=W*.2, dx=Math.sqrt(R*R-dy*dy);
+  const x=clamp(cx<W/2?cx+dx:cx-dx,W*.14,W*.86); return {x, y:HZ+(H-HZ)*BOW_FOOT.depth, r:W*BOW_FOOT.r, a}; }
+/** Whether (x, y) is at the rainbow's foot, while the rainbow is bright enough to see. */
+function atBowFoot(x,y){ const f=bowFoot(); return !!f && f.a>.3 && Math.hypot(x-f.x,(y-f.y)*2.4)<f.r; }
 /** What share of the time each kind of weather fills in `reg`, over `days` in-game days of this sky (for the
     balance report and the tests). */
 function wxShares(reg,days,seed){ seed=seed||wxState().seed; const n={}; for (const k of WX_ORDER) n[k]=0;
@@ -4815,6 +5092,62 @@ function paintWxPane(c,x,y,w,h,P){ const L=wxLook(); if (L.fog<.02 && L.rain<.02
       c.fillStyle='rgba(235,242,248,.55)'; c.beginPath(); c.arc(bx,by,r,0,Math.PI*2); c.fill();
       c.fillStyle='rgba(255,255,255,.85)'; c.beginPath(); c.arc(bx-r*.35,by-r*.35,r*.32,0,Math.PI*2); c.fill(); } } }
 
+/* ---------- The moon's phases, the moonpath, the Moonwhale's mother, and the rainbow's foot ---------- */
+/* The moon waxes and wanes over MOON.cycle in-game days (game/weather.js: moonPhase). It's drawn in its phase in the
+   sky, and its glitter on the water dims with it. On a full-moon night a moonpath lies across the water under it: in
+   the deep pool, a cast onto it is where the Moonwhale Calf is likeliest (RARE_BITES.calf.path). Now and then on those
+   nights its mother breaches far out, a sighting that puts the calf's hint in the journal.
+   After rain by day, the rainbow's near foot comes down onto the water (bowFoot), with a shimmer where it touches:
+   casting there doubles the chance of a mutation, and it's the only place the Prism Shiner bites. */
+/** How much of the moon is lit tonight, 0 (new) to 1 (full). */
+const moonLit = () => (1-Math.cos(moonPhase()/MOON.cycle*Math.PI*2))/2;
+/** Draws the moon in its phase at (cx, cy), radius R: the dark side as a faint disc, the lit side over it. */
+function drawMoonPhase(x,cx,cy,R,a){ const ph=moonPhase(), th=ph/MOON.cycle*Math.PI*2, c=Math.cos(th), wax=ph<MOON.cycle/2;
+  x.save(); x.globalAlpha=a*.16; x.fillStyle='#C9CEDC'; x.beginPath(); x.arc(cx,cy,R,0,Math.PI*2); x.fill(); x.globalAlpha=a;   // earthshine
+  if (ph===0){ x.strokeStyle='rgba(220,226,240,.35)'; x.lineWidth=1; x.stroke(); x.restore(); return; }
+  x.translate(cx,cy); if (!wax) x.scale(-1,1);
+  const lit=new Path2D(); lit.moveTo(0,-R); lit.arc(0,0,R,-Math.PI/2,Math.PI/2,false);
+  if (ph===MOON.full) lit.arc(0,0,R,Math.PI/2,Math.PI*1.5,false); else lit.ellipse(0,0,Math.abs(c)*R,R,0,Math.PI/2,-Math.PI/2,c>0);
+  x.fillStyle='#EEE8D5'; x.fill(lit); x.save(); x.clip(lit);
+  const q=R/15.6, sx=wax?1:-1; x.fillStyle='rgba(180,170,150,.5)'; x.beginPath(); x.arc(-4*q*sx,-3*q,3*q,0,Math.PI*2); x.arc(5*q*sx,4*q,2.2*q,0,Math.PI*2); x.arc(2*q*sx,-6*q,1.5*q,0,Math.PI*2); x.fill(); x.restore();   // the same craters, whichever way it's lit
+  x.restore(); }
+/* The mother's breach, far out on a full-moon night */
+var MOONS={breach:null, t:0};
+function moonUpdate(dt){ const B=MOONS.breach;
+  if (B){ B.t+=dt; if (B.t>B.dur) MOONS.breach=null; return; }
+  if (AQ.open || K.open || REG()!=='lake' || !moonpathOn() || INTRO.active) return;
+  if (Math.random()<dt*MOON.breach/60){                                     // MOON.breach a chance per in-game hour (a real minute)
+    MOONS.breach={x:W*rand(.18,.82), y:HZ+(H-HZ)*rand(.02,.05), t:0, dur:3.4, dir:Math.random()<.5?-1:1};
+    if (AC){ tone(70,2.6,{to:98,vol:.09,type:'sine',delay:.4}); tone(140,1.8,{to:118,vol:.04,type:'sine',delay:.9}); noise(1.4,{vol:.05,f:300,to:120,type:'lowpass',delay:1.5}); }
+    const r=rec('calf'); if (!r.seen && (S.state==='idle'||S.state==='waiting'||S.state==='aiming')){ r.seen=true; persist(); setTimeout(()=>news('Something enormous breached, far out',''),1600); } } }
+function drawBreach(){ const B=MOONS.breach; if (!B) return; const u=B.t/B.dur, k=sc(B.y)*2.4, up=clamp(u/.35,0,1), down=clamp((u-.45)/.3,0,1);
+  const rise=Math.sin(Math.min(1,u/.62)*Math.PI)*34*k, ang=B.dir*(-.7+u*1.3);
+  if (u<.75){ ctx.save(); ctx.translate(B.x+B.dir*u*30*k,B.y-rise); ctx.rotate(ang); ctx.scale(B.dir,1); ctx.globalAlpha=(1-down)*.85;
+    ctx.fillStyle='rgba(28,34,52,.9)'; whalePath(ctx,70*k,true); ctx.restore(); }
+  for (const [at,sz] of [[.08,1],[.6,1.6]]){ const v=(u-at)/.4; if (v<0 || v>1) continue; const x=B.x+B.dir*(at>.5?26*k:0);
+    ctx.fillStyle='rgba(225,236,245,'+(.7*(1-v)).toFixed(3)+')'; for (let i=-3;i<=3;i++){ ctx.beginPath(); ctx.ellipse(x+i*5*k*sz,B.y-Math.sin((1-Math.abs(i)/4)*Math.PI*.5)*v*18*k*sz*(1-v*.5),1.6*k,4*k*sz*(1-v*.5),0,0,Math.PI*2); ctx.fill(); }
+    ctx.strokeStyle='rgba(225,236,245,'+(.5*(1-v)).toFixed(3)+')'; ctx.lineWidth=1; ctx.beginPath(); ctx.ellipse(x,B.y,(10+v*30)*k*sz*.6,(2+v*5)*k*sz*.6,0,0,Math.PI*2); ctx.stroke(); } }
+/** The moonpath: a broken column of light on the water under a full moon, glittering and wider toward the dock. */
+function drawMoonpath(){ if (!moonpathOn()) return; const mx=SC.moonX||W*.74, a=Math.min(1,(PAL.moonVis||0)*1.2)*(1-Math.max(wxLook().cloud,wxLook().fog));
+  ctx.save(); ctx.globalCompositeOperation='lighter';
+  for (let i=0;i<26;i++){ const v=i/25, y=HZ+3+v*v*(H-HZ)*.62, hw=W*lerp(MOON.path[0],MOON.path[1],(y-HZ)/(H-HZ)), sw=Math.sin(S.time*1.6+i*1.7);
+    const w=hw*(.55+.45*Math.abs(Math.sin(i*2.3+S.time*.7))), x=mx+sw*hw*.2;
+    ctx.fillStyle='rgba(210,222,255,'+((.16+.1*Math.sin(S.time*2.2+i))*a*(1-v*.35)).toFixed(3)+')'; ctx.fillRect(x-w,y,w*2,1+v*2.4); }
+  ctx.restore(); }
+/** The rainbow's near foot, coming down onto the water, and the shimmer where it touches. */
+function drawBowFoot(){ const f=bowFoot(); if (!f) return; const a=f.a, cx=W*(PAL.sunX>.5?.32:.68), R=W*.6, dy=W*.2, hx=cx<W/2?cx+Math.sqrt(R*R-dy*dy):cx-Math.sqrt(R*R-dy*dy);
+  const bw=Math.max(2.2,W*.0105), n=PRISM_TRAIL.length;
+  ctx.save(); ctx.globalAlpha=.22*a; ctx.lineWidth=bw+.6;
+  for (let i=0;i<n;i++){ const off=(i-(n-1)/2)*bw*(cx<W/2?-1:1); ctx.strokeStyle=PRISM_TRAIL[i]; ctx.beginPath(); ctx.moveTo(hx+off,HZ-1); ctx.lineTo(f.x+off*1.8,f.y); ctx.stroke(); }
+  ctx.restore();
+  // the shimmer: a soft ring of colours on the water, and glints that come and go
+  ctx.save(); ctx.translate(f.x,f.y); ctx.scale(1,1/2.4); const pr=f.r*(.92+.06*Math.sin(S.time*1.8));
+  for (let i=0;i<n;i++){ ctx.strokeStyle=PRISM_TRAIL[i]; ctx.globalAlpha=(.2+.08*Math.sin(S.time*2+i))*a; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(0,0,pr*(.55+i*.065),0,Math.PI*2); ctx.stroke(); }
+  ctx.restore();
+  for (let i=0;i<7;i++){ const ang=i*2.4+S.time*.4, d=f.r*.8*((i*37%10)/10), x=f.x+Math.cos(ang)*d, y=f.y+Math.sin(ang)*d/2.4, tw=Math.pow(Math.max(0,Math.sin(S.time*3+i*1.9)),5)*a;
+    if (tw<.05) continue; const r=1.4+tw*2.6; ctx.fillStyle=PRISM_TRAIL[i%n]; ctx.globalAlpha=tw; ctx.beginPath(); ctx.moveTo(x,y-r); ctx.lineTo(x+r*.3,y); ctx.lineTo(x,y+r); ctx.lineTo(x-r*.3,y); ctx.closePath(); ctx.fill(); ctx.fillRect(x-r,y-.4,r*2,.8); }
+  ctx.globalAlpha=1; }
+
 /* ---------- Scenery: static backdrop (rebuilt on resize) ---------- */
 const SC={clouds:[],birds:[],boat:null,nextBirds:2.5,nextBoat:4,jump:null,nextJump:5,smoke:[],smokeT:0,flies:[],dfly:[],
   frog:{pad:0,t:5,hop:null,croak:0},gull:null,drop:null,lucky:null,heron:{dir:-1,t:4},bg:null,bank:{L:[],R:[]},tails:[],lamp:null,chimneys:[],waves:[],glints:[],pads:[]};
@@ -4874,10 +5207,10 @@ function buildBg(){
     x.fillStyle=sg; x.fillRect(0,0,W,HZ); x.globalAlpha=P.sunVis; x.fillStyle=P.sunDisc; x.beginPath(); x.arc(sx,sy,W*(P.sunY>.8?.065:.05),0,Math.PI*2); x.fill(); x.globalAlpha=1; }
   const mx=W*.74, my=HZ*.3;
   if (P.moonVis>.01){ const mg=x.createRadialGradient(mx,my,4,mx,my,W*.3); mg.addColorStop(0,'rgba(200,215,255,'+(.3*P.moonVis).toFixed(2)+')'); mg.addColorStop(1,'rgba(200,215,255,0)');
-    x.fillStyle=mg; x.fillRect(0,0,W,HZ); x.globalAlpha=P.moonVis; x.fillStyle='#EEE8D5'; x.beginPath(); x.arc(mx,my,W*.04,0,Math.PI*2); x.fill();
-    x.fillStyle='rgba(180,170,150,.5)'; x.beginPath(); x.arc(mx-4,my-3,3,0,Math.PI*2); x.arc(mx+5,my+4,2.2,0,Math.PI*2); x.arc(mx+2,my-6,1.5,0,Math.PI*2); x.fill(); x.globalAlpha=1; }
+    x.globalAlpha=.25+.75*moonLit(); x.fillStyle=mg; x.fillRect(0,0,W,HZ); x.globalAlpha=1; drawMoonPhase(x,mx,my,W*.04,P.moonVis); }   // in its phase (game/moon.js)
+  SC.moonX=mx;
   paintWxSky(x);   // an overcast deck and fog's wash (game/weather-art.js)
-  const useSun=P.sunVis>=P.moonVis; SC.lightX=useSun?sx:mx; SC.lightRGB=useSun?P.glowR:'210,222,255'; SC.lightA=useSun?P.sunVis*(P.sunY>.7?1:.45):P.moonVis*.7;
+  const useSun=P.sunVis>=P.moonVis; SC.lightX=useSun?sx:mx; SC.lightRGB=useSun?P.glowR:'210,222,255'; SC.lightA=useSun?P.sunVis*(P.sunY>.7?1:.45):P.moonVis*.7*(.25+.75*moonLit());
   drawLand(x,true);
   const ws=REG()==='coast'?[mixP('w0','#94BCCB',.3),mixP('w1','#2F8098',.38),mixP('w2','#1B6276',.38),mixP('w3','#0E3A4A',.3)]:[P.w0,P.w1,P.w2,P.w3];
   const wg=x.createLinearGradient(0,HZ,0,H); wg.addColorStop(0,ws[0]); wg.addColorStop(.1,ws[1]); wg.addColorStop(.45,ws[2]); wg.addColorStop(1,ws[3]);
@@ -5003,7 +5336,7 @@ function drawWater(){
     ctx.fillStyle='rgba(255,240,210,'+a.toFixed(3)+')'; ctx.beginPath(); ctx.moveTo(x,y-r); ctx.lineTo(x+r*.3,y); ctx.lineTo(x,y+r); ctx.lineTo(x-r*.3,y); ctx.closePath(); ctx.fill();
     ctx.fillRect(x-r,y-.4,r*2,.8);
   }
-  drawWxWater(); drawLucky();
+  drawMoonpath(); drawBreach(); drawBowFoot(); drawWxWater(); drawLucky();
   if (SC.jump){ const j=SC.jump, u=j.t/j.dur, k=sc(j.y), hgt=Math.sin(Math.PI*u)*26*k;
     ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
 }
@@ -5380,7 +5713,7 @@ function drawKeepnet(){
   bag(); c.fillStyle='rgba(18,44,52,.38)'; c.fill();
   c.save(); bag(); c.clip();
   c.fillStyle='rgba(60,120,140,.3)'; c.fillRect(-16,18,32,20);   // below the waterline
-  for (let i=0;i<Math.min(n,4);i++){ const f=save.net[n-1-i], F=FISH[f.id]; c.save(); c.translate(-6+i*4.2,8+((i*7)%9)); c.rotate(-1.1+i*.55+Math.sin(S.time*2.4+i)*.12); drawFish(c,f.id,Math.min(18,F.len*.32),false,.95,Math.sin(S.time*5+i)*.4); c.restore(); }
+  for (let i=0;i<Math.min(n,4);i++){ const f=save.net[n-1-i], F=FISH[f.id]; c.save(); c.translate(-6+i*4.2,8+((i*7)%9)); c.rotate(-1.1+i*.55+Math.sin(S.time*2.4+i)*.12); drawFish(c,f.id,Math.min(18,F.len*.32),false,.95,Math.sin(S.time*5+i)*.4,false,f.mut); c.restore(); }
   // the mesh: diamonds, fading where it's under water
   c.strokeStyle='rgba(236,228,206,.82)'; c.lineWidth=.8;
   for (let d=-40;d<=40;d+=5.2){ c.beginPath(); c.moveTo(d,0); c.lineTo(d+36,36); c.stroke(); c.beginPath(); c.moveTo(d,0); c.lineTo(d-36,36); c.stroke(); }
@@ -5785,11 +6118,11 @@ function drawLanding(){
   if (!S.land) return; const L=S.land, F=L.F, r=F.rarity;
   const pos=S.state==='result'?{x:L.to.x,y:L.to.y+Math.sin(S.time*2)*3,e:1}:landPos();
   const len=lerp(F.len*sc(L.from.y),Math.min(W*.55,F.len*2.4),pos.e);
-  if (r!=='common'){ const a=r==='uncommon'?.25:r==='rare'?.45:.7; drawRays(pos.x,pos.y,RAR[r].color,a*pos.e,len*1.3); }
+  landRays(L,pos,len);
   ctx.save(); ctx.translate(pos.x,pos.y);
   const ang=S.state==='result'?-.08:(L.from.x<L.to.x?1:-1)*(.9-pos.e*.95)+Math.sin(S.time*22)*.25*(1-pos.e);
   ctx.rotate(ang); if (L.from.x>L.to.x && S.state!=='result') ctx.scale(-1,1);
-  drawFish(ctx,L.id,len,false,1,Math.sin(S.time*(S.state==='result'?4:20))*(S.state==='result'?.2:.6)); ctx.restore();
+  drawFish(ctx,L.id,len,false,1,Math.sin(S.time*(S.state==='result'?4:20))*(S.state==='result'?.2:.6),false,L.mut); ctx.restore();
 }
 function drawAim(){
   if (S.state!=='aiming' || !S.aim) return; const a=S.aim;
@@ -5862,10 +6195,10 @@ function render(){
   ctx.save();
   if (S.shake>.1) ctx.translate(rand(-1,1)*S.shake,rand(-1,1)*S.shake);
   if (Math.abs(S.zoom-1)>.001){ const cx=W/2, cy=H*.42; ctx.translate(cx,cy); ctx.scale(S.zoom,S.zoom); ctx.translate(-cx,-cy); }
-  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
+  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawRfxWater(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
   drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade(); drawRain();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
-  drawTrapMarkers(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
+  drawTrapMarkers(); drawRfxOver(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
   ctx.restore();
   drawOverlays();
 }
@@ -6682,7 +7015,7 @@ function aqBuildBack(){ const W2=AQ.W, H2=AQ.H, b=AQ.box, hood=AQ.hood, st=AQ.st
     const sky=c.createLinearGradient(0,wy,0,wy+wh); sky.addColorStop(0,'rgb('+P.skyTopR+')'); sky.addColorStop(.65,'rgb('+P.skyLowR+')'); sky.addColorStop(1,'rgb('+P.skyHzR+')'); c.fillStyle=sky; c.fillRect(wx,wy,ww,wh);
     c.save(); c.beginPath(); c.rect(wx,wy,ww,wh); c.clip();
     if (P.stars>.2){ sseed=77; c.fillStyle='rgba(255,255,240,'+(P.stars*.8).toFixed(2)+')'; for (let i=0;i<10;i++) c.fillRect(wx+sr()*ww,wy+sr()*wh*.6,1.3,1.3); }
-    if (P.moonVis>.3){ c.fillStyle='rgba(246,241,226,'+P.moonVis.toFixed(2)+')'; c.beginPath(); c.arc(wx+ww*.7,wy+wh*.28,5,0,Math.PI*2); c.fill(); }
+    if (P.moonVis>.3) drawMoonPhase(c,wx+ww*.7,wy+wh*.28,5,P.moonVis);   // in tonight's phase (game/moon.js)
     if (P.sunVis>.3 && P.sunY<1){ c.fillStyle='rgba(255,244,214,.9)'; c.beginPath(); c.arc(wx+ww*.3,wy+wh*(.15+P.sunY*.45),6,0,Math.PI*2); c.fill(); }
     c.fillStyle='rgb('+P.hillFarR+')'; c.beginPath(); c.moveTo(wx,wy+wh*.72); c.quadraticCurveTo(wx+ww*.35,wy+wh*.5,wx+ww*.6,wy+wh*.66); c.quadraticCurveTo(wx+ww*.85,wy+wh*.58,wx+ww,wy+wh*.68); c.lineTo(wx+ww,wy+wh); c.lineTo(wx,wy+wh); c.fill();
     c.fillStyle='rgb('+P.w1R+')'; c.fillRect(wx,wy+wh*.8,ww,wh*.2); c.fillStyle='rgba(255,255,255,.25)'; c.fillRect(wx+ww*.2,wy+wh*.86,ww*.3,1.2); paintWxPane(c,wx,wy,ww,wh,P); c.restore();
@@ -6821,7 +7154,7 @@ function aqSandTop(x){ const b=AQ.box; return AQ.sandY+Math.sin((x-b.x)*.05)*3+M
 function tankOf(id){ return REGION_FISH.coast.includes(id)?'salt':'fresh'; }
 function tanks(){ save.tanks=save.tanks||{}; for (const k in TANKS){ const t=save.tanks[k]=save.tanks[k]||{lvl:0,fish:[],owned:k==='fresh'}; t.decor=t.decor||[]; if (typeof t.tips!=='number') t.tips=0; if (!t.tipT) t.tipT=Date.now(); } return save.tanks; }
 function tankCap(k){ return TANKS[k].caps[tanks()[k].lvl]; }
-function tankRoom(id){ const k=tankOf(id), t=tanks()[k]; return t.owned && t.fish.length<tankCap(k); }
+function tankRoom(id){ if (FISH[id].noTank) return false; const k=tankOf(id), t=tanks()[k]; return t.owned && t.fish.length<tankCap(k); }
 function hasDecor(k,id){ return tanks()[k].decor.includes(id); }
 function decorFor(k){ return DECOR[k].filter(d=>hasDecor(k,d.id)); }
 function favorites(k,fid){ const F=FISH[fid]; return decorFor(k).filter(d=>(d.beh&&d.beh.includes(F.beh))||(d.ids&&d.ids.includes(fid))||(d.rar&&d.rar.includes(F.rarity))); }
@@ -6972,13 +7305,13 @@ function aqDraw(){
   c.fillStyle='#E9C46A'; for (const fl of AQ.flakes){ c.fillRect(fl.x-1.5,fl.y-1,3,2); }
   const sorted=[...AQ.fish].sort((a,b2)=>a.len-b2.len);
   for (const fi of sorted){ const r=fi.F.rarity, sel=AQ.sel===fi;
-    if (r==='legendary' && Math.random()<.2) AQ.parts.push({x:fi.x+rand(-fi.len/2,fi.len/2),y:fi.y+rand(-6,6),t:0,mote:true});
+    if (rarRank(r)>=rarRank('legendary') && Math.random()<.2) AQ.parts.push({x:fi.x+rand(-fi.len/2,fi.len/2),y:fi.y+rand(-6,6),t:0,mote:true});
     c.save(); c.translate(fi.x,fi.y); if (fi.jump) c.rotate(fi.face*(-.9+fi.jump.t/.8*1.8)); c.scale(fi.face,1);
     if (sel){ c.strokeStyle='rgba(255,255,255,.8)'; c.lineWidth=2; c.setLineDash([4,4]); c.beginPath(); c.ellipse(0,0,fi.len*.62,fi.len*.36,0,0,Math.PI*2); c.stroke(); c.setLineDash([]); }
-    if (r==='rare'||r==='legendary'){ c.strokeStyle=RAR[r].color; c.globalAlpha=.35+.25*Math.sin(t*3+fi.ph); c.lineWidth=3; c.beginPath(); c.ellipse(0,0,fi.len*.55,fi.len*.24,0,0,Math.PI*2); c.stroke(); c.globalAlpha=1; }
+    if (rarRank(r)>=rarRank('rare')){ c.strokeStyle=RAR[r].color; c.globalAlpha=.35+.25*Math.sin(t*3+fi.ph); c.lineWidth=3; c.beginPath(); c.ellipse(0,0,fi.len*.55,fi.len*.24,0,0,Math.PI*2); c.stroke(); c.globalAlpha=1; }
     const swing=Math.sin(t*(fi.F.beh==='tugger'?11:fi.dart>0?16:6)+fi.ph)*(fi.F.beh==='tugger'?.6:.4);
-    drawFish(c,fi.ref.id,fi.len,false,1,swing);
-    if (fi.pb){ c.save(); c.scale(fi.face,1); const ry=-fi.len*fi.F.h*(fi.ref.id==='mayor'?2.3:1.85)-7+Math.sin(t*2+fi.ph)*1.5; c.translate(-fi.len*.02,ry);
+    drawFish(c,fi.ref.id,fi.len,false,1,swing,false,fi.ref.mut);
+    if (fi.pb){ c.save(); c.scale(fi.face,1); const ry=-fi.len*fi.F.h*((DORSAL[fi.ref.id]||DORSAL0).top+.2)-7+Math.sin(t*2+fi.ph)*1.5; c.translate(-fi.len*.02,ry);
       c.fillStyle='#B4503F'; c.strokeStyle=INK; c.lineWidth=1; c.beginPath(); c.moveTo(-2,2); c.lineTo(-5,11); c.lineTo(-2,9); c.lineTo(0,12); c.closePath(); c.fill(); c.stroke(); c.beginPath(); c.moveTo(2,2); c.lineTo(5,11); c.lineTo(2,9); c.lineTo(0,12); c.closePath(); c.fill(); c.stroke();
       c.beginPath(); for (let i=0;i<12;i++){ const a=i/12*6.28, rr=i%2?4.2:5.6; c.lineTo(Math.cos(a)*rr,Math.sin(a)*rr); } c.closePath(); c.fillStyle='#E9B23C'; c.fill(); c.stroke(); c.beginPath(); c.arc(0,0,2,0,6.28); c.fillStyle='#FFF1C2'; c.fill(); c.restore(); }
     if (fi.ref.id==='lantern'){ c.globalCompositeOperation='lighter'; const gg=c.createRadialGradient(0,0,2,0,0,fi.len*.7); gg.addColorStop(0,'rgba(255,220,140,.28)'); gg.addColorStop(1,'rgba(255,220,140,0)'); c.fillStyle=gg; c.beginPath(); c.arc(0,0,fi.len*.7,0,Math.PI*2); c.fill(); c.globalCompositeOperation='source-over'; }
@@ -7489,7 +7822,7 @@ const kBlit=(c,S)=>c.drawImage(S.cv,S.x,S.y,S.w,S.h);
 function drawBoard(c){ kBlit(c,kSprite('board',[-182,-114,192,126],paintBoard)); }
 function drawStove(c){ kBlit(c,kSprite('stove',[-196,-188,198,198],paintStove)); }
 /** The whole fish on the board, before and after its scales come off. */
-function drawBoardFish(c,fid,L,bare){ const F=FISH[fid], h=L*F.h, lw=Math.max(1.5,L*.032); kBlit(c,kSprite('fish',[-L*.64,-h*(fid==='mayor'?2.3:1.75)-lw,L*.7,h*1.15+lw],x=>drawFish(x,fid,L,false,1,0,bare),fid+L.toFixed(1)+bare)); }
+function drawBoardFish(c,fid,L,bare){ const F=FISH[fid], h=L*F.h, lw=Math.max(1.5,L*.032); kBlit(c,kSprite('fish',[-L*.64,-h*((DORSAL[fid]||DORSAL0).top+.1)-lw,L*.8,h*(fid==='calf'?2.4:1.15)+lw],x=>drawFish(x,fid,L,false,1,0,bare),fid+L.toFixed(1)+bare)); }
 function paintBoard(c){ c.save(); c.fillStyle='rgba(30,15,5,.3)'; rrect(c,-172,-100,350,222,22); c.fill();
   // the board's thickness along the front, end grain showing
   rrect(c,-178,-100,350,212,22); c.fillStyle='#A7743F'; c.fill(); c.lineWidth=2; c.strokeStyle=INK; c.stroke();
@@ -7568,7 +7901,7 @@ function kRoom(){ // cached wall, window, tiles, shelf and counter
   c.fillStyle=sky; c.fillRect(wx,wy,ww,wh);
   c.save(); c.beginPath(); c.rect(wx,wy,ww,wh); c.clip();
   if (P.stars>.2){ const rnd=seeded('kstars'); c.fillStyle='rgba(255,255,240,'+P.stars*.8+')'; for (let i=0;i<14;i++) c.fillRect(wx+rnd()*ww,wy+rnd()*wh*.6,1.4,1.4); }
-  if (P.moonVis>.3){ c.fillStyle='rgba(246,241,226,'+P.moonVis+')'; c.beginPath(); c.arc(wx+ww*.72,wy+wh*.25,7*s,0,6.28); c.fill(); }
+  if (P.moonVis>.3) drawMoonPhase(c,wx+ww*.72,wy+wh*.25,7*s,P.moonVis);   // in tonight's phase (game/moon.js)
   if (P.sunVis>.3 && P.sunY<1){ c.fillStyle='rgba(255,244,214,.9)'; c.beginPath(); c.arc(wx+ww*.3,wy+wh*(.15+P.sunY*.45),8*s,0,6.28); c.fill(); }
   c.fillStyle='rgb('+P.hillFarR+')'; c.beginPath(); c.moveTo(wx,wy+wh*.72); c.quadraticCurveTo(wx+ww*.35,wy+wh*.52,wx+ww*.6,wy+wh*.68); c.quadraticCurveTo(wx+ww*.85,wy+wh*.6,wx+ww,wy+wh*.7); c.lineTo(wx+ww,wy+wh); c.lineTo(wx,wy+wh); c.fill();
   c.fillStyle='rgb('+P.w1R+')'; c.fillRect(wx,wy+wh*.78,ww,wh*.22); c.fillStyle='rgba(255,255,255,.25)'; c.fillRect(wx+ww*.2,wy+wh*.84,ww*.3,1.5); c.fillRect(wx+ww*.55,wy+wh*.9,ww*.25,1.5);
@@ -8773,7 +9106,7 @@ if (window.__PWA && 'serviceWorker' in navigator && location.protocol!=='file:')
 let last=performance.now();
 function update(dt,rdt){
   if (S.state==='idle' && save.tutorialDone && save.stats.casts>=12){ S.idleT=(S.idleT||0)+rdt; if (S.idleT>30 && S.idleT-rdt<=30) setHint('Drag back to aim. Release to cast.'); }
-  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt); weatherUpdate(rdt);
+  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt); weatherUpdate(rdt); moonUpdate(rdt); rfxUpdate(rdt);
   { const nc=save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')); if (nc>=24) save.day=(save.day||0)+1; save.clock=nc%24; } PAL=palAt(save.clock);   // save.day: Wanderer's days
   { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2 || (S.time-(SC.bgWxT||0)>.5 && (Math.abs(wxBgKey()-(SC.bgWx||0))>(wxInfo().t<1?.1:.005)))) { SC.bgWxT=S.time; buildBg(); } }   // the hour, or the weather, has moved on
   const ct=hudClock(save.clock); if (ct!==S.clockShown || wxIcon()!==S.wxShown){ const n=(S.clockShown||'').length; S.clockShown=ct; S.wxShown=wxIcon(); setClock(ct); if (ct.length!==n) fitHud(); }
@@ -9306,7 +9639,7 @@ function drawPlaque(x,id,w,h){ const F=FISH[id], pw=Math.min(w*.86,330), ph=h*.9
   x.save(); x.clip(); x.strokeStyle='rgba(30,15,5,.22)'; x.lineWidth=1.2; for (let i=0;i<7;i++){ x.beginPath(); for (let px=-pw/2;px<=pw/2;px+=6){ const y=-ph/2+8+i*ph/7+Math.sin(px*.04+i*1.3)*3; px===-pw/2?x.moveTo(px,y):x.lineTo(px,y); } x.stroke(); } x.restore();
   rrect(x,-pw/2+6,-ph/2+6,pw-12,ph-12,ph*.28); x.strokeStyle='rgba(255,230,190,.25)'; x.lineWidth=1.5; x.stroke();
   for (const sx of [-1,1]){ x.beginPath(); x.arc(sx*(pw/2-ph*.2),0,3.2,0,6.28); x.fillStyle=BRASS; x.fill(); x.strokeStyle=INK; x.lineWidth=1; x.stroke(); }
-  const L=Math.min(pw*.68,(ph*.78)/(F.h*(id==='mayor'?2.9:2.45))); x.translate(0,ph*.04); x.rotate(-.07);
+  const L=Math.min(pw*.68,(ph*.78)/(F.h*((DORSAL[id]||DORSAL0).top+.8))); x.translate(0,ph*.04); x.rotate(-.07);
   x.save(); x.translate(4,5); drawFish(x,id,L,true,.55); x.restore(); drawFish(x,id,L,false,1,.15); x.restore(); }
 function journalRegions(){ return save.boat?[REG(),REG()==='lake'?'coast':'lake']:['lake']; }
 function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
@@ -9585,7 +9918,7 @@ function simulate(st,n){
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
       t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
-      const nib=ech?0:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3));
+      const nib=ech?0:nibbles(F);
       t+=ech?.15:rand(.5,1.1)*bm; for (let i=0;i<nib;i++) t+=(F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*bm;
       // the bite
       const fc={fish:id,spot,lucky}, r=P.react(); t+=r;

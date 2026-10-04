@@ -88,7 +88,7 @@ function drawWater(){
     ctx.fillStyle='rgba(255,240,210,'+a.toFixed(3)+')'; ctx.beginPath(); ctx.moveTo(x,y-r); ctx.lineTo(x+r*.3,y); ctx.lineTo(x,y+r); ctx.lineTo(x-r*.3,y); ctx.closePath(); ctx.fill();
     ctx.fillRect(x-r,y-.4,r*2,.8);
   }
-  drawWxWater(); drawLucky();
+  drawMoonpath(); drawBreach(); drawBowFoot(); drawWxWater(); drawLucky();
   if (SC.jump){ const j=SC.jump, u=j.t/j.dur, k=sc(j.y), hgt=Math.sin(Math.PI*u)*26*k;
     ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
 }
