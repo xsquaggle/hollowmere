@@ -2,7 +2,7 @@
 // Checks the content tables in src/data/ before anything is built: every reference points at something real,
 // every number is in range, every ladder climbs, and every tank set can actually be completed.
 // Run with `npm run check`. Exits 1 and lists each problem when something is off.
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -392,6 +392,20 @@ for (const id of keys(VISITS)) { const V = VISITS[id], w = 'VISITS.' + id; oneOf
   if (V.when && !(VISITS[V.else] && !VISITS[V.else].when)) bad(w + '.else', 'a visit that plays instead, with no condition of its own');
   if (!STANDINGS.some(St => St.visit === id) && !keys(VISITS).some(k => VISITS[k].else === id)) bad(w, 'no standing plays it'); }
 need('PLATTER', PLATTER, { name: 'str', dish: 'str', side: 'str', zone: 'arr' }); if (PLATTER.form !== 'whole') bad('PLATTER.form', 'a Delicacy is served whole');
+
+/* ---------- the code map lists every file (docs/CODEMAP.md) ---------- */
+const MAP_FILE = join(ROOT, 'docs/CODEMAP.md');
+if (!existsSync(MAP_FILE)) bad('docs/CODEMAP.md', 'missing');
+else {
+  const map = readFileSync(MAP_FILE, 'utf8');
+  const mapped = new Set([...map.matchAll(/`((?:src|tools|tests)\/[\w./-]+\.\w+)`/g)].map(m => m[1]));
+  const cssNames = new Set([...map.matchAll(/`([\w-]+\.css)`/g)].map(m => 'src/styles/' + m[1]));
+  const onDisk = [...cfg.js.map(f => 'src/' + f), 'src/' + cfg.testHooks, 'src/index.html',
+    ...['tools', 'tests'].flatMap(d => readdirSync(join(ROOT, d), { withFileTypes: true }).filter(e => e.isFile()).map(e => d + '/' + e.name))];
+  for (const f of onDisk) if (!mapped.has(f)) bad('docs/CODEMAP.md', 'no line for ' + f);
+  for (const f of cfg.css.map(f => 'src/' + f)) if (!cssNames.has(f)) bad('docs/CODEMAP.md', 'styles list is missing ' + f);
+  for (const f of [...mapped, ...cssNames]) if (!existsSync(join(ROOT, f))) bad('docs/CODEMAP.md', 'names ' + f + ', which no longer exists');
+}
 
 /* ---------- every string ---------- */
 let strings = 0;
