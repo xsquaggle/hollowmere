@@ -32,9 +32,9 @@ function palAt(h){
   h=((h%24)+24)%24; let i=0; while (i<PKEYS_C.length-2 && PKEYS_C[i+1][0]<=h) i++;
   const [h0,a]=PKEYS_C[i], [h1,b]=PKEYS_C[i+1]; let t=(h-h0)/(h1-h0); t=t*t*(3-2*t);
   const o={};
-  for (const k in a){ const va=a[k], vb=b[k];
-    if (Array.isArray(va)){ const r=Math.round(lerp(va[0],vb[0],t)), g=Math.round(lerp(va[1],vb[1],t)), bl=Math.round(lerp(va[2],vb[2],t)); o[k]='rgb('+r+','+g+','+bl+')'; o[k+'R']=r+','+g+','+bl; }
-    else o[k]=lerp(va,vb,t); }
+  for (const k in a){ const va=a[k], vb=b[k]; o[k]=Array.isArray(va)?[lerp(va[0],vb[0],t),lerp(va[1],vb[1],t),lerp(va[2],vb[2],t)]:lerp(va,vb,t); }
+  wxTintPal(o);   // the weather greys, dims or fogs it (game/weather-art.js)
+  for (const k in a) if (Array.isArray(o[k])){ const [r,g,bl]=o[k].map(Math.round); o[k]='rgb('+r+','+g+','+bl+')'; o[k+'R']=r+','+g+','+bl; }
   return o;
 }
 const PERIOD = h => h>=5&&h<11?'Morning':h>=11&&h<17?'Day':h>=17&&h<21?'Evening':'Night';

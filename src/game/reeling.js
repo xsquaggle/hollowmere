@@ -9,6 +9,7 @@ function startReel(id,perfect){
   else if (first && F.beh==='tugger') coachShow('New fish: Tuggers pull in a steady rhythm. Let go on each tug, and reel in between.',6);
   else if (first && F.beh==='sleeper') coachShow('New fish: Sleepers barely fight. The hard part was the patience before the bite.',6);
   else if (first && F.beh==='sulker') coachShow('New fish: Sulkers dive. When it dives, let go, then reel hard when it comes back up.',6);
+  else if (first && F.beh==='ghost') coachShow('New fish: Ghosts fade from sight mid-fight. Keep your ring where the line points until it surfaces.',7);
   else if (first && F.rarity==='legendary') coachShow('Something huge. Reel in short bursts and let go whenever the ring turns red.',6);
 }
 /** A fresh fight with fish `id`, hooked at `from` (the bobber). */
@@ -25,10 +26,12 @@ function newHaul(loot,perfect,from,lucky,spot){
 }
 function fightOf(F,perfect,from,o){ const weight=F.beh==='weight';
   return {lucky:o.lucky,id:o.id,loot:o.loot||null,F,perfect,fam:o.fam,mod:o.mod,dist:1,dir:0,tgt:0,dirT:o.tut?99:rand(1.2,1.8),tension:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
-    from:{x:from.x,y:from.y},x:from.x,y:from.y,jump:null,nextJump:rand(2,3),dive:0,warn:0,nextDive:weight?snagGap(F):rand(2.4,3.4),surge:0,
+    from:{x:from.x,y:from.y},x:from.x,y:from.y,jump:null,nextJump:rand(2,3),dive:0,warn:0,nextDive:weight?snagGap(F):rand(2.4,3.4),surge:0,fade:0,nextFade:rand(2.2,3),
     click:0,splashT:0,buzzT:0,ph:weight?rand(0,6.28):0}; }
 /** Seconds between the bottom snagging a haul: heavier crates catch more often. */
 function snagGap(F){ return F.snags>=3?rand(2.2,3.4):F.snags===2?rand(2.8,4):rand(3.5,5); }
+/** Seconds a ghost stays faded: its marker leaves the gauge, and only the line shows where it went. */
+const GHOST_FADE=1.5;
 /* One step of a fight: the fish moves, the line gains or loses tension, and the fish comes in or gets away.
    Nothing is drawn or played here. What happened is pushed onto io.ev for the caller to show, and the
    step returns 'land', 'lose' (reason in io.why) or 'snap' when the fight ends. The game and the balance
@@ -45,6 +48,11 @@ function fightStep(R,dt,io){
   } else if (F.beh==='sulker'){ R.tgt=Math.sin(io.t*.5+1)*.5; }
   else if (F.beh==='tugger'||F.beh==='sleeper'){ R.tgt=Math.sin(io.t*(F.beh==='sleeper'?.25:.4)+1)*(F.beh==='sleeper'?.35:.45); }
   else if (weight){ R.tgt=Math.sin(io.t*.35+R.ph)*.3; }               // a dead weight only sways as it comes up
+  else if (F.beh==='ghost'){                                             // darts like a darter, and fades: while it's gone it
+    if (R.fade>0){ R.fade-=dt; if (R.fade<=0){ R.nextFade=rand(2.6,3.8); R.dirT=rand(1.4,2.2); ev.push('surface'); } }   // slides somewhere new, unseen
+    else { R.nextFade-=dt; R.dirT-=dt;
+      if (R.nextFade<=0){ R.fade=GHOST_FADE; R.tgt=(R.dir>0?-1:1)*rand(.35,.85)*(Math.random()<.75?1:-1); ev.push('fade'); }
+      else if (R.dirT<=0){ R.tgt=(R.tgt>0?-1:1)*rand(.45,.85); R.dirT=rand(1.4,2.2); ev.push('turn'); } } }
   else { R.dirT-=dt; if (R.dirT<=0){ R.tgt=rand(-.8,.8); R.dirT=rand(1.4,2.2); } }
   R.dir=lerp(R.dir,R.tgt,Math.min(1,dt*(quick?3:1.7)));
 
@@ -123,7 +131,9 @@ function updateReel(dt){
 /** What the player sees and hears for each thing that happened in a fight step. */
 function fightShow(R,e){
   switch(e){
-    case 'turn': splash(R.x,R.y,5); break;
+    case 'turn': if (!(R.fade>0)) splash(R.x,R.y,5); break;
+    case 'fade': ripple(R.x,R.y,22); noise(.5,{vol:.07,f:500,to:180,type:'lowpass'}); break;
+    case 'surface': splash(R.x,R.y,8); ripple(R.x,R.y,26); ripple(R.x,R.y,14); tone(330,.18,{to:520,vol:.05,type:'sine'}); break;
     case 'tug': splash(R.x,R.y,6); ripple(R.x,R.y,14); buzz(12); if (!S.tut) shake(1.5); break;
     case 'surge': toast(R.loot?'It’s free! Haul it up.':'Now! Reel hard.','good'); break;
     case 'dive': if (R.loot){ sfx.snagged(); buzz([0,40]); shake(2); } else { sfx.dive(); buzz([0,60]); shake(3); } break;
@@ -135,8 +145,8 @@ function fightShow(R,e){
     case 'click': sfx.click(); break;
     case 'slackWarn': toast('Line’s slack. Hold!','warn'); break;
     case 'strain': buzz(18); pulse(.4,'217,97,76'); break;
-    case 'splash': if (R.loot) haulBubbles(R); else splash(R.x,R.y,3+Math.round(R.tension*6)); break;
-    case 'splash+ripple': if (R.loot) haulBubbles(R); else splash(R.x,R.y,3+Math.round(R.tension*6)); ripple(R.x,R.y,16); break;
+    case 'splash': if (R.loot) haulBubbles(R); else if (!(R.fade>0)) splash(R.x,R.y,3+Math.round(R.tension*6)); break;
+    case 'splash+ripple': if (R.loot) haulBubbles(R); else if (!(R.fade>0)) { splash(R.x,R.y,3+Math.round(R.tension*6)); ripple(R.x,R.y,16); } break;
     case 'tut:reel2': coach('It’s pulling '+(R.tgt>0?'right':'left')+'! Keep holding and slide your finger '+(R.tgt>0?'right':'left')+' until your ring is under the fish.','4 of 4'); break;
     case 'tut:reel3': coach('That’s it! It will switch sides, so follow it. If the ring turns red, lift your finger for a moment.','4 of 4'); break;
     case 'tut:red': R.tutWarn=$('coachText').textContent; coach('Red ring! Lift your finger to ease off, then hold again.','4 of 4', true); break;

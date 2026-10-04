@@ -281,6 +281,10 @@ body.cine #hud,body.cine .corner,body.cine #hint,body.cine #coach,body.cine #toa
 .aq-peek{justify-self:center;background:none;border:0;color:rgba(243,234,215,.75);font:800 12px var(--body);letter-spacing:.06em;padding:2px 8px;cursor:pointer;animation:inPulse 3s ease-in-out infinite}
 #cPB.minor{background:#F3E7C8;border-color:#B08D4C}#cPB.minor b{font-size:18px}
 
+/* the weather mark in the clock chip (game/weather.js): sun or moon, cloud, rain or fog, in the chip's paper color */
+#wxIco{display:inline-flex;flex:none;width:1.25em;height:1.25em;margin:-.15em 0}
+#wxIco svg{width:100%;height:100%;overflow:visible;color:rgba(243,234,215,.92)}
+#clock{cursor:pointer}
 /* Kitchen: a warm smokehouse; stations play on the butcher-block counter, recipe book and cards are paper over wood */
 #kitchen{position:fixed;inset:0;z-index:8;background:#2E2018;animation:aqIn .3s ease;overflow:hidden}
 #kitchen.closing{animation:fadeOut .25s forwards}
@@ -1049,7 +1053,7 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 <div id="hud">
   <div class="chip"><span class="coin" aria-hidden="true"></span><span id="coins">0</span></div><div class="chip glim-chip" id="glimChip" hidden><span class="glim" aria-hidden="true"></span><span id="glimmer">0</span><span class="sr"> Glimmer</span></div><div class="chip meal-chip" id="mealChip" hidden role="button" tabindex="0" aria-label="Meal"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="10.5" r="6.8" fill="#F3EAD7" stroke="#2B2A33" stroke-width="1.2"/><path d="M5 10.5 q4 -3.6 8 0 q-4 3.6 -8 0 Z" fill="#E8B866" stroke="#2B2A33" stroke-width=".9"/><path d="M6.6 4.6 q-1 -1.6 0 -3.2 M10.6 4.6 q-1 -1.6 0 -3.2" stroke="#F3EAD7" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg><span id="mealCasts">0</span></div>
   <div class="chip" id="species">Journal 0/6</div>
-  <div class="chip" id="clock">6:00 PM</div>
+  <div class="chip" id="clock" role="button" tabindex="0"><span id="wxIco" aria-hidden="true"></span><span id="clockT">6:00 PM</span></div>
   <div class="spacer"></div>
   <button class="icon-btn" id="soundBtn" type="button" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M8.6 1.8 h2.8 l.5 2.3 a6.3 6.3 0 0 1 1.7 1 l2.2 -.8 1.4 2.4 -1.8 1.6 a6.3 6.3 0 0 1 0 2 l1.8 1.6 -1.4 2.4 -2.2 -.8 a6.3 6.3 0 0 1 -1.7 1 l-.5 2.3 h-2.8 l-.5 -2.3 a6.3 6.3 0 0 1 -1.7 -1 l-2.2 .8 -1.4 -2.4 1.8 -1.6 a6.3 6.3 0 0 1 0 -2 l-1.8 -1.6 1.4 -2.4 2.2 .8 a6.3 6.3 0 0 1 1.7 -1 Z" fill="currentColor"/><circle cx="10" cy="10" r="2.6" fill="var(--paper)"/></svg><span class="mute-dot" id="muteDot" hidden><svg width="8" height="8" viewBox="0 0 8 8"><path d="M1.5 1.5 L6.5 6.5 M6.5 1.5 L1.5 6.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
   <button class="icon-btn" id="labBtn" type="button" aria-label="Playtest tools"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M13.6 2.2 a4.6 4.6 0 0 0 -4.4 6 L2.8 14.6 a1.9 1.9 0 0 0 2.7 2.7 L11.9 10.9 a4.6 4.6 0 0 0 6 -4.4 L15.4 9 L12.9 8.3 L12.2 5.8 L14.7 3.3 Z" fill="currentColor"/></svg></button>
@@ -1110,11 +1114,12 @@ const INK='#2B2A33', PAPER='#F3EAD7', BRASS='#C9A15A', DANGER='#D9614C', GOOD='#
               reel (seconds of steady reeling with the starter rod); value (coins at an average size);
               size [min, max] real length in cm; len and h (drawn length, and body height as a share of it);
               color and fin; window (seconds to strike after the bite); lore; hint (journal line before it is caught);
-              night:true for fish that come up after dark (meals that boost night fish boost these).
+              night:true for fish that come up after dark (meals that boost night fish boost these); wx:'rain' or 'fog' for
+              fish the weather brings up (data/weather.js says where and how often; they're never in a trap).
    RAR[tier]  how a rarity looks and sounds, in order from common to godly; pips (1 to 8) so rarity never rests on color
               alone; prism and ink for the tiers whose color shifts or bleeds. luckCap is the most luck can multiply
               its odds (see game/mods.js); Godly's sits below Mythic's on purpose, so no build makes Godly routine.
-   ORDER      the lake journal's order.  REGION_FISH  which species live in each region, in journal order.
+   ORDER      the lake journal's order, the same fish as REGION_FISH.lake.  REGION_FISH  which species live in each region, in journal order.
    POOLS      lake bite weights per spot; POOLS_COAST the same for Gullrock Coast. Night, dawn, rods,
               meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench"). */
 const FISH = {
@@ -1141,11 +1146,19 @@ const FISH = {
   saltjaw: {name:'Saltjaw', rarity:'legendary', beh:'darter', night:true, pull:1.85, reel:15, value:1500, size:[140,190], len:92, h:.16, color:'#7E8FA0', fin:'#5A6A7A', window:.7,
             lore:'Coast folk say it follows the lights under the swell.', hint:'Hunts the dark trench, mostly at night.'},
   mayor:   {name:'Mayor Bartholomew', rarity:'legendary', beh:'darter', pull:1.75, reel:14, value:600, size:[110,150], len:86, h:.15, color:'#7D8A63', fin:'#58663F', window:.72,
-            lore:"An ancient pike still wearing the mayor's chain of office.", hint:'Something huge circles the deep pool, most often at dawn.'}
+            lore:"An ancient pike still wearing the mayor's chain of office.", hint:'Something huge circles the deep pool, most often at dawn.'},
+  dace:    {name:'Drizzle Dace', rarity:'uncommon', beh:'leaper', wx:'rain', pull:.95, reel:3.9, value:16, size:[14,26], len:34, h:.24, color:'#A7B8C2', fin:'#6F8794', window:1.15,
+            lore:"Jumps at raindrops. It thinks they're flies, and it's been wrong every time.", hint:'Jumps at raindrops in open water.'},
+  char:    {name:'Mist Char', rarity:'rare', beh:'ghost', wx:'fog', pull:1.25, reel:6.5, value:55, size:[28,56], len:50, h:.26, color:'#97A1A8', fin:'#DD7B50', window:.95,
+            lore:'Pale as the fog it swims in, and warmer in the hand than it looks.', hint:'Glimpsed in the deep pool on foggy mornings.'},
+  mackerel:{name:'Squall Mackerel', rarity:'uncommon', beh:'darter', wx:'rain', pull:1.05, reel:4.2, value:30, size:[26,44], len:44, h:.2, color:'#4F8A8B', fin:'#2F5C60', window:1.05,
+            lore:'Rides in under the squalls, a whole school at a time, and leaves just as fast.', hint:'Rides in under the rain squalls.'},
+  gurnard: {name:'Foghorn Gurnard', rarity:'rare', beh:'ghost', wx:'fog', pull:1.4, reel:7.5, value:160, size:[28,52], len:46, h:.28, color:'#C25A4B', fin:'#E59A5C', window:.9,
+            lore:'Grunts like a foghorn. The lighthouse keepers used to steer by it.', hint:'Grunts from the sea stacks when the fog is in.'}
 };
-const ORDER = ['perch','reedwhisker','lantern','leafjack','mossback','mayor'];
-const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper'};
-const BEH_TIP = {darter:'It darts side to side, so follow it.', leaper:'Tap when it jumps clear of the water.', sulker:'When it dives, let go. Reel hard after.', tugger:'Let go on each tug, reel between tugs.', sleeper:'It barely fights. Just reel it in.'};
+const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','mayor'];
+const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper', ghost:'Ghost'};
+const BEH_TIP = {darter:'It darts side to side, so follow it.', leaper:'Tap when it jumps clear of the water.', sulker:'When it dives, let go. Reel hard after.', tugger:'Let go on each tug, reel between tugs.', sleeper:'It barely fights. Just reel it in.', ghost:'It fades from sight. Follow the line until it surfaces.'};
 const RAR = {
   common:   {label:'Common', color:'#9C968A', pips:1, hitstop:0, land:.8, splash:10, notes:[660,880]},
   uncommon: {label:'Uncommon', color:'#7FB069', pips:2, hitstop:.035, land:1.0, splash:16, notes:[523,659,784], luckCap:1.6},
@@ -1165,7 +1178,7 @@ const POOLS = {
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
 const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench'};
-const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','mossback','mayor'], coast:['sprat','wrasse','kelpeel','bream','grouper','saltjaw']};
+const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','mayor'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','saltjaw']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:20, bream:6},
@@ -1233,6 +1246,49 @@ const MAP_PLACES={
   ocean: {x:330,y:318,name:'Open Ocean',desc:'Uncharted. Barnaby says you’ll need a bigger boat.',built:false}
 };
 
+/* Weather: each water's own skies (game/weather.js works them out, game/weather-art.js draws them).
+   WX[kind]     name; on (the same as a place in time: "in the rain"); mods (modifiers while it lasts, as on rods:
+                data/stats.js; they show on the Bonuses page as the weather's); look (how much cloud, rain and fog it
+                brings, 0 to 1).
+   WX_ORDER     the kinds in the order the Playtest picker lists them.
+   WX_TABLE     how often each kind comes up when the weather turns, per region (weights).
+   WX_FOG_HOUR  fog's weight times this, by the 4-hour spell it starts in (midnight, 4 AM, 8 AM, noon, 4 PM, 8 PM): fog
+                is a morning thing.
+   WX_SPELL     hours: the weather can turn at the start of each spell this long. keep: the chance a spell keeps the
+                weather it had. ease: in-game hours a change takes to come on (the fishing turns over halfway).
+                every: a spell always rolls afresh at least this often (in spells), so a forecast never looks far back.
+   WX_FISH      the fish each weather brings up, per region: added to each spot's pool with these weights.
+   WX_SOME      where those fish turn up at a share of their weight in other weather: rain fish on overcast days
+                ("there's rain in the air"), fog fish in the dawn mist.
+   DAWN_MIST    the hours of the light morning mist on clear and overcast days, and how thick it looks at its thickest.
+   WX_LINES     what Ottilie says about the weather (she picks one of these half the time while it lasts). */
+const WX={
+  clear: {name:'Clear', on:'in clear weather', look:{cloud:0, rain:0, fog:0}, mods:[]},
+  cloudy:{name:'Overcast', on:'on overcast days', look:{cloud:1, rain:0, fog:0}, mods:[]},
+  rain:  {name:'Rain', on:'in the rain', look:{cloud:1, rain:1, fog:0}, mods:[{stat:'bite', v:.7}]},
+  fog:   {name:'Fog', on:'in fog', look:{cloud:.45, rain:0, fog:1}, mods:[]}
+};
+const WX_ORDER=['clear','cloudy','rain','fog'];
+const WX_TABLE={
+  lake: {clear:38, cloudy:27, rain:20, fog:15},
+  coast:{clear:34, cloudy:26, rain:22, fog:18}
+};
+const WX_FOG_HOUR=[.6, 3, 1.4, .25, .25, .6];
+const WX_SPELL={hours:4, keep:.5, ease:.75, every:12};
+const WX_FISH={
+  lake: {rain:{fish:'dace', pools:{open:14, pads:10, reeds:8, far:10, deep:4}},
+         fog: {fish:'char', pools:{deep:18, far:20, open:4, pads:3}}},
+  coast:{rain:{fish:'mackerel', pools:{open:16, far:14, kelp:6, rocks:4, deep:6}},
+         fog: {fish:'gurnard', pools:{rocks:10, deep:9, far:6, open:2, kelp:2}}}
+};
+const WX_SOME={rain:{cloudy:.25}, fog:{mist:1/3}};
+const DAWN_MIST={from:5, to:8, look:.4};
+const WX_LINES={
+  cloudy:['Smells like rain. Your uncle could tell the hour it’d start.','Grey days are good days. The fish stop squinting.'],
+  rain:  ['Mind the drops. A raindrop and a nibble look the same from here.','Your uncle fished every storm. Said the lake talks louder in the rain.','Rain brings the dace up. Daft things jump at every drop.'],
+  fog:   ['Haven’t seen fog like this since the flood.','Hear that? A bell, under the water. Always in the fog.','Fog hides the far fish. Let them come to you.']
+};
+
 /* People: what Ottilie and Barnaby say, the banquet guests' lines, and the uncle's letter in the opening. */
 const OTT_LINES = ['Fish don’t bite for folks who fidget.','Lantern Carp only come up after dark, kid.','Reeds’ll eat your line. My Reedcutter won’t.','Want to reach the deep pool? You’ll need more rod than that.',
   'That heron’s been stealing my bait for years.','Your uncle fished that deep pool every dawn. Never said why.','If a gull stops in midair, run.'];
@@ -1243,7 +1299,8 @@ const LETTER=['Kid,','The shack’s yours now.','Rods are by the door, and Ottil
 
 /* Aquarium: tanks, the tip rate per rarity (coins per minute), decor, and tank sets. Luck is in luck points (.1 is +10 luck).
    Decor with crate: (a rarity) isn't sold: it only comes in loot crates of that tier (data/treasure.js), then waits to be placed.
-   TANK_SETS[].check(fish) gets the tank's fish list and returns true when the set is complete. */
+   TANK_SETS[].check(fish) gets the tank's fish list and returns true when the set is complete. Its bonus applies in its
+   region ('any' for both), and only at night with night:true, or only in the weather wx names (data/weather.js). */
 const TANKS={
   fresh:{name:'Freshwater', water:['#5FA39A','#2F6A66','#1C4644'], sand:'#B79A6E', caps:[6,10,14], costs:[600,1500], unlock:0},
   salt: {name:'Saltwater', water:['#4FA6C4','#2A6F92','#173F5E'], sand:'#E2D3AE', caps:[6,10,14], costs:[800,2000], unlock:1200}
@@ -1276,10 +1333,14 @@ const TANK_SETS=[
    check:f=>f.some(x=>x.id==='mayor') && f.length>=3},
   {id:'lights', tank:'fresh', name:'Night Lights', need:'2 Lantern Carp', bonus:'+8 luck at night', region:'any', luck:.08, night:true,
    check:f=>f.filter(x=>x.id==='lantern').length>=2},
+  {id:'wetlake', tank:'fresh', name:'Wet Weather', need:'A Drizzle Dace and a Mist Char', bonus:'+10 luck at the lake in rain and fog', region:'lake', luck:.1, wx:['rain','fog'],
+   check:f=>['dace','char'].every(id=>f.some(x=>x.id===id))},
   {id:'rockpool', tank:'salt', name:'Rockpool', need:'Silver Sprat, Rock Wrasse and Barnacle Grouper', bonus:'+5% coins from sea fish', region:'coast', value:1.05,
    check:f=>['sprat','wrasse','grouper'].every(id=>f.some(x=>x.id===id))},
   {id:'trench', tank:'salt', name:'Trench Trophy', need:'A Saltjaw', bonus:'+10 luck at the coast', region:'coast', luck:.1,
-   check:f=>f.some(x=>x.id==='saltjaw')}
+   check:f=>f.some(x=>x.id==='saltjaw')},
+  {id:'squall', tank:'salt', name:'Foul Weather', need:'A Squall Mackerel and a Foghorn Gurnard', bonus:'+10 luck at the coast in rain and fog', region:'coast', luck:.1, wx:['rain','fog'],
+   check:f=>['mackerel','gurnard'].every(id=>f.some(x=>x.id===id))}
 ];
 
 /* Kitchen: spices, sides, how fish cook, recipes and meal strength. */
@@ -1297,7 +1358,8 @@ const SPICES={
 const SPICE_ORDER=['salt','pepper','dill','lemon','paprika'], SPICE_MORE=['garlic','fennel'];
 const SIDES={chips:'Chips', rice:'Rice', greens:'Garden greens', bread:'Rye bread', potatoes:'Roast potatoes', corn:'Grilled corn'};
 const FLESH={perch:'#F4CDB0', reedwhisker:'#EFD9C2', lantern:'#F7D9A0', leafjack:'#EEDDB8', mossback:'#E9CDB2', mayor:'#F0D2B6',
-  sprat:'#EBDCD0', wrasse:'#F6C4AE', kelpeel:'#E8D8C0', bream:'#F5DCB5', grouper:'#F3E3D3', saltjaw:'#ECD6CC'};
+  sprat:'#EBDCD0', wrasse:'#F6C4AE', kelpeel:'#E8D8C0', bream:'#F5DCB5', grouper:'#F3E3D3', saltjaw:'#ECD6CC',
+  dace:'#F1E0CC', char:'#F4B9A0', mackerel:'#E8C7B4', gurnard:'#F6E6D8'};
 const COOK_NAME={pan:'Pan-fry', grill:'Grill'};
 /* Each recipe: what it needs from the keepnet, how each station plays, and what the meal does.
    need: [{id or rar, n}]; smoked:true takes a smoked fish of any kind from the keepnet (it skips the Clean station).
@@ -1539,7 +1601,7 @@ const TACKLE_ORDER={reel:['clicker','brassdrag','quickwind','whisper'], line:['c
               Each rod's sockets are RODS[id].ench (1 to 3) in data/gear.js.
    GLIMMER    where Glimmer comes from. record: what beating your record for a species pays, by its rarity.
               geode: what a Glimmer geode holds, [least, most], by region. crate: Glimmer in each crate, by tier.
-   Storm Knot (weather, step 20), Odd Water (mutations, step 21) and Homebody (Wren's bench, step 25) come later. */
+   Odd Water (mutations, step 21) and Homebody (Wren's bench, step 25) come later. */
 const ENCH={
   swift:     {name:'Swift Spool', short:'Reels 30% faster', cost:30, color:'#78C08A', eff:'You reel 30% faster.', down:'Tension rises 30% faster too.',
               mods:[{stat:'reel', v:1.3}, {stat:'drag', v:1.3}]},
@@ -1547,14 +1609,16 @@ const ENCH={
               mods:[{stat:'treasure', v:2}, {stat:'value', v:.85}]},
   deep:      {name:'Lure of the Deep', short:'More rare fish', cost:60, color:'#5C8FD8', eff:'Rare and rarer fish bite more often.', down:'The hook window is 20% shorter.',
               mods:[{stat:'luck', v:.3, when:{rarityMin:'rare'}}, {stat:'hook', v:.8}]},
-  nightglass:{name:'Nightglass', short:'More night fish', cost:60, color:'#A98BE2', eff:'Night fish bite far more often.', down:'By day, fish bite more slowly.',
-              mods:[{stat:'night', v:2}, {stat:'bite', v:1.25, when:{night:false}}]},
+  nightglass:{name:'Nightglass', short:'More night and fog fish', cost:60, color:'#A98BE2', eff:'Night and fog fish bite far more often.', down:'By day, fish bite more slowly.',
+              mods:[{stat:'night', v:2}, {stat:'fog', v:2}, {stat:'bite', v:1.25, when:{night:false}}]},
+  storm:     {name:'Storm Knot', short:'Rain catches +60%', cost:70, color:'#7FB2D9', eff:'In rain, fish are worth 60% more.', down:'Does nothing in other weather.',
+              mods:[{stat:'value', v:1.6, when:{wx:'rain'}}]},
   wanderer:  {name:'Wanderer', short:'Each day’s first catches ×2', cost:80, color:'#E5975A', first:3, eff:'Each day, your first 3 catches at the lake are worth double, and so are your first 3 at the coast.',
               mods:[{stat:'value', v:2, when:{wander:true}}]},
   echo:      {name:'Echo', short:'Perfect hooks echo', cost:110, color:'#58C4C2', eff:'After a perfect hook, another of the same fish sometimes waits there. Cast to the same spot for an instant bite.', down:'Only perfect hooks set it off.',
               mods:[{stat:'echo', v:.35}]}
 };
-const ENCH_ORDER=['swift','magpie','deep','nightglass','wanderer','echo'];
+const ENCH_ORDER=['swift','magpie','deep','nightglass','storm','wanderer','echo'];
 const GLIMMER={
   record:{common:2, uncommon:3, rare:5, epic:8, legendary:12, exotic:18, mythic:26, godly:40},
   geode:{lake:[4,8], coast:[6,12]},
@@ -1701,7 +1765,7 @@ const PLATTER={name:'Delicacy Platter', cook:'none', form:'whole', dish:'plate',
    good  'up' when more is better, 'down' when less is better.  tune:true stats only come from Playtest tuning.
    when  where every bonus to this stat applies, on top of its own conditions (there are no swells at the lake).
          A modifier's own when can name a region, spot, night, fish, beh (a kind of fish: leaper, sulker…), rarity,
-         rarityMin or lucky.
+         rarityMin, lucky or wx (the weather here and now, data/weather.js: one kind or a list).
    unit  'x' to show the total as ×2.5 rather than +150%; 'chance' for a chance shown as a share of catches;
          'count' for a number of things (+4 fish).
    hint  the plain sentence the Bonuses page shows under the stat. The order here is the order on that page. */
@@ -1715,6 +1779,7 @@ const STATS={
   perfect:  {name:'Perfect-hook window', kind:'mul', good:'up', hint:'Tap this fast for a perfect hook: a bigger fish, worth more, that reels faster.'},
   bite:     {name:'Time to a bite', kind:'mul', good:'down', hint:'From your bobber landing to the bite: the quiet, the swim over and the nibbles.'},
   night:    {name:'Night fish', kind:'mul', good:'up', unit:'x', when:{night:true}, hint:'Fish that come up after dark bite more often.'},
+  fog:      {name:'Fog fish', kind:'mul', good:'up', unit:'x', when:{wx:'fog'}, hint:'Fish that come up in fog bite more often.'},
   twitch:   {name:'Twitch pull', kind:'mul', good:'up', unit:'x', hint:'A twitch draws a fish in from farther, and brings the next one sooner.'},
   lure:     {name:'Lure pull', kind:'mul', good:'up', unit:'x', hint:'Some kinds of fish bite more often.'},
   reedBite: {name:'Reed bites', kind:'mul', good:'up', when:{spot:'reeds'}, hint:'Fish in the reeds bite sooner.'},
@@ -1744,12 +1809,12 @@ const MASTERY={catches:10, reel:1.65};
 
 /* ---------- Modifiers: every bonus in the game goes through here ---------- */
 /* Each source (the rod in hand and its tackle, the meal you ate, tank sets, decor, boat parts, artifacts in your vest pockets,
-   keepsakes, mastery, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
-   stat's total in a context (region, time, spot, fish, rarity, Gull Luck) and only matching modifiers count.
+   keepsakes, mastery, the weather, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
+   stat's total in a context (region, time, weather, spot, fish, rarity, Gull Luck) and only matching modifiers count.
    STATS (data/stats.js) says how each stat combines and where it can apply at all. Adding an enchantment or
    a relic later means adding its modifiers to a source; nothing that reads the stats has to change.
-   Sources read only the save, so the balance simulator can swap in a stand-in save. Keep it that way: a
-   future source that needs world state (weather, say) should keep that state in the save too. */
+   Sources read only the save, so the balance simulator can swap in a stand-in save. Keep it that way: world state a
+   source needs lives in the save too (the weather comes from the save's day, hour, region and sky seed). */
 const MODC={frame:0, at:-1, dirty:true, list:null};
 let SIMULATING=false;   // true while the balance simulator borrows the save (game/sim.js)
 function modSources(){
@@ -1766,7 +1831,7 @@ function modSources(){
     for (const b of Rc.boost) add('meal',Rc.name,b.k,b.k==='luck'?b.v*s:Math.max(.2,1+b.v*s),{stars:m.stars}); }
   // completed tank sets, and decor that lends luck while its fish is in the tank
   for (const st of setsDone()){
-    const when={}; if (st.region!=='any') when.region=st.region; if (st.night) when.night=true;
+    const when={}; if (st.region!=='any') when.region=st.region; if (st.night) when.night=true; if (st.wx) when.wx=st.wx;
     if (st.luck) add('set',st.name,'luck',st.luck,{when});
     if (st.value) add('set',st.name,'value',st.value,{when});
   }
@@ -1788,6 +1853,8 @@ function modSources(){
   // mastery: enough of a species and your rod knows it
   for (const id in FISH) if ((save.fish[id]||{}).caught>=MASTERY.catches){ const n='Mastered '+FISH[id].name;
     add('mastery',n,'reel',MASTERY.reel,{when:{fish:id}}); add('mastery',n,'autoTilt',undefined,{when:{fish:id}}); }
+  // the weather here and now (game/weather.js)
+  { const k=wxNow(), K=WX[k]; for (const x of K.mods) L.push(Object.assign({src:'weather',name:K.name},x,{when:Object.assign({wx:k},x.when)})); }
   // Gull Luck: a lucky splash zone doubles the odds of every fish above common while you fish in it
   add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true, rarityMin:'uncommon'}});
   // Fresh water: back after a long while, rarer fish bite more often for a few casts (game/away.js)
@@ -1803,9 +1870,9 @@ function modSources(){
 }
 function modList(){ if (MODC.list && MODC.at===MODC.frame && !MODC.dirty) return MODC.list;
   MODC.list=modSources(); MODC.at=MODC.frame; MODC.dirty=false; return MODC.list; }
-/** The context a stat is read in. Region and time come from the game; callers add spot, fish, rarity or lucky.
+/** The context a stat is read in. Region, time and weather come from the game; callers add spot, fish, rarity or lucky.
     A fish brings its rarity along. */
-function modCtx(c){ const x=Object.assign({region:REG(), night:isNight(save.clock)}, c);
+function modCtx(c){ const x=Object.assign({region:REG(), night:isNight(save.clock), wx:wxNow()}, c);
   if (x.fish){ if (!x.rarity) x.rarity=FISH[x.fish].rarity; if (!x.beh) x.beh=FISH[x.fish].beh; } return x; }
 const rarRank=r=>Object.keys(RAR).indexOf(r);
 function modMatch(m,c){ const w=m.when; if (!w) return true;
@@ -1842,9 +1909,19 @@ function poolFor(spot,lucky){
   if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
   if (w.mayor && ((h>=5 && h<8) || modFlag('mayorWakes',{spot}))) w.mayor*=3;   // the Mayor's dawns, or the Mayor's Spectacles
-  // your bonuses: night-fish boosts (only at night, see STATS.night), then luck per rarity (game/mods.js)
-  const c={spot,lucky}, nightMul=modMul('night',c);
-  for (const k in w){ const F=FISH[k]; if (F.night) w[k]*=nightMul; w[k]*=tierMul(F.rarity,c)*modMul('lure',{spot,lucky,fish:k}); }   // a lure draws its kind of fish
+  // the weather (game/weather.js): its own fish come up, the Mossback rises to the pads in rain, and fog brings the
+  // night fish up by day. They crowd out the fish no rarer than themselves, never the rarer ones: those keep the share
+  // they had, so a wet day never quietly makes the Mayor harder to find.
+  const wx=wxNow(), dry=Object.assign({},w);
+  for (const e of wxFishFor(coastal?'coast':'lake',spot)) w[e.fish]=(w[e.fish]||0)+e.w;
+  if (wx==='rain' && !coastal && spot==='pads' && w.mossback) w.mossback*=2;
+  if (wx==='fog' && !night){ if (coastal){ if (w.kelpeel) w.kelpeel*=1.4; } else { const nl={deep:18,open:24,pads:10}[spot]||4; w.lantern=(w.lantern||0)+nl/4; } }
+  { let top=-1, T0=0, T1=0, hi=0; for (const k in w){ if (w[k]!==dry[k]) top=Math.max(top,rarRank(FISH[k].rarity)); T1+=w[k]; T0+=dry[k]||0; }
+    for (const k in dry) if (rarRank(FISH[k].rarity)>top) hi+=dry[k];
+    if (top>=0 && hi>0 && T0>hi){ const x=(T1-hi)/(T0-hi); for (const k in dry) if (rarRank(FISH[k].rarity)>top) w[k]*=x; } }
+  // your bonuses: night- and fog-fish boosts (only at night and in fog, see STATS), then luck per rarity (game/mods.js)
+  const c={spot,lucky}, nightMul=modMul('night',c), fogMul=modMul('fog',c);
+  for (const k in w){ const F=FISH[k]; if (F.night) w[k]*=nightMul; if (F.wx==='fog') w[k]*=fogMul; w[k]*=tierMul(F.rarity,c)*modMul('lure',{spot,lucky,fish:k}); }   // a lure draws its kind of fish
   return w;
 }
 const ROD = () => RODS[save.rod] || RODS.willow;
@@ -1873,7 +1950,7 @@ const rec = id => save.fish[id] || (save.fish[id] = {caught:0, best:0, seen:fals
 
 /* ---------- Size, weight and records ---------- */
 // Weight follows length on each species' growth curve: grams = K·L³/100 (Fulton's condition factor), times a little variation in build.
-const BUILD_K={perch:1.25, reedwhisker:.9, lantern:1.6, leafjack:1.45, mossback:1.15, mayor:.62, sprat:.75, wrasse:1.3, kelpeel:.18, bream:1.7, grouper:1.9, saltjaw:.55};
+const BUILD_K={perch:1.25, reedwhisker:.9, lantern:1.6, leafjack:1.45, mossback:1.15, mayor:.62, sprat:.75, wrasse:1.3, kelpeel:.18, bream:1.7, grouper:1.9, saltjaw:.55, dace:1.0, char:1.05, mackerel:.95, gurnard:1.25};
 const weighFish=(id,len,build)=>Math.max(4,(BUILD_K[id]||1)*len*len*len/100*(build||1));
 const rollBuild=()=>1+(Math.random()+Math.random()+Math.random()-1.5)*.13;
 function sizePct(id,len){ const F=FISH[id]; return clamp((len-F.size[0])/(F.size[1]-F.size[0]),0,1); }
@@ -1890,9 +1967,9 @@ function fmtTotal(g){ return fmtW(g); }
 const STAR_P='<path d="M10 1.6 l2.6 5.4 5.9 .8 -4.3 4.1 1.1 5.9 -5.3 -2.9 -5.3 2.9 1.1 -5.9 -4.3 -4.1 5.9 -.8 Z"/>';
 function starsHTML(n,cls){ let h='<span class="qstars'+(cls?' '+cls:'')+'" role="img" aria-label="'+n+' of 3 stars">'; for (let i=0;i<3;i++) h+='<svg viewBox="0 0 20 20" class="'+(i<n?'on':'')+'">'+STAR_P+'</svg>'; return h+'</span>'; }
 function spotLabel(reg,spot){ if (!spot) return REGION_NAME[reg]||''; const nm=reg==='coast'&&spot==='deep'?'Dark trench':SPOT_NAME[spot]||''; return nm+', '+(REGION_NAME[reg]||''); }
-function whenLabel(t,hr){ const d=t?new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric'}):'';
+function whenLabel(t,hr,wx){ const d=t?new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric'}):'';
   const p=hr==null?'':hr>=5&&hr<7.5?'at dawn':PERIOD(hr)==='Morning'?'in the morning':PERIOD(hr)==='Day'?'in the afternoon':PERIOD(hr)==='Evening'?'in the evening':'at night';
-  return [d,p].filter(Boolean).join(', '); }
+  return [d,p,(wx==='rain'||wx==='fog')?WX[wx].on:''].filter(Boolean).join(', '); }
 const isPB=(f)=>{ const r=save.fish[f.id]; return !!(r && r.pb && r.pb.t && f.t===r.pb.t && f.size===r.pb.size); };
 /* Old saves only kept the longest length. Turn that into a record at an average build, so nobody loses their bests. */
 function migrateRecords(){ for (const id in save.fish){ const r=save.fish[id]; if (!FISH[id] || !r.caught || r.pb) continue;
@@ -2006,7 +2083,9 @@ function musicDuck(v,secs){ MU.duckT=Math.max(MU.duckT,secs); MU.duckV=v; }
 function musicFrame(dt){ if (!AC||!DUCK) return; MU.duckT=Math.max(0,MU.duckT-Math.max(0,dt||0));
   let d=MU.duckT>0?MU.duckV:1; if (S.state==='reeling') d=Math.min(d,.55); if (S.state==='bite') d=Math.min(d,.7);
   DUCK.gain.setTargetAtTime(d,AC.currentTime,.25);
-  MUSF.frequency.setTargetAtTime(typeof AQ!=='undefined'&&AQ.open?1500:16000,AC.currentTime,.4); }
+  // the weather muffles the music a little: fog most, rain on the hood less (game/weather.js)
+  const L=wxLook(), cut=16000*Math.pow(4200/16000,L.fog)*Math.pow(7000/16000,L.rain*(1-L.fog));
+  MUSF.frequency.setTargetAtTime(typeof AQ!=='undefined'&&AQ.open?1500:cut,AC.currentTime,.4); }
 /* ambience: continuous beds plus little events */
 const AMBL={}; let ambOn=false;
 function ambBed(name,type,freq,q,lfoHz,lfoAmt){ const s=AC.createBufferSource(); s.buffer=ambBuf; s.loop=true; const f=AC.createBiquadFilter(); f.type=type; f.frequency.value=freq; f.Q.value=q;
@@ -2014,17 +2093,27 @@ function ambBed(name,type,freq,q,lfoHz,lfoAmt){ const s=AC.createBufferSource();
   if (lfoHz){ const l=AC.createOscillator(), lg=AC.createGain(); l.frequency.value=lfoHz; lg.gain.value=lfoAmt; l.connect(lg); lg.connect(lv.gain); l.start(); }
   AMBL[name]={g,f}; }
 function ambStart(){ if (ambOn||!AC) return; ambOn=true;
-  ambBed('water','lowpass',420,.6,.13,.45); ambBed('wind','bandpass',650,.5,.05,.5); ambBed('surf','lowpass',800,.4,0,0); ambBed('hiss','highpass',2600,.3,0,0); ambBed('room','lowpass',150,.7,.3,.2); }
+  ambBed('water','lowpass',420,.6,.13,.45); ambBed('wind','bandpass',650,.5,.05,.5); ambBed('surf','lowpass',800,.4,0,0); ambBed('hiss','highpass',2600,.3,0,0); ambBed('room','lowpass',150,.7,.3,.2);
+  ambBed('rain','bandpass',2600,.35,.07,.25); ambBed('drum','lowpass',340,.5,.11,.3); }   // rain on the water, and on the roof and the boards
 let ambClock=0;
 function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{}, t=AC.currentTime; ambClock+=.08;
+  const X=wxLook(), wet=X.rain, fog=X.fog*(X.mist?0:1), out=sc.startsWith('lake')||sc.startsWith('coast');   // the dawn mist stays quiet
   for (const k in AMBL){ let v=L[k]||0; if ((k==='surf'||k==='hiss') && v){ const ph=(ambClock%8.5)/8.5, w=ph<.4?Math.pow(ph/.4,1.6):Math.pow(1-(ph-.4)/.6,1.2); v*=k==='surf'?.35+.65*w:w*w; }
+    if (k==='rain') v=wet*(out?.55:.12); if (k==='drum') v=wet*(out?.25:.5);
     AMBL[k].g.gain.setTargetAtTime(v*.5,t,k==='surf'||k==='hiss'?.25:1.2); }
   const r=Math.random, tod=timeOfDay(), p=(rand(-1,1)), coast=sc.startsWith('coast'), lake=sc.startsWith('lake')||sc==='intro'||sc==='banquet';
-  if (lake && tod==='day' && r()<.018) ambBird(p);
+  // the weather (game/weather.js): birds keep their heads down in rain and fog, frogs love the rain, and fog brings a
+  // foghorn off the coast and a bell somewhere under the lake
+  const hush=1-.67*Math.max(wet,fog);
+  if (out && wet>.2 && r()<.3*wet) ambPatter(p);
+  if (lake && wet>.3 && r()<.01*wet) ambFrog(p);
+  if (coast && fog>.5 && r()<.003*fog) ambFoghorn(p*.5);
+  if (lake && fog>.5 && r()<.0016*fog) ambDeepBell(p*.7);
+  if (lake && tod==='day' && r()<.018*hush) ambBird(p);
   if (lake && tod!=='day' && r()<.05) ambCricket(p);
   if (lake && tod!=='day' && r()<.012) ambFrog(p);
   if (lake && tod==='night' && r()<.0025) ambOwl(p);
-  if (coast && tod!=='night' && r()<.014) ambGull(p);
+  if (coast && tod!=='night' && r()<.014*hush) ambGull(p);
   if (coast && tod!=='day' && r()<.004) ambBuoy(p);
   if (sc==='aquarium' && r()<.45) ambBubble(p*.6);
   if (sc==='kitchen' && r()<.5) ambCrackle(p*.5);
@@ -2041,6 +2130,12 @@ function ambGull(p){ const t=AC.currentTime+.05, n=1+Math.floor(rand(0,3)); for 
   o.frequency.setValueAtTime(900,tt); o.frequency.linearRampToValueAtTime(1350,tt+.08); o.frequency.linearRampToValueAtTime(760,tt+.28); f.type='bandpass'; f.frequency.value=1500; f.Q.value=2;
   g.gain.setValueAtTime(.0001,tt); g.gain.exponentialRampToValueAtTime(.022,tt+.03); g.gain.exponentialRampToValueAtTime(.0001,tt+.3); o.connect(f); f.connect(g); panNode(g,p).connect(AMB); o.start(tt); o.stop(tt+.32); } }
 function ambBuoy(p){ const t=AC.currentTime+.05; ambOsc('sine',330,0,t,3.5,.03,p); ambOsc('sine',330*2.76,0,t,1.2,.008,p); }
+function ambPatter(p){ const t=AC.currentTime+rand(0,.08), s=AC.createBufferSource(); s.buffer=noiseBuf; const f=AC.createBiquadFilter(); f.type='bandpass'; f.frequency.value=rand(2500,6000); f.Q.value=4;   // one drop on the boards
+  const g=AC.createGain(); g.gain.setValueAtTime(rand(.015,.04),t); g.gain.exponentialRampToValueAtTime(.0005,t+.03); s.connect(f); f.connect(g); panNode(g,p).connect(AMB); s.start(t,rand(0,.5),.05); }
+function ambFoghorn(p){ const t=AC.currentTime+.05; for (const [f,v] of [[98,.05],[196,.022],[147,.018]]){ const o=AC.createOscillator(), g=AC.createGain(), fl=AC.createBiquadFilter(); o.type='sawtooth'; o.frequency.value=f;
+    fl.type='lowpass'; fl.frequency.value=420; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+.5); g.gain.setValueAtTime(v,t+2.2); g.gain.exponentialRampToValueAtTime(.0004,t+3.6);
+    o.connect(fl); fl.connect(g); panNode(g,p).connect(AMB); o.start(t); o.stop(t+3.7); } }
+function ambDeepBell(p){ const t=AC.currentTime+.05; ambOsc('sine',196,0,t,4.5,.022,p); ambOsc('sine',196*2.4,0,t,2.2,.006,p); ambOsc('sine',196*.5,0,t+.02,3,.01,p); }
 function ambBubble(p){ const t=AC.currentTime+rand(0,.08), f=rand(500,900); ambOsc('sine',f,f*rand(1.8,2.6),t,.035,.025,p); }
 function ambCrackle(p){ const t=AC.currentTime+rand(0,.08), s=AC.createBufferSource(); s.buffer=noiseBuf; const f=AC.createBiquadFilter(); f.type='bandpass'; f.frequency.value=rand(1500,4000); f.Q.value=3;
   const g=AC.createGain(), d=rand(.008,.03); g.gain.setValueAtTime(rand(.02,.07),t); g.gain.exponentialRampToValueAtTime(.0001,t+d); s.connect(f); f.connect(g); panNode(g,p).connect(AMB); s.start(t,rand(0,.9)); s.stop(t+d+.01); }
@@ -2321,6 +2416,7 @@ function startReel(id,perfect){
   else if (first && F.beh==='tugger') coachShow('New fish: Tuggers pull in a steady rhythm. Let go on each tug, and reel in between.',6);
   else if (first && F.beh==='sleeper') coachShow('New fish: Sleepers barely fight. The hard part was the patience before the bite.',6);
   else if (first && F.beh==='sulker') coachShow('New fish: Sulkers dive. When it dives, let go, then reel hard when it comes back up.',6);
+  else if (first && F.beh==='ghost') coachShow('New fish: Ghosts fade from sight mid-fight. Keep your ring where the line points until it surfaces.',7);
   else if (first && F.rarity==='legendary') coachShow('Something huge. Reel in short bursts and let go whenever the ring turns red.',6);
 }
 /** A fresh fight with fish `id`, hooked at `from` (the bobber). */
@@ -2337,10 +2433,12 @@ function newHaul(loot,perfect,from,lucky,spot){
 }
 function fightOf(F,perfect,from,o){ const weight=F.beh==='weight';
   return {lucky:o.lucky,id:o.id,loot:o.loot||null,F,perfect,fam:o.fam,mod:o.mod,dist:1,dir:0,tgt:0,dirT:o.tut?99:rand(1.2,1.8),tension:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
-    from:{x:from.x,y:from.y},x:from.x,y:from.y,jump:null,nextJump:rand(2,3),dive:0,warn:0,nextDive:weight?snagGap(F):rand(2.4,3.4),surge:0,
+    from:{x:from.x,y:from.y},x:from.x,y:from.y,jump:null,nextJump:rand(2,3),dive:0,warn:0,nextDive:weight?snagGap(F):rand(2.4,3.4),surge:0,fade:0,nextFade:rand(2.2,3),
     click:0,splashT:0,buzzT:0,ph:weight?rand(0,6.28):0}; }
 /** Seconds between the bottom snagging a haul: heavier crates catch more often. */
 function snagGap(F){ return F.snags>=3?rand(2.2,3.4):F.snags===2?rand(2.8,4):rand(3.5,5); }
+/** Seconds a ghost stays faded: its marker leaves the gauge, and only the line shows where it went. */
+const GHOST_FADE=1.5;
 /* One step of a fight: the fish moves, the line gains or loses tension, and the fish comes in or gets away.
    Nothing is drawn or played here. What happened is pushed onto io.ev for the caller to show, and the
    step returns 'land', 'lose' (reason in io.why) or 'snap' when the fight ends. The game and the balance
@@ -2357,6 +2455,11 @@ function fightStep(R,dt,io){
   } else if (F.beh==='sulker'){ R.tgt=Math.sin(io.t*.5+1)*.5; }
   else if (F.beh==='tugger'||F.beh==='sleeper'){ R.tgt=Math.sin(io.t*(F.beh==='sleeper'?.25:.4)+1)*(F.beh==='sleeper'?.35:.45); }
   else if (weight){ R.tgt=Math.sin(io.t*.35+R.ph)*.3; }               // a dead weight only sways as it comes up
+  else if (F.beh==='ghost'){                                             // darts like a darter, and fades: while it's gone it
+    if (R.fade>0){ R.fade-=dt; if (R.fade<=0){ R.nextFade=rand(2.6,3.8); R.dirT=rand(1.4,2.2); ev.push('surface'); } }   // slides somewhere new, unseen
+    else { R.nextFade-=dt; R.dirT-=dt;
+      if (R.nextFade<=0){ R.fade=GHOST_FADE; R.tgt=(R.dir>0?-1:1)*rand(.35,.85)*(Math.random()<.75?1:-1); ev.push('fade'); }
+      else if (R.dirT<=0){ R.tgt=(R.tgt>0?-1:1)*rand(.45,.85); R.dirT=rand(1.4,2.2); ev.push('turn'); } } }
   else { R.dirT-=dt; if (R.dirT<=0){ R.tgt=rand(-.8,.8); R.dirT=rand(1.4,2.2); } }
   R.dir=lerp(R.dir,R.tgt,Math.min(1,dt*(quick?3:1.7)));
 
@@ -2435,7 +2538,9 @@ function updateReel(dt){
 /** What the player sees and hears for each thing that happened in a fight step. */
 function fightShow(R,e){
   switch(e){
-    case 'turn': splash(R.x,R.y,5); break;
+    case 'turn': if (!(R.fade>0)) splash(R.x,R.y,5); break;
+    case 'fade': ripple(R.x,R.y,22); noise(.5,{vol:.07,f:500,to:180,type:'lowpass'}); break;
+    case 'surface': splash(R.x,R.y,8); ripple(R.x,R.y,26); ripple(R.x,R.y,14); tone(330,.18,{to:520,vol:.05,type:'sine'}); break;
     case 'tug': splash(R.x,R.y,6); ripple(R.x,R.y,14); buzz(12); if (!S.tut) shake(1.5); break;
     case 'surge': toast(R.loot?'It’s free! Haul it up.':'Now! Reel hard.','good'); break;
     case 'dive': if (R.loot){ sfx.snagged(); buzz([0,40]); shake(2); } else { sfx.dive(); buzz([0,60]); shake(3); } break;
@@ -2447,8 +2552,8 @@ function fightShow(R,e){
     case 'click': sfx.click(); break;
     case 'slackWarn': toast('Line’s slack. Hold!','warn'); break;
     case 'strain': buzz(18); pulse(.4,'217,97,76'); break;
-    case 'splash': if (R.loot) haulBubbles(R); else splash(R.x,R.y,3+Math.round(R.tension*6)); break;
-    case 'splash+ripple': if (R.loot) haulBubbles(R); else splash(R.x,R.y,3+Math.round(R.tension*6)); ripple(R.x,R.y,16); break;
+    case 'splash': if (R.loot) haulBubbles(R); else if (!(R.fade>0)) splash(R.x,R.y,3+Math.round(R.tension*6)); break;
+    case 'splash+ripple': if (R.loot) haulBubbles(R); else if (!(R.fade>0)) { splash(R.x,R.y,3+Math.round(R.tension*6)); ripple(R.x,R.y,16); } break;
     case 'tut:reel2': coach('It’s pulling '+(R.tgt>0?'right':'left')+'! Keep holding and slide your finger '+(R.tgt>0?'right':'left')+' until your ring is under the fish.','4 of 4'); break;
     case 'tut:reel3': coach('That’s it! It will switch sides, so follow it. If the ring turns red, lift your finger for a moment.','4 of 4'); break;
     case 'tut:red': R.tutWarn=$('coachText').textContent; coach('Red ring! Lift your finger to ease off, then hold again.','4 of 4', true); break;
@@ -2491,7 +2596,7 @@ function startLand(){
   const eaten=!S.tut && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
   const wander=S.tut||eaten?0:wanderCount(REG());   // Wanderer: the day's first catches in this water
   const {size,build,w:wgt,value}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky,wander:!!wander});
-  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0,eaten,wander};
+  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,wx:wxNow(),rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0,eaten,wander};
   // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast
   if (R.perfect && !S.tut && !eaten && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
@@ -2527,7 +2632,7 @@ function showCard(){
   save.stats.landed=(save.stats.landed||0)+L.w; if (L.stars===3) save.stats.trophies=(save.stats.trophies||0)+1;
   L.pbBeat=!L.isNew && !!L.prev && L.w>prevW; L.pbGlim=L.pbBeat?(GLIMMER.record[F.rarity]||2):0;   // records pay Glimmer, kept now and counted up at the stamp
   if (L.pbGlim){ save.glimmer=(save.glimmer||0)+L.pbGlim; save.stats.glimmer=(save.stats.glimmer||0)+L.pbGlim; }
-  if (L.isNew || L.w>prevW){ r.bw=L.w; r.pb={size:L.size,w:L.w,stars:L.stars,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod,perfect:!!L.perfect}; }
+  if (L.isNew || L.w>prevW){ r.bw=L.w; r.pb={size:L.size,w:L.w,stars:L.stars,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,wx:L.wx,rod:L.rod,perfect:!!L.perfect}; }
   if (L.pbBeat) save.stats.pbs=(save.stats.pbs||0)+1;
   L.pbMinor=L.pbBeat && (L.w-L.prev.w)/Math.max(1,L.prev.w)<.1 && F.rarity!=='legendary' && L.stars<3;
   persist();
@@ -2536,6 +2641,7 @@ function showCard(){
   $('cRarity').textContent=RAR[F.rarity].label; $('cNew').hidden=!L.isNew;
   $('cName').textContent=F.name; $('cSize').textContent=fmtLen(L.size); $('cW').textContent=fmtW(L.w); $('cQ').innerHTML=starsHTML(L.stars,'pop'); $('cValue').textContent='+'+L.value; $('cBeh').textContent=BEH[F.beh];
   const tags=[]; if (L.lucky) tags.push('Gull luck '+trimNum(gullMul())+'×'); if (L.perfect) tags.push('Perfect hook +25%'); if (L.build>=1.1) tags.push('Chunky');
+  if (L.wx==='rain'||L.wx==='fog') tags.push('Caught '+WX[L.wx].on);
   if (L.isNew && save.kitchenOpen){ const rid=recipeLearnedBy(L.id); if (rid) tags.push('New recipe: '+RECIPES[rid].name); }
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
   const ord=!L.needFor && orderShort(L.id); L.orderFor=ord&&ord.n>0?ord.T:null; if (L.orderFor && !L.isNew) tags.push('For '+TOWNSFOLK[L.orderFor.who].name+'’s supper order');
@@ -2543,7 +2649,8 @@ function showCard(){
   $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]);
   // runes that did something for this catch
   const runes=[]; if (L.wander) runes.push(runeTag('wanderer','Wanderer ×2 · '+L.wander+' of '+ENCH.wanderer.first)); if (L.echo) runes.push(runeTag('echo','Echo: another waits here'));
-  if (enchOn('deep') && rarRank(F.rarity)>=rarRank('rare')) runes.push(runeTag('deep','Lure of the Deep')); if (enchOn('nightglass') && F.night && isNight(L.hr)) runes.push(runeTag('nightglass','Nightglass'));
+  if (enchOn('deep') && rarRank(F.rarity)>=rarRank('rare')) runes.push(runeTag('deep','Lure of the Deep')); if (enchOn('nightglass') && ((F.night && isNight(L.hr)) || (F.wx==='fog' && L.wx==='fog'))) runes.push(runeTag('nightglass','Nightglass'));
+  if (enchOn('storm') && L.wx==='rain') runes.push(runeTag('storm','Storm Knot +60%'));
   if (runes.length){ $('cTags').insertAdjacentHTML('afterbegin',runes.join('')); if (L.echo) setTimeout(()=>sfx.echo(),500); }
   $('cLore').textContent=L.isNew||F.rarity!=='common' ? F.lore : '';
   $('cLore').hidden=!$('cLore').textContent;
@@ -2570,8 +2677,8 @@ function dismissCard(action){
   if (action==='tank' && !tankRoom(L.id)) action=save.net.length<netCap()?'keep':'sell';
   card.classList.add('out'); setTimeout(()=>{ card.hidden=true; card.classList.remove('out'); },250);
   if (action==='sell') addCoins(L.value);
-  else if (action==='tank'){ addToTank({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod}); sfx.plop(); news('Off to the aquarium','good'); }
-  else { save.net.push({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod}); persist();
+  else if (action==='tank'){ addToTank({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,wx:L.wx,rod:L.rod}); sfx.plop(); news('Off to the aquarium','good'); }
+  else { save.net.push({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,wx:L.wx,rod:L.rod}); persist();
     SC.netPop=1; sfx.plop(); buzz(12); news('Into the keepnet','good');
     if (!save.netSeen){ save.netSeen=true; persist(); setTimeout(()=>coachFor('Kept fish go in your keepnet, hanging '+(REG()==='coast'?'over the side of your boat':'off the dock')+'. Tap it anytime to see them or sell them.',7),700);
       if (!save.aquaSeen) setTimeout(()=>{ if (S.state==='idle') coachFor('Your uncle’s old fish tank still works. Tap the fishbowl at the bottom to visit your aquarium and move fish in.',8); },9000); } }
@@ -2600,7 +2707,7 @@ const HUD={lv:0, sig:''};
 /** A count for the HUD: in full, or shortened when the row is at its tightest. */
 function hudNum(n){ if (HUD.lv<3 || n<1e3) return n.toLocaleString();
   const [d,u]=n<1e6?[1e3,'K']:n<1e9?[1e6,'M']:[1e9,'B'], v=n/d, f=v<100?Math.floor(v*10)/10:Math.floor(v); return f.toLocaleString()+u; }
-const hudClock = h => (isNight(h)||PERIOD(h)==='Evening'?'\u263E\uFE0E ':'\u2600\uFE0E ')+(HUD.lv>=2?clockText(h).replace(/ [AP]M$/,''):clockText(h));
+const hudClock = h => HUD.lv>=2?clockText(h).replace(/ [AP]M$/,''):clockText(h);   // the weather mark beside it shows the sun or moon (game/weather.js: setClock)
 /** Fits the row to the numbers it will settle on (a count-up in progress ends there), then puts back what's showing. */
 function fitHud(){ const hud=$('hud'); if (!hud) return; const g=save.glimmer||0, m=save.meal;
   const chips=[...hud.querySelectorAll('.chip')], sig=[innerWidth,save.coins.toLocaleString().length,g.toLocaleString().length,clockText(save.clock).length,m?String(m.casts).length:0]
@@ -2609,7 +2716,7 @@ function fitHud(){ const hud=$('hud'); if (!hud) return; const g=save.glimmer||0
   const over=()=>chips.some(c=>!c.hidden && c.scrollWidth>c.clientWidth+1);
   if (m && !$('mealChip').hidden) $('mealCasts').textContent=m.casts;
   for (HUD.lv=0; HUD.lv<=5; HUD.lv++){ hud.classList.toggle('tight',HUD.lv>=1); hud.classList.toggle('small',HUD.lv>=4); hud.classList.toggle('nolab',HUD.lv>=5);
-    $('coins').textContent=hudNum(save.coins); $('glimmer').textContent=hudNum(g); S.clockShown=$('clock').textContent=hudClock(save.clock);
+    $('coins').textContent=hudNum(save.coins); $('glimmer').textContent=hudNum(g); S.clockShown=hudClock(save.clock); setClock(S.clockShown);
     if (HUD.lv===5 || !over()) break; }
   $('coins').textContent=hudNum(coinShown); $('glimmer').textContent=hudNum(glimShown); }
 window.addEventListener('resize',fitHud);
@@ -3116,13 +3223,13 @@ function fishPath(id,len){
 function tailPath(id,len){ const F=FISH[id], h=len*F.h, p=new Path2D();
   p.moveTo(-len*.36,0); p.lineTo(-len*.6,-h*.85); p.quadraticCurveTo(-len*.5,0,-len*.6,h*.85); p.closePath(); return p; }
 /* Up close, fish get more: past 44 px a gill line, a side fin, a darker back, a mouth and a glint in the eye; past 80 px
-   fin rays, a lateral line and scales (except the catfish, the eel, and the bream and leafjack, whose patterns already
-   are their scales). Small fish in the scene stay simple, so they read at a glance. */
-const NO_SCALES=new Set(['reedwhisker','leafjack','kelpeel','bream']), OWN_MOUTH=new Set(['grouper','saltjaw']);
+   fin rays, a lateral line and scales (except the catfish, the eel, and the bream, leafjack and mackerel, whose patterns
+   already are their scales). Small fish in the scene stay simple, so they read at a glance. */
+const NO_SCALES=new Set(['reedwhisker','leafjack','kelpeel','bream','mackerel']), OWN_MOUTH=new Set(['grouper','saltjaw']);
 function fishRays(c,lw,pts){ c.strokeStyle='rgba(43,42,51,.32)'; c.lineWidth=clamp(lw*.4,.6,2.2); c.beginPath(); for (let i=0;i<pts.length;i+=4){ c.moveTo(pts[i],pts[i+1]); c.lineTo(pts[i+2],pts[i+3]); } c.stroke(); }
 function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false){
   const F=FISH[id], h=len*F.h; c.save();
-  if (shadow){ c.globalAlpha=alpha; c.fillStyle='rgba(10,26,34,.55)'; c.save(); c.rotate(tailSwing*.2); c.fill(tailPath(id,len)); c.restore(); c.fill(fishPath(id,len)); c.restore(); return; }
+  if (shadow){ c.globalAlpha=alpha; c.fillStyle='rgba(10,26,34,.55)'; c.save(); c.rotate(tailSwing*.2); c.fill(tailPath(id,len)); c.restore(); const sh=fishPath(id,len); if (id==='gurnard') sh.addPath(gurnardWingPath(len,len*F.h)); c.fill(sh,'nonzero'); c.restore(); return; }
   const lw=Math.max(1.5,len*.032), det=len>=80?2:len>=44?1:0; c.lineWidth=lw; c.lineJoin='round'; c.strokeStyle=INK;
   c.save(); c.translate(-len*.36,0); c.rotate(tailSwing*.25); c.translate(len*.36,0);
   const t=tailPath(id,len); c.fillStyle=F.fin; c.fill(t);
@@ -3151,6 +3258,16 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false){
   if (id==='leafjack'){ c.strokeStyle='rgba(70,80,20,.55)'; c.lineWidth=lw*.7; c.beginPath(); c.moveTo(len*.45,0); c.lineTo(-len*.4,0);
     for (let i=0;i<4;i++){ const x=len*(.3-i*.17); c.moveTo(x,0); c.lineTo(x-len*.1,-h*.7); c.moveTo(x,0); c.lineTo(x-len*.1,h*.7);} c.stroke(); }
   if (id==='mayor'){ c.fillStyle='rgba(40,50,30,.3)'; for (let i=0;i<9;i++) c.beginPath(), c.ellipse(len*(.3-i*.08),-h*.2+(i%2)*h*.4,len*.025,h*.15,0,0,Math.PI*2), c.fill(); }
+  if (id==='dace'){ c.strokeStyle='rgba(50,70,85,.35)'; c.lineWidth=Math.max(1,h*.14); c.beginPath(); c.moveTo(len*.4,-h*.08); c.quadraticCurveTo(0,h*.02,-len*.4,-h*.02); c.stroke();
+    c.fillStyle='rgba(235,245,255,.55)'; for (let i=0;i<6;i++){ const x=len*(.26-i*.11), y=(i%2?-.52:-.34)*h, r=len*.022;   // raindrop speckles along the back
+      c.beginPath(); c.moveTo(x,y-r*2.2); c.quadraticCurveTo(x+r*1.1,y-r*.2,x,y+r); c.quadraticCurveTo(x-r*1.1,y-r*.2,x,y-r*2.2); c.fill(); } }
+  if (id==='char'){ c.fillStyle=F.fin; c.globalAlpha=.75; c.beginPath(); c.ellipse(-len*.02,h*.95,len*.5,h*.62,0,0,Math.PI*2); c.fill(); c.globalAlpha=1;   // the orange belly
+    for (let i=0;i<10;i++){ const x=len*(.3-i*.07), y=(i%3===0?-.62:i%3===1?-.3:.02)*h; c.fillStyle=i%4===1?'rgba(240,140,100,.8)':'rgba(240,236,224,.7)'; c.beginPath(); c.arc(x,y,len*.02,0,Math.PI*2); c.fill(); } }
+  if (id==='mackerel'){ c.strokeStyle='rgba(20,40,45,.55)'; c.lineWidth=Math.max(1,len*.018); c.beginPath();   // wavy tiger bars across the back
+    for (let i=0;i<8;i++){ const x=len*(.24-i*.08); c.moveTo(x,-h*1.05); c.quadraticCurveTo(x+len*.04,-h*.7,x-len*.01,-h*.45); c.quadraticCurveTo(x-len*.05,-h*.25,x,-h*.1); } c.stroke();
+    c.fillStyle='rgba(235,240,232,.45)'; c.beginPath(); c.ellipse(0,h*.75,len*.5,h*.5,0,0,Math.PI*2); c.fill(); }
+  if (id==='gurnard'){ c.fillStyle='rgba(120,30,25,.28)'; c.beginPath(); c.ellipse(len*.02,-h*.75,len*.5,h*.45,0,0,Math.PI*2); c.fill();
+    c.fillStyle='rgba(255,220,190,.35)'; for (let i=0;i<7;i++){ c.beginPath(); c.arc(len*(.26-i*.09),-h*.45+(i%2)*h*.15,len*.016,0,Math.PI*2); c.fill(); } }
   if (det>1){ if (!bare && !NO_SCALES.has(id)){ const st=len*.062, r=h*.17; c.strokeStyle='rgba(30,25,20,.13)'; c.lineWidth=clamp(lw*.35,.6,2); c.beginPath();
       for (let x=len*.2,col=0;x>-len*.36;x-=st,col++) for (let row=-3;row<=3;row++){ const y=row*h*.34+(col%2?h*.17:0); c.moveTo(x+Math.cos(Math.PI-.9)*r,y+Math.sin(Math.PI-.9)*r); c.arc(x,y,r,Math.PI-.9,Math.PI+.9); } c.stroke(); }
     const ll=clamp(lw*.22,.7,1.6); c.setLineDash([ll*1.6,ll*2.4]); c.strokeStyle='rgba(30,25,20,.24)'; c.lineWidth=ll; c.beginPath(); c.moveTo(len*.22,-h*.22); c.quadraticCurveTo(-len*.05,-h*.05,-len*.38,-h*.02); c.stroke(); c.setLineDash([]); }
@@ -3158,11 +3275,17 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false){
   c.lineWidth=lw; c.strokeStyle=INK; c.stroke(body);
   if (det){ c.strokeStyle='rgba(43,42,51,.62)'; c.lineWidth=lw*.6; c.beginPath(); c.moveTo(len*.28,-h*.66); c.quadraticCurveTo(len*.19,-h*.02,len*.27,h*.6); c.stroke();
     if (!OWN_MOUTH.has(id)){ c.strokeStyle=INK; c.lineWidth=lw*.55; c.beginPath(); c.moveTo(len*.5,h*.04); c.quadraticCurveTo(len*.465,h*.13,len*.425,h*.11); c.stroke(); }
+    if (id==='gurnard'){ gurnardWing(c,len,h,lw,det,tailSwing); } else {
     c.save(); c.translate(len*.17,h*.24); c.rotate(.45+tailSwing*.2); const pf=new Path2D(); pf.moveTo(0,0); pf.quadraticCurveTo(-len*.05,-h*.34,-len*.17,-h*.08); pf.quadraticCurveTo(-len*.08,h*.2,0,0);
-    c.globalAlpha=.9; c.fillStyle=F.fin; c.fill(pf); c.globalAlpha=1; if (det>1){ c.save(); c.clip(pf); fishRays(c,lw,[0,0,-len*.15,-h*.16, 0,0,-len*.16,-h*.04, 0,0,-len*.12,h*.08]); c.restore(); } c.strokeStyle=INK; c.lineWidth=lw*.6; c.stroke(pf); c.restore(); }
+    c.globalAlpha=.9; c.fillStyle=F.fin; c.fill(pf); c.globalAlpha=1; if (det>1){ c.save(); c.clip(pf); fishRays(c,lw,[0,0,-len*.15,-h*.16, 0,0,-len*.16,-h*.04, 0,0,-len*.12,h*.08]); c.restore(); } c.strokeStyle=INK; c.lineWidth=lw*.6; c.stroke(pf);
+    if (id==='char'){ c.strokeStyle='#F7F3EA'; c.lineWidth=lw*.45; c.beginPath(); c.moveTo(-len*.012,-h*.03); c.quadraticCurveTo(-len*.05,-h*.31,-len*.15,-h*.1); c.stroke(); } c.restore(); } }
   if (id==='grouper'){ for (let i=0;i<6;i++){ const bx=len*(.18-i*.09), by=-h*.85+Math.abs(i-2.5)*h*.05; c.fillStyle='#E8E2D2'; c.beginPath(); c.arc(bx,by,len*.03,0,Math.PI*2); c.fill(); c.lineWidth=lw*.5; c.strokeStyle=INK; c.stroke(); }
     c.strokeStyle=INK; c.lineWidth=lw*.8; c.beginPath(); c.moveTo(len*.5,h*.05); c.lineTo(len*.36,h*.18); c.stroke(); }
   if (id==='saltjaw'){ c.fillStyle='#F4F1E8'; c.beginPath(); for (let i=0;i<5;i++){ c.moveTo(len*(.36+i*.025),h*.05); c.lineTo(len*(.37+i*.025),h*.18); c.lineTo(len*(.385+i*.025),h*.05); } c.fill(); }
+  if (id==='mackerel'){ c.fillStyle=F.fin; c.strokeStyle=INK; c.lineWidth=lw*.45; for (const sg of [-1,1]) for (let i=0;i<3;i++){ const x=-len*(.2+i*.05), y=sg*h*(.6-i*.12);   // finlets to the tail
+      c.beginPath(); c.moveTo(x+len*.015,y); c.lineTo(x-len*.02,y+sg*h*.17); c.lineTo(x-len*.025,y-sg*h*.02); c.closePath(); c.fill(); c.stroke(); } }
+  if (id==='gurnard' && det){ c.strokeStyle=INK; c.lineWidth=lw*.55; c.lineCap='round'; c.beginPath();   // the walking feelers under its chin
+    for (let i=0;i<3;i++){ const x=len*(.3-i*.05); c.moveTo(x,h*.72); c.quadraticCurveTo(x-len*.01,h*1.05,x-len*.05,h*1.18); } c.stroke(); }
   if (id==='reedwhisker'){ c.strokeStyle=INK; c.lineWidth=lw*.7; c.lineCap='round'; c.beginPath();
     c.moveTo(len*.46,h*.05); c.quadraticCurveTo(len*.6,h*.3,len*.55,h*.75); c.moveTo(len*.44,h*.12); c.quadraticCurveTo(len*.5,h*.5,len*.4,h*.85);
     c.moveTo(len*.46,-h*.05); c.quadraticCurveTo(len*.62,-h*.15,len*.66,h*.15); c.stroke(); }
@@ -3171,11 +3294,25 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false){
     c.strokeStyle=INK; c.lineWidth=lw*.6; c.beginPath(); c.moveTo(-len*.05,-h*1.05); c.lineTo(-len*.05,-h*1.35); c.moveTo(len*.02,-h*1.05); c.lineTo(len*.02,-h*1.35); c.moveTo(-len*.07,-h*1.25); c.lineTo(len*.04,-h*1.25); c.stroke(); }
   if (id==='mayor'){ c.strokeStyle=BRASS; c.lineWidth=lw*.9; c.setLineDash([lw*.9,lw*.9]); c.beginPath(); c.moveTo(len*.3,-h*.95); c.quadraticCurveTo(len*.24,h*.9,len*.14,h*.95); c.stroke(); c.setLineDash([]);
     c.fillStyle=BRASS; c.beginPath(); c.arc(len*.2,h*.9,len*.03,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=lw*.6; c.stroke(); }
+  if (id==='gurnard' && !det) gurnardWing(c,len,h,lw,det,tailSwing);
   c.fillStyle='#FFF8E8'; c.beginPath(); c.arc(len*.34,-h*.18,Math.max(1.6,len*.045),0,Math.PI*2); c.fill(); c.lineWidth=lw*.6; c.strokeStyle=INK; c.stroke();
   c.fillStyle=INK; c.beginPath(); c.arc(len*.35,-h*.18,Math.max(.8,len*.022),0,Math.PI*2); c.fill();
   if (det){ c.fillStyle='rgba(255,255,255,.9)'; c.beginPath(); c.arc(len*.343,-h*.18-len*.01,Math.max(.6,len*.008),0,Math.PI*2); c.fill(); }
   c.restore();
 }
+/** The Foghorn Gurnard's side fin: a wide fan like a wing, scalloped between its rays and edged in blue. It's the
+    gurnard's tell even as a silhouette, so it shows at every size (the shadow carries it too). */
+const GURN_FAN={x:.17, y:.04, r:.46, a0:3.8, a1:2.45, n:6};   // swept back, from up to down: the same turn as the body, so a shadow fills them as one
+function gurnardWingPath(len,h){ const G=GURN_FAN, px=len*G.x, py=len*G.y*(h/(len*.28)), R=len*G.r, p=new Path2D(); p.moveTo(px,py);
+  for (let i=0;i<=G.n;i++){ const a=G.a0+(G.a1-G.a0)*i/G.n, ex=px+Math.cos(a)*R, ey=py+Math.sin(a)*R*.85;
+    if (!i){ p.lineTo(ex,ey); continue; } const m=a-(G.a1-G.a0)/G.n/2, r2=R*.86; p.quadraticCurveTo(px+Math.cos(m)*r2,py+Math.sin(m)*r2*.85,ex,ey); }
+  p.closePath(); return p; }
+function gurnardWing(c,len,h,lw,det,sw){ const G=GURN_FAN, px=len*G.x, py=len*G.y*(h/(len*.28)), R=len*G.r; c.save(); c.translate(px,py); c.rotate(sw*.12); c.translate(-px,-py);
+  const P=gurnardWingPath(len,h); c.globalAlpha=.94; c.fillStyle='#E59A5C'; c.fill(P); c.globalAlpha=1;
+  c.save(); c.clip(P); c.strokeStyle='#5FA3DB'; c.lineWidth=Math.max(1.4,len*.035); c.stroke(P);
+  if (det){ const Rr=[]; for (let i=1;i<G.n;i++){ const a=G.a0+(G.a1-G.a0)*i/G.n; Rr.push(px,py,px+Math.cos(a)*R,py+Math.sin(a)*R*.85); } fishRays(c,lw,Rr); }
+  if (det>1){ c.fillStyle='rgba(43,90,140,.5)'; c.beginPath(); c.arc(px-R*.55,py-R*.05,len*.028,0,Math.PI*2); c.fill(); } c.restore();
+  c.strokeStyle=INK; c.lineWidth=lw*.7; c.stroke(P); c.restore(); }
 
 /* ---------- Loot art: crates, pouches, bottles, letters, every find, and the townsfolk who lost them ---------- */
 /* Everything is drawn in the same field-journal style as the fish: flat fills, one highlight, bold ink outlines.
@@ -3655,6 +3792,8 @@ const RUNE_GLYPH={
     c.moveTo(.3,-.06); c.lineTo(.38,-.14); },
   wanderer(c){ c.moveTo(0,-.8); c.lineTo(.17,-.17); c.lineTo(.8,0); c.lineTo(.17,.17); c.lineTo(0,.8); c.lineTo(-.17,.17); c.lineTo(-.8,0); c.lineTo(-.17,-.17); c.closePath();
     c.moveTo(.11,0); c.arc(0,0,.11,0,Math.PI*2); },
+  storm(c){ c.moveTo(-.7,-.12); c.bezierCurveTo(-.3,-.12,-.08,-.7,.22,-.5); c.bezierCurveTo(.5,-.3,.2,.08,-.08,-.12); c.bezierCurveTo(-.3,-.3,.1,-.62,.36,-.3); c.quadraticCurveTo(.5,-.12,.72,-.12);
+    for (const [x,y] of [[-.46,.18],[-.08,.12],[.3,.18],[-.28,.48],[.1,.44],[.48,.48]]){ c.moveTo(x+.07,y); c.lineTo(x-.03,y+.2); } },
   echo(c){ c.moveTo(-.12,0); c.quadraticCurveTo(-.36,-.24,-.62,0); c.quadraticCurveTo(-.36,.24,-.12,0); c.moveTo(-.62,0); c.lineTo(-.82,-.14); c.lineTo(-.82,.14); c.closePath();
     c.moveTo(.16,-.36); c.quadraticCurveTo(.34,0,.16,.36); c.moveTo(.38,-.58); c.quadraticCurveTo(.66,0,.38,.58); }
 };
@@ -4446,14 +4585,235 @@ function palAt(h){
   h=((h%24)+24)%24; let i=0; while (i<PKEYS_C.length-2 && PKEYS_C[i+1][0]<=h) i++;
   const [h0,a]=PKEYS_C[i], [h1,b]=PKEYS_C[i+1]; let t=(h-h0)/(h1-h0); t=t*t*(3-2*t);
   const o={};
-  for (const k in a){ const va=a[k], vb=b[k];
-    if (Array.isArray(va)){ const r=Math.round(lerp(va[0],vb[0],t)), g=Math.round(lerp(va[1],vb[1],t)), bl=Math.round(lerp(va[2],vb[2],t)); o[k]='rgb('+r+','+g+','+bl+')'; o[k+'R']=r+','+g+','+bl; }
-    else o[k]=lerp(va,vb,t); }
+  for (const k in a){ const va=a[k], vb=b[k]; o[k]=Array.isArray(va)?[lerp(va[0],vb[0],t),lerp(va[1],vb[1],t),lerp(va[2],vb[2],t)]:lerp(va,vb,t); }
+  wxTintPal(o);   // the weather greys, dims or fogs it (game/weather-art.js)
+  for (const k in a) if (Array.isArray(o[k])){ const [r,g,bl]=o[k].map(Math.round); o[k]='rgb('+r+','+g+','+bl+')'; o[k+'R']=r+','+g+','+bl; }
   return o;
 }
 const PERIOD = h => h>=5&&h<11?'Morning':h>=11&&h<17?'Day':h>=17&&h<21?'Evening':'Night';
 const isNight = h => h>=20||h<5;
 function clockText(h){ const hh=Math.floor(h), mm=Math.floor((h-hh)*60/10)*10, h12=((hh+11)%12)+1; return h12+':'+String(mm).padStart(2,'0')+(hh<12?' AM':' PM'); }
+
+/* ---------- Weather: each water's skies, worked out from the day and the hour ---------- */
+/* The weather comes in spells of WX_SPELL.hours (data/weather.js). Whether a spell turns, and what it turns to, comes
+   from a hash of the seed kept in the save (save.wx.seed), the region and the spell's number, so the same hour always
+   has the same weather: coming back after time away sees what the sky did meanwhile, and a forecast (the Wet Almanac,
+   step 22) can read ahead. Each spell keeps the weather it had with WX_SPELL.keep, or rolls afresh from the region's
+   table, with fog leaning to the morning. The first in-game day (save.day 0) only rolls clear or overcast, and the
+   sky stays clear until the tutorial is done.
+   A change comes on over WX_SPELL.ease in-game hours: the look blends (wxLook), and the fishing turns over halfway.
+   Playtest and the balance simulator can pin the weather with save.wx.force. Everything here reads only the save, so
+   the simulator's stand-in save has weather of its own (see game/mods.js). */
+var WXM={save:null};                        // the last answer, while nothing it depends on has changed
+const WX_REGN={lake:1, coast:2};
+/** The save's weather state, tidied on first read: a seed for the sky, a pinned kind (Playtest), tips already shown. */
+function wxState(){ let w=save.wx; if (!w || typeof w!=='object' || Array.isArray(w)) w=save.wx={};
+  if (!Number.isInteger(w.seed) || w.seed<1) w.seed=1+Math.floor(Math.random()*2147483646);
+  if (w.force!=null && !WX_ORDER.includes(w.force)) delete w.force;
+  if (!w.seen || typeof w.seen!=='object' || Array.isArray(w.seen)) w.seen={};
+  return w; }
+/** A number in [0, 1) from three integers: the same three always give the same number. */
+function wxHash(a,b,c){ let h=(a|0)^Math.imul(b|0,0x9E3779B1)^Math.imul(c|0,0x85EBCA77);
+  h^=h>>>16; h=Math.imul(h,0x7FEB352D); h^=h>>>15; h=Math.imul(h,0x846CA68B); h^=h>>>16;          // two full mixing rounds, so neighbouring
+  h=Math.imul(h^(c|0),0xC2B2AE35); h^=h>>>13; h=Math.imul(h,0x27D4EB2F); h^=h>>>16; return (h>>>0)/4294967296; }   // numbers land far apart
+/** The spell (4 in-game hours) the clock is in, counted from the first day. */
+const wxSpell = () => (save.day||0)*6+Math.floor((((save.clock%24)+24)%24)/WX_SPELL.hours);
+/** The spell in which the weather at spell B began: it rolls afresh at least every WX_SPELL.every spells. */
+function wxStart(reg,B,seed){ let s=Math.max(0,B); while (s>0 && s%WX_SPELL.every!==0 && wxHash(seed,WX_REGN[reg]||1,s*2)>=1-WX_SPELL.keep) s--; return s; }
+/** What the weather rolled at spell s turned to. */
+function wxRoll(reg,s,seed){ const T=WX_TABLE[reg]||WX_TABLE.lake, fair=s<6, w={}; let sum=0;
+  for (const k of WX_ORDER){ let v=T[k]||0; if (k==='fog') v*=WX_FOG_HOUR[s%6]; if (fair && (k==='rain'||k==='fog')) v=0; w[k]=v; sum+=v; }
+  let x=wxHash(seed,WX_REGN[reg]||1,s*2+1)*sum; for (const k of WX_ORDER){ x-=w[k]; if (x<0) return k; } return 'clear'; }
+/** The weather in region `reg` during spell B. */
+function wxAt(reg,B,seed){ seed=seed||wxState().seed; return wxRoll(reg,wxStart(reg,B,seed),seed); }
+/** Everything about the weather here and now: the kind the fishing uses, and how it looks (cloud, rain, fog, mist and
+    a rainbow, each 0 to 1). Cached until the save, the clock, the region or a pinned kind changes. */
+function wxInfo(){
+  const w=wxState(), M=WXM;
+  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.force===w.force && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
+  const reg=REG(), h=(((save.clock%24)+24)%24), into=h%WX_SPELL.hours; let from, to, t;
+  if (w.force){ from=to=w.force; t=1; }
+  else if (!save.tutorialDone){ from=to='clear'; t=1; }
+  else { const B=wxSpell(); to=wxAt(reg,B,w.seed); from=B>0?wxAt(reg,B-1,w.seed):to; t=from===to?1:clamp(into/WX_SPELL.ease,0,1); }
+  const e=t*t*(3-2*t), A=WX[from].look, Z=WX[to].look, kind=t<.5?from:to;
+  const v={kind, from, to, t, cloud:lerp(A.cloud,Z.cloud,e), rain:lerp(A.rain,Z.rain,e), fog:lerp(A.fog,Z.fog,e), mist:0, bow:0};
+  // the dawn mist on fair mornings: thickest around six, gone by nine
+  if (kind==='clear'||kind==='cloudy'){ const m=h<DAWN_MIST.from-.5||h>DAWN_MIST.to+1.5?0:h<6?(h-(DAWN_MIST.from-.5))/1.5:1-(h-6)/(DAWN_MIST.to+1.5-6); v.mist=clamp(m,0,1); }
+  // a rainbow, by day, in the hour or two after rain gives way
+  if (from==='rain' && to!=='rain' && !w.force && h>=7 && h<18.5) v.bow=clamp((t-.5)/.4,0,1)*clamp((2.4-into)/.8,0,1);
+  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,force:w.force,seed:w.seed,tut:save.tutorialDone,v});
+  return v; }
+/** The weather the fishing uses here and now: 'clear', 'cloudy', 'rain' or 'fog'. */
+const wxNow = () => wxInfo().kind;
+/** How the weather looks right now. Fog's look includes the dawn mist. */
+function wxLook(){ const v=wxInfo(); if (!v.look) v.look={cloud:v.cloud, rain:v.rain, fog:Math.max(v.fog,v.mist*DAWN_MIST.look), mist:v.mist, bow:v.bow}; return v.look; }   // one per answer, not one per call
+/** Whether the dawn mist is on the water for fishing: fog fish rise at a share of their odds. */
+const wxMist = () => { const v=wxInfo(), h=save.clock; return (v.kind==='clear'||v.kind==='cloudy') && h>=DAWN_MIST.from && h<DAWN_MIST.to; };
+/** What share of the time each kind of weather fills in `reg`, over `days` in-game days of this sky (for the
+    balance report and the tests). */
+function wxShares(reg,days,seed){ seed=seed||wxState().seed; const n={}; for (const k of WX_ORDER) n[k]=0;
+  for (let B=6;B<6+days*6;B++) n[wxAt(reg,B,seed)]++; for (const k in n) n[k]=Math.round(n[k]/(days*6)*1000)/1000; return n; }
+/** The weather fish here: {fish, weight} for each spot, at the share the weather gives them right now. */
+function wxFishFor(reg,spot){ const out=[], F=WX_FISH[reg]; if (!F) return out; const kind=wxNow(), mist=wxMist();
+  for (const k in F){ const E=F[k], w=E.pools[spot]; if (!w) continue;
+    const share=kind===k?1:(WX_SOME[k]||{})[kind] || (mist && (WX_SOME[k]||{}).mist) || 0; if (share>0) out.push({fish:E.fish, w:w*share}); }
+  return out; }
+/** One line for the clock tap: what the weather is doing to the fishing here. */
+function wxLine(){ const k=wxNow(), reg=REG(), F=WX_FISH[reg]||{}, known=id=>(save.fish[id]||{}).caught>0, nm=id=>known(id)?'the '+FISH[id].name+' is':'something new is';
+  const where=' at '+REGION_NAME[reg];
+  if (k==='rain') return 'Rain'+where+'. Fish bite sooner and '+nm(F.rain.fish)+' rising, but the drops make nibbles hard to read.';
+  if (k==='fog') return 'Fog'+where+'. Fish hide in the far water until they reach your bobber, and '+nm(F.fog.fish)+' rising.'+(reg==='lake' && !isNight(save.clock)?' Lantern Carp come up by day.':'');
+  if (k==='cloudy') return 'Overcast'+where+'. Grey and quiet, and '+(known(F.rain.fish)?'the '+FISH[F.rain.fish].name+' is':'rain fish are')+' starting to stir.';
+  return (isNight(save.clock)?'A clear night':'Clear skies')+where+'.'+(isNight(save.clock)?'':' The gulls are out, so watch for Gull Luck.')+(wxMist()?' A little dawn mist brings up the odd fog fish.':''); }
+/* Turning weather: a word when rain or fog comes in or clears, and a tip the first time each one comes. */
+var WXT={reg:null, kind:null};
+function weatherUpdate(dt){
+  const k=wxNow(), reg=REG();
+  if (WXT.reg!==reg || WXT.kind==null || INTRO.active){ WXT.reg=reg; WXT.kind=k; }
+  else if (k!==WXT.kind){ const was=WXT.kind; WXT.kind=k; if (!wxState().force && wxInfo().t<1) wxTurned(was,k); }   // only a change you see happening: not time away, a restored save or the tutorial ending
+  weatherArtUpdate(dt);
+}
+function wxTurned(was,k){
+  const F=WX_FISH[REG()]||{}, known=id=>(save.fish[id]||{}).caught>0, w=wxState();
+  if (k==='rain') news('Rain’s coming in'+(F.rain&&known(F.rain.fish)?'. The '+FISH[F.rain.fish].name+' is up':''),'');
+  else if (k==='fog') news('Fog’s rolling in'+(F.fog&&known(F.fog.fish)?'. The '+FISH[F.fog.fish].name+' is about':''),'');
+  else if (was==='rain') news('The rain’s easing off','');
+  else if (was==='fog') news('The fog’s lifting','');
+  if ((k==='rain'||k==='fog') && !w.seen[k] && !S.tut){ w.seen[k]=1; persist();
+    coachLater(k==='rain'?'It’s raining. Fish bite sooner and rain fish come up, but drops dimple the water round your bobber. Only a plunge is a bite.'
+      :'Fog hides fish in the far water until they reach your bobber. Fog fish come up'+(REG()==='lake'?', and Lantern Carp rise by day.':'.'),8); }
+}
+/** The clock chip: the time, a small mark for the weather (with the sun or moon beside it), and its spoken label. */
+function wxIcon(){ const k=wxNow(), night=isNight(save.clock)||PERIOD(save.clock)==='Evening'; return k+(night?'-n':'-d'); }
+const WX_SVG={
+  sun:'<circle cx="8" cy="8" r="3.3" fill="#E8C77E" stroke="#2B2A33" stroke-width=".9"/><path d="M8 1.4v1.8M8 12.8v1.8M1.4 8h1.8M12.8 8h1.8M3.3 3.3l1.3 1.3M11.4 11.4l1.3 1.3M3.3 12.7l1.3-1.3M11.4 4.6l1.3-1.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>',
+  moon:'<path d="M10.6 2.2a6 6 0 1 0 3.2 9.6A5 5 0 0 1 10.6 2.2Z" fill="#E9E2CC" stroke="#2B2A33" stroke-width=".9"/>',
+  sunS:'<circle cx="5.4" cy="5.2" r="2.6" fill="#E8C77E" stroke="#2B2A33" stroke-width=".8"/><path d="M5.4 .9v1M1.1 5.2h1M2.3 2.1l.7.7M8.5 2.1l-.7.7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>',
+  moonS:'<path d="M6.6 1.6a3.6 3.6 0 1 0 1.9 5.8A3 3 0 0 1 6.6 1.6Z" fill="#E9E2CC" stroke="#2B2A33" stroke-width=".8"/>',
+  cloud:'<path d="M4.6 13.2h8.1a2.6 2.6 0 0 0 .3-5.2 3.6 3.6 0 0 0-6.9-.9 2.9 2.9 0 0 0-1.5 6.1Z" fill="currentColor" stroke="#2B2A33" stroke-width=".9" stroke-linejoin="round"/>',
+  rainCloud:'<path d="M4.2 9.6h8.4a2.4 2.4 0 0 0 .3-4.8 3.4 3.4 0 0 0-6.5-.8 2.7 2.7 0 0 0-2.2 5.6Z" fill="currentColor" stroke="#2B2A33" stroke-width=".9" stroke-linejoin="round"/><path d="M5.6 11.4l-.9 2.6M8.6 11.4l-.9 2.6M11.6 11.4l-.9 2.6" stroke="#9CC6E6" stroke-width="1.4" stroke-linecap="round"/>',
+  fog:'<path d="M2 9.4c1.4-1 2.8-1 4.2 0s2.8 1 4.2 0 2.8-1 3.6-.4M2 12.4c1.4-1 2.8-1 4.2 0s2.8 1 4.2 0 2.8-1 3.6-.4M3.6 15c1.2-.7 2.4-.7 3.6 0s2.4.7 3.6 0" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>'
+};
+function wxIconSVG(key){ const [k,dn]=key.split('-'), n=dn==='n', S2=WX_SVG;
+  const body=k==='clear'?(n?S2.moon:S2.sun):k==='cloudy'?(n?S2.moonS:S2.sunS)+S2.cloud:k==='rain'?S2.rainCloud:(n?S2.moonS:S2.sunS)+S2.fog;
+  return '<svg viewBox="0 0 16 16" aria-hidden="true">'+body+'</svg>'; }
+/** Puts the time and the weather mark in the clock chip (the mark only when it changes). */
+function setClock(text){ const ico=$('wxIco'), key=wxIcon();
+  if (ico && ico.dataset.k!==key){ ico.dataset.k=key; ico.innerHTML=wxIconSVG(key); }
+  $('clockT').textContent=text; $('clock').setAttribute('aria-label',clockText(save.clock)+', '+WX[wxNow()].name.toLowerCase()); }
+
+/* ---------- Weather art: the sky's tint, an overcast deck, rain, rings on the water, fog banks and a rainbow ---------- */
+/* What's still is painted once: the tint goes into the palette (palAt), so the cached backdrop (buildBg) greys with
+   the clouds and the far shore fades into fog; the overcast deck is painted into the backdrop too. Only the moving
+   parts draw each frame: three depths of rain (each one path), rings where drops land, splashes on the boards, the
+   fog banks (one cached strip each, slid sideways), a few heavy clouds and the rainbow. */
+var WXV={rings:[], spl:[], ringT:0, splT:0, bobT:0, fogSprite:null, fogKey:'', clouds:null};
+const WX_FOG_DAY=[195,202,207], WX_FOG_NIGHT=[54,61,78];
+// how far each palette color sits, for fog: the far shore and the sky low down fade most, near water least
+const WX_FAR={skyTop:.45, skyMid:.65, skyLow:.85, skyHz:.95, hillFar:.92, hillNear:.8, trees:.66, town:.72, head:.82, w0:.82, w1:.5, w2:.32, w3:.16, cloudLit:.55, cloudBase:.55, glow:.5};
+/** The fog's color at this hour: pale by day, slate at night. */
+function wxFogRGB(dark){ const k=clamp((dark||0)/.4,0,1); return WX_FOG_DAY.map((v,i)=>Math.round(lerp(v,WX_FOG_NIGHT[i],k))); }
+/** Tints a palette (colors as [r,g,b], as palAt builds it) for the weather: overcast greys and dims it, rain a little
+    more, fog pulls the far things toward the fog's color. The sun, moon and stars go behind the clouds, and on grey
+    days the town lights its lamps. */
+function wxTintPal(o){ const L=wxLook(); if (L.cloud<.005 && L.fog<.005) return;
+  const fog=wxFogRGB(o.dark), d=L.cloud*.6, dk=1-.15*L.rain-.05*L.cloud;
+  for (const k in WX_FAR){ const c=o[k]; if (!Array.isArray(c)) continue;
+    const lum=.3*c[0]+.59*c[1]+.11*c[2], grey=[lum*.97,lum,lum*1.05];
+    for (let i=0;i<3;i++){ let v=lerp(c[i],grey[i],d)*dk; v=lerp(v,fog[i],L.fog*WX_FAR[k]*.85); c[i]=v; } }
+  o.sunVis*=1-.9*Math.max(L.cloud,L.fog*.8); o.moonVis*=1-.85*Math.max(L.cloud,L.fog*.8); o.stars*=1-Math.max(L.cloud,L.fog);
+  o.win=Math.max(o.win,.45*Math.max(L.rain,L.fog)); o.fly*=1-L.rain; }
+/** Painted into the cached backdrop, over the sky and under the land: a deck of heavy cloud, and fog's pale wash. */
+function paintWxSky(x){ const L=wxLook(); SC.bgWx=wxBgKey();
+  if (L.cloud>.02){ sseed=611; const a=L.cloud;
+    for (let i=0;i<11;i++){ const cx=sr()*W*1.2-W*.1, cy=HZ*(.04+sr()*.42), r=W*(.1+sr()*.1);
+      x.globalAlpha=.55*a; x.fillStyle=PAL.cloudBase; x.beginPath(); x.ellipse(cx,cy,r*1.7,r*.62,0,0,Math.PI*2); x.fill();
+      x.globalAlpha=.3*a; x.fillStyle=PAL.cloudLit; x.beginPath(); x.ellipse(cx-r*.3,cy-r*.26,r*1.05,r*.3,0,0,Math.PI*2); x.fill();
+      x.globalAlpha=.22*a; x.fillStyle='rgb(40,46,60)'; x.beginPath(); x.ellipse(cx+r*.2,cy+r*.36,r*1.3,r*.22,0,0,Math.PI*2); x.fill(); }
+    x.globalAlpha=1; }
+  if (L.fog>.02){ const f=wxFogRGB(PAL.dark).join(','), g=x.createLinearGradient(0,0,0,HZ); g.addColorStop(0,'rgba('+f+','+(.25*L.fog).toFixed(3)+')'); g.addColorStop(1,'rgba('+f+','+(.75*L.fog).toFixed(3)+')');
+    x.fillStyle=g; x.fillRect(0,0,W,HZ+1); } }
+/** A number that moves when the backdrop should be repainted for the weather. */
+function wxBgKey(){ const L=wxLook(); return L.cloud+L.fog*2+L.rain*.7; }
+/* rain: three depths, far drops short and faint, near ones long and bright. Positions come from the clock, so nothing
+   is stored per drop but where it started. */
+const RAIN_L=[{n:72, len:7, w:.8, a:.2, sp:430, sl:.2},{n:46, len:13, w:1.1, a:.28, sp:620, sl:.22},{n:20, len:22, w:1.6, a:.36, sp:860, sl:.25}];
+{ let sd=97; const r=()=>{ sd=(sd*16807)%2147483647; return (sd-1)/2147483646; }; for (const l of RAIN_L){ l.d=[]; for (let i=0;i<l.n;i++) l.d.push([r(),r(),.75+r()*.5]); } }
+function drawRain(){ const L=wxLook(); if (L.rain<.02) return;
+  const dk=clamp(PAL.dark/.4,0,1), col=[Math.round(lerp(214,160,dk)),Math.round(lerp(226,176,dk)),Math.round(lerp(236,205,dk))].join(','), slow=REDUCED?.35:1, span=H+60;
+  ctx.lineCap='round';
+  for (const l of RAIN_L){ const n=Math.round(l.n*L.rain*(REDUCED?.5:1)); if (!n) continue; ctx.beginPath();
+    for (let i=0;i<n;i++){ const d=l.d[i], sp=l.sp*d[2]*slow, y=((d[1]*span+S.time*sp)%span)-30, x=((d[0]*(W+80)+y*l.sl)%(W+80))-40, len=l.len*d[2];
+      ctx.moveTo(x,y); ctx.lineTo(x+len*l.sl,y+len); }
+    ctx.strokeStyle='rgba('+col+','+(l.a*Math.min(1,L.rain*1.4)).toFixed(3)+')'; ctx.lineWidth=l.w; ctx.stroke(); }
+  // drops bursting on the boards and the deck
+  for (const p of WXV.spl){ const u=p.t/.18, a=(1-u)*.55, r=1.5+u*3.5; ctx.strokeStyle='rgba('+col+','+a.toFixed(3)+')'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(p.x-r*.4,p.y-r*.2); ctx.lineTo(p.x-r,p.y-r); ctx.moveTo(p.x+r*.4,p.y-r*.2); ctx.lineTo(p.x+r,p.y-r); ctx.moveTo(p.x,p.y-r*.3); ctx.lineTo(p.x,p.y-r*1.3); ctx.stroke(); } }
+/** Rings where raindrops land, on the water under everything else. */
+function drawWxWater(){ if (!WXV.rings.length) return; ctx.lineWidth=1;
+  for (const r of WXV.rings){ const u=r.t/r.life, rr=1+u*r.max, a=(1-u)*.42; ctx.strokeStyle='rgba(225,238,242,'+a.toFixed(3)+')';
+    ctx.beginPath(); ctx.ellipse(r.x,r.y,rr,rr*.38,0,0,Math.PI*2); ctx.stroke(); } }
+/** A long, soft strip of fog in the fog's color, painted once per color and slid sideways each frame. */
+function fogSprite(){ const f=wxFogRGB(PAL.dark), key=f.join(',');
+  if (WXV.fogSprite && WXV.fogKey===key) return WXV.fogSprite;
+  const w=512, h=128, c=document.createElement('canvas'); c.width=w; c.height=h; const x=c.getContext('2d'); let sd=29; const r=()=>{ sd=(sd*16807)%2147483647; return (sd-1)/2147483646; };
+  for (let i=0;i<30;i++){ const cx=r()*w, cy=h*(.45+r()*.25), rx=40+r()*70, a=.18+r()*.2;
+    for (const ox of [-w,0,w]){ const g=x.createRadialGradient(cx+ox,cy,2,cx+ox,cy,rx); g.addColorStop(0,'rgba('+key+','+a.toFixed(2)+')'); g.addColorStop(1,'rgba('+key+',0)');
+      x.save(); x.translate(cx+ox,cy); x.scale(1,.42); x.translate(-(cx+ox),-cy); x.fillStyle=g; x.beginPath(); x.arc(cx+ox,cy,rx,0,Math.PI*2); x.fill(); x.restore(); } }
+  WXV.fogSprite=c; WXV.fogKey=key; return c; }
+/** Fog over the far water: a veil that thickens toward the horizon, and three banks drifting at their own pace. Drawn
+    over the fish shadows and under the bobber, so a cast into the fog still shows the bobber. */
+function drawWxVeil(){ const L=wxLook(); if (L.fog<.02) return; const f=wxFogRGB(PAL.dark).join(','), top=HZ-H*.05, wd=H-HZ, key=f+'|'+L.fog.toFixed(2)+'|'+HZ+'|'+H;
+  if (WXV.veilKey!==key){ const g=ctx.createLinearGradient(0,top,0,HZ+wd*.55); g.addColorStop(0,'rgba('+f+','+(.62*L.fog).toFixed(3)+')'); g.addColorStop(.35,'rgba('+f+','+(.42*L.fog).toFixed(3)+')'); g.addColorStop(1,'rgba('+f+',0)'); WXV.veil=g; WXV.veilKey=key; }   // rebuilt only as the fog or the light changes
+  ctx.fillStyle=WXV.veil; ctx.fillRect(-20,top,W+40,wd*.6+H*.05);
+  const sp=fogSprite(), drift=REDUCED?.3:1;
+  for (const [fy,fh,a,v] of [[-.03,.075,.8,2.5],[.1,.085,.6,4.2],[.27,.1,.38,6.5]]){ const y=HZ+wd*fy, h=H*fh, tw=h*4, off=((S.time*v*drift)%tw+tw)%tw;
+    ctx.globalAlpha=a*L.fog; for (let x=-off-tw*.2;x<W+tw;x+=tw) ctx.drawImage(sp,x,y-h*.55,tw,h); }
+  ctx.globalAlpha=1; }
+/** How much of a fish shadow at (x, y) shows through the fog: the far half of the water hides it, unless it has
+    come up to the bobber. */
+function fogVis(x,y){ const L=wxLook(); if (L.fog<.02) return 1;
+  const u=clamp((G.near-y)/(G.near-HZ),0,1), hide=clamp((u-.3)/.28,0,1), b=S.bob;
+  let near=0; if (b){ const k=sc(b.y), d=Math.hypot(x-b.x,(y-b.y)*1.8); near=clamp(1-(d-16*k)/(26*k),0,1); }
+  return Math.max(1-L.fog*hide*.97,near); }
+/** Over the sky: a few heavy clouds drifting under the deck, and a rainbow after the rain. */
+function drawWxSky(){ const L=wxLook();
+  if (L.cloud>.02){ if (!WXV.clouds){ WXV.clouds=[]; let sd=43; const r=()=>{ sd=(sd*16807)%2147483647; return (sd-1)/2147483646; }; for (let i=0;i<4;i++) WXV.clouds.push({x:r()*1.3-.15, y:.12+r()*.3, s:1.6+r()*.9, sp:.003+r()*.004}); }
+    for (const c of WXV.clouds) drawCloud(c.x*W,c.y*HZ,c.s,L.cloud); }
+  if (L.bow>.01){ const cx=W*(PAL.sunX>.5?.32:.68), cy=HZ+W*.2, R=W*.6, bw=Math.max(2.2,W*.0105), cols=['#E06B5B','#E9A05A','#E8D27A','#8CC77E','#6FA9D8','#7A7BCB','#A07AC2'];
+    ctx.save(); ctx.beginPath(); ctx.rect(0,0,W,HZ); ctx.clip(); ctx.lineWidth=bw*7; ctx.globalAlpha=.07*L.bow; ctx.strokeStyle='#FFF6E6'; ctx.beginPath(); ctx.arc(cx,cy,R-bw*7,Math.PI,Math.PI*2); ctx.stroke();
+    ctx.lineWidth=bw+.6; ctx.globalAlpha=.3*L.bow; cols.forEach((c,i)=>{ ctx.strokeStyle=c; ctx.beginPath(); ctx.arc(cx,cy,R-i*bw,Math.PI,Math.PI*2); ctx.stroke(); });
+    ctx.restore(); } }
+/** Rain dripping off the angler's hat brim, in the hat's own frame (game/angler.js): a wet sheen on the brim, and drops
+    that swell at the edge and fall. */
+function wxDrips(c){ const L=wxLook(); if (L.rain<.05) return; const a=L.rain;
+  c.strokeStyle='rgba(225,236,244,'+(.45*a).toFixed(3)+')'; c.lineWidth=1; c.beginPath(); c.ellipse(0,2,20.5,5.6,0,.25,Math.PI-.25); c.stroke();
+  [-16,-6,5,15].forEach((x,i)=>{ const yb=2+6.4*Math.sqrt(1-(x/21.5)*(x/21.5))*.96, ph=(S.time*.62+i*.31)%1;
+    let y=yb, r=.6+Math.min(ph,.65)*1.1; if (ph>.65){ const u=(ph-.65)/.35; y=yb+u*u*24; r=1.1; }
+    c.globalAlpha=a*(ph>.92?(1-ph)/.08:1); c.fillStyle='#DCEAF4'; c.beginPath(); c.ellipse(x,y+r*.4,r*.8,r*1.15,0,0,Math.PI*2); c.fill();
+    c.strokeStyle='rgba(43,42,51,.45)'; c.lineWidth=.6; c.stroke(); c.globalAlpha=1; }); }
+/** Rings on the water, splashes on the boards, and drops near the bobber that dip it, as hard to tell from a nibble as
+    the real thing. Rings and splashes stay under a fixed number. */
+function weatherArtUpdate(dt){ const L=wxLook();
+  if (WXV.clouds && L.cloud>.02) for (const c of WXV.clouds){ c.x+=c.sp*dt*(REDUCED?.3:1); if (c.x>1.25) c.x=-.25; }   // the heavy clouds drift slowly east
+  if (WXV.rings.length){ for (const r of WXV.rings) r.t+=dt; WXV.rings=WXV.rings.filter(r=>r.t<r.life); }
+  if (WXV.spl.length){ for (const p of WXV.spl) p.t+=dt; WXV.spl=WXV.spl.filter(p=>p.t<.18); }
+  if (L.rain<.02 || AQ.open || K.open) return;
+  WXV.ringT+=dt*L.rain*34*W/390; while (WXV.ringT>=1 && WXV.rings.length<70){ WXV.ringT--; const y=rand(HZ+6,H-110), k=sc(y); WXV.rings.push({x:rand(0,W),y,t:0,life:rand(.4,.6),max:(3+rand(0,4))*k}); }
+  WXV.splT+=dt*L.rain*9; while (WXV.splT>=1 && WXV.spl.length<14){ WXV.splT--; WXV.spl.push({x:rand(W*.2,W*.8),y:rand(H-118,H-14),t:0}); }
+  const b=S.bob; if (b && (S.state==='waiting'||S.state==='bite') && L.rain>.3){ WXV.bobT+=dt*L.rain*2.4;
+    while (WXV.bobT>=1){ WXV.bobT--; const k=sc(b.y), a=rand(0,6.28), d=rand(3,20)*k; WXV.rings.push({x:b.x+Math.cos(a)*d,y:b.y+Math.sin(a)*d*.45,t:0,life:.55,max:7*k}); if (d<9*k) b.rd=1; } } }
+/** The weather on a window pane in the shack's rooms (the kitchen and the aquarium, both cached and repainted every
+    quarter hour): a pale wash in fog, and in rain, beads on the glass with a few runs below them. Call it clipped to
+    the pane. P is the palette the room painted the view with. */
+function paintWxPane(c,x,y,w,h,P){ const L=wxLook(); if (L.fog<.02 && L.rain<.02) return;
+  if (L.fog>.02){ c.fillStyle='rgba('+wxFogRGB(P.dark).join(',')+','+(.6*L.fog).toFixed(3)+')'; c.fillRect(x,y,w,h); }
+  if (L.rain>.02){ c.fillStyle='rgba(60,70,84,'+(.16*L.rain).toFixed(3)+')'; c.fillRect(x,y,w,h); sseed=919; const n=Math.round(w*h/260*L.rain);
+    for (let i=0;i<n;i++){ const bx=x+sr()*w, by=y+sr()*h, r=.8+sr()*1.8, run=sr()<.22;
+      if (run){ c.strokeStyle='rgba(230,238,245,.28)'; c.lineWidth=r*.9; c.beginPath(); c.moveTo(bx,by); c.quadraticCurveTo(bx+r*1.2,by+h*.12,bx-r*.4,by+h*(.18+sr()*.15)); c.stroke(); }
+      c.fillStyle='rgba(20,26,34,.3)'; c.beginPath(); c.arc(bx+r*.25,by+r*.3,r,0,Math.PI*2); c.fill();
+      c.fillStyle='rgba(235,242,248,.55)'; c.beginPath(); c.arc(bx,by,r,0,Math.PI*2); c.fill();
+      c.fillStyle='rgba(255,255,255,.85)'; c.beginPath(); c.arc(bx-r*.35,by-r*.35,r*.32,0,Math.PI*2); c.fill(); } } }
 
 /* ---------- Scenery: static backdrop (rebuilt on resize) ---------- */
 const SC={clouds:[],birds:[],boat:null,nextBirds:2.5,nextBoat:4,jump:null,nextJump:5,smoke:[],smokeT:0,flies:[],dfly:[],
@@ -4516,6 +4876,7 @@ function buildBg(){
   if (P.moonVis>.01){ const mg=x.createRadialGradient(mx,my,4,mx,my,W*.3); mg.addColorStop(0,'rgba(200,215,255,'+(.3*P.moonVis).toFixed(2)+')'); mg.addColorStop(1,'rgba(200,215,255,0)');
     x.fillStyle=mg; x.fillRect(0,0,W,HZ); x.globalAlpha=P.moonVis; x.fillStyle='#EEE8D5'; x.beginPath(); x.arc(mx,my,W*.04,0,Math.PI*2); x.fill();
     x.fillStyle='rgba(180,170,150,.5)'; x.beginPath(); x.arc(mx-4,my-3,3,0,Math.PI*2); x.arc(mx+5,my+4,2.2,0,Math.PI*2); x.arc(mx+2,my-6,1.5,0,Math.PI*2); x.fill(); x.globalAlpha=1; }
+  paintWxSky(x);   // an overcast deck and fog's wash (game/weather-art.js)
   const useSun=P.sunVis>=P.moonVis; SC.lightX=useSun?sx:mx; SC.lightRGB=useSun?P.glowR:'210,222,255'; SC.lightA=useSun?P.sunVis*(P.sunY>.7?1:.45):P.moonVis*.7;
   drawLand(x,true);
   const ws=REG()==='coast'?[mixP('w0','#94BCCB',.3),mixP('w1','#2F8098',.38),mixP('w2','#1B6276',.38),mixP('w3','#0E3A4A',.3)]:[P.w0,P.w1,P.w2,P.w3];
@@ -4547,12 +4908,14 @@ function layoutScenery(){
 function drawSky(){
   if (SC.bg) ctx.drawImage(SC.bg,0,0,W,H);
   for (const c of SC.clouds) drawCloud(c.x*W,c.y*HZ,c.s);
-  drawBeam();
+  drawWxSky(); drawBeam();
   for (const p of SC.smoke){ ctx.fillStyle='rgba(205,195,215,'+(.4*(1-p.life/p.max)).toFixed(3)+')'; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); }
   drawBirds(); drawGull();
 }
 
 /* ---------- Scenery: living layers ---------- */
+/** Gulls only fly, and so only drop Gull Luck, in clear or overcast weather. */
+const gullWeather = () => { const k=wxNow(); return k==='clear'||k==='cloudy'; };
 function inLucky(x,y){ const z=SC.lucky; return !!z && Math.hypot(x-z.x,(y-z.y)*2.2)<z.r; }
 function drawGull(){
   const g=SC.gull; if (!g) return; const w=g.s*1.5, flap=Math.sin(S.time*(g.phase==='stop'?22:10)+g.ph);
@@ -4584,18 +4947,19 @@ function drawLucky(){
   ctx.font='800 11.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#F7DD92'; ctx.fillText(trimNum(gullMul())+'× RARITY · '+Math.ceil(z.dur-z.t)+'s',z.x,z.y-z.r/2.2-8);
   if (Math.random()<.15) S.particles.push({x:z.x+rand(-z.r,z.r)*.8,y:z.y+rand(-z.r,z.r)*.3,vx:0,vy:-rand(8,20),g:0,life:0,max:.8,r:rand(1,2),c:'rgba(255,230,150,'});
 }
-function drawCloud(x,y,s){
+function drawCloud(x,y,s,a=1){
   const blobs=[[0,0,16],[15,-6,13],[-15,-2,12],[29,2,9],[-27,3,8]];
-  ctx.fillStyle=PAL.cloudLit; ctx.globalAlpha=.8; for (const b of blobs){ ctx.beginPath(); ctx.arc(x+b[0]*s,y+b[1]*s+3*s,b[2]*s,0,Math.PI*2); ctx.fill(); }
-  ctx.fillStyle=PAL.cloudBase; ctx.globalAlpha=.95; for (const b of blobs){ ctx.beginPath(); ctx.arc(x+b[0]*s,y+b[1]*s,b[2]*s,0,Math.PI*2); ctx.fill(); }
+  ctx.fillStyle=PAL.cloudLit; ctx.globalAlpha=.8*a; for (const b of blobs){ ctx.beginPath(); ctx.arc(x+b[0]*s,y+b[1]*s+3*s,b[2]*s,0,Math.PI*2); ctx.fill(); }
+  ctx.fillStyle=PAL.cloudBase; ctx.globalAlpha=.95*a; for (const b of blobs){ ctx.beginPath(); ctx.arc(x+b[0]*s,y+b[1]*s,b[2]*s,0,Math.PI*2); ctx.fill(); }
   ctx.globalAlpha=1;
 }
+/** The lighthouse beam sweeping round. It burns in fog by day too, and fog turns it into a broad, soft cone. */
 function drawBeam(){
-  const L=SC.lamp; if (!L || PAL.beam<.03) return; ctx.save(); ctx.globalAlpha=PAL.beam; const a=S.time*.8, d=Math.cos(a), flash=Math.max(0,1-Math.abs(d)*3.5);
-  const len=W*.42*Math.abs(d), dir=d>0?1:-1;
-  if (len>4){ const g=ctx.createLinearGradient(L.x,L.y,L.x+dir*len,L.y); g.addColorStop(0,'rgba(255,228,170,.32)'); g.addColorStop(1,'rgba(255,228,170,0)');
-    ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(L.x,L.y-1.5); ctx.lineTo(L.x+dir*len,L.y-9); ctx.lineTo(L.x+dir*len,L.y+7); ctx.lineTo(L.x,L.y+1.5); ctx.closePath(); ctx.fill(); }
-  const r=5+flash*12; const hg=ctx.createRadialGradient(L.x,L.y,0,L.x,L.y,r); hg.addColorStop(0,'rgba(255,236,190,'+(.55+flash*.45).toFixed(2)+')'); hg.addColorStop(1,'rgba(255,236,190,0)');
+  const L=SC.lamp, fog=wxLook().fog, on=Math.max(PAL.beam,fog*.85); if (!L || on<.03) return; ctx.save(); ctx.globalAlpha=on; const a=S.time*.8, d=Math.cos(a), flash=Math.max(0,1-Math.abs(d)*3.5);
+  const len=W*.42*Math.abs(d)*(1+fog*.35), dir=d>0?1:-1, up=9+fog*14, dn=7+fog*12;
+  if (len>4){ const g=ctx.createLinearGradient(L.x,L.y,L.x+dir*len,L.y); g.addColorStop(0,'rgba(255,228,170,'+(.32-fog*.08).toFixed(3)+')'); g.addColorStop(1,'rgba(255,228,170,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(L.x,L.y-1.5); ctx.lineTo(L.x+dir*len,L.y-up); ctx.lineTo(L.x+dir*len,L.y+dn); ctx.lineTo(L.x,L.y+1.5); ctx.closePath(); ctx.fill(); }
+  const r=5+flash*12+fog*9; const hg=ctx.createRadialGradient(L.x,L.y,0,L.x,L.y,r); hg.addColorStop(0,'rgba(255,236,190,'+(.55+flash*.45).toFixed(2)+')'); hg.addColorStop(1,'rgba(255,236,190,0)');
   ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(L.x,L.y,r,0,Math.PI*2); ctx.fill(); ctx.restore();
 }
 function drawBirds(){
@@ -4639,7 +5003,7 @@ function drawWater(){
     ctx.fillStyle='rgba(255,240,210,'+a.toFixed(3)+')'; ctx.beginPath(); ctx.moveTo(x,y-r); ctx.lineTo(x+r*.3,y); ctx.lineTo(x,y+r); ctx.lineTo(x-r*.3,y); ctx.closePath(); ctx.fill();
     ctx.fillRect(x-r,y-.4,r*2,.8);
   }
-  drawLucky();
+  drawWxWater(); drawLucky();
   if (SC.jump){ const j=SC.jump, u=j.t/j.dur, k=sc(j.y), hgt=Math.sin(Math.PI*u)*26*k;
     ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
 }
@@ -4777,7 +5141,7 @@ function updateScenery(dt){
   if (SC.nextBirds<=0 && PAL.dark>.3) SC.nextBirds=4;
   if (SC.nextBirds<=0){ const dir=Math.random()<.5?1:-1, n=2+Math.floor(Math.random()*4), m=[];
     for (let i=0;i<n;i++) m.push({dx:i*11+rand(-2,2), dy:(i%2?1:-1)*Math.ceil(i/2)*5+rand(-1,1), ph:rand(0,6.28), s:rand(4.5,6.5)});
-    SC.birds.push({x:dir>0?-30:W+30, y:rand(HZ*.15,HZ*.62), dir, sp:rand(22,34), members:m, dropAt:(!SC.lucky && !SC.gull && !S.tut && Math.random()<.45)?rand(W*.25,W*.75):null}); SC.nextBirds=REG()==='coast'?rand(5,10):rand(9,18); }
+    SC.birds.push({x:dir>0?-30:W+30, y:rand(HZ*.15,HZ*.62), dir, sp:rand(22,34), members:m, dropAt:(!SC.lucky && !SC.gull && !S.tut && Math.random()<.45 && gullWeather())?rand(W*.25,W*.75):null}); SC.nextBirds=(REG()==='coast'?rand(5,10):rand(9,18))*(gullWeather()?1:3); }
   for (const f of SC.birds){ f.x+=f.dir*f.sp*dt;
     // a gull drops out to make a Gull Luck splash, but never during a treasure moment
     if (f.dropAt!=null && f.members.length>1 && S.state!=='loot' && (f.dir>0?f.x>=f.dropAt:f.x<=f.dropAt)){ const m=f.members.pop(); f.dropAt=null;
@@ -4813,12 +5177,14 @@ function updateScenery(dt){
   else { f.t-=dt; if (f.croak>0) f.croak-=dt;
     if (f.t<=0){ if (Math.random()<.5){ let to=Math.floor(Math.random()*SC.pads[0].length); if (to===f.pad) to=(to+1)%SC.pads[0].length; f.hop={from:f.pad,to,t:0}; }
       else f.croak=.9; f.t=rand(4,9); } }
-  if (OTT.sayT>0) OTT.sayT-=dt; else { OTT.next-=dt; if (OTT.next<=0 && S.state==='idle'){ OTT.say=OTT_LINES[Math.floor(Math.random()*OTT_LINES.length)]; OTT.sayT=4.5; OTT.next=rand(20,35); } }
+  if (OTT.sayT>0) OTT.sayT-=dt; else { OTT.next-=dt; if (OTT.next<=0 && S.state==='idle'){ const wl=WX_LINES[wxNow()], L=wl && Math.random()<.5 ? wl : OTT_LINES;   // half the time, something about the weather
+    OTT.say=L[Math.floor(Math.random()*L.length)]; OTT.sayT=4.5; OTT.next=rand(20,35); } }
   const h=SC.heron; h.t-=dt; if (h.t<=0){ h.dir*=-1; h.t=rand(2.5,7); }
   for (const d of SC.dfly){
     if (!d.ready){ d.x=Math.random()<.5?W*.1:W*.9; d.y=H*.62; d.tx=d.x; d.ty=d.y; d.ready=true; }
     d.hold-=dt;
-    if (d.hold<=0){ const L=Math.random()<.5; d.tx=L?rand(W*.03,W*.28):rand(W*.74,W*.97); d.ty=rand(H*.5,H*.78); d.hold=rand(1.2,3); }
+    if (wxLook().rain>.4){ d.tx=d.x<W/2?-40:W+40; d.ty=H*.6; d.hold=0; }   // they shelter in the reeds while it rains
+    else if (d.hold<=0){ const L=Math.random()<.5; d.tx=L?rand(W*.03,W*.28):rand(W*.74,W*.97); d.ty=rand(H*.5,H*.78); d.hold=rand(1.2,3); }
     d.x=lerp(d.x,d.tx,Math.min(1,dt*3.2)); d.y=lerp(d.y,d.ty,Math.min(1,dt*3.2));
   }
 }
@@ -5298,6 +5664,7 @@ function drawPlayer(){ const p=G.player, P=anglerPose(), C=ANG_COL, c=ctx;
   c.fillStyle=C.hatL; c.globalAlpha=.6; c.beginPath(); c.ellipse(-6,-8,2,3.6,.3,0,Math.PI*2); c.fill(); c.globalAlpha=1;
   c.fillStyle=BRASS; c.beginPath(); c.moveTo(-10.2,-2.2); c.quadraticCurveTo(0,0,10.2,-2.2); c.lineTo(10.1,.2); c.quadraticCurveTo(0,2.6,-10.1,.2); c.closePath(); c.fill(); c.strokeStyle=INK; c.lineWidth=1; c.stroke();
   c.save(); c.translate(7.6,-1.6); c.rotate(-.9+Math.sin(S.time*2.2)*.06); c.fillStyle='#C0392B'; c.beginPath(); c.ellipse(0,-3,1.4,3.4,0,0,Math.PI*2); c.fill(); c.fillStyle='#F3EAD7'; c.beginPath(); c.ellipse(1.2,-2.4,.9,2.6,.3,0,Math.PI*2); c.fill(); c.restore();
+  wxDrips(c);   // rain running off the brim (game/weather-art.js)
   c.restore();
   c.restore(); }
 /** Where the rod's grip and reel sit this frame: the grip runs down from the rod's base toward the chest. */
@@ -5327,7 +5694,7 @@ function drawActive(){
   if ((S.state==='waiting'||S.state==='bite') && S.wait && S.wait.sh){
     const sh=S.wait.sh, F=FISH[S.wait.fish];
     ctx.save(); ctx.translate(sh.x,sh.y); ctx.rotate(sh.ang); ctx.scale(1,.55);
-    drawFish(ctx,S.wait.fish,F.len*sc(sh.y),true,sh.alpha*.9,Math.sin(S.time*(S.wait.phase==='nibble'?9:6))); ctx.restore();
+    drawFish(ctx,S.wait.fish,F.len*sc(sh.y),true,sh.alpha*.9*fogVis(sh.x,sh.y),Math.sin(S.time*(S.wait.phase==='nibble'?9:6))); ctx.restore();   // fog hides it in the far water
     if (modFlag('reveal') && F.rarity!=='common' && S.wait.phase!=='empty'){ const a=(.5+.5*Math.sin(S.time*6))*sh.alpha; ctx.strokeStyle=RAR[F.rarity].color; ctx.globalAlpha=a; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(sh.x,sh.y,F.len*.55*sc(sh.y),F.len*.22*sc(sh.y),0,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1; }
     if (S.wait.fish==='lantern'){ ctx.save(); ctx.globalCompositeOperation='lighter'; for (let i=0;i<3;i++){ const gx=sh.x+Math.cos(sh.ang)*(6-i*7)*sc(sh.y), gy=sh.y+Math.sin(sh.ang)*(6-i*7)*sc(sh.y)*.55; ctx.fillStyle='rgba(255,220,140,'+(.35*sh.alpha*(.6+.4*Math.sin(S.time*3+i))).toFixed(3)+')'; ctx.beginPath(); ctx.arc(gx,gy,3*sc(sh.y),0,Math.PI*2); ctx.fill(); } ctx.restore(); }
   }
@@ -5344,16 +5711,18 @@ function drawActive(){
       ctx.font='800 15px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=PAPER; ctx.fillText('TAP',R.x,R.y-hgt-30-ring*16);
     } else {
       ctx.save(); ctx.translate(R.x,R.y); ctx.rotate(Math.atan2(R.from.y-R.y, (R.from.x-R.x)+R.dir*40)+Math.PI); ctx.scale(1,.55);
-      const k=diving?.7:1; drawFish(ctx,R.id,F.len*sc(R.y)*k,true,diving?.95:.8,Math.sin(S.time*14)); ctx.restore();
+      const k=diving?.7:1; drawFish(ctx,R.id,F.len*sc(R.y)*k,true,(diving?.95:.8)*ghostA(R),Math.sin(S.time*14)); ctx.restore();
       if (diving && R.dive>0){ for (let i=0;i<2;i++) if (Math.random()<.3) S.particles.push({x:R.x+rand(-6,6),y:R.y,vx:0,vy:-rand(10,30),g:-20,life:0,max:.6,r:rand(1.5,3),c:'rgba(225,238,242,'}); }
     }
   }
 }
+/** How much of a ghost shows mid-fight: it melts away as it fades, stays all but gone, and firms up as it surfaces. */
+function ghostA(R){ if (!(R.fade>0)) return 1; const e=Math.min(GHOST_FADE-R.fade,R.fade); return Math.max(.05,1-e/.3); }
 function drawBobber(){
   if (!S.bob || !(S.state==='waiting'||S.state==='bite')) return;
   const b=S.bob, k=sc(b.y), dt=1/60;
-  b.dip*=.94; b.jerk*=.88; b.nibble=Math.max(0,b.nibble-dt*4);
-  const bobY=Math.sin(S.time*2.4)*1.5 + b.dip*4 + b.nibble*5 + (S.state==='bite'?7*k:0);
+  b.dip*=.94; b.jerk*=.88; b.nibble=Math.max(0,b.nibble-dt*4); b.rd=(b.rd||0)*.86;   // rd: a raindrop landing on it (game/weather-art.js)
+  const bobY=Math.sin(S.time*2.4)*1.5 + b.dip*4 + b.nibble*5 + b.rd*2.4 + (S.state==='bite'?7*k:0);
   const x=b.x - b.jerk*6*k, y=b.y+bobY, r=6*k;
   ctx.fillStyle='rgba(10,26,34,.3)'; ctx.beginPath(); ctx.ellipse(b.x,b.y+2,r*1.6,r*.5,0,0,Math.PI*2); ctx.fill();
   ctx.save(); ctx.beginPath(); ctx.rect(x-r*2,y-r*4,r*4,r*4+ (S.state==='bite'?-r*.2:r*.35)+ (b.y-y)); ctx.clip();
@@ -5456,10 +5825,10 @@ function drawGauge(){
   ctx.fillStyle='rgba(20,26,38,.55)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(cx-tw-26,cy-46,tw*2+52,82,18) : ctx.rect(cx-tw-26,cy-46,tw*2+52,82); ctx.fill();
   ctx.lineCap='round'; ctx.strokeStyle='rgba(243,234,215,.18)'; ctx.lineWidth=6; ctx.beginPath(); ctx.moveTo(cx-tw,cy); ctx.lineTo(cx+tw,cy); ctx.stroke();
   const fx=cx+R.dir*tw, tx=cx+S.tilt*tw, m=Math.abs(S.tilt-R.dir)/1.3;
-  ctx.strokeStyle=m<.2?'rgba(127,176,105,.9)':'rgba(217,97,76,'+(.35+.5*Math.min(1,m)).toFixed(2)+')';
-  ctx.beginPath(); ctx.moveTo(tx,cy); ctx.lineTo(fx,cy); ctx.stroke();
-  ctx.save(); ctx.translate(fx,cy-26); ctx.fillStyle=RAR[R.F.rarity].color; ctx.beginPath(); ctx.moveTo(0,10); ctx.lineTo(-7,0); ctx.lineTo(7,0); ctx.closePath(); ctx.fill(); ctx.restore();
-  ctx.font='800 10.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='rgba(243,234,215,.7)'; ctx.fillText(R.loot?'HAUL':'FISH',fx,cy-30);
+  if (!(R.fade>0)){ ctx.strokeStyle=m<.2?'rgba(127,176,105,.9)':'rgba(217,97,76,'+(.35+.5*Math.min(1,m)).toFixed(2)+')';   // a faded ghost gives nothing away here
+    ctx.beginPath(); ctx.moveTo(tx,cy); ctx.lineTo(fx,cy); ctx.stroke(); }
+  const ga=ghostA(R); ctx.save(); ctx.globalAlpha=ga; ctx.translate(fx,cy-26); ctx.fillStyle=RAR[R.F.rarity].color; ctx.beginPath(); ctx.moveTo(0,10); ctx.lineTo(-7,0); ctx.lineTo(7,0); ctx.closePath(); ctx.fill(); ctx.restore();
+  ctx.font='800 10.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='rgba(243,234,215,'+(.7*ga).toFixed(3)+')'; ctx.fillText(R.loot?'HAUL':'FISH',fx,cy-30);
   const T=R.tension, col=T>.82?DANGER:T>.55?BRASS:GOOD, rr=17;
   ctx.fillStyle=S.holding?'rgba(243,234,215,.95)':'rgba(243,234,215,.25)'; ctx.beginPath(); ctx.arc(tx,cy,rr-5,0,Math.PI*2); ctx.fill();
   ctx.strokeStyle='rgba(243,234,215,.25)'; ctx.lineWidth=5; ctx.beginPath(); ctx.arc(tx,cy,rr,0,Math.PI*2); ctx.stroke();
@@ -5468,10 +5837,11 @@ function drawGauge(){
   ctx.fillStyle='rgba(243,234,215,.15)'; ctx.fillRect(cx-tw,cy+22,tw*2,4);
   ctx.fillStyle=PAPER; ctx.fillRect(cx-tw,cy+22,tw*2*(1-R.dist),4);
   const off=Math.abs(S.tilt-R.dir)>.32;
-  if (!off){ ctx.strokeStyle='rgba(127,176,105,.55)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(tx,cy,rr+7,0,Math.PI*2); ctx.stroke(); }
+  if (!off && !(R.fade>0)){ ctx.strokeStyle='rgba(127,176,105,.55)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(tx,cy,rr+7,0,Math.PI*2); ctx.stroke(); }
   let label=!S.holding?'PRESS & HOLD TO REEL':off?(R.dir>S.tilt?'SLIDE RIGHT ▶':'◀ SLIDE LEFT'):'ON IT · KEEP HOLDING', lc=off&&S.holding?'#F5D08A':'rgba(243,234,215,.9)';
   if (diving){ label=R.loot?(R.warn>0?'CATCHING ON THE BOTTOM · LET GO':'SNAGGED · LET GO'):R.warn>0?'DIVE INCOMING · LET GO':'DIVING · LET GO'; lc='#F5D08A'; }
   else if (R.jump){ label='TAP NOW'; lc='#F5D08A'; }
+  else if (R.fade>0){ label='IT FADED · FOLLOW THE LINE'; lc='#D9DEE6'; }
   else if (swellNear(R.y,95)){ label='SWELL COMING · EASE OFF'; lc='#F5D08A'; }
   else if (R.tug){ label='TUG · LET GO'; lc='#F5D08A'; }
   else if (R.F.beh==='tugger' && S.holding){ label='REEL BETWEEN TUGS'; lc='#CFE7B9'; }
@@ -5492,8 +5862,8 @@ function render(){
   ctx.save();
   if (S.shake>.1) ctx.translate(rand(-1,1)*S.shake,rand(-1,1)*S.shake);
   if (Math.abs(S.zoom-1)>.001){ const cx=W/2, cy=H*.42; ctx.translate(cx,cy); ctx.scale(S.zoom,S.zoom); ctx.translate(-cx,-cy); }
-  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawTraps(); drawSwell(); drawActive(); drawBobber();
-  drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade();
+  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
+  drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade(); drawRain();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
   drawTrapMarkers(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
   ctx.restore();
@@ -5503,7 +5873,8 @@ function render(){
 /* ---------- Regions ---------- */
 const REG = () => save.region==='coast' && save.boat ? 'coast' : 'lake';
 function spotName(sp){ return REG()==='coast' && sp==='deep' ? 'Dark trench' : SPOT_NAME[sp]; }
-function lakeDone(){ return REGION_FISH.lake.every(id=>(save.fish[id]||{}).caught>0); }
+/** Every lake fish caught, not counting the ones only weather brings up, so Barnaby never waits on the sky. */
+function lakeDone(){ return REGION_FISH.lake.every(id=>FISH[id].wx || (save.fish[id]||{}).caught>0); }
 function hexRGB(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]; }
 function mixP(key,hex,t){ const a=(PAL[key+'R']||'0,0,0').split(',').map(Number), b=hexRGB(hex); return 'rgb('+a.map((v,i)=>Math.round(lerp(v,b[i],t))).join(',')+')'; }
 
@@ -6314,7 +6685,7 @@ function aqBuildBack(){ const W2=AQ.W, H2=AQ.H, b=AQ.box, hood=AQ.hood, st=AQ.st
     if (P.moonVis>.3){ c.fillStyle='rgba(246,241,226,'+P.moonVis.toFixed(2)+')'; c.beginPath(); c.arc(wx+ww*.7,wy+wh*.28,5,0,Math.PI*2); c.fill(); }
     if (P.sunVis>.3 && P.sunY<1){ c.fillStyle='rgba(255,244,214,.9)'; c.beginPath(); c.arc(wx+ww*.3,wy+wh*(.15+P.sunY*.45),6,0,Math.PI*2); c.fill(); }
     c.fillStyle='rgb('+P.hillFarR+')'; c.beginPath(); c.moveTo(wx,wy+wh*.72); c.quadraticCurveTo(wx+ww*.35,wy+wh*.5,wx+ww*.6,wy+wh*.66); c.quadraticCurveTo(wx+ww*.85,wy+wh*.58,wx+ww,wy+wh*.68); c.lineTo(wx+ww,wy+wh); c.lineTo(wx,wy+wh); c.fill();
-    c.fillStyle='rgb('+P.w1R+')'; c.fillRect(wx,wy+wh*.8,ww,wh*.2); c.fillStyle='rgba(255,255,255,.25)'; c.fillRect(wx+ww*.2,wy+wh*.86,ww*.3,1.2); c.restore();
+    c.fillStyle='rgb('+P.w1R+')'; c.fillRect(wx,wy+wh*.8,ww,wh*.2); c.fillStyle='rgba(255,255,255,.25)'; c.fillRect(wx+ww*.2,wy+wh*.86,ww*.3,1.2); paintWxPane(c,wx,wy,ww,wh,P); c.restore();
     c.strokeStyle='#4A3022'; c.lineWidth=4; c.beginPath(); c.moveTo(wx+ww/2,wy); c.lineTo(wx+ww/2,wy+wh); c.moveTo(wx,wy+wh*.5); c.lineTo(wx+ww,wy+wh*.5); c.stroke();
     c.strokeStyle='rgba(255,255,255,.2)'; c.lineWidth=1.5; c.beginPath(); c.moveTo(wx+5,wy+wh*.4); c.lineTo(wx+ww*.3,wy+5); c.stroke();
     aqInk(c,1.6); c.strokeRect(wx-6,wy-6,ww+12,wh+12);
@@ -6685,7 +7056,7 @@ function aqCollect(){ accrueTips(); const tk=tanks()[AQ.tank], n=Math.floor(tk.t
 function aqCard(fi){
   const f=fi.ref, F=FISH[f.id], card=$('aqCard'), netRoom=save.net.length<netCap(), d=f.t?new Date(f.t):null, k=AQ.tank, favs=favorites(k,f.id);
   card.innerHTML='<div class="aq-card-top"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+'</span><button class="x" id="aqX" aria-label="Close">×</button></div>'+
-    '<h3>'+F.name+(isPB(f)?' <span class="net-rec">Record</span>':'')+'</h3><p><b>'+fmtW(fishW(f))+'</b> · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+'</p><p>Caught at '+(f.spot?spotLabel(f.reg,f.spot):REGION_NAME[tankOf(f.id)==='salt'?'coast':'lake'])+(d?' · '+whenLabel(f.t,f.hr):'')+
+    '<h3>'+F.name+(isPB(f)?' <span class="net-rec">Record</span>':'')+'</h3><p><b>'+fmtW(fishW(f))+'</b> · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+'</p><p>Caught at '+(f.spot?spotLabel(f.reg,f.spot):REGION_NAME[tankOf(f.id)==='salt'?'coast':'lake'])+(d?' · '+whenLabel(f.t,f.hr,f.wx):'')+
     (f.perfect?' · perfect hook':'')+(f.lucky?' · Gull luck':'')+'</p><p class="tip">Earns about '+fishTipRate(k,f).toFixed(2)+' coins a minute in tips'+(favs.length?' · loves the '+favs.map(x=>x.name).join(' and '):'')+'</p><p class="lore">'+F.lore+'</p>'+
     '<div class="row"><button class="btn" id="aqToNet"'+(netRoom?'':' disabled')+'>'+(netRoom?'Back to keepnet':'Keepnet full')+'</button><button class="btn" id="aqSell">Sell · +'+f.value+'</button></div>';
   card.hidden=false;
@@ -7201,6 +7572,7 @@ function kRoom(){ // cached wall, window, tiles, shelf and counter
   if (P.sunVis>.3 && P.sunY<1){ c.fillStyle='rgba(255,244,214,.9)'; c.beginPath(); c.arc(wx+ww*.3,wy+wh*(.15+P.sunY*.45),8*s,0,6.28); c.fill(); }
   c.fillStyle='rgb('+P.hillFarR+')'; c.beginPath(); c.moveTo(wx,wy+wh*.72); c.quadraticCurveTo(wx+ww*.35,wy+wh*.52,wx+ww*.6,wy+wh*.68); c.quadraticCurveTo(wx+ww*.85,wy+wh*.6,wx+ww,wy+wh*.7); c.lineTo(wx+ww,wy+wh); c.lineTo(wx,wy+wh); c.fill();
   c.fillStyle='rgb('+P.w1R+')'; c.fillRect(wx,wy+wh*.78,ww,wh*.22); c.fillStyle='rgba(255,255,255,.25)'; c.fillRect(wx+ww*.2,wy+wh*.84,ww*.3,1.5); c.fillRect(wx+ww*.55,wy+wh*.9,ww*.25,1.5);
+  paintWxPane(c,wx,wy,ww,wh,P);   // rain on the glass, or fog beyond it
   c.restore();
   c.strokeStyle='#3B281C'; c.lineWidth=5*s; c.beginPath(); c.moveTo(wx+ww/2,wy); c.lineTo(wx+ww/2,wy+wh); c.moveTo(wx,wy+wh*.5); c.lineTo(wx+ww,wy+wh*.5); c.stroke();
   c.strokeStyle='rgba(255,255,255,.18)'; c.lineWidth=2; c.beginPath(); c.moveTo(wx+6,wy+wh*.42); c.lineTo(wx+ww*.32,wy+6); c.stroke();
@@ -8282,7 +8654,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=20, SNAP_KEY=KEY+'-snapshots';
+const BUILD=21, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -8401,10 +8773,10 @@ if (window.__PWA && 'serviceWorker' in navigator && location.protocol!=='file:')
 let last=performance.now();
 function update(dt,rdt){
   if (S.state==='idle' && save.tutorialDone && save.stats.casts>=12){ S.idleT=(S.idleT||0)+rdt; if (S.idleT>30 && S.idleT-rdt<=30) setHint('Drag back to aim. Release to cast.'); }
-  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt);
+  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt); weatherUpdate(rdt);
   { const nc=save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')); if (nc>=24) save.day=(save.day||0)+1; save.clock=nc%24; } PAL=palAt(save.clock);   // save.day: Wanderer's days
-  { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2) buildBg(); }
-  const ct=hudClock(save.clock); if (ct!==S.clockShown){ const n=(S.clockShown||'').length; S.clockShown=ct; $('clock').textContent=ct; if (ct.length!==n) fitHud(); }
+  { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2 || (S.time-(SC.bgWxT||0)>.5 && (Math.abs(wxBgKey()-(SC.bgWx||0))>(wxInfo().t<1?.1:.005)))) { SC.bgWxT=S.time; buildBg(); } }   // the hour, or the weather, has moved on
+  const ct=hudClock(save.clock); if (ct!==S.clockShown || wxIcon()!==S.wxShown){ const n=(S.clockShown||'').length; S.clockShown=ct; S.wxShown=wxIcon(); setClock(ct); if (ct.length!==n) fitHud(); }
   for (const p of S.particles){ p.life+=dt;
     if (p.home && p.life>p.home.d){ const k=Math.min(1,dt*7); p.x=lerp(p.x,p.home.x,k); p.y=lerp(p.y,p.home.y,k); if (Math.abs(p.x-p.home.x)+Math.abs(p.y-p.home.y)<8) p.life=p.max; }   // Glimmer motes fly home to the chip
     else { if (p.home){ p.vx*=1-dt*2.5; p.vy*=1-dt*2.5; } p.vy+=p.g*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; } }
@@ -8471,7 +8843,10 @@ function openSheet(html){ $('panel').innerHTML=html; $('sheet').hidden=false; ov
 function closeSheet(){ if ($('sheet').hidden) return; $('sheet').hidden=true; ovClosed('sheet'); }
 $('sheet').addEventListener('pointerdown',e=>{ if (e.target.id==='sheet') closeSheet(); });
 $('mapBtn').addEventListener('click',()=>{ audioInit(); showMap(); });
-{ let lp=0; $('clock').addEventListener('pointerdown',()=>{ clearTimeout(lp); lp=setTimeout(()=>{ buzz(15); $('labBtn').click(); },650); }); ['pointerup','pointercancel','pointerleave'].forEach(ev=>$('clock').addEventListener(ev,()=>clearTimeout(lp))); }
+// the clock: a tap says what the weather is doing to the fishing; a long press opens Playtest
+{ let lp=0, long=false; $('clock').addEventListener('pointerdown',()=>{ clearTimeout(lp); long=false; lp=setTimeout(()=>{ long=true; buzz(15); $('labBtn').click(); },650); }); ['pointerup','pointercancel','pointerleave'].forEach(ev=>$('clock').addEventListener(ev,()=>clearTimeout(lp)));
+  $('clock').addEventListener('click',e=>{ e.stopPropagation(); if (long){ long=false; return; } if (S.state==='loot' || INTRO.active) return; audioInit(); tone(900,.04,{vol:.04,type:'triangle'}); news(wxLine(),''); });
+  $('clock').addEventListener('keydown',e=>{ if (e.key==='Enter'||e.key===' '){ e.preventDefault(); $('clock').click(); } }); }   // a button for keyboards too; its label says the time and the weather
 $('phoneBtn').addEventListener('click',()=>openPhone());
 $('aquaBtn').addEventListener('click',()=>{ $('aquaBtn').classList.remove('pulse'); openAquarium(); });
 $('kitchenBtn').addEventListener('click',()=>{ $('kitchenBtn').classList.remove('pulse'); openKitchen(); });
@@ -8479,7 +8854,7 @@ $('mealChip').addEventListener('click',()=>{ const m=save.meal; if (!m) return; 
 $('journalBtn').addEventListener('click',()=>{ $('journalBtn').classList.remove('pulse'); openJournal(); });
 
 /* ---------- Bonuses: the journal page that shows every bonus and where it comes from ---------- */
-const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', event:'Event'};
+const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', event:'Event', weather:'Weather'};
 /** How a modifier reads: +35 luck, +25%, −30%, ×2.5. Each stat keeps one unit. */
 function modValueText(stat,v,omen){
   if (omen) return '×'+trimNum(v);
@@ -8500,6 +8875,7 @@ function modWhenText(w){
   if (w.spot) out.push(spotIn(w.spot,w.region||REG()));
   else if (w.region) out.push('at '+REGION_NAME[w.region]);
   if (w.night) out.push('at night'); else if (w.night===false) out.push('by day');
+  if (w.wx) out.push(wxOnText(w.wx));
   if (w.lucky) out.push('while you fish a lucky splash');
   if (w.rarity) out.push('for '+w.rarity.map(r=>RAR[r].label.toLowerCase()).join(' and ')+' fish');
   if (w.rarityMin) out.push(w.rarityMin===Object.keys(RAR)[1]?'for every fish above common':'for '+RAR[w.rarityMin].label.toLowerCase()+' fish and rarer');
@@ -8508,12 +8884,15 @@ function modWhenText(w){
   if (w.wander) out.push('on the day’s first '+ENCH.wanderer.first+' catches in each water');
   return out.join(', ');
 }
+/** A weather condition in words: "in the rain", "in rain and fog". */
+function wxOnText(wx){ const L=[].concat(wx); return L.length===1?WX[L[0]].on:'in '+L.map(k=>WX[k].name.toLowerCase()).join(' and '); }
 /** 'on' applies wherever you cast right now; 'cond' depends on where you cast or what bites; 'off-here' and
     'off-now' can't apply in this water or at this hour. Pass a rarity in `now` to settle rarity conditions too. */
 function modState(m,now){ const w=m.when; if (!w) return 'on';
   const spots=Object.keys(now.region==='coast'?POOLS_COAST:POOLS);
   if ((w.region && w.region!==now.region) || (w.spot && !spots.includes(w.spot))) return 'off-here';
   if ((w.night && !now.night) || (w.night===false && now.night)) return 'off-now';
+  if (w.wx && ![].concat(w.wx).includes(now.wx)) return 'off-now';
   if (now.rarity && ((w.rarity && !w.rarity.includes(now.rarity)) || (w.rarityMin && rarRank(now.rarity)<rarRank(w.rarityMin)))) return 'off-here';
   const open=w.spot||w.fish||w.beh||w.lucky||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
   return open ? 'cond' : 'on'; }
@@ -8523,7 +8902,7 @@ const stateNote=st=>st==='off-here'?' · not here':st==='off-now'?' · not now':
 const fishTiers = () => Object.keys(RAR).filter(r=>RAR[r].luckCap && Object.values(FISH).some(F=>F.rarity===r));
 function bonusesHTML(){
   const now=modCtx({}), all=modList().filter(m=>m.src!=='tune' && m.src!=='base'), R=ROD();
-  const where='At '+REGION_NAME[now.region]+(now.night?', at night':', by day');
+  const where='At '+REGION_NAME[now.region]+(now.night?', at night':', by day')+(now.wx==='clear'?'':', '+WX[now.wx].on);
   // gear: what you're carrying
   const sets=setsDone(), parts=(save.parts||[]).map(id=>PARTS[id]&&PARTS[id].name).filter(Boolean), meal=save.meal;
   const reach=castReach(), gear=[['Rod',R.name+(reach>=1?' · casts to the horizon':' · casts '+Math.round(reach*100)+'% of the way out')],
@@ -8918,7 +9297,7 @@ $('bagBtn').addEventListener('click',()=>{ $('bagBtn').classList.remove('pulse')
 /* ---------- Journal: species pages, personal records, finds (game/finds.js) and bonuses ---------- */
 let JTAB='species';
 function recWhere(pb){ if (!pb) return ''; if (!pb.t) return 'Caught before the tape measure, at '+(REGION_NAME[pb.reg]||'the lake');
-  return spotLabel(pb.reg,pb.spot)+' · '+whenLabel(pb.t,pb.hr)+(pb.rod&&RODS[pb.rod]?' · '+RODS[pb.rod].name:''); }
+  return spotLabel(pb.reg,pb.spot)+' · '+whenLabel(pb.t,pb.hr,pb.wx)+(pb.rod&&RODS[pb.rod]?' · '+RODS[pb.rod].name:''); }
 function recBar(id,len){ const F=FISH[id], k=sizePct(id,len);
   return '<div class="rbar"><b style="width:'+Math.round(k*100)+'%"></b><i style="left:'+Math.round(k*100)+'%"></i></div><div class="rlab"><span>'+fmtLen(F.size[0])+'</span><span>'+(k>=.95?'Top of the range':'Range')+'</span><span>'+fmtLen(F.size[1])+'</span></div>'; }
 function drawPlaque(x,id,w,h){ const F=FISH[id], pw=Math.min(w*.86,330), ph=h*.94;
@@ -9090,6 +9469,8 @@ function openTrapShop(){ const s=trapState();
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
    Tackle counts (reel, line and bait, through the same modifiers); bait never runs out in a run. So do runes:
    Wanderer's days turn over every 24 minutes of play, and after an Echo the player casts back to its spot.
+   The weather is pinned for a run (st.wx, clear unless named): its bite speed, its fish, and ghosts fading mid-fight
+   count; fog hiding shadows and raindrops muddling nibbles don't, since the player here reacts to the bite itself.
    Not modeled: aiming (every cast reaches its spot), keeping fish (every catch sells), the aquarium, the
    kitchen, Barnaby or the mail boat, and the clock (an artifact that speeds or stops time doesn't change the
    hour of a run). The setup lives in a stand-in save for the run, then the real save
@@ -9139,13 +9520,15 @@ function simSave(st){
   if (st.enchSave) s.ench=JSON.parse(JSON.stringify(st.enchSave));
   else { const ids=(st.ench||[]).filter(id=>ENCH[id]).slice(0,RODS[s.rod].ench||1); s.ench={own:Object.fromEntries(ids.map(id=>[id,1])), rig:{[s.rod]:ids}}; }
   s.glimmer=0; s.day=0; s.wander=null;
+  s.wx={seed:7, force:WX_ORDER.includes(st.wx)?st.wx:'clear', seen:{}};      // the weather is pinned for a run: clear unless named
   return s;
 }
 /** Plays one fight (a fish or a haul) through the game's fight step, the way player P would. Returns {end, ft, why}. */
 function simFight(R,P,reg,io,fc){
   const dt=1/60; let ft=0, end=null, easeAt=null, easeUntil=0, swellT=reg==='coast'?rand(0,7.5):Infinity;
   const plan={}; io.tilt=0; io.why='';
-  io.steer=(R,dt)=>R.fam?lerp(io.tilt,R.dir,Math.min(1,dt*8)):lerp(io.tilt,R.dir+Math.sin(ft*1.7)*.12,Math.min(1,dt*P.track));
+  // a faded ghost can only be followed by its line, so the player tracks it more slowly and less surely
+  io.steer=(R,dt)=>R.fam?lerp(io.tilt,R.dir,Math.min(1,dt*8)):R.fade>0?lerp(io.tilt,R.dir+Math.sin(ft*1.3)*.3,Math.min(1,dt*P.track*.4)):lerp(io.tilt,R.dir+Math.sin(ft*1.7)*.12,Math.min(1,dt*P.track));
   while (!end && ft<150){
     ft+=dt; io.t=ft; io.ev.length=0;
     if (R.jump && !plan.jumpSet){ plan.jumpSet=true; plan.jump=Math.random()<P.jumps; } if (!R.jump) plan.jumpSet=false;
@@ -9360,7 +9743,8 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   openSheet(head+
     '<div class="stats"><div><b>'+s.casts+'</b><span>Casts</span></div><div><b>'+s.catches+'</b><span>Catches</span></div><div><b>'+rate+'%</b><span>Land rate</span></div><div><b>'+s.perfect+'</b><span>Perfect hooks</span></div><div><b>'+s.escapes+'</b><span>Got away</span></div><div><b>'+s.snaps+'</b><span>Snapped</span></div></div>'+
     '<div class="tune">'+sl('tHook','Hook window',t.hook,'Higher is more forgiving when the bobber plunges.')+sl('tTension','Tension build',t.tension,'Higher makes the line strain faster while reeling.')+sl('tWait','Bite wait',t.wait,'Higher means longer quiet time before a fish shows up.')+
-    '<label for="tClock">Time of day<output id="tClockO">'+clockText(save.clock)+'</output><input type="range" id="tClock" min="0" max="23.75" step="0.25" value="'+save.clock.toFixed(2)+'"><span class="note" style="grid-column:1/-1;margin:0">One in-game hour passes every real minute. Lantern Carp only rise at night; the Mayor favors dawn.</span></label>'+
+    '<label for="tClock">Time of day<output id="tClockO">'+clockText(save.clock)+'</output><input type="range" id="tClock" min="0" max="23.75" step="0.25" value="'+save.clock.toFixed(2)+'"><span class="note" style="grid-column:1/-1;margin:0">One in-game hour passes every real minute. Lantern Carp only rise at night (or in fog); the Mayor favors dawn.</span></label>'+
+    '<label for="tWx">Weather<output id="tWxO">'+(wxState().force?WX[wxState().force].name+' (pinned)':WX[wxNow()].name)+'</output><select id="tWx"><option value="">As the sky has it</option>'+WX_ORDER.map(k=>'<option value="'+k+'"'+(wxState().force===k?' selected':'')+'>'+WX[k].name+', pinned</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Each water has its own weather, turning every few in-game hours. Pinning holds it here and at the coast until you set it back.</span></label>'+
     '<label for="tLoot">Next cast pulls up<output id="tLootO">'+(TREASURE_CTL.force?lootName(TREASURE_CTL.force):'A fish')+'</output><select id="tLoot"><option value="">A fish, as usual</option>'+
       [['pouch','A coin pouch'],['geode','A Glimmer geode'],['bottle','A message bottle'],['letter','A drowned letter'],['find','A find']].concat(LOOT_TIERS.map(t=>['crate:'+t,aOrAn(CRATES[t].name.toLowerCase())])).map(([v,l])=>'<option value="'+v+'">'+l+'</option>').join('')+
       '</select><span class="note" style="grid-column:1/-1;margin:0">Treasure turns up on its own about once in 12 casts. This picks the next one, so you can see every crate open.</span></label></div>'+
@@ -9369,6 +9753,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   bindPlaytestTabs();
   [['tHook','hook'],['tTension','tension'],['tWait','wait']].forEach(([id,k])=>{ $(id).addEventListener('input',e=>{ save.tune[k]=+e.target.value; $(id+'O').textContent=(+e.target.value).toFixed(2)+'×'; persist(); }); });
   $('tClock').addEventListener('input',e=>{ save.clock=+e.target.value; $('tClockO').textContent=clockText(save.clock); buildBg(); persist(); });
+  $('tWx').addEventListener('change',e=>{ const w=wxState(); if (e.target.value) w.force=e.target.value; else delete w.force; persist(); WXT.kind=null; buildBg(); $('tWxO').textContent=w.force?WX[w.force].name+' (pinned)':WX[wxNow()].name; });
   $('coinBtn').addEventListener('click',()=>{ addCoins(1000); });
   // traps, the smoke rack and the clock all move on an hour, as if you'd been away (game/away.js)
   $('hourBtn').addEventListener('click',()=>{ const ms=3600000; trapGiftCheck(); for (const T of trapState().list) T.t-=ms; smokeTick(); for (const h of smokeState().hooks) if (h) h.t-=ms;

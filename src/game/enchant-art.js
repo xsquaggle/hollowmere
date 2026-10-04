@@ -15,6 +15,8 @@ const RUNE_GLYPH={
     c.moveTo(.3,-.06); c.lineTo(.38,-.14); },
   wanderer(c){ c.moveTo(0,-.8); c.lineTo(.17,-.17); c.lineTo(.8,0); c.lineTo(.17,.17); c.lineTo(0,.8); c.lineTo(-.17,.17); c.lineTo(-.8,0); c.lineTo(-.17,-.17); c.closePath();
     c.moveTo(.11,0); c.arc(0,0,.11,0,Math.PI*2); },
+  storm(c){ c.moveTo(-.7,-.12); c.bezierCurveTo(-.3,-.12,-.08,-.7,.22,-.5); c.bezierCurveTo(.5,-.3,.2,.08,-.08,-.12); c.bezierCurveTo(-.3,-.3,.1,-.62,.36,-.3); c.quadraticCurveTo(.5,-.12,.72,-.12);
+    for (const [x,y] of [[-.46,.18],[-.08,.12],[.3,.18],[-.28,.48],[.1,.44],[.48,.48]]){ c.moveTo(x+.07,y); c.lineTo(x-.03,y+.2); } },
   echo(c){ c.moveTo(-.12,0); c.quadraticCurveTo(-.36,-.24,-.62,0); c.quadraticCurveTo(-.36,.24,-.12,0); c.moveTo(-.62,0); c.lineTo(-.82,-.14); c.lineTo(-.82,.14); c.closePath();
     c.moveTo(.16,-.36); c.quadraticCurveTo(.34,0,.16,.36); c.moveTo(.38,-.58); c.quadraticCurveTo(.66,0,.38,.58); }
 };

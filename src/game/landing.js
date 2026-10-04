@@ -12,7 +12,7 @@ function startLand(){
   const eaten=!S.tut && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
   const wander=S.tut||eaten?0:wanderCount(REG());   // Wanderer: the day's first catches in this water
   const {size,build,w:wgt,value}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky,wander:!!wander});
-  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0,eaten,wander};
+  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,wx:wxNow(),rod:save.rod,value,burst:false,isNew:rec(R.id).caught===0,eaten,wander};
   // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast
   if (R.perfect && !S.tut && !eaten && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
@@ -48,7 +48,7 @@ function showCard(){
   save.stats.landed=(save.stats.landed||0)+L.w; if (L.stars===3) save.stats.trophies=(save.stats.trophies||0)+1;
   L.pbBeat=!L.isNew && !!L.prev && L.w>prevW; L.pbGlim=L.pbBeat?(GLIMMER.record[F.rarity]||2):0;   // records pay Glimmer, kept now and counted up at the stamp
   if (L.pbGlim){ save.glimmer=(save.glimmer||0)+L.pbGlim; save.stats.glimmer=(save.stats.glimmer||0)+L.pbGlim; }
-  if (L.isNew || L.w>prevW){ r.bw=L.w; r.pb={size:L.size,w:L.w,stars:L.stars,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod,perfect:!!L.perfect}; }
+  if (L.isNew || L.w>prevW){ r.bw=L.w; r.pb={size:L.size,w:L.w,stars:L.stars,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,wx:L.wx,rod:L.rod,perfect:!!L.perfect}; }
   if (L.pbBeat) save.stats.pbs=(save.stats.pbs||0)+1;
   L.pbMinor=L.pbBeat && (L.w-L.prev.w)/Math.max(1,L.prev.w)<.1 && F.rarity!=='legendary' && L.stars<3;
   persist();
@@ -57,6 +57,7 @@ function showCard(){
   $('cRarity').textContent=RAR[F.rarity].label; $('cNew').hidden=!L.isNew;
   $('cName').textContent=F.name; $('cSize').textContent=fmtLen(L.size); $('cW').textContent=fmtW(L.w); $('cQ').innerHTML=starsHTML(L.stars,'pop'); $('cValue').textContent='+'+L.value; $('cBeh').textContent=BEH[F.beh];
   const tags=[]; if (L.lucky) tags.push('Gull luck '+trimNum(gullMul())+'×'); if (L.perfect) tags.push('Perfect hook +25%'); if (L.build>=1.1) tags.push('Chunky');
+  if (L.wx==='rain'||L.wx==='fog') tags.push('Caught '+WX[L.wx].on);
   if (L.isNew && save.kitchenOpen){ const rid=recipeLearnedBy(L.id); if (rid) tags.push('New recipe: '+RECIPES[rid].name); }
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
   const ord=!L.needFor && orderShort(L.id); L.orderFor=ord&&ord.n>0?ord.T:null; if (L.orderFor && !L.isNew) tags.push('For '+TOWNSFOLK[L.orderFor.who].name+'’s supper order');
@@ -64,7 +65,8 @@ function showCard(){
   $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]);
   // runes that did something for this catch
   const runes=[]; if (L.wander) runes.push(runeTag('wanderer','Wanderer ×2 · '+L.wander+' of '+ENCH.wanderer.first)); if (L.echo) runes.push(runeTag('echo','Echo: another waits here'));
-  if (enchOn('deep') && rarRank(F.rarity)>=rarRank('rare')) runes.push(runeTag('deep','Lure of the Deep')); if (enchOn('nightglass') && F.night && isNight(L.hr)) runes.push(runeTag('nightglass','Nightglass'));
+  if (enchOn('deep') && rarRank(F.rarity)>=rarRank('rare')) runes.push(runeTag('deep','Lure of the Deep')); if (enchOn('nightglass') && ((F.night && isNight(L.hr)) || (F.wx==='fog' && L.wx==='fog'))) runes.push(runeTag('nightglass','Nightglass'));
+  if (enchOn('storm') && L.wx==='rain') runes.push(runeTag('storm','Storm Knot +60%'));
   if (runes.length){ $('cTags').insertAdjacentHTML('afterbegin',runes.join('')); if (L.echo) setTimeout(()=>sfx.echo(),500); }
   $('cLore').textContent=L.isNew||F.rarity!=='common' ? F.lore : '';
   $('cLore').hidden=!$('cLore').textContent;
@@ -91,8 +93,8 @@ function dismissCard(action){
   if (action==='tank' && !tankRoom(L.id)) action=save.net.length<netCap()?'keep':'sell';
   card.classList.add('out'); setTimeout(()=>{ card.hidden=true; card.classList.remove('out'); },250);
   if (action==='sell') addCoins(L.value);
-  else if (action==='tank'){ addToTank({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod}); sfx.plop(); news('Off to the aquarium','good'); }
-  else { save.net.push({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,rod:L.rod}); persist();
+  else if (action==='tank'){ addToTank({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,wx:L.wx,rod:L.rod}); sfx.plop(); news('Off to the aquarium','good'); }
+  else { save.net.push({id:L.id,size:L.size,w:L.w,stars:L.stars,value:L.value,perfect:!!L.perfect,lucky:!!L.lucky,t:L.t,reg:L.reg,spot:L.spot,hr:L.hr,wx:L.wx,rod:L.rod}); persist();
     SC.netPop=1; sfx.plop(); buzz(12); news('Into the keepnet','good');
     if (!save.netSeen){ save.netSeen=true; persist(); setTimeout(()=>coachFor('Kept fish go in your keepnet, hanging '+(REG()==='coast'?'over the side of your boat':'off the dock')+'. Tap it anytime to see them or sell them.',7),700);
       if (!save.aquaSeen) setTimeout(()=>{ if (S.state==='idle') coachFor('Your uncle’s old fish tank still works. Tap the fishbowl at the bottom to visit your aquarium and move fish in.',8); },9000); } }
@@ -121,7 +123,7 @@ const HUD={lv:0, sig:''};
 /** A count for the HUD: in full, or shortened when the row is at its tightest. */
 function hudNum(n){ if (HUD.lv<3 || n<1e3) return n.toLocaleString();
   const [d,u]=n<1e6?[1e3,'K']:n<1e9?[1e6,'M']:[1e9,'B'], v=n/d, f=v<100?Math.floor(v*10)/10:Math.floor(v); return f.toLocaleString()+u; }
-const hudClock = h => (isNight(h)||PERIOD(h)==='Evening'?'\u263E\uFE0E ':'\u2600\uFE0E ')+(HUD.lv>=2?clockText(h).replace(/ [AP]M$/,''):clockText(h));
+const hudClock = h => HUD.lv>=2?clockText(h).replace(/ [AP]M$/,''):clockText(h);   // the weather mark beside it shows the sun or moon (game/weather.js: setClock)
 /** Fits the row to the numbers it will settle on (a count-up in progress ends there), then puts back what's showing. */
 function fitHud(){ const hud=$('hud'); if (!hud) return; const g=save.glimmer||0, m=save.meal;
   const chips=[...hud.querySelectorAll('.chip')], sig=[innerWidth,save.coins.toLocaleString().length,g.toLocaleString().length,clockText(save.clock).length,m?String(m.casts).length:0]
@@ -130,7 +132,7 @@ function fitHud(){ const hud=$('hud'); if (!hud) return; const g=save.glimmer||0
   const over=()=>chips.some(c=>!c.hidden && c.scrollWidth>c.clientWidth+1);
   if (m && !$('mealChip').hidden) $('mealCasts').textContent=m.casts;
   for (HUD.lv=0; HUD.lv<=5; HUD.lv++){ hud.classList.toggle('tight',HUD.lv>=1); hud.classList.toggle('small',HUD.lv>=4); hud.classList.toggle('nolab',HUD.lv>=5);
-    $('coins').textContent=hudNum(save.coins); $('glimmer').textContent=hudNum(g); S.clockShown=$('clock').textContent=hudClock(save.clock);
+    $('coins').textContent=hudNum(save.coins); $('glimmer').textContent=hudNum(g); S.clockShown=hudClock(save.clock); setClock(S.clockShown);
     if (HUD.lv===5 || !over()) break; }
   $('coins').textContent=hudNum(coinShown); $('glimmer').textContent=hudNum(glimShown); }
 window.addEventListener('resize',fitHud);

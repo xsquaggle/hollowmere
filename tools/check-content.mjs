@@ -34,9 +34,9 @@ const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, SPOT_NAME, REGION_FI
   RODS, ROD_ORDER, SEA_RODS, PARTS, PAINTS, OTT_LINES, BAR_LINES, BANQUET_LINES, LETTER,
   TANKS, TIP_BASE, DECOR, TANK_SETS, SPICES, SPICE_ORDER, SIDES, FLESH, COOK_NAME, RECIPES, RECIPE_ORDER, MUSH, MEAL_STR, MEAL_CASTS,
   CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER,
-  TRAPS, TRAP_UNLOCK, FITTINGS, FITTING_ORDER, TRAP_GLIMMER, SMOKE, AWAY,
+  TRAPS, TRAP_UNLOCK, FITTINGS, FITTING_ORDER, TRAP_GLIMMER, SMOKE, AWAY, WX, WX_ORDER, WX_TABLE, WX_FOG_HOUR, WX_SPELL, WX_FISH, WX_SOME, DAWN_MIST, WX_LINES,
   SPICE_MORE, ORDERS, TOWNSFOLK, TOWNSFOLK_ORDER, STANDINGS, UPGRADES, VISITS, PLATTER } = D;
-for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER, TRAPS, FITTINGS, FITTING_ORDER, SMOKE, AWAY, ORDERS, TOWNSFOLK, STANDINGS, UPGRADES, VISITS, PLATTER }))
+for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER, TRAPS, FITTINGS, FITTING_ORDER, SMOKE, AWAY, ORDERS, TOWNSFOLK, STANDINGS, UPGRADES, VISITS, PLATTER, WX, WX_TABLE, WX_FISH }))
   if (!v) { console.error('Missing table ' + n + ' in src/data/.'); process.exit(1); }
 
 /* ---------- fish ---------- */
@@ -109,6 +109,7 @@ const tankFish = { fresh: REGION_FISH.lake || [], salt: REGION_FISH.coast || [] 
 for (const s of TANK_SETS) { const w = 'TANK_SETS.' + s.id; need(w, s, { name: 'str', need: 'str', bonus: 'str', check: 'fn' });
   oneOf(w + '.tank', s.tank, TK, 'tank'); oneOf(w + '.region', s.region, [...REGIONS, 'any'], 'region');
   if (!(s.value > 1 || s.luck > 0)) bad(w, 'needs a value bonus above 1 or luck points above 0');
+  if (s.wx !== undefined) (Array.isArray(s.wx) ? s.wx : [s.wx]).forEach(k => oneOf(w + '.wx', k, keys(WX), 'weather'));
   if (typeof s.check === 'function') { const full = (tankFish[s.tank] || []).flatMap(id => [{ id }, { id }]);
     if (s.check([])) bad(w, 'is complete with an empty tank'); if (!s.check(full)) bad(w, `can never be completed from the ${s.tank} tank's fish`); } }
 
@@ -148,7 +149,7 @@ for (const r of RARS) { const c = RAR[r].luckCap; if (r === RARS[0]) { if (c !==
 // ceilings climb with rarity, except Godly's, which sits below Mythic's on purpose (see data/fish.js)
 for (let i = 2; i < RARS.length; i++) if (RARS[i] !== 'godly' && RAR[RARS[i]].luckCap < RAR[RARS[i - 1]].luckCap) bad('RAR.' + RARS[i], 'rarer tiers should have a ceiling at least as high as the tier below');
 for (const r of RARS) if (RAR[r].luckCap > 4) bad('RAR.' + r, 'a luck ceiling above ×4 lets luck run away (the design caps Mythic at ×4)');
-const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true, false], fish: FIDS, beh: BEHS, rarity: RARS, rarityMin: RARS, lucky: [true], wander: [true] };
+const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true, false], fish: FIDS, beh: BEHS, rarity: RARS, rarityMin: RARS, lucky: [true], wander: [true], wx: keys(WX) };
 const checkMod = (w, m) => {
   const st = STATS[m.stat]; if (!st) return bad(w, `unknown stat ${JSON.stringify(m.stat)} (see data/stats.js)`);
   if (st.kind === 'flag') { if (m.v !== undefined) bad(w, m.stat + ' is a flag and takes no v'); }
@@ -168,6 +169,28 @@ for (const id of keys(PARTS)) (PARTS[id].mods || []).forEach((m, i) => checkMod(
 for (const id of keys(PARTS)) if (!(PARTS[id].mods || []).length) bad('PARTS.' + id, 'a part needs at least one modifier, or it does nothing');
 for (const id of keys(RECIPES)) for (const b of RECIPES[id].boost || []) if (!STATS[b.k]) bad('RECIPES.' + id + '.boost', b.k + ' is not a stat in data/stats.js');
 for (const id of FIDS) if (FISH[id].night !== undefined && FISH[id].night !== true) bad('FISH.' + id, 'night is either true or left out');
+
+/* ---------- weather ---------- */
+sameSet('WX_ORDER', WX_ORDER, keys(WX), 'WX_ORDER and WX'); noDupes('WX_ORDER', WX_ORDER);
+if (!WX.clear) bad('WX', 'needs clear: the first day and the tutorial are always clear (game/weather.js)');
+for (const [k, X] of Object.entries(WX)) { const w = 'WX.' + k; need(w, X, { name: 'str', on: 'str', mods: 'arr' });
+  for (const f of ['cloud', 'rain', 'fog']) if (!(X.look && X.look[f] >= 0 && X.look[f] <= 1)) bad(w + '.look.' + f, 'should be 0 to 1');
+  X.mods.forEach((m, i) => checkMod(`${w}.mods[${i}]`, m)); }
+for (const reg of REGIONS) { const T = WX_TABLE[reg], w = 'WX_TABLE.' + reg; if (!T) { bad(w, 'no weather table for this region'); continue; }
+  sameSet(w, keys(T), keys(WX), 'weather kinds'); for (const [k, v] of Object.entries(T)) if (!(v > 0)) bad(w + '.' + k, 'weight should be above 0'); }
+if (!(WX_FOG_HOUR.length === 24 / WX_SPELL.hours && WX_FOG_HOUR.every(v => v > 0))) bad('WX_FOG_HOUR', 'one weight above 0 per spell of the day');
+if (!(24 % WX_SPELL.hours === 0 && WX_SPELL.keep >= 0 && WX_SPELL.keep < 1 && WX_SPELL.ease > 0 && WX_SPELL.ease < WX_SPELL.hours && Number.isInteger(WX_SPELL.every) && WX_SPELL.every > 1)) bad('WX_SPELL', 'hours divides 24, keep in [0, 1), ease shorter than a spell, every a whole number above 1');
+const wxFish = new Set();
+for (const reg of REGIONS) for (const [k, E] of Object.entries(WX_FISH[reg] || {})) { const w = `WX_FISH.${reg}.${k}`; oneOf(w, k, keys(WX), 'weather');
+  if (!FISH[E.fish]) { bad(w + '.fish', E.fish + ' is not a fish'); continue; }
+  if (FISH[E.fish].wx !== k) bad(w + '.fish', E.fish + ' should have wx:\'' + k + '\''); if (!(REGION_FISH[reg] || []).includes(E.fish)) bad(w + '.fish', E.fish + ' is not in REGION_FISH.' + reg);
+  wxFish.add(E.fish); const pools = reg === 'coast' ? POOLS_COAST : POOLS;
+  for (const [sp, v] of Object.entries(E.pools || {})) { if (!pools[sp]) bad(w + '.pools', sp + ' is not a spot here'); if (!(v > 0)) bad(w + '.pools.' + sp, 'weight should be above 0'); }
+  for (const sp of keys(pools)) if (keys(pools[sp]).includes(E.fish)) bad('POOLS.' + sp, E.fish + ' only comes with the weather (WX_FISH), not in a pool'); }
+for (const id of FIDS) if (FISH[id].wx !== undefined) { oneOf('FISH.' + id + '.wx', FISH[id].wx, keys(WX), 'weather'); if (!wxFish.has(id)) bad('FISH.' + id, 'has wx but no weather brings it up (WX_FISH)'); }
+for (const [k, o] of Object.entries(WX_SOME)) { oneOf('WX_SOME', k, keys(WX), 'weather'); for (const [when, v] of Object.entries(o)) { oneOf('WX_SOME.' + k, when, [...keys(WX), 'mist'], 'weather or mist'); if (!(v > 0 && v < 1)) bad(`WX_SOME.${k}.${when}`, 'a share of the weight, between 0 and 1'); } }
+if (!(DAWN_MIST.from >= 0 && DAWN_MIST.from < DAWN_MIST.to && DAWN_MIST.to <= 12 && DAWN_MIST.look > 0 && DAWN_MIST.look <= 1)) bad('DAWN_MIST', 'from before to, in the morning; look 0 to 1');
+for (const [k, L] of Object.entries(WX_LINES)) { oneOf('WX_LINES', k, keys(WX), 'weather'); if (!(Array.isArray(L) && L.length && L.every(isStr))) bad('WX_LINES.' + k, 'a list of lines'); }
 
 /* ---------- treasure ---------- */
 const KINDS_T = ['pouch', 'geode', 'bottle', 'find', 'crate'];

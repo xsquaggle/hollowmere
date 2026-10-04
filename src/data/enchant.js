@@ -7,7 +7,7 @@
               Each rod's sockets are RODS[id].ench (1 to 3) in data/gear.js.
    GLIMMER    where Glimmer comes from. record: what beating your record for a species pays, by its rarity.
               geode: what a Glimmer geode holds, [least, most], by region. crate: Glimmer in each crate, by tier.
-   Storm Knot (weather, step 20), Odd Water (mutations, step 21) and Homebody (Wren's bench, step 25) come later. */
+   Odd Water (mutations, step 21) and Homebody (Wren's bench, step 25) come later. */
 const ENCH={
   swift:     {name:'Swift Spool', short:'Reels 30% faster', cost:30, color:'#78C08A', eff:'You reel 30% faster.', down:'Tension rises 30% faster too.',
               mods:[{stat:'reel', v:1.3}, {stat:'drag', v:1.3}]},
@@ -15,14 +15,16 @@ const ENCH={
               mods:[{stat:'treasure', v:2}, {stat:'value', v:.85}]},
   deep:      {name:'Lure of the Deep', short:'More rare fish', cost:60, color:'#5C8FD8', eff:'Rare and rarer fish bite more often.', down:'The hook window is 20% shorter.',
               mods:[{stat:'luck', v:.3, when:{rarityMin:'rare'}}, {stat:'hook', v:.8}]},
-  nightglass:{name:'Nightglass', short:'More night fish', cost:60, color:'#A98BE2', eff:'Night fish bite far more often.', down:'By day, fish bite more slowly.',
-              mods:[{stat:'night', v:2}, {stat:'bite', v:1.25, when:{night:false}}]},
+  nightglass:{name:'Nightglass', short:'More night and fog fish', cost:60, color:'#A98BE2', eff:'Night and fog fish bite far more often.', down:'By day, fish bite more slowly.',
+              mods:[{stat:'night', v:2}, {stat:'fog', v:2}, {stat:'bite', v:1.25, when:{night:false}}]},
+  storm:     {name:'Storm Knot', short:'Rain catches +60%', cost:70, color:'#7FB2D9', eff:'In rain, fish are worth 60% more.', down:'Does nothing in other weather.',
+              mods:[{stat:'value', v:1.6, when:{wx:'rain'}}]},
   wanderer:  {name:'Wanderer', short:'Each day’s first catches ×2', cost:80, color:'#E5975A', first:3, eff:'Each day, your first 3 catches at the lake are worth double, and so are your first 3 at the coast.',
               mods:[{stat:'value', v:2, when:{wander:true}}]},
   echo:      {name:'Echo', short:'Perfect hooks echo', cost:110, color:'#58C4C2', eff:'After a perfect hook, another of the same fish sometimes waits there. Cast to the same spot for an instant bite.', down:'Only perfect hooks set it off.',
               mods:[{stat:'echo', v:.35}]}
 };
-const ENCH_ORDER=['swift','magpie','deep','nightglass','wanderer','echo'];
+const ENCH_ORDER=['swift','magpie','deep','nightglass','storm','wanderer','echo'];
 const GLIMMER={
   record:{common:2, uncommon:3, rare:5, epic:8, legendary:12, exotic:18, mythic:26, godly:40},
   geode:{lake:[4,8], coast:[6,12]},

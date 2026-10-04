@@ -1,7 +1,7 @@
 /* ---------- Journal: species pages, personal records, finds (game/finds.js) and bonuses ---------- */
 let JTAB='species';
 function recWhere(pb){ if (!pb) return ''; if (!pb.t) return 'Caught before the tape measure, at '+(REGION_NAME[pb.reg]||'the lake');
-  return spotLabel(pb.reg,pb.spot)+' · '+whenLabel(pb.t,pb.hr)+(pb.rod&&RODS[pb.rod]?' · '+RODS[pb.rod].name:''); }
+  return spotLabel(pb.reg,pb.spot)+' · '+whenLabel(pb.t,pb.hr,pb.wx)+(pb.rod&&RODS[pb.rod]?' · '+RODS[pb.rod].name:''); }
 function recBar(id,len){ const F=FISH[id], k=sizePct(id,len);
   return '<div class="rbar"><b style="width:'+Math.round(k*100)+'%"></b><i style="left:'+Math.round(k*100)+'%"></i></div><div class="rlab"><span>'+fmtLen(F.size[0])+'</span><span>'+(k>=.95?'Top of the range':'Range')+'</span><span>'+fmtLen(F.size[1])+'</span></div>'; }
 function drawPlaque(x,id,w,h){ const F=FISH[id], pw=Math.min(w*.86,330), ph=h*.94;
