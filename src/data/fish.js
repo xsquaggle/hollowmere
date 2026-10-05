@@ -5,9 +5,20 @@
               color and fin; window (seconds to strike after the bite); lore; hint (journal line before it is caught);
               night:true for fish that come up after dark (meals that boost night fish boost these); wx:'rain' or 'fog' for
               fish the weather brings up (data/weather.js says where and how often; they're never in a trap).
+              extra:true for fish that don't count toward finishing a water (Barnaby never waits on them); secret:true
+              for a fish found by experimenting, whose journal page shows a riddle (hint) once it's been seen; beh2 for a
+              fish that changes how it fights halfway in; noTank:true for one too big for any tank.
    RAR[tier]  how a rarity looks and sounds, in order from common to godly; pips (1 to 8) so rarity never rests on color
               alone; prism and ink for the tiers whose color shifts or bleeds. luckCap is the most luck can multiply
               its odds (see game/mods.js); Godly's sits below Mythic's on purpose, so no build makes Godly routine.
+   RARE_BITES fish no spot pool offers: each is checked first on every cast, at its own chance before luck, only where
+              and when it can bite (game/odds.js: rollFish). region; spots (or any); bow:true at the rainbow's foot;
+              moon:'full' and night:true on full-moon nights; path: how much likelier a cast onto the moonpath makes it.
+   DRY        soft bad-luck protection, up to Legendary only: after `from` casts in a row where a Legendary could have
+              bitten and didn't, its odds creep up, reaching ×max at `to`. Landing a Legendary or rarer starts it over.
+   MUTS       mutations, rolled on landing (game/landing.js: catchRoll) on anything below Mythic: chance per catch before
+              bonuses (STATS.mutation), what it multiplies the value by, Glimmer it pays, and for Giant how far past the
+              species' biggest it grows. MUT_ORDER is the order the journal lists them.
    ORDER      the lake journal's order, the same fish as REGION_FISH.lake.  REGION_FISH  which species live in each region, in journal order.
    POOLS      lake bite weights per spot; POOLS_COAST the same for Gullrock Coast. Night, dawn, rods,
               meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench"). */
@@ -42,10 +53,18 @@ const FISH = {
             lore:'Pale as the fog it swims in, and warmer in the hand than it looks.', hint:'Glimpsed in the deep pool on foggy mornings.'},
   mackerel:{name:'Squall Mackerel', rarity:'uncommon', beh:'darter', wx:'rain', pull:1.05, reel:4.2, value:30, size:[26,44], len:44, h:.2, color:'#4F8A8B', fin:'#2F5C60', window:1.05,
             lore:'Rides in under the squalls, a whole school at a time, and leaves just as fast.', hint:'Rides in under the rain squalls.'},
+  gar:     {name:'Steeple Gar', rarity:'epic', beh:'leaper', extra:true, pull:1.55, reel:10, value:170, size:[90,150], len:84, h:.1, color:'#7F866A', fin:'#5B6248', window:.82,
+            lore:'Rests nose-up, like the church steeple it hides behind. The steeple is underwater too.', hint:'Something long and thin hangs nose-up in the deep pool, most of all in the evening.'},
+  angler:  {name:'Gaslight Angler', rarity:'epic', beh:'sulker', night:true, extra:true, pull:1.6, reel:11, value:850, size:[45,80], len:58, h:.4, color:'#5A4E58', fin:'#3D3440', window:.8,
+            lore:'Its lure burns like an old gas lamp. Ships used to steer for it, which is how the trench filled up with ships.', hint:'A small light wanders in the trench after dark.'},
+  shiner:  {name:'Prism Shiner', rarity:'exotic', beh:'darter', secret:true, extra:true, pull:1.15, reel:7.5, value:1200, size:[9,16], len:32, h:.25, color:'#D4E7EA', fin:'#A9CFDA', window:.62,
+            lore:'It swallows the ends of rainbows. That’s why nobody ever reaches one.', hint:'Seen where the colours touch the water.'},
+  calf:    {name:'Moonwhale Calf', rarity:'mythic', beh:'sulker', beh2:'leaper', extra:true, noTank:true, pull:2, reel:22, value:6000, size:[380,520], len:124, h:.3, color:'#5F6F8A', fin:'#45536C', window:.65,
+            lore:'Too big for this lake. Where is its mother?', hint:'Something enormous breaches far out on full-moon nights. It isn’t alone.'},
   gurnard: {name:'Foghorn Gurnard', rarity:'rare', beh:'ghost', wx:'fog', pull:1.4, reel:7.5, value:160, size:[28,52], len:46, h:.28, color:'#C25A4B', fin:'#E59A5C', window:.9,
             lore:'Grunts like a foghorn. The lighthouse keepers used to steer by it.', hint:'Grunts from the sea stacks when the fog is in.'}
 };
-const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','mayor'];
+const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'];
 const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper', ghost:'Ghost'};
 const BEH_TIP = {darter:'It darts side to side, so follow it.', leaper:'Tap when it jumps clear of the water.', sulker:'When it dives, let go. Reel hard after.', tugger:'Let go on each tug, reel between tugs.', sleeper:'It barely fights. Just reel it in.', ghost:'It fades from sight. Follow the line until it surfaces.'};
 const RAR = {
@@ -61,17 +80,29 @@ const RAR = {
 const POOLS = {
   open: {perch:70, reedwhisker:6, leafjack:12, mossback:3},
   pads: {leafjack:55, perch:25, mossback:8},
-  deep: {perch:28, mossback:40, leafjack:12, mayor:6},
-  far:  {perch:22, leafjack:30, mossback:26, reedwhisker:4, mayor:3},
+  deep: {perch:28, mossback:40, leafjack:12, gar:2, mayor:6},
+  far:  {perch:22, leafjack:30, mossback:26, reedwhisker:4, gar:2, mayor:3},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
 const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench'};
-const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','mayor'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','saltjaw']};
+const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:20, bream:6},
   kelp: {kelpeel:46, sprat:24, bream:20, grouper:5},
-  deep: {grouper:30, bream:28, sprat:24, kelpeel:10, saltjaw:4},
-  far:  {bream:34, sprat:28, grouper:20, kelpeel:10, saltjaw:2}
+  deep: {grouper:30, bream:28, sprat:24, kelpeel:10, angler:2, saltjaw:4},
+  far:  {bream:34, sprat:28, grouper:20, kelpeel:10, angler:1, saltjaw:2}
 };
+const RARE_BITES={
+  shiner:{region:'lake', bow:true, chance:.035},
+  calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2}
+};
+const DRY={from:80, to:200, max:2};
+const MUTS={
+  mossy: {name:'Mossy', value:2.5, chance:1/70, glimmer:1, desc:'Moss and tiny plants grow along its back.'},
+  glassy:{name:'Glassy', value:4, chance:1/130, glimmer:2, desc:'See-through, with its bones showing.'},
+  twin:  {name:'Twin', value:1, chance:1/90, glimmer:1, desc:'Two on one hook.'},
+  giant: {name:'Giant', value:1, chance:1/100, glimmer:2, size:[1.25,1.55], desc:'Far past the usual size.'}
+};
+const MUT_ORDER=['mossy','glassy','twin','giant'];

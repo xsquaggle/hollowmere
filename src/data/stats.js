@@ -25,6 +25,7 @@ const STATS={
   fog:      {name:'Fog fish', kind:'mul', good:'up', unit:'x', when:{wx:'fog'}, hint:'Fish that come up in fog bite more often.'},
   twitch:   {name:'Twitch pull', kind:'mul', good:'up', unit:'x', hint:'A twitch draws a fish in from farther, and brings the next one sooner.'},
   lure:     {name:'Lure pull', kind:'mul', good:'up', unit:'x', hint:'Some kinds of fish bite more often.'},
+  mutation: {name:'Mutations', kind:'mul', good:'up', unit:'x', hint:'Catches come up Mossy, Glassy, Twin or Giant more often.'},
   reedBite: {name:'Reed bites', kind:'mul', good:'up', when:{spot:'reeds'}, hint:'Fish in the reeds bite sooner.'},
   tug:      {name:'Tugger pull', kind:'mul', good:'down', hint:'Tuggers yank the line less hard.'},
   swell:    {name:'Swell hits', kind:'mul', good:'down', when:{region:'coast'}, hint:'A swell spikes your line’s tension less.'},

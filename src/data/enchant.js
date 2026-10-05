@@ -7,7 +7,7 @@
               Each rod's sockets are RODS[id].ench (1 to 3) in data/gear.js.
    GLIMMER    where Glimmer comes from. record: what beating your record for a species pays, by its rarity.
               geode: what a Glimmer geode holds, [least, most], by region. crate: Glimmer in each crate, by tier.
-   Odd Water (mutations, step 21) and Homebody (Wren's bench, step 25) come later. */
+   Homebody (Wren's bench, step 25) comes later. */
 const ENCH={
   swift:     {name:'Swift Spool', short:'Reels 30% faster', cost:30, color:'#78C08A', eff:'You reel 30% faster.', down:'Tension rises 30% faster too.',
               mods:[{stat:'reel', v:1.3}, {stat:'drag', v:1.3}]},
@@ -21,10 +21,12 @@ const ENCH={
               mods:[{stat:'value', v:1.6, when:{wx:'rain'}}]},
   wanderer:  {name:'Wanderer', short:'Each day’s first catches ×2', cost:80, color:'#E5975A', first:3, eff:'Each day, your first 3 catches at the lake are worth double, and so are your first 3 at the coast.',
               mods:[{stat:'value', v:2, when:{wander:true}}]},
+  odd:       {name:'Odd Water', short:'Mutations twice as often', cost:90, color:'#6CC4A1', eff:'Mossy, Glassy, Twin and Giant catches come up twice as often.',
+              mods:[{stat:'mutation', v:2}]},
   echo:      {name:'Echo', short:'Perfect hooks echo', cost:110, color:'#58C4C2', eff:'After a perfect hook, another of the same fish sometimes waits there. Cast to the same spot for an instant bite.', down:'Only perfect hooks set it off.',
               mods:[{stat:'echo', v:.35}]}
 };
-const ENCH_ORDER=['swift','magpie','deep','nightglass','storm','wanderer','echo'];
+const ENCH_ORDER=['swift','magpie','deep','nightglass','storm','wanderer','odd','echo'];
 const GLIMMER={
   record:{common:2, uncommon:3, rare:5, epic:8, legendary:12, exotic:18, mythic:26, godly:40},
   geode:{lake:[4,8], coast:[6,12]},

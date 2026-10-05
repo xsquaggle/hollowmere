@@ -60,6 +60,8 @@ function simSave(st){
   else { const ids=(st.ench||[]).filter(id=>ENCH[id]).slice(0,RODS[s.rod].ench||1); s.ench={own:Object.fromEntries(ids.map(id=>[id,1])), rig:{[s.rod]:ids}}; }
   s.glimmer=0; s.day=0; s.wander=null;
   s.wx={seed:7, force:WX_ORDER.includes(st.wx)?st.wx:'clear', seen:{}};      // the weather is pinned for a run: clear unless named
+  if (Number.isInteger(st.moon)) s.wx.moon=st.moon;                          // and the moon, when named (MOON.full is full)
+  s.stats.dry=0;
   return s;
 }
 /** Plays one fight (a fish or a haul) through the game's fight step, the way player P would. Returns {end, ft, why}. */
@@ -91,7 +93,7 @@ function simulate(st,n){
     SIMULATING=true; save=simSave(st); MODC.dirty=true; TREASURE_CTL.off=st.treasure===false;
     const reg=REG(), spots=st.spot==='mix'?Object.keys(reg==='coast'?POOLS_COAST:POOLS):[st.spot];
     const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0,snag:0,washout:0,eaten:0}, perfect:0, hooked:0, coins:0, pbs:0, glimmer:0, pbGlimmer:0, echoes:0, wanders:0, secs:0, fightSecs:0,
-      tiers:{}, species:{}, records:{}, treasure:{rolled:0,hauled:0,lost:0,coins:0,finds:0,kinds:{},crates:{}}};
+      tiers:{}, species:{}, records:{}, muts:{}, tierCoins:{}, mutCoins:0, mutGlimmer:0, treasure:{rolled:0,hauled:0,lost:0,coins:0,finds:0,kinds:{},crates:{}}};
     const io={t:0,holding:true,tut:null,tilt:0,reeling:false,ev:[],why:''};
     let echo=null;                                                   // Echo: the next cast at that spot bites at once
     const dayLen=modFlag('timeStop')?0:1440/modMul('clock');
@@ -120,11 +122,11 @@ function simulate(st,n){
         t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
-      const id=ech||pickW(poolFor(spot,lucky)), F=FISH[id];
+      const at={bow:!!st.bow, path:!!st.path}, id=ech||rollFish(spot,lucky,at), F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
       t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
-      const nib=ech?0:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3));
+      const nib=ech?0:nibbles(F);
       t+=ech?.15:rand(.5,1.1)*bm; for (let i=0;i<nib;i++) t+=(F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*bm;
       // the bite
       const fc={fish:id,spot,lucky}, r=P.react(); t+=r;
@@ -138,12 +140,13 @@ function simulate(st,n){
       if (Math.random()<modAdd('eaten',fc)){ out.lost.eaten++; out.secs+=t+1.2; continue; }
       // landed: the game's own catch roll, then the card
       const wander=!!wanderCount(reg); if (wander) out.wanders++;
-      const k=catchRoll(id,perfect,{spot,lucky,wander}), rar=F.rarity, prev=out.records[id];
-      out.landed++; out.coins+=k.value; out.tiers[rar]=(out.tiers[rar]||0)+1; out.species[id]=(out.species[id]||0)+1;
+      const k=catchRoll(id,perfect,{spot,lucky,wander,bow:at.bow}), rar=F.rarity, prev=out.records[id]; dryEnd(rar);
+      if (k.mut){ const M=MUTS[k.mut]; out.muts[k.mut]=(out.muts[k.mut]||0)+1; out.mutGlimmer+=M.glimmer; out.glimmer+=M.glimmer; out.mutCoins+=k.value*(1-1/(M.value*(k.mut==='twin'?2:1)*(k.mut==='giant'?k.size/FISH[id].size[1]:1))); }
+      out.landed++; out.coins+=k.value; out.tiers[rar]=(out.tiers[rar]||0)+1; out.tierCoins[rar]=(out.tierCoins[rar]||0)+k.value; out.species[id]=(out.species[id]||0)+1;
       if (prev!=null && k.w>prev){ out.pbs++; const b=GLIMMER.record[rar]||2; out.pbGlimmer+=b; out.glimmer+=b; }   // records pay Glimmer
       if (perfect && echoRoll(id,spot)) echo={fish:id,spot};
       if (prev==null || k.w>prev) out.records[id]=k.w;
-      t+=RAR[rar].land*(rar==='rare'||rar==='legendary'?1.03:1)+(rar==='common'?2.2:3.2);
+      t+=RAR[rar].land*(rarRank(rar)>=rarRank('rare')?1.03:1)+(rar==='common'?2.2:3.2)+(rarRank(rar)>=rarRank('mythic')?4:0);   // a Mythic's card takes its time
       out.secs+=t;
     }
     const hours=out.secs/3600, pct=x=>Math.round(x*1000)/10;
@@ -151,6 +154,11 @@ function simulate(st,n){
     out.coinsPerHour=Math.round((out.coins+out.treasure.coins)/hours); out.catchesPerHour=Math.round(out.landed/hours); out.glimmerPerHour=Math.round(out.glimmer/hours*10)/10;
     out.secsPerCast=Math.round(out.secs/n*10)/10; out.fightAvg=Math.round(out.fightSecs/Math.max(1,out.hooked)*10)/10;
     out.coinsPerCatch=Math.round(out.coins/Math.max(1,out.landed)*10)/10; out.landRate=pct(out.landed/Math.max(1,n-out.treasure.rolled)); out.perfectRate=pct(out.perfect/Math.max(1,out.hooked));
+    // rarity: each tier's share of the catch and of the coins, and what mutations add
+    out.tierShare=Object.fromEntries(Object.entries(out.tiers).map(([r,v])=>[r,pct(v/Math.max(1,out.landed))]));
+    out.tierCoinShare=Object.fromEntries(Object.entries(out.tierCoins).map(([r,v])=>[r,pct(v/Math.max(1,out.coins))])); delete out.tierCoins;
+    out.mutShare=pct(Object.values(out.muts).reduce((a,v)=>a+v,0)/Math.max(1,out.landed)); out.mutCoinShare=pct(out.mutCoins/Math.max(1,out.coins)); out.mutGlimmerPerHour=Math.round(out.mutGlimmer/hours*10)/10;
+    out.mutCoins=Math.round(out.mutCoins);
     out.treasure.oneIn=out.treasure.rolled?Math.round(n/out.treasure.rolled*10)/10:null;
     const lc={spot:spots[0],lucky:!!st.lucky};
     out.luck={points:Math.round(luckPoints(lc)*100)/100,

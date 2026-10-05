@@ -3,14 +3,16 @@ function startReel(id,perfect){
   if (S.bite && S.bite.loot) return startHaul(S.bite.loot,perfect);
   const F=FISH[id], first=rec(id).caught===0;
   S.reel=newFight(id,perfect,S.bob,!!(S.wait&&S.wait.lucky),!!S.tut,S.bob.spot);
+  S.reel.bow=!!(S.wait&&S.wait.bow);                                   // hooked at the rainbow's foot: mutations twice as likely
   S.holding=S.pointers.size>0; S.tilt=0; S.pressX=S.thumbX; S.pressTilt=0; humStart(); setState('reeling');
   if (S.tut){ S.tut='reel1'; coach('Hooked! Now press and hold your finger down to reel it in.','4 of 4'); }
+  else if (first && F.beh2) coachShow('Something enormous. It dives at first: let go while it’s down. Halfway in it starts to leap: tap while it’s in the air.',8);
   else if (first && F.beh==='leaper') coachShow('New fish: Leapers jump out of the water. Tap while it’s in the air to keep the line tight.',6);
   else if (first && F.beh==='tugger') coachShow('New fish: Tuggers pull in a steady rhythm. Let go on each tug, and reel in between.',6);
   else if (first && F.beh==='sleeper') coachShow('New fish: Sleepers barely fight. The hard part was the patience before the bite.',6);
   else if (first && F.beh==='sulker') coachShow('New fish: Sulkers dive. When it dives, let go, then reel hard when it comes back up.',6);
   else if (first && F.beh==='ghost') coachShow('New fish: Ghosts fade from sight mid-fight. Keep your ring where the line points until it surfaces.',7);
-  else if (first && F.rarity==='legendary') coachShow('Something huge. Reel in short bursts and let go whenever the ring turns red.',6);
+  else if (first && rarRank(F.rarity)>=rarRank('legendary')) coachShow('Something huge. Reel in short bursts and let go whenever the ring turns red.',6);
 }
 /** A fresh fight with fish `id`, hooked at `from` (the bobber). */
 function newFight(id,perfect,from,lucky,tut,spot){
@@ -40,15 +42,16 @@ const GHOST_FADE=1.5;
         steer(R,dt): where the ring goes this step, ev: [], why: ''} */
 function fightStep(R,dt,io){
   const F=R.F, ev=io.ev, tm=R.mod.tm, tut=io.tut;
-  const weight=F.beh==='weight', quick=F.rarity==='legendary' && !weight, calm=F.rarity==='common';
+  if (F.beh2 && !R.beh2 && R.dist<.5){ R.beh2=true; R.dive=R.warn=R.surge=0; R.jump=null; R.nextJump=rand(.6,1.2); ev.push('beh2'); }   // halfway in, it fights another way (data/fish.js: beh2)
+  const beh=R.beh2?F.beh2:F.beh, weight=beh==='weight', quick=rarRank(F.rarity)>=rarRank('legendary') && !weight, calm=F.rarity==='common';
   if (tut==='reel1'||tut==='reel2'){ /* direction is scripted by the tutorial */ }
-  else if (F.beh==='darter'){
+  else if (beh==='darter'){
     R.dirT-=dt;
     if (R.dirT<=0){ R.tgt=(R.tgt>0?-1:1)*rand(.5,.9); R.dirT=tut?3:quick?rand(.9,1.4):calm?rand(1.8,2.7):rand(1.3,2); ev.push('turn'); }
-  } else if (F.beh==='sulker'){ R.tgt=Math.sin(io.t*.5+1)*.5; }
-  else if (F.beh==='tugger'||F.beh==='sleeper'){ R.tgt=Math.sin(io.t*(F.beh==='sleeper'?.25:.4)+1)*(F.beh==='sleeper'?.35:.45); }
+  } else if (beh==='sulker'){ R.tgt=Math.sin(io.t*.5+1)*.5; }
+  else if (beh==='tugger'||beh==='sleeper'){ R.tgt=Math.sin(io.t*(beh==='sleeper'?.25:.4)+1)*(beh==='sleeper'?.35:.45); }
   else if (weight){ R.tgt=Math.sin(io.t*.35+R.ph)*.3; }               // a dead weight only sways as it comes up
-  else if (F.beh==='ghost'){                                             // darts like a darter, and fades: while it's gone it
+  else if (beh==='ghost'){                                             // darts like a darter, and fades: while it's gone it
     if (R.fade>0){ R.fade-=dt; if (R.fade<=0){ R.nextFade=rand(2.6,3.8); R.dirT=rand(1.4,2.2); ev.push('surface'); } }   // slides somewhere new, unseen
     else { R.nextFade-=dt; R.dirT-=dt;
       if (R.nextFade<=0){ R.fade=GHOST_FADE; R.tgt=(R.dir>0?-1:1)*rand(.35,.85)*(Math.random()<.75?1:-1); ev.push('fade'); }
@@ -64,17 +67,17 @@ function fightStep(R,dt,io){
   if (io.tut==='reel2' && R.onIt>.6 && Math.abs(R.dir-R.tgt)<.1){ io.tut='reel3'; R.dirT=2.6; ev.push('tut:reel3'); }
 
   let diving=false, airborne=false, tug=false;
-  if (F.beh==='tugger'){ R.beat=(R.beat||0)+dt; const ph=R.beat%1.15; tug=ph<.5;
+  if (beh==='tugger'){ R.beat=(R.beat||0)+dt; const ph=R.beat%1.15; tug=ph<.5;
     if (tug && !R.wasTug) ev.push('tug');
     R.wasTug=tug; R.tug=tug; }
   // sulkers dive; a heavy haul catches on the bottom. Either way: let go while it's down, reel hard after
-  if (F.beh==='sulker' || (weight && F.snags)){
+  if (beh==='sulker' || (weight && F.snags)){
     if (R.dive>0){ R.dive-=dt; diving=true; if (R.dive<=0){ R.surge=1.1; ev.push('surge'); } }
     else if (R.warn>0){ R.warn-=dt; if (R.warn<=0){ R.dive=weight?1.2:1.6; ev.push('dive'); } }
     else { R.nextDive-=dt; if (R.nextDive<=0){ R.warn=.6; R.nextDive=weight?snagGap(F):rand(2.6,4.2); ev.push('diveWarn'); } }
     if (R.surge>0) R.surge-=dt;
   }
-  if (F.beh==='leaper'){
+  if (beh==='leaper'){
     if (R.jump){ R.jump.t+=dt; airborne=true;
       if (R.jump.t>=R.jump.dur){ const j=R.jump; R.jump=null; ev.push('splashdown');
         if (!j.tapped){ R.tension=.02; R.dist=Math.min(1,R.dist+.12); ev.push('slackJump');
@@ -90,7 +93,7 @@ function fightStep(R,dt,io){
     if (diving) R.tension+=1.1*tm*dt;
     else {
       R.tension+=(.04+.05*F.pull+F.pull*.4*m+(weight?.12*F.pull:0))*tm*dt*(io.tut?.7:1);
-      const spd=(1/F.reel)*(1-.6*m)*(R.surge>0?2:1)*(F.beh==='tugger'?1.4:1)*(R.perfect?1.1:1)*R.mod.reel;
+      const spd=(1/F.reel)*(1-.6*m)*(R.surge>0?2:1)*(beh==='tugger'?1.4:1)*(R.perfect?1.1:1)*R.mod.reel;
       R.dist-=spd*dt; R.click+=spd*dt;
     }
   } else if (diving){ R.tension=Math.max(.15,R.tension-.35*dt); R.dist=Math.min(1,R.dist+.015*dt); }
@@ -140,6 +143,8 @@ function fightShow(R,e){
     case 'diveWarn': toast(R.loot?'It’s catching on something. Let go!':'It’s diving. Let go!','warn');
       if (R.loot && !save.stats.snagTip){ save.stats.snagTip=true; persist(); coachShow('Heavy hauls catch on the bottom. Let go until it’s free, then haul hard.',6); } break;
     case 'jump': splash(R.x,R.y,10); sfx.leap(); break;
+    case 'beh2': splash(R.x,R.y,22); ripple(R.x,R.y,40); ripple(R.x,R.y,24); shake(4); buzz([0,80,40,80]); tone(110,.9,{to:196,vol:.1,type:'sine'});
+      toast(R.F.beh2==='leaper'?'It’s coming up! Tap while it’s in the air.':'It’s changed how it fights!','warn'); break;
     case 'splashdown': splash(R.x,R.y,14); ripple(R.x,R.y,30); break;
     case 'slackJump': toast('Slack! Tap while it jumps.','warn'); break;
     case 'click': sfx.click(); break;

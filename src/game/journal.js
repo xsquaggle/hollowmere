@@ -10,7 +10,7 @@ function drawPlaque(x,id,w,h){ const F=FISH[id], pw=Math.min(w*.86,330), ph=h*.9
   x.save(); x.clip(); x.strokeStyle='rgba(30,15,5,.22)'; x.lineWidth=1.2; for (let i=0;i<7;i++){ x.beginPath(); for (let px=-pw/2;px<=pw/2;px+=6){ const y=-ph/2+8+i*ph/7+Math.sin(px*.04+i*1.3)*3; px===-pw/2?x.moveTo(px,y):x.lineTo(px,y); } x.stroke(); } x.restore();
   rrect(x,-pw/2+6,-ph/2+6,pw-12,ph-12,ph*.28); x.strokeStyle='rgba(255,230,190,.25)'; x.lineWidth=1.5; x.stroke();
   for (const sx of [-1,1]){ x.beginPath(); x.arc(sx*(pw/2-ph*.2),0,3.2,0,6.28); x.fillStyle=BRASS; x.fill(); x.strokeStyle=INK; x.lineWidth=1; x.stroke(); }
-  const L=Math.min(pw*.68,(ph*.78)/(F.h*(id==='mayor'?2.9:2.45))); x.translate(0,ph*.04); x.rotate(-.07);
+  const L=Math.min(pw*.68,(ph*.78)/(F.h*((DORSAL[id]||DORSAL0).top+(id==='calf'?1.1:.8)))); x.translate(0,ph*.04); x.rotate(-.07);
   x.save(); x.translate(4,5); drawFish(x,id,L,true,.55); x.restore(); drawFish(x,id,L,false,1,.15); x.restore(); }
 function journalRegions(){ return save.boat?[REG(),REG()==='lake'?'coast':'lake']:['lake']; }
 function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
@@ -29,10 +29,14 @@ function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
 function speciesHTML(regs){ let h='<div class="entries">';
   regs.forEach(rg=>{ h+='<h3 class="j-reg">'+REGION_NAME[rg]+'</h3>'; REGION_FISH[rg].forEach(id=>{ const F=FISH[id], r=save.fish[id]||{caught:0,best:0,seen:false};
     if (r.caught>0){ const m=Math.min(MASTERY.catches,r.caught), pb=r.pb;
-      h+='<div class="entry"><canvas data-f="'+id+'"></canvas><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+'</span><h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p><div class="mast"><i style="width:'+Math.round(m/MASTERY.catches*100)+'%"></i></div><p>'+(r.caught>=MASTERY.catches?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/'+MASTERY.catches)+'</p></div></div>'; }
-    else h+='<div class="entry"><canvas data-f="'+id+'" data-sil="1"></canvas><div><span class="r" style="color:#7A7468">'+(r.seen?'Seen, not caught':'Undiscovered')+'</span><h3>???</h3><p>'+(r.seen?F.hint:'Keep fishing to find this one.')+'</p></div></div>';
+      h+='<div class="entry"><canvas data-f="'+id+'"></canvas><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+(F.beh2?' then '+BEH[F.beh2]:'')+'</span>'+rarPipsHTML(F.rarity)+'<h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p>'+mutLineHTML(id)+'<div class="mast"><i style="width:'+Math.round(m/MASTERY.catches*100)+'%"></i></div><p>'+(r.caught>=MASTERY.catches?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/'+MASTERY.catches)+'</p></div></div>'; }
+    else h+='<div class="entry"><canvas data-f="'+id+'" data-sil="1"></canvas><div><span class="r" style="color:#7A7468">'+(r.seen?'Seen, not caught':F.secret?'A secret':'Undiscovered')+'</span><h3>???</h3><p'+(F.secret&&!r.seen?' class="riddle"':'')+'>'+(r.seen||F.secret?F.hint:'Keep fishing to find this one.')+'</p></div></div>';
   }); });
   return h+'</div>'; }
+/** The mutations found for a species, as a line under its lore: the ones still to find show as dashes. Fish too rare to
+    mutate (Mythic and up) get none. */
+function mutLineHTML(id){ if (rarRank(FISH[id].rarity)>=rarRank('mythic')) return ''; const got=mutsFound(id);
+  return '<p class="muts">Mutations: '+MUT_ORDER.map(k=>got.includes(k)?'<b>'+MUTS[k].name+'</b>':'<i aria-label="not found yet">—</i>').join(' · ')+'</p>'; }
 function recordsHTML(regs){ const s=save.stats, all=regs.flatMap(rg=>REGION_FISH[rg]).filter(id=>(save.fish[id]||{}).pb);
   const best=list=>list.reduce((b,id)=>!b||save.fish[id].pb.w>save.fish[b].pb.w?id:b,null);
   let h='<div class="seg units" aria-label="Units"><button type="button" data-units="imperial" class="'+(imperial()?'on':'')+'">lb · in</button><button type="button" data-units="metric" class="'+(!imperial()?'on':'')+'">kg · cm</button></div>';

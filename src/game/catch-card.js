@@ -27,14 +27,14 @@ function recordSnap(){ const L=CARD.L; CARD.snapped=true;
 function tapeRange(F){ return F.size[1]*1.12; }
 function drawCardScene(t){
   const L=CARD.L, F=L.F, c=$('cFish').getContext('2d'), w=CARD.w, h=CARD.h; c.setTransform(CARD.d,0,0,CARD.d,0,0); c.clearRect(0,0,w,h);
-  const {uc}=tapeUnits(), v1=tapeRange(F), ty=h-27, th=13, xs=36, room=ty-th/2-6, finK=F.h*(L.id==='mayor'?2.9:2.45);
+  const {uc}=tapeUnits(), v1=tapeRange(F)*(L.mut==='giant'?MUTS.giant.size[1]/1.08:1), ty=h-27, th=13, xs=36, room=ty-th/2-6, finK=F.h*((DORSAL[L.id]||DORSAL0).top+(L.id==='calf'?1.1:.8)+(L.mut==='twin'?1.6:0));
   // the tape is as long as the card allows, but never so long that a deep-bodied fish won't fit above it
   const span=Math.min(w-10-xs,room/finK*1.08*v1/L.size), X=v=>xs+span*clamp(v/v1,0,1), xe=xs+span;
   const hv=hookAt(t), hx=hv==null?xs:X(hv), p=L.prev&&!L.isNew?L.prev:null;
   // the fish lies along the tape: tail at zero, nose at its length
   const nose=X(L.size), len=(nose-xs)/1.08, cx=xs+len*.58, fy=ty-th/2-4-len*F.h*1.02, col=RAR[F.rarity].color;
   c.save(); c.fillStyle=col; c.globalAlpha=.15; c.beginPath(); c.ellipse(cx,fy+4,len*.62,Math.max(18,len*F.h*1.6),0,0,6.28); c.fill(); c.restore();
-  c.save(); c.translate(cx,fy); c.rotate(Math.sin(t*1.8)*.012); drawFish(c,L.id,len,false,1,Math.sin(t*6)*(t<1.6?.3:.1)); c.restore();
+  c.save(); c.translate(cx,fy); c.rotate(Math.sin(t*1.8)*.012); drawFish(c,L.id,len,false,1,Math.sin(t*6)*(t<1.6?.3:.1),false,L.mut); c.restore();
   c.save(); c.strokeStyle='rgba(43,42,51,.2)'; c.setLineDash([2,4]); c.lineWidth=1.2; c.beginPath(); c.moveTo(xs,ty); c.lineTo(xe,ty); c.stroke(); c.restore();
   if (hv!=null){
     const g=c.createLinearGradient(0,ty-th/2,0,ty+th/2); g.addColorStop(0,'#F7DC6C'); g.addColorStop(1,'#E9C24A');

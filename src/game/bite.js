@@ -14,12 +14,14 @@ function startWaiting(){
     the swim over and the nibbles: spawnApproach). */
 function biteWait(spot){ const c={spot}; return rand(.75,2.1)*modMul('wait',c)*modMul('bite',c); }
 function spawnApproach(){
-  const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.fish=S.tut?'perch':w.echo||pickW(poolFor(b.spot,w.lucky)); const F=FISH[w.fish];
+  const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.bow=atBowFoot(b.x,b.y);
+  // the rare bites and the dry run count once a cast (as the simulator does); a fish that comes back after a spook is an ordinary one
+  w.fish=S.tut?'perch':w.echo||(w.rolled?pickW(poolFor(b.spot,w.lucky)):rollFish(b.spot,w.lucky,{bow:w.bow, path:onMoonpath(b.x,b.y)})); w.rolled=true; const F=FISH[w.fish];
   const ang=rand(0,Math.PI*2), d=w.echo?rand(40,60):rand(85,150);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
   w.sh={x,y,ang:Math.atan2(b.y-y,b.x-x),alpha:0,flee:false};
   w.bm=S.tut?1:modMul('bite',{spot:b.spot,fish:w.fish,lucky:w.lucky});   // bait and the like: a quicker swim over and shorter nibbles
-  if (sonarOn() && !S.tut){ setHint('Sonar: '+(F.rarity==='common'?'a common fish':'a '+RAR[F.rarity].label+' fish')+' is coming in.'); if (F.rarity!=='common') tone(1250,.09,{vol:.06,type:'sine'}); }
+  if (sonarOn() && !S.tut){ setHint('Sonar: '+(F.rarity==='common'?'a common fish':(/^[EUA]/.test(RAR[F.rarity].label)?'an ':'a ')+RAR[F.rarity].label+' fish')+' is coming in.'); if (F.rarity!=='common') tone(1250,.09,{vol:.06,type:'sine'}); }
   w.phase='approach'; w.attract=1;
 }
 function updateWaiting(dt){
@@ -34,7 +36,7 @@ function updateWaiting(dt){
         const sp=(20+F.len*.35)*w.attract*sc(sh.y)*(F.beh==='sleeper'?.5:1)/(w.bm||1)*(w.echo?2.2:1);
         sh.ang=angLerp(sh.ang, Math.atan2(dy,dx)+Math.sin(S.time*2.2)*.5*Math.min(1,d/70), dt*3);
         sh.x+=Math.cos(sh.ang)*sp*dt; sh.y+=Math.sin(sh.ang)*sp*dt*.6;
-        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:w.echo?0:F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,(F.rarity==='rare'||F.rarity==='legendary')?4:3)); w.nibT=S.tut?1.2:w.echo?.15:rand(.5,1.1)*(w.bm||1); }
+        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:w.echo?0:nibbles(F); w.nibT=S.tut?1.2:w.echo?.15:rand(.5,1.1)*(w.bm||1); }
       } else if (w.phase==='nibble'){
         sh.ang=angLerp(sh.ang,Math.atan2(b.y-sh.y,b.x-sh.x),dt*2);
         const hx=b.x-Math.cos(sh.ang)*F.len*.38*sc(b.y), hy=b.y-Math.sin(sh.ang)*F.len*.2*sc(b.y);
@@ -50,6 +52,8 @@ function updateWaiting(dt){
   if (w.phase==='snag') updateSnag(dt);
   if (w.phase==='empty'){ w.t-=dt; if (w.t<=0){ if (w.loot) startSnag(w.loot); else spawnApproach(); } }
 }
+/** How many fake nibbles come before the bite: sleepers nibble most, and rarer fish tease more. */
+function nibbles(F){ const r=rarRank(F.rarity); return F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,r>=rarRank('epic')?5:r>=rarRank('rare')?4:3)); }
 function twitch(){
   const w=S.wait, b=S.bob; w.tw=w.tw.filter(t=>S.time-t<2.5); w.tw.push(S.time);
   b.jerk=1; ripple(b.x,b.y,18); sfx.twitch(); buzz(6);
@@ -86,9 +90,13 @@ function hook(){
   const perfect=b.t<=.3*modMul('perfect',{fish:b.fish,spot:S.bob.spot,lucky:!!(S.wait&&S.wait.lucky)});
   if (perfect){ save.stats.perfect++; toast('Perfect hook!','good'); } else toast('Hooked!','');
   sfx.hook(perfect); buzz(perfect?[0,20,30,20]:25);
-  S.freeze=R.hitstop+(perfect?.04:0); shake(F.rarity==='legendary'?10:F.rarity==='rare'?5:2); pulse(perfect?.35:.2);
+  const rk=rarRank(F.rarity);
+  S.freeze=R.hitstop+(perfect?.04:0); shake(rk>=rarRank('legendary')?10:rk>=rarRank('epic')?7:rk>=rarRank('rare')?5:2); pulse(perfect?.35:.2);
   splash(S.bob.x,S.bob.y,8+R.splash/3);
-  if (F.rarity==='legendary'){ S.darkT=.5; setTimeout(()=>toast('Something enormous…','gold'),350); }
+  hookMoment(F,perfect);   // Epic and up: the water bulges, shifts colour or inks over (game/rarity-fx.js)
+  if (rk>=rarRank('mythic')){ S.darkT=.7; }
+  else if (rk>=rarRank('legendary')){ S.darkT=.5; setTimeout(()=>toast(F.rarity==='exotic'?'Something strange…':'Something enormous…','gold'),350); }
+  else if (rk>=rarRank('epic')) S.darkT=.3;
   else if (F.rarity==='rare') S.darkT=.18;
   startReel(b.fish,perfect);
 }

@@ -2,7 +2,7 @@
 function tankOf(id){ return REGION_FISH.coast.includes(id)?'salt':'fresh'; }
 function tanks(){ save.tanks=save.tanks||{}; for (const k in TANKS){ const t=save.tanks[k]=save.tanks[k]||{lvl:0,fish:[],owned:k==='fresh'}; t.decor=t.decor||[]; if (typeof t.tips!=='number') t.tips=0; if (!t.tipT) t.tipT=Date.now(); } return save.tanks; }
 function tankCap(k){ return TANKS[k].caps[tanks()[k].lvl]; }
-function tankRoom(id){ const k=tankOf(id), t=tanks()[k]; return t.owned && t.fish.length<tankCap(k); }
+function tankRoom(id){ if (FISH[id].noTank) return false; const k=tankOf(id), t=tanks()[k]; return t.owned && t.fish.length<tankCap(k); }
 function hasDecor(k,id){ return tanks()[k].decor.includes(id); }
 function decorFor(k){ return DECOR[k].filter(d=>hasDecor(k,d.id)); }
 function favorites(k,fid){ const F=FISH[fid]; return decorFor(k).filter(d=>(d.beh&&d.beh.includes(F.beh))||(d.ids&&d.ids.includes(fid))||(d.rar&&d.rar.includes(F.rarity))); }
@@ -153,13 +153,13 @@ function aqDraw(){
   c.fillStyle='#E9C46A'; for (const fl of AQ.flakes){ c.fillRect(fl.x-1.5,fl.y-1,3,2); }
   const sorted=[...AQ.fish].sort((a,b2)=>a.len-b2.len);
   for (const fi of sorted){ const r=fi.F.rarity, sel=AQ.sel===fi;
-    if (r==='legendary' && Math.random()<.2) AQ.parts.push({x:fi.x+rand(-fi.len/2,fi.len/2),y:fi.y+rand(-6,6),t:0,mote:true});
+    if (rarRank(r)>=rarRank('legendary') && Math.random()<.2) AQ.parts.push({x:fi.x+rand(-fi.len/2,fi.len/2),y:fi.y+rand(-6,6),t:0,mote:true});
     c.save(); c.translate(fi.x,fi.y); if (fi.jump) c.rotate(fi.face*(-.9+fi.jump.t/.8*1.8)); c.scale(fi.face,1);
     if (sel){ c.strokeStyle='rgba(255,255,255,.8)'; c.lineWidth=2; c.setLineDash([4,4]); c.beginPath(); c.ellipse(0,0,fi.len*.62,fi.len*.36,0,0,Math.PI*2); c.stroke(); c.setLineDash([]); }
-    if (r==='rare'||r==='legendary'){ c.strokeStyle=RAR[r].color; c.globalAlpha=.35+.25*Math.sin(t*3+fi.ph); c.lineWidth=3; c.beginPath(); c.ellipse(0,0,fi.len*.55,fi.len*.24,0,0,Math.PI*2); c.stroke(); c.globalAlpha=1; }
+    if (rarRank(r)>=rarRank('rare')){ c.strokeStyle=RAR[r].color; c.globalAlpha=.35+.25*Math.sin(t*3+fi.ph); c.lineWidth=3; c.beginPath(); c.ellipse(0,0,fi.len*.55,fi.len*.24,0,0,Math.PI*2); c.stroke(); c.globalAlpha=1; }
     const swing=Math.sin(t*(fi.F.beh==='tugger'?11:fi.dart>0?16:6)+fi.ph)*(fi.F.beh==='tugger'?.6:.4);
-    drawFish(c,fi.ref.id,fi.len,false,1,swing);
-    if (fi.pb){ c.save(); c.scale(fi.face,1); const ry=-fi.len*fi.F.h*(fi.ref.id==='mayor'?2.3:1.85)-7+Math.sin(t*2+fi.ph)*1.5; c.translate(-fi.len*.02,ry);
+    drawFish(c,fi.ref.id,fi.len,false,1,swing,false,fi.ref.mut);
+    if (fi.pb){ c.save(); c.scale(fi.face,1); const ry=-fi.len*fi.F.h*((DORSAL[fi.ref.id]||DORSAL0).top+.2)-7+Math.sin(t*2+fi.ph)*1.5; c.translate(-fi.len*.02,ry);
       c.fillStyle='#B4503F'; c.strokeStyle=INK; c.lineWidth=1; c.beginPath(); c.moveTo(-2,2); c.lineTo(-5,11); c.lineTo(-2,9); c.lineTo(0,12); c.closePath(); c.fill(); c.stroke(); c.beginPath(); c.moveTo(2,2); c.lineTo(5,11); c.lineTo(2,9); c.lineTo(0,12); c.closePath(); c.fill(); c.stroke();
       c.beginPath(); for (let i=0;i<12;i++){ const a=i/12*6.28, rr=i%2?4.2:5.6; c.lineTo(Math.cos(a)*rr,Math.sin(a)*rr); } c.closePath(); c.fillStyle='#E9B23C'; c.fill(); c.stroke(); c.beginPath(); c.arc(0,0,2,0,6.28); c.fillStyle='#FFF1C2'; c.fill(); c.restore(); }
     if (fi.ref.id==='lantern'){ c.globalCompositeOperation='lighter'; const gg=c.createRadialGradient(0,0,2,0,0,fi.len*.7); gg.addColorStop(0,'rgba(255,220,140,.28)'); gg.addColorStop(1,'rgba(255,220,140,0)'); c.fillStyle=gg; c.beginPath(); c.arc(0,0,fi.len*.7,0,Math.PI*2); c.fill(); c.globalCompositeOperation='source-over'; }
@@ -188,7 +188,7 @@ function aqDraw(){
     c.font='600 12.5px Nunito, system-ui, sans-serif'; c.fillText(tk.owned?'Move fish here from your keepnet.':'Set it up below to keep sea fish.',b.x+b.w/2,b.y+b.h*.42+12); }
 }
 function aqLoop(now){ if (!AQ.open) return; const dt=Math.min(.05,(now-AQ.last)/1000||0); AQ.last=now; aqUpdate(dt); aqDraw(); requestAnimationFrame(aqLoop); }
-function lovedBy(d){ const out=[]; if (d.all) return 'Every fish'; if (d.beh) out.push(...d.beh.map(bh=>BEH[bh]+'s')); if (d.ids) out.push(...d.ids.map(id=>FISH[id].name)); if (d.rar) out.push('Rare and legendary fish'); return out.join(', '); }
+function lovedBy(d){ const out=[]; if (d.all) return 'Every fish'; if (d.beh) out.push(...d.beh.map(bh=>BEH[bh]+'s')); if (d.ids) out.push(...d.ids.map(id=>FISH[id].name)); if (d.rar) out.push('Rare fish and rarer'); return out.join(', '); }
 function aqTipsUI(){ const k=AQ.tank, tk=tanks()[k], btn=$('aqCollect'); if (!btn) return; const n=Math.floor(tk.tips); btn.textContent=n>=1?'Collect +'+n.toLocaleString():'Tip jar empty'; btn.setAttribute('aria-label',n>=1?'Collect '+n.toLocaleString()+' coins in tips':'The tip jar is empty'); btn.disabled=n<1;
   const r=$('aqRate'); if (r) r.textContent=tk.owned?('Visitors tip about '+tipRate(k).toFixed(1)+' coins a minute. The jar holds '+jarHours(k)+' hours of tips.'):''; }
 function aqUI(){

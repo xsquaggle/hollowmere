@@ -33,7 +33,9 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/casting.js` | 50 | Aiming and the cast: `updateAim`, `release`, `updateCast` |
 | `src/game/bite.js` | 94 | Waiting and the bite: `startWaiting`, `spawnApproach`, `triggerBite`, `hook` |
 | `src/game/reeling.js` | 176 | The fight: `startReel`, `newFight`, `fightStep`, `updateReel`, snaps and lost fish |
+| `src/game/mutations.js` | 20 | Mutations: `rollMutation`, `mutationChance`, the per-species list (`mutsFound`, `noteMutation`), card tags and tips |
 | `src/game/landing.js` | 144 | `catchRoll` (what bit), landing, the catch card, coins, the HUD (`updateHud`) |
+| `src/game/rarity-fx.js` | 81 | The Epic, Exotic and Mythic moments: hook bulge, prism tint, ink, landing trails and rays, card chords, rarity pips |
 | `src/game/catch-card.js` | 68 | The catch card scene: tape measure, the record moment |
 | `src/game/odds.js` | 23 | `poolFor`: which fish each spot offers with the rod in hand |
 | `src/game/records.js` | 28 | Size, weight, quality stars, record formatting |
@@ -47,6 +49,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | --- | --- | --- |
 | `src/game/daynight.js` | 42 | Day and night palettes (`palAt`), `clockText` |
 | `src/game/weather.js` | 107 | Each water's skies from seed, region and hour: `wxAt`, `wxInfo`, `wxFishFor`, the clock icon |
+| `src/game/moon.js` | 55 | Moon phases in the sky, the moonpath, the mother's breach, the rainbow's foot |
 | `src/game/weather-art.js` | 112 | Sky tint, overcast, rain, rings on the water, fog banks, rainbow |
 | `src/game/scenery.js` | 97 | Static backdrop, rebuilt on resize: sky, hills, land |
 | `src/game/scenery-live.js` | 299 | Living layers: water, clouds, gulls, the lucky spot, pads, banks, rocks, boats |
@@ -170,4 +173,5 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/kitchen.test.cjs` | 68 | The four stations, meals, mush |
 | `tests/idle.test.cjs` | 274 | Traps, the smoke rack, time away |
 | `tests/orders.test.cjs` | 287 | Supper orders and reputation |
+| `tests/rarity.test.cjs` | 152 | Moon phases, rare bites, mutations, the dry run, the Mythic's sell |
 | `tests/weather.test.cjs` | 136 | Weather and its fish |

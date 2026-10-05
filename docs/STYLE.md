@@ -83,7 +83,18 @@ There are eight tiers, from Common to Godly. Each tier keeps everything the tier
 | Mythic | Ink that bleeds and recedes |
 | Godly | Light rays |
 
-Pips count the tier from 1 to 8.
+Pips count the tier from 1 to 8, on the catch card and in the journal.
+
+From build 22, Epic and up also have a moment at each beat of a catch (`src/game/rarity-fx.js`):
+
+| Tier | Hook | Landing | Card |
+| --- | --- | --- | --- |
+| Epic | A freeze, and the water bulges with violet sparks | A slow arc trailing violet sparks | A violet frame with a sheen, and a chord |
+| Exotic | The water round the line shifts colour, and keeps shifting while you reel | Prismatic rays and a rainbow trail | A border of turning colour |
+| Mythic | Ink closes in from the edges; music and ambience go quiet | The ink draws back from a full moon and the fish rises across it | Ink-dark double frame, and its name written in by pen, with its own theme |
+
+Mutations are drawn on the fish itself: Glassy shows its bones through a clear body, Mossy wears moss, sprigs and one
+flower along its back, a Twin is a second fish a touch smaller behind the first, and a Giant is simply bigger.
 
 ## Motion
 

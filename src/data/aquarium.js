@@ -23,7 +23,7 @@ const DECOR={
     {id:'anemone', name:'Anemone Bed', price:500, desc:'Waving anemones that sulkers settle beside.', eff:'+30% tips from sulkers', beh:['sulker'], pct:.30},
     {id:'kelpwall', name:'Kelp Forest Wall', price:800, desc:'Tall kelp along the back glass for leapers and eels.', eff:'+30% tips from leapers and the Kelp Ribbon', beh:['leaper'], ids:['kelpeel'], pct:.30},
     {id:'gold', name:'Pirate Gold', price:1000, desc:'Fill the old chest with coins. It burps them into the jar.', eff:'The tip jar holds 12 hours instead of 6', jar:12},
-    {id:'wreck', name:'Shipwreck', price:1600, desc:'A snapped little hull. The big fish claim it as home.', eff:'Rare and legendary fish earn 2× tips', rar:['rare','legendary'], pct:1},
+    {id:'wreck', name:'Shipwreck', price:1600, desc:'A snapped little hull. The big fish claim it as home.', eff:'Rare fish and rarer earn 2× tips', rar:['rare','epic','legendary','exotic'], pct:1},
     {id:'grotto', name:'Pearl Grotto', crate:'exotic', desc:'A shell grotto lined with mother-of-pearl that shimmers through every color.', eff:'+30% tips from every fish', all:.3}
   ]
 };

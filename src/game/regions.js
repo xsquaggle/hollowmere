@@ -1,8 +1,8 @@
 /* ---------- Regions ---------- */
 const REG = () => save.region==='coast' && save.boat ? 'coast' : 'lake';
 function spotName(sp){ return REG()==='coast' && sp==='deep' ? 'Dark trench' : SPOT_NAME[sp]; }
-/** Every lake fish caught, not counting the ones only weather brings up, so Barnaby never waits on the sky. */
-function lakeDone(){ return REGION_FISH.lake.every(id=>FISH[id].wx || (save.fish[id]||{}).caught>0); }
+/** Every lake fish caught, not counting the ones only weather brings up or the extras (Epic and rarer), so Barnaby never waits on the sky or on luck. */
+function lakeDone(){ return REGION_FISH.lake.every(id=>FISH[id].wx || FISH[id].extra || (save.fish[id]||{}).caught>0); }
 function hexRGB(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]; }
 function mixP(key,hex,t){ const a=(PAL[key+'R']||'0,0,0').split(',').map(Number), b=hexRGB(hex); return 'rgb('+a.map((v,i)=>Math.round(lerp(v,b[i],t))).join(',')+')'; }
 
