@@ -11,7 +11,7 @@
 const RFX={bulge:null, tint:null, ink:null, moon:null};
 const PRISM_TRAIL=['#E06B5B','#E9A05A','#E8D27A','#8CC77E','#6FA9D8','#7A7BCB','#A07AC2'];
 /** A fish's rarity as pips, one per tier (1 to 8), so rarity never rests on colour alone. */
-function rarPipsHTML(r){ const n=RAR[r].pips; return '<span class="pips fishpips" style="--pip:'+RAR[r].color+'" role="img" aria-label="'+RAR[r].label+', '+n+' of 8">'+'<i class="on"></i>'.repeat(n)+'</span>'; }
+function rarPipsHTML(r){ const n=RAR[r].pips; return '<span class="pips fishpips" style="--pip:var(--c-'+r+')" role="img" aria-label="'+RAR[r].label+', '+n+' of 8">'+'<i class="on"></i>'.repeat(n)+'</span>'; }
 /** The lake goes quiet for `secs`: the ambience drops away, then comes back as the volume settings have it. */
 function ambQuiet(secs){ if (!AC || !AMB) return; AMB.gain.setTargetAtTime(.0001,AC.currentTime,.25); clearTimeout(RFX.quietT); RFX.quietT=setTimeout(applyVol,secs*1000); }
 function hookMoment(F,perfect){ const rk=rarRank(F.rarity), b=S.bob; RFX.bulge=RFX.tint=RFX.ink=null; if (rk<rarRank('epic') || !b) return;

@@ -82,6 +82,12 @@ save, the region and the hour, so the same hour always has the same weather. Rai
 (`WX_FISH`), and a ghost fades mid-fight. Tap the clock to hear what the weather is doing; Playtest can pin it, beside the time of day.
 `npm run sim -- --weather` reports how often each comes and what each pays, and `--wx rain` runs any setup in one weather.
 
+**Rarity.** Epic fish sit in ordinary pools; Exotic and Mythic fish roll first through `RARE_BITES` (`src/data/fish.js`,
+`rareBite` in `src/game/odds.js`), so adding one takes nothing from the rest. Mutations are `MUTS` (rolled in
+`src/game/mutations.js`), the moon's phases are `MOON` (`src/data/weather.js`, drawn in `src/game/moon.js`), and the
+Epic-to-Mythic moments are in `src/game/rarity-fx.js`. Playtest can pin the moon, bring a rainbow, and pick the next fish
+and mutation; `npm run sim -- --rarity` reports each tier's share and what mutations pay.
+
 **Adding content.** A new fish is an entry in `src/data/fish.js` plus its region list and bite weights (a weather fish takes `wx` and an entry in `WX_FISH`, `src/data/weather.js`, instead of pool weights).
 A new find is an entry in `src/data/treasure.js` plus its drawing in `src/game/loot-art.js`.
 A new reel, line or bait is an entry in `src/data/tackle.js` plus its drawing in `src/game/tackle-art.js`.

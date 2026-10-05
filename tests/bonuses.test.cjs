@@ -39,14 +39,14 @@ module.exports = [
       const page = await newPage();
       await openGame(page, { save: veteran() });
       const r = await page.evaluate(() => {
-        const out = {}; const caps = { uncommon: 1.6, rare: 2.5, legendary: 3.5 };
+        const out = {}; const caps = { uncommon: 1.6, rare: 2.5, epic: 3, legendary: 3.5, exotic: 3.75, mythic: 4 };
         for (const st of [{ rod: 'willow' }, { rod: 'brasscap' }, { rod: 'deepwater' }, { rod: 'deepwater', meal: { id: 'pie', stars: 3 }, sets: 'all' }]) {
           const x = window.__hm.simulate(st, 10); out[st.rod + (st.meal ? '+' : '')] = { pts: x.luck.points, t: x.luck.tiers };
         }
         return { out, caps };
       });
       const { out, caps } = r;
-      assert.deepEqual(out.willow.t, { uncommon: 1, rare: 1, legendary: 1 }, 'no luck, no change');
+      assert.deepEqual(out.willow.t, { uncommon: 1, rare: 1, epic: 1, legendary: 1, exotic: 1, mythic: 1 }, 'no luck, no change');
       near(out.brasscap.t.legendary, 1.35, 'one bonus is close to its face value', 0.01);
       for (const [k, v] of Object.entries(out['deepwater+'].t)) assert.ok(v < caps[k] && v > out.deepwater.t[k], `${k} grows with more luck but stays under ×${caps[k]} (got ${v})`);
       assert.ok(out['deepwater+'].t.legendary > out['deepwater+'].t.rare && out['deepwater+'].t.rare > out['deepwater+'].t.uncommon, 'luck lifts rarer fish more');

@@ -64,7 +64,7 @@ function showCard(){
   if (save.stats.catches===3 && !save.metOttilie) setTimeout(()=>{ if (S.state==='idle') coachFor('Ottilie is waving you over. Tap her ferry by the dock to see her rods.',7); },2200);
   const card=$('card'); card.dataset.r=F.rarity; if (L.mut) card.dataset.mut=L.mut; else delete card.dataset.mut; card.classList.remove('out');
   $('cRarity').textContent=RAR[F.rarity].label; $('cPips').innerHTML=rarPipsHTML(F.rarity); $('cNew').hidden=!L.isNew;
-  $('cName').textContent=F.name; $('cSize').textContent=fmtLen(L.size); $('cW').textContent=fmtW(L.w); $('cQ').innerHTML=starsHTML(L.stars,'pop'); $('cValue').textContent='+'+L.value; $('cBeh').textContent=BEH[F.beh];
+  $('cName').textContent=F.name; $('cSize').textContent=fmtLen(L.size); $('cW').textContent=fmtW(L.w); $('cQ').innerHTML=starsHTML(L.stars,'pop'); $('cValue').textContent='+'+L.value.toLocaleString(); $('cBeh').textContent=BEH[F.beh]+(F.beh2?' then '+BEH[F.beh2]:'');
   const tags=[]; if (L.mut) tags.push(mutTag(L.mut)); if (L.lucky) tags.push('Gull luck '+trimNum(gullMul())+'×'); if (L.perfect) tags.push('Perfect hook +25%'); if (L.build>=1.1 && L.mut!=='giant') tags.push('Chunky');
   if (L.wx==='rain'||L.wx==='fog') tags.push('Caught '+WX[L.wx].on);
   if (L.isNew && save.kitchenOpen){ const rid=recipeLearnedBy(L.id); if (rid) tags.push('New recipe: '+RECIPES[rid].name); }
@@ -82,7 +82,7 @@ function showCard(){
   const full=save.net.length>=netCap();
   S.cardDefault=(L.isNew || F.rarity!=='common' || L.mut || L.pbBeat || L.stars===3 || L.needFor || L.orderFor) && !full ? 'keep' : 'sell';
   S.cardAuto=F.rarity==='common' && !L.mut && !L.isNew && !L.pbBeat && L.stars<3 && !L.needFor && !L.orderFor;
-  S.sellArmed=false; $('cSell').textContent='Sell · +'+L.value.toLocaleString(); $('cKeep').textContent=full?'Keepnet full':'Keep';
+  S.sellArmed=false; $('cSell').classList.remove('armed'); $('cSell').textContent='Sell · +'+L.value.toLocaleString(); $('cKeep').textContent=full?'Keepnet full':'Keep';
   $('cKeep').disabled=full; $('cTank').hidden=!(save.tutorialDone && tankRoom(L.id));
   $('cSell').classList.toggle('primary',S.cardDefault==='sell'); $('cKeep').classList.toggle('primary',S.cardDefault==='keep');
   $('cAuto').hidden=!S.cardAuto; if (S.cardAuto) $('cAuto').innerHTML='Selling in a moment · tap Keep to keep it<span class="bar"><i></i></span>';

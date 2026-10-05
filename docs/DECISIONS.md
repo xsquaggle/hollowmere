@@ -2,6 +2,21 @@
 
 Newest first. Each entry records what was decided and why, so later changes don't undo it by accident.
 
+## 2026-10-05
+
+- **Rarity in full (build 22).** The tiers above Legendary get fish, and every tier from Epic up gets its own moment on the hook, in the air and on the card, each one adding to the tier below and all of it visible with the sound off.
+  - Epic fish live in ordinary pools: the Steeple Gar (lake, deep pool and far water, likelier at dusk, a leaper, 170) and the Gaslight Angler (coast, deep water at night, a sulker whose lure glows even as a shadow, 850). The simulator puts each at 2–4% of the catch where it lives and 8–12% of the coins there.
+  - Exotic and Mythic fish don't sit in pools: they roll first, rarest first, and fall through to the pool when they miss (`rareBite` in `src/game/odds.js`), so adding them takes nothing from anything else.
+  - The Prism Shiner (Exotic, 1,200) bites only where the rainbow's foot comes down on the water, about one cast in 30 there: roughly one every two or three rainbows. Its journal entry shows its riddle from the start.
+  - The Moonwhale Calf (Mythic, 6,000) bites only in the lake's deep pool on full-moon nights, about one cast in 250, twice that on the moonpath. It dives at first and leaps from halfway in (a second behavior, `beh2`). It fits no tank, and selling one takes a second tap. Changed from the plan: the plan said the deep pool or the trench; it's the lake only, because its lore says "this lake" and its mother breaches there.
+  - The moon now has phases, an 8-day cycle worked out from the save's day, drawn in the sky, the windows and the moon's glitter on the water. Now and then on a full-moon night the calf's mother breaches far out, which puts the calf's hint in the journal.
+- **Four mutations, on any fish below Mythic:** Mossy (×2.5), Glassy (×4), Twin (two fish, counted as two caught, worth two) and Giant (a size past the species' range), each drawn on the fish. About 4% of catches mutate, adding about 5% to coins and 10–15 Glimmer an hour. A mutated fish defaults to keep and is never auto-sold, and the journal keeps the ones found for each species. The tutorial's fish never mutates.
+  - The rainbow's foot doubles mutations, and the new Odd Water rune (90 Glimmer) doubles them anywhere.
+- **A long run without a Legendary lifts their odds:** after 80 casts where one could have bitten, rising to double at 200, and reset by landing one. Bad luck shouldn't last for hours.
+- **Deferred:** Godly fish, omens and falling stars go with the Hollow (step 29), storms with the Storm Eye (step 27), and Inked fish with step 28, where the doc places them.
+- **Extras stay off the lake's checklist.** Barnaby's boat waits on the lake's ordinary fish, not on Epic luck or the moon.
+- **Playtest can pin the moon, bring a rainbow now, and pick the next fish and the next mutation,** and the simulator has a rarity report (`npm run sim -- --rarity`).
+
 ## 2026-10-04
 
 - **Each water gets its own weather (build 21).** Clear, overcast, rain and fog, as the design doc's weather table has them (storm and snow come later, with Storm Chaser and the cold regions). The aim is a sky that changes how a session feels and which fish come up, without ever locking anyone out.

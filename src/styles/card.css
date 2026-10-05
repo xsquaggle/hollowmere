@@ -91,7 +91,7 @@
 #card[data-r="mythic"]{border:4px double var(--c-mythic);background:radial-gradient(120% 80% at 50% 0,#F4F5F9,var(--paper) 70%);
   box-shadow:0 6px 0 #1A1922,0 0 0 6px rgba(200,206,222,.45),0 0 60px rgba(225,232,250,.5),0 18px 50px rgba(0,0,0,.6);animation:cardIn .9s cubic-bezier(.2,1.2,.4,1)}
 #card[data-r="epic"] .rarity{background:var(--c-epic)}#card[data-r="exotic"] .rarity{background:linear-gradient(90deg,#C8605A,#C99A2E,#3F9A6A,#3F7FB8,#7A5BB0)}#card[data-r="mythic"] .rarity{background:var(--c-mythic)}
-#cPips{display:inline-flex;margin-left:auto}#cPips:empty{display:none}
+#cPips{display:inline-flex}#cPips:empty{display:none}
 #cName.inked{animation:inkIn 1.8s steps(18,end) .3s both}
 @keyframes inkIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 #cSell.armed{background:#B9493A;color:#fff;border-color:#7A2B21}

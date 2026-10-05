@@ -44,7 +44,7 @@ function rollFish(spot,lucky,at){ if (RARITY_CTL.fish && !SIMULATING){ const f=R
   if (rarRank(FISH[id].rarity)<rarRank('legendary') && Object.keys(w).some(k=>FISH[k].rarity==='legendary')) save.stats.dry=(save.stats.dry||0)+1;
   return id; }
 /** What the dry run multiplies the Legendaries' odds by: 1 until DRY.from casts, rising to DRY.max at DRY.to. */
-function dryMul(){ const d=save.stats.dry||0; return d<=DRY.from?1:1+(DRY.max-1)*Math.min(1,(d-DRY.from)/(DRY.to-DRY.from)); }
+function dryMul(){ const d=Math.max(0,+save.stats.dry||0); return d<=DRY.from?1:1+(DRY.max-1)*Math.min(1,(d-DRY.from)/(DRY.to-DRY.from)); }
 /** Landing a Legendary or rarer ends a dry run. */
 function dryEnd(rar){ if (rarRank(rar)>=rarRank('legendary')) save.stats.dry=0; }
 const ROD = () => RODS[save.rod] || RODS.willow;
