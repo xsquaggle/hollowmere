@@ -84,11 +84,12 @@ module.exports = [
       await openGame(page, { save: veteran({ coins: 500, fish: tinyRecords(FISH) }) });
       assert.ok(!(await visible(page, '#glimChip')), 'no Glimmer chip before the first Glimmer');
       await landFish(page);
-      const L = await page.evaluate(() => ({ pb: window.__S.land.pbBeat, g: window.__S.land.pbGlim, rar: window.__S.land.F.rarity, rec: window.__hm.GLIMMER.record }));
+      const L = await page.evaluate(() => ({ pb: window.__S.land.pbBeat, g: window.__S.land.pbGlim, mut: window.__S.land.mutGlim || 0, rar: window.__S.land.F.rarity, rec: window.__hm.GLIMMER.record }));
       assert.ok(L.pb, 'the catch beat its 1 g record');
       assert.equal(L.g, L.rec[L.rar], 'it pays the record bonus for its rarity in Glimmer');
       let s = await readSave(page);
-      assert.equal(s.glimmer, L.g, 'kept in the save at once'); assert.equal(s.stats.glimmer, L.g);
+      // a mutated catch (a few percent of them) pays its own Glimmer on top
+      assert.equal(s.glimmer, L.g + L.mut, 'kept in the save at once'); assert.equal(s.stats.glimmer, L.g + L.mut);
       assert.match(await page.textContent('#cPB'), new RegExp('\\+' + L.g));
       await until(page, () => !document.getElementById('glimChip').hidden && document.getElementById('glimmer').textContent === String(window.__hm.save.glimmer), null, { timeout: 5000, what: 'the chip to count up' });
       // the stamp has landed and the Glimmer counted up: still no coins until the fish is sold, then just its price
