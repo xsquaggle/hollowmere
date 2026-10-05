@@ -25,7 +25,7 @@ function update(dt,rdt){
   }
 }
 function frame(now){
-  const dt=clamp((now-last)/1000,0,.05); last=now; MODC.frame++; S.time+=dt; musicFrame(dt);
+  const dt=clamp((now-last)/1000,0,.05); last=now; MODC.frame++; S.time+=dt; musicFrame(dt); paceTick(dt);
   APP.liveT=(APP.liveT||30)-dt; if (APP.liveT<=0){ APP.liveT=30; persist(); }   // keeps lastPlayed close, for time away (game/away.js), in the rooms too
   if (AQ.open||K.open||SH.open){ update(dt,dt); requestAnimationFrame(frame); return; } // the world keeps turning while you're in a room
   let gdt=dt*(S.tut==='bite'?.35:1); if (S.freeze>0){ S.freeze-=dt; gdt=0; }

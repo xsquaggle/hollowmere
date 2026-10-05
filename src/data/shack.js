@@ -22,9 +22,9 @@ const FIXUP=[
    done:'New flue, dry wood. It draws well.'},
   {id:'cabinet', line:'Glass-front cabinet for the odds and ends', name:'A glass-front cabinet', cost:9000, eff:'Every curio on show, and treasure turns up 10% more often.', cabinet:true, mods:[{stat:'treasure', v:1.1}],
    done:'Everything you’ve pulled up, where you can see it.'},
-  {id:'panel', line:'Panel the trophy wall', name:'Panel the trophy wall', cost:16000, eff:'Oak panels, brass picture lights, and three more plaques.', plaques:3,
+  {id:'panel', line:'Panel the trophy wall', name:'Panel the trophy wall', cost:14000, eff:'Oak panels, brass picture lights, and three more plaques.', plaques:3,
    done:'Oak, oiled, with a light over every plaque.'},
-  {id:'knock', line:'Knock through to the tank room', name:'Knock through to the tank room', cost:28000, eff:'Both tanks can grow to 18 fish.', tankCap:18,
+  {id:'knock', line:'Knock through to the tank room', name:'Knock through to the tank room', cost:20000, eff:'Both tanks can grow to 18 fish.', tankCap:18,
    done:'An arch where the wall was. The tanks have room to grow.'},
   {id:'trapdoor', line:'Open the trapdoor', name:'Open the trapdoor', why:'Not yet. It needs a key, and you haven’t found the right one.'}
 ];

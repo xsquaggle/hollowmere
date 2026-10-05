@@ -1156,6 +1156,9 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 .bal-tab th+th,.bal-tab td+td{text-align:right}
 .bal-tab td{padding:5px 0;border-top:1px solid rgba(43,42,51,.1);font-weight:700}
 .bal-notes{margin-bottom:4px}
+/* Playtest > Pace: what this run hasn't reached yet is greyed; a time half or twice the simulator's is marked */
+.pace-tab tr.pace-todo td{color:#9A9488}
+.pace-tab td.pace-far{color:#B2493A;font-weight:800}
 </style>
 
 </head>
@@ -1305,8 +1308,8 @@ const RAR = {
 const POOLS = {
   open: {perch:70, reedwhisker:6, leafjack:12, mossback:3},
   pads: {leafjack:55, perch:25, mossback:8},
-  deep: {perch:28, mossback:40, leafjack:12, gar:2, mayor:6},
-  far:  {perch:22, leafjack:30, mossback:26, reedwhisker:4, gar:2, mayor:3},
+  deep: {perch:40, mossback:14, leafjack:20, gar:2.5, mayor:1.2},
+  far:  {perch:22, leafjack:30, mossback:10, reedwhisker:4, gar:2, mayor:.8},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
@@ -1314,10 +1317,10 @@ const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the 
 const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
-  rocks:{wrasse:58, sprat:14, grouper:20, bream:6},
+  rocks:{wrasse:58, sprat:14, grouper:9, bream:6},
   kelp: {kelpeel:46, sprat:24, bream:20, grouper:5},
-  deep: {grouper:30, bream:28, sprat:24, kelpeel:10, angler:2, saltjaw:4},
-  far:  {bream:34, sprat:28, grouper:20, kelpeel:10, angler:1, saltjaw:2}
+  deep: {grouper:14, bream:28, sprat:34, kelpeel:10, angler:2.5, saltjaw:.9},
+  far:  {bream:34, sprat:28, grouper:10, kelpeel:10, angler:1, saltjaw:.6}
 };
 const RARE_BITES={
   shiner:{region:'lake', bow:true, chance:.035},
@@ -1337,7 +1340,7 @@ const MUT_ORDER=['mossy','glassy','twin','giant'];
               snag (chance the reeds catch the line); reedBoost (reed fish bite this much sooner); color; where; perk;
               sea:true for Tacklegram rods; mods, the perk as modifiers (see data/stats.js and game/mods.js);
               ench, how many enchantment sockets it has (1 to 3: data/enchant.js).
-   ROD_ORDER  Ottilie's shop ladder.  SEA_RODS  the Tacklegram ladder.  PARTS (with their mods), PAINTS  boat upgrades and colors
+   ROD_ORDER  Ottilie's shop ladder (each rod about 2.5 times the last, set by the depth gate's whole-run report).  SEA_RODS  the Tacklegram ladder.  PARTS (with their mods), PAINTS  boat upgrades and colors
               (a paint with crate: only comes in loot crates; the rest are sold on Tacklegram).
    A modifier is {stat, v, when?, omen?}: stat names an entry in STATS; when limits it to a region, spot, time
    (night:true, or night:false for daytime), fish, rarity (a list) or rarityMin (that rarity and rarer); omen:true multiplies luck after the
@@ -1345,25 +1348,27 @@ const MUT_ORDER=['mossy','glassy','twin','giant'];
 const RODS = {
   willow:    {name:'Willow Switch', price:0, ench:1,    reach:.36, line:1,    reel:1,    luck:0,    value:1,    snag:.35, reedBoost:1,   color:'#5A4030', where:'Near shore',
               perk:'No perk. Snags in the reeds about 1 cast in 3.'},
-  reedcutter:{name:'Reedcutter', price:75, ench:1,      reach:.5,  line:1.1,  reel:1.05, luck:0,    value:1,    snag:0,   reedBoost:1.7, color:'#5F7136', where:'Reeds and lily pads',
+  reedcutter:{name:'Reedcutter', price:150, ench:1,      reach:.5,  line:1.1,  reel:1.05, luck:0,    value:1,    snag:0,   reedBoost:1.7, color:'#5F7136', where:'Reeds and lily pads',
               perk:'Slices through reeds, and reed fish bite sooner.'},
-  ash:       {name:'Ash Caster', price:200, ench:2,     reach:.7,  line:1.15, reel:1.1,  luck:.1,  value:1.1,  snag:.25, reedBoost:1,   color:'#9A7A52', where:'The deep pool',
+  ash:       {name:'Ash Caster', price:400, ench:2,     reach:.7,  line:1.15, reel:1.1,  luck:.1,  value:1.1,  snag:.25, reedBoost:1,   color:'#9A7A52', where:'The deep pool',
               perk:'A twitch draws fish from twice as far.', mods:[{stat:'twitch', v:2}]},
-  heronwood: {name:'Heronwood Long Rod', price:500, ench:2, reach:.9, line:1.25, reel:1.15, luck:.2, value:1.15, snag:.15, reedBoost:1, color:'#8E959B', where:'Far water',
+  heronwood: {name:'Heronwood Long Rod', price:900, ench:2, reach:.9, line:1.25, reel:1.15, luck:.2, value:1.15, snag:.15, reedBoost:1, color:'#8E959B', where:'Far water',
               perk:'Approaching fish flash their rarity color.', mods:[{stat:'reveal'}]},
-  brasscap:  {name:'Brasscap Pro', price:1200, ench:2,  reach:1,   line:1.4,  reel:1.25, luck:.35, value:1.25, snag:0,   reedBoost:1.3, color:'#B08D4C', where:'The horizon',
+  brasscap:  {name:'Brasscap Pro', price:2000, ench:2,  reach:1,   line:1.4,  reel:1.25, luck:.35, value:1.25, snag:0,   reedBoost:1.3, color:'#B08D4C', where:'The horizon',
               perk:'Perfect-hook window 50% wider.', mods:[{stat:'perfect', v:1.5}]},
-  saltline:  {name:'Saltline Rod', price:2500, ench:3, reach:1, line:1.6, reel:1.3, luck:.45, value:1.4, snag:0, reedBoost:1.3, color:'#3E6E8A', where:'Open water', sea:true,
+  saltline:  {name:'Saltline Rod', price:5000, ench:3, reach:1, line:1.6, reel:1.3, luck:.45, value:1.4, snag:0, reedBoost:1.3, color:'#3E6E8A', where:'Open water', sea:true,
               blurb:'Braided salt-cured line on a blue fiberglass blank.', perk:'Swells hit your line half as hard.', mods:[{stat:'swell', v:.5}]},
-  gale:      {name:'Gale Rod', price:6000, ench:3, reach:1, line:1.8, reel:1.4, luck:.6, value:1.55, snag:0, reedBoost:1.3, color:'#CFC6B2', where:'Open water', sea:true,
+  gale:      {name:'Gale Rod', price:11000, ench:3, reach:1, line:1.8, reel:1.4, luck:.6, value:1.55, snag:0, reedBoost:1.3, color:'#CFC6B2', where:'Open water', sea:true,
               blurb:'Light as driftwood, stiff as a mast.', perk:'Casts ride the wind and never wash out. Plus the Saltline’s perk.',
               mods:[{stat:'swell', v:.5}, {stat:'noWashout'}]},
-  deepwater: {name:'Deepwater Caster', price:12000, ench:3, reach:1, line:2, reel:1.5, luck:.8, value:1.7, snag:0, reedBoost:1.3, color:'#1F3B57', where:'Open water', sea:true,
+  deepwater: {name:'Deepwater Caster', price:24000, ench:3, reach:1, line:2, reel:1.5, luck:.8, value:1.7, snag:0, reedBoost:1.3, color:'#1F3B57', where:'Open water', sea:true,
               blurb:'Built for the trench. Heavy, quiet and very patient.', perk:'Rare-and-up fish bite twice as often in the trench. Plus every perk above.',
               mods:[{stat:'swell', v:.5}, {stat:'noWashout'}, {stat:'luck', omen:true, v:2, when:{region:'coast', spot:'deep', rarityMin:'rare'}}]}
 };
 const ROD_ORDER=['willow','reedcutter','ash','heronwood','brasscap'];
 const SEA_RODS=['saltline','gale','deepwater'];
+/* BOAT  Barnaby's skiff: what it costs. */
+const BOAT={price:3000};
 const PARTS={
   sonar:{name:'Fish Sonar', price:1800, blurb:'A little dish on the bow that pings the water around your bobber.',
          plus:['Pings reveal approaching fish and flash their rarity','A readout tells you what’s coming before it bites'],
@@ -1626,7 +1631,7 @@ const CRATES={
   mythic:   {name:'Mythic chest', look:'Ink black and silver', weight:1.2, pull:1.6, reel:9, snags:3, fish:64, floor:640, items:[{prize:'mythic'}, {lean:'exotic'}, {lean:'legendary'}, {gear:'mythic', chance:.3}]}
 };
 const OWNERS={ottilie:{name:'Ottilie'}, barnaby:{name:'Barnaby'}, pell:{name:'Pell'}};
-const POCKETS={start:1, max:5, costs:[1500, 6000, 18000, 45000]};
+const POCKETS={start:1, max:5, costs:[1500, 5000, 12000, 20000]};
 const FINDS={
   // curios: one of a kind, to collect, and some to give back
   toyboat: {name:'Tin Toy Boat', kind:'curio', rarity:'common', region:'lake', owner:'ottilie', lore:'A child’s tin steamer, red once. Scratched on the hull: O., AGE 7.',
@@ -1988,9 +1993,9 @@ const FIXUP=[
    done:'New flue, dry wood. It draws well.'},
   {id:'cabinet', line:'Glass-front cabinet for the odds and ends', name:'A glass-front cabinet', cost:9000, eff:'Every curio on show, and treasure turns up 10% more often.', cabinet:true, mods:[{stat:'treasure', v:1.1}],
    done:'Everything you’ve pulled up, where you can see it.'},
-  {id:'panel', line:'Panel the trophy wall', name:'Panel the trophy wall', cost:16000, eff:'Oak panels, brass picture lights, and three more plaques.', plaques:3,
+  {id:'panel', line:'Panel the trophy wall', name:'Panel the trophy wall', cost:14000, eff:'Oak panels, brass picture lights, and three more plaques.', plaques:3,
    done:'Oak, oiled, with a light over every plaque.'},
-  {id:'knock', line:'Knock through to the tank room', name:'Knock through to the tank room', cost:28000, eff:'Both tanks can grow to 18 fish.', tankCap:18,
+  {id:'knock', line:'Knock through to the tank room', name:'Knock through to the tank room', cost:20000, eff:'Both tanks can grow to 18 fish.', tankCap:18,
    done:'An arch where the wall was. The tanks have room to grow.'},
   {id:'trapdoor', line:'Open the trapdoor', name:'Open the trapdoor', why:'Not yet. It needs a key, and you haven’t found the right one.'}
 ];
@@ -1998,6 +2003,13 @@ const WALL={start:3, value:1.1, record:1.2};
 const SHELF=6;
 const MARKS=[{yr:'’67', h:.86}, {yr:'’71', h:.74}, {yr:'Mar ’79', h:.62}, {yr:'’84', h:.69}, {yr:'’91', h:.56}];
 const TRAPDOOR=['Locked. Water laps underneath.','Still locked. Something down there knocks, once.','The boards are wet from below.','You put your ear to it. It sounds like a long way down.'];
+
+/* Pace: when a steady player reaches each thing, from the depth gate's whole-run report (step 24).
+   PACE_SIM[key]  minutes of play until it, the median of 11 runs of `npm run sim -- --career --runs 11 --pace`
+                  (paste its output here after a balance change). Keys: rod:<id>, boat, part:<id>, fix:<id>
+                  (the fix-up list), pocket:<n> (the vest's nth pocket), rune:<id>, fish:<id> (the first one caught).
+                  Playtest > Pace (game/pace.js) sets a real run beside these. */
+const PACE_SIM={'fish:leafjack':5, 'fish:perch':5, 'rod:reedcutter':10, 'fish:mossback':10, 'rune:swift':15, 'fish:reedwhisker':20, 'fish:lantern':21, 'rod:ash':25, 'rod:heronwood':44, 'fish:gar':49, 'rune:magpie':49, 'fish:mayor':54, 'rod:brasscap':68, 'fish:char':76, 'rune:deep':86, 'fix:roof':106, 'rune:nightglass':116, 'boat':135, 'fish:kelpeel':140, 'fish:bream':140, 'fish:sprat':140, 'fish:grouper':144, 'rune:storm':154, 'fish:angler':173, 'fish:saltjaw':178, 'rod:saltline':179, 'part:hold':189, 'rune:wanderer':204, 'fish:gurnard':218, 'fix:net':229, 'rune:odd':245, 'pocket:2':279, 'part:sonar':299, 'rune:echo':300, 'fish:wrasse':301, 'part:keel':316, 'fix:lamp':323, 'rod:gale':348, 'fix:stove':365, 'pocket:3':411, 'fix:cabinet':459, 'rod:deepwater':481, 'pocket:4':515, 'fix:panel':534, 'fix:knock':567, 'pocket:5':617};
 
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
@@ -6982,15 +6994,15 @@ function updateBarnaby(dt){
   if (BAR.state!=='gone' && Math.random()<dt*3) SC.smoke.push({x:BAR.x+14,y:H-262,vx:rand(2,6),vy:-rand(8,12),r:2,life:0,max:2.5});
 }
 function openBoatShop(){
-  audioInit(); const can=save.coins>=1500;
+  audioInit(); const can=save.coins>=BOAT.price;
   let h='<div class="panel-head"><div><h2>Barnaby’s Boats</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>';
-  h+='<p class="note" style="font-style:italic;font-size:14px;color:#4B4842">“'+(can?'You’ve outgrown this pond, friend. Better fish out there, and stranger ones.':'Better fish out there, friend. Come back with 1,500 coins and she’s yours.')+'”</p><div class="entries">';
+  h+='<p class="note" style="font-style:italic;font-size:14px;color:#4B4842">“'+(can?'You’ve outgrown this pond, friend. Better fish out there, and stranger ones.':'Better fish out there, friend. Come back with '+BOAT.price.toLocaleString()+' coins and she’s yours.')+'”</p><div class="entries">';
   h+='<div class="entry" style="grid-template-columns:1fr auto;border-color:#C9A15A;border-width:2px"><div><span class="r" style="color:#A07A2E">Your first boat</span><h3>The Skiff</h3><p>Sturdy, a little leaky, and all yours.</p>'+
      '<p style="color:#3D6B3A;font-weight:700">+ Sail to Gullrock Coast</p><p style="color:#3D6B3A;font-weight:700">+ Fish from your own deck, out among the sea stacks</p><p style="color:#3D6B3A;font-weight:700">+ 6 new sea fish, kelp beds, a dark trench and rolling swells</p>'+
-     '<p style="color:#3D6B3A;font-weight:700">+ Sail back to the lake anytime from the Map</p></div><div>'+(save.boat?'<span class="r" style="color:#4E7B4C">Owned</span>':'<button class="btn" id="buyBoat" type="button"'+(can?'':' disabled style="opacity:.45"')+'>Buy · 1,500</button>')+'</div></div>';
+     '<p style="color:#3D6B3A;font-weight:700">+ Sail back to the lake anytime from the Map</p></div><div>'+(save.boat?'<span class="r" style="color:#4E7B4C">Owned</span>':'<button class="btn" id="buyBoat" type="button"'+(can?'':' disabled style="opacity:.45"')+'>Buy · '+BOAT.price.toLocaleString()+'</button>')+'</div></div>';
   h+='<div class="entry" style="grid-template-columns:1fr auto;opacity:.6"><div><span class="r">Coming later</span><h3>The Sloop</h3><p>Barnaby’s keeping her for when you’ve proven yourself on the coast.</p></div><div></div></div>';
   openSheet(h+'</div>'); $('closeS').addEventListener('click',closeSheet);
-  const b=$('buyBoat'); if (b) b.addEventListener('click',()=>{ if (save.coins<1500) return; addCoins(-1500); save.boat=true; persist(); sfx.out('rare'); buzz([0,40,60,40]); closeSheet(); showMap('coast',true); });
+  const b=$('buyBoat'); if (b) b.addEventListener('click',()=>{ if (save.coins<BOAT.price) return; addCoins(-BOAT.price); save.boat=true; persist(); sfx.out('rare'); buzz([0,40,60,40]); closeSheet(); showMap('coast',true); });
 }
 
 /* ---------- Map and travel ---------- */
@@ -10061,7 +10073,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=24, SNAP_KEY=KEY+'-snapshots';
+const BUILD=25, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -10203,7 +10215,7 @@ function update(dt,rdt){
   }
 }
 function frame(now){
-  const dt=clamp((now-last)/1000,0,.05); last=now; MODC.frame++; S.time+=dt; musicFrame(dt);
+  const dt=clamp((now-last)/1000,0,.05); last=now; MODC.frame++; S.time+=dt; musicFrame(dt); paceTick(dt);
   APP.liveT=(APP.liveT||30)-dt; if (APP.liveT<=0){ APP.liveT=30; persist(); }   // keeps lastPlayed close, for time away (game/away.js), in the rooms too
   if (AQ.open||K.open||SH.open){ update(dt,dt); requestAnimationFrame(frame); return; } // the world keeps turning while you're in a room
   let gdt=dt*(S.tut==='bite'?.35:1); if (S.freeze>0){ S.freeze-=dt; gdt=0; }
@@ -11169,13 +11181,61 @@ function balanceResultHTML(r,prev){
   return h;
 }
 
+/* ---------- The pace log: how long a run takes to reach each thing (the depth gate, step 24) ----------
+   Counts minutes of play: the page showing and someone touching it in the last PACE_IDLE seconds, in a room too.
+   Every few seconds it notes anything new the save holds (a rod, the boat, a boat part, a line of the fix-up list,
+   a vest pocket, a rune or a species caught) with the minute it came. Playtest > Pace sets the log beside the
+   simulator's whole run (data/pace.js), so a friend's phone shows where the game ran slow or fast for them.
+   save.pace = {secs, log:[[key, minute]], seen:{key:1}, late:true when the log began on a save already under way}. */
+const PACE={touch:-1e9, t:0}, PACE_IDLE=90;
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{ PACE.touch=S.time; },true));
+function paceState(){ const fresh=!isObj(save.pace); if (fresh) save.pace={};
+  const p=save.pace; if (!(p.secs>=0)) p.secs=0; if (!Array.isArray(p.log)) p.log=[]; if (!isObj(p.seen)) p.seen={};
+  // a save that was already playing before the log began: what it holds now isn't news, and the minutes start here
+  if (fresh && (save.stats.casts>0 || save.coins>0)){ p.late=true; for (const k of paceKeys()) p.seen[k]=1; }
+  return p; }
+/** Everything the log looks for, as keys (the same keys as data/pace.js). */
+function paceKeys(){ const k=[];
+  for (const r of save.rods||[]) if (r!=='willow') k.push('rod:'+r);
+  if (save.boat) k.push('boat');
+  for (const id of save.parts||[]) k.push('part:'+id);
+  for (const id of (isObj(save.shack) && Array.isArray(save.shack.fix) ? save.shack.fix : [])) k.push('fix:'+id);
+  const n=isObj(save.finds) ? +save.finds.pockets||0 : 0; for (let i=POCKETS.start+1;i<=Math.min(n,POCKETS.max);i++) k.push('pocket:'+i);
+  if (isObj(save.ench) && isObj(save.ench.own)) for (const id in save.ench.own) if (ENCH[id]) k.push('rune:'+id);
+  for (const id in save.fish) if (FISH[id] && (save.fish[id]||{}).caught>0) k.push('fish:'+id);
+  return k; }
+/** The main loop's tick (game/loop.js): minutes while someone's playing, and a look for anything new every 5 seconds. */
+function paceTick(dt){ if (SIMULATING || document.hidden || S.time-PACE.touch>PACE_IDLE) return;
+  const p=paceState(); p.secs+=dt; PACE.t+=dt; if (PACE.t<5) return; PACE.t=0;
+  const m=Math.round(p.secs/6)/10;
+  for (const k of paceKeys()) if (!p.seen[k]){ p.seen[k]=1; p.log.push([k,m]); } }
+/** What a key is called in the table. */
+function paceName(k){ const [kind,id]=k.split(':');
+  if (kind==='rod') return RODS[id]?RODS[id].name:id; if (kind==='boat') return 'The boat';
+  if (kind==='part') return PARTS[id]?PARTS[id].name:id; if (kind==='fix'){ const L=FIXUP.find(L=>L.id===id); return L?L.name:id; }
+  if (kind==='pocket') return 'Vest pocket '+id; if (kind==='rune') return ENCH[id]?ENCH[id].name:id;
+  if (kind==='fish') return FISH[id]?FISH[id].name:id; return k; }
+const paceMin = m => { m=Math.round(m); return m<60?m+' min':Math.floor(m/60)+' h '+String(m%60).padStart(2,'0'); };
+/** Playtest > Pace: this run beside the simulator's, in the order the simulator gets there. */
+function paceHTML(){ const p=paceState(), got=Object.fromEntries(p.log);
+  const keys=Object.keys(PACE_SIM).sort((a,b)=>PACE_SIM[a]-PACE_SIM[b]);
+  for (const [k] of p.log) if (!(k in PACE_SIM)) keys.push(k);
+  let h='<div class="stats"><div><b>'+paceMin(p.secs/60)+'</b><span>Played</span></div><div><b>'+p.log.length+'</b><span>Logged</span></div><div><b>'+paceMin(Math.max(0,...Object.values(PACE_SIM)))+'</b><span>Sim finish</span></div></div>';
+  h+='<p class="note">'+(p.late?'This save was under way before the log began, so the minutes count from then and earlier things aren’t listed. ':'')+
+    'Minutes count while the game is showing and someone has touched it in the last '+PACE_IDLE+' seconds. The simulator column is a steady player’s median run. Twice as slow, or half the time, is worth asking a tester about.</p>';
+  h+='<table class="bal-tab pace-tab"><thead><tr><th>What</th><th>This run</th><th>Simulator</th></tr></thead><tbody>';
+  for (const k of keys){ const sim=PACE_SIM[k], at=got[k], d=at!=null && sim ? at/sim : null;
+    h+='<tr'+(at==null?' class="pace-todo"':'')+'><td>'+paceName(k)+'</td><td'+(d!=null&&(d>=2||d<=.5)?' class="pace-far"':'')+'>'+(at!=null?paceMin(at):'–')+'</td><td>'+(sim!=null?paceMin(sim):'–')+'</td></tr>'; }
+  return h+'</tbody></table>'; }
+
 /* ---------- Playtest tools (the wrench, or a long press on the clock) ---------- */
 let PTAB='tools';
 $('labBtn').addEventListener('click',()=>{ if (S.state!=='loot') openPlaytest(); });
 function openPlaytest(tab){ if (tab) PTAB=tab;
   const head='<div class="panel-head"><div><h2>Playtest</h2><p>Build '+BUILD+' · numbers for tuning</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
-    '<div class="seg" role="tablist">'+[['tools','Tools'],['balance','Balance']].map(([k,l])=>'<button type="button" role="tab" data-pt="'+k+'" aria-selected="'+(PTAB===k)+'" class="'+(PTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+    '<div class="seg" role="tablist">'+[['tools','Tools'],['balance','Balance'],['pace','Pace']].map(([k,l])=>'<button type="button" role="tab" data-pt="'+k+'" aria-selected="'+(PTAB===k)+'" class="'+(PTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
   if (PTAB==='balance'){ openSheet(head+balanceFormHTML()); bindPlaytestTabs(); bindBalance(); return; }
+  if (PTAB==='pace'){ openSheet(head+paceHTML()); bindPlaytestTabs(); return; }
   const s=save.stats, fishCasts=s.casts-(s.hauls||0), rate=fishCasts>0?Math.round(s.catches/fishCasts*100):0, t=save.tune;   // treasure casts aren't missed fish
   const sl=(id,label,v,hint)=>'<label for="'+id+'">'+label+'<output id="'+id+'O">'+v.toFixed(2)+'×</output><input type="range" id="'+id+'" min="0.5" max="1.6" step="0.05" value="'+v+'"><span class="note" style="grid-column:1/-1;margin:0">'+hint+'</span></label>';
   openSheet(head+

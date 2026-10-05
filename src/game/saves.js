@@ -1,5 +1,5 @@
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=24, SNAP_KEY=KEY+'-snapshots';
+const BUILD=25, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
