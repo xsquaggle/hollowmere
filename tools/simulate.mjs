@@ -14,6 +14,7 @@
 //   node tools/simulate.mjs --compare-luck           the standard report, before and after step 12's luck curve
 //   node tools/simulate.mjs --rarity                  Epic, Exotic and Mythic shares, mutations, and the rainbow's foot and full moon
 //   node tools/simulate.mjs --spot deep --hour 23 --moon 4 --path   one moon phase (4 is full), casting onto the moonpath; --bow casts at the rainbow's foot
+//   node tools/simulate.mjs --rod brasscap --spot deep --shack   with every fix-up line done and the trophy wall full (data/shack.js)
 //   node tools/simulate.mjs --json                   machine-readable output
 import { existsSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
@@ -63,6 +64,7 @@ function custom() {
   if (opt.hour) st.hour = +opt.hour;
   if (opt.meal) { const [id, s] = String(opt.meal).split(':'); st.meal = { id, stars: +(s || 3) }; }
   if (opt.parts) st.parts = opt.parts === 'all' ? 'all' : String(opt.parts).split(',');
+  if (opt.shack) st.shack = 'all';
   if (opt.mastery) st.mastery = true; if (opt.lucky) st.lucky = true;
   if (opt.moon != null) st.moon = +opt.moon; if (opt.bow) st.bow = true; if (opt.path) st.path = true;
   return [['Custom setup', st]];
@@ -98,7 +100,7 @@ function runeRuns() { const rows = [];
     rows.push(['No runes · ' + base.rod + ', ' + (base.region || 'lake') + ' ' + base.spot + ', ' + base.hour + 'h', base]);
     for (const id of ids) rows.push(['  + ' + id, Object.assign({}, base, { ench: [id] })]); }
   return rows; }
-const runs = opt.tackle ? tackleRuns() : opt.runes ? runeRuns() : Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'lucky', 'player', 'reel', 'line', 'bait', 'ench', 'wx', 'moon', 'bow', 'path'].includes(k)) ? custom() : STANDARD;
+const runs = opt.tackle ? tackleRuns() : opt.runes ? runeRuns() : Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'shack', 'lucky', 'player', 'reel', 'line', 'bait', 'ench', 'wx', 'moon', 'bow', 'path'].includes(k)) ? custom() : STANDARD;
 const casts = +(opt.casts || 1000);
 if (opt.idle) { await idleReport(); process.exit(0); }
 if (opt.orders) { await ordersReport(); process.exit(0); }

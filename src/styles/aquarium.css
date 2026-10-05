@@ -50,6 +50,6 @@
 .aq-card .x{font:400 24px/1 var(--body);background:none;border:0;color:var(--ink);cursor:pointer;padding:0 4px}
 .aq-card h3{margin:0;font:400 21px/1.1 var(--display)}.aq-card p{margin:0;font-size:13px;color:#55514A;line-height:1.4}.aq-card .lore{font-style:italic}
 .aq-card .row .btn{flex:1}
-#cTank{background:none;border:0;padding:2px;font:800 13px var(--body);color:#2F7F96;text-decoration:underline;cursor:pointer;justify-self:center}
+#cTank,#cMount{background:none;border:0;padding:2px;font:800 13px var(--body);color:#2F7F96;text-decoration:underline;cursor:pointer;justify-self:center}
 @keyframes fadeOut{to{opacity:0}}
 .aq-item.crate{opacity:.72;border-style:dashed;box-shadow:none}

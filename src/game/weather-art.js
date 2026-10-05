@@ -94,7 +94,7 @@ function weatherArtUpdate(dt){ const L=wxLook();
   if (WXV.clouds && L.cloud>.02) for (const c of WXV.clouds){ c.x+=c.sp*dt*(REDUCED?.3:1); if (c.x>1.25) c.x=-.25; }   // the heavy clouds drift slowly east
   if (WXV.rings.length){ for (const r of WXV.rings) r.t+=dt; WXV.rings=WXV.rings.filter(r=>r.t<r.life); }
   if (WXV.spl.length){ for (const p of WXV.spl) p.t+=dt; WXV.spl=WXV.spl.filter(p=>p.t<.18); }
-  if (L.rain<.02 || AQ.open || K.open) return;
+  if (L.rain<.02 || AQ.open || K.open || SH.open) return;
   WXV.ringT+=dt*L.rain*34*W/390; while (WXV.ringT>=1 && WXV.rings.length<70){ WXV.ringT--; const y=rand(HZ+6,H-110), k=sc(y); WXV.rings.push({x:rand(0,W),y,t:0,life:rand(.4,.6),max:(3+rand(0,4))*k}); }
   WXV.splT+=dt*L.rain*9; while (WXV.splT>=1 && WXV.spl.length<14){ WXV.splT--; WXV.spl.push({x:rand(W*.2,W*.8),y:rand(H-118,H-14),t:0}); }
   const b=S.bob; if (b && (S.state==='waiting'||S.state==='bite') && L.rain>.3){ WXV.bobT+=dt*L.rain*2.4;

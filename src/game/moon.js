@@ -21,7 +21,7 @@ function drawMoonPhase(x,cx,cy,R,a){ const ph=moonPhase(), th=ph/MOON.cycle*Math
 var MOONS={breach:null, t:0};
 function moonUpdate(dt){ const B=MOONS.breach;
   if (B){ B.t+=dt; if (B.t>B.dur) MOONS.breach=null; return; }
-  if (AQ.open || K.open || REG()!=='lake' || !moonpathOn() || INTRO.active) return;
+  if (AQ.open || K.open || SH.open || REG()!=='lake' || !moonpathOn() || INTRO.active) return;
   if (Math.random()<dt*MOON.breach/60){                                     // MOON.breach a chance per in-game hour (a real minute)
     MOONS.breach={x:W*rand(.18,.82), y:HZ+(H-HZ)*rand(.02,.05), t:0, dur:3.4, dir:Math.random()<.5?-1:1};
     if (AC){ tone(70,2.6,{to:98,vol:.09,type:'sine',delay:.4}); tone(140,1.8,{to:118,vol:.04,type:'sine',delay:.9}); noise(1.4,{vol:.05,f:300,to:120,type:'lowpass',delay:1.5}); }

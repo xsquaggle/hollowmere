@@ -41,6 +41,6 @@ function recipeLearnedBy(fid){ return RECIPE_ORDER.find(id=>RECIPES[id].learn===
 function kitchenUnlockCheck(fromBoot){
   if (save.kitchenOpen || !save.tutorialDone || save.stats.catches<5) return;
   save.kitchenOpen=true; persist(); updateHud();
-  const b=$('kitchenBtn'); b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
-  setTimeout(()=>{ if (S.state==='idle' && !K.open) coachFor('Smoke is rising from your uncle’s old smokehouse. Tap the skillet to cook fish from your keepnet into meals.',8); },fromBoot?1500:2400);
+  shackPulse();
+  setTimeout(()=>{ if (S.state==='idle' && !K.open) coachFor('Smoke is rising from your uncle’s old smokehouse. Tap the shack at the bottom, then the kitchen door, to cook fish from your keepnet into meals.',8); },fromBoot?1500:2400);
 }

@@ -19,13 +19,13 @@ each build.
 | 20 | Weather: clear, overcast, rain and fog in each water, worked out from the save so a forecast can come later; four weather fish and the ghost fight; the Storm Knot rune; rain, fog banks, a rainbow, and their sounds (build 21) |
 | 21 | Rarity in full: two Epic fish, the Prism Shiner at the rainbow's foot and the Moonwhale Calf on full-moon nights; the moon's phases and moonpath; four mutations and the Odd Water rune; Epic-to-Mythic hook, landing and card moments; a dry run that lifts the Legendaries (build 22) |
 | 22 | Story relics: the Wet Almanac's forecast, the Moon Jar, the Drowned Bell and the Cartographer's Pin, each found its own way; treasure maps in three pieces with a cache to dig; combo chips, with the Tuning Fork's wake on a ghost (build 23) |
+| 23 | Shack upgrades: one shack button opens the front room, with doors to the tank room and the kitchen; the trophy wall (3 plaques growing to 8, each species mounted is worth more when caught), the curio shelf and glass-front cabinet, the rod rack, and your uncle's fix-up list of seven jobs with the trapdoor still locked (build 24) |
 
 ## Next
 
 13 waits for friends to be available; the rest go in order.
 
 - **13.** Friend playtest, and the bottom-bar regroup.
-- **23.** Shack upgrades and the trophy wall.
 - **24.** The depth gate: a balance pass and a friend playtest.
 - **25–32.** Phase C: new places and the story.
   - Rootwood River.

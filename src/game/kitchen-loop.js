@@ -71,6 +71,6 @@ function openKitchen(){ audioInit(); const L=$('kitchen'); ovOpen('kitchen',()=>
 }
 function closeKitchen(){ if (!K.open) return; ovClosed('kitchen'); if (K.mode==='station') kLeave(); sizzleStop(); K.open=false; persist(); updateHud();
   if (coinShown!==save.coins) coinTally(500);   // tips came in while the HUD was out of sight
-  ordersAfterKitchen(); const L=$('kitchen'); L.classList.add('closing');
+  ordersAfterKitchen(); shackBack(); const L=$('kitchen'); L.classList.add('closing');
   setTimeout(()=>{ L.hidden=true; L.classList.remove('closing'); L.innerHTML=''; },REDUCED?0:250); last=performance.now(); }
 window.addEventListener('resize',()=>{ if (K.open) kLayout(); });

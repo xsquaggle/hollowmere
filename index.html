@@ -96,7 +96,7 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--night);color:var
 @keyframes bootIn{to{opacity:1}} @keyframes load{to{width:100%}}
 .app-in{display:flex;flex-direction:column;min-height:100%;animation:appIn .25s ease}
 @keyframes appIn{from{opacity:0;transform:scale(.98)}}
-@media (prefers-reduced-motion: reduce){.phone.rise,.phone.sink,.boot-logo,.boot-bar,.boot-bar i,.phone-peek,.map-peek,.book-peek,.bowl-peek,.pan-peek,.app-in{animation-duration:.01s!important;animation-delay:0s!important}}
+@media (prefers-reduced-motion: reduce){.phone.rise,.phone.sink,.boot-logo,.boot-bar,.boot-bar i,.phone-peek,.map-peek,.book-peek,.shack-peek,.app-in{animation-duration:.01s!important;animation-delay:0s!important}}
 #phone{position:fixed;inset:0;background:rgba(10,13,22,.55);display:flex;align-items:center;justify-content:center;z-index:7;padding:16px;box-sizing:border-box}
 .phone{width:min(330px,100%);height:min(640px,100%);background:#1B1E2A;border-radius:38px;padding:14px 11px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;align-items:center;
   box-shadow:0 0 0 2px #2B2A33,0 20px 50px rgba(0,0,0,.5)}
@@ -203,7 +203,7 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--night);color:var
 .aq-card .x{font:400 24px/1 var(--body);background:none;border:0;color:var(--ink);cursor:pointer;padding:0 4px}
 .aq-card h3{margin:0;font:400 21px/1.1 var(--display)}.aq-card p{margin:0;font-size:13px;color:#55514A;line-height:1.4}.aq-card .lore{font-style:italic}
 .aq-card .row .btn{flex:1}
-#cTank{background:none;border:0;padding:2px;font:800 13px var(--body);color:#2F7F96;text-decoration:underline;cursor:pointer;justify-self:center}
+#cTank,#cMount{background:none;border:0;padding:2px;font:800 13px var(--body);color:#2F7F96;text-decoration:underline;cursor:pointer;justify-self:center}
 @keyframes fadeOut{to{opacity:0}}
 .aq-item.crate{opacity:.72;border-style:dashed;box-shadow:none}
 /* Settings: sound, save, install */
@@ -381,12 +381,12 @@ body:not([data-state="idle"]) .corner button{pointer-events:none!important}
 .icon-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
 .icon-btn:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
 .icon-btn.off{background:#CFC6B4}
-.book-peek,.bowl-peek,.pan-peek{position:relative;padding:0;border:0;background:none;cursor:pointer;pointer-events:auto;line-height:0;
+.book-peek,.shack-peek{position:relative;padding:0;border:0;background:none;cursor:pointer;pointer-events:auto;line-height:0;
   margin-bottom:calc(-12px - env(safe-area-inset-bottom,0px));filter:drop-shadow(0 -4px 8px rgba(0,0,0,.35));transition:transform .25s cubic-bezier(.2,1.5,.4,1)}
-.book-peek{animation:peek 9s 4.5s infinite}.bowl-peek{animation:peek 9s 6s infinite}.pan-peek{animation:peek 9s 1.5s infinite}
-.book-peek:hover,.book-peek:focus-visible,.bowl-peek:hover,.bowl-peek:focus-visible,.pan-peek:hover,.pan-peek:focus-visible{transform:translateY(-8px) rotate(-2deg);outline:none}
-.book-peek:active,.bowl-peek:active,.pan-peek:active{transform:translateY(-14px)}
-#journalBtn.pulse,#aquaBtn.pulse,#kitchenBtn.pulse{animation:jpulse .9s ease 3}
+.book-peek{animation:peek 9s 4.5s infinite}.shack-peek{animation:peek 9s 6s infinite}
+.book-peek:hover,.book-peek:focus-visible,.shack-peek:hover,.shack-peek:focus-visible{transform:translateY(-8px) rotate(-2deg);outline:none}
+.book-peek:active,.shack-peek:active{transform:translateY(-14px)}
+#journalBtn.pulse,#shackBtn.pulse{animation:jpulse .9s ease 3}
 @keyframes jpulse{50%{transform:translateY(-12px) scale(1.08)}}
 
 .k-scraps{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-size:12.5px;font-weight:700;line-height:1.35;color:#6B665C;text-align:left}
@@ -1026,6 +1026,74 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 .k-visit .row{width:100%}.k-visit .btn{flex:1;font-size:15px;padding:11px 14px}
 @media (max-width:370px){ .k-tk{grid-template-columns:52px minmax(0,1fr)} .k-tk-pt{width:52px;height:52px} .k-tk-foot{flex-wrap:wrap} .k-tk-foot .btn{flex:1} }
 @media (prefers-reduced-motion: reduce){ .k-tk.new,.k-levelup,.k-visit,.k-visit-gift,.k-town-mini.up{animation-duration:.01s!important;animation-delay:0s!important} .k-town-bar i{transition:none} }
+/* The shack's front room: doors, the fix-up list, plaque and rack cards; the shack button's two badges */
+#shackBtn #aquaTips{right:auto;left:-6px}
+#shack{position:fixed;inset:0;z-index:7;background:#2C2622;animation:aqIn .3s ease;overflow:hidden}
+#shack.closing{animation:fadeOut .25s forwards}
+#shCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:manipulation}
+.sh-top{z-index:1}
+/* the room's taps as buttons, unseen until one has keyboard focus */
+.sh-sr{position:absolute;left:12px;top:calc(env(safe-area-inset-top,0px) + 96px);z-index:2;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 24px)}
+.sh-sr button{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;padding:0;border:0}
+.sh-sr button:focus-visible{position:static;width:auto;height:auto;clip-path:none;padding:6px 10px;border-radius:8px;border:2px solid var(--brass);background:var(--paper);color:var(--ink);font:800 13px/1.2 var(--body)}
+.sh-top h2,.sh-top p{text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.sh-bottom{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;align-items:flex-end;justify-content:space-between;gap:8px;z-index:1;pointer-events:none}
+.sh-bottom>*{pointer-events:auto}
+.sh-listbtn{position:relative;flex:0 1 auto;margin-bottom:4px}
+.sh-n{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:6px;padding:0 5px;border-radius:9px;background:var(--danger);color:#fff;font:800 11px/1 var(--body)}
+.sh-door{position:relative;display:grid;justify-items:center;gap:3px;width:78px;padding:10px 4px 8px;border:2px solid var(--ink);border-bottom-width:0;border-radius:36px 36px 4px 4px;
+  background:repeating-linear-gradient(90deg,#6B4630 0 12px,#5E3D29 12px 13px,#74503A 13px 25px,#5E3D29 25px 26px);color:var(--paper);font:800 12px/1.1 var(--body);cursor:pointer;
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,.18),0 -2px 0 rgba(255,230,200,.08);text-shadow:0 1px 2px rgba(0,0,0,.6);transition:transform .12s}
+.sh-door:active{transform:translateY(2px)}
+.sh-door:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.sh-door[hidden]{display:none}
+.sh-door-ico{width:22px;height:22px;border-radius:50%;background:#4E8F9E;border:1.5px solid var(--ink);box-shadow:inset 0 -6px 0 rgba(0,0,0,.18)}
+.sh-door.right .sh-door-ico{background:#2F2C31;box-shadow:inset 0 -6px 0 #E8B866}
+.sh-door::after{content:"";position:absolute;right:9px;top:52%;width:5px;height:5px;border-radius:50%;background:var(--brass);border:1px solid var(--ink)}
+.sh-door.right::after{right:auto;left:9px}
+.sh-door.arch{background:radial-gradient(ellipse at 50% 100%,rgba(110,200,190,.55),rgba(46,90,92,.95) 70%),#2E5A5C;box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),0 0 18px rgba(110,200,190,.35)}
+.sh-door.arch::after{display:none}
+.sh-door .pk-badge{position:absolute;top:-8px;right:-6px}
+.sh-card{bottom:calc(env(safe-area-inset-bottom,0px) + 96px);max-height:calc(100% - 210px);overflow:auto;z-index:3}
+.sh-card .tip{color:#3D5A3A;font-weight:800}
+.sh-pick{display:grid;gap:6px}
+.sh-pickrow{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:center;text-align:left;padding:6px 8px;border-radius:10px;border:1.5px solid var(--ink);background:#FBF5E8;color:var(--ink);cursor:pointer;font:inherit}
+.sh-pickrow:active{transform:translateY(1px)}
+.sh-pickrow canvas{width:72px;height:36px}
+.sh-pickrow b{display:block;font:400 15px/1.15 var(--display)}
+.sh-pickrow small{display:block;font-size:12px;color:#6B665C;font-weight:700}
+.sh-pickrow .net-rec{font-style:normal}
+.sh-curio{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:start}
+.sh-curio canvas{width:72px;height:72px;border-radius:10px;background:#E6D9BE;border:1.5px solid var(--ink)}
+.sh-curio>div{display:grid;gap:4px}
+.sh-rods{display:grid;gap:6px}
+.sh-rod{display:grid;grid-template-columns:96px 1fr;gap:8px;align-items:center;text-align:left;padding:6px 8px;border-radius:10px;border:1.5px solid var(--ink);background:#FBF5E8;color:var(--ink);cursor:pointer;font:inherit}
+.sh-rod.on{background:#E6F0D6;border-color:#4E7B4C;cursor:default}
+.sh-rod canvas{width:96px;height:30px}
+.sh-rod b{display:block;font:400 15px/1.15 var(--display)}.sh-rod small{display:block;font-size:12px;color:#6B665C;font-weight:700}
+/* the fix-up list: ruled paper on a nail, in the uncle's hand */
+.sh-list{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 16px) 14px calc(env(safe-area-inset-bottom,0px) + 16px);background:rgba(10,10,14,.45);animation:inFade .2s both}
+.sh-paper{position:relative;width:100%;max-width:420px;max-height:100%;overflow:auto;box-sizing:border-box;padding:18px 16px 14px;color:var(--ink);border-radius:4px 4px 6px 3px;transform:rotate(-.6deg);
+  background:repeating-linear-gradient(180deg,transparent 0 29px,rgba(90,130,170,.28) 29px 30px),#F2E9D2;box-shadow:0 10px 26px rgba(0,0,0,.5),inset 0 0 30px rgba(150,120,70,.18);animation:appIn .25s ease}
+.sh-paper::before{content:"";position:absolute;left:50%;top:6px;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:#8C8C94;border:1.5px solid var(--ink)}
+.sh-paper .x{position:absolute;top:6px;right:8px;font:400 26px/1 var(--body);background:none;border:0;color:var(--ink);cursor:pointer;padding:2px 6px}
+.hand{font-family:Caveat,cursive;font-weight:600}
+.sh-paper h3{margin:4px 0 6px;font-size:30px;line-height:1}
+.sh-paper ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.sh-paper li{display:grid;grid-template-columns:1fr auto;column-gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(43,42,51,.15)}
+.sh-paper .ln{font-size:23px;line-height:1.05;position:relative;justify-self:start}
+.sh-paper .eff{grid-column:1;font-size:12.5px;font-weight:700;color:#4E5A42;line-height:1.3}
+.sh-paper li>.btn,.sh-paper li>.tick,.sh-paper li>.tag{grid-column:2;grid-row:1 / span 2}
+.sh-paper .btn.sm{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;font-size:13px}
+.sh-paper li.done .ln::after{content:"";position:absolute;left:-2px;right:-4px;top:55%;height:2px;background:rgba(43,42,51,.85);transform:rotate(-1.5deg);border-radius:1px}
+.sh-paper li.done .eff{color:#6B665C;font-style:italic}
+.sh-paper li.struck .ln::after{animation:strike .5s ease both}
+@keyframes strike{from{right:100%}}
+.sh-paper li.later .ln{color:#6B665C}
+.sh-paper .tick{font:800 20px/1 var(--body);color:#4E7B4C;padding:0 8px}
+.sh-paper .sig{margin:10px 0 2px;font-size:20px;color:#55514A}
+.sh-paper .cash{display:flex;align-items:center;gap:6px;margin:6px 0 0;font-weight:800;font-size:13px}
+@media (prefers-reduced-motion: reduce){#shack,.sh-paper,.sh-list,.sh-paper li.struck .ln::after{animation-duration:.01s!important}}
 /* Sheets */
 #sheet{position:fixed;inset:0;background:rgba(10,13,22,.55);display:flex;align-items:flex-end;justify-content:center;z-index:5}
 .panel{width:min(480px,100%);max-height:82%;overflow:auto;background:var(--paper);color:var(--ink);border-radius:16px 16px 0 0;
@@ -1105,9 +1173,10 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 <div id="hint" aria-live="polite"></div>
 <div id="coach" hidden aria-live="polite"><span id="coachStep">1 of 4</span><p id="coachText"></p></div>
 <div id="toast" aria-live="assertive"></div>
-<div class="corner center"><button class="book-peek" id="journalBtn" type="button" aria-label="Open journal"><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><rect x="6" y="4" width="44" height="44" rx="5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.8"/><rect x="10" y="4" width="40" height="44" rx="4" fill="#7E5439"/><path d="M10 4 V48" stroke="#4A3022" stroke-width="2"/><rect x="16" y="12" width="28" height="18" rx="3" fill="none" stroke="#C9A15A" stroke-width="1.4"/><path d="M23 21 q6 -6 13 0 q-7 6 -13 0 Z M36 21 l4 -3 v6 Z" fill="#C9A15A"/><rect x="46" y="20" width="8" height="10" rx="2" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><path d="M8 47 H50" stroke="#F1E4C6" stroke-width="2"/></svg></button><button class="bag-peek" id="bagBtn" type="button" aria-label="Open tackle bag" hidden><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><path d="M15 19 L3 3" stroke="#2B2A33" stroke-width="4.4" stroke-linecap="round"/><path d="M15 19 L3 3" stroke="#8A5E3C" stroke-width="2.2" stroke-linecap="round"/><circle cx="3" cy="3" r="1.5" fill="#C9A15A" stroke="#2B2A33" stroke-width=".8"/><path d="M12 21 C12 6 44 6 44 21" fill="none" stroke="#2B2A33" stroke-width="5.4" stroke-linecap="round"/><path d="M12 21 C12 6 44 6 44 21" fill="none" stroke="#6B4630" stroke-width="3" stroke-linecap="round"/><rect x="5" y="17" width="46" height="31" rx="7" fill="#8A8352" stroke="#2B2A33" stroke-width="1.8"/><rect x="11" y="34" width="34" height="11" rx="3" fill="#7A7447" stroke="#2B2A33" stroke-width="1.2"/><path d="M14 37 H42" stroke="#F1E4C6" stroke-width=".9" stroke-dasharray="1.6 1.6" opacity=".45"/><path d="M5 23 C5 19.5 8 17 12 17 H44 C48 17 51 19.5 51 23 V27 C51 32 46 34.5 40 34.5 H16 C10 34.5 5 32 5 27 Z" fill="#6E6840" stroke="#2B2A33" stroke-width="1.8"/><path d="M9 21.5 H47" stroke="#F1E4C6" stroke-width="1" stroke-dasharray="2 2" opacity=".55"/><path d="M8 26 q2 5 8 6" stroke="#fff" stroke-width="1.3" opacity=".22" fill="none" stroke-linecap="round"/><rect x="25" y="25" width="6" height="15" rx="1.5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.2"/><rect x="22.6" y="29.5" width="10.8" height="7.4" rx="1.6" fill="none" stroke="#2B2A33" stroke-width="3.6"/><rect x="22.6" y="29.5" width="10.8" height="7.4" rx="1.6" fill="none" stroke="#C9A15A" stroke-width="1.9"/><path d="M28 30 V36.4" stroke="#E3C27A" stroke-width="1.2"/></svg><span class="pk-badge bait-tag" id="bagBait" hidden></span></button><button class="bowl-peek" id="aquaBtn" type="button" aria-label="Open aquarium" hidden><svg width="58" height="50" viewBox="0 0 58 50" aria-hidden="true"><path d="M14 8 H44 C55 14 57 30 50 40 C46 46 40 48 29 48 C18 48 12 46 8 40 C1 30 3 14 14 8 Z" fill="rgba(210,235,240,.35)" stroke="#2B2A33" stroke-width="1.8"/><path d="M6 22 C10 20 16 24 22 22 C28 20 34 24 40 22 C46 20 50 23 52 22 C54 30 52 38 48 42 C44 46 38 48 29 48 C20 48 14 46 10 42 C6 38 4 30 6 22 Z" fill="#4E8F9E" opacity=".85"/><path d="M22 33 q7 -7 15 0 q-8 7 -15 0 Z M37 33 l5 -4 v8 Z" fill="#E08A3E" stroke="#2B2A33" stroke-width="1.2"/><circle cx="25.5" cy="32" r="1.2" fill="#2B2A33"/><path d="M14 46 q3 -10 8 -12 M16 46 q-2 -8 -1 -11" fill="none" stroke="#5E8F4E" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="16" r="2" fill="none" stroke="#F6F1E6" stroke-width="1"/><circle cx="43" cy="11" r="1.4" fill="none" stroke="#F6F1E6" stroke-width="1"/><path d="M12 8 H46" stroke="#2B2A33" stroke-width="3" stroke-linecap="round"/><path d="M12 14 C10 22 10 30 13 36" fill="none" stroke="#fff" stroke-width="1.6" opacity=".55" stroke-linecap="round"/></svg><span class="pk-badge coin-badge" id="aquaTips" hidden></span></button><button class="pan-peek" id="kitchenBtn" type="button" aria-label="Open kitchen" hidden><svg width="60" height="50" viewBox="0 0 60 50" aria-hidden="true"><path d="M41 17 L56 6" stroke="#2B2A33" stroke-width="8" stroke-linecap="round"/><path d="M41 17 L56 6" stroke="#6E4A33" stroke-width="4.5" stroke-linecap="round"/><ellipse cx="26" cy="33" rx="23" ry="16" fill="#2F2C31" stroke="#2B2A33" stroke-width="1.8"/><ellipse cx="26" cy="32" rx="18" ry="11.5" fill="#4A454D"/><path d="M14 33 q10 -10 22 -2 q-10 9 -22 2 Z" fill="#E8B866" stroke="#2B2A33" stroke-width="1.2"/><path d="M19 30 l3 4 M24 28 l3 5 M29 28 l2.5 5" stroke="#B9762F" stroke-width="1.3" stroke-linecap="round"/><path d="M21 15 q-3 -4 0 -8 M29 14 q-3 -4 0 -8" fill="none" stroke="#F6F1E6" stroke-width="1.7" stroke-linecap="round" opacity=".85"/><path d="M9 28 q3 -6 9 -8" fill="none" stroke="#fff" stroke-width="1.4" opacity=".3" stroke-linecap="round"/></svg><span class="pk-badge order-badge" id="kitchenOrders" hidden></span></button><button class="map-peek" id="mapBtn" type="button" aria-label="Open map" hidden><svg width="66" height="50" viewBox="0 0 66 50" aria-hidden="true"><rect x="9" y="9" width="48" height="34" fill="#F1E4C6" stroke="#2B2A33" stroke-width="1.6"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43 L57 43 L57 9 Z" fill="#C3D9D7"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43" fill="none" stroke="#2B2A33" stroke-width="1"/><ellipse cx="21" cy="34" rx="7" ry="4.5" fill="#AFCDD2" stroke="#2B2A33" stroke-width="1"/><path d="M26 32 C32 26 36 22 44 17" fill="none" stroke="#B4584A" stroke-width="1.6" stroke-dasharray="2.5 2"/><circle cx="44" cy="17" r="2.4" fill="#C9A15A" stroke="#2B2A33" stroke-width="1"/><path d="M14 20 l3 -5 l3 5 Z M19 20 l3 -6 l3 6 Z" fill="#E4D6B6" stroke="#2B2A33" stroke-width=".8"/><rect x="4" y="4" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="4" y="41" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/></svg></button><button class="phone-peek" id="phoneBtn" type="button" aria-label="Open phone" hidden><span class="pk-glow"><span class="pk-logo"></span></span><span class="pk-notch"></span><span class="pk-badge" id="phoneBadge" hidden>1</span></button></div>
+<div class="corner center"><button class="book-peek" id="journalBtn" type="button" aria-label="Open journal"><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><rect x="6" y="4" width="44" height="44" rx="5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.8"/><rect x="10" y="4" width="40" height="44" rx="4" fill="#7E5439"/><path d="M10 4 V48" stroke="#4A3022" stroke-width="2"/><rect x="16" y="12" width="28" height="18" rx="3" fill="none" stroke="#C9A15A" stroke-width="1.4"/><path d="M23 21 q6 -6 13 0 q-7 6 -13 0 Z M36 21 l4 -3 v6 Z" fill="#C9A15A"/><rect x="46" y="20" width="8" height="10" rx="2" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><path d="M8 47 H50" stroke="#F1E4C6" stroke-width="2"/></svg></button><button class="bag-peek" id="bagBtn" type="button" aria-label="Open tackle bag" hidden><svg width="56" height="50" viewBox="0 0 56 50" aria-hidden="true"><path d="M15 19 L3 3" stroke="#2B2A33" stroke-width="4.4" stroke-linecap="round"/><path d="M15 19 L3 3" stroke="#8A5E3C" stroke-width="2.2" stroke-linecap="round"/><circle cx="3" cy="3" r="1.5" fill="#C9A15A" stroke="#2B2A33" stroke-width=".8"/><path d="M12 21 C12 6 44 6 44 21" fill="none" stroke="#2B2A33" stroke-width="5.4" stroke-linecap="round"/><path d="M12 21 C12 6 44 6 44 21" fill="none" stroke="#6B4630" stroke-width="3" stroke-linecap="round"/><rect x="5" y="17" width="46" height="31" rx="7" fill="#8A8352" stroke="#2B2A33" stroke-width="1.8"/><rect x="11" y="34" width="34" height="11" rx="3" fill="#7A7447" stroke="#2B2A33" stroke-width="1.2"/><path d="M14 37 H42" stroke="#F1E4C6" stroke-width=".9" stroke-dasharray="1.6 1.6" opacity=".45"/><path d="M5 23 C5 19.5 8 17 12 17 H44 C48 17 51 19.5 51 23 V27 C51 32 46 34.5 40 34.5 H16 C10 34.5 5 32 5 27 Z" fill="#6E6840" stroke="#2B2A33" stroke-width="1.8"/><path d="M9 21.5 H47" stroke="#F1E4C6" stroke-width="1" stroke-dasharray="2 2" opacity=".55"/><path d="M8 26 q2 5 8 6" stroke="#fff" stroke-width="1.3" opacity=".22" fill="none" stroke-linecap="round"/><rect x="25" y="25" width="6" height="15" rx="1.5" fill="#6B4630" stroke="#2B2A33" stroke-width="1.2"/><rect x="22.6" y="29.5" width="10.8" height="7.4" rx="1.6" fill="none" stroke="#2B2A33" stroke-width="3.6"/><rect x="22.6" y="29.5" width="10.8" height="7.4" rx="1.6" fill="none" stroke="#C9A15A" stroke-width="1.9"/><path d="M28 30 V36.4" stroke="#E3C27A" stroke-width="1.2"/></svg><span class="pk-badge bait-tag" id="bagBait" hidden></span></button><button class="shack-peek" id="shackBtn" type="button" aria-label="Open your shack" hidden><svg width="60" height="50" viewBox="0 0 60 50" aria-hidden="true"><path d="M41 13 q-3 -4 0 -8 q3 -3 0 -6" fill="none" stroke="#F6F1E6" stroke-width="1.6" stroke-linecap="round" opacity=".7"/><rect x="37" y="9" width="7" height="11" fill="#7A5236" stroke="#2B2A33" stroke-width="1.5"/><rect x="9" y="22" width="42" height="27" fill="#5E7A70" stroke="#2B2A33" stroke-width="1.8"/><path d="M10 28 H50 M10 34 H50 M10 40 H50 M10 46 H50" stroke="#475F57" stroke-width="1.1"/><path d="M11 24 V48" stroke="#F1E4C6" stroke-width="1" opacity=".25"/><path d="M4 25 L30 6 L56 25 Z" fill="#6B4630" stroke="#2B2A33" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 20 L30 7.6 M17 22 L30 12.4 M43 18.6 L48 22" stroke="#4A3022" stroke-width="1.1"/><path d="M4 25 L30 6 L56 25" fill="none" stroke="#C9A15A" stroke-width="1" opacity=".55" transform="translate(0 2)"/><rect x="14" y="29" width="12" height="10" rx="1" fill="#F2C86A" stroke="#2B2A33" stroke-width="1.5"/><path d="M20 29 V39 M14 34 H26" stroke="#7A5236" stroke-width="1.3"/><rect x="32" y="31" width="11" height="18" fill="#7A5236" stroke="#2B2A33" stroke-width="1.5"/><path d="M35.5 33 V47 M39.5 33 V47" stroke="#5E3D29" stroke-width="1"/><circle cx="41" cy="40.5" r="1.1" fill="#C9A15A"/><rect x="12.5" y="39" width="15" height="2.4" fill="#5E3F2C" stroke="#2B2A33" stroke-width="1"/></svg><span class="pk-badge coin-badge" id="aquaTips" hidden></span><span class="pk-badge order-badge" id="kitchenOrders" hidden></span></button><button class="map-peek" id="mapBtn" type="button" aria-label="Open map" hidden><svg width="66" height="50" viewBox="0 0 66 50" aria-hidden="true"><rect x="9" y="9" width="48" height="34" fill="#F1E4C6" stroke="#2B2A33" stroke-width="1.6"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43 L57 43 L57 9 Z" fill="#C3D9D7"/><path d="M38 9 C42 18 40 24 46 30 C50 34 48 39 50 43" fill="none" stroke="#2B2A33" stroke-width="1"/><ellipse cx="21" cy="34" rx="7" ry="4.5" fill="#AFCDD2" stroke="#2B2A33" stroke-width="1"/><path d="M26 32 C32 26 36 22 44 17" fill="none" stroke="#B4584A" stroke-width="1.6" stroke-dasharray="2.5 2"/><circle cx="44" cy="17" r="2.4" fill="#C9A15A" stroke="#2B2A33" stroke-width="1"/><path d="M14 20 l3 -5 l3 5 Z M19 20 l3 -6 l3 6 Z" fill="#E4D6B6" stroke="#2B2A33" stroke-width=".8"/><rect x="4" y="4" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="2.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="4" y="41" width="58" height="7" rx="3.5" fill="#7A5236" stroke="#2B2A33" stroke-width="1.6"/><rect x="1" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/><rect x="59" y="39.5" width="6" height="10" rx="3" fill="#C9A15A" stroke="#2B2A33" stroke-width="1.4"/></svg></button><button class="phone-peek" id="phoneBtn" type="button" aria-label="Open phone" hidden><span class="pk-glow"><span class="pk-logo"></span></span><span class="pk-notch"></span><span class="pk-badge" id="phoneBadge" hidden>1</span></button></div>
 <div id="phone" hidden></div>
 <div id="aqua" hidden></div>
+<div id="shack" hidden></div>
 <div id="intro" hidden></div>
 <div id="news" role="status" aria-live="polite"></div>
 <div id="kitchen" hidden></div>
@@ -1127,6 +1196,7 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
   <p id="cLore"></p>
   <div class="card-actions"><button class="btn" id="cSell" type="button">Sell · +0</button><button class="btn" id="cKeep" type="button">Keep</button></div>
   <button id="cTank" type="button" hidden>Send straight to the aquarium</button>
+  <button id="cMount" type="button" hidden>Mount it on the trophy wall</button>
   <p id="cAuto">Selling in a moment · tap Keep to keep it</p>
 </div>
 
@@ -1382,12 +1452,13 @@ const BANQUET_LINES=[['Ottilie','Your uncle never managed it, you know. Fifty ye
 const LETTER=['Kid,','The shack’s yours now.','Rods are by the door, and Ottilie','still owes me a favour.','Don’t fish the deep pool at dawn.','…Or do. I never could stop.'];
 
 /* Aquarium: tanks, the tip rate per rarity (coins per minute), decor, and tank sets. Luck is in luck points (.1 is +10 luck).
+   A tank size bigger than the shack allows waits for the fix-up list's knock-through (data/shack.js: FIXUP tankCap).
    Decor with crate: (a rarity) isn't sold: it only comes in loot crates of that tier (data/treasure.js), then waits to be placed.
    TANK_SETS[].check(fish) gets the tank's fish list and returns true when the set is complete. Its bonus applies in its
    region ('any' for both), and only at night with night:true, or only in the weather wx names (data/weather.js). */
 const TANKS={
-  fresh:{name:'Freshwater', water:['#5FA39A','#2F6A66','#1C4644'], sand:'#B79A6E', caps:[6,10,14], costs:[600,1500], unlock:0},
-  salt: {name:'Saltwater', water:['#4FA6C4','#2A6F92','#173F5E'], sand:'#E2D3AE', caps:[6,10,14], costs:[800,2000], unlock:1200}
+  fresh:{name:'Freshwater', water:['#5FA39A','#2F6A66','#1C4644'], sand:'#B79A6E', caps:[6,10,14,18], costs:[600,1500,4000], unlock:0},
+  salt: {name:'Saltwater', water:['#4FA6C4','#2A6F92','#173F5E'], sand:'#E2D3AE', caps:[6,10,14,18], costs:[800,2000,5000], unlock:1200}
 };
 const TIP_BASE={common:.05, uncommon:.12, rare:.35, epic:.7, legendary:1.2, exotic:2.2, mythic:4, godly:8};
 const DECOR={
@@ -1893,6 +1964,41 @@ const VISITS={
 /* A Delicacy order is served whole on a plate, with the customer's side and a wedge of lemon. */
 const PLATTER={name:'Delicacy Platter', cook:'none', form:'whole', dish:'plate', side:'bread', spice:{}, zone:[.5,.7], speed:1};
 
+/* The shack's front room: the trophy wall, the curio shelf, and your uncle's fix-up list (game/shack.js runs it,
+   game/shack-art.js draws it).
+   FIXUP[]     the uncle's list, in the order he wrote it. line: his words, in his hand. name: what the room's card calls
+               it. cost: coins (none: it can't be done yet, and why says what it waits for). eff: what it does, one
+               sentence. mods: modifiers, as on rods (data/stats.js). plaques: plaques it adds to the trophy wall.
+               cabinet: every curio goes on show. tankCap: the biggest a tank can grow (data/aquarium.js: TANKS caps).
+               done: what the room says about it once it's done.
+   WALL        the trophy wall: plaques to start, and what a mount does for its species' sale value (value), or while
+               it's your record for that species (record). The most plaques the wall can hold is start plus every
+               line's plaques.
+   SHELF       curios on the open shelf before the cabinet.
+   MARKS       high-water marks pencilled on the wall: the year, and how high (0 the floor, 1 the ceiling).
+   TRAPDOOR    what the locked trapdoor says when you tap it, in turn. */
+const FIXUP=[
+  {id:'roof',  line:'Patch the roof', name:'Patch the roof', cost:400, eff:'The drip stops, and the dry wall takes two more plaques.', plaques:2,
+   done:'Dry, for the first time in years.'},
+  {id:'net',   line:'Mend the old net', name:'Mend the old net', cost:1200, eff:'Your keepnet holds 4 more fish.', mods:[{stat:'netCap', v:4}],
+   done:'Tarred and tied off. It hangs by the door.'},
+  {id:'lamp',  line:'Lamp in the window', name:'A lamp in the window', cost:2500, eff:'Night fish bite 15% more often.', mods:[{stat:'night', v:1.15}],
+   done:'The town can see your light from the far shore.'},
+  {id:'stove', line:'Get the stove going', name:'Get the stove going', cost:5000, eff:'Meals last 20% longer.', mods:[{stat:'mealCasts', v:1.2}],
+   done:'New flue, dry wood. It draws well.'},
+  {id:'cabinet', line:'Glass-front cabinet for the odds and ends', name:'A glass-front cabinet', cost:9000, eff:'Every curio on show, and treasure turns up 10% more often.', cabinet:true, mods:[{stat:'treasure', v:1.1}],
+   done:'Everything you’ve pulled up, where you can see it.'},
+  {id:'panel', line:'Panel the trophy wall', name:'Panel the trophy wall', cost:16000, eff:'Oak panels, brass picture lights, and three more plaques.', plaques:3,
+   done:'Oak, oiled, with a light over every plaque.'},
+  {id:'knock', line:'Knock through to the tank room', name:'Knock through to the tank room', cost:28000, eff:'Both tanks can grow to 18 fish.', tankCap:18,
+   done:'An arch where the wall was. The tanks have room to grow.'},
+  {id:'trapdoor', line:'Open the trapdoor', name:'Open the trapdoor', why:'Not yet. It needs a key, and you haven’t found the right one.'}
+];
+const WALL={start:3, value:1.1, record:1.2};
+const SHELF=6;
+const MARKS=[{yr:'’67', h:.86}, {yr:'’71', h:.74}, {yr:'Mar ’79', h:.62}, {yr:'’84', h:.69}, {yr:'’91', h:.56}];
+const TRAPDOOR=['Locked. Water laps underneath.','Still locked. Something down there knocks, once.','The boards are wet from below.','You put your ear to it. It sounds like a long way down.'];
+
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
          luck  bonuses add up as luck points; each rarity turns the points into odds on a curve that flattens
@@ -1953,7 +2059,7 @@ const MASTERY={catches:10, reel:1.65};
 
 /* ---------- Modifiers: every bonus in the game goes through here ---------- */
 /* Each source (the rod in hand and its tackle, the meal you ate, tank sets, decor, boat parts, artifacts in your vest pockets,
-   keepsakes, mastery, the weather, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
+   keepsakes, the shack's fix-ups and mounts, mastery, the weather, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
    stat's total in a context (region, time, weather, spot, fish, rarity, Gull Luck) and only matching modifiers count.
    STATS (data/stats.js) says how each stat combines and where it can apply at all. Adding an enchantment or
    a relic later means adding its modifiers to a source; nothing that reads the stats has to change.
@@ -1993,6 +2099,8 @@ function modSources(){
   const FS=findsState();
   for (const id of FS.equip){ const D=FINDS[id]; if (D && FS.have[id]) for (const x of D.mods||[]) L.push(Object.assign({src:'artifact',name:D.name},x)); }
   for (const id in FS.have){ const D=FINDS[id]; if (D && D.kind==='keepsake') for (const x of D.mods||[]) L.push(Object.assign({src:'keepsake',name:D.name},x)); }
+  // the shack: each line of the fix-up list done, and each fish on the trophy wall (game/shack.js)
+  fixUpMods(add,L);
   add('base','Keepnet','netCap',STATS.netCap.start);
   // mastery: enough of a species and your rod knows it
   for (const id in FISH) if ((save.fish[id]||{}).caught>=MASTERY.catches){ const n='Mastered '+FISH[id].name;
@@ -2224,6 +2332,7 @@ function timeOfDay(){ const h=save.clock; return h>=5&&h<17?'day':h>=17&&h<20.5?
 function audioScene(){ if (typeof INTRO!=='undefined' && INTRO.active && INTRO.quiet) return 'intro';
   if (typeof K!=='undefined' && K.open) return K.mode==='banquet'?'banquet':'kitchen';
   if (typeof AQ!=='undefined' && AQ.open) return 'aquarium';
+  if (typeof SH!=='undefined' && SH.open) return 'aquarium';
   const r=REG(), tod=timeOfDay(); return r==='coast'?'coast_'+tod:'lake_'+tod; }
 const MU={on:false,mood:null,next:0,bar:0,beat:0,timer:0,mel:null,duckT:0,duckV:1,fade:1};
 function musicStart(){ if (!AC||MU.on) return; MU.on=true; MU.next=AC.currentTime+.2; MU.timer=setInterval(musicTick,80); ambStart(); }
@@ -2258,7 +2367,7 @@ function musicFrame(dt){ if (!AC||!DUCK) return; MU.duckT=Math.max(0,MU.duckT-Ma
   DUCK.gain.setTargetAtTime(d,AC.currentTime,.25);
   // the weather muffles the music a little: fog most, rain on the hood less (game/weather.js)
   const L=wxLook(), cut=16000*Math.pow(4200/16000,L.fog)*Math.pow(7000/16000,L.rain*(1-L.fog));
-  MUSF.frequency.setTargetAtTime(typeof AQ!=='undefined'&&AQ.open?1500:cut,AC.currentTime,.4); }
+  MUSF.frequency.setTargetAtTime((typeof AQ!=='undefined'&&AQ.open)||(typeof SH!=='undefined'&&SH.open)?1500:cut,AC.currentTime,.4); }
 /* ambience: continuous beds plus little events */
 const AMBL={}; let ambOn=false;
 function ambBed(name,type,freq,q,lfoHz,lfoAmt){ const s=AC.createBufferSource(); s.buffer=ambBuf; s.loop=true; const f=AC.createBiquadFilter(); f.type=type; f.frequency.value=freq; f.Q.value=q;
@@ -2437,10 +2546,13 @@ function updateHint(){
 function updateAim(x,y){
   const a=S.aim; a.x=x; a.y=y;
   const vx=a.sx-x, vy=a.sy-y, len=Math.hypot(vx,vy), maxPull=Math.min(H*.3,230);
-  a.p = -vy>4 ? clamp(len/maxPull,0,1) : 0;
-  a.th = len>10 ? clamp(Math.atan2(vx,-vy),-.8,.8) : 0;
+  // a pull down counts, and so does one nearly level with the dock: on a wide screen the side water is a long way across
+  a.p = (-vy>4 || (Math.abs(vx)>16 && -vy>-Math.abs(vx)*.25)) ? clamp(len/maxPull,0,1) : 0;
   const depth=clamp((a.p-.12)/.88,0,1)*castReach(), ty=lerp(G.near,HZ+26,depth); a.depth=depth;
-  const tx=clamp(W/2+Math.tan(a.th)*(G.player.y-ty)*.85,22,W-22);
+  // the widest angle reaches the screen's edge at this distance, so a wide screen's banks are in range too
+  const far=Math.max(40,(G.player.y-ty)*.85), maxTh=clamp(Math.atan((W/2-22)/far),.8,1.4);
+  a.th = len>10 ? clamp(Math.atan2(vx,Math.max(-vy,.01)),-maxTh,maxTh) : 0;
+  const tx=clamp(W/2+Math.tan(a.th)*far,22,W-22);
   a.target={x:tx,y:ty}; a.spot=spotAt(tx,ty); a.lucky=inLucky(tx,ty);
 }
 function release(){
@@ -2879,7 +2991,8 @@ function showCard(){
   S.cardDefault=(L.isNew || F.rarity!=='common' || L.mut || L.pbBeat || L.stars===3 || L.needFor || L.orderFor) && !full ? 'keep' : 'sell';
   S.cardAuto=F.rarity==='common' && !L.mut && !L.isNew && !L.pbBeat && L.stars<3 && !L.needFor && !L.orderFor;
   S.sellArmed=false; $('cSell').classList.remove('armed'); $('cSell').textContent='Sell · +'+L.value.toLocaleString(); $('cKeep').textContent=full?'Keepnet full':'Keep';
-  $('cKeep').disabled=full; $('cTank').hidden=!(save.tutorialDone && tankRoom(L.id));
+  const mountable=save.tutorialDone && L.pbBeat && !L.pbMinor && canMount(keptFish(L));   // a new record can go straight up on the wall (game/shack.js)
+  $('cKeep').disabled=full; $('cTank').hidden=mountable || !(save.tutorialDone && tankRoom(L.id)); $('cMount').hidden=!mountable;
   $('cSell').classList.toggle('primary',S.cardDefault==='sell'); $('cKeep').classList.toggle('primary',S.cardDefault==='keep');
   $('cAuto').hidden=!S.cardAuto; if (S.cardAuto) $('cAuto').innerHTML='Selling in a moment · tap Keep to keep it<span class="bar"><i></i></span>';
   const rs=$('cRec'), pbEl=$('cPB'); rs.hidden=pbEl.hidden=!L.pbBeat; rs.hidden=!L.pbBeat||L.pbMinor; pbEl.classList.toggle('minor',!!L.pbMinor); rs.parentNode.classList.toggle('rec',!!L.pbBeat&&!L.pbMinor); rs.style.animationDelay=pbEl.style.animationDelay=REDUCED?'0s':'';
@@ -2902,13 +3015,15 @@ function dismissCard(action){
   if (action==='keep' && save.net.length>=netCap()) action='sell';
   if (action==='sell' && rarRank(L.F.rarity)>=rarRank('mythic') && !S.sellArmed){ S.sellArmed=true; $('cSell').textContent='Sell it? Tap again'; $('cSell').classList.add('armed'); return; }   // a Mythic is never sold by accident
   if (action==='tank' && !tankRoom(L.id)) action=save.net.length<netCap()?'keep':'sell';
+  if (action==='mount' && !canMount(keptFish(L))) action=save.net.length<netCap()?'keep':'sell';
   card.classList.add('out'); setTimeout(()=>{ card.hidden=true; card.classList.remove('out'); },250);
   if (action==='sell') addCoins(L.value);
   else if (action==='tank'){ addToTank(keptFish(L)); sfx.plop(); news('Off to the aquarium','good'); }
+  else if (action==='mount'){ mountFish(keptFish(L)); shSfx.mount(); buzz([0,18,120,18]); shackPulse(); news(L.F.name+' is up on the trophy wall in your shack','gold'); }
   else { save.net.push(keptFish(L)); persist();
     SC.netPop=1; sfx.plop(); buzz(12); news('Into the keepnet','good');
     if (!save.netSeen){ save.netSeen=true; persist(); setTimeout(()=>coachFor('Kept fish go in your keepnet, hanging '+(REG()==='coast'?'over the side of your boat':'off the dock')+'. Tap it anytime to see them or sell them.',7),700);
-      if (!save.aquaSeen) setTimeout(()=>{ if (S.state==='idle') coachFor('Your uncle’s old fish tank still works. Tap the fishbowl at the bottom to visit your aquarium and move fish in.',8); },9000); } }
+      if (!save.aquaSeen) setTimeout(()=>{ if (S.state==='idle') coachFor('Your uncle’s old fish tank still works. Tap the shack at the bottom, then the tank room door, to visit your aquarium and move fish in.',8); },9000); } }
   if (L.isNew){ $('journalBtn').classList.remove('pulse'); void $('journalBtn').offsetWidth; $('journalBtn').classList.add('pulse'); }
   const finishing=S.tut==='card'; if (finishing){ save.tutorialDone=true; S.tut=null; persist(); }
   S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); kitchenUnlockCheck(); relicAfterCatch(L);   // the Moon Jar fills, Ottilie's almanac (game/relics.js)
@@ -2918,6 +3033,7 @@ function dismissCard(action){
 $('cKeep').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); dismissCard('keep'); });
 $('cSell').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); dismissCard('sell'); });
 $('cTank').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); dismissCard('tank'); });
+$('cMount').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); dismissCard('mount'); });
 let coinShown=0;
 function addCoins(n){ save.coins+=n; persist(); sfx.coin(Math.ceil(n/5)); coinTally(Math.max(250,Math.min(900,250+Math.abs(n)*40))); }
 let coinGoal=0;
@@ -2950,7 +3066,7 @@ window.addEventListener('resize',fitHud);
 if (document.fonts) document.fonts.ready.then(()=>{ HUD.sig=''; fitHud(); });   // the display font changes every width
 function updateHud(){
   const all=REGION_FISH.lake.concat(save.boat?REGION_FISH.coast:[]), n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
-  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('aquaBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; $('kitchenBtn').hidden=!save.kitchenOpen; ordersBadge(); $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
+  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('shackBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; ordersBadge(); $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
   updateGlimChip(); fitHud(); $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
 }
 
@@ -5501,7 +5617,7 @@ function weatherArtUpdate(dt){ const L=wxLook();
   if (WXV.clouds && L.cloud>.02) for (const c of WXV.clouds){ c.x+=c.sp*dt*(REDUCED?.3:1); if (c.x>1.25) c.x=-.25; }   // the heavy clouds drift slowly east
   if (WXV.rings.length){ for (const r of WXV.rings) r.t+=dt; WXV.rings=WXV.rings.filter(r=>r.t<r.life); }
   if (WXV.spl.length){ for (const p of WXV.spl) p.t+=dt; WXV.spl=WXV.spl.filter(p=>p.t<.18); }
-  if (L.rain<.02 || AQ.open || K.open) return;
+  if (L.rain<.02 || AQ.open || K.open || SH.open) return;
   WXV.ringT+=dt*L.rain*34*W/390; while (WXV.ringT>=1 && WXV.rings.length<70){ WXV.ringT--; const y=rand(HZ+6,H-110), k=sc(y); WXV.rings.push({x:rand(0,W),y,t:0,life:rand(.4,.6),max:(3+rand(0,4))*k}); }
   WXV.splT+=dt*L.rain*9; while (WXV.splT>=1 && WXV.spl.length<14){ WXV.splT--; WXV.spl.push({x:rand(W*.2,W*.8),y:rand(H-118,H-14),t:0}); }
   const b=S.bob; if (b && (S.state==='waiting'||S.state==='bite') && L.rain>.3){ WXV.bobT+=dt*L.rain*2.4;
@@ -5541,7 +5657,7 @@ function drawMoonPhase(x,cx,cy,R,a){ const ph=moonPhase(), th=ph/MOON.cycle*Math
 var MOONS={breach:null, t:0};
 function moonUpdate(dt){ const B=MOONS.breach;
   if (B){ B.t+=dt; if (B.t>B.dur) MOONS.breach=null; return; }
-  if (AQ.open || K.open || REG()!=='lake' || !moonpathOn() || INTRO.active) return;
+  if (AQ.open || K.open || SH.open || REG()!=='lake' || !moonpathOn() || INTRO.active) return;
   if (Math.random()<dt*MOON.breach/60){                                     // MOON.breach a chance per in-game hour (a real minute)
     MOONS.breach={x:W*rand(.18,.82), y:HZ+(H-HZ)*rand(.02,.05), t:0, dur:3.4, dir:Math.random()<.5?-1:1};
     if (AC){ tone(70,2.6,{to:98,vol:.09,type:'sine',delay:.4}); tone(140,1.8,{to:118,vol:.04,type:'sine',delay:.9}); noise(1.4,{vol:.05,f:300,to:120,type:'lowpass',delay:1.5}); }
@@ -7596,7 +7712,7 @@ function accrueTips(){ const now=Date.now(), T=tanks();
 function setsDone(){ const t=tanks(); return TANK_SETS.filter(s=>t[s.tank].owned && s.check(t[s.tank].fish)); }
 function addToTank(f){ accrueTips(); const k=tankOf(f.id), before=new Set(setsDone().map(s=>s.id)); tanks()[k].fish.push(f); persist();
   setsDone().forEach(s=>{ if (!before.has(s.id)) setTimeout(()=>{ toast('Tank set: '+s.name,'gold'); coachFor('Tank set complete: '+s.name+'. '+s.bonus+'.',6); sfx.out('rare'); },400); });
-  $('aquaBtn').classList.remove('pulse'); void $('aquaBtn').offsetWidth; $('aquaBtn').classList.add('pulse'); }
+  shackPulse(); }
 
 const AQ={open:false,tank:'fresh',fish:[],flakes:[],bubbles:[],parts:[],snow:[],t:0,sel:null,W:0,H:0,dpr:1,cv:null,ctx:null,last:0,box:null,sparkle:null,art:{},pool:{},sprites:{},creep:null};
 /** Fits the tank between the tabs and the buttons, so nothing overlaps on a short screen: the jar on the hood, then
@@ -7783,9 +7899,11 @@ function aqUI(){
   if (!tk.owned) sh+='<p class="aq-shop-note">Set up the saltwater tank first to start decorating it.</p>';
   else {
     sh+='<h3 class="aq-shop-sub">Tank</h3><div class="aq-items">';
-    if (tk.lvl<T.costs.length) sh+='<div class="aq-item"><div class="ico"><canvas data-tankicon="'+k+'"></canvas></div><div class="txt"><h4>Bigger tank</h4><p class="eff">Room for '+T.caps[tk.lvl+1]+' fish (now '+cap+')</p><p>More fish on display means more tips.</p></div>'+
+    const next=T.caps[tk.lvl+1];
+    if (next && next<=shackTankCap()) sh+='<div class="aq-item"><div class="ico"><canvas data-tankicon="'+k+'"></canvas></div><div class="txt"><h4>Bigger tank</h4><p class="eff">Room for '+next+' fish (now '+cap+')</p><p>More fish on display means more tips.</p></div>'+
       '<button class="btn" data-buy="size"'+(save.coins>=T.costs[tk.lvl]?'':' disabled')+'>'+T.costs[tk.lvl].toLocaleString()+'</button></div>';
-    else sh+='<div class="aq-item"><div class="txt"><h4>Biggest tank</h4><p>Room for '+cap+' fish. As big as the shack allows.</p></div></div>';
+    else if (next) sh+='<div class="aq-item"><div class="txt"><h4>Biggest tank</h4><p>Room for '+cap+' fish. As big as the shack allows.</p><p class="eff">Knock through to the tank room, on your uncle’s fix-up list in the shack, and it can grow to '+next+'.</p></div></div>';
+    else sh+='<div class="aq-item"><div class="txt"><h4>Biggest tank</h4><p>Room for '+cap+' fish, with the wall knocked through.</p></div></div>';
     sh+='</div><h3 class="aq-shop-sub">Decor</h3><div class="aq-items">';
     DECOR[k].forEach(d=>{ const own=hasDecor(k,d.id), found=(tk.stored||[]).includes(d.id);
       if (d.crate && !own && !found){ sh+='<div class="aq-item crate"><div class="ico"><canvas data-decor="'+d.id+'"></canvas></div><div class="txt"><h4>'+d.name+'</h4><p class="eff">'+d.eff+'</p><p>Not sold anywhere. It turns up in '+cratesOf(d.crate)+'.</p></div><span class="tag">Crates only</span></div>'; return; }
@@ -7802,7 +7920,7 @@ function aqUI(){
   $('aqUp').addEventListener('click',()=>$('aqua').scrollTo({top:0,behavior:REDUCED?'auto':'smooth'}));
   const bb=$('aqBuy'); if (bb){ bb.disabled=save.coins<T.unlock; bb.addEventListener('click',()=>{ if (save.coins<T.unlock) return; addCoins(-T.unlock); tk.owned=true; tk.tipT=Date.now(); persist(); sfx.out('rare'); toast('Saltwater tank ready','gold'); aqBuild(); aqUI(); }); }
   $('aqShop').querySelectorAll('[data-buy]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.buy; accrueTips();
-    if (id==='size'){ const cost=T.costs[tk.lvl]; if (save.coins<cost) return; addCoins(-cost); tk.lvl++; persist(); sfx.out('uncommon'); toast('Bigger tank: room for '+tankCap(k),'gold'); AQ.sparkle={x:AQ.box.x+AQ.box.w/2,y:AQ.box.y+AQ.box.h/2,t:0}; }
+    if (id==='size'){ const cost=T.costs[tk.lvl]; if (save.coins<cost || !(T.caps[tk.lvl+1]<=shackTankCap())) return; addCoins(-cost); tk.lvl++; persist(); sfx.out('uncommon'); toast('Bigger tank: room for '+tankCap(k),'gold'); AQ.sparkle={x:AQ.box.x+AQ.box.w/2,y:AQ.box.y+AQ.box.h/2,t:0}; }
     else { const d=DECOR[k].find(x=>x.id===id); if (!d || save.coins<d.price) return; addCoins(-d.price); tk.decor.push(id); persist(); sfx.out('uncommon'); buzz([0,20,30,20]); toast(d.name+' added','gold');
       const sp=aqDecorSpot(id)||{x:AQ.box.x+AQ.box.w/2,y:AQ.sandY-20}; AQ.sparkle={x:sp.x,y:sp.y,t:0}; AQ.fish.forEach(aqPick); }
     $('aqua').scrollTo({top:0,behavior:REDUCED?'auto':'smooth'}); aqUI(); }));
@@ -7844,7 +7962,7 @@ function openAquarium(tank){ ovOpen('aqua',()=>{ const c=$('aqCard'); if (c && !
   AQ.last=performance.now(); requestAnimationFrame(aqLoop);
   if (!save.aquaSeen){ save.aquaSeen=true; persist(); }
 }
-function closeAquarium(){ if (!AQ.open) return; if (AQ.ro){ AQ.ro.disconnect(); AQ.ro=null; } ovClosed('aqua'); accrueTips(); persist(); AQ.open=false; const L=$('aqua'); L.classList.add('closing'); setTimeout(()=>{ L.hidden=true; L.classList.remove('closing'); L.innerHTML=''; },REDUCED?0:250); last=performance.now(); }
+function closeAquarium(){ if (!AQ.open) return; if (AQ.ro){ AQ.ro.disconnect(); AQ.ro=null; } ovClosed('aqua'); accrueTips(); persist(); AQ.open=false; shackBack(); const L=$('aqua'); L.classList.add('closing'); setTimeout(()=>{ L.hidden=true; L.classList.remove('closing'); L.innerHTML=''; },REDUCED?0:250); last=performance.now(); }
 
 window.addEventListener('resize',()=>{ if (AQ.open && aqRefit()) aqDraw(); });
 
@@ -7891,8 +8009,8 @@ function recipeLearnedBy(fid){ return RECIPE_ORDER.find(id=>RECIPES[id].learn===
 function kitchenUnlockCheck(fromBoot){
   if (save.kitchenOpen || !save.tutorialDone || save.stats.catches<5) return;
   save.kitchenOpen=true; persist(); updateHud();
-  const b=$('kitchenBtn'); b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
-  setTimeout(()=>{ if (S.state==='idle' && !K.open) coachFor('Smoke is rising from your uncle’s old smokehouse. Tap the skillet to cook fish from your keepnet into meals.',8); },fromBoot?1500:2400);
+  shackPulse();
+  setTimeout(()=>{ if (S.state==='idle' && !K.open) coachFor('Smoke is rising from your uncle’s old smokehouse. Tap the shack at the bottom, then the kitchen door, to cook fish from your keepnet into meals.',8); },fromBoot?1500:2400);
 }
 
 /* ---------- Supper orders and Town reputation (data/orders.js) ---------- */
@@ -9099,21 +9217,21 @@ const ORDK={flash:false, visit:null, tip:false};
 const ORDERS_TIP='The townsfolk have started pinning supper orders at your kitchen window. Cook to the ticket for tips and the town’s good opinion. Skip any you like.';
 function kOrderClear(){ K.order=null; K.R=null; K.sts=null; K.spice=null; K.zone=null; K.garnish=null; K.smoked=false; }
 function kOrderSet(T){ K.order=T; K.R=T.kind==='delicacy'?ticketRecipe(T):null; K.spice=ticketSpice(T); K.zone=ticketZone(T); K.garnish=ticketGarnish(T); }
-/** The skillet's badge: how many tickets are pinned up. */
+/** The shack button's order badge: how many tickets are pinned up. */
 function ordersBadge(){ const el=$('kitchenOrders'); if (!el) return; const n=ordersOpen()?ordersState().list.length:0; el.hidden=!n || !save.kitchenOpen; el.textContent=n;
-  const b=$('kitchenBtn'); if (b) b.setAttribute('aria-label','Open kitchen'+(n?', '+n+(n===1?' supper order':' supper orders')+' waiting':'')); }
+  const b=$('shackBtn'); if (b) b.setAttribute('aria-label','Open your shack'+(n?', '+n+(n===1?' supper order':' supper orders')+' waiting in the kitchen':'')); if (SH.open) shUI(); }
 const ORDT={t:0};
 /** Each second: pins the evening's tickets when they're due, and says so. */
 function ordersUpdate(dt){ ORDT.t-=dt; if (ORDT.t>0) return; ORDT.t=1; const r=ordersTick(); if (!r) return; ordersBadge(); ORDK.flash=true;
   // in the kitchen, the new tickets go up in the book where you are, and nothing else on the page moves; the very
   // first evening's tip waits until you step out
   if (K.open){ if (r==='first') ORDK.tip=true; kOrdersRefresh(); return; }
-  const b=$('kitchenBtn'); if (b){ b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); }
+  shackPulse();
   if (r==='first') whenPlaying(()=>coachFor(ORDERS_TIP,9));
   else if (!S.tut) news('Supper orders are up at the kitchen window','gold'); }
 /** Stepping out of the kitchen after the first evening's tickets went up while you were in it. */
 function ordersAfterKitchen(){ if (!ORDK.tip) return; ORDK.tip=false; if (save.stats.orders>0) return;
-  const b=$('kitchenBtn'); if (b){ b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); } whenPlaying(()=>coachFor(ORDERS_TIP,9)); }
+  shackPulse(); whenPlaying(()=>coachFor(ORDERS_TIP,9)); }
 /** Redraws just the orders at the top of the book (the rack's picker, a "Replace?" and the scroll stay as they are). */
 function kOrdersRefresh(){ if (K.mode!=='book') return; const sec=$('kOrdersSec'); if (!sec) return; sec.innerHTML=ordersHTML(); bindOrders(sec); }
 
@@ -9296,9 +9414,537 @@ function openKitchen(){ audioInit(); const L=$('kitchen'); ovOpen('kitchen',()=>
 }
 function closeKitchen(){ if (!K.open) return; ovClosed('kitchen'); if (K.mode==='station') kLeave(); sizzleStop(); K.open=false; persist(); updateHud();
   if (coinShown!==save.coins) coinTally(500);   // tips came in while the HUD was out of sight
-  ordersAfterKitchen(); const L=$('kitchen'); L.classList.add('closing');
+  ordersAfterKitchen(); shackBack(); const L=$('kitchen'); L.classList.add('closing');
   setTimeout(()=>{ L.hidden=true; L.classList.remove('closing'); L.innerHTML=''; },REDUCED?0:250); last=performance.now(); }
 window.addEventListener('resize',()=>{ if (K.open) kLayout(); });
+
+/* ---------- Shack art: the front room, its plaques and mounts, the curio shelf, the rod rack, the fix-up list ---------- */
+/* The room is laid out from the screen (shLayout), then painted once into cached layers (SH.art): the walls, floor,
+   window, shelf and everything else that stands still, rebuilt when the layout, the half hour or the room changes
+   (SH.ver). Each plaque caches its board and its fish separately, so the rarity kit can play between and over them.
+   What moves draws live: the drip and its rings, dust in the window light, the lamp's and the stove's flames, water
+   glinting through the trapdoor, and the mounts' glow, foil, sparks, motes, prism and ink. Light comes from the
+   window, upper left; after dark from the lamp, the stove and the picture lights. */
+const SHW={wall:['#4E5D57','#4A5852','#53625B','#47544E'], paint:'rgba(214,226,214,.07)', bare:'#6E5440', grain:'rgba(16,22,20,.32)',
+  oak:['#8A6440','#7E5A39','#946C46'], oakD:'#5C3F26', oakL:'#B08A5E', board:['#6B4630','#5A3A27','#7E5639'], floor:['#5E4636','#584130','#634A38'],
+  brass:'#C9A15A', brassL:'#EACB84', brassD:'#94733A', iron:'#2F2D31', ironL:'#4A474D', chalk:'rgba(240,234,220,.55)', pencil:'rgba(30,28,34,.55)'};
+const shInk=(c,w)=>{ c.strokeStyle=INK; c.lineWidth=w; c.lineJoin='round'; c.lineCap='round'; };
+/** Lays the room out between the title and the buttons. Returns true when anything moved. */
+function shLayout(){ const c=SH.cv; if (!c) return false; const L0=$('shack'), top=L0.querySelector('.sh-top'), bot=L0.querySelector('.sh-bottom');
+  const W=c.offsetWidth, H=c.offsetHeight, dpr=Math.min(window.devicePixelRatio||1,2), tb=top.offsetTop+top.offsetHeight, bb=bot.offsetTop;
+  const s=shackState(), n=s.wall.length, nMax=Math.max(n,plaqueMax()), cab=fixDone('cabinet');
+  const sig=[W,H,dpr,tb,bb,n,cab].map(v=>typeof v==='number'?Math.round(v):v).join(); if (sig===SH.sig && SH.L) return false; SH.sig=sig;
+  SH.W=W; SH.H=H; SH.dpr=dpr; c.width=Math.round(W*dpr); c.height=Math.round(H*dpr);
+  const beamY=Math.max(8,tb-6), floorH=clamp((bb-tb)*.2,64,140), floorY=bb-floorH, wy0=beamY+16, wy1=floorY-12, Hw=wy1-wy0;
+  const rackW=W<360?46:56, ax=12+rackW+8, aw=W-ax-14;
+  // the top strip: the window, left, and the list pinned beside it
+  const hA=clamp(Hw*.2,58,104), ww=Math.min(132,aw*.48), win={x:ax+4,y:wy0+4,w:ww,h:hA-10};
+  const lw=clamp(aw*.3,64,96), list={x:ax+aw-lw-4,y:wy0,w:lw,h:Math.min(hA+8,lw*1.3)};
+  // the shelf, or the cabinet, along the bottom of the wall
+  const stoveX=W-68, shelfH=cab?clamp(Hw*.26,72,116):clamp(Hw*.15,48,62), shelf={x:ax,y:wy1-shelfH,w:Math.min(aw,stoveX-10-ax),h:shelfH};
+  // the plaques between, three across: room for every plaque the wall can ever hold, the ones still to come in chalk
+  const rows=Math.ceil(nMax/3), gap=8, room=shelf.y-10-(wy0+hA+6), ph=clamp((room-gap*(rows-1))/rows,48,90), pw=Math.min((aw-gap*2)/3,ph*1.3);
+  const bh=rows*ph+gap*(rows-1), by=wy0+hA+12+Math.max(0,Math.min(28,(room-bh)*.3)), plaques=[];
+  for (let r=0,i=0;r<rows;r++){ const inRow=r%2?Math.min(2,nMax-i):Math.min(3,nMax-i), rw=inRow*pw+(inRow-1)*gap, x0=ax+(aw-rw)/2;
+    for (let k=0;k<inRow;k++,i++) plaques.push({x:x0+k*(pw+gap),y:by+r*(ph+gap),w:pw,h:ph}); }
+  const locked=plaques.splice(n), panel={x:ax-2,y:by-18,w:aw+4,h:bh+30};
+  // the floor: the trapdoor in the middle, the bucket under the drip, the stove at the right, the net at the left
+  const tw=Math.min(132,W*.34), trap={x:W/2-tw/2,y:floorY+floorH*.18,w:tw,h:Math.min(floorH*.52,tw*.46)};
+  const bucket={x:clamp(W*.74,trap.x+trap.w+30,W-80),y:floorY+floorH*.3,r:15};
+  const stove={x:stoveX,y:floorY-floorH*.12,w:58,h:floorH*.86};
+  const net={x:12,y:floorY+floorH*.28,w:Math.min(86,trap.x-24),h:floorH*.42};
+  const rTop=floorY-(floorY-beamY)*.44, rack={x:10,y:rTop,w:rackW,h:floorY+floorH*.22-rTop};
+  SH.L={W,H,tb,bb,beamY,floorY,floorH,wy0,wy1,win,list,shelf,plaques,locked,panel,trap,bucket,stove,net,rack,curios:[],pw,ph};
+  shPlaceCurios(); SH.art={}; return true; }
+/** Where each curio stands: on the open shelf (six, with the clock), or two rows in the cabinet. */
+function shPlaceCurios(){ const L=SH.L, S=L.shelf, ids=shelfCurios(), cab=fixDone('cabinet'), out=[];
+  if (cab){ const per=Math.max(6,Math.ceil(ids.length/2)), cw=(S.w-24)/per, s=Math.min(cw*.92,S.h*.36);
+    ids.forEach((id,i)=>{ const r=i<per?0:1, k=r?i-per:i; out.push({id,x:S.x+12+cw*(k+.5),y:S.y+14+(r+.5)*((S.h-24)/2)+s*.08,s}); }); }
+  else { const shown=ids.slice(-SHELF), cw=(S.w-58)/SHELF, s=Math.min(cw*.9,S.h*.62);
+    shown.forEach((id,i)=>{ out.push({id,x:S.x+58+cw*(i+.5),y:S.y+S.h-14-s*.42,s}); }); }
+  L.curios=out; }
+function shCanvas(slot,w,h){ const d=SH.dpr, o=SH.art[slot], cv=(o&&o.cv)||document.createElement('canvas'); cv.width=Math.max(1,Math.round(w*d)); cv.height=Math.max(1,Math.round(h*d));
+  const c=cv.getContext('2d'); c.setTransform(d,0,0,d,0,0); return [cv,c]; }
+
+/* ---- the back layer: walls, beam, window, list, rack, shelf, floor and its things ---- */
+function shBuildBack(){ const L=SH.L, W=L.W, H=L.H, [cv,c]=shCanvas('back',W,H), P=palAt(save.clock), dark=P.dark||0;
+  sseed=711; shWall(c,L); shMarks(c,L);
+  if (fixDone('panel')) shPanel(c,L);
+  if (!fixDone('roof')) shStain(c,L);
+  shLocked(c,L); shWindow(c,L,P); shList(c,L);
+  shShelf(c,L);
+  shFloor(c,L); shTrapdoor(c,L);
+  if (!fixDone('roof')) shBucket(c,L);
+  shNet(c,L); shStove(c,L); shRack(c,L);
+  // the beam across the top, with the crack the drip comes through
+  c.fillStyle='#3A2A20'; c.fillRect(0,0,W,L.beamY+10); c.fillStyle='#4C382A'; c.fillRect(0,L.beamY,W,10); c.fillStyle='rgba(255,230,200,.1)'; c.fillRect(0,L.beamY,W,1.5);
+  c.strokeStyle='rgba(20,12,8,.5)'; c.lineWidth=.8; for (let x=0;x<W;x+=58){ c.beginPath(); c.moveTo(x+sr()*20,L.beamY+3); c.bezierCurveTo(x+20,L.beamY+2,x+35,L.beamY+6,x+52,L.beamY+4); c.stroke(); }
+  shInk(c,1.4); c.beginPath(); c.moveTo(0,L.beamY+10); c.lineTo(W,L.beamY+10); c.stroke();
+  if (!fixDone('roof')){ const bx=L.bucket.x; c.strokeStyle='rgba(15,10,8,.8)'; c.lineWidth=1.2; c.beginPath(); c.moveTo(bx-8,L.beamY+2); c.lineTo(bx-2,L.beamY+6); c.lineTo(bx+3,L.beamY+5); c.lineTo(bx+9,L.beamY+9); c.stroke(); }
+  // daylight from the window, then the dark
+  const w=L.win, G=c.createRadialGradient(w.x+w.w/2,w.y+w.h,8,w.x+w.w/2,w.y+w.h+50,W*.75); G.addColorStop(0,'rgba(255,224,176,'+(.15*(1-dark)).toFixed(3)+')'); G.addColorStop(1,'rgba(255,224,176,0)');
+  c.fillStyle=G; c.fillRect(0,0,W,L.floorY+L.floorH);
+  if (fixDone('knock')){ const K=c.createRadialGradient(0,L.floorY+L.floorH*.6,4,0,L.floorY+L.floorH*.6,W*.45); K.addColorStop(0,'rgba(110,200,190,.22)'); K.addColorStop(1,'rgba(110,200,190,0)'); c.fillStyle=K; c.fillRect(0,L.floorY-80,W*.5,L.floorH+120); }
+  shNight(c,L,dark);
+  SH.art.back={cv, qh:Math.floor(save.clock*2), ver:SH.ver}; }
+function shWall(c,L){ const W=L.W, bw=30, y1=L.floorY;
+  for (let x=0,i=0;x<W;x+=bw,i++){ c.fillStyle=SHW.wall[i%4]; c.fillRect(x,0,bw+1,y1); c.fillStyle='rgba(10,14,12,.55)'; c.fillRect(x,0,1.6,y1); c.fillStyle='rgba(230,240,230,.06)'; c.fillRect(x+1.6,0,1.2,y1);
+    // old paint worn through to the wood
+    for (let k=0;k<2;k++) if (sr()<.45){ const px=x+5+sr()*(bw-10), py=sr()*y1, r=2+sr()*4; c.fillStyle=SHW.bare; c.beginPath(); c.moveTo(px,py-r*1.6);
+      for (let q=1;q<7;q++){ const a=q/7*Math.PI*2, rr=r*(.6+sr()*.6); c.lineTo(px+Math.sin(a)*rr,py-Math.cos(a)*rr*1.6); } c.closePath(); c.fill(); c.strokeStyle='rgba(225,235,225,.18)'; c.lineWidth=.6; c.stroke(); }
+    c.strokeStyle=SHW.grain; c.lineWidth=.8; for (let g=0;g<2;g++){ const gx=x+7+g*12+sr()*5; c.beginPath(); c.moveTo(gx,0); for (let y=0;y<y1;y+=44) c.quadraticCurveTo(gx+(sr()-.5)*4,y+22,gx+(sr()-.5)*2,y+44); c.stroke(); }
+    for (const ny of [L.beamY+18, y1-22]){ c.fillStyle='#1B1E1C'; c.beginPath(); c.arc(x+bw*.5,ny,1.2,0,Math.PI*2); c.fill(); c.fillStyle='rgba(220,230,220,.3)'; c.beginPath(); c.arc(x+bw*.5-.4,ny-.4,.45,0,Math.PI*2); c.fill(); } }
+  // what's left of the pale paint, thickest up high and worn away toward the floor
+  const pg=c.createLinearGradient(0,0,0,y1*.7); pg.addColorStop(0,SHW.paint); pg.addColorStop(1,'rgba(214,226,214,0)'); c.fillStyle=pg; c.fillRect(0,0,W,y1*.7);
+  // skirting
+  c.fillStyle='#33291F'; c.fillRect(0,y1-10,W,10); c.fillStyle='rgba(255,230,210,.08)'; c.fillRect(0,y1-10,W,1.5); }
+/** High-water marks, pencilled on the left boards with the year beside each. */
+function shMarks(c,L){ const span=L.floorY-L.beamY; c.save(); c.font='600 11px Caveat, cursive'; c.textAlign='left';
+  for (const M of MARKS){ const y=L.floorY-M.h*span; c.strokeStyle=SHW.pencil; c.lineWidth=1.1; c.beginPath(); c.moveTo(6,y); c.lineTo(34+sr()*8,y+(sr()-.5)*1.5); c.stroke();
+    c.beginPath(); c.moveTo(6,y); c.lineTo(10,y-3); c.stroke(); c.fillStyle='rgba(30,28,34,.6)'; c.fillText(M.yr,8,y-3); }
+  c.restore(); }
+/** Oak panelling behind the plaques, with rails, stiles and a moulded cap. */
+function shPanel(c,L){ const P=L.panel; c.save();
+  c.fillStyle='rgba(0,0,0,.35)'; c.fillRect(P.x+3,P.y+4,P.w,P.h);
+  c.fillStyle=SHW.oak[0]; c.fillRect(P.x,P.y,P.w,P.h);
+  const cols=3, cw=P.w/cols; for (let i=0;i<cols;i++){ const x=P.x+i*cw+6, y=P.y+8, w=cw-12, h=P.h-16;
+    c.fillStyle=SHW.oak[1+(i%2)]; c.fillRect(x,y,w,h); c.fillStyle='rgba(40,24,10,.35)'; c.fillRect(x,y,w,2); c.fillRect(x,y,2,h); c.fillStyle='rgba(255,226,180,.18)'; c.fillRect(x,y+h-2,w,2); c.fillRect(x+w-2,y,2,h);
+    c.strokeStyle='rgba(60,36,16,.32)'; c.lineWidth=.8; for (let g=0;g<4;g++){ const gx=x+6+g*(w-12)/3+sr()*4; c.beginPath(); c.moveTo(gx,y+3); c.bezierCurveTo(gx+4,y+h*.3,gx-4,y+h*.6,gx+2,y+h-3); c.stroke(); } }
+  c.fillStyle=SHW.oakL; c.fillRect(P.x-4,P.y-6,P.w+8,7); c.fillStyle=SHW.oakD; c.fillRect(P.x-4,P.y-1,P.w+8,2); shInk(c,1.2); c.strokeRect(P.x-4,P.y-6,P.w+8,7); c.strokeRect(P.x,P.y,P.w,P.h);
+  // a brass picture light over each plaque
+  for (const p of L.plaques){ const x=p.x+p.w/2, y=p.y-8; c.fillStyle=SHW.brassD; c.fillRect(x-1,y-9,2,8); c.fillStyle=SHW.brass; c.beginPath(); c.moveTo(x-p.w*.22,y); c.lineTo(x+p.w*.22,y); c.lineTo(x+p.w*.18,y+5); c.lineTo(x-p.w*.18,y+5); c.closePath(); c.fill(); shInk(c,1); c.stroke();
+    c.fillStyle=SHW.brassL; c.fillRect(x-p.w*.2,y+.6,p.w*.4,1.2); }
+  c.restore(); }
+/** Where more plaques will hang once the wall's ready for them: a nail and a chalk outline. */
+function shLocked(c,L){ c.save(); for (const p of L.locked){ const h=p.h-4; c.setLineDash([5,4]); c.strokeStyle='rgba(235,232,220,.22)'; c.lineWidth=1.4; rrect(c,p.x+2,p.y+2,p.w-4,h-4,h*.3); c.stroke(); c.setLineDash([]);
+    c.fillStyle='#1B1E1C'; c.beginPath(); c.arc(p.x+p.w/2,p.y+4,1.6,0,Math.PI*2); c.fill(); c.fillStyle='rgba(220,230,220,.35)'; c.beginPath(); c.arc(p.x+p.w/2-.5,p.y+3.5,.6,0,Math.PI*2); c.fill(); }
+  c.restore(); }
+/** The damp under the leak: a darker run down the boards. */
+function shStain(c,L){ const x=L.bucket.x, G=c.createLinearGradient(0,L.beamY,0,L.floorY); G.addColorStop(0,'rgba(20,26,24,.4)'); G.addColorStop(1,'rgba(20,26,24,0)');
+  c.fillStyle=G; c.beginPath(); c.moveTo(x-10,L.beamY+8); c.bezierCurveTo(x-22,L.beamY+60,x-6,L.floorY*.6,x-16,L.floorY-10); c.lineTo(x+16,L.floorY-10); c.bezierCurveTo(x+6,L.floorY*.6,x+22,L.beamY+60,x+10,L.beamY+8); c.closePath(); c.fill(); }
+function shWindow(c,L,P){ const w=L.win, wx=w.x, wy=w.y, ww=w.w, wh=w.h; if (wh<30) return;
+  c.fillStyle='#3B281C'; rrect(c,wx-5,wy-5,ww+10,wh+10,3); c.fill();
+  const sky=c.createLinearGradient(0,wy,0,wy+wh); sky.addColorStop(0,'rgb('+P.skyTopR+')'); sky.addColorStop(.65,'rgb('+P.skyLowR+')'); sky.addColorStop(1,'rgb('+P.skyHzR+')'); c.fillStyle=sky; c.fillRect(wx,wy,ww,wh);
+  c.save(); c.beginPath(); c.rect(wx,wy,ww,wh); c.clip();
+  if (P.stars>.2){ sseed=91; c.fillStyle='rgba(255,255,240,'+(P.stars*.8).toFixed(2)+')'; for (let i=0;i<9;i++) c.fillRect(wx+sr()*ww,wy+sr()*wh*.55,1.2,1.2); }
+  if (P.moonVis>.3) drawMoonPhase(c,wx+ww*.72,wy+wh*.26,5,P.moonVis);
+  if (P.sunVis>.3 && P.sunY<1){ c.fillStyle='rgba(255,244,214,.9)'; c.beginPath(); c.arc(wx+ww*.28,wy+wh*(.15+P.sunY*.45),6,0,Math.PI*2); c.fill(); }
+  // the far shore and the town's roofs, the water, the end of your dock
+  c.fillStyle='rgb('+P.hillFarR+')'; c.beginPath(); c.moveTo(wx,wy+wh*.66); c.quadraticCurveTo(wx+ww*.4,wy+wh*.46,wx+ww*.7,wy+wh*.6); c.quadraticCurveTo(wx+ww*.9,wy+wh*.55,wx+ww,wy+wh*.62); c.lineTo(wx+ww,wy+wh); c.lineTo(wx,wy+wh); c.fill();
+  c.fillStyle='rgba(30,30,40,.35)'; for (let i=0;i<5;i++){ const rx=wx+ww*(.5+i*.07), ry=wy+wh*.6; c.beginPath(); c.moveTo(rx,ry); c.lineTo(rx+3,ry-4); c.lineTo(rx+6,ry); c.fill(); }
+  c.fillStyle='rgb('+P.w1R+')'; c.fillRect(wx,wy+wh*.74,ww,wh*.26); c.fillStyle='rgba(255,255,255,.25)'; c.fillRect(wx+ww*.15,wy+wh*.82,ww*.3,1.2);
+  c.fillStyle='#5A4032'; c.fillRect(wx+ww*.55,wy+wh*.84,ww*.45,wh*.16); c.fillStyle='rgba(0,0,0,.25)'; c.fillRect(wx+ww*.55,wy+wh*.84,ww*.45,1.5);
+  paintWxPane(c,wx,wy,ww,wh,P); c.restore();
+  c.strokeStyle='#4A3022'; c.lineWidth=3.5; c.beginPath(); c.moveTo(wx+ww/2,wy); c.lineTo(wx+ww/2,wy+wh); c.moveTo(wx,wy+wh*.5); c.lineTo(wx+ww,wy+wh*.5); c.stroke();
+  c.strokeStyle='rgba(255,255,255,.2)'; c.lineWidth=1.4; c.beginPath(); c.moveTo(wx+4,wy+wh*.38); c.lineTo(wx+ww*.28,wy+4); c.stroke();
+  shInk(c,1.5); c.strokeRect(wx-5,wy-5,ww+10,wh+10);
+  // the sill, and the lamp on it once it's bought
+  c.fillStyle='#5E3F2C'; c.fillRect(wx-9,wy+wh+5,ww+18,5); shInk(c,1); c.strokeRect(wx-9,wy+wh+5,ww+18,5);
+  if (fixDone('lamp')) shLamp(c,wx+ww-14,wy+wh+5,false); }
+/** A hurricane lamp: brass base and cap, glass chimney, the flame drawn live. y is the surface it stands on. */
+function shLamp(c,x,y,lit){ c.save(); c.translate(x,y);
+  c.fillStyle=SHW.brass; c.beginPath(); c.ellipse(0,-2,7,2.5,0,0,Math.PI*2); c.fill(); shInk(c,.9); c.stroke(); c.fillStyle=SHW.brassD; c.fillRect(-5,-6,10,4); c.strokeRect(-5,-6,10,4);
+  c.fillStyle='rgba(235,240,235,.35)'; c.beginPath(); c.moveTo(-3,-6); c.bezierCurveTo(-8,-10,-8,-16,-3,-19); c.lineTo(3,-19); c.bezierCurveTo(8,-16,8,-10,3,-6); c.closePath(); c.fill(); shInk(c,.9); c.stroke();
+  c.fillStyle=SHW.brass; c.fillRect(-4,-22,8,3); c.strokeRect(-4,-22,8,3); c.strokeStyle=SHW.brassD; c.lineWidth=1; c.beginPath(); c.arc(0,-24,4,Math.PI,0); c.stroke(); c.restore(); }
+/** The uncle's list: a sheet of ruled paper on a nail, his lines in pencil, the ones you've done struck through. */
+function shList(c,L){ const p=L.list, s=shackState(); c.save(); c.translate(p.x+p.w/2,p.y); c.rotate(.035);
+  const x=-p.w/2, w=p.w, h=p.h; c.fillStyle='rgba(0,0,0,.3)'; c.fillRect(x+3,6,w,h);
+  c.fillStyle='#EFE5CC'; c.beginPath(); c.moveTo(x,4); c.lineTo(x+w,2); c.lineTo(x+w-1,h); c.lineTo(x+w*.6,h+2); c.lineTo(x+w*.3,h-1); c.lineTo(x+1,h+1); c.closePath(); c.fill();
+  c.strokeStyle='rgba(90,130,170,.35)'; c.lineWidth=.6; for (let y=16;y<h-4;y+=(h-20)/FIXUP.length){ c.beginPath(); c.moveTo(x+4,y+4); c.lineTo(x+w-4,y+4); c.stroke(); }
+  c.fillStyle='rgba(43,42,51,.85)'; c.font='600 '+Math.max(8,Math.min(11,w*.12))+'px Caveat, cursive'; c.textAlign='left';
+  c.fillText('Things to fix',x+5,13);
+  const step=(h-20)/FIXUP.length; FIXUP.forEach((F,i)=>{ const y=16+step*(i+.5)+2, t=F.line.length>17?F.line.slice(0,15)+'…':F.line; c.fillStyle='rgba(43,42,51,.75)'; c.font='600 '+Math.max(7,Math.min(9,w*.095))+'px Caveat, cursive'; c.fillText(t,x+5,y);
+    if (s.fix.includes(F.id) && !(SH.strike && SH.strike.id===F.id && SH.strike.t<.6)){ const tw=Math.min(w-10,c.measureText(t).width); c.strokeStyle='rgba(43,42,51,.8)'; c.lineWidth=1; c.beginPath(); c.moveTo(x+4,y-2.5); c.lineTo(x+6+tw,y-3.5); c.stroke(); } });
+  shInk(c,1); c.beginPath(); c.moveTo(x,4); c.lineTo(x+w,2); c.lineTo(x+w-1,h); c.lineTo(x+w*.6,h+2); c.lineTo(x+w*.3,h-1); c.lineTo(x+1,h+1); c.closePath(); c.stroke();
+  c.fillStyle='#8C8C94'; c.beginPath(); c.arc(0,6,2.2,0,Math.PI*2); c.fill(); shInk(c,.8); c.stroke(); c.restore(); }
+/** The open shelf on brackets, with the mantel clock stopped at 3:12; or, once it's built, the glass-front cabinet. */
+function shShelf(c,L){ const S=L.shelf;
+  if (fixDone('cabinet')){ c.fillStyle='rgba(0,0,0,.35)'; c.fillRect(S.x+4,S.y+5,S.w,S.h);
+    c.fillStyle='#5E3D28'; c.fillRect(S.x,S.y,S.w,S.h); c.fillStyle='#3E2A1E'; c.fillRect(S.x+8,S.y+10,S.w-16,S.h-18);
+    const mid=S.y+10+(S.h-18)/2; c.fillStyle='#6E4A33'; c.fillRect(S.x+8,mid-2,S.w-16,4); c.fillRect(S.x+8,S.y+S.h-12,S.w-16,4);
+    c.fillStyle=SHW.oakL; c.fillRect(S.x-3,S.y-5,S.w+6,6); shInk(c,1.2); c.strokeRect(S.x-3,S.y-5,S.w+6,6); c.strokeRect(S.x,S.y,S.w,S.h); c.strokeRect(S.x+8,S.y+10,S.w-16,S.h-18);
+    return; }
+  const y=S.y+S.h-10; c.fillStyle='rgba(0,0,0,.32)'; c.fillRect(S.x+3,y+6,S.w,4);
+  c.fillStyle='#8A6240'; c.fillRect(S.x,y,S.w,6); c.fillStyle='#6E4A33'; c.fillRect(S.x,y+4,S.w,2); shInk(c,1.1); c.strokeRect(S.x,y,S.w,6);
+  for (const bx of [S.x+14,S.x+S.w-18]){ c.fillStyle='#4E3424'; c.beginPath(); c.moveTo(bx,y+6); c.lineTo(bx+5,y+6); c.lineTo(bx+5,y+18); c.closePath(); c.fill(); c.stroke(); }
+  shClock(c,S.x+26,y,Math.min(34,S.h*.62)); }
+/** The mantel clock: a dome of walnut with a cream face, its hands stopped at 3:12 like every clock in town. */
+function shClock(c,x,y,s){ c.save(); c.translate(x,y);
+  c.fillStyle='#5A3A27'; c.beginPath(); c.moveTo(-s*.45,0); c.lineTo(-s*.45,-s*.5); c.quadraticCurveTo(-s*.45,-s*.98,0,-s*.98); c.quadraticCurveTo(s*.45,-s*.98,s*.45,-s*.5); c.lineTo(s*.45,0); c.closePath(); c.fill(); shInk(c,1); c.stroke();
+  c.fillStyle='rgba(255,226,180,.18)'; c.beginPath(); c.moveTo(-s*.38,-s*.5); c.quadraticCurveTo(-s*.38,-s*.88,0,-s*.9); c.lineTo(0,-s*.84); c.quadraticCurveTo(-s*.32,-s*.82,-s*.32,-s*.5); c.closePath(); c.fill();
+  const r=s*.27, cy=-s*.52; c.fillStyle=SHW.brass; c.beginPath(); c.arc(0,cy,r+2,0,Math.PI*2); c.fill(); shInk(c,.8); c.stroke(); c.fillStyle='#F3EAD7'; c.beginPath(); c.arc(0,cy,r,0,Math.PI*2); c.fill();
+  c.strokeStyle=INK; c.lineWidth=.6; for (let i=0;i<12;i++){ const a=i/12*Math.PI*2; c.beginPath(); c.moveTo(Math.sin(a)*r*.82,cy-Math.cos(a)*r*.82); c.lineTo(Math.sin(a)*r*.95,cy-Math.cos(a)*r*.95); c.stroke(); }
+  const hA=(3+12/60)/12*Math.PI*2, mA=12/60*Math.PI*2; c.lineWidth=1.2; c.beginPath(); c.moveTo(0,cy); c.lineTo(Math.sin(hA)*r*.5,cy-Math.cos(hA)*r*.5); c.stroke(); c.lineWidth=.8; c.beginPath(); c.moveTo(0,cy); c.lineTo(Math.sin(mA)*r*.78,cy-Math.cos(mA)*r*.78); c.stroke();
+  c.fillStyle='#3A2A20'; c.fillRect(-s*.5,-2,s,3); c.restore(); }
+function shFloor(c,L){ const W=L.W, y0=L.floorY, H=L.H;
+  for (let y=y0,r=0;y<H;y+=16,r++){ c.fillStyle=SHW.floor[r%3]; c.fillRect(0,y,W,16); c.fillStyle='rgba(20,12,8,.5)'; c.fillRect(0,y,W,1.4);
+    const off=(r*61)%130; for (let x=off;x<W;x+=130){ c.fillStyle='rgba(20,12,8,.45)'; c.fillRect(x,y,1.4,16); c.fillStyle='#2A1D15'; c.beginPath(); c.arc(x+5,y+8,1,0,Math.PI*2); c.fill(); }
+    c.strokeStyle='rgba(36,22,12,.3)'; c.lineWidth=.7; c.beginPath(); c.moveTo(0,y+5+sr()*5); c.bezierCurveTo(W*.3,y+4+sr()*6,W*.6,y+6+sr()*5,W,y+6+sr()*4); c.stroke(); }
+  const G=c.createLinearGradient(0,y0,0,y0+24); G.addColorStop(0,'rgba(0,0,0,.35)'); G.addColorStop(1,'rgba(0,0,0,0)'); c.fillStyle=G; c.fillRect(0,y0,W,24); }
+/** The trapdoor: planks on two iron straps, a ring pull and a padlock, with dark gaps where the water shows. */
+function shTrapdoor(c,L){ const T=L.trap; c.save();
+  c.fillStyle='#1A1512'; rrect(c,T.x-3,T.y-3,T.w+6,T.h+6,3); c.fill();
+  const n=5, pw=T.w/n; for (let i=0;i<n;i++){ c.fillStyle=SHW.board[i%3]; c.fillRect(T.x+i*pw+1,T.y,pw-2,T.h);
+    c.strokeStyle='rgba(30,18,10,.35)'; c.lineWidth=.7; c.beginPath(); c.moveTo(T.x+i*pw+pw*.4,T.y+2); c.bezierCurveTo(T.x+i*pw+pw*.6,T.y+T.h*.4,T.x+i*pw+pw*.3,T.y+T.h*.7,T.x+i*pw+pw*.5,T.y+T.h-2); c.stroke(); }
+  for (const f of [.24,.76]){ const y=T.y+T.h*f-2.5; c.fillStyle=SHW.iron; c.fillRect(T.x-1,y,T.w+2,5); c.fillStyle=SHW.ironL; c.fillRect(T.x-1,y,T.w+2,1.2);
+    for (let i=0;i<n;i++){ c.fillStyle='#17161A'; c.beginPath(); c.arc(T.x+i*pw+pw/2,y+2.5,1.1,0,Math.PI*2); c.fill(); } }
+  const rx=T.x+T.w/2, ry=T.y+T.h*.52; c.strokeStyle=SHW.iron; c.lineWidth=2.4; c.beginPath(); c.ellipse(rx,ry+3,6,4,0,0,Math.PI*2); c.stroke(); c.strokeStyle=SHW.ironL; c.lineWidth=.8; c.beginPath(); c.ellipse(rx,ry+2.5,6,4,0,Math.PI*1.1,Math.PI*1.7); c.stroke();
+  const lx=T.x+T.w-12, ly=T.y+T.h*.52; c.fillStyle='#8B8478'; rrect(c,lx-5,ly-2,10,9,2); c.fill(); shInk(c,.9); c.stroke(); c.strokeStyle='#6A655C'; c.lineWidth=1.6; c.beginPath(); c.arc(lx,ly-2,3.4,Math.PI,0); c.stroke(); c.fillStyle=INK; c.fillRect(lx-.6,ly+1.5,1.2,3);
+  shInk(c,1.4); rrect(c,T.x-3,T.y-3,T.w+6,T.h+6,3); c.stroke(); c.restore(); }
+function shBucket(c,L){ const B=L.bucket, x=B.x, y=B.y, r=B.r; c.save();
+  c.fillStyle='rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(x+3,y+r*1.5,r*1.1,4,0,0,Math.PI*2); c.fill();
+  c.fillStyle='#8E949A'; c.beginPath(); c.moveTo(x-r,y); c.lineTo(x+r,y); c.lineTo(x+r*.78,y+r*1.5); c.lineTo(x-r*.78,y+r*1.5); c.closePath(); c.fill(); shInk(c,1.1); c.stroke();
+  c.fillStyle='#6E747A'; c.fillRect(x-r*.9,y+r*.55,r*1.8,2.5); c.fillStyle='rgba(255,255,255,.3)'; c.fillRect(x-r*.6,y+2,2,r*1.2);
+  c.fillStyle='#47706E'; c.beginPath(); c.ellipse(x,y+.5,r*.92,3.4,0,0,Math.PI*2); c.fill(); shInk(c,1); c.beginPath(); c.ellipse(x,y,r,3.8,0,0,Math.PI*2); c.stroke();
+  c.strokeStyle='#5B6066'; c.lineWidth=1.2; c.beginPath(); c.moveTo(x-r,y); c.quadraticCurveTo(x-r*.2,y-r*1.1,x+r*.4,y-r*.95); c.stroke(); c.restore(); }
+/** The old net: a torn heap before it's mended; after, coiled neat with its corks. */
+function shNet(c,L){ const N=L.net, x=N.x, y=N.y, w=N.w, h=N.h; if (w<36) return; c.save(); const mended=fixDone('net');
+  c.fillStyle='rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(x+w/2+3,y+h*.92,w*.48,h*.18,0,0,Math.PI*2); c.fill();
+  c.fillStyle=mended?'#8E8668':'#7A725A'; c.beginPath(); c.moveTo(x+4,y+h*.9); c.bezierCurveTo(x,y+h*.3,x+w*.3,y,x+w*.5,y+h*.1); c.bezierCurveTo(x+w*.75,y-2,x+w,y+h*.4,x+w-3,y+h*.9); c.closePath(); c.fill();
+  c.save(); c.clip(); c.strokeStyle='rgba(40,34,24,.55)'; c.lineWidth=.7; for (let i=-8;i<16;i++){ c.beginPath(); c.moveTo(x+i*6,y); c.lineTo(x+i*6+h,y+h); c.stroke(); c.beginPath(); c.moveTo(x+i*6+h,y); c.lineTo(x+i*6,y+h); c.stroke(); }
+  if (!mended){ c.fillStyle='rgba(40,30,22,.85)'; for (const [u,v,r] of [[.32,.45,6],[.66,.6,5],[.5,.25,3.5]]){ c.beginPath(); c.ellipse(x+w*u,y+h*v,r,r*.7,.3,0,Math.PI*2); c.fill(); } }
+  c.restore(); shInk(c,1.1); c.beginPath(); c.moveTo(x+4,y+h*.9); c.bezierCurveTo(x,y+h*.3,x+w*.3,y,x+w*.5,y+h*.1); c.bezierCurveTo(x+w*.75,y-2,x+w,y+h*.4,x+w-3,y+h*.9); c.closePath(); c.stroke();
+  if (mended) for (const u of [.18,.42,.66,.86]){ const fx=x+w*u, fy=y+h*(.55+.18*Math.sin(u*9)); c.fillStyle='#C9733E'; c.beginPath(); c.ellipse(fx,fy,4.5,3,0,0,Math.PI*2); c.fill(); shInk(c,.8); c.stroke(); c.fillStyle='rgba(255,220,180,.4)'; c.fillRect(fx-2,fy-2,3,1); }
+  else { c.strokeStyle='rgba(60,50,36,.8)'; c.lineWidth=.8; for (const u of [.3,.7]){ c.beginPath(); c.moveTo(x+w*u,y+h*.3); c.quadraticCurveTo(x+w*u+6,y+h*.6,x+w*u+2,y+h*1.05); c.stroke(); } }
+  c.restore(); }
+/** The pot-belly stove: cold and rusted before it's fixed, its door's grille drawn live once it's lit. */
+function shStove(c,L){ const S=L.stove, x=S.x, y=S.y, w=S.w, h=S.h, lit=fixDone('stove'), cx=x+w/2; c.save();
+  c.fillStyle='rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(cx+4,y+h,w*.5,5,0,0,Math.PI*2); c.fill();
+  // the flue into the wall
+  c.fillStyle=lit?'#2E2C30':'#4E3A32'; c.fillRect(cx-5,y-30,10,32); shInk(c,1); c.strokeRect(cx-5,y-30,10,32); c.fillStyle='rgba(255,255,255,.12)'; c.fillRect(cx-3,y-28,1.5,28);
+  c.fillStyle='#5A5550'; c.beginPath(); c.ellipse(cx,y-33,10,4.5,0,0,Math.PI*2); c.fill(); c.stroke(); c.fillStyle='#1E1C20'; c.beginPath(); c.ellipse(cx,y-33,5.5,2.4,0,0,Math.PI*2); c.fill();
+  // legs, belly, top
+  c.fillStyle=SHW.iron; for (const lx of [x+8,x+w-12]){ c.fillRect(lx,y+h-10,4,10); c.strokeRect(lx,y+h-10,4,10); }
+  const body=lit?SHW.iron:'#5A4038'; c.fillStyle=body; c.beginPath(); c.moveTo(x+10,y+4); c.bezierCurveTo(x-2,y+h*.35,x-2,y+h*.75,x+10,y+h-8); c.lineTo(x+w-10,y+h-8); c.bezierCurveTo(x+w+2,y+h*.75,x+w+2,y+h*.35,x+w-10,y+4); c.closePath(); c.fill(); shInk(c,1.4); c.stroke();
+  c.fillStyle=lit?'#4A474D':'#6E5248'; c.beginPath(); c.ellipse(x+w*.34,y+h*.42,w*.14,h*.22,-.2,0,Math.PI*2); c.fill();
+  if (!lit){ sseed=55; c.fillStyle='rgba(150,80,40,.55)'; for (let i=0;i<14;i++){ c.beginPath(); c.arc(x+8+sr()*(w-16),y+8+sr()*(h-20),1+sr()*2.4,0,Math.PI*2); c.fill(); }
+    c.strokeStyle='rgba(230,230,230,.4)'; c.lineWidth=.5; c.beginPath(); c.moveTo(x+w-6,y+6); c.lineTo(x+w-18,y+14); c.moveTo(x+w-6,y+6); c.lineTo(x+w-10,y+20); c.moveTo(x+w-8,y+12); c.lineTo(x+w-15,y+11); c.stroke(); }
+  c.fillStyle=lit?'#3C3A40':'#5E4840'; rrect(c,x+4,y-2,w-8,8,3); c.fill(); shInk(c,1.1); c.stroke();
+  // the door, its grille, a brass handle
+  const dx=cx-w*.2, dy=y+h*.42, dw=w*.4, dh=h*.3; c.fillStyle='#17151A'; rrect(c,dx,dy,dw,dh,3); c.fill(); shInk(c,1); c.stroke();
+  c.strokeStyle=lit?'#3C3A40':'#5E4840'; c.lineWidth=1.6; for (let i=1;i<4;i++){ c.beginPath(); c.moveTo(dx+dw*i/4,dy+2); c.lineTo(dx+dw*i/4,dy+dh-2); c.stroke(); }
+  c.fillStyle=SHW.brass; c.beginPath(); c.arc(dx+dw+4,dy+dh/2,2.2,0,Math.PI*2); c.fill(); shInk(c,.8); c.stroke();
+  S.door={x:dx,y:dy,w:dw,h:dh}; c.restore(); }
+/** The rod rack in the corner: a slotted board at the top, a tray at the bottom, your rods standing in it. */
+function shRack(c,L){ const R=L.rack, rods=rackRods(), x=R.x, w=R.w, top=R.y, bot=R.y+R.h; c.save();
+  // rods first, so the board's slots sit over them
+  const n=Math.max(1,rods.length), gap=(w-10)/n; R.slots=[];
+  rods.forEach((id,i)=>{ const rx=x+5+gap*(i+.5), held=id===save.rod; R.slots.push({id,x:rx}); if (held) return; shRod(c,id,rx,top+8,bot-6); });
+  c.fillStyle='#6B4A33'; c.fillRect(x,top,w,9); c.fillStyle='#88623F'; c.fillRect(x,top,w,2); shInk(c,1.1); c.strokeRect(x,top,w,9);
+  for (const s of R.slots){ c.fillStyle=s.id===save.rod?'#2A1D15':'#3B281C'; c.beginPath(); c.arc(s.x,top+5,2.4,0,Math.PI*2); c.fill(); }
+  c.fillStyle='#5A3C2A'; c.fillRect(x-2,bot-8,w+4,10); c.fillStyle='#88623F'; c.fillRect(x-2,bot-8,w+4,2); shInk(c,1.1); c.strokeRect(x-2,bot-8,w+4,10);
+  c.restore(); }
+/** One rod standing up: cork grip, reel seat, the blank in its color with a few guides. */
+function shRod(c,id,x,y0,y1){ const R=RODS[id], len=y1-y0; c.save();
+  c.strokeStyle=INK; c.lineWidth=3.6; c.beginPath(); c.moveTo(x,y1); c.lineTo(x,y0); c.stroke();
+  c.strokeStyle=R.color; c.lineWidth=2; c.beginPath(); c.moveTo(x,y1); c.lineTo(x,y0); c.stroke();
+  c.strokeStyle='rgba(255,255,255,.25)'; c.lineWidth=.6; c.beginPath(); c.moveTo(x-.5,y1-len*.3); c.lineTo(x-.5,y0+4); c.stroke();
+  c.fillStyle='#C4A07A'; c.fillRect(x-2.6,y1-len*.2,5.2,len*.18); shInk(c,.8); c.strokeRect(x-2.6,y1-len*.2,5.2,len*.18);
+  c.fillStyle='rgba(120,80,50,.4)'; for (let k=0;k<5;k++) c.fillRect(x-2.6,y1-len*.2+k*len*.036,5.2,.7);
+  c.fillStyle=SHW.brass; c.fillRect(x-2.2,y1-len*.25,4.4,len*.05); c.strokeRect(x-2.2,y1-len*.25,4.4,len*.05);
+  for (const u of [.42,.6,.76,.9]){ const gy=y1-len*u; c.strokeStyle='#B8BCC4'; c.lineWidth=.8; c.beginPath(); c.arc(x+2.2,gy,1.4,0,Math.PI*2); c.stroke(); }
+  c.restore(); }
+
+/* ---- plaques: the board (cached), the fish (cached), the rarity kit (live) ---- */
+function shBoard(c,p,m){ const x=0, y=0, w=p.w, h=p.h-4; sseed=313;
+  c.fillStyle='rgba(0,0,0,.4)'; rrect(c,x+3,y+5,w,h,h*.3); c.fill();
+  c.fillStyle=SHW.board[1]; rrect(c,x,y,w,h,h*.3); c.fill();
+  c.fillStyle=SHW.board[0]; rrect(c,x+4,y+4,w-8,h-8,h*.26); c.fill();
+  c.save(); rrect(c,x+4,y+4,w-8,h-8,h*.26); c.clip(); c.strokeStyle='rgba(30,16,8,.3)'; c.lineWidth=.8;
+  for (let g=0;g<5;g++){ const gy=y+8+g*(h-16)/4+sr()*3; c.beginPath(); c.moveTo(x,gy); c.bezierCurveTo(x+w*.3,gy-3+sr()*2,x+w*.7,gy+3,x+w,gy-1); c.stroke(); }
+  c.fillStyle='rgba(255,226,190,.12)'; c.beginPath(); c.ellipse(x+w*.3,y+h*.25,w*.4,h*.2,-.3,0,Math.PI*2); c.fill(); c.restore();
+  c.strokeStyle='rgba(255,230,200,.25)'; c.lineWidth=1.2; c.beginPath(); c.moveTo(x+h*.3,y+1.5); c.lineTo(x+w-h*.3,y+1.5); c.stroke();
+  shInk(c,1.4); rrect(c,x,y,w,h,h*.3); c.stroke(); c.lineWidth=.8; rrect(c,x+4,y+4,w-8,h-8,h*.26); c.stroke();
+  // the brass plate
+  const plw=Math.min(w*.62,86), plh=Math.max(10,h*.17), px=x+(w-plw)/2, py=y+h-plh-5;
+  c.fillStyle=SHW.brassD; rrect(c,px,py+1,plw,plh,2); c.fill(); c.fillStyle=SHW.brass; rrect(c,px,py,plw,plh,2); c.fill(); c.fillStyle=SHW.brassL; c.fillRect(px+2,py+1,plw-4,1.2); shInk(c,.9); rrect(c,px,py,plw,plh,2); c.stroke();
+  if (m){ const F=FISH[m.f.id], nm=(m.f.mut?MUTS[m.f.mut].name+' ':'')+F.name; let fs=Math.min(plh*.62,9); c.font='400 '+fs+'px "Young Serif", Georgia, serif';
+    while (fs>5 && c.measureText(nm).width>plw-6){ fs-=.5; c.font='400 '+fs+'px "Young Serif", Georgia, serif'; }
+    c.fillStyle='#3A2A12'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(nm,x+w/2,py+plh/2+.5); c.textBaseline='alphabetic'; }
+  else { c.strokeStyle='rgba(60,40,10,.45)'; c.lineWidth=.8; c.beginPath(); c.moveTo(px+6,py+plh/2); c.lineTo(px+plw-6,py+plh/2); c.stroke();
+    // a chalk mark where a fish could go
+    c.strokeStyle=SHW.chalk; c.lineWidth=1.6; const cx=x+w/2, cy=y+h*.42, s=Math.min(w,h)*.12; c.beginPath(); c.moveTo(cx-s,cy); c.lineTo(cx+s,cy); c.moveTo(cx,cy-s); c.lineTo(cx,cy+s); c.stroke(); }
+  // the hanger
+  c.fillStyle=SHW.brassD; c.beginPath(); c.arc(x+w/2,y+3,2,0,Math.PI*2); c.fill(); }
+/** A mount: the fish turned a little nose-up with its tail curled, as if it had just jumped. */
+function shMountFish(c,p,m){ const f=m.f, F=FISH[f.id], h=p.h-4, len=Math.min(p.w*.72,(h*.6)/Math.max(.22,F.h*1.15));
+  c.save(); c.translate(p.w/2+len*.02,h*.42); c.rotate(-.13); drawFish(c,f.id,len,false,1,.55,false,f.mut||null); c.restore(); return len; }
+function shPlaqueArt(i){ const L=SH.L, p=L.plaques[i], m=shackState().wall[i], key=[p.w|0,p.h|0,SH.dpr,m?m.f.id+':'+m.f.size+':'+(m.f.mut||''):'-'].join('|'), A=SH.art['pl'+i];
+  if (A && A.key===key) return A;
+  const [bcv,bc]=shCanvas('plb'+i,p.w+6,p.h+6); shBoard(bc,p,m);
+  let fcv=null, len=0; if (m){ const r=shCanvas('plf'+i,p.w,p.h); fcv=r[0]; len=shMountFish(r[1],p,m); }
+  return SH.art['pl'+i]={key, b:bcv, f:fcv, len, rar:m?FISH[m.f.id].rarity:null}; }
+
+/* ---- night: the room darkens; the lamp, the stove and the picture lights glow ---- */
+function shNight(c,L,dark){ if (dark<=.02) return; c.save(); c.globalCompositeOperation='source-atop'; c.fillStyle='rgba(10,8,22,'+(dark*.55).toFixed(3)+')'; c.fillRect(0,0,L.W,L.H); c.restore(); }
+
+/* ---- the frame ---- */
+function shDraw(){ if (!SH.L || !SH.ctx) return;
+  // a fix can add plaques or the cabinet, so a new version lays the room out again before it's painted
+  const B=SH.art.back; if (!B || B.qh!==Math.floor(save.clock*2) || B.ver!==SH.ver){ shLayout(); shPlaceCurios(); shBuildBack(); }
+  const L=SH.L, c=SH.ctx, d=SH.dpr, W=L.W, H=L.H, t=SH.t, P=palAt(save.clock), dark=P.dark||0;
+  c.setTransform(1,0,0,1,0,0); c.drawImage(SH.art.back.cv,0,0); c.setTransform(d,0,0,d,0,0);
+  // the curios, each with a soft shadow under it, the cabinet's glass over them. They're drawn live (some glint), on
+  // their own layer so the night darkens the curios themselves and not a box around them.
+  if (L.curios.length){ const S=L.shelf, o=SH.art.curios;
+    let sc=o&&o.cv; if (!sc || sc.width!==Math.max(1,Math.round(S.w*d)) || sc.height!==Math.max(1,Math.round(S.h*d))){ sc=shCanvas('curios',S.w,S.h)[0]; SH.art.curios={cv:sc}; }
+    const x=sc.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,sc.width,sc.height); x.setTransform(d,0,0,d,-S.x*d,-S.y*d);
+    for (const k of L.curios){ x.save(); x.translate(k.x,k.y); x.fillStyle='rgba(0,0,0,.25)'; x.beginPath(); x.ellipse(0,k.s*.42,k.s*.36,k.s*.08,0,0,Math.PI*2); x.fill();
+      drawFind(x,k.id,k.s,t); x.restore(); }
+    if (dark>.02){ x.save(); x.globalCompositeOperation='source-atop'; x.fillStyle='rgba(10,8,22,'+(dark*.5).toFixed(3)+')'; x.fillRect(S.x,S.y,S.w,S.h); x.restore(); }
+    c.drawImage(sc,S.x,S.y,S.w,S.h);
+    const k=SH.sel && SH.sel.k==='curio' && L.curios.find(q=>q.id===SH.sel.id);
+    if (k){ c.strokeStyle='rgba(255,226,150,.85)'; c.lineWidth=2; c.beginPath(); c.ellipse(k.x,k.y+k.s*.42,k.s*.42,k.s*.11,0,0,Math.PI*2); c.stroke(); } }
+  if (fixDone('cabinet')) shGlass(c,L.shelf);
+  // plaques
+  const panel=fixDone('panel');
+  L.plaques.forEach((p,i)=>{ const A=shPlaqueArt(i), m=shackState().wall[i], fx=SH.fx.find(f=>f.k==='mount' && f.i===i), drop=fx?Math.max(0,1-fx.t/.35):0;
+    c.save(); c.translate(p.x,p.y-drop*drop*14); c.drawImage(A.b,0,0,p.w+6,p.h+6);
+    if (m && A.f){ shGlowBehind(c,p,A,t); c.drawImage(A.f,0,0,p.w,p.h); shRarityOver(c,p,A,t,i); }
+    if (dark>.02){ c.fillStyle='rgba(10,8,22,'+(dark*(panel?.18:.5)).toFixed(3)+')'; rrect(c,0,0,p.w,p.h-4,(p.h-4)*.3); c.fill(); }
+    if (fx && fx.t<1.2){ const a=Math.sin(Math.min(1,fx.t/1.2)*Math.PI); c.fillStyle='rgba(255,236,180,'+(a*.35).toFixed(3)+')'; rrect(c,0,0,p.w,p.h-4,(p.h-4)*.3); c.fill(); }
+    if (SH.sel && SH.sel.k==='plaque' && SH.sel.i===i){ c.strokeStyle='rgba(255,226,150,.9)'; c.lineWidth=2.4; rrect(c,-3,-3,p.w+6,p.h+2,(p.h-4)*.32); c.stroke(); }
+    c.restore();
+    if (panel){ const x=p.x+p.w/2, y=p.y-3, a=.18+.5*dark, G=c.createRadialGradient(x,y,2,x,y+p.h*.5,p.w*.7); G.addColorStop(0,'rgba(255,226,160,'+a.toFixed(3)+')'); G.addColorStop(1,'rgba(255,226,160,0)');
+      c.save(); c.globalCompositeOperation='lighter'; c.fillStyle=G; c.fillRect(p.x-10,p.y-6,p.w+20,p.h+10); c.restore(); } });
+  // the lamp's flame, the stove's fire, the window's dust
+  if (fixDone('lamp')) shLampLive(c,L,t,dark);
+  if (fixDone('stove')) shStoveLive(c,L,t,dark);
+  if (dark<.6) for (const m of SH.motes){ const a=Math.sin(Math.min(1,m.t/m.life)*Math.PI)*.5*(1-dark); c.fillStyle='rgba(255,240,210,'+a.toFixed(3)+')'; c.fillRect(m.x,m.y,1.4,1.4); }
+  shTrapLive(c,L,t);
+  // the drip, and its rings in the bucket
+  if (!fixDone('roof')){ const bx=L.bucket.x, sw=Math.min(1,(SH.dripT||0)/2.6); c.fillStyle='rgba(170,210,215,.85)'; c.beginPath(); c.ellipse(bx,L.beamY+10+sw*2,1.2+sw*1.3,1.4+sw*2,0,0,Math.PI*2); c.fill();
+    for (const dr of SH.drips){ c.fillStyle='rgba(170,210,215,.9)'; c.beginPath(); c.ellipse(bx,dr.y,1.5,3.2,0,0,Math.PI*2); c.fill(); } }
+  for (const f of SH.fx){
+    if (f.k==='ring'){ const u=f.t/.6; c.strokeStyle='rgba(200,230,230,'+(.7*(1-u)).toFixed(3)+')'; c.lineWidth=1; c.beginPath(); c.ellipse(f.x,f.y,3+u*10,1+u*3,0,0,Math.PI*2); c.stroke(); }
+    else if (f.k==='dust'){ if (f.t<0) continue; const u=f.t/1.2; c.fillStyle='rgba(220,200,170,'+(.6*(1-u)).toFixed(3)+')'; c.beginPath(); c.arc(f.x+f.vx*f.t,f.y+f.vy*f.t,1.6,0,Math.PI*2); c.fill(); }
+    else if (f.k==='spark'){ const u=f.t/1.4; for (let q=0;q<5;q++){ c.fillStyle='rgba(255,'+(160+q*15)+',80,'+(1-u).toFixed(3)+')'; c.fillRect(f.x+Math.sin(q*2.1+f.t*3)*10*u,f.y-u*40-q*5,1.6,1.6); } }
+    else if (f.k==='fixed'){ shFixedFx(c,L,f); } }
+  // the list's newest line, struck through as you watch
+  if (SH.strike && SH.strike.t<.9) shStrikeLive(c,L,SH.strike); }
+function shGlass(c,S){ c.save(); c.fillStyle='rgba(200,225,230,.07)'; c.fillRect(S.x+8,S.y+10,S.w-16,S.h-18);
+  c.fillStyle='rgba(255,255,255,.1)'; c.beginPath(); c.moveTo(S.x+S.w*.12,S.y+10); c.lineTo(S.x+S.w*.2,S.y+10); c.lineTo(S.x+S.w*.1,S.y+S.h-8); c.lineTo(S.x+S.w*.02+8,S.y+S.h-8); c.closePath(); c.fill();
+  c.strokeStyle='#5E3D28'; c.lineWidth=3; c.beginPath(); c.moveTo(S.x+S.w/2,S.y+10); c.lineTo(S.x+S.w/2,S.y+S.h-8); c.stroke(); shInk(c,1); c.beginPath(); c.moveTo(S.x+S.w/2,S.y+10); c.lineTo(S.x+S.w/2,S.y+S.h-8); c.stroke();
+  for (const hx of [S.x+S.w/2-6,S.x+S.w/2+6]){ c.fillStyle=SHW.brass; c.beginPath(); c.arc(hx,S.y+S.h/2,2,0,Math.PI*2); c.fill(); shInk(c,.7); c.stroke(); } c.restore(); }
+const shRarRank = A => A.rar?rarRank(A.rar):-1;
+/** Uncommon and up: a soft glow in the tier's color behind the fish, breathing. */
+function shGlowBehind(c,p,A,t){ const rk=shRarRank(A); if (rk<1) return; const col=RAR[A.rar].color, a=.22+.12*Math.sin(t*1.6+p.x*.01), G=c.createRadialGradient(p.w/2,(p.h-4)*.42,2,p.w/2,(p.h-4)*.42,A.len*.62);
+  G.addColorStop(0,shHexA(col,a)); G.addColorStop(1,shHexA(col,0)); c.fillStyle=G; c.fillRect(0,0,p.w,p.h); }
+const shHexA=(hex,a)=>{ const n=parseInt(hex.slice(1),16); return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a.toFixed(3)+')'; };
+/** Rare and up: foil (a band of light across the fish); Exotic turns it to a prism. Epic: sparks. Legendary: motes.
+    Mythic: ink at the board's edges that bleeds in and draws back. Drawn onto a scratch copy of the fish so it stays on the fish. */
+function shRarityOver(c,p,A,t,i){ const rk=shRarRank(A); if (rk<2) return;
+  if (!REDUCED){ const S=SH.art.scratch||(SH.art.scratch={cv:document.createElement('canvas')}), cv=S.cv, d=SH.dpr; if (cv.width!==A.f.width || cv.height!==A.f.height){ cv.width=A.f.width; cv.height=A.f.height; }
+    const x=cv.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.globalCompositeOperation='source-over'; x.clearRect(0,0,cv.width,cv.height); x.drawImage(A.f,0,0); x.globalCompositeOperation='source-in';
+    const u=((t*.28+i*.37)%1.6)-.3, bx=u*p.w*d, G=x.createLinearGradient(bx-30*d,0,bx+30*d,p.h*d*.6);
+    if (rk>=rarRank('exotic')){ PRISM_TRAIL.forEach((col,k)=>G.addColorStop(k/(PRISM_TRAIL.length-1),shHexA(col,.55))); x.fillStyle=G; }
+    else { G.addColorStop(0,'rgba(255,255,255,0)'); G.addColorStop(.5,'rgba(255,255,255,.55)'); G.addColorStop(1,'rgba(255,255,255,0)'); x.fillStyle=G; }
+    x.fillRect(0,0,cv.width,cv.height); c.drawImage(cv,0,0,p.w,p.h); }
+  if (rk>=rarRank('epic')){ for (let q=0;q<3;q++){ const ph=(t*.7+q/3+i*.21)%1, sx=p.w*(.2+.6*((q*.37+i*.13+Math.floor(t*.7+q/3)*.29)%1)), sy=(p.h-4)*(.2+.4*((q*.53+Math.floor(t*.7+q/3)*.41)%1)), a=Math.sin(ph*Math.PI), r=2.5*a+.5;
+      c.fillStyle=shHexA(rk>=rarRank('legendary')?'#F2D27A':'#B48BE8',a*.9); c.beginPath(); c.moveTo(sx,sy-r*2); c.lineTo(sx+r*.5,sy-r*.5); c.lineTo(sx+r*2,sy); c.lineTo(sx+r*.5,sy+r*.5); c.lineTo(sx,sy+r*2); c.lineTo(sx-r*.5,sy+r*.5); c.lineTo(sx-r*2,sy); c.lineTo(sx-r*.5,sy-r*.5); c.closePath(); c.fill(); } }
+  if (rk>=rarRank('legendary') && !REDUCED){ for (let q=0;q<4;q++){ const ph=(t*.18+q/4+i*.1)%1, mx=p.w*(.15+.7*((q*.61+i*.17)%1))+Math.sin(t+q)*4, my=(p.h-4)*(.9-ph*.8); c.fillStyle='rgba(242,210,122,'+(Math.sin(ph*Math.PI)*.7).toFixed(3)+')'; c.beginPath(); c.arc(mx,my,1.3,0,Math.PI*2); c.fill(); } }
+  if (rk>=rarRank('mythic')){ const a=.35+.25*Math.sin(t*.9+i), h=p.h-4; c.save(); rrect(c,0,0,p.w,h,h*.3); c.clip(); const G=c.createRadialGradient(p.w/2,h/2,Math.min(p.w,h)*.25,p.w/2,h/2,Math.max(p.w,h)*.62);
+    G.addColorStop(0,'rgba(18,16,30,0)'); G.addColorStop(1,'rgba(18,16,30,'+a.toFixed(3)+')'); c.fillStyle=G; c.fillRect(0,0,p.w,h); c.restore(); } }
+function shLampLive(c,L,t,dark){ const w=L.win, x=w.x+w.w-14, y=w.y+w.h+5-14, f=1+.08*Math.sin(t*9)+.05*Math.sin(t*23);
+  c.save(); c.globalCompositeOperation='lighter'; const G=c.createRadialGradient(x,y,1,x,y,40+dark*90); G.addColorStop(0,'rgba(255,200,120,'+(.25+dark*.4)*f+')'); G.addColorStop(1,'rgba(255,200,120,0)'); c.fillStyle=G; c.fillRect(x-140,y-140,280,280); c.restore();
+  c.fillStyle='#FFD37A'; c.beginPath(); c.ellipse(x,y,1.6*f,3.6*f,0,0,Math.PI*2); c.fill(); c.fillStyle='#FFF4D6'; c.beginPath(); c.ellipse(x,y+.8,.7,1.6,0,0,Math.PI*2); c.fill();
+  // a moth, after dark
+  if (dark>.4 && !REDUCED){ const mx=x+Math.sin(t*2.1)*16+Math.sin(t*5.3)*4, my=y-8+Math.cos(t*1.7)*10; c.fillStyle='rgba(220,210,190,.8)'; const fl=Math.abs(Math.sin(t*24)); c.beginPath(); c.ellipse(mx-1.6,my,2.2,1.2*fl+.3,-.4,0,Math.PI*2); c.ellipse(mx+1.6,my,2.2,1.2*fl+.3,.4,0,Math.PI*2); c.fill(); } }
+function shStoveLive(c,L,t,dark){ const D=L.stove.door; if (!D) return; const f=.75+.25*Math.sin(t*7)*Math.sin(t*3.1+1);
+  c.save(); c.beginPath(); rrect(c,D.x+1,D.y+1,D.w-2,D.h-2,2); c.clip(); const G=c.createLinearGradient(0,D.y+D.h,0,D.y); G.addColorStop(0,'rgba(255,170,60,'+(.9*f).toFixed(3)+')'); G.addColorStop(1,'rgba(200,60,20,'+(.6*f).toFixed(3)+')'); c.fillStyle=G; c.fillRect(D.x,D.y,D.w,D.h);
+  c.strokeStyle='#3C3A40'; c.lineWidth=1.6; for (let i=1;i<4;i++){ c.beginPath(); c.moveTo(D.x+D.w*i/4,D.y+2); c.lineTo(D.x+D.w*i/4,D.y+D.h-2); c.stroke(); } c.restore();
+  c.save(); c.globalCompositeOperation='lighter'; const R=c.createRadialGradient(D.x+D.w/2,D.y+D.h,2,D.x+D.w/2,D.y+D.h,60+dark*80); R.addColorStop(0,'rgba(255,150,70,'+((.12+dark*.3)*f).toFixed(3)+')'); R.addColorStop(1,'rgba(255,150,70,0)'); c.fillStyle=R; c.fillRect(D.x-150,D.y-150,300,300); c.restore(); }
+/** Light off the water under the trapdoor, through the gaps between its planks. */
+function shTrapLive(c,L,t){ const T=L.trap, n=5, pw=T.w/n, lap=SH.fx.find(f=>f.k==='lap'), boost=lap?Math.max(0,1-lap.t/1.2):0; c.save();
+  for (let i=1;i<n;i++){ const x=T.x+i*pw; for (let k=0;k<3;k++){ const y=T.y+T.h*(.15+k*.3)+Math.sin(t*1.3+i*1.7+k)*2, a=(.12+.14*Math.max(0,Math.sin(t*2.2+i*1.3+k*2)))*(1+boost*2.5); c.fillStyle='rgba(140,210,215,'+Math.min(.8,a).toFixed(3)+')'; c.fillRect(x-.8,y,1.6,T.h*.12); } }
+  c.restore(); }
+function shStrikeLive(c,L,S){ const p=L.list, i=FIXUP.findIndex(F=>F.id===S.id); if (i<0) return; const u=clamp(S.t/.6,0,1), h=p.h, step=(h-20)/FIXUP.length, y=16+step*(i+.5)+2, w=p.w;
+  c.save(); c.translate(p.x+p.w/2,p.y); c.rotate(.035); c.font='600 '+Math.max(7,Math.min(9,w*.095))+'px Caveat, cursive'; const F=FIXUP[i], t2=F.line.length>17?F.line.slice(0,15)+'…':F.line, tw=Math.min(w-10,c.measureText(t2).width);
+  c.strokeStyle='rgba(43,42,51,.85)'; c.lineWidth=1.2; c.beginPath(); c.moveTo(-w/2+4,y-2.5); c.lineTo(-w/2+4+(tw+2)*u,y-2.5-u); c.stroke(); c.restore(); }
+/** Where a fix-up shows in the room, a sparkle and a few motes of sawdust. */
+function shFixedFx(c,L,f){ const at={roof:{x:L.bucket.x,y:L.beamY+12}, net:{x:L.net.x+L.net.w/2,y:L.net.y+L.net.h/2}, lamp:{x:L.win.x+L.win.w-14,y:L.win.y+L.win.h-6}, stove:{x:L.stove.x+L.stove.w/2,y:L.stove.y+L.stove.h/2},
+    cabinet:{x:L.shelf.x+L.shelf.w/2,y:L.shelf.y+L.shelf.h/2}, panel:{x:L.panel.x+L.panel.w/2,y:L.panel.y+L.panel.h/2}, knock:{x:20,y:L.floorY+L.floorH*.5}}[f.id]; if (!at) return;
+  const u=f.t/1.2, a=Math.sin(u*Math.PI); c.save(); c.globalCompositeOperation='lighter'; const G=c.createRadialGradient(at.x,at.y,2,at.x,at.y,30+u*40); G.addColorStop(0,'rgba(255,230,160,'+(a*.6).toFixed(3)+')'); G.addColorStop(1,'rgba(255,230,160,0)'); c.fillStyle=G; c.fillRect(at.x-80,at.y-80,160,160); c.restore();
+  for (let q=0;q<8;q++){ const ang=q/8*Math.PI*2+f.t, r=10+u*36; c.fillStyle='rgba(255,236,190,'+((1-u)*.9).toFixed(3)+')'; c.fillRect(at.x+Math.cos(ang)*r,at.y+Math.sin(ang)*r*.7,1.8,1.8); } }
+
+/* ---------- The shack's front room: the trophy wall, the curio shelf, the rod rack and the fix-up list ---------- */
+/* save.shack = {fix: the fix-up lines done, wall: one entry per plaque (null, or {f: the fish as the keepnet keeps it,
+   t: when it went up}), seen, td: the trapdoor line shown last}. Content is in data/shack.js; game/shack-art.js draws
+   the room. Modifier sources read the save alone (fixUpMods), so the balance simulator sees the same bonuses. */
+function shackState(){ const s=save.shack=save.shack||{}; if (!Array.isArray(s.fix)) s.fix=[]; if (!Array.isArray(s.wall)) s.wall=[];
+  // a mount of a fish the game no longer has, or a second of one species, comes down
+  const seen={}; for (let i=0;i<s.wall.length;i++){ const m=s.wall[i], id=m && m.f && m.f.id; if (!id || !FISH[id] || seen[id]) s.wall[i]=null; else seen[id]=1; }
+  const n=plaqueCount(s); while (s.wall.length<n) s.wall.push(null); return s; }
+const fixDone = id => !!(save.shack && Array.isArray(save.shack.fix) && save.shack.fix.includes(id));
+const fixLine = id => FIXUP.find(L=>L.id===id);
+function plaqueCount(s){ const fix=(s&&s.fix)||[]; return WALL.start+FIXUP.reduce((a,L)=>a+(L.plaques&&fix.includes(L.id)?L.plaques:0),0); }
+const plaqueMax = () => WALL.start+FIXUP.reduce((a,L)=>a+(L.plaques||0),0);
+/** The biggest a tank can grow: the size before the knock-through until the wall comes down. */
+function shackTankCap(){ const K=FIXUP.find(L=>L.tankCap); if (!K) return Infinity; return fixDone(K.id)?K.tankCap:Math.max(...TANKS.fresh.caps.filter(c=>c<K.tankCap)); }
+const mountedAt = id => shackState().wall.findIndex(m=>m && m.f.id===id);
+/** Is this mount your record for its species? (game/records.js: isPB) */
+const mountIsRecord = m => !!(m && isPB(m.f));
+/** The shack's modifiers, from the save alone: each fix-up line done, and each mount (its species sells for more). */
+function fixUpMods(add,L){ const s=save.shack; if (!s) return;
+  if (Array.isArray(s.fix)) for (const id of s.fix){ const F=fixLine(id); if (F) for (const m of F.mods||[]) L.push(Object.assign({src:'shack',name:F.name},m)); }
+  const seen={}; if (Array.isArray(s.wall)) for (const m of s.wall) if (m && m.f && FISH[m.f.id] && !seen[m.f.id] && (seen[m.f.id]=1)) add('mount','Mounted '+FISH[m.f.id].name,'value',mountIsRecord(m)?WALL.record:WALL.value,{when:{fish:m.f.id}}); }
+/** A shack with every line fixed and the wall full of the most valuable species, for the balance simulator. */
+function shackFull(){ const ids=Object.keys(FISH).filter(id=>!FISH[id].noTank).sort((a,b)=>FISH[b].value-FISH[a].value).slice(0,plaqueMax());
+  return {fix:FIXUP.filter(L=>L.cost).map(L=>L.id), wall:ids.map(id=>({f:{id,size:FISH[id].size[1],value:FISH[id].value,t:0},t:0}))}; }
+/** Can this keepnet fish go up on the wall? A free plaque, or its species is up already and this one would replace it. */
+function canMount(f){ if (!f || !FISH[f.id] || FISH[f.id].noTank || f.smoked) return false; const s=shackState(); return mountedAt(f.id)>=0 || s.wall.some(m=>!m); }
+/** Puts a fish up. at: the plaque (a free one by default); a mount of the same species comes down to the keepnet,
+    or sells if the keepnet is full. Returns the plaque, or -1. */
+function mountFish(f,at){ if (!canMount(f)) return -1; const s=shackState(), same=mountedAt(f.id);
+  let i=same>=0?same:(at!=null && at>=0 && at<s.wall.length && !s.wall[at]?at:s.wall.findIndex(m=>!m)); if (i<0) return -1;
+  const old=s.wall[i]; s.wall[i]={f,t:Date.now()};
+  if (old){ if (save.net.length<netCap()){ save.net.push(old.f); news('Your old '+FISH[old.f.id].name+' is back in the keepnet',''); } else { addCoins(old.f.value); news('No room in the keepnet: sold your old '+FISH[old.f.id].name,''); } }
+  persist(); SH.ver++; return i; }
+/** Takes a mount down into the keepnet. */
+function unmount(at){ const s=shackState(), m=s.wall[at]; if (!m || save.net.length>=netCap()) return false; s.wall[at]=null; save.net.push(m.f); persist(); SH.ver++; return true; }
+function buyFix(id){ const L=fixLine(id), s=shackState(); if (!L || !L.cost || s.fix.includes(id) || save.coins<L.cost) return false;
+  addCoins(-L.cost); s.fix.push(id); shackState(); persist(); SH.ver++; return true; }
+/** The curios on show: every one you have and haven't given back, newest last. */
+function shelfCurios(){ const FS=findsState(); return Object.keys(FINDS).filter(id=>FINDS[id].kind==='curio' && FS.have[id] && !FS.returned[id]).sort((a,b)=>(FS.have[a].t||0)-(FS.have[b].t||0)); }
+const shelfRoom = () => fixDone('cabinet')?Infinity:SHELF;
+/** Rods on the rack: every rod you own, in shop order; the one in hand leaves its pegs empty. */
+const rackRods = () => [...ROD_ORDER,...SEA_RODS].filter(id=>save.rods.includes(id));
+
+/** The shack button nods: a fish is in the tank, the kitchen's open, an order's come in. */
+function shackPulse(){ const b=$('shackBtn'); if (!b) return; b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); }
+/* ---------- the room ---------- */
+const SH={open:false, cv:null, ctx:null, W:0, H:0, dpr:1, L:null, art:{}, ver:0, t:0, last:0, motes:[], drips:[], sel:null, fx:[], strike:null, tdN:0};
+const shSfx={
+  hammer: n => { for (let i=0;i<(n||3);i++){ tone(210-i*12,.07,{to:120,vol:.22,type:'triangle',delay:i*.16}); noise(.05,{vol:.18,f:1800,delay:i*.16}); } },
+  mount: () => { tone(180,.09,{to:110,vol:.24,type:'triangle'}); noise(.06,{vol:.14,f:1400}); tone(180,.09,{to:110,vol:.2,type:'triangle',delay:.14}); tone(1568,.5,{vol:.05,type:'sine',delay:.3}); tone(2093,.6,{vol:.035,type:'sine',delay:.36}); },
+  creak: () => { tone(140,.35,{to:190,vol:.06,type:'sawtooth'}); noise(.3,{vol:.05,f:500,q:3}); },
+  drip: () => { tone(rand(1300,1600),.06,{to:700,vol:.04}); },
+  knock: () => { tone(90,.25,{to:60,vol:.2,type:'sine'}); noise(.15,{vol:.08,f:260,type:'lowpass'}); }
+};
+function shSub(){ const s=shackState(), n=s.wall.filter(Boolean).length, c=shelfCurios().length;
+  return !s.seen?'Your uncle’s front room. Tap a plaque to mount a fish.':n+' of '+s.wall.length+' plaque'+(s.wall.length===1?'':'s')+' filled · '+c+' curio'+(c===1?'':'s'); }
+function shUI(){ const s=shackState(), left=FIXUP.filter(L=>L.cost && !s.fix.includes(L.id));
+  $('shSub').textContent=shSub();
+  const lb=$('shList'); lb.innerHTML='Fix-up list'+(left.length?'<span class="sh-n">'+left.length+'</span>':''); lb.setAttribute('aria-label','Your uncle’s fix-up list, '+(left.length?left.length+' things left to fix':'all done'));
+  const kd=$('kitchenBtn'); kd.hidden=!save.kitchenOpen; const no=ordersOpen()?ordersState().list.length:0; kd.querySelector('.pk-badge').hidden=!no; kd.querySelector('.pk-badge').textContent=no; kd.setAttribute('aria-label','Out back to the kitchen'+(no?', '+no+' order'+(no===1?'':'s')+' waiting':''));
+  const tips=Math.floor(Object.keys(TANKS).reduce((a,k)=>a+(tanks()[k].owned?tanks()[k].tips:0),0)), tb=$('aquaBtn').querySelector('.pk-badge'); tb.hidden=tips<5; tb.textContent='+'+tips; $('aquaBtn').setAttribute('aria-label','Go through to the tank room'+(tips>=5?', '+tips+' coins in the tip jars':''));
+  $('aquaBtn').classList.toggle('arch',fixDone('knock'));
+  // the room's taps as buttons, for a keyboard or a screen reader: each plaque, the rod rack, the trapdoor
+  $('shSr').innerHTML=s.wall.map((m,i)=>'<button type="button" data-k="plaque" data-i="'+i+'">Plaque '+(i+1)+': '+(m?FISH[m.f.id].name:'empty')+'</button>').join('')+
+    '<button type="button" data-k="rack">Rod rack</button><button type="button" data-k="trap">Trapdoor</button>'; }
+function openShack(){ if (SH.open) return; ovOpen('shack',()=>{ if (!$('shCard').hidden){ shCardClose(); return false; } if (!$('shListP').hidden){ shListClose(); return false; } closeShack(); });
+  audioInit(); accrueTips(); const L=$('shack'); shackState();
+  L.innerHTML='<canvas id="shCanvas" aria-label="The shack’s front room"></canvas><div class="aq-top sh-top"><div><h2>Your shack</h2><p id="shSub"></p></div><button class="btn" id="shClose" type="button">Close</button></div>'+
+    '<div class="sh-bottom"><button class="sh-door" id="aquaBtn" type="button" aria-label="Go through to the tank room"><span class="sh-door-ico" aria-hidden="true"></span>Tank room<span class="pk-badge coin-badge" hidden></span></button>'+
+    '<button class="btn sh-listbtn" id="shList" type="button">Fix-up list</button>'+
+    '<button class="sh-door right" id="kitchenBtn" type="button" aria-label="Out back to the kitchen"><span class="sh-door-ico" aria-hidden="true"></span>Kitchen<span class="pk-badge order-badge" hidden></span></button></div>'+
+    '<div class="sh-sr" id="shSr" role="group" aria-label="In the room"></div><div class="aq-card sh-card" id="shCard" hidden></div><div class="sh-list" id="shListP" hidden></div>';
+  L.hidden=false; SH.open=true; SH.cv=$('shCanvas'); SH.ctx=SH.cv.getContext('2d'); SH.sig=null; SH.sel=null; SH.fx=[]; SH.strike=null;
+  shUI(); shLayout();
+  if (window.ResizeObserver){ SH.ro=new ResizeObserver(()=>{ if (SH.open && shLayout()) shDraw(); }); SH.ro.observe(L); SH.ro.observe(L.querySelector('.sh-bottom')); }
+  $('shClose').addEventListener('click',closeShack);
+  $('shList').addEventListener('click',()=>{ shCardClose(); shListOpen(); });
+  $('aquaBtn').addEventListener('click',()=>{ shSfx.creak(); shCardClose(); shListClose(); openAquarium(); });
+  $('kitchenBtn').addEventListener('click',()=>{ if (!save.kitchenOpen) return; shSfx.creak(); shCardClose(); shListClose(); openKitchen(); });
+  SH.cv.addEventListener('pointerdown',shTap);
+  $('shSr').addEventListener('click',e=>{ const b=e.target.closest('[data-k]'); if (b) shDo({k:b.dataset.k, i:+b.dataset.i}); });
+  // the list's hand and the plates' serif may still be arriving: paint the room again once they're here
+  if (document.fonts && document.fonts.load) Promise.all(['600 12px Caveat','400 12px "Young Serif"'].map(f=>document.fonts.load(f))).then(()=>{ SH.ver++; SH.art={}; }).catch(()=>{});
+  if (!shackState().seen){ shackState().seen=true; persist(); }
+  SH.last=performance.now(); requestAnimationFrame(shLoop); }
+function closeShack(){ if (!SH.open) return; if (SH.ro){ SH.ro.disconnect(); SH.ro=null; } ovClosed('shack'); SH.open=false; persist(); updateHud();
+  const L=$('shack'); L.classList.add('closing'); setTimeout(()=>{ L.hidden=true; L.classList.remove('closing'); L.innerHTML=''; },REDUCED?0:250); last=performance.now(); }
+/** Coming back from the tank room or the kitchen: the badges and anything that changed while away. */
+function shackBack(){ if (!SH.open) return; SH.ver++; shUI(); }
+function shLoop(now){ if (!SH.open) return; const dt=Math.min(.05,(now-SH.last)/1000||0); SH.last=now;
+  if (!AQ.open && !K.open){ SH.t+=dt; shUpdate(dt); shDraw(); } requestAnimationFrame(shLoop); }
+function shUpdate(dt){ const L=SH.L; if (!L) return;
+  // the drip, until the roof's patched: a bead swells on the beam, falls and plinks in the bucket
+  if (!fixDone('roof') && L.bucket){ SH.dripT=(SH.dripT||0)+dt; if (SH.dripT>2.6){ SH.dripT=0; SH.drips.push({y:L.beamY+6,v:0}); }
+    for (const d of SH.drips){ d.v+=900*dt; d.y+=d.v*dt; } const top=L.bucket.y+6; SH.drips=SH.drips.filter(d=>{ if (d.y<top) return true; SH.fx.push({k:'ring',x:L.bucket.x,y:top+3,t:0}); if (!REDUCED) shSfx.drip(); return false; }); }
+  // dust in the window's light, by day
+  if (L.win && SH.motes.length<14 && Math.random()<dt*3) SH.motes.push({x:L.win.x+rand(0,L.win.w),y:L.win.y+L.win.h+rand(-6,30),vx:rand(-4,4),vy:rand(-3,3),t:0,life:rand(4,8)});
+  for (const m of SH.motes){ m.t+=dt; m.x+=m.vx*dt+Math.sin(SH.t+m.y*.05)*3*dt; m.y+=m.vy*dt; } SH.motes=SH.motes.filter(m=>m.t<m.life);
+  for (const f of SH.fx) f.t+=dt; SH.fx=SH.fx.filter(f=>f.t<(f.k==='ring'?.6:f.k==='spark'?1.4:1.2));
+  if (SH.strike) SH.strike.t+=dt; }
+/** What a tap lands on: a plaque, a curio, a rod on the rack, the list, the trapdoor. */
+function shHit(x,y){ const L=SH.L; if (!L) return null; const inR=(r,p)=>r && x>r.x-(p||0) && x<r.x+r.w+(p||0) && y>r.y-(p||0) && y<r.y+r.h+(p||0);
+  for (let i=0;i<L.plaques.length;i++) if (inR(L.plaques[i],4)) return {k:'plaque',i};
+  for (const p of L.locked) if (inR(p,2)) return {k:'list'};
+  for (const c of L.curios) if (Math.hypot(x-c.x,y-c.y)<c.s*.62) return {k:'curio',id:c.id};
+  if (inR(L.rack,4)) return {k:'rack'};
+  if (inR(L.list,6)) return {k:'list'};
+  if (inR(L.trap,6)) return {k:'trap'};
+  if (L.stove && inR(L.stove,4) && fixDone('stove')) return {k:'stove'};
+  return null; }
+function shTap(e){ const r=SH.cv.getBoundingClientRect(), k=r.width?SH.W/r.width:1; shDo(shHit((e.clientX-r.left)*k,(e.clientY-r.top)*k)); }
+/** What a tap on the room does, from the canvas or from the room's buttons for keyboards and screen readers. */
+function shDo(h){ if (!h) return;
+  if (h.k==='plaque'){ shListClose(); shPlaqueCard(h.i); tone(700,.05,{vol:.05,type:'triangle'}); }
+  else if (h.k==='curio'){ shListClose(); shCurioCard(h.id); sfx.find(FINDS[h.id].rarity); }
+  else if (h.k==='rack'){ shListClose(); shRackCard(); sfx.rig('reel'); }
+  else if (h.k==='list'){ shCardClose(); shListOpen(); }
+  else if (h.k==='trap'){ const s=shackState(), n=(s.td||0)%TRAPDOOR.length; s.td=n+1; persist(); news(TRAPDOOR[n],''); shSfx.knock(); buzz(10); SH.fx.push({k:'lap',t:0}); }
+  else if (h.k==='stove'){ noise(.4,{vol:.06,f:1800,q:.6}); SH.fx.push({k:'spark',x:SH.L.stove.x+SH.L.stove.w/2,y:SH.L.stove.y+SH.L.stove.h*.55,t:0}); } }
+/** The rack's card: every rod you own, the one in hand marked; tap one to take it down and fish with it. */
+function shRackCard(){ const c=$('shCard'), rods=rackRods(); SH.sel={k:'rack'};
+  c.innerHTML='<div class="aq-card-top"><span class="r">Rod rack</span><button class="x" id="shX" type="button" aria-label="Close">×</button></div><h3>Your rods</h3>'+
+    (rods.length>1?'<p>Take one down to fish with it. Each keeps its own reel, line and runes.</p>':'<p>Only the one you’re holding, for now. Ottilie sells better rods.</p>')+
+    '<div class="sh-rods">'+rods.map(id=>'<button type="button" class="sh-rod'+(id===save.rod?' on':'')+'" data-rod="'+id+'"'+(id===save.rod?' aria-pressed="true"':'')+'><canvas data-rodart="'+id+'"></canvas><span><b>'+RODS[id].name+'</b><small>'+(id===save.rod?'In your hands':RODS[id].where)+'</small></span></button>').join('')+'</div>';
+  c.hidden=false; $('shX').addEventListener('click',shCardClose); paintRodArt(c.querySelectorAll('canvas[data-rodart]'));
+  c.querySelectorAll('[data-rod]').forEach(b=>b.addEventListener('click',()=>{ shTakeRod(b.dataset.rod); shRackCard(); })); }
+function shTakeRod(id){ if (id===save.rod || !save.rods.includes(id)) return;
+  save.rod=id; persist(); sfx.hook(false); buzz(12); news('Took down the '+RODS[id].name,'good'); SH.ver++; }
+function shCardClose(){ const c=$('shCard'); if (c){ c.hidden=true; c.innerHTML=''; } SH.sel=null; }
+/** A plaque's card: the mount and where it came from, or, on an empty plaque, the keepnet fish that could go up. */
+function shPlaqueCard(i){ const s=shackState(), m=s.wall[i], c=$('shCard'); SH.sel={k:'plaque',i};
+  if (m){ const f=m.f, F=FISH[f.id], rec=mountIsRecord(m), d=f.t?whenLabel(f.t,f.hr,f.wx):'';
+    c.innerHTML='<div class="aq-card-top"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+'</span><button class="x" id="shX" type="button" aria-label="Close">×</button></div>'+
+      '<h3>'+(f.mut?MUTS[f.mut].name+' ':'')+F.name+(rec?' <span class="net-rec">Record</span>':'')+'</h3><p><b>'+fmtW(fishW(f))+'</b> · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+'</p>'+
+      '<p>Caught at '+(f.spot?spotLabel(f.reg,f.spot):REGION_NAME[f.reg]||'')+(d?' · '+d:'')+(f.rod&&RODS[f.rod]?' · '+RODS[f.rod].name:'')+'</p>'+
+      '<p class="tip">While it’s up, every '+F.name+' you catch is worth '+Math.round(((rec?WALL.record:WALL.value)-1)*100)+'% more'+(rec?', since it’s your record':'. Mount your record for '+Math.round((WALL.record-1)*100)+'%')+'.</p>'+
+      '<div class="row"><button class="btn" id="shDown" type="button"'+(save.net.length<netCap()?'':' disabled')+'>'+(save.net.length<netCap()?'Take it down':'Keepnet full')+'</button></div>';
+    c.hidden=false; $('shX').addEventListener('click',shCardClose);
+    $('shDown').addEventListener('click',()=>{ if (!unmount(i)) return; sfx.plop(); news(F.name+' is back in the keepnet',''); shCardClose(); shUI(); });
+    return; }
+  const list=save.net.map((f,j)=>({f,j})).filter(({f})=>canMount(f)).sort((a,b)=>shMountRank(b.f)-shMountRank(a.f)).slice(0,8);
+  let h='<div class="aq-card-top"><span class="r">Plaque '+(i+1)+' of '+s.wall.length+'</span><button class="x" id="shX" type="button" aria-label="Close">×</button></div><h3>Mount a fish</h3>';
+  if (!list.length) h+='<p>'+(save.net.some(f=>!f.smoked)?'Nothing in your keepnet fits a plaque.':'Keep a fish from a catch card and it can go up here.')+' While a species is up, each one you catch is worth '+Math.round((WALL.value-1)*100)+'% more, or '+Math.round((WALL.record-1)*100)+'% if it’s your record.</p>';
+  else { h+='<p>From your keepnet. While it’s up, each of its species you catch is worth '+Math.round((WALL.value-1)*100)+'% more, '+Math.round((WALL.record-1)*100)+'% if it’s your record.</p><div class="sh-pick">';
+    for (const {f,j} of list){ const F=FISH[f.id], up=mountedAt(f.id)>=0;
+      h+='<button type="button" class="sh-pickrow" data-mount="'+j+'"><canvas data-f="'+f.id+'"'+(f.mut?' data-mut="'+f.mut+'"':'')+'></canvas><span><b>'+(f.mut?MUTS[f.mut].name+' ':'')+F.name+(isPB(f)?' <i class="net-rec">Record</i>':'')+'</b><small>'+fmtW(fishW(f))+' · '+RAR[F.rarity].label+(up?' · swaps the one up':'')+'</small></span></button>'; }
+    h+='</div>'; }
+  c.innerHTML=h; c.hidden=false; $('shX').addEventListener('click',shCardClose);
+  shPaintFish(c.querySelectorAll('canvas[data-f]'));
+  c.querySelectorAll('[data-mount]').forEach(b=>b.addEventListener('click',()=>{ const j=+b.dataset.mount, f=save.net[j]; if (!f) return; save.net.splice(j,1);
+    const at=mountFish(f,i); if (at<0){ save.net.splice(j,0,f); return; } shCardClose(); shMounted(at); shUI(); })); }
+/** Best first in the picker: records, then rarer, then heavier. */
+const shMountRank = f => (isPB(f)?1e6:0)+rarRank(FISH[f.id].rarity)*1e4+fishQ(f)*1e3+Math.min(999,fishW(f)/100);
+function shPaintFish(list){ const d=Math.min(window.devicePixelRatio||1,2); list.forEach(cv=>{ const r=layoutBox(cv); if (!r.width) return; cv.width=r.width*d; cv.height=r.height*d;
+  const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); drawFish(x,cv.dataset.f,r.width*.78,false,1,0,false,cv.dataset.mut||null); }); }
+/** The moment a fish goes up: two hammer taps, dust, and the plate catching the light. */
+function shMounted(at){ const P=SH.L&&SH.L.plaques[at]; shSfx.mount(); buzz([0,18,120,18]); SH.fx.push({k:'mount',i:at,t:0});
+  if (P) for (let q=0;q<10;q++) SH.fx.push({k:'dust',x:P.x+rand(0,P.w),y:P.y+P.h,vx:rand(-20,20),vy:rand(10,40),t:rand(0,.2)});
+  const m=shackState().wall[at]; if (m) news(FISH[m.f.id].name+' is up on the wall','gold'); }
+function shCurioCard(id){ const D=FINDS[id], FS=findsState(), c=$('shCard'); SH.sel={k:'curio',id};
+  c.innerHTML='<div class="aq-card-top"><span class="r" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' curio</span><button class="x" id="shX" type="button" aria-label="Close">×</button></div>'+
+    '<div class="sh-curio"><canvas data-find="'+id+'"></canvas><div><h3>'+D.name+'</h3><p class="lore">'+D.lore+'</p><p>'+foundWhere(FS.have[id],id)+'</p>'+(D.owner?'<p class="tip">This belongs to '+OWNERS[D.owner].name+'. You can give it back from the journal’s Finds page.</p>':'')+'</div></div>';
+  c.hidden=false; $('shX').addEventListener('click',shCardClose); paintTiles(c.querySelectorAll('canvas[data-find]')); }
+/* ---------- the fix-up list ---------- */
+function shListOpen(){ const P=$('shListP'), s=shackState();
+  let h='<div class="sh-paper" role="dialog" aria-label="Your uncle’s fix-up list"><button class="x" id="shLX" type="button" aria-label="Close">×</button><h3 class="hand">Things to fix</h3><ol>';
+  FIXUP.forEach((L,i)=>{ const done=s.fix.includes(L.id), can=L.cost && save.coins>=L.cost;
+    h+='<li class="'+(done?'done':'')+(L.cost?'':' later')+'" data-line="'+L.id+'"><span class="hand ln">'+L.line+'</span><span class="eff">'+(done?L.done:L.cost?L.eff:L.why)+'</span>'+
+      (done?'<span class="tick" aria-label="Done">✓</span>':L.cost?'<button class="btn sm" type="button" data-fix="'+L.id+'"'+(can?'':' disabled')+'><span class="coin" aria-hidden="true"></span>'+L.cost.toLocaleString()+'</button>':'<span class="tag">Not yet</span>')+'</li>'; });
+  h+='</ol><p class="hand sig">— and for heaven’s sake, keep the lamp lit.</p><p class="cash"><span class="coin" aria-hidden="true"></span>'+save.coins.toLocaleString()+' coins</p></div>';
+  P.innerHTML=h; P.hidden=false; sfx.paper();
+  $('shLX').addEventListener('click',shListClose);
+  P.querySelectorAll('[data-fix]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.fix; if (!buyFix(id)) return; shFixed(id); shListOpen(); P.querySelector('[data-line="'+id+'"]').classList.add('struck'); shUI(); })); }
+function shListClose(){ const P=$('shListP'); if (P){ P.hidden=true; P.innerHTML=''; } }
+/** A line done: hammer taps, the room rebuilt with the change in it, and a sparkle where it happened. */
+function shFixed(id){ const L=fixLine(id); SH.ver++; shLayout(); shSfx.hammer(id==='knock'?5:3); buzz([0,20,140,20,140,20]); SH.strike={id,t:0}; SH.fx.push({k:'fixed',id,t:0}); news(L.name+'. '+L.done,'gold'); }
+
+window.addEventListener('resize',()=>{ if (SH.open && shLayout()) shDraw(); });
 
 /* ---------- Opening: a letter, the stars, and something old in the deep pool ---------- */
 const INTRO={active:false,full:false,phase:'gate',t:0,quiet:false,shadow:0,ang:0,glint:0,raf:0,last:0,ev:{},bus:null,stars:null,shoot:null};
@@ -9415,7 +10061,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=23, SNAP_KEY=KEY+'-snapshots';
+const BUILD=24, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -9559,7 +10205,7 @@ function update(dt,rdt){
 function frame(now){
   const dt=clamp((now-last)/1000,0,.05); last=now; MODC.frame++; S.time+=dt; musicFrame(dt);
   APP.liveT=(APP.liveT||30)-dt; if (APP.liveT<=0){ APP.liveT=30; persist(); }   // keeps lastPlayed close, for time away (game/away.js), in the rooms too
-  if (AQ.open||K.open){ update(dt,dt); requestAnimationFrame(frame); return; } // the world keeps turning while you're in a room
+  if (AQ.open||K.open||SH.open){ update(dt,dt); requestAnimationFrame(frame); return; } // the world keeps turning while you're in a room
   let gdt=dt*(S.tut==='bite'?.35:1); if (S.freeze>0){ S.freeze-=dt; gdt=0; }
   S.tipT=(S.tipT||0)-dt; if (S.tipT<=0){ S.tipT=5; accrueTips(); }
   APP.snapT-=dt; if (APP.snapT<=0){ APP.snapT=600; snapshot('Autosave'); }
@@ -9609,13 +10255,12 @@ $('mapBtn').addEventListener('click',()=>{ audioInit(); showMap(); });
   $('clock').addEventListener('click',e=>{ e.stopPropagation(); if (long){ long=false; return; } if (S.state==='loot' || INTRO.active) return; audioInit(); tone(900,.04,{vol:.04,type:'triangle'}); if (modFlag('forecast')) openAlmanac(); else news(wxLine(),''); });   // the Wet Almanac reads ahead (game/relics.js)
   $('clock').addEventListener('keydown',e=>{ if (e.key==='Enter'||e.key===' '){ e.preventDefault(); $('clock').click(); } }); }   // a button for keyboards too; its label says the time and the weather
 $('phoneBtn').addEventListener('click',()=>openPhone());
-$('aquaBtn').addEventListener('click',()=>{ $('aquaBtn').classList.remove('pulse'); openAquarium(); });
-$('kitchenBtn').addEventListener('click',()=>{ $('kitchenBtn').classList.remove('pulse'); openKitchen(); });
+$('shackBtn').addEventListener('click',()=>{ $('shackBtn').classList.remove('pulse'); openShack(); });
 $('mealChip').addEventListener('click',()=>{ const m=save.meal; if (!m) return; coachFor(mealName(m.id)+(m.id==='mush'?'':' '+'★'.repeat(m.stars))+': '+effText(m.id,m.stars)+'. '+(m.last?'Last cast.':m.casts+' casts left.'),5); });
 $('journalBtn').addEventListener('click',()=>{ $('journalBtn').classList.remove('pulse'); openJournal(); });
 
 /* ---------- Bonuses: the journal page that shows every bonus and where it comes from ---------- */
-const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', event:'Event', weather:'Weather'};
+const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', shack:'Shack', mount:'Trophy wall', event:'Event', weather:'Weather'};
 /** How a modifier reads: +35 luck, +25%, −30%, ×2.5. Each stat keeps one unit. */
 function modValueText(stat,v,omen){
   if (omen) return '×'+trimNum(v);
@@ -10133,7 +10778,8 @@ function openNet(){
       const tags=[f.delicacy?'Hollowmere Delicacy':f.smoked?'Smoked '+fmtMins((f.smokedH||0)*60):'',f.perfect?'Perfect hook':'',f.lucky?'Gull luck':'',f.trap?'From a trap':''].filter(Boolean).join(' · '), room=!f.smoked && tankRoom(f.id), hook=save.kitchenOpen && smokable(f);
       h+='<div class="entry" style="grid-template-columns:84px 1fr auto"><canvas data-f="'+f.id+'"'+(f.smoked?' data-sm="'+(f.delicacy?'del':'1')+'" data-u="'+Math.round(Math.min(1,(f.smokedH||0)/(canDelicacy(f)?delicacyHours():SMOKE.full))*100)+'"':'')+' style="width:84px;height:42px"></canvas><div style="min-width:0"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+'</span><h3>'+F.name+(isPB(f)?'<span class="net-rec">Record</span>':'')+'</h3><p>'+fmtW(fishW(f))+' · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+(tags?'<br>'+tags:'')+'</p></div>'+
         '<div style="display:grid;gap:6px">'+(f.smoked?'':'<button class="btn" data-tank="'+i+'" type="button"'+(room?'':' disabled')+'>'+(room?'To tank':tanks()[tankOf(f.id)].owned?'Tank full':'No tank')+'</button>')+
-        (hook?'<button class="btn" data-hang="'+i+'" type="button"'+(freeHook()>=0?'':' disabled')+'>'+(freeHook()>=0?'Smoke it':'Rack full')+'</button>':'')+'<button class="btn" data-sell="'+i+'" type="button">Sell · +'+f.value+'</button></div></div>'; });
+        (hook?'<button class="btn" data-hang="'+i+'" type="button"'+(freeHook()>=0?'':' disabled')+'>'+(freeHook()>=0?'Smoke it':'Rack full')+'</button>':'')+
+        (save.tutorialDone && canMount(f)?'<button class="btn" data-mount="'+i+'" type="button">'+(mountedAt(f.id)>=0?'Swap mount':'Mount it')+'</button>':'')+'<button class="btn" data-sell="'+i+'" type="button">Sell · +'+f.value+'</button></div></div>'; });
     h+='</div>';
   }
   h+='<p class="note" style="margin-top:12px">Fish stay fresh in the net, so there’s no rush to sell.'+(hasPart('hold')?'':' A Roomy Keepnet from Tacklegram holds 24.')+'</p>';
@@ -10141,6 +10787,9 @@ function openNet(){
   document.querySelectorAll('#panel canvas[data-f]').forEach(c=>{ const r=layoutBox(c), d=Math.min(window.devicePixelRatio||1,2);
     c.width=r.width*d; c.height=r.height*d; const x=c.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d);
     if (c.dataset.sm) drawSmokedFish(x,c.dataset.f,r.width*.78,c.dataset.sm==='del'?100:+c.dataset.u||0,c.dataset.sm==='del'); else drawFish(x,c.dataset.f,r.width*.8,false); });
+  // up on the trophy wall in the shack (game/shack.js)
+  document.querySelectorAll('#panel [data-mount]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.mount, f=save.net[i]; if (!f) return; save.net.splice(i,1);
+    const at=mountFish(f); if (at<0){ save.net.splice(i,0,f); return; } shSfx.mount(); buzz([0,18,120,18]); shackPulse(); news(FISH[f.id].name+' is up on the trophy wall in your shack','gold'); openNet(); }));
   document.querySelectorAll('#panel [data-hang]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.hang, f=save.net[i]; if (!f || hangFish(i)<0) return; sfx.rig('bait'); news(FISH[f.id].name+' is on the smoke rack in the kitchen','good'); openNet(); }));
   const sell=idxs=>{ const set=new Set(idxs); let sum=0; save.net=save.net.filter((f,i)=>{ if (set.has(i)){ sum+=f.value; return false; } return true; }); persist(); if (sum) addCoins(sum); openNet(); };
   document.querySelectorAll('[data-sell]').forEach(b=>b.addEventListener('click',()=>{ const f=save.net[+b.dataset.sell];   // a Mythic asks twice, as on the card
@@ -10279,6 +10928,8 @@ function simSave(st){
     for (const id of REGION_FISH.coast) s.tanks.salt.fish.push(F(id),F(id)); }
   if (st.fish) for (const id in st.fish) s.fish[id]={caught:st.fish[id].caught||0,best:0,seen:true};
   else if (st.mastery) for (const id in FISH) s.fish[id]={caught:MASTERY.catches+2,best:0,seen:true};
+  // the shack: copied from a real save, or every line fixed and the wall full (game/shack.js: shackFull)
+  if (st.shack==='all') s.shack=shackFull(); else if (st.shack) s.shack=JSON.parse(JSON.stringify(st.shack));
   // finds: copied from a real save, or artifacts named for the run (all in pockets) plus any keepsakes named
   if (st.finds) s.finds=JSON.parse(JSON.stringify(st.finds));
   else { s.finds={have:{},equip:[],pockets:POCKETS.max,treasure:1};
@@ -10431,12 +11082,13 @@ const BAL_TIMES=[[6.5,'Dawn'],[12,'Noon'],[18.5,'Dusk'],[22,'Night']];
 const balTime=h=>h>=5&&h<8?6.5:isNight(h)?22:h>=17?18.5:12;
 function balMine(){ const m=save.meal, rig=rigFor(save.rod);
   return {region:REG(), spot:'open', hour:balTime(save.clock), rod:save.rod, reel:rig.reel, line:rig.line, bait:baitOn()||'', meal:mealActive()?m.id:'', stars:mealActive()?m.stars:3,
-    sets:'mine', parts:'mine', mastery:'mine', finds:'mine', runes:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000}; }
+    sets:'mine', parts:'mine', mastery:'mine', shack:'mine', finds:'mine', runes:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000}; }
 function balanceFormHTML(){
   const f=BAL.form||(BAL.form=balMine());
   const sel=(id,label,opts,v)=>'<label for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(([k,l])=>'<option value="'+k+'"'+(String(k)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
   const spots=Object.keys(f.region==='coast'?POOLS_COAST:POOLS).map(sp=>[sp,f.region==='coast'&&sp==='deep'?'Dark trench':SPOT_NAME[sp]]);
   const mySets=setsDone().length, myParts=(save.parts||[]).length, myMast=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=MASTERY.catches).length;
+  const myFix=shackState().fix.length, myMounts=shackState().wall.filter(Boolean).length;
   const myArts=findsState().equip.length, myRunes=enchFor(f.rod).filter(Boolean).length;
   let h='<p class="note">Plays casts with the game’s own odds, fights, catch rolls, snags, swells, treasure, tackle and tuning. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps. Every catch is sold; aiming, the aquarium and the kitchen aren’t played.</p>'+
     '<div class="bal-form">'+
@@ -10452,6 +11104,7 @@ function balanceFormHTML(){
     sel('bSets','Tank sets',[['mine','Yours ('+mySets+')'],['none','None'],['all','Every set']],f.sets)+
     sel('bParts','Boat parts',[['mine','Yours ('+myParts+')'],['none','None'],['all','Every part']],f.parts)+
     sel('bMastery','Mastery',[['mine','Yours ('+myMast+')'],['none','None'],['all','Every fish']],f.mastery)+
+    sel('bShack','Shack',[['mine','Yours ('+myFix+' fixed, '+myMounts+' up)'],['none','None'],['all','All fixed, wall full']],f.shack||'mine')+
     sel('bFinds','Artifacts',[['mine','Your pockets ('+myArts+')'],['none','None']].concat(Object.keys(FINDS).filter(id=>FINDS[id].kind==='artifact').map(id=>[id,FINDS[id].name])),f.finds)+
     sel('bRunes','Runes',[['mine','Yours on that rod ('+myRunes+')'],['none','None']].concat(ENCH_ORDER.map(id=>[id,ENCH[id].name])),f.runes||'mine')+
     sel('bTreasure','Treasure',[['yes','Turns up'],['no','Left out']],f.treasure)+
@@ -10466,12 +11119,13 @@ function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:
     parts:f.parts==='all'?'all':f.parts==='mine'?(save.parts||[]).slice():[], lucky:f.lucky==='yes', player:f.player};
   if (f.sets==='mine') st.tanks=tanks(); else st.sets=f.sets;
   if (f.mastery==='mine') st.fish=save.fish; else st.mastery=f.mastery==='all';
+  if (f.shack==='all') st.shack='all'; else if (f.shack!=='none') st.shack=shackState();
   if (f.finds==='mine') st.finds=findsState(); else if (f.finds!=='none') st.artifacts=[f.finds];
   if (f.runes==='mine' || !f.runes) st.enchSave=enchState(); else if (f.runes!=='none') st.ench=[f.runes];
   if (f.treasure==='no') st.treasure=false;
   return st; }
 function bindBalance(){
-  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bFinds:'finds',bRunes:'runes',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n'};
+  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bShack:'shack',bFinds:'finds',bRunes:'runes',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n'};
   for (const [id,k] of Object.entries(ids)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
     if (k==='region') BAL.form.spot='open';
     if (k==='region' || k==='rod'){ const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; }
@@ -10538,9 +11192,10 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
       MUT_ORDER.map(k=>'<option value="'+k+'"'+(RARITY_CTL.mut===k?' selected':'')+'>'+MUTS[k].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">The next fish you land comes up with this (not a Mythic, and not in the first lesson).</span></label>'+
     '<label for="tMoon">Moon<output id="tMoonO">'+moonName()+'</output><select id="tMoon"><option value="">As the sky has it</option>'+
       Array.from({length:MOON.cycle},(_,i)=>'<option value="'+i+'"'+(wxState().moon===i?' selected':'')+'>'+moonName(i)+', pinned</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">A full moon puts the moonpath across the deep pool at night, where the Moonwhale Calf bites.</span></label>'+
+    '<label for="tFix">Shack<output id="tFixO">'+shackState().fix.length+' of '+FIXUP.filter(L=>L.cost).length+' fixed</output><select id="tFix"><option value="">Fix a line for free…</option>'+FIXUP.filter(L=>L.cost).map(L=>'<option value="'+L.id+'"'+(fixDone(L.id)?' disabled':'')+'>'+L.name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Your uncle’s fix-up list, in the shack. Fill the wall puts a fish of every rarity up on the free plaques.</span></label>'+
     '<label for="tRelic">Story relics<output id="tRelicO">'+Object.keys(STORY).filter(hasFind).length+' of '+Object.keys(STORY).length+'</output><select id="tRelic"><option value="">Hand one over…</option>'+Object.keys(STORY).map(id=>'<option value="'+id+'"'+(hasFind(id)?' disabled':'')+'>'+FINDS[id].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Each is found its own way: the almanac from Ottilie, the jar on the moonpath, the bell in the deep pool’s small-hours fog, the pin in your first map’s cache.</span></label></div>'+
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
-    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="jarBtn" type="button">Fill the Moon Jar</button><button class="btn" id="mapBtn2" type="button">Finish the map</button><button class="btn" id="bowBtn" type="button">'+(wxState().bow?'Clear the rainbow':'Rainbow now')+'</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
+    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="jarBtn" type="button">Fill the Moon Jar</button><button class="btn" id="wallBtn" type="button">Fill the wall</button><button class="btn" id="mapBtn2" type="button">Finish the map</button><button class="btn" id="bowBtn" type="button">'+(wxState().bow?'Clear the rainbow':'Rainbow now')+'</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
   bindPlaytestTabs();
   [['tHook','hook'],['tTension','tension'],['tWait','wait']].forEach(([id,k])=>{ $(id).addEventListener('input',e=>{ save.tune[k]=+e.target.value; $(id+'O').textContent=(+e.target.value).toFixed(2)+'×'; persist(); }); });
   $('tClock').addEventListener('input',e=>{ save.clock=+e.target.value; $('tClockO').textContent=clockText(save.clock); buildBg(); persist(); });
@@ -10548,6 +11203,13 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   $('coinBtn').addEventListener('click',()=>{ addCoins(1000); });
   $('tRelic').addEventListener('change',e=>{ const id=e.target.value; if (!id || hasFind(id)) return; const FS=findsState(); FS.have[id]={t:Date.now(),hr:save.clock,reg:REG(),src:'story'}; FS.fresh.push(id);
     if (FS.equip.length<FS.pockets) FS.equip.push(id); persist(); updateJournalDot(); closeSheet(); news(FINDS[id].name+(FS.equip.includes(id)?' is in a pocket':' is in your tackle bag'),'good'); });
+  $('tFix').addEventListener('change',e=>{ const id=e.target.value, L=fixLine(id); if (!L || fixDone(id)) return; addCoins(L.cost); buyFix(id); closeSheet(); news(L.name+': done',''); });
+  $('wallBtn').addEventListener('click',()=>{ const s=shackState(), up=new Set(s.wall.filter(Boolean).map(m=>m.f.id)), byRar={};
+    for (const id of Object.keys(FISH)) if (!FISH[id].noTank && !up.has(id)) (byRar[FISH[id].rarity]=byRar[FISH[id].rarity]||[]).push(id);
+    const pick=Object.keys(RAR).slice().reverse().flatMap(r=>byRar[r]||[]); let n=0;
+    for (let i=0;i<s.wall.length;i++) if (!s.wall[i] && pick.length){ const id=pick.shift(), F=FISH[id], size=Math.round(lerp(F.size[0],F.size[1],.7)*10)/10, w=weighFish(id,size,1);
+      s.wall[i]={f:{id,size,w,stars:qualityOf(id,size,false),value:F.value,t:Date.now(),reg:REGION_FISH.coast.includes(id)?'coast':'lake',hr:save.clock,rod:save.rod},t:Date.now()}; n++; }
+    persist(); SH.ver++; closeSheet(); news(n?n+' fish up on the wall':'The wall is full',''); });
   $('jarBtn').addEventListener('click',()=>{ const r=relicState(); r.jar=MOON_JAR.fill; r.armed=false; persist(); closeSheet(); news(modFlag('moonJar')?'The Moon Jar is full':'The Moon Jar is full, but it only works from a pocket',''); });
   $('mapBtn2').addEventListener('click',()=>{ while (mapCan({}) && !mapWhole()) addMapPiece({}); persist(); closeSheet(); news(mapWhole()?'Your treasure map is whole':'You already have a map from another water',''); });
   $('tFish').addEventListener('change',e=>{ RARITY_CTL.fish=e.target.value||null; $('tFishO').textContent=RARITY_CTL.fish?FISH[RARITY_CTL.fish].name:'As the water has it'; });

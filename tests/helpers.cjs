@@ -32,6 +32,8 @@ function watch(page) {
   page.errors = [];
   page.on('pageerror', e => page.errors.push(String(e.stack || e)));
   page.on('console', m => { if (m.type() === 'error' && !noise.test(m.text())) page.errors.push(m.text()); });
+  // the tank room and the kitchen open from the shack: tap the shack in the bottom bar (unless you're in it), then the door
+  page.room = async door => { if (!(await page.evaluate(() => !!document.getElementById('shCanvas')))) { await page.click('#shackBtn'); await page.waitForTimeout(450); } await page.click(door); };
   return page;
 }
 

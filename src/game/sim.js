@@ -42,6 +42,8 @@ function simSave(st){
     for (const id of REGION_FISH.coast) s.tanks.salt.fish.push(F(id),F(id)); }
   if (st.fish) for (const id in st.fish) s.fish[id]={caught:st.fish[id].caught||0,best:0,seen:true};
   else if (st.mastery) for (const id in FISH) s.fish[id]={caught:MASTERY.catches+2,best:0,seen:true};
+  // the shack: copied from a real save, or every line fixed and the wall full (game/shack.js: shackFull)
+  if (st.shack==='all') s.shack=shackFull(); else if (st.shack) s.shack=JSON.parse(JSON.stringify(st.shack));
   // finds: copied from a real save, or artifacts named for the run (all in pockets) plus any keepsakes named
   if (st.finds) s.finds=JSON.parse(JSON.stringify(st.finds));
   else { s.finds={have:{},equip:[],pockets:POCKETS.max,treasure:1};

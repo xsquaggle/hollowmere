@@ -24,7 +24,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/ui-flow.js` | 32 | The news ribbon (`news`), queued coach tips, the overlay stack (`ovPush`, `ovOpen`), swipe-to-close |
 | `src/game/boot.js` | 17 | `boot`: starts everything (always last in the build) |
 | `src/index.html` | 57 | Page skeleton: head, markup, where styles, scripts and fonts go |
-| `src/test-hooks.js` | 39 | Test build only: `window.__` handles for the test suite |
+| `src/test-hooks.js` | 56 | Test build only: `window.__` handles for the test suite |
 
 ## Fishing: cast, bite, reel, land
 
@@ -102,7 +102,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/order-kitchen.js` | 131 | Orders in the kitchen: tickets in the book, serving, visits |
 | `src/game/portrait-art.js` | 221 | Townsfolk head-and-shoulders portraits |
 
-## Aquarium, shops, journal, menus
+## The shack, aquarium, shops, journal, menus
 
 | File | Lines | What's in it |
 | --- | --- | --- |
@@ -110,6 +110,8 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/aquarium-art.js` | 487 | Aquarium drawing: room, tank, sand, plants, decor, tip jar |
 | `src/game/shops.js` | 113 | Keepnet and Ottilie's shop sheets (rods, tackle, traps) |
 | `src/game/tacklegram.js` | 108 | The phone shop: sea rods, boat parts, the mail boat |
+| `src/game/shack.js` | 178 | The shack's front room: `openShack`, the trophy wall (`mountFish`, `unmount`, `canMount`), the fix-up list (`buyFix`, `fixDone`, `shackTankCap`), the curio shelf, the rod rack, the trapdoor, the shack's modifiers (`fixUpMods`) |
+| `src/game/shack-art.js` | 348 | The front room drawn: `shLayout`, walls, window, the uncle's list, shelf or cabinet, floor, trapdoor, stove, net, rod rack; plaques and mounts with their rarity kit |
 | `src/game/journal.js` | 50 | The journal: species pages, records |
 | `src/game/bonuses.js` | 104 | The Bonuses journal page |
 | `src/game/saves.js` | 115 | `BUILD` number, backup codes, earlier saves, settings and sound sheets |
@@ -148,11 +150,12 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/data/enchant.js` | 32 | `ENCH` runes, `GLIMMER` |
 | `src/data/idle.js` | 41 | `TRAPS`, `FITTINGS`, `SMOKE`, `AWAY` |
 | `src/data/orders.js` | 87 | `ORDERS`, `TOWNSFOLK`, `STANDINGS`, `UPGRADES`, `VISITS`, `PLATTER` |
+| `src/data/shack.js` | 34 | `FIXUP` (the uncle's fix-up list), `WALL` (plaques and what a mount does), `SHELF`, `MARKS`, `TRAPDOOR` |
 | `src/data/stats.js` | 51 | `STATS` (everything a bonus can change), `MASTERY` |
 
 ## Styles (`src/styles/`)
 
-One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map.css`, `aquarium.css`, `settings.css`, `intro.css`, `news.css`, `kitchen.css`, `card.css`, `loot.css`, `bonuses.css`, `finds.css`, `relics.css`, `bag.css`, `enchant.css`, `idle.css`, `orders.css`, `sheets.css`, `balance.css`.
+One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map.css`, `aquarium.css`, `settings.css`, `intro.css`, `news.css`, `kitchen.css`, `card.css`, `loot.css`, `bonuses.css`, `finds.css`, `relics.css`, `bag.css`, `enchant.css`, `idle.css`, `orders.css`, `shack.css`, `sheets.css`, `balance.css`.
 
 ## Tools and tests
 
@@ -162,7 +165,7 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tools/check-content.mjs` | 417 | Checks every content table, and that this map lists every file |
 | `tools/simulate.mjs` | 201 | The balance simulator from the command line (`npm run sim`) |
 | `tests/run.cjs` | 38 | Runs the Playwright suite against `build/test.html` |
-| `tests/helpers.cjs` | 104 | Shared helpers: cast, hook, reel and tap like a player |
+| `tests/helpers.cjs` | 106 | Shared helpers: cast, hook, reel and tap like a player, and `page.room` to go through the shack to a room |
 | `tests/fishing.test.cjs` | 59 | The core loop and the record moment |
 | `tests/opening.test.cjs` | 23 | The opening |
 | `tests/ui.test.cjs` | 59 | Back gesture, closing things, music, Playtest tools |
@@ -179,3 +182,4 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/rarity.test.cjs` | 152 | Moon phases, rare bites, mutations, the dry run, the Mythic's sell |
 | `tests/weather.test.cjs` | 136 | Weather and its fish |
 | `tests/relics.test.cjs` | 229 | Story relics, treasure maps, the Moon Jar, the almanac, combos |
+| `tests/shack.test.cjs` | 202 | The shack: the fix-up list, mounting and the wall bonus, the rod rack, the knock-through, the room at five phone sizes, odd saves |

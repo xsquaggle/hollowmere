@@ -1,10 +1,11 @@
 /* Aquarium: tanks, the tip rate per rarity (coins per minute), decor, and tank sets. Luck is in luck points (.1 is +10 luck).
+   A tank size bigger than the shack allows waits for the fix-up list's knock-through (data/shack.js: FIXUP tankCap).
    Decor with crate: (a rarity) isn't sold: it only comes in loot crates of that tier (data/treasure.js), then waits to be placed.
    TANK_SETS[].check(fish) gets the tank's fish list and returns true when the set is complete. Its bonus applies in its
    region ('any' for both), and only at night with night:true, or only in the weather wx names (data/weather.js). */
 const TANKS={
-  fresh:{name:'Freshwater', water:['#5FA39A','#2F6A66','#1C4644'], sand:'#B79A6E', caps:[6,10,14], costs:[600,1500], unlock:0},
-  salt: {name:'Saltwater', water:['#4FA6C4','#2A6F92','#173F5E'], sand:'#E2D3AE', caps:[6,10,14], costs:[800,2000], unlock:1200}
+  fresh:{name:'Freshwater', water:['#5FA39A','#2F6A66','#1C4644'], sand:'#B79A6E', caps:[6,10,14,18], costs:[600,1500,4000], unlock:0},
+  salt: {name:'Saltwater', water:['#4FA6C4','#2A6F92','#173F5E'], sand:'#E2D3AE', caps:[6,10,14,18], costs:[800,2000,5000], unlock:1200}
 };
 const TIP_BASE={common:.05, uncommon:.12, rare:.35, epic:.7, legendary:1.2, exotic:2.2, mythic:4, godly:8};
 const DECOR={

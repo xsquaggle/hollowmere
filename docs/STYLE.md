@@ -73,6 +73,13 @@ Step 16, the art pass, brought everything older up to this bar: the scene in par
   - In the scene, a whole map's ring is a dashed line on the water; the pin's mark is a brass pin in it. A moonlit cast draws a pool of night with the moon's light on it round the bobber. The Moon Jar sits on the dock by the tackle box (on the skiff, on deck), glowing as it fills.
   - A faded ghost leaves the Drowned Bell's rings on the water and a hollow ring on the gauge, and the Tuning Fork's glowing wake.
   - Combo chips are small brass-edged pills; an unknown combo is a dashed "???" pill. The almanac sheet is ruled paper with pencilled times and ink-line weather icons, and the moon drawn in its phase.
+- **Shack art** lives in `src/game/shack-art.js` and `src/styles/shack.css`.
+  - The front room is sea-green painted planks worn through to the wood, under a dark beam, on a plank floor; the same 3–4 values and ink as the kitchen and the tank room. The old paint is palest up high and wears away toward the floor.
+  - Your uncle's high-water marks are pencilled on the left boards with their years. His fix-up list is ruled paper on a nail in Caveat, struck through in ink as each job is done (the struck line draws itself).
+  - Plaques are rounded oak shields with a brass name plate, the fish turned a little nose-up. Plaques still to come are chalk outlines. Panelled, the wall is oiled oak with a brass picture light over each plaque. A mounted fish keeps its rarity kit: foil and prism over the fish, sparks, motes from Legendary, ink from Mythic.
+  - The shelf's curios cast soft shadows; the cabinet adds glass with one streak of light and a mantel clock stopped at 3:12. The rod rack shows each rod you own in its own colors.
+  - Each fix changes the room: the roof's stain and the bucket under the drip go, the net gets mended, a lamp lights the window (a moth at night), the stove glows, the knock-through glows teal past the tank room's door, which becomes an arch.
+  - The doors at the bottom are arched plank doors with a brass knob, the tank room's with a teal porthole, the kitchen's with a crescent. At night the room darkens from the window and the lamp and picture lights carry it.
 - **Fish up close:** past 44 px a fish gets a gill line, a side fin, a darker back, a mouth and a glint in its eye; past 80 px, fin rays, a lateral line and scales. Catfish, eels, and fish whose pattern already reads as scales don't get extra scales. The Foghorn Gurnard's wing-like fan shows at every size, its shadow included, because it's the gurnard's silhouette.
 
 ## Rarity kit

@@ -94,12 +94,12 @@ body:not([data-state="idle"]) .corner button{pointer-events:none!important}
 .icon-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
 .icon-btn:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
 .icon-btn.off{background:#CFC6B4}
-.book-peek,.bowl-peek,.pan-peek{position:relative;padding:0;border:0;background:none;cursor:pointer;pointer-events:auto;line-height:0;
+.book-peek,.shack-peek{position:relative;padding:0;border:0;background:none;cursor:pointer;pointer-events:auto;line-height:0;
   margin-bottom:calc(-12px - env(safe-area-inset-bottom,0px));filter:drop-shadow(0 -4px 8px rgba(0,0,0,.35));transition:transform .25s cubic-bezier(.2,1.5,.4,1)}
-.book-peek{animation:peek 9s 4.5s infinite}.bowl-peek{animation:peek 9s 6s infinite}.pan-peek{animation:peek 9s 1.5s infinite}
-.book-peek:hover,.book-peek:focus-visible,.bowl-peek:hover,.bowl-peek:focus-visible,.pan-peek:hover,.pan-peek:focus-visible{transform:translateY(-8px) rotate(-2deg);outline:none}
-.book-peek:active,.bowl-peek:active,.pan-peek:active{transform:translateY(-14px)}
-#journalBtn.pulse,#aquaBtn.pulse,#kitchenBtn.pulse{animation:jpulse .9s ease 3}
+.book-peek{animation:peek 9s 4.5s infinite}.shack-peek{animation:peek 9s 6s infinite}
+.book-peek:hover,.book-peek:focus-visible,.shack-peek:hover,.shack-peek:focus-visible{transform:translateY(-8px) rotate(-2deg);outline:none}
+.book-peek:active,.shack-peek:active{transform:translateY(-14px)}
+#journalBtn.pulse,#shackBtn.pulse{animation:jpulse .9s ease 3}
 @keyframes jpulse{50%{transform:translateY(-12px) scale(1.08)}}
 
 .k-scraps{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-size:12.5px;font-weight:700;line-height:1.35;color:#6B665C;text-align:left}

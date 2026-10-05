@@ -42,6 +42,12 @@ window.__hm={ get save(){ return save; }, FISH, RODS, REGION_FISH, RECIPES, DECO
     ghost:()=>({rings:GHOSTFX.rings.length, wake:GHOSTFX.wake.length}), signs:(R,dt)=>ghostSigns(R,dt), combos:id=>combosHTML(id), seen:id=>comboSeen(id), known:id=>comboKnown(id),
     // pockets changed mid-frame: read the bonuses afresh
     landed:()=>moonFishLanded(), pocket:id=>{ findsState().equip.push(id); MODC.dirty=true; } },
+  FIXUP, WALL,
+  openNet:()=>openNet(), closeSheet:()=>closeSheet(),
+  shack:{ state:()=>shackState(), open:()=>openShack(), close:()=>closeShack(), fix:id=>buyFix(id), canMount:f=>canMount(f), tankCap:()=>shackTankCap(), curios:()=>shelfCurios(),
+    layout:()=>SH.L, hit:(x,y)=>shHit(x,y), sel:()=>SH.sel, plaques:()=>plaqueCount(shackState()), full:()=>shackFull(), rack:()=>rackRods(),
+    // a keepnet fish up on the wall, as the picker does it
+    mountNet:(j,at)=>{ const f=save.net[j]; if (!f) return -1; save.net.splice(j,1); const i=mountFish(f,at); if (i<0) save.net.splice(j,0,f); return i; }, unmount:i=>unmount(i) },
   treasure(o){ TREASURE_CTL.off=o===false; TREASURE_CTL.force=o&&o.kind?o:null; }, findsState:()=>findsState(), rollTreasure:c=>rollTreasure(c||{spot:'open'}),
   rollCrateTier:c=>rollCrateTier(c||{spot:'open'}), treasureChance:c=>treasureChance(c||{spot:'open'}), openLoot:(l,c)=>openLoot(l,c||{spot:'open'}), modAdd:(s,c)=>modAdd(s,c), castReach:()=>castReach(), gullMul:()=>gullMul(),
   tierMul:(r,c)=>tierMul(r,c), modMul:(s,c)=>modMul(s,c), luckPoints:c=>luckPoints(c),

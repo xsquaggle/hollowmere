@@ -159,7 +159,7 @@ module.exports = [
       const page = await newPage();
       const tanks = { fresh: { lvl: 0, owned: true, fish: [], decor: [], stored: ['belltower'], tips: 0, tipT: now }, salt: { lvl: 0, owned: false, fish: [], decor: [], tips: 0, tipT: now } };
       await openGame(page, { save: veteran({ tanks, coins: 99999, aquaSeen: true }) });
-      await page.click('#aquaBtn'); await page.waitForTimeout(700);
+      await page.room('#aquaBtn'); await page.waitForTimeout(700);
       assert.equal(await page.$('[data-buy="belltower"]'), null, 'there is no price to pay');
       await page.click('[data-place="belltower"]'); await page.waitForTimeout(400);
       const s = await readSave(page);

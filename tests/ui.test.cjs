@@ -31,11 +31,11 @@ module.exports = [
       await openGame(page, { save: veteran({ boat: true, fish: lakeFish(), coins: 900, kitchenOpen: true, kitchenSeen: true, net: [{ id: 'perch', size: 20, value: 2, t: Date.now() }, { id: 'perch', size: 21, value: 2, t: Date.now() }, { id: 'perch', size: 22, value: 2, t: Date.now() }] }) });
       await page.mouse.click(180, 400); await page.waitForTimeout(500);
       assert.equal(await page.evaluate(() => window.__MU.mood), 'lake_day', 'noon on the lake plays the day mood');
-      await page.click('#aquaBtn'); await page.waitForTimeout(3200);
+      await page.room('#aquaBtn'); await page.waitForTimeout(3200);
       assert.equal(await page.evaluate(() => window.__MU.mood), 'aquarium');
       await page.keyboard.press('Escape'); await page.waitForTimeout(700);
       assert.equal(await visible(page, '#aqua'), false, 'Escape leaves the aquarium');
-      await page.click('#kitchenBtn'); await page.waitForTimeout(2600);
+      await page.room('#kitchenBtn'); await page.waitForTimeout(2600);
       assert.equal(await page.evaluate(() => window.__MU.mood), 'kitchen');
       await page.click('[data-cook="fry"]'); await page.waitForTimeout(600);
       await page.goBack(); await page.waitForTimeout(400);
