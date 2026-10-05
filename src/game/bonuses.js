@@ -22,6 +22,7 @@ function modWhenText(w){
   if (w.night) out.push('at night'); else if (w.night===false) out.push('by day');
   if (w.wx) out.push(wxOnText(w.wx));
   if (w.lucky) out.push('while you fish a lucky splash');
+  if (w.bow) out.push('where the rainbow touches the water');
   if (w.rarity) out.push('for '+w.rarity.map(r=>RAR[r].label.toLowerCase()).join(' and ')+' fish');
   if (w.rarityMin) out.push(w.rarityMin===Object.keys(RAR)[1]?'for every fish above common':'for '+RAR[w.rarityMin].label.toLowerCase()+' fish and rarer');
   if (w.fish) out.push('with '+FISH[w.fish].name);
@@ -38,8 +39,9 @@ function modState(m,now){ const w=m.when; if (!w) return 'on';
   if ((w.region && w.region!==now.region) || (w.spot && !spots.includes(w.spot))) return 'off-here';
   if ((w.night && !now.night) || (w.night===false && now.night)) return 'off-now';
   if (w.wx && ![].concat(w.wx).includes(now.wx)) return 'off-now';
+  if (w.bow && !bowFoot()) return 'off-now';
   if (now.rarity && ((w.rarity && !w.rarity.includes(now.rarity)) || (w.rarityMin && rarRank(now.rarity)<rarRank(w.rarityMin)))) return 'off-here';
-  const open=w.spot||w.fish||w.beh||w.lucky||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
+  const open=w.spot||w.fish||w.beh||w.lucky||w.bow||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
   return open ? 'cond' : 'on'; }
 const stateClass=st=>st.startsWith('off')?'off':st;
 const stateNote=st=>st==='off-here'?' · not here':st==='off-now'?' · not now':'';

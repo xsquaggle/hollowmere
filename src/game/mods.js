@@ -48,6 +48,8 @@ function modSources(){
   { const k=wxNow(), K=WX[k]; for (const x of K.mods) L.push(Object.assign({src:'weather',name:K.name},x,{when:Object.assign({wx:k},x.when)})); }
   // Gull Luck: a lucky splash zone doubles the odds of every fish above common while you fish in it
   add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true, rarityMin:'uncommon'}});
+  // The rainbow's foot: a fish hooked where it touches the water comes up mutated twice as often (game/moon.js)
+  add('event',"Rainbow's foot",'mutation',2,{when:{bow:true}});
   // Fresh water: back after a long while, rarer fish bite more often for a few casts (game/away.js)
   if (save.fresh>0 || save.freshLast) add('event','Fresh water','luck',AWAY.fresh.x,{omen:true, when:{rarityMin:'rare'}, casts:save.fresh>0?save.fresh:undefined, last:!(save.fresh>0)||undefined});
   // playtest tuning

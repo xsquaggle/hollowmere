@@ -3,6 +3,8 @@
    Glyphs are drawn in a unit square (-1..1) so the same path serves the tray, the tag on the catch card, the
    socket on the rig and the etching, where the glyph draws itself stroke by stroke (o.p, 0 to 1). */
 const RUNE_GLYPH={
+  odd(c){ c.moveTo(0,-.8); c.bezierCurveTo(.2,-.42,.6,-.06,.6,.26); c.bezierCurveTo(.6,.62,.32,.8,0,.8); c.bezierCurveTo(-.32,.8,-.6,.62,-.6,.26); c.bezierCurveTo(-.6,-.06,-.2,-.42,0,-.8);   // a drop of water,
+    c.moveTo(.02,.3); c.arc(-.04,.3,.06,0,Math.PI*1.5,true); c.arc(-.02,.32,.16,-Math.PI*.5,Math.PI,false); c.arc(.02,.3,.28,Math.PI,Math.PI*.2,false); },   // turning on itself
   swift(c){ c.moveTo(-.34,-.5); c.lineTo(-.34,.5); c.moveTo(.42,-.5); c.lineTo(.42,.5);
     for (const y of [-.24,0,.24]){ c.moveTo(-.34,y); c.lineTo(.42,y); }
     for (const [x0,y,l] of [[-.62,-.3,.18],[-.78,0,.3],[-.62,.3,.18]]){ c.moveTo(x0-l,y); c.lineTo(x0,y); } },

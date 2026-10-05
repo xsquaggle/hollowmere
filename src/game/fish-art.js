@@ -40,7 +40,7 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   if (shadow){ c.globalAlpha=alpha; c.fillStyle='rgba(10,26,34,.55)'; c.save(); c.rotate(tailSwing*.2); c.fill(tailPath(id,len)); c.restore(); const sh=fishPath(id,len); if (id==='gurnard') sh.addPath(gurnardWingPath(len,len*F.h)); c.fill(sh,'nonzero');
     if (id==='angler') anglerLure(c,len,h,Math.max(1,len*.02),true);   // its lure glows even as a shadow under the water
     c.restore(); return; }
-  if (mut==='twin'){ c.save(); c.translate(-len*.14,h*1.15); c.scale(.86,.86); drawFish(c,id,len,false,alpha,-tailSwing*.8,bare); c.restore(); }
+  if (mut==='twin'){ c.save(); c.translate(-len*.2,-h*1.05); c.scale(.84,.84); drawFish(c,id,len,false,alpha,-tailSwing*.8,bare); c.restore(); }
   if (alpha<1) c.globalAlpha=alpha;
   const lw=Math.max(1.5,len*.032), det=len>=80?2:len>=44?1:0; c.lineWidth=lw; c.lineJoin='round'; c.strokeStyle=INK;
   c.save(); c.translate(-len*.36,0); c.rotate(tailSwing*.25); c.translate(len*.36,0);
@@ -104,7 +104,7 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   if (det){ if (id!=='calf'){ const gx=id==='gar'?.2:id==='angler'?.12:.28; c.strokeStyle='rgba(43,42,51,.62)'; c.lineWidth=lw*.6; c.beginPath(); c.moveTo(len*gx,-h*.66); c.quadraticCurveTo(len*(gx-.09),-h*.02,len*(gx-.01),h*.6); c.stroke(); }
     if (!OWN_MOUTH.has(id)){ c.strokeStyle=INK; c.lineWidth=lw*.55; c.beginPath(); c.moveTo(len*.5,h*.04); c.quadraticCurveTo(len*.465,h*.13,len*.425,h*.11); c.stroke(); }
     if (id==='gurnard'){ gurnardWing(c,len,h,lw,det,tailSwing); } else {
-    const fl=id==='calf'?2.1:1; c.save(); c.translate(len*(id==='calf'?.24:.17),h*(id==='calf'?.45:.24)); c.rotate((id==='calf'?.75:.45)+tailSwing*.2); const pf=new Path2D(); pf.moveTo(0,0); pf.quadraticCurveTo(-len*.05*fl,-h*.34,-len*.17*fl,-h*.08*fl); pf.quadraticCurveTo(-len*.08*fl,h*.2,0,0);
+    const fl=id==='calf'?1.7:1; c.save(); c.translate(len*(id==='calf'?.22:.17),h*(id==='calf'?.5:.24)); c.rotate((id==='calf'?1.25:.45)+tailSwing*.2); const pf=new Path2D(); pf.moveTo(0,0); pf.quadraticCurveTo(-len*.05*fl,-h*.34,-len*.17*fl,-h*.08*fl); pf.quadraticCurveTo(-len*.08*fl,h*.2,0,0);
     c.globalAlpha=.9; c.fillStyle=F.fin; c.fill(pf); c.globalAlpha=1; if (det>1 && id!=='calf'){ c.save(); c.clip(pf); fishRays(c,lw,[0,0,-len*.15,-h*.16, 0,0,-len*.16,-h*.04, 0,0,-len*.12,h*.08]); c.restore(); } c.strokeStyle=INK; c.lineWidth=lw*.6; c.stroke(pf);
     if (id==='char'){ c.strokeStyle='#F7F3EA'; c.lineWidth=lw*.45; c.beginPath(); c.moveTo(-len*.012,-h*.03); c.quadraticCurveTo(-len*.05,-h*.31,-len*.15,-h*.1); c.stroke(); } c.restore(); } }
   if (id==='grouper'){ for (let i=0;i<6;i++){ const bx=len*(.18-i*.09), by=-h*.85+Math.abs(i-2.5)*h*.05; c.fillStyle='#E8E2D2'; c.beginPath(); c.arc(bx,by,len*.03,0,Math.PI*2); c.fill(); c.lineWidth=lw*.5; c.strokeStyle=INK; c.stroke(); }
