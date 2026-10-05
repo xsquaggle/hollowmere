@@ -1308,7 +1308,7 @@ const RAR = {
 const POOLS = {
   open: {perch:70, reedwhisker:6, leafjack:12, mossback:3},
   pads: {leafjack:55, perch:25, mossback:8},
-  deep: {perch:40, mossback:14, leafjack:20, gar:2.5, mayor:1.2},
+  deep: {perch:40, mossback:11, leafjack:20, gar:2.5, mayor:1},
   far:  {perch:22, leafjack:30, mossback:10, reedwhisker:4, gar:2, mayor:.8},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
@@ -2009,7 +2009,7 @@ const TRAPDOOR=['Locked. Water laps underneath.','Still locked. Something down t
                   (paste its output here after a balance change). Keys: rod:<id>, boat, part:<id>, fix:<id>
                   (the fix-up list), pocket:<n> (the vest's nth pocket), rune:<id>, fish:<id> (the first one caught).
                   Playtest > Pace (game/pace.js) sets a real run beside these. */
-const PACE_SIM={'fish:leafjack':5, 'fish:perch':5, 'rod:reedcutter':10, 'fish:mossback':10, 'rune:swift':15, 'fish:reedwhisker':20, 'fish:lantern':21, 'rod:ash':25, 'rod:heronwood':44, 'fish:gar':49, 'rune:magpie':49, 'fish:mayor':54, 'rod:brasscap':68, 'fish:char':76, 'rune:deep':86, 'fix:roof':106, 'rune:nightglass':116, 'boat':135, 'fish:kelpeel':140, 'fish:bream':140, 'fish:sprat':140, 'fish:grouper':144, 'rune:storm':154, 'fish:angler':173, 'fish:saltjaw':178, 'rod:saltline':179, 'part:hold':189, 'rune:wanderer':204, 'fish:gurnard':218, 'fix:net':229, 'rune:odd':245, 'pocket:2':279, 'part:sonar':299, 'rune:echo':300, 'fish:wrasse':301, 'part:keel':316, 'fix:lamp':323, 'rod:gale':348, 'fix:stove':365, 'pocket:3':411, 'fix:cabinet':459, 'rod:deepwater':481, 'pocket:4':515, 'fix:panel':534, 'fix:knock':567, 'pocket:5':617};
+const PACE_SIM={'fish:perch':5, 'fish:leafjack':5, 'fish:mossback':5, 'rod:reedcutter':5, 'rod:ash':20, 'fish:lantern':21, 'rune:swift':25, 'fish:mayor':26, 'rod:heronwood':26, 'fish:gar':34, 'rune:magpie':48, 'fish:reedwhisker':62, 'rod:brasscap':69, 'fish:char':73, 'rune:deep':76, 'fix:roof':104, 'rune:nightglass':111, 'rune:storm':149, 'boat':166, 'fish:bream':172, 'fish:sprat':172, 'fish:kelpeel':172, 'fish:grouper':172, 'fish:angler':177, 'rod:saltline':186, 'rune:wanderer':196, 'fish:saltjaw':213, 'fish:gurnard':218, 'part:hold':219, 'fix:net':247, 'rune:odd':256, 'fish:wrasse':256, 'rod:gale':288, 'pocket:2':293, 'rune:echo':311, 'part:sonar':312, 'part:keel':332, 'fix:lamp':333, 'fix:stove':381, 'pocket:3':394, 'fix:cabinet':439, 'rod:deepwater':467, 'pocket:4':486, 'fix:panel':513, 'fix:knock':543, 'pocket:5':600};
 
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
@@ -11186,7 +11186,8 @@ function balanceResultHTML(r,prev){
    Every few seconds it notes anything new the save holds (a rod, the boat, a boat part, a line of the fix-up list,
    a vest pocket, a rune or a species caught) with the minute it came. Playtest > Pace sets the log beside the
    simulator's whole run (data/pace.js), so a friend's phone shows where the game ran slow or fast for them.
-   save.pace = {secs, log:[[key, minute]], seen:{key:1}, late:true when the log began on a save already under way}. */
+   save.pace = {secs, log:[[key, minute]], seen:{key:1}, late:true when the log began on a save already under way,
+   tools:true once Playtest's tools have handed anything over}. The opening doesn't count: the simulator starts at the first cast. */
 const PACE={touch:-1e9, t:0}, PACE_IDLE=90;
 ['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{ PACE.touch=S.time; },true));
 function paceState(){ const fresh=!isObj(save.pace); if (fresh) save.pace={};
@@ -11196,32 +11197,33 @@ function paceState(){ const fresh=!isObj(save.pace); if (fresh) save.pace={};
   return p; }
 /** Everything the log looks for, as keys (the same keys as data/pace.js). */
 function paceKeys(){ const k=[];
-  for (const r of save.rods||[]) if (r!=='willow') k.push('rod:'+r);
+  for (const r of save.rods||[]) if (r!=='willow' && RODS[r]) k.push('rod:'+r);
   if (save.boat) k.push('boat');
-  for (const id of save.parts||[]) k.push('part:'+id);
-  for (const id of (isObj(save.shack) && Array.isArray(save.shack.fix) ? save.shack.fix : [])) k.push('fix:'+id);
+  for (const id of save.parts||[]) if (PARTS[id]) k.push('part:'+id);
+  for (const id of (isObj(save.shack) && Array.isArray(save.shack.fix) ? save.shack.fix : [])) if (FIXUP.some(L=>L.id===id)) k.push('fix:'+id);
   const n=isObj(save.finds) ? +save.finds.pockets||0 : 0; for (let i=POCKETS.start+1;i<=Math.min(n,POCKETS.max);i++) k.push('pocket:'+i);
   if (isObj(save.ench) && isObj(save.ench.own)) for (const id in save.ench.own) if (ENCH[id]) k.push('rune:'+id);
   for (const id in save.fish) if (FISH[id] && (save.fish[id]||{}).caught>0) k.push('fish:'+id);
   return k; }
 /** The main loop's tick (game/loop.js): minutes while someone's playing, and a look for anything new every 5 seconds. */
-function paceTick(dt){ if (SIMULATING || document.hidden || S.time-PACE.touch>PACE_IDLE) return;
+function paceTick(dt){ if (SIMULATING || INTRO.active || document.hidden || S.time-PACE.touch>PACE_IDLE) return;
   const p=paceState(); p.secs+=dt; PACE.t+=dt; if (PACE.t<5) return; PACE.t=0;
   const m=Math.round(p.secs/6)/10;
   for (const k of paceKeys()) if (!p.seen[k]){ p.seen[k]=1; p.log.push([k,m]); } }
 /** What a key is called in the table. */
-function paceName(k){ const [kind,id]=k.split(':');
+function paceName(k){ const [kind,raw]=String(k).split(':'), id=String(raw).replace(/[<>&"]/g,'');   // a log read from a pasted backup code could hold anything
   if (kind==='rod') return RODS[id]?RODS[id].name:id; if (kind==='boat') return 'The boat';
   if (kind==='part') return PARTS[id]?PARTS[id].name:id; if (kind==='fix'){ const L=FIXUP.find(L=>L.id===id); return L?L.name:id; }
   if (kind==='pocket') return 'Vest pocket '+id; if (kind==='rune') return ENCH[id]?ENCH[id].name:id;
-  if (kind==='fish') return FISH[id]?FISH[id].name:id; return k; }
+  if (kind==='fish') return FISH[id]?FISH[id].name:id; return String(k).replace(/[<>&"]/g,''); }
 const paceMin = m => { m=Math.round(m); return m<60?m+' min':Math.floor(m/60)+' h '+String(m%60).padStart(2,'0'); };
 /** Playtest > Pace: this run beside the simulator's, in the order the simulator gets there. */
 function paceHTML(){ const p=paceState(), got=Object.fromEntries(p.log);
   const keys=Object.keys(PACE_SIM).sort((a,b)=>PACE_SIM[a]-PACE_SIM[b]);
-  for (const [k] of p.log) if (!(k in PACE_SIM)) keys.push(k);
+  for (const [k] of p.log) if (!(k in PACE_SIM) && !keys.includes(k)) keys.push(k);
   let h='<div class="stats"><div><b>'+paceMin(p.secs/60)+'</b><span>Played</span></div><div><b>'+p.log.length+'</b><span>Logged</span></div><div><b>'+paceMin(Math.max(0,...Object.values(PACE_SIM)))+'</b><span>Sim finish</span></div></div>';
   h+='<p class="note">'+(p.late?'This save was under way before the log began, so the minutes count from then and earlier things aren’t listed. ':'')+
+    (p.tools?'Playtest’s tools have been used on this save, so some times may be early. ':'')+
     'Minutes count while the game is showing and someone has touched it in the last '+PACE_IDLE+' seconds. The simulator column is a steady player’s median run. Twice as slow, or half the time, is worth asking a tester about.</p>';
   h+='<table class="bal-tab pace-tab"><thead><tr><th>What</th><th>This run</th><th>Simulator</th></tr></thead><tbody>';
   for (const k of keys){ const sim=PACE_SIM[k], at=got[k], d=at!=null && sim ? at/sim : null;
@@ -11257,6 +11259,8 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
     '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="jarBtn" type="button">Fill the Moon Jar</button><button class="btn" id="wallBtn" type="button">Fill the wall</button><button class="btn" id="mapBtn2" type="button">Finish the map</button><button class="btn" id="bowBtn" type="button">'+(wxState().bow?'Clear the rainbow':'Rainbow now')+'</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
   bindPlaytestTabs();
+  // anything the tools hand over or change makes the pace log's times less telling (game/pace.js)
+  $('panel').querySelectorAll('button:not([data-pt]):not(#closeS), select, input').forEach(el=>el.addEventListener(el.tagName==='BUTTON'?'click':'change',()=>{ paceState().tools=true; persist(); }));
   [['tHook','hook'],['tTension','tension'],['tWait','wait']].forEach(([id,k])=>{ $(id).addEventListener('input',e=>{ save.tune[k]=+e.target.value; $(id+'O').textContent=(+e.target.value).toFixed(2)+'×'; persist(); }); });
   $('tClock').addEventListener('input',e=>{ save.clock=+e.target.value; $('tClockO').textContent=clockText(save.clock); buildBg(); persist(); });
   $('tWx').addEventListener('change',e=>{ const w=wxState(); if (e.target.value) w.force=e.target.value; else delete w.force; persist(); WXT.kind=null; buildBg(); $('tWxO').textContent=w.force?WX[w.force].name+' (pinned)':WX[wxNow()].name; });

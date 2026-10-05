@@ -98,6 +98,13 @@ dig up its cache. Playtest can hand over a relic, fill the Moon Jar and finish a
 bigger tank. Playtest can do any line of the list for free and fill the wall; `npm run sim -- --shack all` runs a setup
 with every fix done and the wall full.
 
+**Pacing (the depth gate).** `npm run sim -- --career` plays whole runs from the first cast, buying rods, the boat
+and everything else as the coins come in, and lists when each thing happens and the longest waits with nothing new.
+`--builds` puts four builds on one rod and water. Rare and Legendary odds follow the design doc's table, and prices
+are set so the lake and the coast take about 9 hours. In the game, Playtest > Pace logs a real run's minutes of
+play beside the simulator's (`src/game/pace.js`, `src/data/pace.js`); after a balance change, paste
+`npm run sim -- --career --runs 11 --pace` into `src/data/pace.js`.
+
 **Adding content.** A new fish is an entry in `src/data/fish.js` plus its region list and bite weights (a weather fish takes `wx` and an entry in `WX_FISH`, `src/data/weather.js`, instead of pool weights).
 A new find is an entry in `src/data/treasure.js` plus its drawing in `src/game/loot-art.js`.
 A new reel, line or bait is an entry in `src/data/tackle.js` plus its drawing in `src/game/tackle-art.js`.

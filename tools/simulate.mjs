@@ -17,7 +17,7 @@
 //   node tools/simulate.mjs --rod brasscap --spot deep --shack   with every fix-up line done and the trophy wall full (data/shack.js)
 //   node tools/simulate.mjs --builds                  four builds on one rod and water, by day and at night (the M2 gate: builds play differently)
 //   node tools/simulate.mjs --career                  a whole run from the first cast: when each rod, the boat and everything else gets bought (--runs 5)
-//   node tools/simulate.mjs --career --runs 9 --pace  the same, as data/pace.js's table of medians for Playtest > Pace
+//   node tools/simulate.mjs --career --runs 11 --pace  the same, as data/pace.js's table of medians for Playtest > Pace
 //   node tools/simulate.mjs --json                   machine-readable output
 import { existsSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
@@ -258,7 +258,8 @@ for (const m of modes) {
     Shopping: rods and the boat first; anything over half the price of the next of those goes on everything else,
     cheapest first (traps, fittings, tackle, boat parts, paint, tanks, decor, the fix-up list, vest pockets). Runes are etched
     with Glimmer as it comes in, cheapest first. Counted toward income: rods, spots and the hour, treasure, mastery,
-    the boat's parts, the fix-up list and the trophy wall. Not counted: tackle, runes, meals, tank sets, aquarium tips,
+    the boat's parts, the fix-up list and the trophy wall (each plaque the most valuable species caught, at its biggest,
+    so the wall's share runs a little high). Not counted: tackle, runes, meals, tank sets, aquarium tips,
     supper orders and traps, so a real run earns a little more than this one. */
 async function careerReport() {
   const browser = await chromium.launch(); const p = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -306,8 +307,9 @@ async function careerReport() {
         while (runes.length && C.glim >= hm.ENCH[runes[0]].cost) { const id = runes.shift(); C.glim -= hm.ENCH[id].cost; C.runes.push(id); ev('rune:' + id, hm.ENCH[id].name, 'rune'); }
         // fish: the best-paying spot this hour, or one stretch in four somewhere else
         const hour = bucket((9 + C.min) % 24), regions = C.boat ? ['lake', 'coast'] : ['lake'];
-        const rodIn = reg => C.rods.filter(r => reg === 'coast' || !hm.RODS[r].sea || true).sort((a, b) => hm.RODS[b].price - hm.RODS[a].price)[0];
-        const opts = []; for (const reg of regions) { const rod = rodIn(reg); for (const sp in REACH[reg]) if (hm.RODS[rod].reach >= REACH[reg][sp]) opts.push({ rod, reg, sp }); }
+        // the best rod owned, in either water: the game lets sea rods fish the lake too
+        const best = C.rods.slice().sort((a, b) => hm.RODS[b].price - hm.RODS[a].price)[0];
+        const opts = []; for (const reg of regions) { const rod = best; for (const sp in REACH[reg]) if (hm.RODS[rod].reach >= REACH[reg][sp]) opts.push({ rod, reg, sp }); }
         let pick; if (n++ % 4 === 3) pick = opts[Math.floor(Math.random() * opts.length)];
         else pick = opts.reduce((a, o) => rate(o.rod, o.reg, o.sp, hour) > rate(a.rod, a.reg, a.sp, hour) ? o : a);
         const fish = {}; for (const id in C.fish) fish[id] = { caught: C.fish[id] };

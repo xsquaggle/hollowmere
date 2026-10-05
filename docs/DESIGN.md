@@ -23,6 +23,10 @@ It's a personal game for the owner and friends: free, with no ads, purchases or 
 8. **The shack:** your uncle's front room, one button on the bar, with doors to the tank room and the kitchen. Mount fish on the trophy wall (while a species is up, each one you catch is worth more, more again if the mount is your record), see your finds on the curio shelf, pick a rod off the rack, and work down his fix-up list: each job costs coins and does something (a dry roof and more plaques, a bigger keepnet, a lamp for night fish, a stove for longer meals, a cabinet, oak panels, a knock-through for bigger tanks). The trapdoor stays locked for now.
 9. **Go further:** reach new water (Stillwater Lake, then Gullrock Coast by boat) with new fish, people and secrets.
 
+Pacing follows the design doc: Legendaries about 1 cast in 80 (1 in 25 at the best spots and hours), rares 10 to 20%,
+each rod about 2.5 times the last, something new every 10 to 20 minutes early and every 30 to 45 later. With the lake
+and the coast, a steady player owns everything in about 9 hours (`npm run sim -- --career`).
+
 Every bonus is a modifier in one pipeline (`src/game/mods.js`). The Bonuses page and the balance simulator read it,
 so nothing is balanced by guesswork: `npm run sim` reports the numbers.
 

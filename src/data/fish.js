@@ -80,7 +80,7 @@ const RAR = {
 const POOLS = {
   open: {perch:70, reedwhisker:6, leafjack:12, mossback:3},
   pads: {leafjack:55, perch:25, mossback:8},
-  deep: {perch:40, mossback:14, leafjack:20, gar:2.5, mayor:1.2},
+  deep: {perch:40, mossback:11, leafjack:20, gar:2.5, mayor:1},
   far:  {perch:22, leafjack:30, mossback:10, reedwhisker:4, gar:2, mayor:.8},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };

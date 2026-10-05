@@ -13,8 +13,8 @@ module.exports = [
           trench: s({ rod: 'deepwater', region: 'coast', spot: 'deep', hour: 22 }) }; });
       const L = t => t.legendary || 0;
       assert.ok(L(r.open) === 0 && r.open.rare < 6, 'open water: commons, a few rares, no Legendary ' + JSON.stringify(r.open));
-      assert.ok(r.deep.rare > 12 && r.deep.rare < 26, 'the deep pool is the lake\'s rare spot, not a rare farm ' + JSON.stringify(r.deep));
-      assert.ok(L(r.deep) > .5 && L(r.deep) < 3.5, 'the Mayor at noon: about 1 cast in 60 ' + JSON.stringify(r.deep));
+      assert.ok(r.deep.rare > 10 && r.deep.rare < 20, 'the deep pool is the lake\'s rare spot, not a rare farm ' + JSON.stringify(r.deep));
+      assert.ok(L(r.deep) > .5 && L(r.deep) < 3, 'the Mayor at noon: about 1 cast in 60 ' + JSON.stringify(r.deep));
       assert.ok(L(r.dawn) < 8, 'the Mayor\'s dawn with the Brasscap stays under 1 in 12 ' + JSON.stringify(r.dawn));
       assert.ok(L(r.trench) > 2 && L(r.trench) < 10, 'the Saltjaw at night with the Deepwater Caster ' + JSON.stringify(r.trench));
     },
@@ -47,6 +47,10 @@ module.exports = [
       assert.equal(tab.played, '0 min');
       assert.deepEqual(tab.far, ['Reedcutter', 'Ash Caster'], 'half or twice the simulator\'s time is marked');
       await page.screenshot({ path: require('path').join(__dirname, 'out', 'pace-tab.png') });
+      // a Playtest tool hands something over: the log says its times may be early
+      await page.click('[data-pt="tools"]'); await page.waitForTimeout(300); await page.click('#coinBtn');
+      await page.click('[data-pt="pace"]'); await page.waitForTimeout(300);
+      assert.match(await page.textContent('#panel'), /Playtest’s tools have been used/);
     },
   },
 ];

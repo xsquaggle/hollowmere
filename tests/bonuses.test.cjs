@@ -83,7 +83,7 @@ module.exports = [
       assert.ok(r.willow.landRate > 90, 'a steady player lands most fish');
       assert.equal(r.willow.tiers.legendary || 0, 0, 'no legendary fish live in open water');
       assert.ok(r.brass.coinsPerCatch > r.willow.coinsPerCatch * 1.3, 'the Brasscap’s value bonus shows in the report');
-      assert.ok((r.deep.tiers.legendary || 0) > 80, 'the Mayor shows up at the deep pool at dawn');
+      assert.ok((r.deep.tiers.legendary || 0) > 20, 'the Mayor shows up at the deep pool at dawn (about 1 cast in 20, step 24)');
       assert.equal(r.willowDeep.reach.ok, false, 'the report flags a spot the rod can’t reach');
       assert.ok(r.newb.landRate < r.brass.landRate + 5 && r.newb.perfectRate < 60, 'a new player hooks fewer perfectly');
       const after = await readSave(page);
