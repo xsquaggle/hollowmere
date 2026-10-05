@@ -10,7 +10,7 @@ function drawPlaque(x,id,w,h){ const F=FISH[id], pw=Math.min(w*.86,330), ph=h*.9
   x.save(); x.clip(); x.strokeStyle='rgba(30,15,5,.22)'; x.lineWidth=1.2; for (let i=0;i<7;i++){ x.beginPath(); for (let px=-pw/2;px<=pw/2;px+=6){ const y=-ph/2+8+i*ph/7+Math.sin(px*.04+i*1.3)*3; px===-pw/2?x.moveTo(px,y):x.lineTo(px,y); } x.stroke(); } x.restore();
   rrect(x,-pw/2+6,-ph/2+6,pw-12,ph-12,ph*.28); x.strokeStyle='rgba(255,230,190,.25)'; x.lineWidth=1.5; x.stroke();
   for (const sx of [-1,1]){ x.beginPath(); x.arc(sx*(pw/2-ph*.2),0,3.2,0,6.28); x.fillStyle=BRASS; x.fill(); x.strokeStyle=INK; x.lineWidth=1; x.stroke(); }
-  const L=Math.min(pw*.68,(ph*.78)/(F.h*((DORSAL[id]||DORSAL0).top+(id==='calf'?1.7:.8)))); x.translate(0,ph*.04); x.rotate(-.07);
+  const L=Math.min(pw*.68,(ph*.78)/(F.h*((DORSAL[id]||DORSAL0).top+(id==='calf'?1.1:.8)))); x.translate(0,ph*.04); x.rotate(-.07);
   x.save(); x.translate(4,5); drawFish(x,id,L,true,.55); x.restore(); drawFish(x,id,L,false,1,.15); x.restore(); }
 function journalRegions(){ return save.boat?[REG(),REG()==='lake'?'coast':'lake']:['lake']; }
 function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
