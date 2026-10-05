@@ -16,7 +16,8 @@ function updateHint(){
   if (s==='idle') setHint(vet?'':save.firstCast ? 'Drag down from anywhere, then let go to cast.' : 'Drag back to aim. Release to cast.');
   else if (s==='aiming') setHint('');
   else if (s==='casting') setHint('');
-  else if (s==='waiting') setHint(vet?(inLucky(S.bob.x,S.bob.y)?'Gull luck · ':'')+spotName(S.bob.spot):(inLucky(S.bob.x,S.bob.y)?'Gull luck! ':'')+spotName(S.bob.spot)+'. Wait for the bobber to plunge. Tap to twitch it.');
+  else if (s==='waiting'){ const mk=mapAt(S.bob.x,S.bob.y), m=mk==='pin'?'The map’s mark · ':mk?'The map’s ring · ':'', moon=S.bob.moon?'Moonlit · ':'';
+    setHint(vet?moon+m+(inLucky(S.bob.x,S.bob.y)?'Gull luck · ':'')+spotName(S.bob.spot):moon+m+(inLucky(S.bob.x,S.bob.y)?'Gull luck! ':'')+spotName(S.bob.spot)+'. Wait for the bobber to plunge. Tap to twitch it.'); }
   else if (s==='bite') setHint('');
   else if (s==='reeling') { const R=S.reel; setHint(R.loot?(vet?'':R.F.tip):vet?'':R.fam ? 'Mastered: your rod tracks it for you. Hold to reel.' : 'Hold to reel. Slide to keep your ring under the fish. '+BEH_TIP[R.beh2?R.F.beh2:R.F.beh]); }
   else setHint('');

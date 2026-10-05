@@ -1,7 +1,8 @@
 /* ---------- Waiting & bite ---------- */
 function startWaiting(){
   const lucky=inLucky(S.bob.x,S.bob.y);
-  const loot=S.tut?null:rollTreasure({spot:S.bob.spot,lucky});   // one roll per cast: this cast pulls up treasure, or a fish
+  // one roll per cast: this cast pulls up treasure, or a fish. A story relic or a map's cache waiting right here comes first (game/relics.js).
+  const loot=S.tut?null:storyLoot(S.bob)||rollTreasure({spot:S.bob.spot,lucky});
   // Echo: one waits where you hooked the last, and bites at once. If treasure comes up first, it keeps waiting.
   const E=S.echo, here=!S.tut && !!E && E.reg===REG() && E.spot===S.bob.spot, echo=here && !loot ? E.fish : null; S.echo=here && loot ? E : null;
   S.wait={phase:'empty', t:echo?.35:biteWait(S.bob.spot)*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1, lucky, echo, loot};

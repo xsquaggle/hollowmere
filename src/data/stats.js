@@ -46,7 +46,12 @@ const STATS={
   noWashout:{name:'Swell-proof casts', kind:'flag', when:{region:'coast'}, hint:'Casts never wash out in a swell.'},
   autoTilt: {name:'Rod tracks the fish', kind:'flag', hint:'Your rod follows a mastered fish for you.'},
   mayorWakes:{name:'The Mayor wakes', kind:'flag', when:{region:'lake'}, hint:'Mayor Bartholomew bites at any hour, as he does at dawn.'},
-  timeStop: {name:'Time stands still', kind:'flag', hint:'The in-game clock doesn’t move.'}
+  timeStop: {name:'Time stands still', kind:'flag', hint:'The in-game clock doesn’t move.'},
+  forecast: {name:'Weather forecast', kind:'flag', hint:'Tap the clock to read the next three turns of the weather, and the moon.'},
+  moonJar:  {name:'Moonlight in a jar', kind:'flag', hint:'Night catches fill the Moon Jar. Spend it by day and one cast is fished as if at night.'},
+  ghostRings:{name:'Ghosts ring', kind:'flag', hint:'A faded ghost fish rings like a bell, so you can follow it.'},
+  ghostWake:{name:'Ghost wake', kind:'flag', hint:'A faded ghost fish leaves a glowing wake on the water.'},
+  mapPin:   {name:'Map pin', kind:'flag', hint:'Treasure maps mark the exact spot, and every 5th treasure is a map piece.'}
 };
 /* Mastery: catch this many of a species and it reels in faster, with your rod following it. */
 const MASTERY={catches:10, reel:1.65};

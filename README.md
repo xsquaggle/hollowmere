@@ -88,6 +88,11 @@ save, the region and the hour, so the same hour always has the same weather. Rai
 Epic-to-Mythic moments are in `src/game/rarity-fx.js`. Playtest can pin the moon, bring a rainbow, and pick the next fish
 and mutation; `npm run sim -- --rarity` reports each tier's share and what mutations pay.
 
+**Story relics.** Four artifacts the story hands you rather than treasure (`from:'story'` in `src/data/treasure.js`): how
+each is found, treasure maps, the Moon Jar and combos are in `src/data/relics.js`, run by `src/game/relics.js` and drawn
+in `src/game/relic-art.js`. Treasure maps come in three pieces; a whole map rings a stretch of water where a cast can
+dig up its cache. Playtest can hand over a relic, fill the Moon Jar and finish a map.
+
 **Adding content.** A new fish is an entry in `src/data/fish.js` plus its region list and bite weights (a weather fish takes `wx` and an entry in `WX_FISH`, `src/data/weather.js`, instead of pool weights).
 A new find is an entry in `src/data/treasure.js` plus its drawing in `src/game/loot-art.js`.
 A new reel, line or bait is an entry in `src/data/tackle.js` plus its drawing in `src/game/tackle-art.js`.

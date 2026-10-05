@@ -94,7 +94,8 @@ function bonusesHTML(){
     if (mast.length) lines+='<li class="cond"><span class="n">Mastered fish</span><span class="s">Mastery · with your '+mast.length+' mastered species</span><b class="up">'+modValueText(stat,mast[0].v)+'</b></li>';
     h+='<section class="bn-card"><header><h3>'+S0.name+'</h3><b class="'+totCls+'">'+(tot===(add?0:1)?'—':modValueText(stat,tot))+'</b></header><p class="bn-hint">'+S0.hint+'</p><ul class="bn-src">'+lines+'</ul></section>';
   }
-  const flagStats=Object.keys(STATS).filter(k=>STATS[k].kind==='flag' && k!=='autoTilt');
+  // a combo's flag stays off the page until it's been seen, so its chip can say "???" (game/relics.js)
+  const flagStats=Object.keys(STATS).filter(k=>STATS[k].kind==='flag' && k!=='autoTilt' && !(k==='ghostWake' && !comboKnown('wake')));
   const flags=flagStats.map(st=>({st,ms:all.filter(m=>m.stat===st)})).filter(x=>x.ms.length);
   if (flags.length){ any=true; h+='<section class="bn-card"><header><h3>Perks</h3></header><ul class="bn-src">'+flags.map(({st,ms})=>{
       const sts=ms.map(m=>modState(m,now)), best=sts.includes('on')?'on':sts.includes('cond')?'cond':sts[0], m=ms[sts.indexOf(best)], w=modWhenText(m.when);

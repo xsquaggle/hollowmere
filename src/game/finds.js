@@ -4,6 +4,8 @@
    Keepsakes work from the moment you have them. Curios are for the collection, and a few belong to people in
    town, who give something back for them. Notes from bottles, the logbook and drowned letters can be reread. */
 let FD_SEL=null;
+/** What a find is called: the story's artifacts are relics. */
+const findKind = D => D.from==='story'?'relic':D.kind;
 const findList = kind => Object.keys(FINDS).filter(id=>FINDS[id].kind===kind);
 function pocketIt(id){ const FS=findsState(); if (!FS.have[id] || FINDS[id].kind!=='artifact' || FS.equip.includes(id) || FS.equip.length>=FS.pockets) return false;
   FS.equip.push(id); persist(); sfx.pocket(true); buzz(12); news(FINDS[id].name+' is in a pocket','good'); return true; }
@@ -12,7 +14,8 @@ function sewCost(){ const FS=findsState(); return FS.pockets>=POCKETS.max?null:P
 function sewPocket(){ const FS=findsState(), cost=sewCost(); if (cost==null || save.coins<cost) return false;
   addCoins(-cost); FS.pockets++; persist(); sfx.out('uncommon'); buzz([0,20,30,20]); news('Ottilie sewed on another pocket','gold'); return true; }
 const ownerHas = who => Object.keys(FINDS).filter(id=>FINDS[id].owner===who && hasFind(id) && !findsState().returned[id]);
-function foundWhere(h){ if (!h) return ''; const src=h.src==='return'?'A thank-you gift':h.src==='town'?'A gift from the town':LOOT_TIERS.includes(h.src)?'From '+aOrAn(CRATES[h.src].name.toLowerCase()):h.src==='playtest'?'From Playtest':'Pulled up loose';
+function foundWhere(h,id){ if (!h) return ''; if (h.src==='story' && STORY[id]) return STORY[id].found+(h.t?' · '+whenLabel(h.t,h.hr):'');
+  const src=h.src==='return'?'A thank-you gift':h.src==='town'?'A gift from the town':LOOT_TIERS.includes(h.src)?'From '+aOrAn(CRATES[h.src].name.toLowerCase()):h.src==='playtest'?'From Playtest':'Pulled up loose';
   return src+(h.reg?' · '+(h.spot&&h.src!=='return'&&h.src!=='town'?spotLabel(h.reg,h.spot):REGION_NAME[h.reg]):'')+(h.t?' · '+whenLabel(h.t,h.hr):''); }
 function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(hasFind), keeps=findList('keepsake').filter(hasFind);
   const all=Object.keys(FINDS), got=all.filter(hasFind).length, cost=sewCost();
@@ -20,10 +23,14 @@ function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(ha
   if (!FS.treasure) h+='<p class="note">About one cast in a dozen, your line snags on something that isn’t a fish. Everything you pull up is kept here.</p>';
   // the vest itself lives in the tackle bag (game/bag.js); this is what's in it
   h+='<section class="fd-card fd-vest"><header><h3>Vest pockets</h3><span>'+FS.equip.length+' of '+FS.pockets+' in use</span></header><p class="bn-hint">'+(FS.equip.length?'Carrying '+FS.equip.map(id=>FINDS[id].name).join(', ')+'. ':'')+'You pocket and swap artifacts in your tackle bag.</p><button type="button" class="btn sm" id="fdBag">Open your tackle bag</button></section>';
+  // the treasure map in hand (game/relics.js)
+  { const R=relicState(), m=R.map; if (m || R.caches){ const whole=!!m && m.n>=MAPS.pieces;
+    h+='<section class="fd-card fd-map"><header><h3>Treasure map</h3><span>'+(m?Math.min(m.n,MAPS.pieces)+' of '+MAPS.pieces+' pieces':R.caches+' cache'+(R.caches===1?'':'s')+' dug up')+'</span></header>'+
+      (m?'<canvas class="fd-mapart" data-map="'+m.n+'"></canvas>':'')+'<p class="bn-hint">'+(!m?'Map pieces turn up as treasure. Three make a map.':whole?'It rings a stretch of '+REGION_NAME[m.reg]+'. Cast inside the ring to dig up the cache.'+(modFlag('mapPin')?' Your Cartographer’s Pin marks the exact spot.':''):'More pieces turn up as treasure '+(m.reg==='lake'?'on ':'at ')+REGION_NAME[m.reg]+'.')+'</p></section>'; } }
   // artifacts and keepsakes you have
   const row=id=>{ const D=FINDS[id], eq=FS.equip.includes(id), art=D.kind==='artifact';
     const btn=!art?'<span class="tag ok">Always on</span>':eq?'<span class="tag ok">In a pocket</span>':'<span class="tag">Not carried</span>';
-    return '<div class="fd-row rf'+(eq?' eq':'')+'" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+D.kind+(FS.fresh.includes(id)?' · <b>New</b>':'')+'</span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+'</div>'+btn+'</div>'; };
+    return '<div class="fd-row rf'+(eq?' eq':'')+'" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+findKind(D)+(FS.fresh.includes(id)?' · <b>New</b>':'')+'</span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+combosHTML(id)+'</div>'+btn+'</div>'; };
   if (arts.length) h+='<section class="fd-card"><header><h3>Artifacts</h3><span>'+arts.length+' of '+findList('artifact').length+'</span></header>'+arts.map(row).join('')+'</section>';
   if (keeps.length) h+='<section class="fd-card"><header><h3>Keepsakes</h3><span>'+keeps.length+' of '+findList('keepsake').length+'</span></header>'+keeps.map(row).join('')+'</section>';
   // the collection: everything, found or not
@@ -41,17 +48,17 @@ function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(ha
 const rarInk = r => ({common:'#7A7468', uncommon:'#4E7B3E', rare:'#3B78B0', epic:'#7448A8', legendary:'#9A7322', exotic:'#24857A', mythic:'#3A3848', godly:'#9A7A22'})[r]||'#7A7468';
 function letterState(id){ const s=findsState().letters[id]; return s==='delivered'?'Delivered':s==='waiting'?'Waiting for Pell':'Not delivered'; }
 function findDetailHTML(id){ if (!id || !FINDS[id]) return ''; const D=FINDS[id], FS=findsState(), have=hasFind(id);
-  if (!have) return '<div class="fd-detail none"><h4>Not found yet</h4><p>'+(D.from==='return'?'Someone in town might give you this, if you find what they lost.':D.from==='town'?'The town might give you this one day, if your cooking wins them over.':
+  if (!have) return '<div class="fd-detail none"><h4>Not found yet</h4><p>'+(D.from==='story'?RAR[D.rarity].label+' relic. '+STORY[id].hint:D.from==='return'?'Someone in town might give you this, if you find what they lost.':D.from==='town'?'The town might give you this one day, if your cooking wins them over.':
     aOrAn(RAR[D.rarity].label.toLowerCase()+' '+D.kind).replace(/^a/,'A')+(rarRank(D.rarity)>=rarRank('exotic')?', only ever found in '+LOOT_TIERS.slice(rarRank(D.rarity)).map(cratesOf).join(' and ')+'.':D.region==='any'?'. It could turn up anywhere.':', somewhere around '+REGION_NAME[D.region]+'.'))+'</p></div>';
   const owed=D.owner && !FS.returned[id], O=D.owner&&OWNERS[D.owner];
-  return '<div class="fd-detail rf" data-r="'+D.rarity+'"><canvas data-find="'+id+'" class="big"></canvas><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+D.kind+'</span><h4>'+D.name+'</h4><p class="lore">'+D.lore+'</p>'+
-    (D.eff?'<p class="eff">'+D.eff+'</p>':'')+(D.down?'<p class="down">'+D.down+'</p>':'')+'<p class="where">'+foundWhere(FS.have[id])+'</p>'+
+  return '<div class="fd-detail rf" data-r="'+D.rarity+'"><canvas data-find="'+id+'" class="big"></canvas><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+findKind(D)+'</span><h4>'+D.name+'</h4><p class="lore">'+D.lore+'</p>'+
+    (D.eff?'<p class="eff">'+D.eff+'</p>':'')+(D.down?'<p class="down">'+D.down+'</p>':'')+combosHTML(id)+'<p class="where">'+foundWhere(FS.have[id],id)+'</p>'+
     (id==='musicbox'?'<button type="button" class="btn sm" id="windBox">Wind it</button>':'')+
     (owed?'<p class="owner">This belongs to '+O.name+'.</p><button type="button" class="btn primary" data-give="'+id+'">Give it back to '+O.name+'</button>':D.owner?'<p class="owner">Returned to '+O.name+'.</p>':'')+'</div>'; }
 let FD_T=0;
 const fdReady = () => performance.now()-FD_T>350;   // the page just re-rendered: a double tap can't hit what appeared under the finger
 function bindFinds(){ const p=$('panel'); FD_T=performance.now();
-  paintTiles(p.querySelectorAll('canvas[data-find],canvas[data-notekind]'));
+  paintTiles(p.querySelectorAll('canvas[data-find],canvas[data-notekind],canvas[data-map]'));
   p.querySelectorAll('[data-sel]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.sel, pocket=b.classList.contains('pk'); FD_SEL=FD_SEL===id&&!pocket?null:id; tone(900,.04,{vol:.04,type:'triangle'}); showDetail(pocket); }));
   p.querySelectorAll('[data-read]').forEach(b=>b.addEventListener('click',()=>openNote(b.dataset.read,{})));
   const fb=$('fdBag'); if (fb) fb.addEventListener('click',()=>{ if (!fdReady()) return; closeSheet(); if (!BAG) openBag(); });   // with the bag already open under the journal, closing the sheet is enough

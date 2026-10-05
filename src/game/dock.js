@@ -74,7 +74,7 @@ function ropeCoil(x,cx,cy,r){
 
 /* ---------- live parts ---------- */
 function drawDock(){
-  if (REG()==='coast'){ drawSkiffDeck(); drawTrapProp(); drawKeepnet(); return; }
+  if (REG()==='coast'){ drawSkiffDeck(); drawTrapProp(); drawMoonJarProp(); drawKeepnet(); return; }
   const D=dockGeo(), {cx,top}=D;
   // ripples round the piles first, then the cached deck over them
   ctx.strokeStyle='rgba(225,238,242,'+(.22+.1*Math.sin(S.time*2)).toFixed(3)+')'; ctx.lineWidth=1.3;
@@ -82,6 +82,7 @@ function drawDock(){
   if (!SC.dock || SC.dock.key!==dockKey()) buildDock();
   if (SC.dock) ctx.drawImage(SC.dock.c,0,SC.dock.y,W,SC.dock.h);
   drawTackleBox(cx-54,top+50);
+  drawMoonJarProp();   // the Moon Jar, when it's in a pocket (game/relic-art.js)
   drawPail(cx+48,top+47);
   drawBaitOnDock(cx+30,top+56);
   drawTrapProp();

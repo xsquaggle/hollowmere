@@ -140,6 +140,7 @@ function drawGauge(){
   if (!(R.fade>0)){ ctx.strokeStyle=m<.2?'rgba(127,176,105,.9)':'rgba(217,97,76,'+(.35+.5*Math.min(1,m)).toFixed(2)+')';   // a faded ghost gives nothing away here
     ctx.beginPath(); ctx.moveTo(tx,cy); ctx.lineTo(fx,cy); ctx.stroke(); }
   const ga=ghostA(R); ctx.save(); ctx.globalAlpha=ga; ctx.translate(fx,cy-26); ctx.fillStyle=RAR[R.F.rarity].color; ctx.beginPath(); ctx.moveTo(0,10); ctx.lineTo(-7,0); ctx.lineTo(7,0); ctx.closePath(); ctx.fill(); ctx.restore();
+  drawGaugeBell(R,fx,cy-21);   // the Drowned Bell: a faded ghost's marker rings on (game/relic-art.js)
   ctx.font='800 10.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='rgba(243,234,215,'+(.7*ga).toFixed(3)+')'; ctx.fillText(R.loot?'HAUL':'FISH',fx,cy-30);
   const T=R.tension, col=T>.82?DANGER:T>.55?BRASS:GOOD, rr=17;
   ctx.fillStyle=S.holding?'rgba(243,234,215,.95)':'rgba(243,234,215,.25)'; ctx.beginPath(); ctx.arc(tx,cy,rr-5,0,Math.PI*2); ctx.fill();
@@ -174,7 +175,7 @@ function render(){
   ctx.save();
   if (S.shake>.1) ctx.translate(rand(-1,1)*S.shake,rand(-1,1)*S.shake);
   if (Math.abs(S.zoom-1)>.001){ const cx=W/2, cy=H*.42; ctx.translate(cx,cy); ctx.scale(S.zoom,S.zoom); ctx.translate(-cx,-cy); }
-  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawRfxWater(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
+  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawRfxWater(); drawRelicWater(); drawGhostFx(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
   drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade(); drawRain();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
   drawTrapMarkers(); drawRfxOver(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();

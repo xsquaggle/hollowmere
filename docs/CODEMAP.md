@@ -70,6 +70,8 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/loot.js` | 293 | The loot moment: a find lands, opens and shows what's inside |
 | `src/game/loot-art.js` | 288 | Crates, pouches, bottles, letters, every find's drawing |
 | `src/game/finds.js` | 87 | The Finds journal page, vest pockets, returning lost things |
+| `src/game/relics.js` | 150 | Story relics: how each is found (`storyLoot`, Ottilie's `storyGift`), treasure maps (`mapAt`, `addMapPiece`), the Moon Jar (`tapJar`, `nightNow`), the Wet Almanac's page, ghost rings and wake, combo chips (`combosHTML`) |
+| `src/game/relic-art.js` | 120 | The four relics' drawings, treasure maps, and in the scene: the map's ring and pin, a moonlit cast, the jar on the dock, ghost rings and wake |
 | `src/game/tackle.js` | 55 | What's on the rod in hand: reels, lines, bait (`rigFor`, `baitOn`, `tickBait`) |
 | `src/game/tackle-art.js` | 171 | Every reel, line and bait drawn, and the rod rig |
 | `src/game/bag.js` | 247 | The tackle bag overlay: rig, rods, vest pockets, keepsakes |
@@ -140,7 +142,8 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/data/aquarium.js` | 45 | `TANKS`, `DECOR`, `TANK_SETS`, tip rates |
 | `src/data/kitchen.js` | 61 | `SPICES`, `SIDES`, `RECIPES`, `MEAL_STR` |
 | `src/data/music.js` | 18 | Chords, moods, the motif, ambience levels |
-| `src/data/treasure.js` | 132 | `TREASURE`, `CRATES`, `FINDS`, `OWNERS`, `POCKETS`, `NOTES` |
+| `src/data/treasure.js` | 145 | `TREASURE`, `CRATES`, `FINDS`, `OWNERS`, `POCKETS`, `NOTES` |
+| `src/data/relics.js` | 40 | `STORY` (how each story relic is found), `MAPS`, `MOON_JAR`, `COMBOS` |
 | `src/data/tackle.js` | 34 | `TACKLE` (reels, lines, bait) |
 | `src/data/enchant.js` | 32 | `ENCH` runes, `GLIMMER` |
 | `src/data/idle.js` | 41 | `TRAPS`, `FITTINGS`, `SMOKE`, `AWAY` |
@@ -149,7 +152,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 
 ## Styles (`src/styles/`)
 
-One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map.css`, `aquarium.css`, `settings.css`, `intro.css`, `news.css`, `kitchen.css`, `card.css`, `loot.css`, `bonuses.css`, `finds.css`, `bag.css`, `enchant.css`, `idle.css`, `orders.css`, `sheets.css`, `balance.css`.
+One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map.css`, `aquarium.css`, `settings.css`, `intro.css`, `news.css`, `kitchen.css`, `card.css`, `loot.css`, `bonuses.css`, `finds.css`, `relics.css`, `bag.css`, `enchant.css`, `idle.css`, `orders.css`, `sheets.css`, `balance.css`.
 
 ## Tools and tests
 
@@ -175,3 +178,4 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/orders.test.cjs` | 287 | Supper orders and reputation |
 | `tests/rarity.test.cjs` | 152 | Moon phases, rare bites, mutations, the dry run, the Mythic's sell |
 | `tests/weather.test.cjs` | 136 | Weather and its fish |
+| `tests/relics.test.cjs` | 229 | Story relics, treasure maps, the Moon Jar, the almanac, combos |

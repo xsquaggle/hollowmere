@@ -35,8 +35,8 @@ const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, SPOT_NAME, REGION_FI
   TANKS, TIP_BASE, DECOR, TANK_SETS, SPICES, SPICE_ORDER, SIDES, FLESH, COOK_NAME, RECIPES, RECIPE_ORDER, MUSH, MEAL_STR, MEAL_CASTS,
   CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER,
   TRAPS, TRAP_UNLOCK, FITTINGS, FITTING_ORDER, TRAP_GLIMMER, SMOKE, AWAY, WX, WX_ORDER, WX_TABLE, WX_FOG_HOUR, WX_SPELL, WX_FISH, WX_SOME, DAWN_MIST, WX_LINES,
-  SPICE_MORE, ORDERS, TOWNSFOLK, TOWNSFOLK_ORDER, STANDINGS, UPGRADES, VISITS, PLATTER } = D;
-for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER, TRAPS, FITTINGS, FITTING_ORDER, SMOKE, AWAY, ORDERS, TOWNSFOLK, STANDINGS, UPGRADES, VISITS, PLATTER, WX, WX_TABLE, WX_FISH }))
+  SPICE_MORE, ORDERS, TOWNSFOLK, TOWNSFOLK_ORDER, STANDINGS, UPGRADES, VISITS, PLATTER, STORY, MAPS, MOON_JAR, COMBOS } = D;
+for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER, TRAPS, FITTINGS, FITTING_ORDER, SMOKE, AWAY, ORDERS, TOWNSFOLK, STANDINGS, UPGRADES, VISITS, PLATTER, WX, WX_TABLE, WX_FISH, STORY, MAPS, MOON_JAR, COMBOS }))
   if (!v) { console.error('Missing table ' + n + ' in src/data/.'); process.exit(1); }
 
 /* ---------- fish ---------- */
@@ -193,12 +193,12 @@ if (!(DAWN_MIST.from >= 0 && DAWN_MIST.from < DAWN_MIST.to && DAWN_MIST.to <= 12
 for (const [k, L] of Object.entries(WX_LINES)) { oneOf('WX_LINES', k, keys(WX), 'weather'); if (!(Array.isArray(L) && L.length && L.every(isStr))) bad('WX_LINES.' + k, 'a list of lines'); }
 
 /* ---------- treasure ---------- */
-const KINDS_T = ['pouch', 'geode', 'bottle', 'find', 'crate'];
+const KINDS_T = ['pouch', 'geode', 'bottle', 'find', 'crate', 'map'];
 sameSet('TREASURE.kinds', keys(TREASURE.kinds), KINDS_T, 'treasure kinds and the kinds game/loot.js shows');
 for (const [k, v] of Object.entries(TREASURE.kinds)) if (!(v > 0)) bad('TREASURE.kinds.' + k, 'weight should be above 0');
 if (!(TREASURE.rate > 0 && TREASURE.rate < .5 && TREASURE.firstRate >= TREASURE.rate && TREASURE.firstRate < 1)) bad('TREASURE', 'rate should be in (0, .5) and firstRate at least rate');
 if (!(Number.isInteger(TREASURE.from) && TREASURE.from >= 0)) bad('TREASURE.from', 'a whole number of catches');
-for (const k of ['pouch', 'geode', 'bottle', 'find', 'letter']) need('TREASURE.haul.' + k, TREASURE.haul[k] || {}, { pull: 'num+', reel: 'num+' });
+for (const k of ['pouch', 'geode', 'bottle', 'find', 'letter', 'map']) need('TREASURE.haul.' + k, TREASURE.haul[k] || {}, { pull: 'num+', reel: 'num+' });
 if (!(TREASURE.pouch[0] > 0 && TREASURE.pouch[0] <= TREASURE.pouch[1])) bad('TREASURE.pouch', '[least, most] fish worth of coins');
 for (const r of keys(TREASURE.loose)) { oneOf('TREASURE.loose', r, RARS, 'rarity'); if (rank(r) > rank('legendary')) bad('TREASURE.loose.' + r, 'Exotic and rarer finds only come in crates'); }
 const L = TREASURE.letter; oneOf('TREASURE.letter.region', L.region, REGIONS, 'region'); (L.spots || []).forEach(sp => oneOf('TREASURE.letter.spots', sp, keys(SPOT_NAME), 'spot'));
@@ -220,11 +220,32 @@ for (const id of keys(FINDS)) { const F = FINDS[id], w = 'FINDS.' + id;
   need(w, F, { name: 'str', lore: 'str' }); oneOf(w + '.kind', F.kind, FKINDS, 'find kind'); oneOf(w + '.rarity', F.rarity, CT, 'crate tier'); oneOf(w + '.region', F.region, [...REGIONS, 'any'], 'region');
   if (F.kind === 'curio') { if (F.mods || F.eff) bad(w, 'curios do nothing: no mods or eff'); }
   else { need(w, F, { eff: 'str', mods: 'arr' }); if (!(F.mods || []).length) bad(w, 'an artifact or keepsake needs at least one modifier'); (F.mods || []).forEach((m, i) => checkMod(`${w}.mods[${i}]`, m)); if (F.down !== undefined && !isStr(F.down)) bad(w + '.down', 'empty'); }
-  if (F.from !== undefined) { oneOf(w + '.from', F.from, ['return', 'town'], 'source'); if (F.kind !== 'keepsake') bad(w, 'only keepsakes come as rewards'); }
+  if (F.from !== undefined) { oneOf(w + '.from', F.from, ['return', 'town', 'story'], 'source'); if (F.from === 'story' ? F.kind !== 'artifact' : F.kind !== 'keepsake') bad(w, F.from === 'story' ? 'story relics are artifacts' : 'only keepsakes come as rewards');
+    if (F.from === 'story' && !STORY[id]) bad(w, 'a story relic needs its entry in STORY (data/relics.js)'); }
   if (F.owner !== undefined) { oneOf(w + '.owner', F.owner, keys(OWNERS), 'owner'); if (F.kind !== 'curio') bad(w, 'only curios can belong to someone'); const R = F.reward || {};
     if (!isStr(R.line)) bad(w + '.reward', 'a returned find needs the owner’s line'); if (!(R.coins > 0)) bad(w + '.reward', 'coins should be above 0');
     if (R.keepsake !== undefined) { if (!FINDS[R.keepsake] || FINDS[R.keepsake].kind !== 'keepsake' || FINDS[R.keepsake].from !== 'return') bad(w + '.reward', R.keepsake + ' should be a keepsake with from:"return"'); } }
   if (rank(F.rarity) > rank('legendary') && F.from) bad(w, 'Exotic and rarer finds come in crates'); }
+/* ---------- story relics, treasure maps and combos (data/relics.js) ---------- */
+for (const id of keys(STORY)) { const St = STORY[id], w = 'STORY.' + id;
+  if (!FINDS[id] || FINDS[id].from !== 'story') bad(w, 'names a find with from:"story" in FINDS');
+  need(w, St, { found: 'str', hint: 'str' }); oneOf(w + '.how', St.how, ['ottilie', 'moonpath', 'bell', 'cache'], 'way to find it');
+  if (St.how === 'ottilie') { need(w, St, { line: 'str', fish: 'arr' }); (St.fish || []).forEach(f => { if (!FISH[f]) bad(w + '.fish', 'unknown fish ' + f); }); }
+  if (St.how === 'bell') { oneOf(w + '.spot', St.spot, keys(SPOT_NAME), 'spot'); oneOf(w + '.wx', St.wx, keys(WX), 'weather');
+    if (!(Array.isArray(St.hours) && St.hours[0] >= 0 && St.hours[0] < St.hours[1] && St.hours[1] <= 24)) bad(w + '.hours', '[from, to) on the 24-hour clock'); } }
+if (keys(STORY).filter(id => STORY[id].how === 'cache').length !== 1) bad('STORY', 'exactly one relic waits in the first cache');
+need('MAPS', MAPS, { pieces: 'num+', ring: '01', chance: '01', pinR: '01', every: 'num+', depth: 'arr' });
+if (!(Number.isInteger(MAPS.pieces) && MAPS.pieces >= 2 && MAPS.pieces <= 3)) bad('MAPS.pieces', '2 or 3: the map art tears into three');
+if (!(MAPS.pinR < MAPS.ring)) bad('MAPS', 'the pin’s mark should be smaller than the ring');
+if (!(MAPS.depth[0] > 0 && MAPS.depth[0] < MAPS.depth[1] && MAPS.depth[1] <= 1)) bad('MAPS.depth', '[near, far] within 0 to 1');
+if (!(Number.isInteger(MAPS.every) && MAPS.every >= 2)) bad('MAPS.every', 'a whole number of treasures, at least 2');
+for (const t of keys(MAPS.cache)) { oneOf('MAPS.cache', t, CT, 'crate tier'); if (!(MAPS.cache[t] > 0)) bad('MAPS.cache.' + t, 'weight above 0'); }
+oneOf('MAPS.first', MAPS.first, CT, 'crate tier');
+need('MOON_JAR', MOON_JAR, { fill: 'num+', fullMoon: 'num+' }); if (!(Number.isInteger(MOON_JAR.fill) && MOON_JAR.fullMoon <= MOON_JAR.fill)) bad('MOON_JAR', 'a whole number of catches, and a full-moon catch no more than that');
+for (const id of keys(COMBOS)) { const C = COMBOS[id], w = 'COMBOS.' + id; need(w, C, { with: 'str', eff: 'str' });
+  if (!FINDS[C.a] || FINDS[C.a].kind !== 'artifact') bad(w + '.a', 'names an artifact in FINDS'); if (C.live !== undefined && C.live !== true) bad(w + '.live', 'true, or left out'); }
+for (const id of keys(STORY)) if (!keys(COMBOS).some(k => COMBOS[k].a === id)) bad('STORY.' + id, 'every story relic has at least one combo (COMBOS)');
+
 for (const id of keys(FINDS).filter(id => FINDS[id].from === 'return')) if (keys(FINDS).filter(o => (FINDS[o].reward || {}).keepsake === id).length !== 1) bad('FINDS.' + id, 'a reward keepsake should be given by exactly one returned find');
 for (const t of CT) if (rank(t) > 0 && !keys(FINDS).some(id => FINDS[id].rarity === t && !FINDS[id].from)) bad('FINDS', 'no find of rarity ' + t + ' for its crates');
 for (const k of keys(OWNERS)) need('OWNERS.' + k, OWNERS[k], { name: 'str' });

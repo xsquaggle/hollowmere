@@ -1,5 +1,6 @@
 /* Treasure: everything a line pulls up that isn't a fish.
-   TREASURE   how often treasure turns up and which kind (weights); a pouch's size (in catches' worth of coins). A geode holds
+   TREASURE   how often treasure turns up and which kind (weights; a map is a piece of a treasure map, data/relics.js: MAPS);
+              a pouch's size (in catches' worth of coins). A geode holds
               Glimmer (data/enchant.js: GLIMMER.geode), and every crate holds some (GLIMMER.crate).
               Before the first treasure the odds are firstRate, and that first one is always a Common crate.
    CRATES     one per rarity, Common to Mythic. weight (before luck), pull and reel (the haul), snags (how often
@@ -19,17 +20,17 @@
               lore; artifacts and keepsakes have eff (what it does, one sentence), down (its catch, if any) and
               mods (modifiers, as on rods: see data/stats.js). A curio with an owner can be returned for a reward:
               {coins, keepsake, line}. from:'return' keepsakes only come as rewards for returned curios, from:'town' ones from the
-              town (data/orders.js). Exotic and Mythic finds only
-              come in crates. Drawn in game/loot-art.js.
+              town (data/orders.js), and from:'story' artifacts are the story relics, each found its own way (data/relics.js:
+              STORY). Exotic and Mythic finds only come in crates. Drawn in game/loot-art.js and game/relic-art.js.
    OWNERS     who in town lost things (you give them back from the journal's Finds page).  POCKETS  the vest: pockets you start with, the most, and what Ottilie
               charges to sew each one after the first.
    NOTES      what's inside message bottles (kind bottle), the uncle's logbook pages (logbook) and drowned letters
               (letter, with to: the address Pell reads out). Lines are written the way they're inked. */
 const TREASURE={
   rate:1/12, firstRate:1/4, from:8,
-  kinds:{pouch:35, geode:14, bottle:20, find:5, crate:26},
+  kinds:{pouch:35, geode:14, bottle:20, find:5, crate:26, map:8},
   letter:{weight:6, region:'lake', spots:['deep','far'], from:25},
-  haul:{pouch:{pull:.55, reel:2.2}, geode:{pull:.7, reel:2.8}, bottle:{pull:.5, reel:2.4}, find:{pull:.75, reel:3}, letter:{pull:.5, reel:2.6}},
+  haul:{pouch:{pull:.55, reel:2.2}, geode:{pull:.7, reel:2.8}, bottle:{pull:.5, reel:2.4}, find:{pull:.75, reel:3}, letter:{pull:.5, reel:2.6}, map:{pull:.45, reel:2.2}},
   pouch:[1.5,3],
   loose:{common:50, uncommon:30, rare:14, epic:5, legendary:1}
 };
@@ -82,7 +83,7 @@ const FINDS={
   magpie:  {name:'Magpie’s Button', kind:'artifact', rarity:'uncommon', region:'any', lore:'Mother-of-pearl, from a coat nobody remembers wearing.',
             eff:'Treasure turns up 50% more often.', down:'Fish are worth 10% less.', mods:[{stat:'treasure', v:1.5}, {stat:'value', v:.9}]},
   tuningfork:{name:'Tuning Fork', kind:'artifact', rarity:'rare', region:'any', lore:'It hums a note just under hearing. Fish lean toward it.',
-            eff:'The perfect-hook window is twice as wide.', down:'−10 luck for rare fish and rarer.', mods:[{stat:'perfect', v:2}, {stat:'luck', v:-.1, when:{rarityMin:'rare'}}]},
+            eff:'The perfect-hook window is twice as wide.', down:'−10 luck for rare fish and rarer.', mods:[{stat:'perfect', v:2}, {stat:'luck', v:-.1, when:{rarityMin:'rare'}}, {stat:'ghostWake'}]},
   hourglass:{name:'Cracked Hourglass', kind:'artifact', rarity:'rare', region:'any', lore:'The sand runs uphill when nobody is looking.',
             eff:'Time passes three times as fast.', down:'Tank tips build up half as fast.', mods:[{stat:'clock', v:3}, {stat:'tips', v:.5}]},
   hungryhook:{name:'Hungry Hook', kind:'artifact', rarity:'epic', region:'any', lore:'It was hungry when your uncle found it. It still is.',
@@ -95,6 +96,15 @@ const FINDS={
             eff:'Time stands still while you carry it.', mods:[{stat:'timeStop'}]},
   pearl:   {name:'Moon Pearl', kind:'artifact', rarity:'mythic', region:'any', lore:'It is warm. It is always warm, and it glows a little when the moon is up.',
             eff:'Every fish rarer than common bites 50% more often, on top of luck’s ceiling.', mods:[{stat:'luck', omen:true, v:1.5, when:{rarityMin:'uncommon'}}]},
+  // the story relics: never loose or in crates, each found its own way (data/relics.js: STORY)
+  almanac: {name:'Wet Almanac', kind:'artifact', rarity:'rare', region:'lake', from:'story', lore:'Hollowmere, 1966. Every day’s weather pencilled in, the whole year through. It is right far more often than it should be.',
+            eff:'Tap the clock to read ahead: the next three turns of the weather, and the moon.', mods:[{stat:'forecast'}]},
+  moonjar: {name:'Moon Jar', kind:'artifact', rarity:'epic', region:'lake', from:'story', lore:'A preserving jar with a wire bail. Leave it open under a full moon and it keeps a little of the light.',
+            eff:'Night catches fill it. Tap it on the dock by day and your next cast is fished as if it were night.', mods:[{stat:'moonJar'}]},
+  bell:    {name:'Drowned Bell', kind:'artifact', rarity:'legendary', region:'lake', from:'story', lore:'A hand bell from the clock tower, green with the lake. It is never quite silent.',
+            eff:'Ghost fish ring like a bell while they fade, so you can follow them.', mods:[{stat:'ghostRings'}]},
+  pin:     {name:'Cartographer’s Pin', kind:'artifact', rarity:'epic', region:'any', from:'story', lore:'A brass map pin with a compass rose for a head. Whoever drew the treasure maps marked every cache with it.',
+            eff:'Treasure maps mark the exact spot, and every 5th treasure is a map piece.', mods:[{stat:'mapPin'}]},
   // keepsakes: they work from the shelf
   thermos: {name:'Uncle’s Thermos', kind:'keepsake', rarity:'rare', region:'any', lore:'Still half full of something hot. You don’t remember filling it.',
             eff:'Meals last half again as many casts.', mods:[{stat:'mealCasts', v:1.5}]},
@@ -123,6 +133,8 @@ const NOTES={
   glassy:  {kind:'bottle', lines:['If the water ever goes glassy','and the birds go quiet, cast.','Don’t ask why.','Just cast.']},
   porch:   {kind:'bottle', lines:['I left the porch light on','for you. Sixty years is a long','time to leave a light on.','— M.']},
   twitch:  {kind:'bottle', region:'lake', lines:['Note to self:','Lantern Carp hate a twitchy','bobber. Sit on your hands.']},
+  moonjar: {kind:'bottle', region:'lake', lines:['Full moon tonight!','Mama says moonlight keeps','if you have a jar for it.','She dropped hers in the shiny','path on the water. — Hattie']},
+  three:   {kind:'bottle', region:'lake', lines:['Three in the morning, and fog','down on the deep pool.','Something under it still','rings the hour.','I didn’t cast. I wish I had.']},
   log1:    {kind:'logbook', page:1, lines:['Day 212.','The perch keep coming up with','coins in their bellies.','Old coins, every one 1966.','Who is feeding them pennies','from sixty years ago?']},
   log2:    {kind:'logbook', page:2, lines:['Day 340.','3:12 again. The town hall clock,','my watch, the mantel clock.','All stopped at 3:12 the night','the town went under.','Ottilie won’t talk about it.','She was on the ferry.']},
   edith:   {kind:'letter', to:'Mrs. Edith Crane, 4 Lantern Row', lines:['Edie,','the water’s up past the second','step again. The mayor says not','to worry. I worry anyway.','Save me a dance on Saturday.','— Walter']},

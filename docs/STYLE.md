@@ -67,6 +67,12 @@ Step 16, the art pass, brought everything older up to this bar: the scene in par
   - Fog fades fish shadows in the far water. A ghost's marker and gap line leave the gauge while it's faded, and the label says to follow the line.
   - The clock chip's weather marks are small ink-line icons in cream: a sun or moon, a cloud, a cloud with rain, and fog bands.
   - The kitchen and aquarium windows show beads and runs on the glass in rain, and a pale wash in fog.
+- **Relic art** lives in `src/game/relic-art.js` and `src/styles/relics.css`.
+  - The four relics join the finds' drawings, in the same 3–4 values and ink: a damp cloth-bound almanac with brass corners, a pencil and a ribbon; a preserving jar on a wire bail holding night-blue light with a crescent in it; a bronze hand bell gone green, with rings of sound; a brass pin with a compass-rose head through a scrap of map.
+  - Treasure maps are sepia ink on parchment, torn into three pieces that fit back together: shoreline, the deep pool, pads and the dock, with a dashed ring and a red X. A piece comes up turning slowly, with a glint.
+  - In the scene, a whole map's ring is a dashed line on the water; the pin's mark is a brass pin in it. A moonlit cast draws a pool of night with the moon's light on it round the bobber. The Moon Jar sits on the dock by the tackle box (on the skiff, on deck), glowing as it fills.
+  - A faded ghost leaves the Drowned Bell's rings on the water and a hollow ring on the gauge, and the Tuning Fork's glowing wake.
+  - Combo chips are small brass-edged pills; an unknown combo is a dashed "???" pill. The almanac sheet is ruled paper with pencilled times and ink-line weather icons, and the moon drawn in its phase.
 - **Fish up close:** past 44 px a fish gets a gill line, a side fin, a darker back, a mouth and a glint in its eye; past 80 px, fin rays, a lateral line and scales. Catfish, eels, and fish whose pattern already reads as scales don't get extra scales. The Foghorn Gurnard's wing-like fan shows at every size, its shadow included, because it's the gurnard's silhouette.
 
 ## Rarity kit

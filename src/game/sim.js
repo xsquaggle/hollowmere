@@ -119,7 +119,7 @@ function simulate(st,n){
         const g=openLoot(loot,cx); T.hauled++; T.coins+=g.coins; out.glimmer+=g.glimmer; T.kinds[loot.kind]=(T.kinds[loot.kind]||0)+1; if (loot.tier) T.crates[loot.tier]=(T.crates[loot.tier]||0)+1;
         T.finds+=g.items.filter(it=>it.type==='find').length;
         // the haul flies in; a pouch pops, anything else waits for a tap and a look at what's inside
-        t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'?3.5:8;
+        t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'||loot.kind==='map'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
       const at={bow:!!st.bow, path:!!st.path}, id=ech||rollFish(spot,lucky,at), F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath

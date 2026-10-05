@@ -6,7 +6,7 @@ cv.addEventListener('pointerdown',e=>{
     case 'idle':
       if (S.place){ placeDown(x,y); break; }                                       // setting a trap: a marked spot, or the trap itself
       { const T=onTrapProp(x,y); if (T){ startPlacing(T,{x,y}); break; } }      // the trap waiting on the dock or the deck
-      S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y),onTrap:trapAt(x,y)}; setState('aiming'); break;
+      S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y),onTrap:trapAt(x,y),onJar:onJar(x,y)}; setState('aiming'); break;
     case 'waiting': twitch(); break;
     case 'bite': hook(); break;
     case 'reeling': leapTap(); S.holding=true; S.pressX=x; S.pressTilt=S.tilt; break;

@@ -12,7 +12,8 @@ window.__hm={ get save(){ return save; }, FISH, RODS, REGION_FISH, RECIPES, DECO
       for (let i=0;i<4;i++) drawHeronFlying(60+i*90,340,1.6,1,i*.2);
       drawGreyWading(60,470,1.4,1); drawTrapOnDeck(ctx,'lake',190,460,1.4,1,true); drawTrapOnDeck(ctx,'coast',300,460,1.4,1,false);
       return cv.toDataURL('image/png'); },
-    drawPortrait:(...a)=>drawPortrait(...a), drawFish:(...a)=>drawFish(...a), drawSmokedFish:(...a)=>drawSmokedFish(...a), drawTackle:(...a)=>drawTackle(...a), drawRig:(...a)=>drawRig(...a), drawGeode:(...a)=>drawGeode(...a), drawRune:(...a)=>drawRune(...a), drawGlimGem:(...a)=>drawGlimGem(...a) }, openShop:t=>openShop(t),
+    drawPortrait:(...a)=>drawPortrait(...a), drawFish:(...a)=>drawFish(...a), drawSmokedFish:(...a)=>drawSmokedFish(...a), drawTackle:(...a)=>drawTackle(...a), drawRig:(...a)=>drawRig(...a), drawGeode:(...a)=>drawGeode(...a), drawRune:(...a)=>drawRune(...a), drawGlimGem:(...a)=>drawGlimGem(...a),
+    drawFind:(...a)=>drawFind(...a), drawFindSilhouette:(...a)=>drawFindSilhouette(...a), drawMapPiece:(...a)=>drawMapPiece(...a), drawTreasureMap:(...a)=>drawTreasureMap(...a) }, openShop:t=>openShop(t),
   WX, WX_ORDER, pool:(sp,l)=>poolFor(sp,l), reel:id=>{ S.bite=null; startReel(id,false); }, wx:{ now:()=>wxNow(), info:()=>wxInfo(), shares:(r,d,s)=>wxShares(r,d,s), at:(r,B,s)=>wxAt(r,B,s), line:()=>wxLine(), look:()=>wxLook(), state:()=>wxState() },
   rarity:{ ctl:RARITY_CTL, MUTS, MUT_ORDER, RARE_BITES, MOON, phase:()=>moonPhase(), full:()=>fullMoon(), lit:()=>moonLit(), name:p=>moonName(p), path:()=>moonpathOn(), onPath:(x,y)=>onMoonpath(x,y),
     foot:()=>bowFoot(), atFoot:(x,y)=>atBowFoot(x,y), rare:(sp,l,at)=>rareBite(sp,l,at), roll:(sp,l,at)=>rollFish(sp,l,at), mut:(id,c)=>rollMutation(id,c), chance:c=>mutationChance(c),
@@ -34,6 +35,13 @@ window.__hm={ get save(){ return save; }, FISH, RODS, REGION_FISH, RECIPES, DECO
     // finish the station in hand with these scores, as if played (for tests that aren't about the stations themselves)
     finish:sc=>{ for (const k of kSts()) K.scores[k]=sc; showResult(); }, jump:k=>{ for (const q of kSts()){ if (q===k) break; K.scores[q]=K.scores[q]||85; } ({clean:startClean,season:startSeason,cook:startCook,plate:startPlate})[k](); }, visit:()=>ORDK.visit&&{who:ORDK.visit.who, key:ORDK.visit.key, line:ORDK.visit.line}, grey:()=>greyPick(), want:()=>ordersWant(), restore:()=>kRestore() },
   hud:{ coins:n=>addCoins(n), eat:(id,stars)=>eatMeal(id,stars||3), lv:()=>HUD.lv, refit:()=>{ HUD.sig=''; fitHud(); return HUD.lv; } },
+  STORY, MAPS, MOON_JAR, COMBOS,
+  relics:{ state:()=>relicState(), story:b=>storyLoot(b), mapAt:(x,y)=>mapAt(x,y), mapXY:()=>{ const m=relicState().map; return m&&mapXY(m); }, piece:c=>addMapPiece(c||{}), mapCan:c=>mapCan(c||{}),
+    whole:()=>mapWhole(), cacheTier:c=>cacheTier(c||{spot:'open'}), pinDue:c=>pinMapDue(c||{}), night:()=>nightNow(), jarFill:L=>jarFill(L), tapJar:()=>tapJar(), jarPos:()=>jarPos(), onJar:(x,y)=>onJar(x,y),
+    almanac:()=>({rows:almanacRows(), moon:almanacMoon()}), openAlmanac:()=>openAlmanac(), afterCatch:L=>relicAfterCatch(L), due:()=>almanacDue(), gift:id=>storyGift(id),
+    ghost:()=>({rings:GHOSTFX.rings.length, wake:GHOSTFX.wake.length}), signs:(R,dt)=>ghostSigns(R,dt), combos:id=>combosHTML(id), seen:id=>comboSeen(id), known:id=>comboKnown(id),
+    // pockets changed mid-frame: read the bonuses afresh
+    landed:()=>moonFishLanded(), pocket:id=>{ findsState().equip.push(id); MODC.dirty=true; } },
   treasure(o){ TREASURE_CTL.off=o===false; TREASURE_CTL.force=o&&o.kind?o:null; }, findsState:()=>findsState(), rollTreasure:c=>rollTreasure(c||{spot:'open'}),
   rollCrateTier:c=>rollCrateTier(c||{spot:'open'}), treasureChance:c=>treasureChance(c||{spot:'open'}), openLoot:(l,c)=>openLoot(l,c||{spot:'open'}), modAdd:(s,c)=>modAdd(s,c), castReach:()=>castReach(), gullMul:()=>gullMul(),
   tierMul:(r,c)=>tierMul(r,c), modMul:(s,c)=>modMul(s,c), luckPoints:c=>luckPoints(c),
