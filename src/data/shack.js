@@ -28,7 +28,7 @@ const FIXUP=[
    done:'An arch where the wall was. The tanks have room to grow.'},
   {id:'trapdoor', line:'Open the trapdoor', name:'Open the trapdoor', why:'Not yet. It needs a key, and you haven’t found the right one.'}
 ];
-const WALL={start:3, value:1.15, record:1.3};
+const WALL={start:3, value:1.1, record:1.2};
 const SHELF=6;
 const MARKS=[{yr:'’67', h:.86}, {yr:'’71', h:.74}, {yr:'Mar ’79', h:.62}, {yr:'’84', h:.69}, {yr:'’91', h:.56}];
 const TRAPDOOR=['Locked. Water laps underneath.','Still locked. Something down there knocks, once.','The boards are wet from below.','You put your ear to it. It sounds like a long way down.'];

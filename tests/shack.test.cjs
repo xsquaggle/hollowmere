@@ -72,7 +72,7 @@ module.exports = [
       let s = await readSave(page);
       assert.equal(s.shack.wall[1].f.id, 'perch', 'it went up on the plaque you tapped');
       assert.equal(s.net.length, 2);
-      assert.ok(Math.abs(await page.evaluate(() => window.__hm.modMul('value', { fish: 'perch' })) - 1.3) < 1e-9, 'your record on the wall: +30%');
+      assert.ok(Math.abs(await page.evaluate(() => window.__hm.modMul('value', { fish: 'perch' })) - 1.2) < 1e-9, 'your record on the wall: +20%');
       assert.equal(await page.evaluate(() => window.__hm.modMul('value', { fish: 'dace' })), 1, 'other fish don’t change');
       // a plaque's card, and taking it down
       await tapRect(page, L.plaques[1]);
@@ -80,7 +80,7 @@ module.exports = [
       await page.click('#shDown'); await page.waitForTimeout(400);
       s = await readSave(page);
       assert.equal(s.shack.wall[1], null); assert.equal(s.net.length, 3, 'back in the keepnet');
-      // a non-record mount is worth +15%, and a second of the same species swaps it rather than taking a plaque
+      // a non-record mount is worth +10%, and a second of the same species swaps it rather than taking a plaque
       const r = await page.evaluate(() => { const hm = window.__hm, out = {};
         hm.save.fish.dace = { caught: 1, best: 40, seen: true, pb: { size: 40, w: 900, t: 1 } };
         out.at = hm.shack.mountNet(hm.save.net.findIndex(f => f.id === 'dace'));
@@ -90,7 +90,7 @@ module.exports = [
         out.wall = hm.shack.state().wall.filter(Boolean).map(m => m.f.id + ':' + m.f.size);
         out.netDace = hm.save.net.filter(f => f.id === 'dace').map(f => f.size);
         return out; });
-      assert.ok(Math.abs(r.mul - 1.15) < 1e-9, 'not your record: +15%');
+      assert.ok(Math.abs(r.mul - 1.1) < 1e-9, 'not your record: +10%');
       assert.equal(r.swap, r.at, 'the second dace went on the same plaque');
       assert.deepEqual(r.wall, ['dace:31']);
       assert.deepEqual(r.netDace, [26], 'and the first came back to the keepnet');

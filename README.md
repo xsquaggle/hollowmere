@@ -93,6 +93,11 @@ each is found, treasure maps, the Moon Jar and combos are in `src/data/relics.js
 in `src/game/relic-art.js`. Treasure maps come in three pieces; a whole map rings a stretch of water where a cast can
 dig up its cache. Playtest can hand over a relic, fill the Moon Jar and finish a map.
 
+**The shack.** The front room's fix-up list, trophy wall and curio shelf are in `src/data/shack.js`, run by
+`src/game/shack.js` and drawn in `src/game/shack-art.js`. A fix is a list of modifiers like a rod's, plus plaques or a
+bigger tank. Playtest can do any line of the list for free and fill the wall; `npm run sim -- --shack all` runs a setup
+with every fix done and the wall full.
+
 **Adding content.** A new fish is an entry in `src/data/fish.js` plus its region list and bite weights (a weather fish takes `wx` and an entry in `WX_FISH`, `src/data/weather.js`, instead of pool weights).
 A new find is an entry in `src/data/treasure.js` plus its drawing in `src/game/loot-art.js`.
 A new reel, line or bait is an entry in `src/data/tackle.js` plus its drawing in `src/game/tackle-art.js`.

@@ -74,7 +74,8 @@ function shWall(c,L){ const W=L.W, bw=30, y1=L.floorY;
       for (let q=1;q<7;q++){ const a=q/7*Math.PI*2, rr=r*(.6+sr()*.6); c.lineTo(px+Math.sin(a)*rr,py-Math.cos(a)*rr*1.6); } c.closePath(); c.fill(); c.strokeStyle='rgba(225,235,225,.18)'; c.lineWidth=.6; c.stroke(); }
     c.strokeStyle=SHW.grain; c.lineWidth=.8; for (let g=0;g<2;g++){ const gx=x+7+g*12+sr()*5; c.beginPath(); c.moveTo(gx,0); for (let y=0;y<y1;y+=44) c.quadraticCurveTo(gx+(sr()-.5)*4,y+22,gx+(sr()-.5)*2,y+44); c.stroke(); }
     for (const ny of [L.beamY+18, y1-22]){ c.fillStyle='#1B1E1C'; c.beginPath(); c.arc(x+bw*.5,ny,1.2,0,Math.PI*2); c.fill(); c.fillStyle='rgba(220,230,220,.3)'; c.beginPath(); c.arc(x+bw*.5-.4,ny-.4,.45,0,Math.PI*2); c.fill(); } }
-  c.fillStyle=SHW.paint; c.fillRect(0,0,W,y1*.5);
+  // what's left of the pale paint, thickest up high and worn away toward the floor
+  const pg=c.createLinearGradient(0,0,0,y1*.7); pg.addColorStop(0,SHW.paint); pg.addColorStop(1,'rgba(214,226,214,0)'); c.fillStyle=pg; c.fillRect(0,0,W,y1*.7);
   // skirting
   c.fillStyle='#33291F'; c.fillRect(0,y1-10,W,10); c.fillStyle='rgba(255,230,210,.08)'; c.fillRect(0,y1-10,W,1.5); }
 /** High-water marks, pencilled on the left boards with the year beside each. */
@@ -261,11 +262,18 @@ function shNight(c,L,dark){ if (dark<=.02) return; c.save(); c.globalCompositeOp
 function shDraw(){ const L=SH.L, c=SH.ctx; if (!L || !c) return; const d=SH.dpr, W=L.W, H=L.H, t=SH.t, P=palAt(save.clock), dark=P.dark||0;
   const B=SH.art.back; if (!B || B.qh!==Math.floor(save.clock*2) || B.ver!==SH.ver){ shPlaceCurios(); shBuildBack(); }
   c.setTransform(1,0,0,1,0,0); c.drawImage(SH.art.back.cv,0,0); c.setTransform(d,0,0,d,0,0);
-  // the curios, each with a soft shadow under it, the cabinet's glass over them
-  for (const k of L.curios){ c.save(); c.translate(k.x,k.y); c.fillStyle='rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(0,k.s*.42,k.s*.36,k.s*.08,0,0,Math.PI*2); c.fill();
-    drawFind(c,k.id,k.s,t); if (SH.sel && SH.sel.k==='curio' && SH.sel.id===k.id){ c.strokeStyle='rgba(255,226,150,.85)'; c.lineWidth=2; c.beginPath(); c.ellipse(0,k.s*.42,k.s*.42,k.s*.11,0,0,Math.PI*2); c.stroke(); } c.restore(); }
+  // the curios, each with a soft shadow under it, the cabinet's glass over them. They're drawn live (some glint), on
+  // their own layer so the night darkens the curios themselves and not a box around them.
+  if (L.curios.length){ const S=L.shelf, o=SH.art.curios;
+    let sc=o&&o.cv; if (!sc || sc.width!==Math.max(1,Math.round(S.w*d)) || sc.height!==Math.max(1,Math.round(S.h*d))){ sc=shCanvas('curios',S.w,S.h)[0]; SH.art.curios={cv:sc}; }
+    const x=sc.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,sc.width,sc.height); x.setTransform(d,0,0,d,-S.x*d,-S.y*d);
+    for (const k of L.curios){ x.save(); x.translate(k.x,k.y); x.fillStyle='rgba(0,0,0,.25)'; x.beginPath(); x.ellipse(0,k.s*.42,k.s*.36,k.s*.08,0,0,Math.PI*2); x.fill();
+      drawFind(x,k.id,k.s,t); x.restore(); }
+    if (dark>.02){ x.save(); x.globalCompositeOperation='source-atop'; x.fillStyle='rgba(10,8,22,'+(dark*.5).toFixed(3)+')'; x.fillRect(S.x,S.y,S.w,S.h); x.restore(); }
+    c.drawImage(sc,S.x,S.y,S.w,S.h);
+    const k=SH.sel && SH.sel.k==='curio' && L.curios.find(q=>q.id===SH.sel.id);
+    if (k){ c.strokeStyle='rgba(255,226,150,.85)'; c.lineWidth=2; c.beginPath(); c.ellipse(k.x,k.y+k.s*.42,k.s*.42,k.s*.11,0,0,Math.PI*2); c.stroke(); } }
   if (fixDone('cabinet')) shGlass(c,L.shelf);
-  if (dark>.02 && L.curios.length) { c.save(); c.fillStyle='rgba(10,8,22,'+(dark*.45).toFixed(3)+')'; c.fillRect(L.shelf.x,L.shelf.y,L.shelf.w,L.shelf.h); c.restore(); }
   // plaques
   const panel=fixDone('panel');
   L.plaques.forEach((p,i)=>{ const A=shPlaqueArt(i), m=shackState().wall[i], fx=SH.fx.find(f=>f.k==='mount' && f.i===i), drop=fx?Math.max(0,1-fx.t/.35):0;
