@@ -33,7 +33,7 @@ module.exports = [
         can: [...document.querySelectorAll('#bagTray [data-act="etch"]')].map(b => !b.disabled), need: document.querySelector('#bagTray .need') && document.querySelector('#bagTray .need').textContent,
         drawn: [...document.querySelectorAll('#bagTray canvas[data-rune]')].every(c => c.width > 0) }));
       assert.deepEqual(tray.rows, ['Swift Spool', 'Magpie Knot', 'Lure of the Deep', 'Nightglass', 'Storm Knot', 'Wanderer', 'Odd Water', 'Echo']);
-      assert.deepEqual(tray.can, [true, true, true, true, true, true, false], 'Echo costs 110, more than the 100 you have');
+      assert.deepEqual(tray.can, [true, true, true, true, true, true, true, false], 'Odd Water costs 90, and Echo costs 110, more than the 100 you have');
       assert.equal(tray.need, '10 more Glimmer to etch it');
       assert.ok(tray.drawn, 'every rune is drawn');
       // etching: pays once, plays out on the rig in under 1.2 s, and the rune's modifiers join the pipeline
