@@ -15,7 +15,7 @@ Hollowmere is a personal game for friends: free, with nothing to buy.
 ## Working on the game
 
 The game is one page with everything built in, so it runs from a link or from the home screen with no server.
-Its source lives in `src/` as small files, and a build pastes them together.
+Its source lives in `src/` as small files, and a build pastes them together. `docs/CODEMAP.md` lists every file and what's in it.
 
 | Where | What |
 | --- | --- |
