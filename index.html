@@ -1398,7 +1398,8 @@ const SPICE_ORDER=['salt','pepper','dill','lemon','paprika'], SPICE_MORE=['garli
 const SIDES={chips:'Chips', rice:'Rice', greens:'Garden greens', bread:'Rye bread', potatoes:'Roast potatoes', corn:'Grilled corn'};
 const FLESH={perch:'#F4CDB0', reedwhisker:'#EFD9C2', lantern:'#F7D9A0', leafjack:'#EEDDB8', mossback:'#E9CDB2', mayor:'#F0D2B6',
   sprat:'#EBDCD0', wrasse:'#F6C4AE', kelpeel:'#E8D8C0', bream:'#F5DCB5', grouper:'#F3E3D3', saltjaw:'#ECD6CC',
-  dace:'#F1E0CC', char:'#F4B9A0', mackerel:'#E8C7B4', gurnard:'#F6E6D8'};
+  dace:'#F1E0CC', char:'#F4B9A0', mackerel:'#E8C7B4', gurnard:'#F6E6D8',
+  gar:'#F2DCC4', angler:'#F7EDE2', shiner:'#F3E2DA', calf:'#D9A79A'};
 const COOK_NAME={pan:'Pan-fry', grill:'Grill'};
 /* Each recipe: what it needs from the keepnet, how each station plays, and what the meal does.
    need: [{id or rar, n}]; smoked:true takes a smoked fish of any kind from the keepnet (it skips the Clean station).
@@ -1899,6 +1900,8 @@ function modSources(){
   { const k=wxNow(), K=WX[k]; for (const x of K.mods) L.push(Object.assign({src:'weather',name:K.name},x,{when:Object.assign({wx:k},x.when)})); }
   // Gull Luck: a lucky splash zone doubles the odds of every fish above common while you fish in it
   add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true, rarityMin:'uncommon'}});
+  // The rainbow's foot: a fish hooked where it touches the water comes up mutated twice as often (game/moon.js)
+  add('event',"Rainbow's foot",'mutation',2,{when:{bow:true}});
   // Fresh water: back after a long while, rarer fish bite more often for a few casts (game/away.js)
   if (save.fresh>0 || save.freshLast) add('event','Fresh water','luck',AWAY.fresh.x,{omen:true, when:{rarityMin:'rare'}, casts:save.fresh>0?save.fresh:undefined, last:!(save.fresh>0)||undefined});
   // playtest tuning
@@ -2486,6 +2489,7 @@ function startReel(id,perfect){
   S.reel.bow=!!(S.wait&&S.wait.bow);                                   // hooked at the rainbow's foot: mutations twice as likely
   S.holding=S.pointers.size>0; S.tilt=0; S.pressX=S.thumbX; S.pressTilt=0; humStart(); setState('reeling');
   if (S.tut){ S.tut='reel1'; coach('Hooked! Now press and hold your finger down to reel it in.','4 of 4'); }
+  else if (first && F.beh2) coachShow('Something enormous. It dives at first: let go while it’s down. Halfway in it starts to leap: tap while it’s in the air.',8);
   else if (first && F.beh==='leaper') coachShow('New fish: Leapers jump out of the water. Tap while it’s in the air to keep the line tight.',6);
   else if (first && F.beh==='tugger') coachShow('New fish: Tuggers pull in a steady rhythm. Let go on each tug, and reel in between.',6);
   else if (first && F.beh==='sleeper') coachShow('New fish: Sleepers barely fight. The hard part was the patience before the bite.',6);
@@ -2521,15 +2525,16 @@ const GHOST_FADE=1.5;
         steer(R,dt): where the ring goes this step, ev: [], why: ''} */
 function fightStep(R,dt,io){
   const F=R.F, ev=io.ev, tm=R.mod.tm, tut=io.tut;
-  const weight=F.beh==='weight', quick=F.rarity==='legendary' && !weight, calm=F.rarity==='common';
+  if (F.beh2 && !R.beh2 && R.dist<.5){ R.beh2=true; R.dive=R.warn=R.surge=0; R.nextJump=rand(.6,1.2); ev.push('beh2'); }   // halfway in, it fights another way (data/fish.js: beh2)
+  const beh=R.beh2?F.beh2:F.beh, weight=beh==='weight', quick=rarRank(F.rarity)>=rarRank('legendary') && !weight, calm=F.rarity==='common';
   if (tut==='reel1'||tut==='reel2'){ /* direction is scripted by the tutorial */ }
-  else if (F.beh==='darter'){
+  else if (beh==='darter'){
     R.dirT-=dt;
     if (R.dirT<=0){ R.tgt=(R.tgt>0?-1:1)*rand(.5,.9); R.dirT=tut?3:quick?rand(.9,1.4):calm?rand(1.8,2.7):rand(1.3,2); ev.push('turn'); }
-  } else if (F.beh==='sulker'){ R.tgt=Math.sin(io.t*.5+1)*.5; }
-  else if (F.beh==='tugger'||F.beh==='sleeper'){ R.tgt=Math.sin(io.t*(F.beh==='sleeper'?.25:.4)+1)*(F.beh==='sleeper'?.35:.45); }
+  } else if (beh==='sulker'){ R.tgt=Math.sin(io.t*.5+1)*.5; }
+  else if (beh==='tugger'||beh==='sleeper'){ R.tgt=Math.sin(io.t*(beh==='sleeper'?.25:.4)+1)*(beh==='sleeper'?.35:.45); }
   else if (weight){ R.tgt=Math.sin(io.t*.35+R.ph)*.3; }               // a dead weight only sways as it comes up
-  else if (F.beh==='ghost'){                                             // darts like a darter, and fades: while it's gone it
+  else if (beh==='ghost'){                                             // darts like a darter, and fades: while it's gone it
     if (R.fade>0){ R.fade-=dt; if (R.fade<=0){ R.nextFade=rand(2.6,3.8); R.dirT=rand(1.4,2.2); ev.push('surface'); } }   // slides somewhere new, unseen
     else { R.nextFade-=dt; R.dirT-=dt;
       if (R.nextFade<=0){ R.fade=GHOST_FADE; R.tgt=(R.dir>0?-1:1)*rand(.35,.85)*(Math.random()<.75?1:-1); ev.push('fade'); }
@@ -2545,17 +2550,17 @@ function fightStep(R,dt,io){
   if (io.tut==='reel2' && R.onIt>.6 && Math.abs(R.dir-R.tgt)<.1){ io.tut='reel3'; R.dirT=2.6; ev.push('tut:reel3'); }
 
   let diving=false, airborne=false, tug=false;
-  if (F.beh==='tugger'){ R.beat=(R.beat||0)+dt; const ph=R.beat%1.15; tug=ph<.5;
+  if (beh==='tugger'){ R.beat=(R.beat||0)+dt; const ph=R.beat%1.15; tug=ph<.5;
     if (tug && !R.wasTug) ev.push('tug');
     R.wasTug=tug; R.tug=tug; }
   // sulkers dive; a heavy haul catches on the bottom. Either way: let go while it's down, reel hard after
-  if (F.beh==='sulker' || (weight && F.snags)){
+  if (beh==='sulker' || (weight && F.snags)){
     if (R.dive>0){ R.dive-=dt; diving=true; if (R.dive<=0){ R.surge=1.1; ev.push('surge'); } }
     else if (R.warn>0){ R.warn-=dt; if (R.warn<=0){ R.dive=weight?1.2:1.6; ev.push('dive'); } }
     else { R.nextDive-=dt; if (R.nextDive<=0){ R.warn=.6; R.nextDive=weight?snagGap(F):rand(2.6,4.2); ev.push('diveWarn'); } }
     if (R.surge>0) R.surge-=dt;
   }
-  if (F.beh==='leaper'){
+  if (beh==='leaper'){
     if (R.jump){ R.jump.t+=dt; airborne=true;
       if (R.jump.t>=R.jump.dur){ const j=R.jump; R.jump=null; ev.push('splashdown');
         if (!j.tapped){ R.tension=.02; R.dist=Math.min(1,R.dist+.12); ev.push('slackJump');
@@ -2571,7 +2576,7 @@ function fightStep(R,dt,io){
     if (diving) R.tension+=1.1*tm*dt;
     else {
       R.tension+=(.04+.05*F.pull+F.pull*.4*m+(weight?.12*F.pull:0))*tm*dt*(io.tut?.7:1);
-      const spd=(1/F.reel)*(1-.6*m)*(R.surge>0?2:1)*(F.beh==='tugger'?1.4:1)*(R.perfect?1.1:1)*R.mod.reel;
+      const spd=(1/F.reel)*(1-.6*m)*(R.surge>0?2:1)*(beh==='tugger'?1.4:1)*(R.perfect?1.1:1)*R.mod.reel;
       R.dist-=spd*dt; R.click+=spd*dt;
     }
   } else if (diving){ R.tension=Math.max(.15,R.tension-.35*dt); R.dist=Math.min(1,R.dist+.015*dt); }
@@ -2621,6 +2626,8 @@ function fightShow(R,e){
     case 'diveWarn': toast(R.loot?'It’s catching on something. Let go!':'It’s diving. Let go!','warn');
       if (R.loot && !save.stats.snagTip){ save.stats.snagTip=true; persist(); coachShow('Heavy hauls catch on the bottom. Let go until it’s free, then haul hard.',6); } break;
     case 'jump': splash(R.x,R.y,10); sfx.leap(); break;
+    case 'beh2': splash(R.x,R.y,22); ripple(R.x,R.y,40); ripple(R.x,R.y,24); shake(4); buzz([0,80,40,80]); tone(110,.9,{to:196,vol:.1,type:'sine'});
+      toast(R.F.beh2==='leaper'?'It’s coming up! Tap while it’s in the air.':'It’s changed how it fights!','warn'); break;
     case 'splashdown': splash(R.x,R.y,14); ripple(R.x,R.y,30); break;
     case 'slackJump': toast('Slack! Tap while it jumps.','warn'); break;
     case 'click': sfx.click(); break;
@@ -3364,7 +3371,7 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   if (shadow){ c.globalAlpha=alpha; c.fillStyle='rgba(10,26,34,.55)'; c.save(); c.rotate(tailSwing*.2); c.fill(tailPath(id,len)); c.restore(); const sh=fishPath(id,len); if (id==='gurnard') sh.addPath(gurnardWingPath(len,len*F.h)); c.fill(sh,'nonzero');
     if (id==='angler') anglerLure(c,len,h,Math.max(1,len*.02),true);   // its lure glows even as a shadow under the water
     c.restore(); return; }
-  if (mut==='twin'){ c.save(); c.translate(-len*.14,h*1.15); c.scale(.86,.86); drawFish(c,id,len,false,alpha,-tailSwing*.8,bare); c.restore(); }
+  if (mut==='twin'){ c.save(); c.translate(-len*.2,-h*1.05); c.scale(.84,.84); drawFish(c,id,len,false,alpha,-tailSwing*.8,bare); c.restore(); }
   if (alpha<1) c.globalAlpha=alpha;
   const lw=Math.max(1.5,len*.032), det=len>=80?2:len>=44?1:0; c.lineWidth=lw; c.lineJoin='round'; c.strokeStyle=INK;
   c.save(); c.translate(-len*.36,0); c.rotate(tailSwing*.25); c.translate(len*.36,0);
@@ -3428,7 +3435,7 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   if (det){ if (id!=='calf'){ const gx=id==='gar'?.2:id==='angler'?.12:.28; c.strokeStyle='rgba(43,42,51,.62)'; c.lineWidth=lw*.6; c.beginPath(); c.moveTo(len*gx,-h*.66); c.quadraticCurveTo(len*(gx-.09),-h*.02,len*(gx-.01),h*.6); c.stroke(); }
     if (!OWN_MOUTH.has(id)){ c.strokeStyle=INK; c.lineWidth=lw*.55; c.beginPath(); c.moveTo(len*.5,h*.04); c.quadraticCurveTo(len*.465,h*.13,len*.425,h*.11); c.stroke(); }
     if (id==='gurnard'){ gurnardWing(c,len,h,lw,det,tailSwing); } else {
-    const fl=id==='calf'?2.1:1; c.save(); c.translate(len*(id==='calf'?.24:.17),h*(id==='calf'?.45:.24)); c.rotate((id==='calf'?.75:.45)+tailSwing*.2); const pf=new Path2D(); pf.moveTo(0,0); pf.quadraticCurveTo(-len*.05*fl,-h*.34,-len*.17*fl,-h*.08*fl); pf.quadraticCurveTo(-len*.08*fl,h*.2,0,0);
+    const fl=id==='calf'?1.7:1; c.save(); c.translate(len*(id==='calf'?.22:.17),h*(id==='calf'?.5:.24)); c.rotate((id==='calf'?1.25:.45)+tailSwing*.2); const pf=new Path2D(); pf.moveTo(0,0); pf.quadraticCurveTo(-len*.05*fl,-h*.34,-len*.17*fl,-h*.08*fl); pf.quadraticCurveTo(-len*.08*fl,h*.2,0,0);
     c.globalAlpha=.9; c.fillStyle=F.fin; c.fill(pf); c.globalAlpha=1; if (det>1 && id!=='calf'){ c.save(); c.clip(pf); fishRays(c,lw,[0,0,-len*.15,-h*.16, 0,0,-len*.16,-h*.04, 0,0,-len*.12,h*.08]); c.restore(); } c.strokeStyle=INK; c.lineWidth=lw*.6; c.stroke(pf);
     if (id==='char'){ c.strokeStyle='#F7F3EA'; c.lineWidth=lw*.45; c.beginPath(); c.moveTo(-len*.012,-h*.03); c.quadraticCurveTo(-len*.05,-h*.31,-len*.15,-h*.1); c.stroke(); } c.restore(); } }
   if (id==='grouper'){ for (let i=0;i<6;i++){ const bx=len*(.18-i*.09), by=-h*.85+Math.abs(i-2.5)*h*.05; c.fillStyle='#E8E2D2'; c.beginPath(); c.arc(bx,by,len*.03,0,Math.PI*2); c.fill(); c.lineWidth=lw*.5; c.strokeStyle=INK; c.stroke(); }
@@ -3957,6 +3964,8 @@ function drawRig(c,w,h,rod,rig,bait,t,fx){ const R=RODS[rod]||RODS.willow, L=rig
    Glyphs are drawn in a unit square (-1..1) so the same path serves the tray, the tag on the catch card, the
    socket on the rig and the etching, where the glyph draws itself stroke by stroke (o.p, 0 to 1). */
 const RUNE_GLYPH={
+  odd(c){ c.moveTo(0,-.8); c.bezierCurveTo(.2,-.42,.6,-.06,.6,.26); c.bezierCurveTo(.6,.62,.32,.8,0,.8); c.bezierCurveTo(-.32,.8,-.6,.62,-.6,.26); c.bezierCurveTo(-.6,-.06,-.2,-.42,0,-.8);   // a drop of water,
+    c.moveTo(.02,.3); c.arc(-.04,.3,.06,0,Math.PI*1.5,true); c.arc(-.02,.32,.16,-Math.PI*.5,Math.PI,false); c.arc(.02,.3,.28,Math.PI,Math.PI*.2,false); },   // turning on itself
   swift(c){ c.moveTo(-.34,-.5); c.lineTo(-.34,.5); c.moveTo(.42,-.5); c.lineTo(.42,.5);
     for (const y of [-.24,0,.24]){ c.moveTo(-.34,y); c.lineTo(.42,y); }
     for (const [x0,y,l] of [[-.62,-.3,.18],[-.78,0,.3],[-.62,.3,.18]]){ c.moveTo(x0-l,y); c.lineTo(x0,y); } },
@@ -6206,8 +6215,8 @@ function render(){
 /* ---------- Regions ---------- */
 const REG = () => save.region==='coast' && save.boat ? 'coast' : 'lake';
 function spotName(sp){ return REG()==='coast' && sp==='deep' ? 'Dark trench' : SPOT_NAME[sp]; }
-/** Every lake fish caught, not counting the ones only weather brings up, so Barnaby never waits on the sky. */
-function lakeDone(){ return REGION_FISH.lake.every(id=>FISH[id].wx || (save.fish[id]||{}).caught>0); }
+/** Every lake fish caught, not counting the ones only weather brings up or the extras (Epic and rarer), so Barnaby never waits on the sky or on luck. */
+function lakeDone(){ return REGION_FISH.lake.every(id=>FISH[id].wx || FISH[id].extra || (save.fish[id]||{}).caught>0); }
 function hexRGB(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]; }
 function mixP(key,hex,t){ const a=(PAL[key+'R']||'0,0,0').split(',').map(Number), b=hexRGB(hex); return 'rgb('+a.map((v,i)=>Math.round(lerp(v,b[i],t))).join(',')+')'; }
 
@@ -9210,6 +9219,7 @@ function modWhenText(w){
   if (w.night) out.push('at night'); else if (w.night===false) out.push('by day');
   if (w.wx) out.push(wxOnText(w.wx));
   if (w.lucky) out.push('while you fish a lucky splash');
+  if (w.bow) out.push('where the rainbow touches the water');
   if (w.rarity) out.push('for '+w.rarity.map(r=>RAR[r].label.toLowerCase()).join(' and ')+' fish');
   if (w.rarityMin) out.push(w.rarityMin===Object.keys(RAR)[1]?'for every fish above common':'for '+RAR[w.rarityMin].label.toLowerCase()+' fish and rarer');
   if (w.fish) out.push('with '+FISH[w.fish].name);
@@ -9226,8 +9236,9 @@ function modState(m,now){ const w=m.when; if (!w) return 'on';
   if ((w.region && w.region!==now.region) || (w.spot && !spots.includes(w.spot))) return 'off-here';
   if ((w.night && !now.night) || (w.night===false && now.night)) return 'off-now';
   if (w.wx && ![].concat(w.wx).includes(now.wx)) return 'off-now';
+  if (w.bow && !bowFoot()) return 'off-now';
   if (now.rarity && ((w.rarity && !w.rarity.includes(now.rarity)) || (w.rarityMin && rarRank(now.rarity)<rarRank(w.rarityMin)))) return 'off-here';
-  const open=w.spot||w.fish||w.beh||w.lucky||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
+  const open=w.spot||w.fish||w.beh||w.lucky||w.bow||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
   return open ? 'cond' : 'on'; }
 const stateClass=st=>st.startsWith('off')?'off':st;
 const stateNote=st=>st==='off-here'?' · not here':st==='off-now'?' · not now':'';
