@@ -31,8 +31,11 @@ function storyLoot(b){ if (TREASURE_CTL.off || !save.tutorialDone || S.tut || SI
 const storyWhere = w => Object.assign({},w,{src:'story'});
 /** Ottilie's gift: once you've caught every fish the Wet Almanac asks for. Checked after each catch. */
 function almanacDue(){ return !hasFind('almanac') && save.tutorialDone && STORY.almanac.fish.every(id=>(save.fish[id]||{}).caught>0); }
-function relicAfterCatch(L){ if (L) jarFill(L);
-  if (almanacDue()) setTimeout(()=>{ if (S.state==='idle' && $('sheet').hidden && almanacDue()) storyGift('almanac'); },700); }
+function relicAfterCatch(L){ if (L) jarFill(L); if (almanacDue() && !GIFT.wait){ GIFT.wait=true; setTimeout(giftWhenFree,700); } }
+/** Ottilie waits her turn: until you're idle on the dock with no sheet open and no tip showing. */
+const GIFT={wait:false};
+function giftWhenFree(){ if (!almanacDue()){ GIFT.wait=false; return; }
+  if (S.state==='idle' && $('sheet').hidden && !coachTimer && !COACHQ.length){ GIFT.wait=false; storyGift('almanac'); return; } setTimeout(giftWhenFree,1500); }
 /** Hands over a story relic with its giver's words, on the sheet a returned find uses. */
 function storyGift(id){ const FS=findsState(), D=FINDS[id], St=STORY[id], who='ottilie'; if (FS.have[id]) return;
   FS.have[id]=storyWhere({t:Date.now(), hr:save.clock, reg:REG()}); FS.fresh.push(id); persist(); updateJournalDot(); sfx.out(D.rarity); buzz([0,30,40,30]);
@@ -59,7 +62,7 @@ function addMapPiece(c){ const r=relicState(); if (!mapCan(c)) return r.map;
   r.map.n++; return r.map; }
 /** Where the map's cache lies on screen. Its depth and angle are kept rather than its pixels, so it stays put
     through a resize, and casting at that depth and angle always reaches it. */
-function mapXY(m){ const ty=lerp(G.near,HZ+26,m.depth); return {x:clamp(W/2+Math.tan(m.th)*(G.player.y-ty)*.85,W*.1,W*.9), y:ty}; }
+function mapXY(m){ const ty=lerp(G.near,HZ+26,Math.min(m.depth,Math.max(MAPS.depth[0],castReach()*.95))); return {x:clamp(W/2+Math.tan(m.th)*(G.player.y-ty)*.85,W*.1,W*.9), y:ty}; }
 /** 'pin' on the Cartographer's Pin's mark, 'ring' inside the whole map's ring, or null. */
 function mapAt(x,y){ const m=relicState().map; if (!m || m.n<MAPS.pieces || m.reg!==REG()) return null;
   const p=mapXY(m), k=sc(p.y), d=Math.hypot(x-p.x,(y-p.y)*2.2);
@@ -89,10 +92,19 @@ function tapJar(){ const r=relicState(); audioInit(); tone(1400,.05,{vol:.05,typ
   if (isNight(save.clock)){ toast('It’s night already. Save the moonlight for daytime.','warn'); return; }
   r.jar=0; r.armed=true; persist(); JAR.pour=1; sfxJar(); buzz([0,20,40,20]);
   news('Moonlight spills over the water. Your next cast is a night cast','gold'); }
-/** The cast that lands with the jar's moonlight: it counts as night until the fish is in. */
-function moonCastLanded(c,bob){ if (!c.moon) return; const r=relicState(); if (!r.armed) return; r.armed=false; persist(); bob.moon=true;
+/** The cast that lands with the jar's moonlight: it counts as night until the fish is in. The light stays in the
+    water, cast after cast, until a fish is landed by it (moonFishLanded); a night cast leaves it for the day. */
+function moonCastLanded(c,bob){ if (!c.moon || isNight(save.clock)) return; const r=relicState(); if (!r.armed) return; bob.moon=true;
   ripple(bob.x,bob.y,60); for (let i=0;i<14;i++) S.particles.push({x:bob.x+rand(-30,30)*sc(bob.y),y:bob.y+rand(-6,6),vx:rand(-10,10),vy:-rand(10,40),g:-6,life:0,max:rand(.8,1.6),r:rand(1.2,2.4),c:'rgba(214,228,255,',glim:true}); }
-function updateRelics(dt){ JAR.pour=Math.max(0,JAR.pour-dt*.7); JAR.glow=Math.max(0,JAR.glow-dt*1.5); ghostFxAge(dt); }
+/** Moonlight rising off a lit jar, and spilling as it's poured: so many a second, whatever the frame rate. */
+function jarMotes(dt){ if (!(S.time-(JAR.seen??-1)<.2)) return;   // only while the jar is on screen (drawMoonJarProp)
+   const r=relicState(), p=jarPos(), mote=o=>S.particles.push(Object.assign({life:0,c:'rgba('+RA.moon+',',glim:true},o));
+  JAR.acc=(JAR.acc||0)+dt*((r.armed?12:0)+(JAR.pour>0?120:0));
+  while (JAR.acc>=1){ JAR.acc--;
+    if (JAR.pour>0) mote({x:p.x+rand(-5,5),y:p.y-28,vx:rand(10,60)*(Math.random()<.5?-1:1),vy:-rand(40,90)*JAR.pour,g:120,max:rand(.7,1.2),r:rand(1,2)});
+    else mote({x:p.x+rand(-7,7),y:p.y-25,vx:rand(-6,6),vy:-rand(10,24),g:-4,max:rand(.8,1.4),r:rand(.8,1.6)}); } }
+function moonFishLanded(){ const r=relicState(); if (!r.armed) return; r.armed=false; persist(); }
+function updateRelics(dt){ jarMotes(dt); JAR.pour=Math.max(0,JAR.pour-dt*.7); JAR.glow=Math.max(0,JAR.glow-dt*1.5); ghostFxAge(dt); }
 function sfxJar(){ [1568,1976,2349,2637,3136].forEach((n,i)=>tone(n,.6,{vol:.035,type:'sine',delay:i*.07})); noise(.6,{vol:.04,f:5000,to:2400,q:1.2}); }
 
 /* ---------- the Wet Almanac ---------- */
@@ -119,8 +131,8 @@ function openAlmanac(){ const now=wxNow(), h=(((save.clock%24)+24)%24), rows=alm
   const row=(label,k,note,at,cls)=>'<li class="'+(cls||'')+'"><span class="al-ico">'+ico(k,at)+'</span><span class="al-t">'+label+'</span><b>'+WX[k].name+'</b><span class="al-n">'+note+'</span></li>';
   let html='<div class="panel-head"><div><h2>Wet Almanac</h2><p>'+REGION_NAME[REG()]+' · in pencil, in a careful hand</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
     '<div class="almanac"><ol class="al-rows">'+row('Now',now,almanacNote(now,h),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind,r.at),r.at)).join('')+'</ol>'+
-    '<div class="al-moon"><span class="al-ico">'+moonSVG(m.p)+'</span><div><b>'+(h>=5&&h<20?'Tonight: ':'')+m.name+'</b><span>'+(m.toFull===0?'The moonpath lies across the deep pool tonight.':'Full moon in '+m.toFull+' night'+(m.toFull===1?'':'s')+'.')+'</span></div></div>'+
-    (pinned?'<p class="note">The weather is pinned in Playtest, so the almanac reads it as staying.</p>':'')+'</div>';
+    '<div class="al-moon"><span class="al-ico">'+moonSVG(m.p)+'</span><div><b>'+(h>=5&&h<20?'Tonight: ':'')+m.name+'</b><span>'+(m.toFull===0?'Full moon tonight.':'Full moon in '+m.toFull+' night'+(m.toFull===1?'':'s')+'.')+'</span></div></div>'+
+    '<p class="note al-line">'+wxLine()+'</p>'+(pinned?'<p class="note">The weather is pinned in Playtest, so the almanac reads it as staying.</p>':'')+'</div>';
   openSheet(html); $('closeS').addEventListener('click',closeSheet); noise(.35,{vol:.08,f:2400,to:1200,q:.7}); }
 
 /* ---------- ghost fish: the Drowned Bell's rings and the Tuning Fork's wake ---------- */
@@ -140,5 +152,5 @@ function comboSeen(id){ const r=relicState(), C=COMBOS[id]; if (!C || !C.live ||
   news('Combo: '+FINDS[C.a].name+' with '+C.with.toLowerCase(),'gold'); }
 /** A relic's combo chips: "Combos with" its known partners, and "???" for the ones still to find. */
 function combosHTML(fid){ const list=Object.keys(COMBOS).filter(k=>COMBOS[k].a===fid); if (!list.length) return '';
-  return '<div class="combos"><span class="k">Combos with</span>'+list.map(k=>comboKnown(k)?'<span class="cb on">'+COMBOS[k].with+'</span>':'<span class="cb q" aria-label="A combo you haven’t found">???</span>').join('')+'</div>'+
+  return '<div class="combos"><span class="k">Combos with</span>'+list.map(k=>comboKnown(k)?'<span class="cb on">'+COMBOS[k].with+'</span>':'<span class="cb q" role="img" aria-label="A combo you haven’t found">???</span>').join('')+'</div>'+
     list.filter(comboKnown).map(k=>'<p class="cb-eff">'+COMBOS[k].eff+'</p>').join(''); }

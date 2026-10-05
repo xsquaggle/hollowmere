@@ -138,6 +138,7 @@ module.exports = [
         hm.save.clock = 12; out.dayNight = R.night();
         R.tapJar(); out.armed = R.state().armed; out.after = R.state().jar;
         window.__S.bob = { moon: true }; out.moonCast = R.night(); window.__S.bob = null;
+        out.stillArmed = R.state().armed; R.landed(); out.spent = R.state().armed;
         out.onJar = (() => { const p = R.jarPos(); return R.onJar(p.x, p.y - 10); })();
         return out; });
       assert.equal(r.one, 1, 'a night catch pours in some moonlight');
@@ -148,6 +149,7 @@ module.exports = [
       assert.equal(r.dayNight, false);
       assert.equal(r.armed, true, 'tapped by day, it pours the light out'); assert.equal(r.after, 0);
       assert.equal(r.moonCast, true, 'and the cast it lights is fished as night');
+      assert.equal(r.stillArmed, true, 'the light waits for a fish'); assert.equal(r.spent, false, 'and is spent on the one it lands');
       assert.equal(r.onJar, true, 'the jar on the dock can be tapped');
     },
   },
@@ -204,6 +206,11 @@ module.exports = [
       assert.equal(r.bell.rings, 1, 'the Drowned Bell rings while it fades');
       assert.equal(r.notLive, false, 'a combo can’t be seen before its partner is in the game');
       assert.ok((await readSave(page)).finds.story.combos.wake > 0, 'it is saved');
+      const bonuses = async (p) => { await p.click('#journalBtn'); await p.waitForTimeout(300); await p.click('[data-jt="bonuses"]'); await p.waitForTimeout(300); return p.textContent('#panel'); };
+      assert.match(await bonuses(page), /Ghost wake/, 'once seen, the Bonuses page lists the perk');
+      const p2 = await newPage();
+      await openGame(p2, { save: veteran({ finds: finds(['tuningfork'], ['tuningfork']) }) });
+      assert.doesNotMatch(await bonuses(p2), /Ghost wake/, 'but not before, so the chip’s ??? isn’t given away');
     },
   },
   {
