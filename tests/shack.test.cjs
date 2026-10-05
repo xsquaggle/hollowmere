@@ -34,6 +34,16 @@ module.exports = [
       assert.equal(s.coins, 60000 - 400 - 2500 - 1200);
       assert.deepEqual(s.shack.fix, ['roof', 'lamp', 'net']);
       assert.equal(s.shack.wall.length, 5, 'the dry wall takes two more plaques');
+      // the room lays itself out again: the two new plaques are real ones, not chalk, and open the mount picker
+      await page.click('#shLX'); await page.waitForTimeout(300);
+      const L5 = await page.evaluate(() => window.__hm.shack.layout());
+      assert.equal(L5.plaques.length, 5); assert.equal(L5.locked.length, 3);
+      await tapRect(page, L5.plaques[4]);
+      assert.match(await page.textContent('#shCard'), /Mount a fish/);
+      await page.click('#shX'); await page.waitForTimeout(200);
+      // and every plaque is a button for a keyboard too
+      assert.equal(await page.locator('#shSr [data-k="plaque"]').count(), 5);
+      await page.click('#shList'); await page.waitForTimeout(300);
       const after = await page.evaluate(() => ({ net: window.__hm.modAdd('netCap'), night: window.__hm.modMul('night', { night: true }), day: window.__hm.modMul('night', { night: false }) }));
       assert.equal(after.net, 16, 'the mended net holds four more');
       assert.ok(Math.abs(after.night - 1.15) < 1e-9, 'the lamp: night fish ×1.15');
@@ -172,6 +182,21 @@ module.exports = [
           assert.ok(m.sH >= 48, at + ': plaques big enough to tap');
         }
       }
+    },
+  },
+  {
+    name: 'odd or old shack data loads cleanly: unknown fish and doubled species come down, and the room still draws',
+    async run({ newPage, openGame, veteran }) {
+      const page = await newPage();
+      const shack = { fix: ['roof', 'nope'], wall: [{}, { f: fish('nosuchfish', 20, 10) }, { f: fish('dace', 26, 30) }, { f: fish('dace', 31, 40) }, null] };
+      await openGame(page, { save: veteran({ shack }) });
+      const r = await page.evaluate(() => { const hm = window.__hm, s = hm.shack.state(); return { wall: s.wall.map(m => m && m.f.id), mul: hm.modMul('value', { fish: 'dace' }), can: hm.shack.canMount({ id: 'perch', size: 20, value: 10 }) }; });
+      assert.deepEqual(r.wall, [null, null, 'dace', null, null]);
+      assert.ok(Math.abs(r.mul - 1.1) < 1e-9, 'one dace mount, counted once');
+      assert.equal(r.can, true);
+      await page.click('#shackBtn'); await page.waitForTimeout(700);
+      assert.equal(await shackOpen(page), true);
+      assert.deepEqual(page.errors, []);
     },
   },
 ];

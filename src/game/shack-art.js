@@ -21,7 +21,7 @@ function shLayout(){ const c=SH.cv; if (!c) return false; const L0=$('shack'), t
   const hA=clamp(Hw*.2,58,104), ww=Math.min(132,aw*.48), win={x:ax+4,y:wy0+4,w:ww,h:hA-10};
   const lw=clamp(aw*.3,64,96), list={x:ax+aw-lw-4,y:wy0,w:lw,h:Math.min(hA+8,lw*1.3)};
   // the shelf, or the cabinet, along the bottom of the wall
-  const stoveX=W-68, shelfH=cab?clamp(Hw*.26,84,116):clamp(Hw*.15,48,62), shelf={x:ax,y:wy1-shelfH,w:Math.min(aw,stoveX-10-ax),h:shelfH};
+  const stoveX=W-68, shelfH=cab?clamp(Hw*.26,72,116):clamp(Hw*.15,48,62), shelf={x:ax,y:wy1-shelfH,w:Math.min(aw,stoveX-10-ax),h:shelfH};
   // the plaques between, three across: room for every plaque the wall can ever hold, the ones still to come in chalk
   const rows=Math.ceil(nMax/3), gap=8, room=shelf.y-10-(wy0+hA+6), ph=clamp((room-gap*(rows-1))/rows,48,90), pw=Math.min((aw-gap*2)/3,ph*1.3);
   const bh=rows*ph+gap*(rows-1), by=wy0+hA+12+Math.max(0,Math.min(28,(room-bh)*.3)), plaques=[];
@@ -259,8 +259,10 @@ function shPlaqueArt(i){ const L=SH.L, p=L.plaques[i], m=shackState().wall[i], k
 function shNight(c,L,dark){ if (dark<=.02) return; c.save(); c.globalCompositeOperation='source-atop'; c.fillStyle='rgba(10,8,22,'+(dark*.55).toFixed(3)+')'; c.fillRect(0,0,L.W,L.H); c.restore(); }
 
 /* ---- the frame ---- */
-function shDraw(){ const L=SH.L, c=SH.ctx; if (!L || !c) return; const d=SH.dpr, W=L.W, H=L.H, t=SH.t, P=palAt(save.clock), dark=P.dark||0;
-  const B=SH.art.back; if (!B || B.qh!==Math.floor(save.clock*2) || B.ver!==SH.ver){ shPlaceCurios(); shBuildBack(); }
+function shDraw(){ if (!SH.L || !SH.ctx) return;
+  // a fix can add plaques or the cabinet, so a new version lays the room out again before it's painted
+  const B=SH.art.back; if (!B || B.qh!==Math.floor(save.clock*2) || B.ver!==SH.ver){ shLayout(); shPlaceCurios(); shBuildBack(); }
+  const L=SH.L, c=SH.ctx, d=SH.dpr, W=L.W, H=L.H, t=SH.t, P=palAt(save.clock), dark=P.dark||0;
   c.setTransform(1,0,0,1,0,0); c.drawImage(SH.art.back.cv,0,0); c.setTransform(d,0,0,d,0,0);
   // the curios, each with a soft shadow under it, the cabinet's glass over them. They're drawn live (some glint), on
   // their own layer so the night darkens the curios themselves and not a box around them.

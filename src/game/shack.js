@@ -3,6 +3,8 @@
    t: when it went up}), seen, td: the trapdoor line shown last}. Content is in data/shack.js; game/shack-art.js draws
    the room. Modifier sources read the save alone (fixUpMods), so the balance simulator sees the same bonuses. */
 function shackState(){ const s=save.shack=save.shack||{}; if (!Array.isArray(s.fix)) s.fix=[]; if (!Array.isArray(s.wall)) s.wall=[];
+  // a mount of a fish the game no longer has, or a second of one species, comes down
+  const seen={}; for (let i=0;i<s.wall.length;i++){ const m=s.wall[i], id=m && m.f && m.f.id; if (!id || !FISH[id] || seen[id]) s.wall[i]=null; else seen[id]=1; }
   const n=plaqueCount(s); while (s.wall.length<n) s.wall.push(null); return s; }
 const fixDone = id => !!(save.shack && Array.isArray(save.shack.fix) && save.shack.fix.includes(id));
 const fixLine = id => FIXUP.find(L=>L.id===id);
@@ -15,8 +17,8 @@ const mountedAt = id => shackState().wall.findIndex(m=>m && m.f.id===id);
 const mountIsRecord = m => !!(m && isPB(m.f));
 /** The shack's modifiers, from the save alone: each fix-up line done, and each mount (its species sells for more). */
 function fixUpMods(add,L){ const s=save.shack; if (!s) return;
-  for (const id of s.fix||[]){ const F=fixLine(id); if (F) for (const m of F.mods||[]) L.push(Object.assign({src:'shack',name:F.name},m)); }
-  for (const m of s.wall||[]) if (m && m.f && FISH[m.f.id]) add('mount','Mounted '+FISH[m.f.id].name,'value',mountIsRecord(m)?WALL.record:WALL.value,{when:{fish:m.f.id}}); }
+  if (Array.isArray(s.fix)) for (const id of s.fix){ const F=fixLine(id); if (F) for (const m of F.mods||[]) L.push(Object.assign({src:'shack',name:F.name},m)); }
+  const seen={}; if (Array.isArray(s.wall)) for (const m of s.wall) if (m && m.f && FISH[m.f.id] && !seen[m.f.id] && (seen[m.f.id]=1)) add('mount','Mounted '+FISH[m.f.id].name,'value',mountIsRecord(m)?WALL.record:WALL.value,{when:{fish:m.f.id}}); }
 /** A shack with every line fixed and the wall full of the most valuable species, for the balance simulator. */
 function shackFull(){ const ids=Object.keys(FISH).filter(id=>!FISH[id].noTank).sort((a,b)=>FISH[b].value-FISH[a].value).slice(0,plaqueMax());
   return {fix:FIXUP.filter(L=>L.cost).map(L=>L.id), wall:ids.map(id=>({f:{id,size:FISH[id].size[1],value:FISH[id].value,t:0},t:0}))}; }
@@ -55,16 +57,19 @@ function shSub(){ const s=shackState(), n=s.wall.filter(Boolean).length, c=shelf
 function shUI(){ const s=shackState(), left=FIXUP.filter(L=>L.cost && !s.fix.includes(L.id));
   $('shSub').textContent=shSub();
   const lb=$('shList'); lb.innerHTML='Fix-up list'+(left.length?'<span class="sh-n">'+left.length+'</span>':''); lb.setAttribute('aria-label','Your uncle’s fix-up list, '+(left.length?left.length+' things left to fix':'all done'));
-  const kd=$('kitchenBtn'); kd.hidden=!save.kitchenOpen; const no=ordersOpen()?ordersState().list.length:0; kd.querySelector('.pk-badge').hidden=!no; kd.querySelector('.pk-badge').textContent=no;
-  const tips=Math.floor(Object.keys(TANKS).reduce((a,k)=>a+(tanks()[k].owned?tanks()[k].tips:0),0)), tb=$('aquaBtn').querySelector('.pk-badge'); tb.hidden=tips<1; tb.textContent='+'+tips;
-  $('aquaBtn').classList.toggle('arch',fixDone('knock')); }
+  const kd=$('kitchenBtn'); kd.hidden=!save.kitchenOpen; const no=ordersOpen()?ordersState().list.length:0; kd.querySelector('.pk-badge').hidden=!no; kd.querySelector('.pk-badge').textContent=no; kd.setAttribute('aria-label','Out back to the kitchen'+(no?', '+no+' order'+(no===1?'':'s')+' waiting':''));
+  const tips=Math.floor(Object.keys(TANKS).reduce((a,k)=>a+(tanks()[k].owned?tanks()[k].tips:0),0)), tb=$('aquaBtn').querySelector('.pk-badge'); tb.hidden=tips<5; tb.textContent='+'+tips; $('aquaBtn').setAttribute('aria-label','Go through to the tank room'+(tips>=5?', '+tips+' coins in the tip jars':''));
+  $('aquaBtn').classList.toggle('arch',fixDone('knock'));
+  // the room's taps as buttons, for a keyboard or a screen reader: each plaque, the rod rack, the trapdoor
+  $('shSr').innerHTML=s.wall.map((m,i)=>'<button type="button" data-k="plaque" data-i="'+i+'">Plaque '+(i+1)+': '+(m?FISH[m.f.id].name:'empty')+'</button>').join('')+
+    '<button type="button" data-k="rack">Rod rack</button><button type="button" data-k="trap">Trapdoor</button>'; }
 function openShack(){ if (SH.open) return; ovOpen('shack',()=>{ if (!$('shCard').hidden){ shCardClose(); return false; } if (!$('shListP').hidden){ shListClose(); return false; } closeShack(); });
   audioInit(); accrueTips(); const L=$('shack'); shackState();
   L.innerHTML='<canvas id="shCanvas" aria-label="The shack’s front room"></canvas><div class="aq-top sh-top"><div><h2>Your shack</h2><p id="shSub"></p></div><button class="btn" id="shClose" type="button">Close</button></div>'+
     '<div class="sh-bottom"><button class="sh-door" id="aquaBtn" type="button" aria-label="Go through to the tank room"><span class="sh-door-ico" aria-hidden="true"></span>Tank room<span class="pk-badge coin-badge" hidden></span></button>'+
     '<button class="btn sh-listbtn" id="shList" type="button">Fix-up list</button>'+
     '<button class="sh-door right" id="kitchenBtn" type="button" aria-label="Out back to the kitchen"><span class="sh-door-ico" aria-hidden="true"></span>Kitchen<span class="pk-badge order-badge" hidden></span></button></div>'+
-    '<div class="aq-card sh-card" id="shCard" hidden></div><div class="sh-list" id="shListP" hidden></div>';
+    '<div class="sh-sr" id="shSr" role="group" aria-label="In the room"></div><div class="aq-card sh-card" id="shCard" hidden></div><div class="sh-list" id="shListP" hidden></div>';
   L.hidden=false; SH.open=true; SH.cv=$('shCanvas'); SH.ctx=SH.cv.getContext('2d'); SH.sig=null; SH.sel=null; SH.fx=[]; SH.strike=null;
   shUI(); shLayout();
   if (window.ResizeObserver){ SH.ro=new ResizeObserver(()=>{ if (SH.open && shLayout()) shDraw(); }); SH.ro.observe(L); SH.ro.observe(L.querySelector('.sh-bottom')); }
@@ -73,6 +78,7 @@ function openShack(){ if (SH.open) return; ovOpen('shack',()=>{ if (!$('shCard')
   $('aquaBtn').addEventListener('click',()=>{ shSfx.creak(); shCardClose(); shListClose(); openAquarium(); });
   $('kitchenBtn').addEventListener('click',()=>{ if (!save.kitchenOpen) return; shSfx.creak(); shCardClose(); shListClose(); openKitchen(); });
   SH.cv.addEventListener('pointerdown',shTap);
+  $('shSr').addEventListener('click',e=>{ const b=e.target.closest('[data-k]'); if (b) shDo({k:b.dataset.k, i:+b.dataset.i}); });
   // the list's hand and the plates' serif may still be arriving: paint the room again once they're here
   if (document.fonts && document.fonts.load) Promise.all(['600 12px Caveat','400 12px "Young Serif"'].map(f=>document.fonts.load(f))).then(()=>{ SH.ver++; SH.art={}; }).catch(()=>{});
   if (!shackState().seen){ shackState().seen=true; persist(); }
@@ -102,7 +108,9 @@ function shHit(x,y){ const L=SH.L; if (!L) return null; const inR=(r,p)=>r && x>
   if (inR(L.trap,6)) return {k:'trap'};
   if (L.stove && inR(L.stove,4) && fixDone('stove')) return {k:'stove'};
   return null; }
-function shTap(e){ const r=SH.cv.getBoundingClientRect(), k=r.width?SH.W/r.width:1, h=shHit((e.clientX-r.left)*k,(e.clientY-r.top)*k); if (!h) return;
+function shTap(e){ const r=SH.cv.getBoundingClientRect(), k=r.width?SH.W/r.width:1; shDo(shHit((e.clientX-r.left)*k,(e.clientY-r.top)*k)); }
+/** What a tap on the room does, from the canvas or from the room's buttons for keyboards and screen readers. */
+function shDo(h){ if (!h) return;
   if (h.k==='plaque'){ shListClose(); shPlaqueCard(h.i); tone(700,.05,{vol:.05,type:'triangle'}); }
   else if (h.k==='curio'){ shListClose(); shCurioCard(h.id); sfx.find(FINDS[h.id].rarity); }
   else if (h.k==='rack'){ shListClose(); shRackCard(); sfx.rig('reel'); }
@@ -125,15 +133,15 @@ function shPlaqueCard(i){ const s=shackState(), m=s.wall[i], c=$('shCard'); SH.s
     c.innerHTML='<div class="aq-card-top"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+'</span><button class="x" id="shX" type="button" aria-label="Close">×</button></div>'+
       '<h3>'+(f.mut?MUTS[f.mut].name+' ':'')+F.name+(rec?' <span class="net-rec">Record</span>':'')+'</h3><p><b>'+fmtW(fishW(f))+'</b> · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+'</p>'+
       '<p>Caught at '+(f.spot?spotLabel(f.reg,f.spot):REGION_NAME[f.reg]||'')+(d?' · '+d:'')+(f.rod&&RODS[f.rod]?' · '+RODS[f.rod].name:'')+'</p>'+
-      '<p class="tip">'+F.name+' sells for '+Math.round(((rec?WALL.record:WALL.value)-1)*100)+'% more while it’s up'+(rec?', since it’s your record':'. Mount your record for '+Math.round((WALL.record-1)*100)+'%')+'.</p>'+
+      '<p class="tip">While it’s up, every '+F.name+' you catch is worth '+Math.round(((rec?WALL.record:WALL.value)-1)*100)+'% more'+(rec?', since it’s your record':'. Mount your record for '+Math.round((WALL.record-1)*100)+'%')+'.</p>'+
       '<div class="row"><button class="btn" id="shDown" type="button"'+(save.net.length<netCap()?'':' disabled')+'>'+(save.net.length<netCap()?'Take it down':'Keepnet full')+'</button></div>';
     c.hidden=false; $('shX').addEventListener('click',shCardClose);
     $('shDown').addEventListener('click',()=>{ if (!unmount(i)) return; sfx.plop(); news(F.name+' is back in the keepnet',''); shCardClose(); shUI(); });
     return; }
   const list=save.net.map((f,j)=>({f,j})).filter(({f})=>canMount(f)).sort((a,b)=>shMountRank(b.f)-shMountRank(a.f)).slice(0,8);
   let h='<div class="aq-card-top"><span class="r">Plaque '+(i+1)+' of '+s.wall.length+'</span><button class="x" id="shX" type="button" aria-label="Close">×</button></div><h3>Mount a fish</h3>';
-  if (!list.length) h+='<p>'+(save.net.some(f=>!f.smoked)?'Every fish in your keepnet has a better one on the wall already.':'Keep a fish from a catch card and it can go up here.')+' A mounted species sells for '+Math.round((WALL.value-1)*100)+'% more, or '+Math.round((WALL.record-1)*100)+'% if it’s your record.</p>';
-  else { h+='<p>From your keepnet. Its species sells for '+Math.round((WALL.value-1)*100)+'% more while it’s up, '+Math.round((WALL.record-1)*100)+'% if it’s your record.</p><div class="sh-pick">';
+  if (!list.length) h+='<p>'+(save.net.some(f=>!f.smoked)?'Nothing in your keepnet fits a plaque.':'Keep a fish from a catch card and it can go up here.')+' While a species is up, each one you catch is worth '+Math.round((WALL.value-1)*100)+'% more, or '+Math.round((WALL.record-1)*100)+'% if it’s your record.</p>';
+  else { h+='<p>From your keepnet. While it’s up, each of its species you catch is worth '+Math.round((WALL.value-1)*100)+'% more, '+Math.round((WALL.record-1)*100)+'% if it’s your record.</p><div class="sh-pick">';
     for (const {f,j} of list){ const F=FISH[f.id], up=mountedAt(f.id)>=0;
       h+='<button type="button" class="sh-pickrow" data-mount="'+j+'"><canvas data-f="'+f.id+'"'+(f.mut?' data-mut="'+f.mut+'"':'')+'></canvas><span><b>'+(f.mut?MUTS[f.mut].name+' ':'')+F.name+(isPB(f)?' <i class="net-rec">Record</i>':'')+'</b><small>'+fmtW(fishW(f))+' · '+RAR[F.rarity].label+(up?' · swaps the one up':'')+'</small></span></button>'; }
     h+='</div>'; }
@@ -165,6 +173,6 @@ function shListOpen(){ const P=$('shListP'), s=shackState();
   P.querySelectorAll('[data-fix]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.fix; if (!buyFix(id)) return; shFixed(id); shListOpen(); P.querySelector('[data-line="'+id+'"]').classList.add('struck'); shUI(); })); }
 function shListClose(){ const P=$('shListP'); if (P){ P.hidden=true; P.innerHTML=''; } }
 /** A line done: hammer taps, the room rebuilt with the change in it, and a sparkle where it happened. */
-function shFixed(id){ const L=fixLine(id); shSfx.hammer(id==='knock'?5:3); buzz([0,20,140,20,140,20]); SH.strike={id,t:0}; SH.fx.push({k:'fixed',id,t:0}); news(L.name+'. '+L.done,'gold'); }
+function shFixed(id){ const L=fixLine(id); SH.ver++; shLayout(); shSfx.hammer(id==='knock'?5:3); buzz([0,20,140,20,140,20]); SH.strike={id,t:0}; SH.fx.push({k:'fixed',id,t:0}); news(L.name+'. '+L.done,'gold'); }
 
 window.addEventListener('resize',()=>{ if (SH.open && shLayout()) shDraw(); });

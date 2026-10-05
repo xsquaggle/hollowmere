@@ -110,8 +110,8 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/aquarium-art.js` | 487 | Aquarium drawing: room, tank, sand, plants, decor, tip jar |
 | `src/game/shops.js` | 113 | Keepnet and Ottilie's shop sheets (rods, tackle, traps) |
 | `src/game/tacklegram.js` | 108 | The phone shop: sea rods, boat parts, the mail boat |
-| `src/game/shack.js` | 170 | The shack's front room: `openShack`, the trophy wall (`mountFish`, `unmount`, `canMount`), the fix-up list (`buyFix`, `fixDone`, `shackTankCap`), the curio shelf, the rod rack, the trapdoor, the shack's modifiers (`fixUpMods`) |
-| `src/game/shack-art.js` | 345 | The front room drawn: `shLayout`, walls, window, the uncle's list, shelf or cabinet, floor, trapdoor, stove, net, rod rack; plaques and mounts with their rarity kit |
+| `src/game/shack.js` | 178 | The shack's front room: `openShack`, the trophy wall (`mountFish`, `unmount`, `canMount`), the fix-up list (`buyFix`, `fixDone`, `shackTankCap`), the curio shelf, the rod rack, the trapdoor, the shack's modifiers (`fixUpMods`) |
+| `src/game/shack-art.js` | 348 | The front room drawn: `shLayout`, walls, window, the uncle's list, shelf or cabinet, floor, trapdoor, stove, net, rod rack; plaques and mounts with their rarity kit |
 | `src/game/journal.js` | 50 | The journal: species pages, records |
 | `src/game/bonuses.js` | 104 | The Bonuses journal page |
 | `src/game/saves.js` | 115 | `BUILD` number, backup codes, earlier saves, settings and sound sheets |
@@ -182,4 +182,4 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/rarity.test.cjs` | 152 | Moon phases, rare bites, mutations, the dry run, the Mythic's sell |
 | `tests/weather.test.cjs` | 136 | Weather and its fish |
 | `tests/relics.test.cjs` | 229 | Story relics, treasure maps, the Moon Jar, the almanac, combos |
-| `tests/shack.test.cjs` | 177 | The shack: the fix-up list, mounting and the wall bonus, the rod rack, the knock-through, the room at five phone sizes |
+| `tests/shack.test.cjs` | 202 | The shack: the fix-up list, mounting and the wall bonus, the rod rack, the knock-through, the room at five phone sizes, odd saves |

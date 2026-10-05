@@ -4,6 +4,10 @@
 #shack.closing{animation:fadeOut .25s forwards}
 #shCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:manipulation}
 .sh-top{z-index:1}
+/* the room's taps as buttons, unseen until one has keyboard focus */
+.sh-sr{position:absolute;left:12px;top:calc(env(safe-area-inset-top,0px) + 96px);z-index:2;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 24px)}
+.sh-sr button{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;padding:0;border:0}
+.sh-sr button:focus-visible{position:static;width:auto;height:auto;clip-path:none;padding:6px 10px;border-radius:8px;border:2px solid var(--brass);background:var(--paper);color:var(--ink);font:800 13px/1.2 var(--body)}
 .sh-top h2,.sh-top p{text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .sh-bottom{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;align-items:flex-end;justify-content:space-between;gap:8px;z-index:1;pointer-events:none}
 .sh-bottom>*{pointer-events:auto}
