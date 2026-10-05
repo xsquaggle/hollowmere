@@ -56,4 +56,22 @@ module.exports = [
       assert.match(await page.textContent('#panel .rec-hero'), /\d (g|kg)[^a-z]/);
     },
   },
+  {
+    name: 'on a wide screen the aim reaches both banks, and a drag nearly level with the dock still casts',
+    async run({ newPage, openGame, veteran }) {
+      for (const vp of [{ width: 1212, height: 860 }, { width: 390, height: 844 }]) {
+        const page = await newPage({ viewport: vp });
+        await openGame(page, { save: veteran({}) });
+        const aim = async (dx, dy) => { const sx = vp.width / 2, sy = vp.height - 200; await page.mouse.move(sx, sy); await page.mouse.down();
+          await page.mouse.move(sx + dx, sy + dy, { steps: 4 });
+          const a = await page.evaluate(() => { const a = window.__S.aim; return { p: a.p, x: a.target && a.target.x }; });
+          await page.mouse.move(sx, sy); await page.mouse.up(); await page.waitForTimeout(150); await page.evaluate(() => window.__hm.setState('idle')); return a; };
+        const left = await aim(vp.width * .45, 90), right = await aim(-vp.width * .45, 90), level = await aim(vp.width * .4, 0);
+        assert.ok(left.x < vp.width * .1, vp.width + ': the cast reaches the left bank (' + Math.round(left.x) + ')');
+        assert.ok(right.x > vp.width * .9, vp.width + ': and the right (' + Math.round(right.x) + ')');
+        assert.ok(level.p >= .12 && level.x < vp.width * .2, vp.width + ': a level drag still aims a cast');
+        await page.close();
+      }
+    },
+  },
 ];

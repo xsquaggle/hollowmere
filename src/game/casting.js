@@ -2,10 +2,13 @@
 function updateAim(x,y){
   const a=S.aim; a.x=x; a.y=y;
   const vx=a.sx-x, vy=a.sy-y, len=Math.hypot(vx,vy), maxPull=Math.min(H*.3,230);
-  a.p = -vy>4 ? clamp(len/maxPull,0,1) : 0;
-  a.th = len>10 ? clamp(Math.atan2(vx,-vy),-.8,.8) : 0;
+  // a pull down counts, and so does one nearly level with the dock: on a wide screen the side water is a long way across
+  a.p = (-vy>4 || (Math.abs(vx)>16 && -vy>-Math.abs(vx)*.25)) ? clamp(len/maxPull,0,1) : 0;
   const depth=clamp((a.p-.12)/.88,0,1)*castReach(), ty=lerp(G.near,HZ+26,depth); a.depth=depth;
-  const tx=clamp(W/2+Math.tan(a.th)*(G.player.y-ty)*.85,22,W-22);
+  // the widest angle reaches the screen's edge at this distance, so a wide screen's banks are in range too
+  const far=Math.max(40,(G.player.y-ty)*.85), maxTh=clamp(Math.atan((W/2-22)/far),.8,1.4);
+  a.th = len>10 ? clamp(Math.atan2(vx,Math.max(-vy,.01)),-maxTh,maxTh) : 0;
+  const tx=clamp(W/2+Math.tan(a.th)*far,22,W-22);
   a.target={x:tx,y:ty}; a.spot=spotAt(tx,ty); a.lucky=inLucky(tx,ty);
 }
 function release(){
