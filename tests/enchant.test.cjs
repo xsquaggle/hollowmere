@@ -32,7 +32,7 @@ module.exports = [
       const tray = await page.evaluate(() => ({ rows: [...document.querySelectorAll('#bagTray .tr-row.rune h4')].map(h => h.textContent),
         can: [...document.querySelectorAll('#bagTray [data-act="etch"]')].map(b => !b.disabled), need: document.querySelector('#bagTray .need') && document.querySelector('#bagTray .need').textContent,
         drawn: [...document.querySelectorAll('#bagTray canvas[data-rune]')].every(c => c.width > 0) }));
-      assert.deepEqual(tray.rows, ['Swift Spool', 'Magpie Knot', 'Lure of the Deep', 'Nightglass', 'Storm Knot', 'Wanderer', 'Echo']);
+      assert.deepEqual(tray.rows, ['Swift Spool', 'Magpie Knot', 'Lure of the Deep', 'Nightglass', 'Storm Knot', 'Wanderer', 'Odd Water', 'Echo']);
       assert.deepEqual(tray.can, [true, true, true, true, true, true, false], 'Echo costs 110, more than the 100 you have');
       assert.equal(tray.need, '10 more Glimmer to etch it');
       assert.ok(tray.drawn, 'every rune is drawn');

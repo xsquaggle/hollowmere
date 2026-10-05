@@ -63,7 +63,7 @@ module.exports = [
       for (const s of ['Rarity luck', 'Brasscap Pro', 'Mayor’s Banquet Pie', '+60 luck', '+118 luck', 'Lake Royalty', 'Night Lights', 'Tiny Town Hall', 'Gull Luck', '×2',
         'Fish value', 'Perfect-hook window', 'Swell hits', 'Stabilizer Keel', 'Mastery', 'Copper Perch', 'Mayor Bartholomew']) assert.ok(text.includes(s), 'shows ' + s);
       const off = await page.$$eval('.bn-src li.off .n', els => els.map(e => e.textContent));
-      assert.deepEqual(off.sort(), ['Rarity reveal', 'Sonar readout', 'Stabilizer Keel'], 'coast-only bonuses are marked not here at the lake');
+      assert.deepEqual(off.sort(), ['Rainbow\'s foot', 'Rarity reveal', 'Sonar readout', 'Stabilizer Keel'], 'coast-only bonuses are marked not here at the lake, and the rainbow\'s foot not now');
       assert.match(await page.textContent('.bn-luck .bn-tiers'), /Legendary ×2\.1/);
     },
   },
