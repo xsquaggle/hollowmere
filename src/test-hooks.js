@@ -12,7 +12,8 @@ window.__hm={ get save(){ return save; }, FISH, RODS, REGION_FISH, RECIPES, DECO
       for (let i=0;i<4;i++) drawHeronFlying(60+i*90,340,1.6,1,i*.2);
       drawGreyWading(60,470,1.4,1); drawTrapOnDeck(ctx,'lake',190,460,1.4,1,true); drawTrapOnDeck(ctx,'coast',300,460,1.4,1,false);
       return cv.toDataURL('image/png'); },
-    drawPortrait:(...a)=>drawPortrait(...a), drawFish:(...a)=>drawFish(...a), drawSmokedFish:(...a)=>drawSmokedFish(...a), drawTackle:(...a)=>drawTackle(...a), drawRig:(...a)=>drawRig(...a), drawGeode:(...a)=>drawGeode(...a), drawRune:(...a)=>drawRune(...a), drawGlimGem:(...a)=>drawGlimGem(...a) }, openShop:t=>openShop(t),
+    drawPortrait:(...a)=>drawPortrait(...a), drawFish:(...a)=>drawFish(...a), drawSmokedFish:(...a)=>drawSmokedFish(...a), drawTackle:(...a)=>drawTackle(...a), drawRig:(...a)=>drawRig(...a), drawGeode:(...a)=>drawGeode(...a), drawRune:(...a)=>drawRune(...a), drawGlimGem:(...a)=>drawGlimGem(...a),
+    drawFind:(...a)=>drawFind(...a), drawFindSilhouette:(...a)=>drawFindSilhouette(...a), drawMapPiece:(...a)=>drawMapPiece(...a), drawTreasureMap:(...a)=>drawTreasureMap(...a) }, openShop:t=>openShop(t),
   WX, WX_ORDER, pool:(sp,l)=>poolFor(sp,l), reel:id=>{ S.bite=null; startReel(id,false); }, wx:{ now:()=>wxNow(), info:()=>wxInfo(), shares:(r,d,s)=>wxShares(r,d,s), at:(r,B,s)=>wxAt(r,B,s), line:()=>wxLine(), look:()=>wxLook(), state:()=>wxState() },
   rarity:{ ctl:RARITY_CTL, MUTS, MUT_ORDER, RARE_BITES, MOON, phase:()=>moonPhase(), full:()=>fullMoon(), lit:()=>moonLit(), name:p=>moonName(p), path:()=>moonpathOn(), onPath:(x,y)=>onMoonpath(x,y),
     foot:()=>bowFoot(), atFoot:(x,y)=>atBowFoot(x,y), rare:(sp,l,at)=>rareBite(sp,l,at), roll:(sp,l,at)=>rollFish(sp,l,at), mut:(id,c)=>rollMutation(id,c), chance:c=>mutationChance(c),

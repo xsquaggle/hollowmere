@@ -26,10 +26,12 @@ Object.assign(FIND_ART,{
     laShine(c,-12,-32,8,2,.25); c.restore(); },
   // a preserving jar on a wire bail, full of kept moonlight
   moonjar(c,s,t){ laGlow(c,0,4,58,RA.moon,.32+.06*Math.sin(t*1.6)); laInk(c);
-    c.beginPath(); c.moveTo(-24,-26); c.quadraticCurveTo(-32,-18,-32,0); c.lineTo(-32,30); c.quadraticCurveTo(-32,40,-22,40); c.lineTo(22,40); c.quadraticCurveTo(32,40,32,30); c.lineTo(32,0); c.quadraticCurveTo(32,-18,24,-26); c.closePath();
-    c.save(); c.clip(); const g=c.createLinearGradient(0,-26,0,40); g.addColorStop(0,'rgba(170,200,240,.5)'); g.addColorStop(1,'rgba(232,240,255,.95)'); c.fillStyle=g; c.fillRect(-34,-30,68,72);
-    c.fillStyle='rgba(255,255,255,.85)'; for (let i=0;i<7;i++){ const a=t*.6+i*.9, x=Math.sin(a*1.3+i)*20, y=14-((t*10+i*9)%40); c.beginPath(); c.arc(x,y,1.2+(i%3)*.6,0,7); c.fill(); }
-    c.fillStyle='rgba(120,150,200,.25)'; c.fillRect(-34,-30,14,72); c.restore(); c.stroke();
+    const body=()=>{ c.beginPath(); c.moveTo(-24,-26); c.quadraticCurveTo(-32,-18,-32,0); c.lineTo(-32,30); c.quadraticCurveTo(-32,40,-22,40); c.lineTo(22,40); c.quadraticCurveTo(32,40,32,30); c.lineTo(32,0); c.quadraticCurveTo(32,-18,24,-26); c.closePath(); };
+    body(); c.save(); c.clip(); c.fillStyle='#6E86A8'; c.fillRect(-34,-30,68,72);
+    const g=c.createLinearGradient(0,-10,0,40); g.addColorStop(0,'rgba(196,214,246,.9)'); g.addColorStop(1,'rgba(240,244,255,1)'); c.fillStyle=g; c.beginPath(); c.moveTo(-34,-6+Math.sin(t*1.4)*1.2); c.quadraticCurveTo(0,-10-Math.sin(t*1.4)*1.2,34,-6); c.lineTo(34,42); c.lineTo(-34,42); c.closePath(); c.fill();
+    c.save(); c.translate(4,14); c.rotate(-.3); c.fillStyle='#FFFDF2'; c.beginPath(); c.arc(0,0,11,0,7); c.fill(); c.fillStyle='rgba(196,214,246,.95)'; c.beginPath(); c.arc(5,-3,9.5,0,7); c.fill(); c.restore();
+    c.fillStyle='rgba(255,255,255,.9)'; for (let i=0;i<7;i++){ const a=t*.6+i*.9, x=Math.sin(a*1.3+i)*20, y=34-((t*8+i*7)%40); c.beginPath(); c.arc(x,y,1+(i%3)*.5,0,7); c.fill(); }
+    c.fillStyle='rgba(60,80,120,.22)'; c.fillRect(18,-30,16,72); c.restore(); laInk(c); body(); c.stroke();
     c.strokeStyle='rgba(255,255,255,.75)'; c.lineWidth=2.6; c.beginPath(); c.moveTo(-24,-8); c.lineTo(-24,26); c.stroke();
     laInk(c); rrect(c,-25,-34,50,10,3); laFill(c,'#C9DCE4'); laEll(c,0,-36,22,5); laFill(c,'#D9E8EE');
     c.strokeStyle=INK; c.lineWidth=4.4; c.beginPath(); c.moveTo(-26,-29); c.quadraticCurveTo(0,-52,26,-29); c.stroke(); c.strokeStyle=LA.silver; c.lineWidth=2; c.stroke();
@@ -118,7 +120,7 @@ function drawGaugeBell(R,x,y){ if (!(R.fade>0) || R.loot || !modFlag('ghostRings
   ctx.strokeStyle='rgba(236,224,176,'+(.85-.5*u).toFixed(3)+')'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,7+u*5,0,Math.PI*2); ctx.stroke(); }
 /** The Moon Jar on the dock (or the skiff's deck), lit by how much moonlight it holds. Tap it to spend a full jar. */
 function drawMoonJarProp(){ if (!modFlag('moonJar')) return; const p=jarPos(), r=relicState(), f=r.armed?1:r.jar/MOON_JAR.fill, full=f>=1;
-  ctx.save(); ctx.translate(p.x,p.y);
+  ctx.save(); ctx.translate(p.x,p.y); ctx.scale(1.25,1.25);
   if (f>0){ const g=ctx.createRadialGradient(0,-8,2,0,-8,26+f*14); g.addColorStop(0,'rgba('+RA.moon+','+(.22+.3*f+.2*JAR.glow).toFixed(3)+')'); g.addColorStop(1,'rgba('+RA.moon+',0)'); ctx.fillStyle=g; ctx.fillRect(-46,-54,92,92); }
   ctx.fillStyle='rgba(8,14,22,.3)'; ctx.beginPath(); ctx.ellipse(0,2,11,3,0,0,7); ctx.fill();
   const lvl=-2-f*16; ctx.save(); ctx.beginPath(); ctx.moveTo(-9,-18); ctx.lineTo(-9,-1); ctx.quadraticCurveTo(-9,2,-6,2); ctx.lineTo(6,2); ctx.quadraticCurveTo(9,2,9,-1); ctx.lineTo(9,-18); ctx.closePath(); ctx.clip();
@@ -129,5 +131,5 @@ function drawMoonJarProp(){ if (!modFlag('moonJar')) return; const p=jarPos(), r
   ctx.strokeStyle='rgba(255,255,255,.7)'; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(-6,-14); ctx.lineTo(-6,-4); ctx.stroke();
   if (full && !r.armed){ const a=.5+.5*Math.sin(S.time*3); ctx.fillStyle='rgba(255,255,255,'+a.toFixed(3)+')'; ctx.beginPath(); ctx.arc(4,-24+Math.sin(S.time*1.4)*2,1.3,0,7); ctx.fill(); }
   ctx.restore();
-  if (r.armed && Math.random()<.2) S.particles.push({x:p.x+rand(-6,6),y:p.y-20,vx:rand(-6,6),vy:-rand(10,24),g:-4,life:0,max:rand(.8,1.4),r:rand(.8,1.6),c:'rgba('+RA.moon+',',glim:true});
-  if (JAR.pour>0){ const u=1-JAR.pour; for (let i=0;i<2;i++) S.particles.push({x:p.x+rand(-4,4),y:p.y-22,vx:rand(10,60)*(Math.random()<.5?-1:1),vy:-rand(40,90)*(1-u),g:120,life:0,max:rand(.7,1.2),r:rand(1,2),c:'rgba('+RA.moon+',',glim:true}); } }
+  if (r.armed && Math.random()<.2) S.particles.push({x:p.x+rand(-7,7),y:p.y-25,vx:rand(-6,6),vy:-rand(10,24),g:-4,life:0,max:rand(.8,1.4),r:rand(.8,1.6),c:'rgba('+RA.moon+',',glim:true});
+  if (JAR.pour>0){ const u=1-JAR.pour; for (let i=0;i<2;i++) S.particles.push({x:p.x+rand(-5,5),y:p.y-28,vx:rand(10,60)*(Math.random()<.5?-1:1),vy:-rand(40,90)*(1-u),g:120,life:0,max:rand(.7,1.2),r:rand(1,2),c:'rgba('+RA.moon+',',glim:true}); } }

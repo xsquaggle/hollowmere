@@ -82,7 +82,7 @@ function jarFill(L){ if (!modFlag('moonJar') || L.moon || L.eaten || !isNight(L.
 const JAR={pour:0, glow:0};
 /** Where the jar sits: on the dock by the tackle box, or on the skiff's deck. */
 function jarPos(){ return REG()==='coast'?{x:W/2-52, y:H-112+(S.bob_y||0)}:{x:W/2-80, y:H-128+44}; }
-function onJar(x,y){ if (!modFlag('moonJar') || S.state!=='idle') return false; const p=jarPos(); return Math.hypot(x-p.x,(y-p.y)*1.2)<24; }
+function onJar(x,y){ if (!modFlag('moonJar') || S.state!=='idle') return false; const p=jarPos(); return Math.hypot(x-p.x,(y-p.y+10)*1.2)<28; }
 function tapJar(){ const r=relicState(); audioInit(); tone(1400,.05,{vol:.05,type:'sine'}); buzz(8); JAR.glow=1;
   if (r.armed){ toast('The moonlight is waiting. Cast!',''); return; }
   if (!jarFull()){ toast('Moonlight: '+r.jar+' of '+MOON_JAR.fill+'. Catches after dark fill it.',''); return; }
@@ -109,16 +109,16 @@ function moonSVG(p){ const c=MOON.cycle, th=p/c*Math.PI*2, R=9, x=Math.cos(th)*R
   // the lit limb from top to bottom on its side, then back up along the terminator (an ellipse as wide as cos θ)
   const limb='M0 -'+R+' A'+R+' '+R+' 0 0 '+(wax?1:0)+' 0 '+R, term=' A'+Math.max(.01,Math.abs(x)).toFixed(2)+' '+R+' 0 0 '+((x>0)===wax?0:1)+' 0 -'+R;
   return '<svg viewBox="-11 -11 22 22" aria-hidden="true"><circle r="'+R+'" fill="'+dark+'"/><path d="'+limb+term+'Z" fill="'+lit+'"/><circle r="'+R+'" fill="none" stroke="#2B2A33" stroke-width="1.2"/></svg>'; }
-function almanacNote(k){ const F=WX_FISH[REG()]||{}, known=id=>(save.fish[id]||{}).caught>0;
+function almanacNote(k,at){ const F=WX_FISH[REG()]||{}, known=id=>(save.fish[id]||{}).caught>0;
   if (k==='rain') return F.rain?(known(F.rain.fish)?FISH[F.rain.fish].name+' rising':'Rain fish rising'):'Bites come sooner';
   if (k==='fog') return F.fog?(known(F.fog.fish)?FISH[F.fog.fish].name+' about':'Fog fish about'):'Fish hide far out';
-  if (k==='cloudy') return 'Grey and quiet'; return 'Gulls out by day'; }
+  if (k==='cloudy') return 'Grey and quiet'; return isNight(at%24)?'A clear night':'Gulls out by day'; }
 function openAlmanac(){ const now=wxNow(), h=(((save.clock%24)+24)%24), rows=almanacRows(), m=almanacMoon(), pinned=!!wxState().force;
   const ico=(k,at)=>wxIconSVG(k+((isNight(at%24)||PERIOD(at%24)==='Evening')?'-n':'-d'));
   const when=at=>(at>=24?'Tomorrow ':'')+clockText(at%24);
   const row=(label,k,note,at,cls)=>'<li class="'+(cls||'')+'"><span class="al-ico">'+ico(k,at)+'</span><span class="al-t">'+label+'</span><b>'+WX[k].name+'</b><span class="al-n">'+note+'</span></li>';
   let html='<div class="panel-head"><div><h2>Wet Almanac</h2><p>'+REGION_NAME[REG()]+' · in pencil, in a careful hand</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
-    '<div class="almanac"><ol class="al-rows">'+row('Now',now,almanacNote(now),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind),r.at)).join('')+'</ol>'+
+    '<div class="almanac"><ol class="al-rows">'+row('Now',now,almanacNote(now,h),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind,r.at),r.at)).join('')+'</ol>'+
     '<div class="al-moon"><span class="al-ico">'+moonSVG(m.p)+'</span><div><b>'+(h>=5&&h<20?'Tonight: ':'')+m.name+'</b><span>'+(m.toFull===0?'The moonpath lies across the deep pool tonight.':'Full moon in '+m.toFull+' night'+(m.toFull===1?'':'s')+'.')+'</span></div></div>'+
     (pinned?'<p class="note">The weather is pinned in Playtest, so the almanac reads it as staying.</p>':'')+'</div>';
   openSheet(html); $('closeS').addEventListener('click',closeSheet); noise(.35,{vol:.08,f:2400,to:1200,q:.7}); }
