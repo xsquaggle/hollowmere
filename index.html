@@ -3928,10 +3928,12 @@ Object.assign(FIND_ART,{
     laShine(c,-12,-32,8,2,.25); c.restore(); },
   // a preserving jar on a wire bail, full of kept moonlight
   moonjar(c,s,t){ laGlow(c,0,4,58,RA.moon,.32+.06*Math.sin(t*1.6)); laInk(c);
-    c.beginPath(); c.moveTo(-24,-26); c.quadraticCurveTo(-32,-18,-32,0); c.lineTo(-32,30); c.quadraticCurveTo(-32,40,-22,40); c.lineTo(22,40); c.quadraticCurveTo(32,40,32,30); c.lineTo(32,0); c.quadraticCurveTo(32,-18,24,-26); c.closePath();
-    c.save(); c.clip(); const g=c.createLinearGradient(0,-26,0,40); g.addColorStop(0,'rgba(170,200,240,.5)'); g.addColorStop(1,'rgba(232,240,255,.95)'); c.fillStyle=g; c.fillRect(-34,-30,68,72);
-    c.fillStyle='rgba(255,255,255,.85)'; for (let i=0;i<7;i++){ const a=t*.6+i*.9, x=Math.sin(a*1.3+i)*20, y=14-((t*10+i*9)%40); c.beginPath(); c.arc(x,y,1.2+(i%3)*.6,0,7); c.fill(); }
-    c.fillStyle='rgba(120,150,200,.25)'; c.fillRect(-34,-30,14,72); c.restore(); c.stroke();
+    const body=()=>{ c.beginPath(); c.moveTo(-24,-26); c.quadraticCurveTo(-32,-18,-32,0); c.lineTo(-32,30); c.quadraticCurveTo(-32,40,-22,40); c.lineTo(22,40); c.quadraticCurveTo(32,40,32,30); c.lineTo(32,0); c.quadraticCurveTo(32,-18,24,-26); c.closePath(); };
+    body(); c.save(); c.clip(); c.fillStyle='#6E86A8'; c.fillRect(-34,-30,68,72);
+    const g=c.createLinearGradient(0,-10,0,40); g.addColorStop(0,'rgba(196,214,246,.9)'); g.addColorStop(1,'rgba(240,244,255,1)'); c.fillStyle=g; c.beginPath(); c.moveTo(-34,-6+Math.sin(t*1.4)*1.2); c.quadraticCurveTo(0,-10-Math.sin(t*1.4)*1.2,34,-6); c.lineTo(34,42); c.lineTo(-34,42); c.closePath(); c.fill();
+    c.save(); c.translate(4,14); c.rotate(-.3); c.fillStyle='#FFFDF2'; c.beginPath(); c.arc(0,0,11,0,7); c.fill(); c.fillStyle='rgba(196,214,246,.95)'; c.beginPath(); c.arc(5,-3,9.5,0,7); c.fill(); c.restore();
+    c.fillStyle='rgba(255,255,255,.9)'; for (let i=0;i<7;i++){ const a=t*.6+i*.9, x=Math.sin(a*1.3+i)*20, y=34-((t*8+i*7)%40); c.beginPath(); c.arc(x,y,1+(i%3)*.5,0,7); c.fill(); }
+    c.fillStyle='rgba(60,80,120,.22)'; c.fillRect(18,-30,16,72); c.restore(); laInk(c); body(); c.stroke();
     c.strokeStyle='rgba(255,255,255,.75)'; c.lineWidth=2.6; c.beginPath(); c.moveTo(-24,-8); c.lineTo(-24,26); c.stroke();
     laInk(c); rrect(c,-25,-34,50,10,3); laFill(c,'#C9DCE4'); laEll(c,0,-36,22,5); laFill(c,'#D9E8EE');
     c.strokeStyle=INK; c.lineWidth=4.4; c.beginPath(); c.moveTo(-26,-29); c.quadraticCurveTo(0,-52,26,-29); c.stroke(); c.strokeStyle=LA.silver; c.lineWidth=2; c.stroke();
@@ -4020,7 +4022,7 @@ function drawGaugeBell(R,x,y){ if (!(R.fade>0) || R.loot || !modFlag('ghostRings
   ctx.strokeStyle='rgba(236,224,176,'+(.85-.5*u).toFixed(3)+')'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,7+u*5,0,Math.PI*2); ctx.stroke(); }
 /** The Moon Jar on the dock (or the skiff's deck), lit by how much moonlight it holds. Tap it to spend a full jar. */
 function drawMoonJarProp(){ if (!modFlag('moonJar')) return; const p=jarPos(), r=relicState(), f=r.armed?1:r.jar/MOON_JAR.fill, full=f>=1;
-  ctx.save(); ctx.translate(p.x,p.y);
+  ctx.save(); ctx.translate(p.x,p.y); ctx.scale(1.25,1.25);
   if (f>0){ const g=ctx.createRadialGradient(0,-8,2,0,-8,26+f*14); g.addColorStop(0,'rgba('+RA.moon+','+(.22+.3*f+.2*JAR.glow).toFixed(3)+')'); g.addColorStop(1,'rgba('+RA.moon+',0)'); ctx.fillStyle=g; ctx.fillRect(-46,-54,92,92); }
   ctx.fillStyle='rgba(8,14,22,.3)'; ctx.beginPath(); ctx.ellipse(0,2,11,3,0,0,7); ctx.fill();
   const lvl=-2-f*16; ctx.save(); ctx.beginPath(); ctx.moveTo(-9,-18); ctx.lineTo(-9,-1); ctx.quadraticCurveTo(-9,2,-6,2); ctx.lineTo(6,2); ctx.quadraticCurveTo(9,2,9,-1); ctx.lineTo(9,-18); ctx.closePath(); ctx.clip();
@@ -4031,8 +4033,8 @@ function drawMoonJarProp(){ if (!modFlag('moonJar')) return; const p=jarPos(), r
   ctx.strokeStyle='rgba(255,255,255,.7)'; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(-6,-14); ctx.lineTo(-6,-4); ctx.stroke();
   if (full && !r.armed){ const a=.5+.5*Math.sin(S.time*3); ctx.fillStyle='rgba(255,255,255,'+a.toFixed(3)+')'; ctx.beginPath(); ctx.arc(4,-24+Math.sin(S.time*1.4)*2,1.3,0,7); ctx.fill(); }
   ctx.restore();
-  if (r.armed && Math.random()<.2) S.particles.push({x:p.x+rand(-6,6),y:p.y-20,vx:rand(-6,6),vy:-rand(10,24),g:-4,life:0,max:rand(.8,1.4),r:rand(.8,1.6),c:'rgba('+RA.moon+',',glim:true});
-  if (JAR.pour>0){ const u=1-JAR.pour; for (let i=0;i<2;i++) S.particles.push({x:p.x+rand(-4,4),y:p.y-22,vx:rand(10,60)*(Math.random()<.5?-1:1),vy:-rand(40,90)*(1-u),g:120,life:0,max:rand(.7,1.2),r:rand(1,2),c:'rgba('+RA.moon+',',glim:true}); } }
+  if (r.armed && Math.random()<.2) S.particles.push({x:p.x+rand(-7,7),y:p.y-25,vx:rand(-6,6),vy:-rand(10,24),g:-4,life:0,max:rand(.8,1.4),r:rand(.8,1.6),c:'rgba('+RA.moon+',',glim:true});
+  if (JAR.pour>0){ const u=1-JAR.pour; for (let i=0;i<2;i++) S.particles.push({x:p.x+rand(-5,5),y:p.y-28,vx:rand(10,60)*(Math.random()<.5?-1:1),vy:-rand(40,90)*(1-u),g:120,life:0,max:rand(.7,1.2),r:rand(1,2),c:'rgba('+RA.moon+',',glim:true}); } }
 
 /* ---------- Tackle art: every reel, line and bait, and the rod rig in the bag ---------- */
 /* Same field-journal style as the finds (game/loot-art.js): flat fills, one highlight, bold ink outlines.
@@ -5157,7 +5159,7 @@ function jarFill(L){ if (!modFlag('moonJar') || L.moon || L.eaten || !isNight(L.
 const JAR={pour:0, glow:0};
 /** Where the jar sits: on the dock by the tackle box, or on the skiff's deck. */
 function jarPos(){ return REG()==='coast'?{x:W/2-52, y:H-112+(S.bob_y||0)}:{x:W/2-80, y:H-128+44}; }
-function onJar(x,y){ if (!modFlag('moonJar') || S.state!=='idle') return false; const p=jarPos(); return Math.hypot(x-p.x,(y-p.y)*1.2)<24; }
+function onJar(x,y){ if (!modFlag('moonJar') || S.state!=='idle') return false; const p=jarPos(); return Math.hypot(x-p.x,(y-p.y+10)*1.2)<28; }
 function tapJar(){ const r=relicState(); audioInit(); tone(1400,.05,{vol:.05,type:'sine'}); buzz(8); JAR.glow=1;
   if (r.armed){ toast('The moonlight is waiting. Cast!',''); return; }
   if (!jarFull()){ toast('Moonlight: '+r.jar+' of '+MOON_JAR.fill+'. Catches after dark fill it.',''); return; }
@@ -5184,16 +5186,16 @@ function moonSVG(p){ const c=MOON.cycle, th=p/c*Math.PI*2, R=9, x=Math.cos(th)*R
   // the lit limb from top to bottom on its side, then back up along the terminator (an ellipse as wide as cos θ)
   const limb='M0 -'+R+' A'+R+' '+R+' 0 0 '+(wax?1:0)+' 0 '+R, term=' A'+Math.max(.01,Math.abs(x)).toFixed(2)+' '+R+' 0 0 '+((x>0)===wax?0:1)+' 0 -'+R;
   return '<svg viewBox="-11 -11 22 22" aria-hidden="true"><circle r="'+R+'" fill="'+dark+'"/><path d="'+limb+term+'Z" fill="'+lit+'"/><circle r="'+R+'" fill="none" stroke="#2B2A33" stroke-width="1.2"/></svg>'; }
-function almanacNote(k){ const F=WX_FISH[REG()]||{}, known=id=>(save.fish[id]||{}).caught>0;
+function almanacNote(k,at){ const F=WX_FISH[REG()]||{}, known=id=>(save.fish[id]||{}).caught>0;
   if (k==='rain') return F.rain?(known(F.rain.fish)?FISH[F.rain.fish].name+' rising':'Rain fish rising'):'Bites come sooner';
   if (k==='fog') return F.fog?(known(F.fog.fish)?FISH[F.fog.fish].name+' about':'Fog fish about'):'Fish hide far out';
-  if (k==='cloudy') return 'Grey and quiet'; return 'Gulls out by day'; }
+  if (k==='cloudy') return 'Grey and quiet'; return isNight(at%24)?'A clear night':'Gulls out by day'; }
 function openAlmanac(){ const now=wxNow(), h=(((save.clock%24)+24)%24), rows=almanacRows(), m=almanacMoon(), pinned=!!wxState().force;
   const ico=(k,at)=>wxIconSVG(k+((isNight(at%24)||PERIOD(at%24)==='Evening')?'-n':'-d'));
   const when=at=>(at>=24?'Tomorrow ':'')+clockText(at%24);
   const row=(label,k,note,at,cls)=>'<li class="'+(cls||'')+'"><span class="al-ico">'+ico(k,at)+'</span><span class="al-t">'+label+'</span><b>'+WX[k].name+'</b><span class="al-n">'+note+'</span></li>';
   let html='<div class="panel-head"><div><h2>Wet Almanac</h2><p>'+REGION_NAME[REG()]+' · in pencil, in a careful hand</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
-    '<div class="almanac"><ol class="al-rows">'+row('Now',now,almanacNote(now),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind),r.at)).join('')+'</ol>'+
+    '<div class="almanac"><ol class="al-rows">'+row('Now',now,almanacNote(now,h),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind,r.at),r.at)).join('')+'</ol>'+
     '<div class="al-moon"><span class="al-ico">'+moonSVG(m.p)+'</span><div><b>'+(h>=5&&h<20?'Tonight: ':'')+m.name+'</b><span>'+(m.toFull===0?'The moonpath lies across the deep pool tonight.':'Full moon in '+m.toFull+' night'+(m.toFull===1?'':'s')+'.')+'</span></div></div>'+
     (pinned?'<p class="note">The weather is pinned in Playtest, so the almanac reads it as staying.</p>':'')+'</div>';
   openSheet(html); $('closeS').addEventListener('click',closeSheet); noise(.35,{vol:.08,f:2400,to:1200,q:.7}); }

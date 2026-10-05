@@ -178,3 +178,4 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/orders.test.cjs` | 287 | Supper orders and reputation |
 | `tests/rarity.test.cjs` | 152 | Moon phases, rare bites, mutations, the dry run, the Mythic's sell |
 | `tests/weather.test.cjs` | 136 | Weather and its fish |
+| `tests/relics.test.cjs` | 229 | Story relics, treasure maps, the Moon Jar, the almanac, combos |
