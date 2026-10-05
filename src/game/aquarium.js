@@ -16,7 +16,7 @@ function accrueTips(){ const now=Date.now(), T=tanks();
 function setsDone(){ const t=tanks(); return TANK_SETS.filter(s=>t[s.tank].owned && s.check(t[s.tank].fish)); }
 function addToTank(f){ accrueTips(); const k=tankOf(f.id), before=new Set(setsDone().map(s=>s.id)); tanks()[k].fish.push(f); persist();
   setsDone().forEach(s=>{ if (!before.has(s.id)) setTimeout(()=>{ toast('Tank set: '+s.name,'gold'); coachFor('Tank set complete: '+s.name+'. '+s.bonus+'.',6); sfx.out('rare'); },400); });
-  $('aquaBtn').classList.remove('pulse'); void $('aquaBtn').offsetWidth; $('aquaBtn').classList.add('pulse'); }
+  shackPulse(); }
 
 const AQ={open:false,tank:'fresh',fish:[],flakes:[],bubbles:[],parts:[],snow:[],t:0,sel:null,W:0,H:0,dpr:1,cv:null,ctx:null,last:0,box:null,sparkle:null,art:{},pool:{},sprites:{},creep:null};
 /** Fits the tank between the tabs and the buttons, so nothing overlaps on a short screen: the jar on the hood, then
@@ -203,9 +203,11 @@ function aqUI(){
   if (!tk.owned) sh+='<p class="aq-shop-note">Set up the saltwater tank first to start decorating it.</p>';
   else {
     sh+='<h3 class="aq-shop-sub">Tank</h3><div class="aq-items">';
-    if (tk.lvl<T.costs.length) sh+='<div class="aq-item"><div class="ico"><canvas data-tankicon="'+k+'"></canvas></div><div class="txt"><h4>Bigger tank</h4><p class="eff">Room for '+T.caps[tk.lvl+1]+' fish (now '+cap+')</p><p>More fish on display means more tips.</p></div>'+
+    const next=T.caps[tk.lvl+1];
+    if (next && next<=shackTankCap()) sh+='<div class="aq-item"><div class="ico"><canvas data-tankicon="'+k+'"></canvas></div><div class="txt"><h4>Bigger tank</h4><p class="eff">Room for '+next+' fish (now '+cap+')</p><p>More fish on display means more tips.</p></div>'+
       '<button class="btn" data-buy="size"'+(save.coins>=T.costs[tk.lvl]?'':' disabled')+'>'+T.costs[tk.lvl].toLocaleString()+'</button></div>';
-    else sh+='<div class="aq-item"><div class="txt"><h4>Biggest tank</h4><p>Room for '+cap+' fish. As big as the shack allows.</p></div></div>';
+    else if (next) sh+='<div class="aq-item"><div class="txt"><h4>Biggest tank</h4><p>Room for '+cap+' fish. As big as the shack allows.</p><p class="eff">Knock through to the tank room, on your uncle’s fix-up list in the shack, and it can grow to '+next+'.</p></div></div>';
+    else sh+='<div class="aq-item"><div class="txt"><h4>Biggest tank</h4><p>Room for '+cap+' fish, with the wall knocked through.</p></div></div>';
     sh+='</div><h3 class="aq-shop-sub">Decor</h3><div class="aq-items">';
     DECOR[k].forEach(d=>{ const own=hasDecor(k,d.id), found=(tk.stored||[]).includes(d.id);
       if (d.crate && !own && !found){ sh+='<div class="aq-item crate"><div class="ico"><canvas data-decor="'+d.id+'"></canvas></div><div class="txt"><h4>'+d.name+'</h4><p class="eff">'+d.eff+'</p><p>Not sold anywhere. It turns up in '+cratesOf(d.crate)+'.</p></div><span class="tag">Crates only</span></div>'; return; }
@@ -222,7 +224,7 @@ function aqUI(){
   $('aqUp').addEventListener('click',()=>$('aqua').scrollTo({top:0,behavior:REDUCED?'auto':'smooth'}));
   const bb=$('aqBuy'); if (bb){ bb.disabled=save.coins<T.unlock; bb.addEventListener('click',()=>{ if (save.coins<T.unlock) return; addCoins(-T.unlock); tk.owned=true; tk.tipT=Date.now(); persist(); sfx.out('rare'); toast('Saltwater tank ready','gold'); aqBuild(); aqUI(); }); }
   $('aqShop').querySelectorAll('[data-buy]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.buy; accrueTips();
-    if (id==='size'){ const cost=T.costs[tk.lvl]; if (save.coins<cost) return; addCoins(-cost); tk.lvl++; persist(); sfx.out('uncommon'); toast('Bigger tank: room for '+tankCap(k),'gold'); AQ.sparkle={x:AQ.box.x+AQ.box.w/2,y:AQ.box.y+AQ.box.h/2,t:0}; }
+    if (id==='size'){ const cost=T.costs[tk.lvl]; if (save.coins<cost || !(T.caps[tk.lvl+1]<=shackTankCap())) return; addCoins(-cost); tk.lvl++; persist(); sfx.out('uncommon'); toast('Bigger tank: room for '+tankCap(k),'gold'); AQ.sparkle={x:AQ.box.x+AQ.box.w/2,y:AQ.box.y+AQ.box.h/2,t:0}; }
     else { const d=DECOR[k].find(x=>x.id===id); if (!d || save.coins<d.price) return; addCoins(-d.price); tk.decor.push(id); persist(); sfx.out('uncommon'); buzz([0,20,30,20]); toast(d.name+' added','gold');
       const sp=aqDecorSpot(id)||{x:AQ.box.x+AQ.box.w/2,y:AQ.sandY-20}; AQ.sparkle={x:sp.x,y:sp.y,t:0}; AQ.fish.forEach(aqPick); }
     $('aqua').scrollTo({top:0,behavior:REDUCED?'auto':'smooth'}); aqUI(); }));
@@ -264,6 +266,6 @@ function openAquarium(tank){ ovOpen('aqua',()=>{ const c=$('aqCard'); if (c && !
   AQ.last=performance.now(); requestAnimationFrame(aqLoop);
   if (!save.aquaSeen){ save.aquaSeen=true; persist(); }
 }
-function closeAquarium(){ if (!AQ.open) return; if (AQ.ro){ AQ.ro.disconnect(); AQ.ro=null; } ovClosed('aqua'); accrueTips(); persist(); AQ.open=false; const L=$('aqua'); L.classList.add('closing'); setTimeout(()=>{ L.hidden=true; L.classList.remove('closing'); L.innerHTML=''; },REDUCED?0:250); last=performance.now(); }
+function closeAquarium(){ if (!AQ.open) return; if (AQ.ro){ AQ.ro.disconnect(); AQ.ro=null; } ovClosed('aqua'); accrueTips(); persist(); AQ.open=false; shackBack(); const L=$('aqua'); L.classList.add('closing'); setTimeout(()=>{ L.hidden=true; L.classList.remove('closing'); L.innerHTML=''; },REDUCED?0:250); last=performance.now(); }
 
 window.addEventListener('resize',()=>{ if (AQ.open && aqRefit()) aqDraw(); });

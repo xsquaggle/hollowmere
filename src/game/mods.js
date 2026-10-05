@@ -1,6 +1,6 @@
 /* ---------- Modifiers: every bonus in the game goes through here ---------- */
 /* Each source (the rod in hand and its tackle, the meal you ate, tank sets, decor, boat parts, artifacts in your vest pockets,
-   keepsakes, mastery, the weather, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
+   keepsakes, the shack's fix-ups and mounts, mastery, the weather, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
    stat's total in a context (region, time, weather, spot, fish, rarity, Gull Luck) and only matching modifiers count.
    STATS (data/stats.js) says how each stat combines and where it can apply at all. Adding an enchantment or
    a relic later means adding its modifiers to a source; nothing that reads the stats has to change.
@@ -40,6 +40,8 @@ function modSources(){
   const FS=findsState();
   for (const id of FS.equip){ const D=FINDS[id]; if (D && FS.have[id]) for (const x of D.mods||[]) L.push(Object.assign({src:'artifact',name:D.name},x)); }
   for (const id in FS.have){ const D=FINDS[id]; if (D && D.kind==='keepsake') for (const x of D.mods||[]) L.push(Object.assign({src:'keepsake',name:D.name},x)); }
+  // the shack: each line of the fix-up list done, and each fish on the trophy wall (game/shack.js)
+  fixUpMods(add,L);
   add('base','Keepnet','netCap',STATS.netCap.start);
   // mastery: enough of a species and your rod knows it
   for (const id in FISH) if ((save.fish[id]||{}).caught>=MASTERY.catches){ const n='Mastered '+FISH[id].name;

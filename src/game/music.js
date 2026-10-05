@@ -45,6 +45,7 @@ function timeOfDay(){ const h=save.clock; return h>=5&&h<17?'day':h>=17&&h<20.5?
 function audioScene(){ if (typeof INTRO!=='undefined' && INTRO.active && INTRO.quiet) return 'intro';
   if (typeof K!=='undefined' && K.open) return K.mode==='banquet'?'banquet':'kitchen';
   if (typeof AQ!=='undefined' && AQ.open) return 'aquarium';
+  if (typeof SH!=='undefined' && SH.open) return 'aquarium';
   const r=REG(), tod=timeOfDay(); return r==='coast'?'coast_'+tod:'lake_'+tod; }
 const MU={on:false,mood:null,next:0,bar:0,beat:0,timer:0,mel:null,duckT:0,duckV:1,fade:1};
 function musicStart(){ if (!AC||MU.on) return; MU.on=true; MU.next=AC.currentTime+.2; MU.timer=setInterval(musicTick,80); ambStart(); }
@@ -79,7 +80,7 @@ function musicFrame(dt){ if (!AC||!DUCK) return; MU.duckT=Math.max(0,MU.duckT-Ma
   DUCK.gain.setTargetAtTime(d,AC.currentTime,.25);
   // the weather muffles the music a little: fog most, rain on the hood less (game/weather.js)
   const L=wxLook(), cut=16000*Math.pow(4200/16000,L.fog)*Math.pow(7000/16000,L.rain*(1-L.fog));
-  MUSF.frequency.setTargetAtTime(typeof AQ!=='undefined'&&AQ.open?1500:cut,AC.currentTime,.4); }
+  MUSF.frequency.setTargetAtTime((typeof AQ!=='undefined'&&AQ.open)||(typeof SH!=='undefined'&&SH.open)?1500:cut,AC.currentTime,.4); }
 /* ambience: continuous beds plus little events */
 const AMBL={}; let ambOn=false;
 function ambBed(name,type,freq,q,lfoHz,lfoAmt){ const s=AC.createBufferSource(); s.buffer=ambBuf; s.loop=true; const f=AC.createBiquadFilter(); f.type=type; f.frequency.value=freq; f.Q.value=q;

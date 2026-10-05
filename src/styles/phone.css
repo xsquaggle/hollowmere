@@ -13,7 +13,7 @@
 @keyframes bootIn{to{opacity:1}} @keyframes load{to{width:100%}}
 .app-in{display:flex;flex-direction:column;min-height:100%;animation:appIn .25s ease}
 @keyframes appIn{from{opacity:0;transform:scale(.98)}}
-@media (prefers-reduced-motion: reduce){.phone.rise,.phone.sink,.boot-logo,.boot-bar,.boot-bar i,.phone-peek,.map-peek,.book-peek,.bowl-peek,.pan-peek,.app-in{animation-duration:.01s!important;animation-delay:0s!important}}
+@media (prefers-reduced-motion: reduce){.phone.rise,.phone.sink,.boot-logo,.boot-bar,.boot-bar i,.phone-peek,.map-peek,.book-peek,.shack-peek,.app-in{animation-duration:.01s!important;animation-delay:0s!important}}
 #phone{position:fixed;inset:0;background:rgba(10,13,22,.55);display:flex;align-items:center;justify-content:center;z-index:7;padding:16px;box-sizing:border-box}
 .phone{width:min(330px,100%);height:min(640px,100%);background:#1B1E2A;border-radius:38px;padding:14px 11px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;align-items:center;
   box-shadow:0 0 0 2px #2B2A33,0 20px 50px rgba(0,0,0,.5)}

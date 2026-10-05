@@ -102,7 +102,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/order-kitchen.js` | 131 | Orders in the kitchen: tickets in the book, serving, visits |
 | `src/game/portrait-art.js` | 221 | Townsfolk head-and-shoulders portraits |
 
-## Aquarium, shops, journal, menus
+## The shack, aquarium, shops, journal, menus
 
 | File | Lines | What's in it |
 | --- | --- | --- |
@@ -110,6 +110,8 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/aquarium-art.js` | 487 | Aquarium drawing: room, tank, sand, plants, decor, tip jar |
 | `src/game/shops.js` | 113 | Keepnet and Ottilie's shop sheets (rods, tackle, traps) |
 | `src/game/tacklegram.js` | 108 | The phone shop: sea rods, boat parts, the mail boat |
+| `src/game/shack.js` | 175 | The shack's front room: `openShack`, the trophy wall (`mountFish`, `unmount`, `canMount`), the fix-up list (`buyFix`, `fixDone`, `shackTankCap`), the curio shelf, the rod rack, the trapdoor, the shack's modifiers (`fixUpMods`) |
+| `src/game/shack-art.js` | 300 | The front room drawn: `shLayout`, walls, window, the uncle's list, shelf or cabinet, floor, trapdoor, stove, net, rod rack; plaques and mounts with their rarity kit |
 | `src/game/journal.js` | 50 | The journal: species pages, records |
 | `src/game/bonuses.js` | 104 | The Bonuses journal page |
 | `src/game/saves.js` | 115 | `BUILD` number, backup codes, earlier saves, settings and sound sheets |
@@ -148,11 +150,12 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/data/enchant.js` | 32 | `ENCH` runes, `GLIMMER` |
 | `src/data/idle.js` | 41 | `TRAPS`, `FITTINGS`, `SMOKE`, `AWAY` |
 | `src/data/orders.js` | 87 | `ORDERS`, `TOWNSFOLK`, `STANDINGS`, `UPGRADES`, `VISITS`, `PLATTER` |
+| `src/data/shack.js` | 35 | `FIXUP` (the uncle's fix-up list), `WALL` (plaques and what a mount does), `SHELF`, `MARKS`, `TRAPDOOR` |
 | `src/data/stats.js` | 51 | `STATS` (everything a bonus can change), `MASTERY` |
 
 ## Styles (`src/styles/`)
 
-One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map.css`, `aquarium.css`, `settings.css`, `intro.css`, `news.css`, `kitchen.css`, `card.css`, `loot.css`, `bonuses.css`, `finds.css`, `relics.css`, `bag.css`, `enchant.css`, `idle.css`, `orders.css`, `sheets.css`, `balance.css`.
+One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map.css`, `aquarium.css`, `settings.css`, `intro.css`, `news.css`, `kitchen.css`, `card.css`, `loot.css`, `bonuses.css`, `finds.css`, `relics.css`, `bag.css`, `enchant.css`, `idle.css`, `orders.css`, `shack.css`, `sheets.css`, `balance.css`.
 
 ## Tools and tests
 

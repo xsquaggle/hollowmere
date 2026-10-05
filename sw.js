@@ -1,5 +1,5 @@
-// Hollowmere offline worker. Build e7a47cc1e8
-const CACHE='hollowmere-e7a47cc1e8';
+// Hollowmere offline worker. Build 05acd45314
+const CACHE='hollowmere-05acd45314';
 const SHELL=['./','index.html','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','icons/apple-touch-icon.png','icons/favicon-64.png'];
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())); });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('hollowmere-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });

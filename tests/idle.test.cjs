@@ -128,7 +128,7 @@ module.exports = [
     async run({ newPage, openGame, veteran, readSave, until }) {
       const page = await newPage();
       await openGame(page, { save: veteran({ coins: 100, fish: known, kitchenOpen: true, kitchenSeen: true, net: [netFish('mossback', 50), netFish('perch', 4)] }) });
-      await page.click('#kitchenBtn'); await page.waitForTimeout(900);
+      await page.room('#kitchenBtn'); await page.waitForTimeout(900);
       assert.match(await page.textContent('#kBook'), /Smoke rack\s*0\/3/);
       await page.click('#kBook [data-hang="0"]'); await page.waitForTimeout(300);
       assert.match(await page.textContent('#kBook'), /Hang which fish/);
@@ -140,7 +140,7 @@ module.exports = [
       assert.equal(v.v[1], 80, '60% more at 6 hours');
       assert.equal(v.v[2], 125, 'a Delicacy at 8 hours: 2.5 times');
       // the book redraws when it opens again; keep it: back in the keepnet, smoked, out of recipes
-      await page.click('#kClose'); await page.waitForTimeout(500); await page.click('#kitchenBtn'); await page.waitForTimeout(900);
+      await page.click('#kClose'); await page.waitForTimeout(500); await page.room('#kitchenBtn'); await page.waitForTimeout(900);
       assert.match(await page.textContent('#kBook'), /Delicacy: Mossback/);
       await page.click('#kBook [data-keephook="0"]'); await page.waitForTimeout(300);
       s = await readSave(page); const del = s.net.find(f => f.id === 'mossback');
@@ -151,7 +151,7 @@ module.exports = [
       // the perch, from the keepnet's own button, then sold off the rack
       await page.click('#kClose'); await page.waitForTimeout(500);
       await page.evaluate(() => window.__hm.idle.hang(window.__hm.save.net.findIndex(f => f.id === 'perch')));
-      await page.click('#kitchenBtn'); await page.waitForTimeout(900);
+      await page.room('#kitchenBtn'); await page.waitForTimeout(900);
       await page.click('#kBook [data-sellhook="0"]'); await page.waitForTimeout(300);
       s = await readSave(page); assert.equal(s.coins, 104, 'sold the freshly hung perch for 4');
       assert.deepEqual(page.errors, []);

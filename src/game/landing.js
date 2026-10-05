@@ -84,7 +84,8 @@ function showCard(){
   S.cardDefault=(L.isNew || F.rarity!=='common' || L.mut || L.pbBeat || L.stars===3 || L.needFor || L.orderFor) && !full ? 'keep' : 'sell';
   S.cardAuto=F.rarity==='common' && !L.mut && !L.isNew && !L.pbBeat && L.stars<3 && !L.needFor && !L.orderFor;
   S.sellArmed=false; $('cSell').classList.remove('armed'); $('cSell').textContent='Sell · +'+L.value.toLocaleString(); $('cKeep').textContent=full?'Keepnet full':'Keep';
-  $('cKeep').disabled=full; $('cTank').hidden=!(save.tutorialDone && tankRoom(L.id));
+  const mountable=save.tutorialDone && L.pbBeat && !L.pbMinor && canMount(keptFish(L));   // a new record can go straight up on the wall (game/shack.js)
+  $('cKeep').disabled=full; $('cTank').hidden=mountable || !(save.tutorialDone && tankRoom(L.id)); $('cMount').hidden=!mountable;
   $('cSell').classList.toggle('primary',S.cardDefault==='sell'); $('cKeep').classList.toggle('primary',S.cardDefault==='keep');
   $('cAuto').hidden=!S.cardAuto; if (S.cardAuto) $('cAuto').innerHTML='Selling in a moment · tap Keep to keep it<span class="bar"><i></i></span>';
   const rs=$('cRec'), pbEl=$('cPB'); rs.hidden=pbEl.hidden=!L.pbBeat; rs.hidden=!L.pbBeat||L.pbMinor; pbEl.classList.toggle('minor',!!L.pbMinor); rs.parentNode.classList.toggle('rec',!!L.pbBeat&&!L.pbMinor); rs.style.animationDelay=pbEl.style.animationDelay=REDUCED?'0s':'';
@@ -107,13 +108,15 @@ function dismissCard(action){
   if (action==='keep' && save.net.length>=netCap()) action='sell';
   if (action==='sell' && rarRank(L.F.rarity)>=rarRank('mythic') && !S.sellArmed){ S.sellArmed=true; $('cSell').textContent='Sell it? Tap again'; $('cSell').classList.add('armed'); return; }   // a Mythic is never sold by accident
   if (action==='tank' && !tankRoom(L.id)) action=save.net.length<netCap()?'keep':'sell';
+  if (action==='mount' && !canMount(keptFish(L))) action=save.net.length<netCap()?'keep':'sell';
   card.classList.add('out'); setTimeout(()=>{ card.hidden=true; card.classList.remove('out'); },250);
   if (action==='sell') addCoins(L.value);
   else if (action==='tank'){ addToTank(keptFish(L)); sfx.plop(); news('Off to the aquarium','good'); }
+  else if (action==='mount'){ mountFish(keptFish(L)); shSfx.mount(); buzz([0,18,120,18]); shackPulse(); news(L.F.name+' is up on the trophy wall in your shack','gold'); }
   else { save.net.push(keptFish(L)); persist();
     SC.netPop=1; sfx.plop(); buzz(12); news('Into the keepnet','good');
     if (!save.netSeen){ save.netSeen=true; persist(); setTimeout(()=>coachFor('Kept fish go in your keepnet, hanging '+(REG()==='coast'?'over the side of your boat':'off the dock')+'. Tap it anytime to see them or sell them.',7),700);
-      if (!save.aquaSeen) setTimeout(()=>{ if (S.state==='idle') coachFor('Your uncle’s old fish tank still works. Tap the fishbowl at the bottom to visit your aquarium and move fish in.',8); },9000); } }
+      if (!save.aquaSeen) setTimeout(()=>{ if (S.state==='idle') coachFor('Your uncle’s old fish tank still works. Tap the shack at the bottom, then the tank room door, to visit your aquarium and move fish in.',8); },9000); } }
   if (L.isNew){ $('journalBtn').classList.remove('pulse'); void $('journalBtn').offsetWidth; $('journalBtn').classList.add('pulse'); }
   const finishing=S.tut==='card'; if (finishing){ save.tutorialDone=true; S.tut=null; persist(); }
   S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); kitchenUnlockCheck(); relicAfterCatch(L);   // the Moon Jar fills, Ottilie's almanac (game/relics.js)
@@ -123,6 +126,7 @@ function dismissCard(action){
 $('cKeep').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); dismissCard('keep'); });
 $('cSell').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); dismissCard('sell'); });
 $('cTank').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); dismissCard('tank'); });
+$('cMount').addEventListener('click',e=>{ e.stopPropagation(); audioInit(); dismissCard('mount'); });
 let coinShown=0;
 function addCoins(n){ save.coins+=n; persist(); sfx.coin(Math.ceil(n/5)); coinTally(Math.max(250,Math.min(900,250+Math.abs(n)*40))); }
 let coinGoal=0;
@@ -155,6 +159,6 @@ window.addEventListener('resize',fitHud);
 if (document.fonts) document.fonts.ready.then(()=>{ HUD.sig=''; fitHud(); });   // the display font changes every width
 function updateHud(){
   const all=REGION_FISH.lake.concat(save.boat?REGION_FISH.coast:[]), n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
-  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('aquaBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; $('kitchenBtn').hidden=!save.kitchenOpen; ordersBadge(); $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
+  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('shackBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; ordersBadge(); $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
   updateGlimChip(); fitHud(); $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
 }

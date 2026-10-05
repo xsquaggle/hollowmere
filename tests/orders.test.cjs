@@ -64,7 +64,7 @@ module.exports = [
       await page.evaluate(() => { window.__hm.save.day = 5; window.__hm.save.clock = 9; }); await page.waitForTimeout(1300);
       assert.deepEqual((await readSave(page)).orders.list.map(T => T.id), second, 'still the same tickets the next morning');
       // in the book: Town reputation and the tickets, each with its portrait
-      await page.click('#kitchenBtn'); await page.waitForTimeout(1000);
+      await page.room('#kitchenBtn'); await page.waitForTimeout(1000);
       assert.match(await page.textContent('#kBook'), /Town reputation\s*New in town\s*0/);
       assert.match(await page.textContent('#kBook'), /20 more to A familiar face/);
       const pix = await page.evaluate(() => [...document.querySelectorAll('.k-tk-pt')].map(cv => { const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i]) n++; return n; }));
@@ -83,7 +83,7 @@ module.exports = [
       assert.deepEqual(w.spice, { paprika: 2, pepper: 3 }, 'gumbo’s spice, one more pepper and no salt');
       assert.deepEqual(w.zone.map(v => Math.round(v * 100) / 100), [.72, .92], 'well done moves gumbo’s zone up');
       assert.deepEqual(w.lines, ['extra pepper', 'no sea salt', 'well done', 'no dill on top']);
-      await page.click('#kitchenBtn'); await page.waitForTimeout(900);
+      await page.room('#kitchenBtn'); await page.waitForTimeout(900);
       assert.match(await page.textContent('#kBook'), /Ottilie\s*the ferry\s*Reedwhisker Gumbo\s*extra pepper\s*no sea salt\s*well done\s*no dill on top/);
       const r = await cookOrder(page, 7);
       for (const st of ['clean', 'season', 'cook', 'plate']) assert.ok(r.scores[st] >= 70, `${st} scored ${r.scores[st]}`);
@@ -107,7 +107,7 @@ module.exports = [
       const page = await newPage();
       await openGame(page, { save: veteran(cook({ clock: 19, day: 2, stats: { catches: 30, casts: 40, cooks: 1, catchAvg: 10 }, net: [nf('perch', 2), nf('perch', 2), nf('perch', 3)],
         orders: { day: 2, list: [ticket(1, 'tam', 'chowder')], rep: 18, next: 2 } })) });
-      await page.click('#kitchenBtn'); await page.waitForTimeout(900);
+      await page.room('#kitchenBtn'); await page.waitForTimeout(900);
       assert.match(await page.textContent('#kBook'), /A town recipe/, 'Kedgeree waits, unnamed');
       await page.evaluate(() => { window.__hm.orders.cook(1); }); await page.waitForTimeout(300);
       await page.evaluate(() => window.__hm.orders.finish(80)); await page.waitForTimeout(500);
@@ -144,7 +144,7 @@ module.exports = [
       const list = [ticket(1, 'tam', 'wraps', [], { smoked: true }), { id: 2, who: 'bram', kind: 'delicacy', side: 'bread', tw: [], say: '' }, { id: 3, who: 'grey', kind: 'grey', tw: [], say: '' }, ticket(4, 'pell', 'fry')];
       const net = [nf('leafjack', 11, { smoked: true, smokedH: 2 }), nf('mossback', 125, { smoked: true, delicacy: true, smokedH: 8 }), nf('perch', 2), nf('perch', 3), nf('perch', 4), nf('reedwhisker', 3)];
       await openGame(page, { save: veteran(cook({ coins: 0, clock: 19, day: 2, stats: { catches: 30, casts: 40, cooks: 1, catchAvg: 10 }, net, orders: { day: 2, list, rep: 140, seen: { 1: 1, 2: 1, 3: 1 }, next: 5 } })) });
-      await page.click('#kitchenBtn'); await page.waitForTimeout(900);
+      await page.room('#kitchenBtn'); await page.waitForTimeout(900);
       await page.evaluate(() => window.__hm.orders.cook(1)); await page.waitForTimeout(300);
       let k = await page.evaluate(() => window.__hm.orders.k());
       assert.deepEqual([k.sts, k.st, k.smoked], [['season', 'cook', 'plate'], 'season', true], 'straight to Season with the smoked leafjack');
@@ -220,11 +220,11 @@ module.exports = [
       const fish = { ...known, perch: { ...known.perch, pb: { t: 0.25, size: 30 } } };
       await openGame(p2, { save: veteran(cook({ clock: 19, day: 2, fish, stats: { catches: 30, casts: 40, cooks: 3 }, net: [nf('perch', 2, { t: 0.25 }), nf('perch', 3), nf('reedwhisker', 3)],
         orders: { day: 2, list: [ticket(1, 'pell', 'fry'), { id: 2, who: 'grey', kind: 'grey', tw: [], say: '<img src=x onerror="window.__pwned=1">' }], rep: 30, next: 3 } })) });
-      await p2.click('#kitchenBtn'); await p2.waitForTimeout(900);
+      await p2.room('#kitchenBtn'); await p2.waitForTimeout(900);
       const g = await p2.evaluate(() => ({ pick: window.__hm.orders.grey(), btn: document.querySelector('[data-order="2"]').textContent, need: document.querySelector('[data-tk="2"] .k-need').textContent, say: window.__hm.orders.state().list[1].say, pwned: !!window.__pwned }));
       assert.equal(g.need, 'He’d take your Reedwhisker', 'not the perch the fry needs'); assert.equal(g.btn, 'Hand it over');
       assert.equal(g.say, 'He taps on the glass with his beak. A fish. Whole. No plate.', 'only Grey’s own line on his ticket'); assert.equal(g.pwned, false);
-      await p2.evaluate(() => { window.__hm.save.net.pop(); window.__hm.orders.state(); }); await p2.click('#kClose'); await p2.waitForTimeout(400); await p2.click('#kitchenBtn'); await p2.waitForTimeout(900);
+      await p2.evaluate(() => { window.__hm.save.net.pop(); window.__hm.orders.state(); }); await p2.click('#kClose'); await p2.waitForTimeout(400); await p2.room('#kitchenBtn'); await p2.waitForTimeout(900);
       assert.deepEqual(await p2.evaluate(() => [window.__hm.orders.grey(), document.querySelector('[data-order="2"]').textContent, document.querySelector('[data-order="2"]').disabled]), [-1, 'Nothing spare', true], 'the fry needs both perch');
       assert.deepEqual([page.errors, p2.errors], [[], []]);
     },
@@ -241,7 +241,7 @@ module.exports = [
       s = await readSave(p2); assert.deepEqual([s.cooking, s.pantry], [undefined, [{ id: 'fry', stars: 2 }]]);
       // mid-cook, the save holds the fish; done, it doesn't
       await p2.evaluate(() => { window.__hm.save.net.push({ id: 'perch', size: 30, w: 300, stars: 2, value: 2, t: 2, reg: 'lake', spot: 'open', hr: 12, rod: 'willow' }, { id: 'perch', size: 30, w: 300, stars: 2, value: 2, t: 3, reg: 'lake', spot: 'open', hr: 12, rod: 'willow' }); });
-      await p2.click('#kitchenBtn'); await p2.waitForTimeout(900); await p2.click('[data-cook="fry"]'); await p2.waitForTimeout(300);
+      await p2.room('#kitchenBtn'); await p2.waitForTimeout(900); await p2.click('[data-cook="fry"]'); await p2.waitForTimeout(300);
       s = await readSave(p2); assert.equal(s.cooking.fish.length, 2);
       await p2.evaluate(() => window.__hm.orders.finish(80)); await p2.waitForTimeout(300);
       s = await readSave(p2); assert.deepEqual(s.cooking, { meal: { id: 'fry', stars: 2 } }, 'cooked: now it’s the meal that’s kept');
@@ -250,7 +250,7 @@ module.exports = [
       const p3 = await newPage();
       await openGame(p3, { save: veteran(cook({ coins: 50, clock: 17.5, day: 3, barnabyCame: false, stats: { catches: 30, casts: 40, cooks: 3, catchAvg: 10 }, meal: { id: 'fry', stars: 2, casts: 5, full: 30 }, pantry: [{ id: 'chowder', stars: 2 }],
         net: [nf('perch', 2), nf('perch', 3)], orders: { day: 2, list: [ticket(1, 'tam', 'fry')], rep: 128, next: 2 } })) });
-      await p3.evaluate(() => { window.__hm.save.clock = 17.5; }); await p3.click('#kitchenBtn'); await p3.waitForTimeout(900);
+      await p3.evaluate(() => { window.__hm.save.clock = 17.5; }); await p3.room('#kitchenBtn'); await p3.waitForTimeout(900);
       await p3.click('[data-eat="0"]'); assert.equal(await p3.textContent('[data-eat="0"]'), 'Replace?');
       await p3.evaluate(() => { window.__hm.save.clock = 18.05; });
       await until(p3, () => window.__hm.orders.state().day === 3, null, { timeout: 3000, what: 'the evening’s tickets' });
@@ -274,7 +274,7 @@ module.exports = [
       const p4 = await newPage();
       await openGame(p4, { save: veteran(cook({ clock: 19, day: 2, stats: { catches: 30, casts: 40, trapSet: 1 }, net: [nf('perch', 2), nf('perch', 3)],
         traps: { gift: true, list: [{ reg: 'lake', n: 0, spot: 'pads', t: Date.now(), carry: 0, fish: [], g: 0 }] } })) });
-      await p4.click('#kitchenBtn'); await p4.waitForTimeout(900); await p4.click('[data-cook="fry"]'); await p4.waitForTimeout(300);
+      await p4.room('#kitchenBtn'); await p4.waitForTimeout(900); await p4.click('[data-cook="fry"]'); await p4.waitForTimeout(300);
       await p4.evaluate(() => window.__hm.orders.finish(80)); await p4.waitForTimeout(300); await p4.click('#kEat');
       await until(p4, () => document.querySelectorAll('#kOrdersSec [data-tk]').length === 2, null, { timeout: 3000, what: 'the first tickets, in the book' });
       assert.match(await p4.textContent('#kOrdersSec'), /The townsfolk pin their supper orders here each evening/);

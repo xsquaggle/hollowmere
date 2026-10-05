@@ -6,21 +6,21 @@ const ORDK={flash:false, visit:null, tip:false};
 const ORDERS_TIP='The townsfolk have started pinning supper orders at your kitchen window. Cook to the ticket for tips and the town’s good opinion. Skip any you like.';
 function kOrderClear(){ K.order=null; K.R=null; K.sts=null; K.spice=null; K.zone=null; K.garnish=null; K.smoked=false; }
 function kOrderSet(T){ K.order=T; K.R=T.kind==='delicacy'?ticketRecipe(T):null; K.spice=ticketSpice(T); K.zone=ticketZone(T); K.garnish=ticketGarnish(T); }
-/** The skillet's badge: how many tickets are pinned up. */
+/** The shack button's order badge: how many tickets are pinned up. */
 function ordersBadge(){ const el=$('kitchenOrders'); if (!el) return; const n=ordersOpen()?ordersState().list.length:0; el.hidden=!n || !save.kitchenOpen; el.textContent=n;
-  const b=$('kitchenBtn'); if (b) b.setAttribute('aria-label','Open kitchen'+(n?', '+n+(n===1?' supper order':' supper orders')+' waiting':'')); }
+  const b=$('shackBtn'); if (b) b.setAttribute('aria-label','Open your shack'+(n?', '+n+(n===1?' supper order':' supper orders')+' waiting in the kitchen':'')); if (SH.open) shUI(); }
 const ORDT={t:0};
 /** Each second: pins the evening's tickets when they're due, and says so. */
 function ordersUpdate(dt){ ORDT.t-=dt; if (ORDT.t>0) return; ORDT.t=1; const r=ordersTick(); if (!r) return; ordersBadge(); ORDK.flash=true;
   // in the kitchen, the new tickets go up in the book where you are, and nothing else on the page moves; the very
   // first evening's tip waits until you step out
   if (K.open){ if (r==='first') ORDK.tip=true; kOrdersRefresh(); return; }
-  const b=$('kitchenBtn'); if (b){ b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); }
+  shackPulse();
   if (r==='first') whenPlaying(()=>coachFor(ORDERS_TIP,9));
   else if (!S.tut) news('Supper orders are up at the kitchen window','gold'); }
 /** Stepping out of the kitchen after the first evening's tickets went up while you were in it. */
 function ordersAfterKitchen(){ if (!ORDK.tip) return; ORDK.tip=false; if (save.stats.orders>0) return;
-  const b=$('kitchenBtn'); if (b){ b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); } whenPlaying(()=>coachFor(ORDERS_TIP,9)); }
+  shackPulse(); whenPlaying(()=>coachFor(ORDERS_TIP,9)); }
 /** Redraws just the orders at the top of the book (the rack's picker, a "Replace?" and the scroll stay as they are). */
 function kOrdersRefresh(){ if (K.mode!=='book') return; const sec=$('kOrdersSec'); if (!sec) return; sec.innerHTML=ordersHTML(); bindOrders(sec); }
 

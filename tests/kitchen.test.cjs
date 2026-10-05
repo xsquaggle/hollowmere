@@ -48,7 +48,7 @@ module.exports = [
       const now = Date.now(), fish = {};
       for (const id of [...KEEPNET, 'mossback']) fish[id] = { caught: 2, best: 30, seen: true };
       await openGame(page, { save: veteran({ boat: true, clock: 9, net: KEEPNET.map(id => ({ id, size: 30, value: VALUES[id], t: now })), parts: ['hold'], fish, kitchenOpen: true, kitchenSeen: true }) });
-      await page.click('#kitchenBtn'); await page.waitForTimeout(700);
+      await page.room('#kitchenBtn'); await page.waitForTimeout(700);
       const good = await cook(page, 'bream');
       for (const st of ['clean', 'season', 'cook', 'plate']) assert.ok(good.scores[st] >= 70, `${st} scored ${good.scores[st]}`);
       assert.equal(good.res.stars, 3);

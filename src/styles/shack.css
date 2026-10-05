@@ -1,0 +1,64 @@
+/* The shack's front room: doors, the fix-up list, plaque and rack cards; the shack button's two badges */
+#shackBtn #aquaTips{right:auto;left:-6px}
+#shack{position:fixed;inset:0;z-index:7;background:#2C2622;animation:aqIn .3s ease;overflow:hidden}
+#shack.closing{animation:fadeOut .25s forwards}
+#shCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:manipulation}
+.sh-top{z-index:1}
+.sh-top h2,.sh-top p{text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.sh-bottom{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;align-items:flex-end;justify-content:space-between;gap:8px;z-index:1;pointer-events:none}
+.sh-bottom>*{pointer-events:auto}
+.sh-listbtn{position:relative;flex:0 1 auto;margin-bottom:4px}
+.sh-n{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:6px;padding:0 5px;border-radius:9px;background:var(--danger);color:#fff;font:800 11px/1 var(--body)}
+.sh-door{position:relative;display:grid;justify-items:center;gap:3px;width:78px;padding:10px 4px 8px;border:2px solid var(--ink);border-bottom-width:0;border-radius:36px 36px 4px 4px;
+  background:repeating-linear-gradient(90deg,#6B4630 0 12px,#5E3D29 12px 13px,#74503A 13px 25px,#5E3D29 25px 26px);color:var(--paper);font:800 12px/1.1 var(--body);cursor:pointer;
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,.18),0 -2px 0 rgba(255,230,200,.08);text-shadow:0 1px 2px rgba(0,0,0,.6);transition:transform .12s}
+.sh-door:active{transform:translateY(2px)}
+.sh-door:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.sh-door[hidden]{display:none}
+.sh-door-ico{width:22px;height:22px;border-radius:50%;background:#4E8F9E;border:1.5px solid var(--ink);box-shadow:inset 0 -6px 0 rgba(0,0,0,.18)}
+.sh-door.right .sh-door-ico{background:#2F2C31;box-shadow:inset 0 -6px 0 #E8B866}
+.sh-door::after{content:"";position:absolute;right:9px;top:52%;width:5px;height:5px;border-radius:50%;background:var(--brass);border:1px solid var(--ink)}
+.sh-door.right::after{right:auto;left:9px}
+.sh-door.arch{background:radial-gradient(ellipse at 50% 100%,rgba(110,200,190,.55),rgba(46,90,92,.95) 70%),#2E5A5C;box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),0 0 18px rgba(110,200,190,.35)}
+.sh-door.arch::after{display:none}
+.sh-door .pk-badge{position:absolute;top:-8px;right:-6px}
+.sh-card{bottom:calc(env(safe-area-inset-bottom,0px) + 96px);max-height:calc(100% - 210px);overflow:auto;z-index:3}
+.sh-card .tip{color:#3D5A3A;font-weight:800}
+.sh-pick{display:grid;gap:6px}
+.sh-pickrow{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:center;text-align:left;padding:6px 8px;border-radius:10px;border:1.5px solid var(--ink);background:#FBF5E8;color:var(--ink);cursor:pointer;font:inherit}
+.sh-pickrow:active{transform:translateY(1px)}
+.sh-pickrow canvas{width:72px;height:36px}
+.sh-pickrow b{display:block;font:400 15px/1.15 var(--display)}
+.sh-pickrow small{display:block;font-size:12px;color:#6B665C;font-weight:700}
+.sh-pickrow .net-rec{font-style:normal}
+.sh-curio{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:start}
+.sh-curio canvas{width:72px;height:72px;border-radius:10px;background:#E6D9BE;border:1.5px solid var(--ink)}
+.sh-curio>div{display:grid;gap:4px}
+.sh-rods{display:grid;gap:6px}
+.sh-rod{display:grid;grid-template-columns:96px 1fr;gap:8px;align-items:center;text-align:left;padding:6px 8px;border-radius:10px;border:1.5px solid var(--ink);background:#FBF5E8;color:var(--ink);cursor:pointer;font:inherit}
+.sh-rod.on{background:#E6F0D6;border-color:#4E7B4C;cursor:default}
+.sh-rod canvas{width:96px;height:30px}
+.sh-rod b{display:block;font:400 15px/1.15 var(--display)}.sh-rod small{display:block;font-size:12px;color:#6B665C;font-weight:700}
+/* the fix-up list: ruled paper on a nail, in the uncle's hand */
+.sh-list{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 16px) 14px calc(env(safe-area-inset-bottom,0px) + 16px);background:rgba(10,10,14,.45);animation:inFade .2s both}
+.sh-paper{position:relative;width:100%;max-width:420px;max-height:100%;overflow:auto;box-sizing:border-box;padding:18px 16px 14px;color:var(--ink);border-radius:4px 4px 6px 3px;transform:rotate(-.6deg);
+  background:repeating-linear-gradient(180deg,transparent 0 29px,rgba(90,130,170,.28) 29px 30px),#F2E9D2;box-shadow:0 10px 26px rgba(0,0,0,.5),inset 0 0 30px rgba(150,120,70,.18);animation:appIn .25s ease}
+.sh-paper::before{content:"";position:absolute;left:50%;top:6px;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:#8C8C94;border:1.5px solid var(--ink)}
+.sh-paper .x{position:absolute;top:6px;right:8px;font:400 26px/1 var(--body);background:none;border:0;color:var(--ink);cursor:pointer;padding:2px 6px}
+.hand{font-family:Caveat,cursive;font-weight:600}
+.sh-paper h3{margin:4px 0 6px;font-size:30px;line-height:1}
+.sh-paper ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.sh-paper li{display:grid;grid-template-columns:1fr auto;column-gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(43,42,51,.15)}
+.sh-paper .ln{font-size:23px;line-height:1.05;position:relative;justify-self:start}
+.sh-paper .eff{grid-column:1;font-size:12.5px;font-weight:700;color:#4E5A42;line-height:1.3}
+.sh-paper li>.btn,.sh-paper li>.tick,.sh-paper li>.tag{grid-column:2;grid-row:1 / span 2}
+.sh-paper .btn.sm{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;font-size:13px}
+.sh-paper li.done .ln::after{content:"";position:absolute;left:-2px;right:-4px;top:55%;height:2px;background:rgba(43,42,51,.85);transform:rotate(-1.5deg);border-radius:1px}
+.sh-paper li.done .eff{color:#6B665C;font-style:italic}
+.sh-paper li.struck .ln::after{animation:strike .5s ease both}
+@keyframes strike{from{right:100%}}
+.sh-paper li.later .ln{color:#6B665C}
+.sh-paper .tick{font:800 20px/1 var(--body);color:#4E7B4C;padding:0 8px}
+.sh-paper .sig{margin:10px 0 2px;font-size:20px;color:#55514A}
+.sh-paper .cash{display:flex;align-items:center;gap:6px;margin:6px 0 0;font-weight:800;font-size:13px}
+@media (prefers-reduced-motion: reduce){#shack,.sh-paper,.sh-list,.sh-paper li.struck .ln::after{animation-duration:.01s!important}}

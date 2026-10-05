@@ -5,12 +5,13 @@ const BAL_TIMES=[[6.5,'Dawn'],[12,'Noon'],[18.5,'Dusk'],[22,'Night']];
 const balTime=h=>h>=5&&h<8?6.5:isNight(h)?22:h>=17?18.5:12;
 function balMine(){ const m=save.meal, rig=rigFor(save.rod);
   return {region:REG(), spot:'open', hour:balTime(save.clock), rod:save.rod, reel:rig.reel, line:rig.line, bait:baitOn()||'', meal:mealActive()?m.id:'', stars:mealActive()?m.stars:3,
-    sets:'mine', parts:'mine', mastery:'mine', finds:'mine', runes:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000}; }
+    sets:'mine', parts:'mine', mastery:'mine', shack:'mine', finds:'mine', runes:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000}; }
 function balanceFormHTML(){
   const f=BAL.form||(BAL.form=balMine());
   const sel=(id,label,opts,v)=>'<label for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(([k,l])=>'<option value="'+k+'"'+(String(k)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
   const spots=Object.keys(f.region==='coast'?POOLS_COAST:POOLS).map(sp=>[sp,f.region==='coast'&&sp==='deep'?'Dark trench':SPOT_NAME[sp]]);
   const mySets=setsDone().length, myParts=(save.parts||[]).length, myMast=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=MASTERY.catches).length;
+  const myFix=shackState().fix.length, myMounts=shackState().wall.filter(Boolean).length;
   const myArts=findsState().equip.length, myRunes=enchFor(f.rod).filter(Boolean).length;
   let h='<p class="note">Plays casts with the game’s own odds, fights, catch rolls, snags, swells, treasure, tackle and tuning. Only the player is pretend: a steady player reacts in about a third of a second and handles most dives, tugs and jumps. Every catch is sold; aiming, the aquarium and the kitchen aren’t played.</p>'+
     '<div class="bal-form">'+
@@ -26,6 +27,7 @@ function balanceFormHTML(){
     sel('bSets','Tank sets',[['mine','Yours ('+mySets+')'],['none','None'],['all','Every set']],f.sets)+
     sel('bParts','Boat parts',[['mine','Yours ('+myParts+')'],['none','None'],['all','Every part']],f.parts)+
     sel('bMastery','Mastery',[['mine','Yours ('+myMast+')'],['none','None'],['all','Every fish']],f.mastery)+
+    sel('bShack','Shack',[['mine','Yours ('+myFix+' fixed, '+myMounts+' up)'],['none','None'],['all','All fixed, wall full']],f.shack||'mine')+
     sel('bFinds','Artifacts',[['mine','Your pockets ('+myArts+')'],['none','None']].concat(Object.keys(FINDS).filter(id=>FINDS[id].kind==='artifact').map(id=>[id,FINDS[id].name])),f.finds)+
     sel('bRunes','Runes',[['mine','Yours on that rod ('+myRunes+')'],['none','None']].concat(ENCH_ORDER.map(id=>[id,ENCH[id].name])),f.runes||'mine')+
     sel('bTreasure','Treasure',[['yes','Turns up'],['no','Left out']],f.treasure)+
@@ -40,12 +42,13 @@ function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:
     parts:f.parts==='all'?'all':f.parts==='mine'?(save.parts||[]).slice():[], lucky:f.lucky==='yes', player:f.player};
   if (f.sets==='mine') st.tanks=tanks(); else st.sets=f.sets;
   if (f.mastery==='mine') st.fish=save.fish; else st.mastery=f.mastery==='all';
+  if (f.shack==='all') st.shack='all'; else if (f.shack!=='none') st.shack=shackState();
   if (f.finds==='mine') st.finds=findsState(); else if (f.finds!=='none') st.artifacts=[f.finds];
   if (f.runes==='mine' || !f.runes) st.enchSave=enchState(); else if (f.runes!=='none') st.ench=[f.runes];
   if (f.treasure==='no') st.treasure=false;
   return st; }
 function bindBalance(){
-  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bFinds:'finds',bRunes:'runes',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n'};
+  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bShack:'shack',bFinds:'finds',bRunes:'runes',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n'};
   for (const [id,k] of Object.entries(ids)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
     if (k==='region') BAL.form.spot='open';
     if (k==='region' || k==='rod'){ const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; }
