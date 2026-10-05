@@ -214,7 +214,7 @@ function pocketRows(at){ const FS=findsState(), cur=FS.equip[at], arts=findList(
     const act=here?'<button class="btn sm" type="button" data-act="out" data-id="'+id+'">Take it out</button>'
       :where>=0?'<span class="tag">In pocket '+(where+1)+'</span>'
       :'<button class="btn sm primary" type="button" data-act="pocket" data-id="'+id+'">'+(cur?'Swap it in':'Pocket it')+'</button>';
-    h+='<div class="tr-row rf'+(here?' on':'')+'" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div class="tr-txt"><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' artifact</span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+'</div>'+act+'</div>'; }
+    h+='<div class="tr-row rf'+(here?' on':'')+'" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div class="tr-txt"><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+findKind(D)+'</span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+combosHTML(id)+'</div>'+act+'</div>'; }
   const left=findList('artifact').length-arts.length; if (left) h+='<p class="tr-sub">'+left+' more artifact'+(left===1?'':'s')+' still out there</p>';
   return h; }
 function trayAct(act,id){ if (!BAG || !BAG.tray) return; const {kind,at}=BAG.tray, FS=findsState();

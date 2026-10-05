@@ -124,7 +124,7 @@ const FIGHT_IO={t:0,holding:false,tut:null,tilt:0,reeling:false,ev:[],why:'',
 function updateReel(dt){
   const R=S.reel, io=FIGHT_IO; io.t=S.time; io.holding=S.holding; io.tut=S.tut; io.tilt=S.tilt; io.ev.length=0; io.why='';
   const end=fightStep(R,dt,io);
-  S.tilt=io.tilt; S.tut=io.tut;
+  S.tilt=io.tilt; S.tut=io.tut; ghostSigns(R,dt);   // a faded ghost: the Drowned Bell's rings, the Tuning Fork's wake (game/relics.js)
   for (const e of io.ev) fightShow(R,e);
   if (end==='lose') return lose(io.why);
   if (end==='snap') return snap();

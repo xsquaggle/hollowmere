@@ -670,6 +670,30 @@ body:not([data-state="idle"]) .corner button{pointer-events:none!important}
 .rt-gifts{display:grid;gap:8px;margin:0 0 12px}
 .rt-gift{display:flex;align-items:center;gap:8px;font-weight:800;color:#6B665C}.rt-gift b{font:400 26px/1 var(--display);color:var(--ink)}.rt-gift .coin{width:20px;height:20px}
 .rt-go{width:100%;font-size:15px;padding:12px}
+/* Story relics: combo chips, the treasure map card, and the Wet Almanac's page */
+.combos{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:5px}
+.combos .k{font-size:9.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#7A7468;margin-right:2px}
+.combos .cb{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:999px;line-height:1.2}
+.combos .cb.on{background:rgba(201,161,90,.22);color:#6E5236;box-shadow:inset 0 0 0 1.5px rgba(140,106,46,.45)}
+.combos .cb.on::before{content:'→ ';opacity:.7}
+.combos .cb.q{background:rgba(43,42,51,.07);color:#8A857A;border:1.5px dashed rgba(43,42,51,.28);letter-spacing:.12em}
+.cb-eff{margin:3px 0 0;font-size:12px;line-height:1.35;color:#6E5236;font-style:italic}
+.fd-map{background:linear-gradient(#F0E4C6,#E5D5AE);border-color:#8A6A44}
+.fd-mapart{width:100%;max-width:220px;height:150px;justify-self:center}
+.hl-item .hl-art.map{width:64px;height:64px}
+.almanac{background:repeating-linear-gradient(#F6EEDB 0 27px,#E3D6B9 27px 28px);border:1.5px solid #8A6A44;border-radius:10px;padding:6px 12px 10px;box-shadow:inset 6px 0 0 rgba(62,94,106,.25)}
+.al-rows{list-style:none;margin:0;padding:0}
+.al-rows li{display:grid;grid-template-columns:26px minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:10px;align-items:center;padding:7px 0;border-bottom:1px dashed rgba(107,74,46,.3)}
+.al-rows li:last-child{border-bottom:0}
+.al-rows li.now{background:rgba(201,161,90,.14);margin:0 -12px;padding:7px 12px}
+.al-ico{grid-row:1/3;width:26px;height:26px;color:#4E5E6A;display:grid;place-items:center}
+.al-ico svg{width:24px;height:24px}
+.al-t{font:600 17px/1.1 'Caveat',cursive;color:#3A3832}
+.al-rows b{font:400 15px/1.1 var(--display);color:var(--ink);text-align:right}
+.al-n{grid-column:2/4;font-size:12px;color:#6B665C}
+.al-moon{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:center;margin-top:8px;padding-top:8px;border-top:1.5px solid rgba(107,74,46,.35)}
+.al-moon b{display:block;font:400 15px/1.15 var(--display)}
+.al-moon span{font-size:12.5px;color:#4B4842}
 /* Tackle bag (game/bag.js): a waxed-canvas satchel whose flap lifts onto a cloth with your rod rig, rods, vest
    pockets, keepsakes and what the setup adds up to. Opens in 0.7 s, closes in 0.35 s, fades in 0.15 s with
    reduced motion. The flap's resting state is open; the .opening and .closing classes animate to and from it. */
@@ -1486,7 +1510,8 @@ const AMB_LV={ lake_day:{water:.55,wind:.22}, lake_dusk:{water:.5,wind:.14}, lak
   coast_night:{surf:.8,hiss:.18,wind:.3}, aquarium:{room:.5,water:.12}, kitchen:{room:.75}, banquet:{water:.25,wind:.1}, intro:{water:.4,wind:.3} };
 
 /* Treasure: everything a line pulls up that isn't a fish.
-   TREASURE   how often treasure turns up and which kind (weights); a pouch's size (in catches' worth of coins). A geode holds
+   TREASURE   how often treasure turns up and which kind (weights; a map is a piece of a treasure map, data/relics.js: MAPS);
+              a pouch's size (in catches' worth of coins). A geode holds
               Glimmer (data/enchant.js: GLIMMER.geode), and every crate holds some (GLIMMER.crate).
               Before the first treasure the odds are firstRate, and that first one is always a Common crate.
    CRATES     one per rarity, Common to Mythic. weight (before luck), pull and reel (the haul), snags (how often
@@ -1506,17 +1531,17 @@ const AMB_LV={ lake_day:{water:.55,wind:.22}, lake_dusk:{water:.5,wind:.14}, lak
               lore; artifacts and keepsakes have eff (what it does, one sentence), down (its catch, if any) and
               mods (modifiers, as on rods: see data/stats.js). A curio with an owner can be returned for a reward:
               {coins, keepsake, line}. from:'return' keepsakes only come as rewards for returned curios, from:'town' ones from the
-              town (data/orders.js). Exotic and Mythic finds only
-              come in crates. Drawn in game/loot-art.js.
+              town (data/orders.js), and from:'story' artifacts are the story relics, each found its own way (data/relics.js:
+              STORY). Exotic and Mythic finds only come in crates. Drawn in game/loot-art.js and game/relic-art.js.
    OWNERS     who in town lost things (you give them back from the journal's Finds page).  POCKETS  the vest: pockets you start with, the most, and what Ottilie
               charges to sew each one after the first.
    NOTES      what's inside message bottles (kind bottle), the uncle's logbook pages (logbook) and drowned letters
               (letter, with to: the address Pell reads out). Lines are written the way they're inked. */
 const TREASURE={
   rate:1/12, firstRate:1/4, from:8,
-  kinds:{pouch:35, geode:14, bottle:20, find:5, crate:26},
+  kinds:{pouch:35, geode:14, bottle:20, find:5, crate:26, map:8},
   letter:{weight:6, region:'lake', spots:['deep','far'], from:25},
-  haul:{pouch:{pull:.55, reel:2.2}, geode:{pull:.7, reel:2.8}, bottle:{pull:.5, reel:2.4}, find:{pull:.75, reel:3}, letter:{pull:.5, reel:2.6}},
+  haul:{pouch:{pull:.55, reel:2.2}, geode:{pull:.7, reel:2.8}, bottle:{pull:.5, reel:2.4}, find:{pull:.75, reel:3}, letter:{pull:.5, reel:2.6}, map:{pull:.45, reel:2.2}},
   pouch:[1.5,3],
   loose:{common:50, uncommon:30, rare:14, epic:5, legendary:1}
 };
@@ -1569,7 +1594,7 @@ const FINDS={
   magpie:  {name:'Magpie’s Button', kind:'artifact', rarity:'uncommon', region:'any', lore:'Mother-of-pearl, from a coat nobody remembers wearing.',
             eff:'Treasure turns up 50% more often.', down:'Fish are worth 10% less.', mods:[{stat:'treasure', v:1.5}, {stat:'value', v:.9}]},
   tuningfork:{name:'Tuning Fork', kind:'artifact', rarity:'rare', region:'any', lore:'It hums a note just under hearing. Fish lean toward it.',
-            eff:'The perfect-hook window is twice as wide.', down:'−10 luck for rare fish and rarer.', mods:[{stat:'perfect', v:2}, {stat:'luck', v:-.1, when:{rarityMin:'rare'}}]},
+            eff:'The perfect-hook window is twice as wide.', down:'−10 luck for rare fish and rarer.', mods:[{stat:'perfect', v:2}, {stat:'luck', v:-.1, when:{rarityMin:'rare'}}, {stat:'ghostWake'}]},
   hourglass:{name:'Cracked Hourglass', kind:'artifact', rarity:'rare', region:'any', lore:'The sand runs uphill when nobody is looking.',
             eff:'Time passes three times as fast.', down:'Tank tips build up half as fast.', mods:[{stat:'clock', v:3}, {stat:'tips', v:.5}]},
   hungryhook:{name:'Hungry Hook', kind:'artifact', rarity:'epic', region:'any', lore:'It was hungry when your uncle found it. It still is.',
@@ -1582,6 +1607,15 @@ const FINDS={
             eff:'Time stands still while you carry it.', mods:[{stat:'timeStop'}]},
   pearl:   {name:'Moon Pearl', kind:'artifact', rarity:'mythic', region:'any', lore:'It is warm. It is always warm, and it glows a little when the moon is up.',
             eff:'Every fish rarer than common bites 50% more often, on top of luck’s ceiling.', mods:[{stat:'luck', omen:true, v:1.5, when:{rarityMin:'uncommon'}}]},
+  // the story relics: never loose or in crates, each found its own way (data/relics.js: STORY)
+  almanac: {name:'Wet Almanac', kind:'artifact', rarity:'rare', region:'lake', from:'story', lore:'Hollowmere, 1966. Every day’s weather pencilled in, the whole year through. It is right far more often than it should be.',
+            eff:'Tap the clock to read ahead: the next three turns of the weather, and the moon.', mods:[{stat:'forecast'}]},
+  moonjar: {name:'Moon Jar', kind:'artifact', rarity:'epic', region:'lake', from:'story', lore:'A preserving jar with a wire bail. Leave it open under a full moon and it keeps a little of the light.',
+            eff:'Night catches fill it. Tap it on the dock by day and your next cast is fished as if it were night.', mods:[{stat:'moonJar'}]},
+  bell:    {name:'Drowned Bell', kind:'artifact', rarity:'legendary', region:'lake', from:'story', lore:'A hand bell from the clock tower, green with the lake. It is never quite silent.',
+            eff:'Ghost fish ring like a bell while they fade, so you can follow them.', mods:[{stat:'ghostRings'}]},
+  pin:     {name:'Cartographer’s Pin', kind:'artifact', rarity:'epic', region:'any', from:'story', lore:'A brass map pin with a compass rose for a head. Whoever drew the treasure maps marked every cache with it.',
+            eff:'Treasure maps mark the exact spot, and every 5th treasure is a map piece.', mods:[{stat:'mapPin'}]},
   // keepsakes: they work from the shelf
   thermos: {name:'Uncle’s Thermos', kind:'keepsake', rarity:'rare', region:'any', lore:'Still half full of something hot. You don’t remember filling it.',
             eff:'Meals last half again as many casts.', mods:[{stat:'mealCasts', v:1.5}]},
@@ -1610,6 +1644,8 @@ const NOTES={
   glassy:  {kind:'bottle', lines:['If the water ever goes glassy','and the birds go quiet, cast.','Don’t ask why.','Just cast.']},
   porch:   {kind:'bottle', lines:['I left the porch light on','for you. Sixty years is a long','time to leave a light on.','— M.']},
   twitch:  {kind:'bottle', region:'lake', lines:['Note to self:','Lantern Carp hate a twitchy','bobber. Sit on your hands.']},
+  moonjar: {kind:'bottle', region:'lake', lines:['Full moon tonight!','Mama says moonlight keeps','if you have a jar for it.','She dropped hers in the shiny','path on the water. — Hattie']},
+  three:   {kind:'bottle', region:'lake', lines:['Three in the morning, and fog','down on the deep pool.','Something under it still','rings the hour.','I didn’t cast. I wish I had.']},
   log1:    {kind:'logbook', page:1, lines:['Day 212.','The perch keep coming up with','coins in their bellies.','Old coins, every one 1966.','Who is feeding them pennies','from sixty years ago?']},
   log2:    {kind:'logbook', page:2, lines:['Day 340.','3:12 again. The town hall clock,','my watch, the mantel clock.','All stopped at 3:12 the night','the town went under.','Ottilie won’t talk about it.','She was on the ferry.']},
   edith:   {kind:'letter', to:'Mrs. Edith Crane, 4 Lantern Row', lines:['Edie,','the water’s up past the second','step again. The mayor says not','to worry. I worry anyway.','Save me a dance on Saturday.','— Walter']},
@@ -1617,6 +1653,45 @@ const NOTES={
   keeper:  {kind:'letter', to:'The Keeper of the Bait Shack', lines:['To the new keeper,','we see your lantern at night.','It is good to have a light','on the water again.','Don’t fish the deep pool at dawn.','Or do. He never could stop.','— your neighbors']}
 };
 const LETTER_ORDER=['edith','albert','keeper'];
+
+/* Story relics: the artifacts the story hands you (FINDS with from:'story', in data/treasure.js), treasure maps and
+   relic combos. game/relics.js runs them; game/relic-art.js draws them.
+   STORY[id]   how each story relic is found. how: 'ottilie' (she gives it to you once you've caught every fish in
+               fish), 'moonpath' (the first cast into the moonpath on a full-moon night), 'bell' (the first cast into
+               spot, in wx, between hours[0] and hours[1] on the in-game clock) or 'cache' (inside your first treasure
+               map's cache). found: the line under it on the Finds page. hint: what the Finds page says before you
+               have it. Ottilie's gift comes with her line.
+   MAPS        treasure maps. pieces make a map, and the map rings a stretch of water in the region where its first
+               piece came up. ring: the ring's radius as a share of the screen's width; without the Cartographer's Pin
+               a cast inside it digs up the cache this often (chance). pinR: the pin's mark, as a share of the width
+               (a cast that close always finds it). every: with the pin, every this-many-th treasure is a map piece while
+               a map is unfinished. depth: how far out the cache can lie (0 at the dock to 1 at the far shore, never past
+               your reach). cache: the crate a cache is, by tier (weights, before luck); the first is always first.
+   MOON_JAR    fill: night catches to fill it; fullMoon: what one catch on a full-moon night counts as.
+   COMBOS[id]  two things that change each other. a: the relic or artifact (a FINDS id). with: the partner's name.
+               eff: what they do together, shown once you've seen it happen. live: the partner is in the game now;
+               otherwise the combo shows as "???" until the step that adds its partner. */
+const STORY={
+  almanac:{how:'ottilie', fish:['dace','char'], found:'A gift from Ottilie',
+           hint:'Ottilie’s mother kept one. She might part with it for someone who fishes in every weather.',
+           line:'My mother’s almanac. She pencilled in the weather every morning, and it was always right, even the year after. You fish the rain and the fog now. You should have it.'},
+  moonjar:{how:'moonpath', found:'Pulled up from the moonpath',
+           hint:'Someone dropped one where the moon lies on the water.'},
+  bell:   {how:'bell', spot:'deep', wx:'fog', hours:[0,5], found:'Pulled up from the deep pool, in the fog',
+           hint:'Something in the deep pool still rings in the small hours, when the fog is down.'},
+  pin:    {how:'cache', found:'From your first treasure map’s cache',
+           hint:'Whoever drew the treasure maps left it with their first cache.'}
+};
+const MAPS={pieces:3, ring:.13, chance:.35, pinR:.045, every:5, depth:[.2,.88], cache:{rare:50, epic:35, legendary:15}, first:'epic'};
+const MOON_JAR={fill:8, fullMoon:2};
+const COMBOS={
+  wake:     {a:'tuningfork', with:'Ghost fish', live:true, eff:'A faded ghost fish leaves a glowing wake on the water.'},
+  twinspool:{a:'hungryhook', with:'Twin Spool', eff:'It eats the fish you didn’t pick, and grows hungrier for it.'},
+  lantern:  {a:'moonjar', with:'Lantern Rod', eff:'Fish shadows show their rarity in the moonlight.'},
+  tide:     {a:'almanac', with:'Tidecaller', eff:'The Tidecaller calls rain twice as often.'},
+  tower:    {a:'bell', with:'The bell tower', eff:'Ring it in the Drowned Quarter, and the tower answers.'},
+  lodestone:{a:'pin', with:'Lodestone Rod', eff:'Map caches pull toward your line.'}
+};
 
 /* Tackle: what goes on a rod. Every rod has a Reel socket and a Line socket, and one bait (or lure) rides on
    whichever rod you hold. Gear lives in the tackle bag (game/bag.js); its effects are modifiers (data/stats.js).
@@ -1866,7 +1941,12 @@ const STATS={
   noWashout:{name:'Swell-proof casts', kind:'flag', when:{region:'coast'}, hint:'Casts never wash out in a swell.'},
   autoTilt: {name:'Rod tracks the fish', kind:'flag', hint:'Your rod follows a mastered fish for you.'},
   mayorWakes:{name:'The Mayor wakes', kind:'flag', when:{region:'lake'}, hint:'Mayor Bartholomew bites at any hour, as he does at dawn.'},
-  timeStop: {name:'Time stands still', kind:'flag', hint:'The in-game clock doesn’t move.'}
+  timeStop: {name:'Time stands still', kind:'flag', hint:'The in-game clock doesn’t move.'},
+  forecast: {name:'Weather forecast', kind:'flag', hint:'Tap the clock to read the next three turns of the weather, and the moon.'},
+  moonJar:  {name:'Moonlight in a jar', kind:'flag', hint:'Night catches fill the Moon Jar. Spend it by day and one cast is fished as if at night.'},
+  ghostRings:{name:'Ghosts ring', kind:'flag', hint:'A faded ghost fish rings like a bell, so you can follow it.'},
+  ghostWake:{name:'Ghost wake', kind:'flag', hint:'A faded ghost fish leaves a glowing wake on the water.'},
+  mapPin:   {name:'Map pin', kind:'flag', hint:'Treasure maps mark the exact spot, and every 5th treasure is a map piece.'}
 };
 /* Mastery: catch this many of a species and it reels in faster, with your rod following it. */
 const MASTERY={catches:10, reel:1.65};
@@ -1938,7 +2018,7 @@ function modList(){ if (MODC.list && MODC.at===MODC.frame && !MODC.dirty) return
   MODC.list=modSources(); MODC.at=MODC.frame; MODC.dirty=false; return MODC.list; }
 /** The context a stat is read in. Region, time and weather come from the game; callers add spot, fish, rarity or lucky.
     A fish brings its rarity along. */
-function modCtx(c){ const x=Object.assign({region:REG(), night:isNight(save.clock), wx:wxNow()}, c);
+function modCtx(c){ const x=Object.assign({region:REG(), night:nightNow(), wx:wxNow()}, c);
   if (x.fish){ if (!x.rarity) x.rarity=FISH[x.fish].rarity; if (!x.beh) x.beh=FISH[x.fish].beh; } return x; }
 const rarRank=r=>Object.keys(RAR).indexOf(r);
 function modMatch(m,c){ const w=m.when; if (!w) return true;
@@ -1971,7 +2051,7 @@ function tierMul(rar,c){ c=Object.assign({},c,{rarity:rar}); const cap=RAR[rar].
 /* ---------- Bite odds: which fish each spot offers, and the rod in hand ---------- */
 /** Each fish's weight in this spot's pool, here and now. */
 function poolFor(spot,lucky){
-  const h=save.clock, night=isNight(h), coastal=REG()==='coast', w=Object.assign({},(coastal?POOLS_COAST:POOLS)[spot]||(coastal?POOLS_COAST.open:POOLS.open));
+  const h=save.clock, night=nightNow(), coastal=REG()==='coast', w=Object.assign({},(coastal?POOLS_COAST:POOLS)[spot]||(coastal?POOLS_COAST.open:POOLS.open));
   // the water itself: who comes up at night, and the Mayor's dawns
   if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
@@ -2002,7 +2082,7 @@ const RARE_ORDER=Object.keys(RARE_BITES).sort((a,b)=>rarRank(FISH[b].rarity)-rar
 function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
   for (const id of RARE_ORDER){ const B=RARE_BITES[id];
     if (B.region!==reg || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
-    if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock))) continue;
+    if ((B.moon==='full' && !fullMoon()) || (B.night && !nightNow())) continue;
     if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
   return null; }
 /** Playtest: the next fish to bite, and the next mutation, picked by hand (game/playtest.js). */
@@ -2346,7 +2426,8 @@ function updateHint(){
   if (s==='idle') setHint(vet?'':save.firstCast ? 'Drag down from anywhere, then let go to cast.' : 'Drag back to aim. Release to cast.');
   else if (s==='aiming') setHint('');
   else if (s==='casting') setHint('');
-  else if (s==='waiting') setHint(vet?(inLucky(S.bob.x,S.bob.y)?'Gull luck · ':'')+spotName(S.bob.spot):(inLucky(S.bob.x,S.bob.y)?'Gull luck! ':'')+spotName(S.bob.spot)+'. Wait for the bobber to plunge. Tap to twitch it.');
+  else if (s==='waiting'){ const mk=mapAt(S.bob.x,S.bob.y), m=mk==='pin'?'The map’s mark · ':mk?'The map’s ring · ':'', moon=S.bob.moon?'Moonlit · ':'';
+    setHint(vet?moon+m+(inLucky(S.bob.x,S.bob.y)?'Gull luck · ':'')+spotName(S.bob.spot):moon+m+(inLucky(S.bob.x,S.bob.y)?'Gull luck! ':'')+spotName(S.bob.spot)+'. Wait for the bobber to plunge. Tap to twitch it.'); }
   else if (s==='bite') setHint('');
   else if (s==='reeling') { const R=S.reel; setHint(R.loot?(vet?'':R.F.tip):vet?'':R.fam ? 'Mastered: your rod tracks it for you. Hold to reel.' : 'Hold to reel. Slide to keep your ring under the fish. '+BEH_TIP[R.beh2?R.F.beh2:R.F.beh]); }
   else setHint('');
@@ -2369,9 +2450,10 @@ function release(){
   if (a && a.onBar && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openBoatShop(); return; }
   if (a && a.onOtt && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openShop(); return; }
   if (a && a.onTrap && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); tapTrap(a.onTrap); return; }
+  if (a && a.onJar && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); tapJar(); return; }
   if (!a || !a.target || a.p<.12){ setState('idle'); if (S.tut) coach('Drag a little farther down before you let go.','1 of 4'); else toast('Pull back farther','warn'); return; }
   S.cast={t:0, dur:.4+.42*a.p, from:{x:G.rodBase.x+18,y:G.rodBase.y-88}, to:a.target, p:a.p, th:a.th, spot:a.spot};
-  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal(); tickBait(); S.cast.fresh=freshCast();
+  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal(); tickBait(); S.cast.fresh=freshCast(); S.cast.moon=relicState().armed;   // the Moon Jar's moonlight goes with it (game/relics.js)
   if (save.firstCast){ save.firstCast=false; persist(); }
   setState('casting');
 }
@@ -2395,7 +2477,7 @@ function updateCast(dt){
       splash(x,y,6); ripple(x,y,18); sfx.snap(); buzz([0,30,30,30]); shake(2);
       toast('Snagged in the reeds!','warn'); coachFor('Reeds snag ordinary rods. Ottilie sells a Reedcutter that slices right through.',5);
       S.lost={t:0,pos:{x,y},snapped:false}; setState('lost'); return; }
-    S.bob={x,y,spot:c.spot,dip:1,jerk:0,nibble:0,plunge:0};
+    S.bob={x,y,spot:c.spot,dip:1,jerk:0,nibble:0,plunge:0}; moonCastLanded(c,S.bob);
     splash(x,y,8); ripple(x,y,40); ripple(x,y,24); sfx.plop(); buzz(8);
     if (c.fresh){ for (let i=0;i<8;i++) S.particles.push({x:x+rand(-14,14)*sc(y),y:y+rand(-4,4),vx:rand(-20,20),vy:rand(-40,-14),g:0,life:0,max:rand(.6,1),r:rand(1.4,2.2),c:'rgba(214,240,255,',glim:true}); }   // Fresh water
     for (const f of S.ambient){ if (Math.hypot(f.x*W-x,f.y*H-y)<90){ f.flee=1.2; f.a=Math.atan2(f.y*H-y,f.x*W-x); } }
@@ -2406,7 +2488,8 @@ function updateCast(dt){
 /* ---------- Waiting & bite ---------- */
 function startWaiting(){
   const lucky=inLucky(S.bob.x,S.bob.y);
-  const loot=S.tut?null:rollTreasure({spot:S.bob.spot,lucky});   // one roll per cast: this cast pulls up treasure, or a fish
+  // one roll per cast: this cast pulls up treasure, or a fish. A story relic or a map's cache waiting right here comes first (game/relics.js).
+  const loot=S.tut?null:storyLoot(S.bob)||rollTreasure({spot:S.bob.spot,lucky});
   // Echo: one waits where you hooked the last, and bites at once. If treasure comes up first, it keeps waiting.
   const E=S.echo, here=!S.tut && !!E && E.reg===REG() && E.spot===S.bob.spot, echo=here && !loot ? E.fish : null; S.echo=here && loot ? E : null;
   S.wait={phase:'empty', t:echo?.35:biteWait(S.bob.spot)*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1, lucky, echo, loot};
@@ -2632,7 +2715,7 @@ const FIGHT_IO={t:0,holding:false,tut:null,tilt:0,reeling:false,ev:[],why:'',
 function updateReel(dt){
   const R=S.reel, io=FIGHT_IO; io.t=S.time; io.holding=S.holding; io.tut=S.tut; io.tilt=S.tilt; io.ev.length=0; io.why='';
   const end=fightStep(R,dt,io);
-  S.tilt=io.tilt; S.tut=io.tut;
+  S.tilt=io.tilt; S.tut=io.tut; ghostSigns(R,dt);   // a faded ghost: the Drowned Bell's rings, the Tuning Fork's wake (game/relics.js)
   for (const e of io.ev) fightShow(R,e);
   if (end==='lose') return lose(io.why);
   if (end==='snap') return snap();
@@ -2728,7 +2811,7 @@ function startLand(){
   const eaten=!S.tut && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
   const wander=S.tut||eaten?0:wanderCount(REG());   // Wanderer: the day's first catches in this water
   const {size,build,w:wgt,value,mut}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky,wander:!!wander,bow:!!R.bow,tut:!!S.tut});
-  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,wx:wxNow(),rod:save.rod,value,mut,burst:false,isNew:rec(R.id).caught===0,eaten,wander};
+  S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,wx:wxNow(),rod:save.rod,value,mut,burst:false,isNew:rec(R.id).caught===0,eaten,wander,moon:!!(S.bob&&S.bob.moon)};
   // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast
   if (R.perfect && !S.tut && !eaten && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
   const rk=rarRank(F.rarity), big=rk>=rarRank('legendary');
@@ -2786,7 +2869,7 @@ function showCard(){
   $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]); if (L.mut) $('cTags').children[0].className='mut';
   // runes that did something for this catch
   const runes=[]; if (L.wander) runes.push(runeTag('wanderer','Wanderer ×2 · '+L.wander+' of '+ENCH.wanderer.first)); if (L.echo) runes.push(runeTag('echo','Echo: another waits here'));
-  if (enchOn('deep') && rarRank(F.rarity)>=rarRank('rare')) runes.push(runeTag('deep','Lure of the Deep')); if (enchOn('nightglass') && ((F.night && isNight(L.hr)) || (F.wx==='fog' && L.wx==='fog'))) runes.push(runeTag('nightglass','Nightglass'));
+  if (enchOn('deep') && rarRank(F.rarity)>=rarRank('rare')) runes.push(runeTag('deep','Lure of the Deep')); if (enchOn('nightglass') && ((F.night && (isNight(L.hr)||L.moon)) || (F.wx==='fog' && L.wx==='fog'))) runes.push(runeTag('nightglass','Nightglass'));
   if (enchOn('storm') && L.wx==='rain') runes.push(runeTag('storm','Storm Knot +60%'));
   if (runes.length){ $('cTags').insertAdjacentHTML('afterbegin',runes.join('')); if (L.echo) setTimeout(()=>sfx.echo(),500); }
   $('cLore').textContent=L.isNew||F.rarity!=='common' ? F.lore : '';
@@ -2827,7 +2910,7 @@ function dismissCard(action){
       if (!save.aquaSeen) setTimeout(()=>{ if (S.state==='idle') coachFor('Your uncle’s old fish tank still works. Tap the fishbowl at the bottom to visit your aquarium and move fish in.',8); },9000); } }
   if (L.isNew){ $('journalBtn').classList.remove('pulse'); void $('journalBtn').offsetWidth; $('journalBtn').classList.add('pulse'); }
   const finishing=S.tut==='card'; if (finishing){ save.tutorialDone=true; S.tut=null; persist(); }
-  S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); kitchenUnlockCheck();
+  S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); kitchenUnlockCheck(); relicAfterCatch(L);   // the Moon Jar fills, Ottilie's almanac (game/relics.js)
   if (!save.backupHinted && !save.lastBackup && !isStandalone() && save.stats.catches>=40){ save.backupHinted=true; persist(); coachFor('Your game lives in this browser. Tap the gear, then Save, to make a backup code and keep it safe.',8); }
   if (finishing) coachFor('You’re ready. Rarer fish fight in new ways, and the deep pool hides the best ones.',6); else if (!S.tut && !coachTimer) coachOff();
 }
@@ -2905,6 +2988,8 @@ function rollTreasure(c){
   const w=Object.assign({},TREASURE.kinds);
   if (!nextBottleNote(c,true)){ w.pouch+=w.bottle; w.bottle=0; }      // every note read: the bottle's share goes to coins
   if (!pickLoose(c,true)){ w.pouch+=w.find; w.find=0; }
+  // a treasure map's pieces (game/relics.js): only while there's a map to add to; with the Cartographer's Pin, every 5th treasure
+  if (!mapCan(c)){ w.pouch+=w.map; w.map=0; } else if (pinMapDue(c)) return {kind:'map'};
   if (letterCan(c)) w.letter=TREASURE.letter.weight;
   const kind=pickW(w); return kind==='crate'?{kind, tier:rollCrateTier(c)}:{kind};
 }
@@ -2957,7 +3042,7 @@ function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',
   const out={kind:loot.kind, tier:loot.tier||null, coins:0, glimmer:0, items:[]};
   const glim=([a,b])=>a+Math.floor(Math.random()*(b-a+1));
   const where={t:Date.now(), hr:save.clock, reg:x.region, spot:c.spot||'open', src:loot.kind==='crate'?loot.tier:loot.kind};
-  const give=id=>{ FS.have[id]=Object.assign({},where); FS.fresh.push(id); out.items.push({type:'find',id}); };
+  const give=(id,w)=>{ FS.have[id]=Object.assign({},w||where); FS.fresh.push(id); out.items.push({type:'find',id}); };
   const note=id=>{ if (!FS.notes.includes(id)) FS.notes.push(id); out.items.push({type:'note',id}); };
   const spare=r=>{ const n=Math.round(crateCoins(r,c)*.5); out.coins+=n; out.items.push({type:'spare',n,rarity:r}); };   // half a crate of that tier
   FS.treasure++;
@@ -2965,9 +3050,11 @@ function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',
   else if (loot.kind==='geode') out.glimmer=glim(GLIMMER.geode[x.region]||GLIMMER.geode.lake);
   else if (loot.kind==='bottle'){ const id=nextBottleNote(c); FS.bottles++; if (id) note(id); else spare('common'); }
   else if (loot.kind==='letter'){ const id=nextLetter(); if (id){ FS.letters[id]='waiting'; note(id); } else spare('uncommon'); }   // Pell collects it on his next stop
-  else if (loot.kind==='find'){ const id=pickLoose(c); if (id) give(id); else spare('common'); }
+  else if (loot.kind==='find'){ const id=loot.id&&!FS.have[loot.id]?loot.id:pickLoose(c); if (id) give(id,loot.id===id?storyWhere(where):null); else spare('common'); }   // a story relic (game/relics.js), or a loose find
+  else if (loot.kind==='map'){ const m=addMapPiece(c); out.items.push({type:'map', n:m.n}); }
   else if (loot.kind==='crate'){ const C=CRATES[loot.tier]; FS.crates[loot.tier]=(FS.crates[loot.tier]||0)+1;
     out.coins=crateCoins(loot.tier,c); out.glimmer=glim(GLIMMER.crate[loot.tier]);
+    if (loot.cache){ out.cache=true; cacheDug(give,where); }   // a treasure map's cache: the first holds the Cartographer's Pin
     for (const it of C.items){
       if (it.chance!=null && !(Math.random()<it.chance)) continue;
       if (it.note && Math.random()<it.note){ const id=nextBottleNote(c); if (id){ note(id); continue; } }
@@ -2992,7 +3079,7 @@ function grantDecor(k,id){ const t=tanks()[k]; t.stored=t.stored||[]; if (!t.sto
 /* ---------- the snag and the haul ---------- */
 /** What the line feels like with treasure on it: a dead weight. Crates get heavier and snag more by tier. */
 function haulOf(loot){ const C=loot.kind==='crate'?CRATES[loot.tier]:TREASURE.haul[loot.kind], tier=loot.kind==='crate'?loot.tier:'common';
-  return {name:loot.kind==='crate'?C.name:'Something', rarity:tier, beh:'weight', pull:C.pull, reel:C.reel, snags:C.snags||0, len:loot.kind==='crate'?30+5*rarRank(tier):16, loot:true,
+  return {name:loot.cache?'Buried cache':loot.kind==='crate'?C.name:'Something', rarity:tier, beh:'weight', pull:C.pull, reel:C.reel, snags:C.snags||0, len:loot.kind==='crate'?30+5*rarRank(tier):16, loot:true,
     tip:C.snags?'Hold to haul it up. When it catches on the bottom, let go, then haul hard.':'Hold to haul it up. Let go if the ring turns red.'}; }
 /** The quiet ran out and treasure came instead of a fish: the bobber drifts, dips and drags. */
 function startSnag(loot){ const w=S.wait, b=S.bob; w.phase='snag'; w.loot=loot; w.lucky=inLucky(b.x,b.y); w.snagT=rand(.9,1.6); w.drag=Math.random()<.5?-1:1; w.fish=null; w.sh=null;
@@ -3813,6 +3900,140 @@ function drawPortrait(c,who,s){ c.save(); c.scale(s/100,s/100);
     c.fillStyle='#2D4870'; c.fillRect(-22,-30,44,10); c.fillRect(-14,-38,28,9); c.fillStyle=LA.brass; c.fillRect(-4,-30,8,5); }
   c.restore(); c.restore(); }
 
+/* ---------- Relic art: the four story relics, treasure maps, and their marks in the scene ---------- */
+/* The relics join FIND_ART (game/loot-art.js), so the Finds page, the tackle bag, the haul card and the loot moment
+   all draw them the same way: 100 units across, ink outlines, light from the upper left. Treasure maps are torn
+   parchment in pencil and sepia. In the scene: the map's ring on the water (and the pin's mark), the pool of
+   moonlight round a moonlit bobber, the Moon Jar on the dock, and the Drowned Bell's rings and the Tuning Fork's
+   wake round a faded ghost. */
+const RA={verd:'#5E9A86', verdD:'#3E6E60', verdL:'#9CC9B4', bronze:'#A8743E', bronzeD:'#6E4A26', cloth:'#3E5E6A', clothD:'#2C4650', clothL:'#5C8290',
+  sepia:'#6B4A2E', parch:'#EBDDB8', parchD:'#D4C095', glass:'rgba(196,226,236,.38)', moon:'214,228,255'};
+Object.assign(FIND_ART,{
+  // a cloth-bound almanac, swollen with damp: water stains, brass corners, a pencil in the spine and a ribbon
+  almanac(c,s,t){ c.save(); c.rotate(-.12); laInk(c);
+    c.beginPath(); c.moveTo(-26,-38); c.lineTo(34,-36); c.lineTo(36,38); c.lineTo(-24,40); c.closePath(); laFill(c,'#F1E6CC');
+    c.strokeStyle='rgba(120,100,70,.5)'; c.lineWidth=1; for (let i=0;i<6;i++){ c.beginPath(); c.moveTo(30+i*.8,-34+i*.5); c.lineTo(32+i*.8,36-i*.3); c.stroke(); }
+    laInk(c); rrect(c,-34,-40,62,80,4); laFill(c,RA.cloth);
+    c.fillStyle=RA.clothD; c.fillRect(-34,-38,9,76); c.strokeStyle=INK; c.lineWidth=2; c.beginPath(); c.moveTo(-25,-39); c.lineTo(-25,39); c.stroke();
+    c.save(); rrect(c,-34,-40,62,80,4); c.clip();
+    c.fillStyle='rgba(30,52,60,.45)'; c.beginPath(); c.ellipse(10,26,22,13,.3,0,7); c.fill(); c.beginPath(); c.ellipse(-6,-24,10,6,-.4,0,7); c.fill();
+    c.strokeStyle='rgba(150,190,200,.35)'; c.lineWidth=1.2; c.beginPath(); c.ellipse(10,26,22,13,.3,0,7); c.stroke();
+    c.fillStyle=RA.clothL; c.fillRect(-23,-38,4,76); c.restore();
+    for (const [x,y,sx,sy] of [[28,-40,-1,1],[28,40,-1,-1]]){ laInk(c,2.4); c.beginPath(); c.moveTo(x,y); c.lineTo(x+sx*12,y); c.lineTo(x,y+sy*12); c.closePath(); laFill(c,LA.brass); }
+    laInk(c,2.6); rrect(c,-15,-24,36,22,3); laFill(c,'#E3D3A8'); c.fillStyle=INK; c.font='700 10px "Young Serif", Georgia, serif'; c.textAlign='center'; c.fillText('1966',3,-9);
+    c.strokeStyle=INK; c.lineWidth=2.4; c.beginPath(); c.moveTo(3,6); c.quadraticCurveTo(-4,15,3,20); c.quadraticCurveTo(10,15,3,6); c.closePath(); c.fillStyle='#9CC6E6'; c.fill(); c.stroke();
+    c.strokeStyle='#B4433A'; c.lineWidth=4; c.beginPath(); c.moveTo(18,40); c.quadraticCurveTo(20+Math.sin(t*2)*1.5,48,16,54); c.stroke();
+    c.save(); c.translate(-30,-44); c.rotate(.18); laInk(c,2.4); c.fillStyle='#E2B13C'; c.fillRect(-3,0,6,40); c.strokeRect(-3,0,6,40);
+    c.fillStyle='#E7A0A0'; c.fillRect(-3,-6,6,6); c.strokeRect(-3,-6,6,6); c.fillStyle=LA.silver; c.fillRect(-3,0,6,3); c.beginPath(); c.moveTo(-3,40); c.lineTo(0,48); c.lineTo(3,40); c.closePath(); c.fillStyle='#E9D1A6'; c.fill(); c.stroke(); c.restore();
+    laShine(c,-12,-32,8,2,.25); c.restore(); },
+  // a preserving jar on a wire bail, full of kept moonlight
+  moonjar(c,s,t){ laGlow(c,0,4,58,RA.moon,.32+.06*Math.sin(t*1.6)); laInk(c);
+    c.beginPath(); c.moveTo(-24,-26); c.quadraticCurveTo(-32,-18,-32,0); c.lineTo(-32,30); c.quadraticCurveTo(-32,40,-22,40); c.lineTo(22,40); c.quadraticCurveTo(32,40,32,30); c.lineTo(32,0); c.quadraticCurveTo(32,-18,24,-26); c.closePath();
+    c.save(); c.clip(); const g=c.createLinearGradient(0,-26,0,40); g.addColorStop(0,'rgba(170,200,240,.5)'); g.addColorStop(1,'rgba(232,240,255,.95)'); c.fillStyle=g; c.fillRect(-34,-30,68,72);
+    c.fillStyle='rgba(255,255,255,.85)'; for (let i=0;i<7;i++){ const a=t*.6+i*.9, x=Math.sin(a*1.3+i)*20, y=14-((t*10+i*9)%40); c.beginPath(); c.arc(x,y,1.2+(i%3)*.6,0,7); c.fill(); }
+    c.fillStyle='rgba(120,150,200,.25)'; c.fillRect(-34,-30,14,72); c.restore(); c.stroke();
+    c.strokeStyle='rgba(255,255,255,.75)'; c.lineWidth=2.6; c.beginPath(); c.moveTo(-24,-8); c.lineTo(-24,26); c.stroke();
+    laInk(c); rrect(c,-25,-34,50,10,3); laFill(c,'#C9DCE4'); laEll(c,0,-36,22,5); laFill(c,'#D9E8EE');
+    c.strokeStyle=INK; c.lineWidth=4.4; c.beginPath(); c.moveTo(-26,-29); c.quadraticCurveTo(0,-52,26,-29); c.stroke(); c.strokeStyle=LA.silver; c.lineWidth=2; c.stroke();
+    c.strokeStyle=INK; c.lineWidth=3.6; c.beginPath(); c.moveTo(-27,-27); c.lineTo(-10,-38); c.stroke(); c.strokeStyle=LA.silverD; c.lineWidth=1.6; c.stroke();
+    laShine(c,14,-36,6,1.6,.5); },
+  // a bronze hand bell gone green in the lake, its clapper showing, sound rings round it
+  bell(c,s,t){ const u=(t*.7)%1; c.strokeStyle='rgba(222,214,170,'+(.45*(1-u)).toFixed(3)+')'; c.lineWidth=2; for (const k of [0,.5]){ const v=(u+k)%1; c.beginPath(); c.ellipse(0,10,30+v*22,(30+v*22)*.8,0,0,7); c.stroke(); }
+    c.save(); c.rotate(.14+Math.sin(t*2.2)*.04); laInk(c);
+    rrect(c,-6,-46,12,22,4); laFill(c,LA.wood); c.fillStyle='rgba(255,230,200,.25)'; c.fillRect(-4,-44,3,18);
+    c.beginPath(); c.moveTo(-10,-26); c.quadraticCurveTo(-14,-24,-18,0); c.quadraticCurveTo(-22,22,-34,30); c.lineTo(34,30); c.quadraticCurveTo(22,22,18,0); c.quadraticCurveTo(14,-24,10,-26); c.closePath(); laFill(c,RA.bronze);
+    c.save(); c.clip(); c.fillStyle=RA.verd; c.beginPath(); c.moveTo(-36,8); c.quadraticCurveTo(-14,0,2,14); c.quadraticCurveTo(18,2,36,12); c.lineTo(36,34); c.lineTo(-36,34); c.closePath(); c.fill();
+    c.fillStyle=RA.verdL; for (const [x,y,r] of [[-18,-8,3],[8,-16,2.4],[14,6,3.2],[-6,20,2.6],[22,22,2]]){ c.beginPath(); c.arc(x,y,r,0,7); c.fill(); }
+    c.fillStyle=RA.bronzeD; c.fillRect(12,-26,8,60); c.fillStyle='rgba(255,226,170,.45)'; c.fillRect(-12,-20,4,26); c.restore();
+    laInk(c); laEll(c,0,30,34,7); laFill(c,RA.verdD); laEll(c,0,30,27,4.6); c.fillStyle='#1E2A28'; c.fill();
+    c.fillStyle=INK; c.beginPath(); c.arc(4,36,5,0,7); c.fill(); c.fillStyle='#7A5A3A'; c.beginPath(); c.arc(3,35,3,0,7); c.fill();
+    c.strokeStyle='#4E7A3A'; c.lineWidth=2.2; c.beginPath(); c.moveTo(-20,26); c.quadraticCurveTo(-24,38,-18,46); c.stroke(); c.beginPath(); c.moveTo(-12,28); c.quadraticCurveTo(-10,36,-14,42); c.stroke();
+    c.restore(); },
+  // a brass map pin with a compass-rose head, stuck through a scrap of map
+  pin(c,s,t){ c.save(); c.rotate(-.08); laInk(c,2.6); c.beginPath(); c.moveTo(-36,-10); c.lineTo(-8,-30); c.lineTo(34,-18); c.lineTo(36,22); c.lineTo(4,34); c.lineTo(-34,24); c.closePath(); laFill(c,RA.parch);
+    c.strokeStyle=RA.sepia; c.lineWidth=1.6; c.setLineDash([3,4]); c.beginPath(); c.moveTo(-28,16); c.quadraticCurveTo(-10,-6,6,8); c.quadraticCurveTo(16,16,20,2); c.stroke(); c.setLineDash([]);
+    c.lineWidth=2.4; c.beginPath(); c.moveTo(16,-2); c.lineTo(24,6); c.moveTo(24,-2); c.lineTo(16,6); c.stroke();
+    c.strokeStyle='rgba(107,74,46,.45)'; c.lineWidth=1.2; c.beginPath(); c.moveTo(-30,-4); c.quadraticCurveTo(-20,-12,-6,-18); c.stroke(); c.restore();
+    c.fillStyle='rgba(30,24,16,.25)'; laEll(c,26,4,10,3); c.fill();
+    c.save(); c.translate(20,2); c.rotate(-.7); laInk(c); c.strokeStyle=INK; c.lineWidth=5; c.beginPath(); c.moveTo(0,0); c.lineTo(0,-36); c.stroke(); c.strokeStyle=LA.silver; c.lineWidth=2.4; c.stroke();
+    c.translate(0,-44); laInk(c); c.beginPath(); c.arc(0,0,14,0,7); laFill(c,LA.brass); c.fillStyle=LA.brassD; c.beginPath(); c.arc(2,2,10,0,7); c.fill();
+    c.fillStyle=LA.brassL; c.strokeStyle=INK; c.lineWidth=1.4; c.beginPath(); for (let i=0;i<8;i++){ const a=i*Math.PI/4-Math.PI/2, r=i%2?4:11; c.lineTo(Math.cos(a)*r,Math.sin(a)*r); } c.closePath(); c.fill(); c.stroke();
+    c.fillStyle='#B4433A'; c.beginPath(); c.moveTo(0,-11); c.lineTo(2.6,-3); c.lineTo(-2.6,-3); c.closePath(); c.fill(); laShine(c,-5,-6,3,1.6,.6); c.restore(); }
+});
+
+/* ---------- treasure maps ---------- */
+/** The map's sketch, in a 100-unit square: shoreline, the deep pool, pads, the dock at the bottom, and its ring.
+    Each piece is one third of the sheet, torn; a missing piece shows as its dashed outline. */
+const MAP_TEARS=[[[-46,-40],[-6,-44],[2,-20],[-10,4],[-2,22],[-14,44],[-46,42]],
+                 [[-6,-44],[46,-42],[44,-6],[22,2],[8,-4],[-10,4],[2,-20]],
+                 [[-10,4],[8,-4],[22,2],[44,-6],[46,42],[-14,44],[-2,22]]];
+function mapSketch(c,whole){ c.strokeStyle=RA.sepia; c.lineWidth=1.8;
+  c.beginPath(); c.moveTo(-44,-20); c.bezierCurveTo(-26,-28,24,-30,44,-22); c.stroke();
+  c.lineWidth=1.2; c.strokeStyle='rgba(107,74,46,.6)'; for (let i=0;i<5;i++){ c.beginPath(); c.moveTo(-40+i*18,-27+Math.sin(i)*2); c.lineTo(-36+i*18,-33+Math.sin(i)*2); c.lineTo(-32+i*18,-27+Math.sin(i)*2); c.stroke(); }
+  c.setLineDash([2,3]); c.beginPath(); c.ellipse(16,-8,14,5,0,0,7); c.stroke(); c.setLineDash([]);
+  for (const [x,y] of [[-24,12],[-18,16],[-28,18]]){ c.beginPath(); c.ellipse(x,y,4,2,0,0,7); c.stroke(); }
+  c.lineWidth=1.8; c.strokeStyle=RA.sepia; c.strokeRect(-6,32,12,12); c.beginPath(); c.moveTo(0,32); c.lineTo(0,26); c.stroke();
+  for (const [x,y] of [[-36,28],[-40,22],[36,26],[40,30]]){ c.beginPath(); c.moveTo(x,y); c.lineTo(x+1,y-7); c.stroke(); }
+  if (whole){ const m=relicState().map, k=m?m.depth:.5, th=m?m.th:0, y=lerp(28,-18,k), x=clamp(Math.tan(th)*(36-y)*.9,-38,38);
+    c.strokeStyle='#9A3A2E'; c.lineWidth=2.4; c.setLineDash([4,3]); c.beginPath(); c.ellipse(x,y,13,6,0,0,7); c.stroke(); c.setLineDash([]);
+    c.beginPath(); c.moveTo(x-4,y-3); c.lineTo(x+4,y+3); c.moveTo(x+4,y-3); c.lineTo(x-4,y+3); c.stroke(); } }
+function drawTreasureMap(c,w,h,n){ const s=Math.min(w,h)*.9; c.save(); c.scale(s/100,s/100); n=clamp(n|0,0,MAPS.pieces); const whole=n>=MAPS.pieces;
+  for (let i=0;i<MAP_TEARS.length;i++){ const P=MAP_TEARS[i], have=i<n;
+    if (!have){ c.setLineDash([3,4]); c.strokeStyle='rgba(107,74,46,.45)'; c.lineWidth=1.4; laPoly(c,P); c.stroke(); c.setLineDash([]); continue; }
+    c.save(); c.translate(whole?0:(i-1)*2,whole?0:(i%2?-2:2)); laInk(c,2.4); laPoly(c,P); laFill(c,i%2?RA.parch:'#EFE2C0'); c.clip(); mapSketch(c,whole);
+    c.fillStyle='rgba(120,90,50,.12)'; c.beginPath(); c.arc(P[0][0]+10,P[0][1]+12,14,0,7); c.fill(); c.restore(); }
+  c.restore(); }
+/** A single piece, as it comes up out of the water. */
+function drawMapPiece(c,s,n,t){ c.save(); c.scale(s/100,s/100); c.rotate(-.18+Math.sin(t*1.3)*.04); const P=MAP_TEARS[clamp((n|0)-1,0,2)];
+  c.save(); c.scale(1.5,1.5); const cx=P.reduce((a,p)=>a+p[0],0)/P.length, cy=P.reduce((a,p)=>a+p[1],0)/P.length; c.translate(-cx,-cy);
+  laInk(c,2); laPoly(c,P); laFill(c,RA.parch); c.clip(); mapSketch(c,false);
+  c.fillStyle='rgba(60,110,130,.18)'; c.fillRect(cx-60,cy+4,120,40); c.restore(); c.restore(); }
+
+/* ---------- in the scene ---------- */
+/** The whole map's ring on the water where its cache lies, and with the Cartographer's Pin, the pin's mark. */
+function drawRelicWater(){ const m=relicState().map;
+  if (m && m.n>=MAPS.pieces && m.reg===REG() && S.state!=='loot' && !INTRO.active){ const p=mapXY(m), k=sc(p.y), r=W*MAPS.ring*k, a=.5+.15*Math.sin(S.time*1.4);
+    ctx.save(); ctx.strokeStyle='rgba(243,234,215,'+(a*.55).toFixed(3)+')'; ctx.lineWidth=2.2*k+.6; ctx.setLineDash([9*k+3,7*k+3]); ctx.lineDashOffset=-S.time*6;
+    ctx.beginPath(); ctx.ellipse(p.x,p.y,r,r/2.2,0,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+    if (modFlag('mapPin')){ const bob=Math.sin(S.time*2.2)*1.5;
+      ctx.strokeStyle='rgba(242,216,150,'+(.5+.3*Math.sin(S.time*3)).toFixed(3)+')'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.ellipse(p.x,p.y,10*k+4,(10*k+4)*.4,0,0,Math.PI*2); ctx.stroke();
+      ctx.save(); ctx.translate(p.x,p.y-10*k+bob); ctx.scale(k,k); ctx.strokeStyle=INK; ctx.lineWidth=3.4; ctx.beginPath(); ctx.moveTo(0,10); ctx.lineTo(0,-6); ctx.stroke(); ctx.strokeStyle=LA.silver; ctx.lineWidth=1.6; ctx.stroke();
+      ctx.fillStyle=LA.brass; ctx.strokeStyle=INK; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(0,-11,6,0,7); ctx.fill(); ctx.stroke(); ctx.fillStyle=LA.brassL; ctx.beginPath(); ctx.arc(-1.6,-12.6,2,0,7); ctx.fill(); ctx.restore(); }
+    else { ctx.strokeStyle='rgba(154,58,46,'+(a*.6).toFixed(3)+')'; ctx.lineWidth=2*k+.5; const q=6*k+2; ctx.beginPath(); ctx.moveTo(p.x-q,p.y-q*.4); ctx.lineTo(p.x+q,p.y+q*.4); ctx.moveTo(p.x+q,p.y-q*.4); ctx.lineTo(p.x-q,p.y+q*.4); ctx.stroke(); }
+    ctx.restore(); }
+  // a moonlit cast: a pool of night round the bobber, with the moon's light on it
+  const b=S.bob; if (b && b.moon){ const k=sc(b.y), R=110*k, g=ctx.createRadialGradient(b.x,b.y,4,b.x,b.y,R);
+    g.addColorStop(0,'rgba(18,26,58,.5)'); g.addColorStop(.7,'rgba(18,26,58,.28)'); g.addColorStop(1,'rgba(18,26,58,0)');
+    ctx.save(); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(b.x,b.y,R,R*.42,0,0,Math.PI*2); ctx.fill();
+    ctx.globalCompositeOperation='lighter'; for (let i=0;i<5;i++){ const ph=S.time*1.2+i*1.3, w=(14+i*4)*k*(.7+.3*Math.sin(ph));
+      ctx.strokeStyle='rgba('+RA.moon+','+(.22*(.6+.4*Math.sin(ph*1.7))).toFixed(3)+')'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(b.x-w,b.y-14*k+i*7*k); ctx.lineTo(b.x+w,b.y-14*k+i*7*k); ctx.stroke(); }
+    ctx.restore(); } }
+/** Round a faded ghost: the Drowned Bell's rings of sound, and the Tuning Fork's glowing wake. Both fade out. */
+function drawGhostFx(){ const W2=GHOSTFX.wake;
+  if (W2.length>1){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.lineCap='round';
+    for (let i=1;i<W2.length;i++){ const p=W2[i-1], q=W2[i], a=Math.max(0,1-q.a/1.6); ctx.strokeStyle='rgba(170,240,230,'+(.55*a).toFixed(3)+')'; ctx.lineWidth=(5*a+1)*sc(q.y); ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); }
+    ctx.restore(); }
+  for (const r of GHOSTFX.rings){ const u=r.a/1.3, k=sc(r.y), a=(1-u)*(1-u);
+    for (const d of [0,.18]){ const v=Math.max(0,u-d), rad=(8+v*70)*k; ctx.strokeStyle='rgba(236,224,176,'+(.75*a).toFixed(3)+')'; ctx.lineWidth=(2.2-d*5)*k+.4; ctx.beginPath(); ctx.ellipse(r.x,r.y,rad,rad*.38,0,0,Math.PI*2); ctx.stroke(); } } }
+/** The fight gauge: with the Drowned Bell, a faded ghost keeps a hollow ring where its marker was. */
+function drawGaugeBell(R,x,y){ if (!(R.fade>0) || R.loot || !modFlag('ghostRings',{fish:R.id})) return; const u=(GHOSTFX.next>0?1-GHOSTFX.next/.55:0);
+  ctx.strokeStyle='rgba(236,224,176,'+(.85-.5*u).toFixed(3)+')'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,7+u*5,0,Math.PI*2); ctx.stroke(); }
+/** The Moon Jar on the dock (or the skiff's deck), lit by how much moonlight it holds. Tap it to spend a full jar. */
+function drawMoonJarProp(){ if (!modFlag('moonJar')) return; const p=jarPos(), r=relicState(), f=r.armed?1:r.jar/MOON_JAR.fill, full=f>=1;
+  ctx.save(); ctx.translate(p.x,p.y);
+  if (f>0){ const g=ctx.createRadialGradient(0,-8,2,0,-8,26+f*14); g.addColorStop(0,'rgba('+RA.moon+','+(.22+.3*f+.2*JAR.glow).toFixed(3)+')'); g.addColorStop(1,'rgba('+RA.moon+',0)'); ctx.fillStyle=g; ctx.fillRect(-46,-54,92,92); }
+  ctx.fillStyle='rgba(8,14,22,.3)'; ctx.beginPath(); ctx.ellipse(0,2,11,3,0,0,7); ctx.fill();
+  const lvl=-2-f*16; ctx.save(); ctx.beginPath(); ctx.moveTo(-9,-18); ctx.lineTo(-9,-1); ctx.quadraticCurveTo(-9,2,-6,2); ctx.lineTo(6,2); ctx.quadraticCurveTo(9,2,9,-1); ctx.lineTo(9,-18); ctx.closePath(); ctx.clip();
+  ctx.fillStyle='rgba(150,180,200,.35)'; ctx.fillRect(-10,-20,20,24);
+  if (f>0){ ctx.fillStyle='rgba(226,236,255,'+(.75+.2*Math.sin(S.time*2)).toFixed(3)+')'; ctx.fillRect(-10,lvl+Math.sin(S.time*1.6)*.6,20,24); }
+  ctx.restore(); ctx.strokeStyle=INK; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(-9,-18); ctx.lineTo(-9,-1); ctx.quadraticCurveTo(-9,2,-6,2); ctx.lineTo(6,2); ctx.quadraticCurveTo(9,2,9,-1); ctx.lineTo(9,-18); ctx.stroke();
+  ctx.fillStyle='#C9DCE4'; ctx.fillRect(-8,-22,16,4); ctx.strokeRect(-8,-22,16,4); ctx.strokeStyle=LA.silverD; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(-9,-19); ctx.quadraticCurveTo(0,-30,9,-19); ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.7)'; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(-6,-14); ctx.lineTo(-6,-4); ctx.stroke();
+  if (full && !r.armed){ const a=.5+.5*Math.sin(S.time*3); ctx.fillStyle='rgba(255,255,255,'+a.toFixed(3)+')'; ctx.beginPath(); ctx.arc(4,-24+Math.sin(S.time*1.4)*2,1.3,0,7); ctx.fill(); }
+  ctx.restore();
+  if (r.armed && Math.random()<.2) S.particles.push({x:p.x+rand(-6,6),y:p.y-20,vx:rand(-6,6),vy:-rand(10,24),g:-4,life:0,max:rand(.8,1.4),r:rand(.8,1.6),c:'rgba('+RA.moon+',',glim:true});
+  if (JAR.pour>0){ const u=1-JAR.pour; for (let i=0;i<2;i++) S.particles.push({x:p.x+rand(-4,4),y:p.y-22,vx:rand(10,60)*(Math.random()<.5?-1:1),vy:-rand(40,90)*(1-u),g:120,life:0,max:rand(.7,1.2),r:rand(1,2),c:'rgba('+RA.moon+',',glim:true}); } }
+
 /* ---------- Tackle art: every reel, line and bait, and the rod rig in the bag ---------- */
 /* Same field-journal style as the finds (game/loot-art.js): flat fills, one highlight, bold ink outlines.
    Each piece is drawn in a 100 by 100 box centered on the origin, so drawTackle can scale it to any tile.
@@ -4621,7 +4842,7 @@ function lootLand(){ const L=S.loot, k=L.kind; L.x=L.to.x; L.y=L.to.y; L.rot=0; 
   const heavy=k==='crate'; shake(heavy?2.5+L.ti*1.4:1.2); sfx.thud(heavy?L.ti:-1); buzz(heavy?[0,26+L.ti*8]:14);
   drip(L.x,L.y-8,heavy?14+L.ti*2:6); splash(L.x,L.y,heavy?8+L.ti*2:4,'rgba(205,228,236,');
   S.darkT=heavy?.3+L.ti*.04:.22;
-  if (k==='find'){ L.phase='glint'; L.st=.6; sfx.glint(); return; }
+  if (k==='find'||k==='map'){ L.phase='glint'; L.st=.6; sfx.glint(); const it=L.got.items[0]; if (it && it.id==='bell') sfxGhostBell(L.x); return; }   // the Drowned Bell rings as it comes up
   L.phase='ready';
   const FS=findsState();
   if (heavy && FS.treasure===1) coachShow('A crate! Tap it to open it.',6);
@@ -4681,15 +4902,18 @@ function drawLoot(){ const L=S.loot; if (!L) return; const ti=L.ti, R=RAR[L.tier
   else if (L.kind==='geode'){ if (L.phase!=='geode' || L.st>.15) { ctx.globalAlpha=L.phase==='geode'?Math.min(1,L.st/.15):1; drawGeode(ctx,58*k,L.gopen||0,S.time); ctx.globalAlpha=1; } }
   else if (L.kind==='bottle'){ drawBottle(ctx,76*k,S.time); if (L.cork){ ctx.save(); ctx.translate(-14,-30+L.cork.y*.3); ctx.rotate(L.cork.r); ctx.fillStyle='#B68A5E'; ctx.fillRect(-5,-4,10,8); ctx.strokeStyle=INK; ctx.lineWidth=1.6; ctx.strokeRect(-5,-4,10,8); ctx.restore(); } }
   else if (L.kind==='letter'){ drawEnvelope(ctx,84*k,!!L.cork); }
+  else if (L.kind==='map'){ const it=L.got.items[0]; drawMapPiece(ctx,74*k,it?it.n:1,S.time); if (L.phase==='glint') drawGlint(L); }
   else if (L.kind==='find'){ const it=L.got.items[0], id=it&&it.type==='find'?it.id:null, r=id?FINDS[id].rarity:'common';
     if (L.phase!=='fly' && r!=='common') drawRays(0,-6,RAR[r].color,.35+.1*Math.sin(S.time*2),70+rarRank(r)*12);
     if (id) drawFind(ctx,id,70*k,S.time); else drawPouch(ctx,56*k);
-    if (L.phase==='glint'){ const g=1-L.st/.6; ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.translate(18,-18); ctx.rotate(g*2); ctx.fillStyle='rgba(255,250,230,'+(1-g).toFixed(2)+')';
-      for (let i=0;i<4;i++){ ctx.rotate(Math.PI/2); ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(3,-3); ctx.lineTo(0,-16*(1-g*.5)); ctx.lineTo(-3,-3); ctx.closePath(); ctx.fill(); } ctx.restore(); } }
+    if (L.phase==='glint') drawGlint(L); }
   ctx.restore();
   if (L.phase==='ready' && L.kind==='crate') drawLootLabels(L);
   if (L.phase==='ready' && (L.kind==='bottle'||L.kind==='letter')){ ctx.globalAlpha=.78+.22*Math.sin(S.time*4); lootLabel(L.x,L.y+44,L.kind==='bottle'?'TAP TO UNCORK':'TAP TO OPEN',PAPER,14); ctx.globalAlpha=1; }
 }
+/** The four-point glint as a find comes up. */
+function drawGlint(L){ const g=1-L.st/.6; ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.translate(18,-18); ctx.rotate(g*2); ctx.fillStyle='rgba(255,250,230,'+(1-g).toFixed(2)+')';
+      for (let i=0;i<4;i++){ ctx.rotate(Math.PI/2); ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(3,-3); ctx.lineTo(0,-16*(1-g*.5)); ctx.lineTo(-3,-3); ctx.closePath(); ctx.fill(); } ctx.restore(); }
 function lootLabel(x,y,text,col,size){ ctx.font='800 '+(size||12)+'px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.lineWidth=4; ctx.strokeStyle='rgba(20,22,34,.85)'; ctx.strokeText(text,x,y); ctx.fillStyle=col; ctx.fillText(text,x,y); }
 function drawLootLabels(L){ const cw=crateW(L.ti)*(L.fitK||1), R=RAR[L.tier], hv=L.hv||0, pulseA=.78+.22*Math.sin(S.time*4);
   // the crate's name and pips sit above it, unless a tip or a short screen leaves no room: then below
@@ -4729,15 +4953,14 @@ function drawSnagUnder(){ const b=S.bob, k=sc(b.y), u=S.wait&&S.wait.phase==='sn
   ctx.save(); ctx.globalAlpha=.25+.35*u; ctx.fillStyle='rgba(12,26,34,.8)'; ctx.beginPath(); ctx.ellipse(b.x,b.y+6*k,18*k*(.6+.4*u),7*k*(.6+.4*u),0,0,7); ctx.fill(); ctx.restore(); }
 
 /* ---------- the haul card ---------- */
-const KIND_LABEL={curio:'curio', artifact:'artifact', keepsake:'keepsake'};
 function pipsHTML(r){ const n=rarRank(r)+1; return '<span class="pips" aria-label="'+RAR[r].label+'">'+Array.from({length:LOOT_TIERS.length},(_,i)=>'<i class="'+(i<n?'on':'')+'"></i>').join('')+'</span>'; }
 function freePocket(){ const FS=findsState(); return FS.equip.length<FS.pockets; }
 /** One thing from inside, in a dashed slot that's laid out first, so you can see how many are coming. */
 function haulSlotHTML(it,i){ return '<div class="hl-slot" style="--i:'+i+'"><div class="hl-pop" style="--i:'+i+'" data-r="'+itemRarity(it)+'">'+haulItemHTML(it,i)+'</div></div>'; }
 function haulItemHTML(it,i){ const st=' style="--i:'+i+'"';
   if (it.type==='find'){ const D=FINDS[it.id], art=D.kind==='artifact', eq=findsState().equip.includes(it.id);
-    return '<div class="hl-item rf" data-r="'+D.rarity+'"'+st+'><canvas class="hl-art" data-find="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[D.rarity].label+' '+KIND_LABEL[D.kind]+' · <b>New</b></span><h3>'+D.name+'</h3>'+
-      '<p>'+(D.eff||D.lore)+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+(D.owner?'<p class="owner">This belongs to '+OWNERS[D.owner].name+'. Give it back from your journal’s Finds page.</p>':'')+
+    return '<div class="hl-item rf" data-r="'+D.rarity+'"'+st+'><canvas class="hl-art" data-find="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[D.rarity].label+' '+findKind(D)+' · <b>New</b></span><h3>'+D.name+'</h3>'+
+      '<p>'+(D.eff||D.lore)+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+combosHTML(it.id)+(D.owner?'<p class="owner">This belongs to '+OWNERS[D.owner].name+'. Give it back from your journal’s Finds page.</p>':'')+
       (art?(eq?'<p class="on">In a pocket. Working now.</p>':freePocket()?'<button class="btn sm" type="button" data-pocket="'+it.id+'">Put it in a pocket</button>':'<p class="pk-note">Your pockets are full. Swap it in from your tackle bag.</p>'):'')+
       (D.kind==='keepsake'?'<p class="on">Working now, from your shelf.</p>':'')+'</div></div>'; }
   if (it.type==='paint'){ const P=PAINTS[it.id];
@@ -4749,14 +4972,18 @@ function haulItemHTML(it,i){ const st=' style="--i:'+i+'"';
       '<p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+(on?'<p class="on">On your '+ROD().name+'.</p>':T.kind==='bait'?'<p class="on">In your tackle bag.</p>':'<button class="btn sm" type="button" data-rigit="'+it.id+'">Put it on your '+ROD().name+'</button>')+'</div></div>'; }
   if (it.type==='note'){ const N=NOTES[it.id];
     return '<div class="hl-item rf" data-r="common"'+st+'><canvas class="hl-art" data-notekind="'+N.kind+'"></canvas><div class="hl-txt"><span class="k">'+noteKind(N)+'</span><h3>'+noteTitle(it.id)+'</h3><p>Kept with your notes in the journal.</p><button class="btn sm" type="button" data-read="'+it.id+'">Read it</button></div></div>'; }
+  if (it.type==='map'){ const whole=it.n>=MAPS.pieces, pin=modFlag('mapPin'), reg=(relicState().map||{}).reg;
+    return '<div class="hl-item rf" data-r="uncommon"'+st+'><canvas class="hl-art map" data-map="'+it.n+'"></canvas><div class="hl-txt"><span class="k">Treasure map · piece '+Math.min(it.n,MAPS.pieces)+' of '+MAPS.pieces+'</span><h3>'+(whole?'The map is whole':'A piece of a map')+'</h3><p>'+
+      (whole?'It rings a stretch of '+REGION_NAME[reg||REG()]+'. Cast inside the ring to dig up what’s buried there.'+(pin?' Your Cartographer’s Pin marks the exact spot.':''):(MAPS.pieces-it.n===1?'One more piece':(MAPS.pieces-it.n)+' more pieces')+' and it shows where something is buried'+(reg&&reg!==REG()?'':' in '+REGION_NAME[reg||REG()])+'.')+'</p></div></div>'; }
   if (it.type==='spare') return '<div class="hl-item spare"'+st+'><div class="hl-txt"><span class="k">Spare coins</span><h3><span class="coin"></span>+'+it.n.toLocaleString()+'</h3><p>You’ve found every '+RAR[it.rarity].label.toLowerCase()+' thing this could have held, so it paid in coins.</p></div></div>';
   return ''; }
 function haulTitle(L){ const g=L.got;
-  if (L.kind==='crate') return CRATES[L.tier].name;
+  if (L.kind==='crate') return g.cache?'A buried cache':CRATES[L.tier].name;
+  if (L.kind==='map') return g.items[0]&&g.items[0].n>=MAPS.pieces?'The map is whole':'A piece of a map';
   const it=g.items[0]; if (it && it.type==='find') return 'You found something';
   return 'Treasure'; }
 function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
-  const tier=L.kind==='crate'?L.tier:first&&first.type==='find'?FINDS[first.id].rarity:'common';
+  const tier=L.kind==='crate'?L.tier:first&&first.type==='find'?FINDS[first.id].rarity:L.kind==='map'?'uncommon':'common';
   el.dataset.r=tier; el.dataset.kind=L.kind; el.classList.remove('out');
   let h='<div class="hl-top"><span class="rarity">'+RAR[tier].label+'</span>'+pipsHTML(tier)+'</div><h2>'+haulTitle(L)+'</h2>';
   const base=g.base==null?g.coins:g.base;
@@ -4767,7 +4994,7 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   const n=g.items.length, last=.35+Math.max(0,n-1)*.55;
   h+='<button class="btn primary" id="hlGo" type="button" style="animation-delay:'+(last+.3).toFixed(2)+'s">Collect</button>';
   el.innerHTML=h; el.hidden=false; ovOpen('haul',()=>{ lootEnd(); });
-  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear],canvas[data-decor],canvas[data-rune]'));
+  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear],canvas[data-decor],canvas[data-rune],canvas[data-map]'));
   // the coins count up, then each item arrives with its own sound
   if (base){ const b=$('hlCoins'), t0=performance.now(), dur=REDUCED?1:Math.min(1100,350+base*.25); sfx.coin(6);
     (function step(now){ if (!b.isConnected) return; const k=Math.min(1,(now-t0)/dur); b.textContent=Math.round(base*(1-Math.pow(1-k,3))).toLocaleString(); if (k<1) requestAnimationFrame(step); else tallyCoins(); })(t0); }
@@ -4784,7 +5011,7 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   const cardTop=window.innerHeight-(parseFloat(getComputedStyle(el).bottom)||18)-el.offsetHeight, room=cardTop-14-(L.kind==='crate'?crateW(L.ti)*1.02+L.hv:90)-64;
   L.lift=Math.min(L.to.y,cardTop-14); if (L.kind==='crate' && room<0) L.fit=Math.max(.5,1+room/(crateW(L.ti)*1.02));
 }
-const itemRarity=it=>it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
+const itemRarity=it=>it.type==='map'?'uncommon':it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
 function hideHaul(){ const el=$('haul'); if (el.hidden) return; ovClosed('haul'); el.classList.add('out'); setTimeout(()=>{ el.hidden=true; el.classList.remove('out'); el.innerHTML=''; },REDUCED?0:250); }
 /** Paints tiles in two passes, every size read before any canvas is resized, so the page lays out once. */
 /** Tiles are sized by their layout box, not their box on screen, so a sheet mid-zoom or a badge popping in doesn't
@@ -4794,6 +5021,7 @@ function paintTiles(list){ const d=Math.min(window.devicePixelRatio||1,2), rs=[.
 function paintTile(cv,r,d){ r=r||{width:cv.offsetWidth,height:cv.offsetHeight}; d=d||Math.min(window.devicePixelRatio||1,2); if (!r.width) return;
   cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); const s=Math.min(r.width,r.height)*.86;
   if (cv.dataset.find){ if (cv.dataset.sil) drawFindSilhouette(x,cv.dataset.find,s); else drawFind(x,cv.dataset.find,s,0); }
+  else if (cv.dataset.map) drawTreasureMap(x,r.width,r.height,+cv.dataset.map);
   else if (cv.dataset.paint) drawHullSwatch(x,cv.dataset.paint,s);
   else if (cv.dataset.gear) drawTackle(x,cv.dataset.gear,s,S.time);
   else if (cv.dataset.hook) drawBareHook(x,s);
@@ -4844,6 +5072,151 @@ function letterToPell(id){ if (!id || !lettersWaiting()) return; if (MAIL.state=
 function pellReads(){ if (S.state==='loot') return null;   // not while you're still holding it; the boat comes round again
   const FS=findsState(), id=LETTER_ORDER.find(k=>FS.letters[k]==='waiting'); if (!id) return null; FS.letters[id]='delivered'; persist();
   const N=NOTES[id]; return id==='keeper'?'For the Keeper of the Bait Shack. That’s you, I believe. You keep it.':'For '+N.to+'. I’ll see it gets there.'; }
+
+/* ---------- Story relics: how each is found, treasure maps, the Moon Jar, the Wet Almanac and combos ---------- */
+/* The four story relics (STORY in data/relics.js) are artifacts that never turn up loose or in crates:
+     Wet Almanac         Ottilie gives it once you've caught the lake's rain and fog fish (relicAfterCatch).
+     Moon Jar            the first cast into the moonpath on a full-moon night snags it (storyLoot).
+     Drowned Bell        the first cast into the deep pool in fog, in the small hours, snags it (storyLoot).
+     Cartographer's Pin  inside your first treasure map's cache.
+   Treasure maps come as treasure, in pieces (MAPS). A whole map rings a stretch of water in its region; a cast inside
+   the ring can dig up the cache, and with the pin the exact spot is marked and certain. The Moon Jar fills with night
+   catches and, spent by day, makes one cast count as night (nightNow). Every relic shows its combos as chips: a known
+   one names its partner, the rest show "???". Like treasure, all of this reads only the save. */
+
+/** The story part of the finds save, with every field in place. */
+function relicState(){ const FS=findsState(); let r=FS.story; if (!r || typeof r!=='object' || Array.isArray(r)) r=FS.story={};
+  if (!r.map || typeof r.map!=='object' || !REGION_NAME[r.map.reg] || !(r.map.n>0)) r.map=null;
+  r.jar=clamp(+r.jar||0,0,MOON_JAR.fill); r.armed=!!r.armed; r.caches=Math.max(0,+r.caches||0);
+  if (!r.combos || typeof r.combos!=='object') r.combos={}; return r; }
+
+/** Night, for the fishing: after dark, or a cast the Moon Jar lit. */
+function nightNow(){ return isNight(save.clock) || (!SIMULATING && !!(S.bob && S.bob.moon)); }
+
+/* ---------- finding them ---------- */
+/** A story relic or a map's cache waiting where the bobber landed, instead of the usual treasure roll (or null). */
+function storyLoot(b){ if (TREASURE_CTL.off || !save.tutorialDone || S.tut || SIMULATING || !b) return null;
+  const reg=REG(), h=(((save.clock%24)+24)%24), B=STORY.bell;
+  if (!hasFind('moonjar') && reg===FINDS.moonjar.region && onMoonpath(b.x,b.y)) return {kind:'find', id:'moonjar'};
+  if (!hasFind('bell') && reg===FINDS.bell.region && b.spot===B.spot && wxNow()===B.wx && h>=B.hours[0] && h<B.hours[1]) return {kind:'find', id:'bell'};
+  const at=mapAt(b.x,b.y);
+  if (at==='pin' || (at==='ring' && Math.random()<MAPS.chance)) return {kind:'crate', tier:cacheTier({spot:b.spot}), cache:true};
+  return null; }
+/** Where a story relic was found, for the Finds page. */
+const storyWhere = w => Object.assign({},w,{src:'story'});
+/** Ottilie's gift: once you've caught every fish the Wet Almanac asks for. Checked after each catch. */
+function almanacDue(){ return !hasFind('almanac') && save.tutorialDone && STORY.almanac.fish.every(id=>(save.fish[id]||{}).caught>0); }
+function relicAfterCatch(L){ if (L) jarFill(L);
+  if (almanacDue()) setTimeout(()=>{ if (S.state==='idle' && $('sheet').hidden && almanacDue()) storyGift('almanac'); },700); }
+/** Hands over a story relic with its giver's words, on the sheet a returned find uses. */
+function storyGift(id){ const FS=findsState(), D=FINDS[id], St=STORY[id], who='ottilie'; if (FS.have[id]) return;
+  FS.have[id]=storyWhere({t:Date.now(), hr:save.clock, reg:REG()}); FS.fresh.push(id); persist(); updateJournalDot(); sfx.out(D.rarity); buzz([0,30,40,30]);
+  const h='<div class="panel-head"><div><h2>Ottilie</h2><p>She has something for you</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
+    '<div class="rt-card"><canvas class="rt-face" data-who="'+who+'"></canvas><p class="rt-line">“'+St.line+'”</p></div><div class="rt-gifts">'+
+    '<div class="fd-row rf" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' relic · <b>New</b></span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+combosHTML(id)+'</div>'+
+    (freePocket()?'<button class="btn sm" type="button" id="sgPocket">Pocket it</button>':'<span class="tag">Pockets full</span>')+'</div></div>'+
+    '<button class="btn primary rt-go" id="rtGo" type="button">Thank you, Ottilie</button>';
+  openSheet(h); $('closeS').addEventListener('click',closeSheet); $('rtGo').addEventListener('click',closeSheet);
+  const pk=$('sgPocket'); if (pk) pk.addEventListener('click',()=>{ if (pocketIt(id)) pk.outerHTML='<span class="tag ok">In a pocket</span>'; });
+  paintTiles(document.querySelectorAll('#panel canvas[data-find]'));
+  document.querySelectorAll('#panel canvas[data-who]').forEach(cv=>{ const r=cv.getBoundingClientRect(), d=Math.min(window.devicePixelRatio||1,2); cv.width=r.width*d; cv.height=r.height*d;
+    const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); drawPortrait(x,cv.dataset.who,Math.min(r.width,r.height)); });
+  if (!save.finds.pocketTip){ save.finds.pocketTip=true; persist(); coachLater('Relics are artifacts: they work from a vest pocket. Pocket and swap them in your tackle bag.',8); } }
+
+/* ---------- treasure maps ---------- */
+const mapWhole = () => { const m=relicState().map; return !!m && m.n>=MAPS.pieces; };
+/** Whether a map piece can come up here: no map yet, or an unfinished one from this water. */
+function mapCan(c){ const m=relicState().map; return !m || (m.n<MAPS.pieces && m.reg===modCtx(c).region); }
+/** A piece of the map in hand (the first piece starts it, and decides where its cache lies). Returns the map. */
+function addMapPiece(c){ const r=relicState(); if (!mapCan(c)) return r.map;
+  if (!r.map){ const top=Math.max(MAPS.depth[0]+.05,Math.min(MAPS.depth[1],castReach()*.95));
+    r.map={reg:modCtx(c).region, n:0, depth:rand(MAPS.depth[0],top), th:rand(-.45,.45), seed:Math.floor(Math.random()*1e6), t:Date.now()}; }
+  r.map.n++; return r.map; }
+/** Where the map's cache lies on screen. Its depth and angle are kept rather than its pixels, so it stays put
+    through a resize, and casting at that depth and angle always reaches it. */
+function mapXY(m){ const ty=lerp(G.near,HZ+26,m.depth); return {x:clamp(W/2+Math.tan(m.th)*(G.player.y-ty)*.85,W*.1,W*.9), y:ty}; }
+/** 'pin' on the Cartographer's Pin's mark, 'ring' inside the whole map's ring, or null. */
+function mapAt(x,y){ const m=relicState().map; if (!m || m.n<MAPS.pieces || m.reg!==REG()) return null;
+  const p=mapXY(m), k=sc(p.y), d=Math.hypot(x-p.x,(y-p.y)*2.2);
+  if (modFlag('mapPin') && d<W*MAPS.pinR*k+8) return 'pin';
+  return d<W*MAPS.ring*k?'ring':null; }
+/** What a cache is: the first is always MAPS.first, later ones lean on luck like crates. */
+function cacheTier(c){ if (!relicState().caches) return MAPS.first; const w={}; for (const t in MAPS.cache) w[t]=MAPS.cache[t]*tierMul(t,c); return pickW(w); }
+/** The cache is up: the map is spent, and the first cache holds the Cartographer's Pin. */
+function cacheDug(give,where){ const r=relicState(); r.caches++; r.map=null; if (!hasFind('pin')) give('pin',storyWhere(where)); }
+/** Every 5th treasure is a map piece, with the pin in a pocket and a map to add to. */
+function pinMapDue(c){ return modFlag('mapPin',c) && mapCan(c) && (findsState().treasure+1)%MAPS.every===0; }
+
+/* ---------- the Moon Jar ---------- */
+const jarFull = () => relicState().jar>=MOON_JAR.fill;
+/** A fish landed after dark pours a little moonlight in (a full moon pours more). A moonlit cast's fish doesn't. */
+function jarFill(L){ if (!modFlag('moonJar') || L.moon || L.eaten || !isNight(L.hr)) return; const r=relicState(), was=r.jar;
+  r.jar=Math.min(MOON_JAR.fill,r.jar+(fullMoon()?MOON_JAR.fullMoon:1)); JAR.glow=1; persist();
+  if (r.jar>=MOON_JAR.fill && was<MOON_JAR.fill){ news('The Moon Jar is full of moonlight','gold');
+    if (!r.jarTip){ r.jarTip=1; persist(); coachLater('Your Moon Jar is full. Come daytime, tap it on the dock, and your next cast is fished as if it were night.',8); } } }
+const JAR={pour:0, glow:0};
+/** Where the jar sits: on the dock by the tackle box, or on the skiff's deck. */
+function jarPos(){ return REG()==='coast'?{x:W/2-52, y:H-112+(S.bob_y||0)}:{x:W/2-80, y:H-128+44}; }
+function onJar(x,y){ if (!modFlag('moonJar') || S.state!=='idle') return false; const p=jarPos(); return Math.hypot(x-p.x,(y-p.y)*1.2)<24; }
+function tapJar(){ const r=relicState(); audioInit(); tone(1400,.05,{vol:.05,type:'sine'}); buzz(8); JAR.glow=1;
+  if (r.armed){ toast('The moonlight is waiting. Cast!',''); return; }
+  if (!jarFull()){ toast('Moonlight: '+r.jar+' of '+MOON_JAR.fill+'. Catches after dark fill it.',''); return; }
+  if (isNight(save.clock)){ toast('It’s night already. Save the moonlight for daytime.','warn'); return; }
+  r.jar=0; r.armed=true; persist(); JAR.pour=1; sfxJar(); buzz([0,20,40,20]);
+  news('Moonlight spills over the water. Your next cast is a night cast','gold'); }
+/** The cast that lands with the jar's moonlight: it counts as night until the fish is in. */
+function moonCastLanded(c,bob){ if (!c.moon) return; const r=relicState(); if (!r.armed) return; r.armed=false; persist(); bob.moon=true;
+  ripple(bob.x,bob.y,60); for (let i=0;i<14;i++) S.particles.push({x:bob.x+rand(-30,30)*sc(bob.y),y:bob.y+rand(-6,6),vx:rand(-10,10),vy:-rand(10,40),g:-6,life:0,max:rand(.8,1.6),r:rand(1.2,2.4),c:'rgba(214,228,255,',glim:true}); }
+function updateRelics(dt){ JAR.pour=Math.max(0,JAR.pour-dt*.7); JAR.glow=Math.max(0,JAR.glow-dt*1.5); ghostFxAge(dt); }
+function sfxJar(){ [1568,1976,2349,2637,3136].forEach((n,i)=>tone(n,.6,{vol:.035,type:'sine',delay:i*.07})); noise(.6,{vol:.04,f:5000,to:2400,q:1.2}); }
+
+/* ---------- the Wet Almanac ---------- */
+/** The next three turns of the weather here, after now: [{at, kind}], at in hours from midnight today (24+ is
+    tomorrow). Pinned weather and the tutorial's clear skies are read as they'll stay. */
+function almanacRows(){ const w=wxState(), reg=REG(), B=wxSpell(), dayH=Math.floor(B/6)*24, out=[];
+  for (let i=1;i<=3;i++){ const s=B+i, at=s*WX_SPELL.hours-dayH, k=w.force||(!save.tutorialDone?'clear':wxAt(reg,s,w.seed)); out.push({at, kind:k}); }
+  return out; }
+/** Tonight's moon (the coming night by day, this night before dawn): phase and nights until the next full moon. */
+function almanacMoon(){ const w=wxState(), c=MOON.cycle, h=(((save.clock%24)+24)%24), nd=(save.day||0)-(h<5?1:0);
+  const p=w.moon!=null?w.moon:(((nd+MOON.offset)%c)+c)%c; return {p, name:moonName(p), toFull:((MOON.full-p)%c+c)%c}; }
+function moonSVG(p){ const c=MOON.cycle, th=p/c*Math.PI*2, R=9, x=Math.cos(th)*R, wax=p<c/2, lit='#F2E7C4', dark='#3A3F55';
+  if (p===0) return '<svg viewBox="-11 -11 22 22" aria-hidden="true"><circle r="'+R+'" fill="'+dark+'" stroke="#2B2A33" stroke-width="1.2"/></svg>';
+  // the lit limb from top to bottom on its side, then back up along the terminator (an ellipse as wide as cos θ)
+  const limb='M0 -'+R+' A'+R+' '+R+' 0 0 '+(wax?1:0)+' 0 '+R, term=' A'+Math.max(.01,Math.abs(x)).toFixed(2)+' '+R+' 0 0 '+((x>0)===wax?0:1)+' 0 -'+R;
+  return '<svg viewBox="-11 -11 22 22" aria-hidden="true"><circle r="'+R+'" fill="'+dark+'"/><path d="'+limb+term+'Z" fill="'+lit+'"/><circle r="'+R+'" fill="none" stroke="#2B2A33" stroke-width="1.2"/></svg>'; }
+function almanacNote(k){ const F=WX_FISH[REG()]||{}, known=id=>(save.fish[id]||{}).caught>0;
+  if (k==='rain') return F.rain?(known(F.rain.fish)?FISH[F.rain.fish].name+' rising':'Rain fish rising'):'Bites come sooner';
+  if (k==='fog') return F.fog?(known(F.fog.fish)?FISH[F.fog.fish].name+' about':'Fog fish about'):'Fish hide far out';
+  if (k==='cloudy') return 'Grey and quiet'; return 'Gulls out by day'; }
+function openAlmanac(){ const now=wxNow(), h=(((save.clock%24)+24)%24), rows=almanacRows(), m=almanacMoon(), pinned=!!wxState().force;
+  const ico=(k,at)=>wxIconSVG(k+((isNight(at%24)||PERIOD(at%24)==='Evening')?'-n':'-d'));
+  const when=at=>(at>=24?'Tomorrow ':'')+clockText(at%24);
+  const row=(label,k,note,at,cls)=>'<li class="'+(cls||'')+'"><span class="al-ico">'+ico(k,at)+'</span><span class="al-t">'+label+'</span><b>'+WX[k].name+'</b><span class="al-n">'+note+'</span></li>';
+  let html='<div class="panel-head"><div><h2>Wet Almanac</h2><p>'+REGION_NAME[REG()]+' · in pencil, in a careful hand</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
+    '<div class="almanac"><ol class="al-rows">'+row('Now',now,almanacNote(now),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind),r.at)).join('')+'</ol>'+
+    '<div class="al-moon"><span class="al-ico">'+moonSVG(m.p)+'</span><div><b>'+(h>=5&&h<20?'Tonight: ':'')+m.name+'</b><span>'+(m.toFull===0?'The moonpath lies across the deep pool tonight.':'Full moon in '+m.toFull+' night'+(m.toFull===1?'':'s')+'.')+'</span></div></div>'+
+    (pinned?'<p class="note">The weather is pinned in Playtest, so the almanac reads it as staying.</p>':'')+'</div>';
+  openSheet(html); $('closeS').addEventListener('click',closeSheet); noise(.35,{vol:.08,f:2400,to:1200,q:.7}); }
+
+/* ---------- ghost fish: the Drowned Bell's rings and the Tuning Fork's wake ---------- */
+const GHOSTFX={next:0, rings:[], wake:[]};
+/** Each frame of a fight: while a ghost is faded, the bell rings out where it is and the fork leaves a wake. */
+function ghostSigns(R,dt){ if (!R || R.loot || !(R.fade>0)){ GHOSTFX.next=0; return; } const c={fish:R.id};
+  if (modFlag('ghostWake',c)){ comboSeen('wake'); const l=GHOSTFX.wake[GHOSTFX.wake.length-1]; if (!l || Math.hypot(l.x-R.x,l.y-R.y)>3) GHOSTFX.wake.push({x:R.x,y:R.y,a:0}); }
+  if (modFlag('ghostRings',c)){ GHOSTFX.next-=dt; if (GHOSTFX.next<=0){ GHOSTFX.next=.55; GHOSTFX.rings.push({x:R.x,y:R.y,a:0}); sfxGhostBell(R.x); } } }
+function ghostFxAge(dt){ for (const L of [GHOSTFX.rings,GHOSTFX.wake]){ for (const p of L) p.a+=dt; while (L.length && L[0].a>(L===GHOSTFX.rings?1.3:1.6)) L.shift(); } }
+function sfxGhostBell(x){ const f=[659,784,880][Math.floor(Math.random()*3)], pan=clamp((x/W-.5)*1.4,-.8,.8);
+  if (AC && typeof iBell==='function'){ iBell(f,AC.currentTime,{dur:1.6,vol:.045,pan,dest:master}); return; } tone(f,1.2,{vol:.05,type:'sine'}); tone(f*2.76,.4,{vol:.015,type:'sine'}); }
+
+/* ---------- combos ---------- */
+const comboKnown = id => !!relicState().combos[id];
+/** The first time a combo happens, it's known from then on (only combos whose partner is in the game can). */
+function comboSeen(id){ const r=relicState(), C=COMBOS[id]; if (!C || !C.live || r.combos[id]) return; r.combos[id]=Date.now(); persist();
+  news('Combo: '+FINDS[C.a].name+' with '+C.with.toLowerCase(),'gold'); }
+/** A relic's combo chips: "Combos with" its known partners, and "???" for the ones still to find. */
+function combosHTML(fid){ const list=Object.keys(COMBOS).filter(k=>COMBOS[k].a===fid); if (!list.length) return '';
+  return '<div class="combos"><span class="k">Combos with</span>'+list.map(k=>comboKnown(k)?'<span class="cb on">'+COMBOS[k].with+'</span>':'<span class="cb q" aria-label="A combo you haven’t found">???</span>').join('')+'</div>'+
+    list.filter(comboKnown).map(k=>'<p class="cb-eff">'+COMBOS[k].eff+'</p>').join(''); }
 
 /* ---------- Day and night ---------- */
 const NIGHT={skyTop:'#0D1227',skyMid:'#1A2040',skyLow:'#2A2F52',skyHz:'#3A3F68',hillFar:'#2B2E4C',hillNear:'#1F2238',trees:'#141826',town:'#10131F',head:'#121626',
@@ -5662,7 +6035,7 @@ function ropeCoil(x,cx,cy,r){
 
 /* ---------- live parts ---------- */
 function drawDock(){
-  if (REG()==='coast'){ drawSkiffDeck(); drawTrapProp(); drawKeepnet(); return; }
+  if (REG()==='coast'){ drawSkiffDeck(); drawTrapProp(); drawMoonJarProp(); drawKeepnet(); return; }
   const D=dockGeo(), {cx,top}=D;
   // ripples round the piles first, then the cached deck over them
   ctx.strokeStyle='rgba(225,238,242,'+(.22+.1*Math.sin(S.time*2)).toFixed(3)+')'; ctx.lineWidth=1.3;
@@ -5670,6 +6043,7 @@ function drawDock(){
   if (!SC.dock || SC.dock.key!==dockKey()) buildDock();
   if (SC.dock) ctx.drawImage(SC.dock.c,0,SC.dock.y,W,SC.dock.h);
   drawTackleBox(cx-54,top+50);
+  drawMoonJarProp();   // the Moon Jar, when it's in a pocket (game/relic-art.js)
   drawPail(cx+48,top+47);
   drawBaitOnDock(cx+30,top+56);
   drawTrapProp();
@@ -6201,6 +6575,7 @@ function drawGauge(){
   if (!(R.fade>0)){ ctx.strokeStyle=m<.2?'rgba(127,176,105,.9)':'rgba(217,97,76,'+(.35+.5*Math.min(1,m)).toFixed(2)+')';   // a faded ghost gives nothing away here
     ctx.beginPath(); ctx.moveTo(tx,cy); ctx.lineTo(fx,cy); ctx.stroke(); }
   const ga=ghostA(R); ctx.save(); ctx.globalAlpha=ga; ctx.translate(fx,cy-26); ctx.fillStyle=RAR[R.F.rarity].color; ctx.beginPath(); ctx.moveTo(0,10); ctx.lineTo(-7,0); ctx.lineTo(7,0); ctx.closePath(); ctx.fill(); ctx.restore();
+  drawGaugeBell(R,fx,cy-21);   // the Drowned Bell: a faded ghost's marker rings on (game/relic-art.js)
   ctx.font='800 10.5px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='rgba(243,234,215,'+(.7*ga).toFixed(3)+')'; ctx.fillText(R.loot?'HAUL':'FISH',fx,cy-30);
   const T=R.tension, col=T>.82?DANGER:T>.55?BRASS:GOOD, rr=17;
   ctx.fillStyle=S.holding?'rgba(243,234,215,.95)':'rgba(243,234,215,.25)'; ctx.beginPath(); ctx.arc(tx,cy,rr-5,0,Math.PI*2); ctx.fill();
@@ -6235,7 +6610,7 @@ function render(){
   ctx.save();
   if (S.shake>.1) ctx.translate(rand(-1,1)*S.shake,rand(-1,1)*S.shake);
   if (Math.abs(S.zoom-1)>.001){ const cx=W/2, cy=H*.42; ctx.translate(cx,cy); ctx.scale(S.zoom,S.zoom); ctx.translate(-cx,-cy); }
-  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawRfxWater(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
+  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawRfxWater(); drawRelicWater(); drawGhostFx(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
   drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade(); drawRain();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
   drawTrapMarkers(); drawRfxOver(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
@@ -9027,7 +9402,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=22, SNAP_KEY=KEY+'-snapshots';
+const BUILD=23, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -9146,7 +9521,7 @@ if (window.__PWA && 'serviceWorker' in navigator && location.protocol!=='file:')
 let last=performance.now();
 function update(dt,rdt){
   if (S.state==='idle' && save.tutorialDone && save.stats.casts>=12){ S.idleT=(S.idleT||0)+rdt; if (S.idleT>30 && S.idleT-rdt<=30) setHint('Drag back to aim. Release to cast.'); }
-  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt); weatherUpdate(rdt); moonUpdate(rdt); rfxUpdate(rdt);
+  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt); weatherUpdate(rdt); moonUpdate(rdt); rfxUpdate(rdt); updateRelics(rdt);
   { const nc=save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')); if (nc>=24) save.day=(save.day||0)+1; save.clock=nc%24; } PAL=palAt(save.clock);   // save.day: Wanderer's days
   { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2 || (S.time-(SC.bgWxT||0)>.5 && (Math.abs(wxBgKey()-(SC.bgWx||0))>(wxInfo().t<1?.1:.005)))) { SC.bgWxT=S.time; buildBg(); } }   // the hour, or the weather, has moved on
   const ct=hudClock(save.clock); if (ct!==S.clockShown || wxIcon()!==S.wxShown){ const n=(S.clockShown||'').length; S.clockShown=ct; S.wxShown=wxIcon(); setClock(ct); if (ct.length!==n) fitHud(); }
@@ -9186,7 +9561,7 @@ cv.addEventListener('pointerdown',e=>{
     case 'idle':
       if (S.place){ placeDown(x,y); break; }                                       // setting a trap: a marked spot, or the trap itself
       { const T=onTrapProp(x,y); if (T){ startPlacing(T,{x,y}); break; } }      // the trap waiting on the dock or the deck
-      S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y),onTrap:trapAt(x,y)}; setState('aiming'); break;
+      S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y),onTrap:trapAt(x,y),onJar:onJar(x,y)}; setState('aiming'); break;
     case 'waiting': twitch(); break;
     case 'bite': hook(); break;
     case 'reeling': leapTap(); S.holding=true; S.pressX=x; S.pressTilt=S.tilt; break;
@@ -9218,7 +9593,7 @@ $('sheet').addEventListener('pointerdown',e=>{ if (e.target.id==='sheet') closeS
 $('mapBtn').addEventListener('click',()=>{ audioInit(); showMap(); });
 // the clock: a tap says what the weather is doing to the fishing; a long press opens Playtest
 { let lp=0, long=false; $('clock').addEventListener('pointerdown',()=>{ clearTimeout(lp); long=false; lp=setTimeout(()=>{ long=true; buzz(15); $('labBtn').click(); },650); }); ['pointerup','pointercancel','pointerleave'].forEach(ev=>$('clock').addEventListener(ev,()=>clearTimeout(lp)));
-  $('clock').addEventListener('click',e=>{ e.stopPropagation(); if (long){ long=false; return; } if (S.state==='loot' || INTRO.active) return; audioInit(); tone(900,.04,{vol:.04,type:'triangle'}); news(wxLine(),''); });
+  $('clock').addEventListener('click',e=>{ e.stopPropagation(); if (long){ long=false; return; } if (S.state==='loot' || INTRO.active) return; audioInit(); tone(900,.04,{vol:.04,type:'triangle'}); if (modFlag('forecast')) openAlmanac(); else news(wxLine(),''); });   // the Wet Almanac reads ahead (game/relics.js)
   $('clock').addEventListener('keydown',e=>{ if (e.key==='Enter'||e.key===' '){ e.preventDefault(); $('clock').click(); } }); }   // a button for keyboards too; its label says the time and the weather
 $('phoneBtn').addEventListener('click',()=>openPhone());
 $('aquaBtn').addEventListener('click',()=>{ $('aquaBtn').classList.remove('pulse'); openAquarium(); });
@@ -9339,6 +9714,8 @@ function bonusesHTML(){
    Keepsakes work from the moment you have them. Curios are for the collection, and a few belong to people in
    town, who give something back for them. Notes from bottles, the logbook and drowned letters can be reread. */
 let FD_SEL=null;
+/** What a find is called: the story's artifacts are relics. */
+const findKind = D => D.from==='story'?'relic':D.kind;
 const findList = kind => Object.keys(FINDS).filter(id=>FINDS[id].kind===kind);
 function pocketIt(id){ const FS=findsState(); if (!FS.have[id] || FINDS[id].kind!=='artifact' || FS.equip.includes(id) || FS.equip.length>=FS.pockets) return false;
   FS.equip.push(id); persist(); sfx.pocket(true); buzz(12); news(FINDS[id].name+' is in a pocket','good'); return true; }
@@ -9347,7 +9724,8 @@ function sewCost(){ const FS=findsState(); return FS.pockets>=POCKETS.max?null:P
 function sewPocket(){ const FS=findsState(), cost=sewCost(); if (cost==null || save.coins<cost) return false;
   addCoins(-cost); FS.pockets++; persist(); sfx.out('uncommon'); buzz([0,20,30,20]); news('Ottilie sewed on another pocket','gold'); return true; }
 const ownerHas = who => Object.keys(FINDS).filter(id=>FINDS[id].owner===who && hasFind(id) && !findsState().returned[id]);
-function foundWhere(h){ if (!h) return ''; const src=h.src==='return'?'A thank-you gift':h.src==='town'?'A gift from the town':LOOT_TIERS.includes(h.src)?'From '+aOrAn(CRATES[h.src].name.toLowerCase()):h.src==='playtest'?'From Playtest':'Pulled up loose';
+function foundWhere(h,id){ if (!h) return ''; if (h.src==='story' && STORY[id]) return STORY[id].found+(h.t?' · '+whenLabel(h.t,h.hr):'');
+  const src=h.src==='return'?'A thank-you gift':h.src==='town'?'A gift from the town':LOOT_TIERS.includes(h.src)?'From '+aOrAn(CRATES[h.src].name.toLowerCase()):h.src==='playtest'?'From Playtest':'Pulled up loose';
   return src+(h.reg?' · '+(h.spot&&h.src!=='return'&&h.src!=='town'?spotLabel(h.reg,h.spot):REGION_NAME[h.reg]):'')+(h.t?' · '+whenLabel(h.t,h.hr):''); }
 function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(hasFind), keeps=findList('keepsake').filter(hasFind);
   const all=Object.keys(FINDS), got=all.filter(hasFind).length, cost=sewCost();
@@ -9355,10 +9733,14 @@ function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(ha
   if (!FS.treasure) h+='<p class="note">About one cast in a dozen, your line snags on something that isn’t a fish. Everything you pull up is kept here.</p>';
   // the vest itself lives in the tackle bag (game/bag.js); this is what's in it
   h+='<section class="fd-card fd-vest"><header><h3>Vest pockets</h3><span>'+FS.equip.length+' of '+FS.pockets+' in use</span></header><p class="bn-hint">'+(FS.equip.length?'Carrying '+FS.equip.map(id=>FINDS[id].name).join(', ')+'. ':'')+'You pocket and swap artifacts in your tackle bag.</p><button type="button" class="btn sm" id="fdBag">Open your tackle bag</button></section>';
+  // the treasure map in hand (game/relics.js)
+  { const R=relicState(), m=R.map; if (m || R.caches){ const whole=!!m && m.n>=MAPS.pieces;
+    h+='<section class="fd-card fd-map"><header><h3>Treasure map</h3><span>'+(m?Math.min(m.n,MAPS.pieces)+' of '+MAPS.pieces+' pieces':R.caches+' cache'+(R.caches===1?'':'s')+' dug up')+'</span></header>'+
+      (m?'<canvas class="fd-mapart" data-map="'+m.n+'"></canvas>':'')+'<p class="bn-hint">'+(!m?'Map pieces turn up as treasure. Three make a map.':whole?'It rings a stretch of '+REGION_NAME[m.reg]+'. Cast inside the ring to dig up the cache.'+(modFlag('mapPin')?' Your Cartographer’s Pin marks the exact spot.':''):'More pieces turn up as treasure '+(m.reg==='lake'?'on ':'at ')+REGION_NAME[m.reg]+'.')+'</p></section>'; } }
   // artifacts and keepsakes you have
   const row=id=>{ const D=FINDS[id], eq=FS.equip.includes(id), art=D.kind==='artifact';
     const btn=!art?'<span class="tag ok">Always on</span>':eq?'<span class="tag ok">In a pocket</span>':'<span class="tag">Not carried</span>';
-    return '<div class="fd-row rf'+(eq?' eq':'')+'" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+D.kind+(FS.fresh.includes(id)?' · <b>New</b>':'')+'</span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+'</div>'+btn+'</div>'; };
+    return '<div class="fd-row rf'+(eq?' eq':'')+'" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+findKind(D)+(FS.fresh.includes(id)?' · <b>New</b>':'')+'</span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+combosHTML(id)+'</div>'+btn+'</div>'; };
   if (arts.length) h+='<section class="fd-card"><header><h3>Artifacts</h3><span>'+arts.length+' of '+findList('artifact').length+'</span></header>'+arts.map(row).join('')+'</section>';
   if (keeps.length) h+='<section class="fd-card"><header><h3>Keepsakes</h3><span>'+keeps.length+' of '+findList('keepsake').length+'</span></header>'+keeps.map(row).join('')+'</section>';
   // the collection: everything, found or not
@@ -9376,17 +9758,17 @@ function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(ha
 const rarInk = r => ({common:'#7A7468', uncommon:'#4E7B3E', rare:'#3B78B0', epic:'#7448A8', legendary:'#9A7322', exotic:'#24857A', mythic:'#3A3848', godly:'#9A7A22'})[r]||'#7A7468';
 function letterState(id){ const s=findsState().letters[id]; return s==='delivered'?'Delivered':s==='waiting'?'Waiting for Pell':'Not delivered'; }
 function findDetailHTML(id){ if (!id || !FINDS[id]) return ''; const D=FINDS[id], FS=findsState(), have=hasFind(id);
-  if (!have) return '<div class="fd-detail none"><h4>Not found yet</h4><p>'+(D.from==='return'?'Someone in town might give you this, if you find what they lost.':D.from==='town'?'The town might give you this one day, if your cooking wins them over.':
+  if (!have) return '<div class="fd-detail none"><h4>Not found yet</h4><p>'+(D.from==='story'?RAR[D.rarity].label+' relic. '+STORY[id].hint:D.from==='return'?'Someone in town might give you this, if you find what they lost.':D.from==='town'?'The town might give you this one day, if your cooking wins them over.':
     aOrAn(RAR[D.rarity].label.toLowerCase()+' '+D.kind).replace(/^a/,'A')+(rarRank(D.rarity)>=rarRank('exotic')?', only ever found in '+LOOT_TIERS.slice(rarRank(D.rarity)).map(cratesOf).join(' and ')+'.':D.region==='any'?'. It could turn up anywhere.':', somewhere around '+REGION_NAME[D.region]+'.'))+'</p></div>';
   const owed=D.owner && !FS.returned[id], O=D.owner&&OWNERS[D.owner];
-  return '<div class="fd-detail rf" data-r="'+D.rarity+'"><canvas data-find="'+id+'" class="big"></canvas><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+D.kind+'</span><h4>'+D.name+'</h4><p class="lore">'+D.lore+'</p>'+
-    (D.eff?'<p class="eff">'+D.eff+'</p>':'')+(D.down?'<p class="down">'+D.down+'</p>':'')+'<p class="where">'+foundWhere(FS.have[id])+'</p>'+
+  return '<div class="fd-detail rf" data-r="'+D.rarity+'"><canvas data-find="'+id+'" class="big"></canvas><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+findKind(D)+'</span><h4>'+D.name+'</h4><p class="lore">'+D.lore+'</p>'+
+    (D.eff?'<p class="eff">'+D.eff+'</p>':'')+(D.down?'<p class="down">'+D.down+'</p>':'')+combosHTML(id)+'<p class="where">'+foundWhere(FS.have[id],id)+'</p>'+
     (id==='musicbox'?'<button type="button" class="btn sm" id="windBox">Wind it</button>':'')+
     (owed?'<p class="owner">This belongs to '+O.name+'.</p><button type="button" class="btn primary" data-give="'+id+'">Give it back to '+O.name+'</button>':D.owner?'<p class="owner">Returned to '+O.name+'.</p>':'')+'</div>'; }
 let FD_T=0;
 const fdReady = () => performance.now()-FD_T>350;   // the page just re-rendered: a double tap can't hit what appeared under the finger
 function bindFinds(){ const p=$('panel'); FD_T=performance.now();
-  paintTiles(p.querySelectorAll('canvas[data-find],canvas[data-notekind]'));
+  paintTiles(p.querySelectorAll('canvas[data-find],canvas[data-notekind],canvas[data-map]'));
   p.querySelectorAll('[data-sel]').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.sel, pocket=b.classList.contains('pk'); FD_SEL=FD_SEL===id&&!pocket?null:id; tone(900,.04,{vol:.04,type:'triangle'}); showDetail(pocket); }));
   p.querySelectorAll('[data-read]').forEach(b=>b.addEventListener('click',()=>openNote(b.dataset.read,{})));
   const fb=$('fdBag'); if (fb) fb.addEventListener('click',()=>{ if (!fdReady()) return; closeSheet(); if (!BAG) openBag(); });   // with the bag already open under the journal, closing the sheet is enough
@@ -9637,7 +10019,7 @@ function pocketRows(at){ const FS=findsState(), cur=FS.equip[at], arts=findList(
     const act=here?'<button class="btn sm" type="button" data-act="out" data-id="'+id+'">Take it out</button>'
       :where>=0?'<span class="tag">In pocket '+(where+1)+'</span>'
       :'<button class="btn sm primary" type="button" data-act="pocket" data-id="'+id+'">'+(cur?'Swap it in':'Pocket it')+'</button>';
-    h+='<div class="tr-row rf'+(here?' on':'')+'" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div class="tr-txt"><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' artifact</span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+'</div>'+act+'</div>'; }
+    h+='<div class="tr-row rf'+(here?' on':'')+'" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div class="tr-txt"><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+findKind(D)+'</span><h4>'+D.name+'</h4><p>'+D.eff+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+combosHTML(id)+'</div>'+act+'</div>'; }
   const left=findList('artifact').length-arts.length; if (left) h+='<p class="tr-sub">'+left+' more artifact'+(left===1?'':'s')+' still out there</p>';
   return h; }
 function trayAct(act,id){ if (!BAG || !BAG.tray) return; const {kind,at}=BAG.tray, FS=findsState();
@@ -9960,7 +10342,7 @@ function simulate(st,n){
         const g=openLoot(loot,cx); T.hauled++; T.coins+=g.coins; out.glimmer+=g.glimmer; T.kinds[loot.kind]=(T.kinds[loot.kind]||0)+1; if (loot.tier) T.crates[loot.tier]=(T.crates[loot.tier]||0)+1;
         T.finds+=g.items.filter(it=>it.type==='find').length;
         // the haul flies in; a pouch pops, anything else waits for a tap and a look at what's inside
-        t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'?3.5:8;
+        t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'||loot.kind==='map'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
       const at={bow:!!st.bow, path:!!st.path}, id=ech||rollFish(spot,lucky,at), F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath
@@ -10134,21 +10516,26 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
     '<label for="tClock">Time of day<output id="tClockO">'+clockText(save.clock)+'</output><input type="range" id="tClock" min="0" max="23.75" step="0.25" value="'+save.clock.toFixed(2)+'"><span class="note" style="grid-column:1/-1;margin:0">One in-game hour passes every real minute. Lantern Carp only rise at night (or in fog); the Mayor favors dawn.</span></label>'+
     '<label for="tWx">Weather<output id="tWxO">'+(wxState().force?WX[wxState().force].name+' (pinned)':WX[wxNow()].name)+'</output><select id="tWx"><option value="">As the sky has it</option>'+WX_ORDER.map(k=>'<option value="'+k+'"'+(wxState().force===k?' selected':'')+'>'+WX[k].name+', pinned</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Each water has its own weather, turning every few in-game hours. Pinning holds it here and at the coast until you set it back.</span></label>'+
     '<label for="tLoot">Next cast pulls up<output id="tLootO">'+(TREASURE_CTL.force?lootName(TREASURE_CTL.force):'A fish')+'</output><select id="tLoot"><option value="">A fish, as usual</option>'+
-      [['pouch','A coin pouch'],['geode','A Glimmer geode'],['bottle','A message bottle'],['letter','A drowned letter'],['find','A find']].concat(LOOT_TIERS.map(t=>['crate:'+t,aOrAn(CRATES[t].name.toLowerCase())])).map(([v,l])=>'<option value="'+v+'">'+l+'</option>').join('')+
+      [['pouch','A coin pouch'],['geode','A Glimmer geode'],['bottle','A message bottle'],['letter','A drowned letter'],['find','A find'],['map','A treasure map piece']].concat(LOOT_TIERS.map(t=>['crate:'+t,aOrAn(CRATES[t].name.toLowerCase())])).map(([v,l])=>'<option value="'+v+'">'+l+'</option>').join('')+
       '</select><span class="note" style="grid-column:1/-1;margin:0">Treasure turns up on its own about once in 12 casts. This picks the next one, so you can see every crate open.</span></label>'+
     '<label for="tFish">Next fish to bite<output id="tFishO">'+(RARITY_CTL.fish?FISH[RARITY_CTL.fish].name:'As the water has it')+'</output><select id="tFish"><option value="">As the water has it</option>'+
       Object.keys(FISH).map(id=>'<option value="'+id+'"'+(RARITY_CTL.fish===id?' selected':'')+'>'+FISH[id].name+' ('+RAR[FISH[id].rarity].label+')</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Picks the next fish, wherever you cast, to see each tier’s hook, landing and card.</span></label>'+
     '<label for="tMut">Next mutation<output id="tMutO">'+(RARITY_CTL.mut?MUTS[RARITY_CTL.mut].name:'Left to chance')+'</output><select id="tMut"><option value="">Left to chance</option>'+
       MUT_ORDER.map(k=>'<option value="'+k+'"'+(RARITY_CTL.mut===k?' selected':'')+'>'+MUTS[k].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">The next fish you land comes up with this (not a Mythic, and not in the first lesson).</span></label>'+
     '<label for="tMoon">Moon<output id="tMoonO">'+moonName()+'</output><select id="tMoon"><option value="">As the sky has it</option>'+
-      Array.from({length:MOON.cycle},(_,i)=>'<option value="'+i+'"'+(wxState().moon===i?' selected':'')+'>'+moonName(i)+', pinned</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">A full moon puts the moonpath across the deep pool at night, where the Moonwhale Calf bites.</span></label></div>'+
+      Array.from({length:MOON.cycle},(_,i)=>'<option value="'+i+'"'+(wxState().moon===i?' selected':'')+'>'+moonName(i)+', pinned</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">A full moon puts the moonpath across the deep pool at night, where the Moonwhale Calf bites.</span></label>'+
+    '<label for="tRelic">Story relics<output id="tRelicO">'+Object.keys(STORY).filter(hasFind).length+' of '+Object.keys(STORY).length+'</output><select id="tRelic"><option value="">Hand one over…</option>'+Object.keys(STORY).map(id=>'<option value="'+id+'"'+(hasFind(id)?' disabled':'')+'>'+FINDS[id].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Each is found its own way: the almanac from Ottilie, the jar on the moonpath, the bell in the deep pool’s small-hours fog, the pin in your first map’s cache.</span></label></div>'+
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
-    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="bowBtn" type="button">'+(wxState().bow?'Clear the rainbow':'Rainbow now')+'</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
+    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="jarBtn" type="button">Fill the Moon Jar</button><button class="btn" id="mapBtn2" type="button">Finish the map</button><button class="btn" id="bowBtn" type="button">'+(wxState().bow?'Clear the rainbow':'Rainbow now')+'</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
   bindPlaytestTabs();
   [['tHook','hook'],['tTension','tension'],['tWait','wait']].forEach(([id,k])=>{ $(id).addEventListener('input',e=>{ save.tune[k]=+e.target.value; $(id+'O').textContent=(+e.target.value).toFixed(2)+'×'; persist(); }); });
   $('tClock').addEventListener('input',e=>{ save.clock=+e.target.value; $('tClockO').textContent=clockText(save.clock); buildBg(); persist(); });
   $('tWx').addEventListener('change',e=>{ const w=wxState(); if (e.target.value) w.force=e.target.value; else delete w.force; persist(); WXT.kind=null; buildBg(); $('tWxO').textContent=w.force?WX[w.force].name+' (pinned)':WX[wxNow()].name; });
   $('coinBtn').addEventListener('click',()=>{ addCoins(1000); });
+  $('tRelic').addEventListener('change',e=>{ const id=e.target.value; if (!id || hasFind(id)) return; const FS=findsState(); FS.have[id]={t:Date.now(),hr:save.clock,reg:REG(),src:'story'}; FS.fresh.push(id);
+    if (FS.equip.length<FS.pockets) FS.equip.push(id); persist(); updateJournalDot(); closeSheet(); news(FINDS[id].name+(FS.equip.includes(id)?' is in a pocket':' is in your tackle bag'),'good'); });
+  $('jarBtn').addEventListener('click',()=>{ const r=relicState(); r.jar=MOON_JAR.fill; r.armed=false; persist(); closeSheet(); news(modFlag('moonJar')?'The Moon Jar is full':'The Moon Jar is full, but it only works from a pocket',''); });
+  $('mapBtn2').addEventListener('click',()=>{ while (mapCan({}) && !mapWhole()) addMapPiece({}); persist(); closeSheet(); news(mapWhole()?'Your treasure map is whole':'You already have a map from another water',''); });
   $('tFish').addEventListener('change',e=>{ RARITY_CTL.fish=e.target.value||null; $('tFishO').textContent=RARITY_CTL.fish?FISH[RARITY_CTL.fish].name:'As the water has it'; });
   $('tMut').addEventListener('change',e=>{ RARITY_CTL.mut=e.target.value||null; $('tMutO').textContent=RARITY_CTL.mut?MUTS[RARITY_CTL.mut].name:'Left to chance'; });
   $('tMoon').addEventListener('change',e=>{ const w=wxState(); if (e.target.value!=='') w.moon=+e.target.value; else delete w.moon; persist(); buildBg(); $('tMoonO').textContent=moonName(); });
@@ -10173,7 +10560,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   let armed=false; $('resetAll').addEventListener('click',e=>{ if (!armed){ armed=true; e.target.textContent='Tap again to erase'; return; }
     snapshot('Before erasing',true); const snd=save.sound; save=fresh(); save.sound=snd; persist(); coinShown=0; $('coins').textContent='0'; glimShown=glimGoal=0; $('glimmer').textContent='0'; updateHud(); closeSheet(); setState('idle'); news('Progress erased',''); });
 }
-const lootName=l=>l.kind==='crate'?CRATES[l.tier].name:{pouch:'Coin pouch',geode:'Glimmer geode',bottle:'Message bottle',letter:'Drowned letter',find:'A find'}[l.kind];
+const lootName=l=>l.kind==='crate'?CRATES[l.tier].name:{pouch:'Coin pouch',geode:'Glimmer geode',bottle:'Message bottle',letter:'Drowned letter',find:'A find',map:'A treasure map piece'}[l.kind];
 function bindPlaytestTabs(){ $('closeS').addEventListener('click',closeSheet);
   document.querySelectorAll('#panel [data-pt]').forEach(b=>b.addEventListener('click',()=>{ tone(900,.04,{vol:.04,type:'triangle'}); openPlaytest(b.dataset.pt); $('panel').scrollTop=0; })); }
 

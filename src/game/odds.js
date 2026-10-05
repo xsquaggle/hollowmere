@@ -1,7 +1,7 @@
 /* ---------- Bite odds: which fish each spot offers, and the rod in hand ---------- */
 /** Each fish's weight in this spot's pool, here and now. */
 function poolFor(spot,lucky){
-  const h=save.clock, night=isNight(h), coastal=REG()==='coast', w=Object.assign({},(coastal?POOLS_COAST:POOLS)[spot]||(coastal?POOLS_COAST.open:POOLS.open));
+  const h=save.clock, night=nightNow(), coastal=REG()==='coast', w=Object.assign({},(coastal?POOLS_COAST:POOLS)[spot]||(coastal?POOLS_COAST.open:POOLS.open));
   // the water itself: who comes up at night, and the Mayor's dawns
   if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
@@ -32,7 +32,7 @@ const RARE_ORDER=Object.keys(RARE_BITES).sort((a,b)=>rarRank(FISH[b].rarity)-rar
 function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
   for (const id of RARE_ORDER){ const B=RARE_BITES[id];
     if (B.region!==reg || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
-    if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock))) continue;
+    if ((B.moon==='full' && !fullMoon()) || (B.night && !nightNow())) continue;
     if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
   return null; }
 /** Playtest: the next fish to bite, and the next mutation, picked by hand (game/playtest.js). */

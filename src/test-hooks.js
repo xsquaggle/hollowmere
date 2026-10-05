@@ -34,6 +34,11 @@ window.__hm={ get save(){ return save; }, FISH, RODS, REGION_FISH, RECIPES, DECO
     // finish the station in hand with these scores, as if played (for tests that aren't about the stations themselves)
     finish:sc=>{ for (const k of kSts()) K.scores[k]=sc; showResult(); }, jump:k=>{ for (const q of kSts()){ if (q===k) break; K.scores[q]=K.scores[q]||85; } ({clean:startClean,season:startSeason,cook:startCook,plate:startPlate})[k](); }, visit:()=>ORDK.visit&&{who:ORDK.visit.who, key:ORDK.visit.key, line:ORDK.visit.line}, grey:()=>greyPick(), want:()=>ordersWant(), restore:()=>kRestore() },
   hud:{ coins:n=>addCoins(n), eat:(id,stars)=>eatMeal(id,stars||3), lv:()=>HUD.lv, refit:()=>{ HUD.sig=''; fitHud(); return HUD.lv; } },
+  STORY, MAPS, MOON_JAR, COMBOS,
+  relics:{ state:()=>relicState(), story:b=>storyLoot(b), mapAt:(x,y)=>mapAt(x,y), mapXY:()=>{ const m=relicState().map; return m&&mapXY(m); }, piece:c=>addMapPiece(c||{}), mapCan:c=>mapCan(c||{}),
+    whole:()=>mapWhole(), cacheTier:c=>cacheTier(c||{spot:'open'}), pinDue:c=>pinMapDue(c||{}), night:()=>nightNow(), jarFill:L=>jarFill(L), tapJar:()=>tapJar(), jarPos:()=>jarPos(), onJar:(x,y)=>onJar(x,y),
+    almanac:()=>({rows:almanacRows(), moon:almanacMoon()}), openAlmanac:()=>openAlmanac(), afterCatch:L=>relicAfterCatch(L), due:()=>almanacDue(), gift:id=>storyGift(id),
+    ghost:()=>({rings:GHOSTFX.rings.length, wake:GHOSTFX.wake.length}), signs:(R,dt)=>ghostSigns(R,dt), combos:id=>combosHTML(id), seen:id=>comboSeen(id), known:id=>comboKnown(id) },
   treasure(o){ TREASURE_CTL.off=o===false; TREASURE_CTL.force=o&&o.kind?o:null; }, findsState:()=>findsState(), rollTreasure:c=>rollTreasure(c||{spot:'open'}),
   rollCrateTier:c=>rollCrateTier(c||{spot:'open'}), treasureChance:c=>treasureChance(c||{spot:'open'}), openLoot:(l,c)=>openLoot(l,c||{spot:'open'}), modAdd:(s,c)=>modAdd(s,c), castReach:()=>castReach(), gullMul:()=>gullMul(),
   tierMul:(r,c)=>tierMul(r,c), modMul:(s,c)=>modMul(s,c), luckPoints:c=>luckPoints(c),

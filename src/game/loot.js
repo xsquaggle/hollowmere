@@ -68,7 +68,7 @@ function lootLand(){ const L=S.loot, k=L.kind; L.x=L.to.x; L.y=L.to.y; L.rot=0; 
   const heavy=k==='crate'; shake(heavy?2.5+L.ti*1.4:1.2); sfx.thud(heavy?L.ti:-1); buzz(heavy?[0,26+L.ti*8]:14);
   drip(L.x,L.y-8,heavy?14+L.ti*2:6); splash(L.x,L.y,heavy?8+L.ti*2:4,'rgba(205,228,236,');
   S.darkT=heavy?.3+L.ti*.04:.22;
-  if (k==='find'){ L.phase='glint'; L.st=.6; sfx.glint(); return; }
+  if (k==='find'||k==='map'){ L.phase='glint'; L.st=.6; sfx.glint(); const it=L.got.items[0]; if (it && it.id==='bell') sfxGhostBell(L.x); return; }   // the Drowned Bell rings as it comes up
   L.phase='ready';
   const FS=findsState();
   if (heavy && FS.treasure===1) coachShow('A crate! Tap it to open it.',6);
@@ -128,15 +128,18 @@ function drawLoot(){ const L=S.loot; if (!L) return; const ti=L.ti, R=RAR[L.tier
   else if (L.kind==='geode'){ if (L.phase!=='geode' || L.st>.15) { ctx.globalAlpha=L.phase==='geode'?Math.min(1,L.st/.15):1; drawGeode(ctx,58*k,L.gopen||0,S.time); ctx.globalAlpha=1; } }
   else if (L.kind==='bottle'){ drawBottle(ctx,76*k,S.time); if (L.cork){ ctx.save(); ctx.translate(-14,-30+L.cork.y*.3); ctx.rotate(L.cork.r); ctx.fillStyle='#B68A5E'; ctx.fillRect(-5,-4,10,8); ctx.strokeStyle=INK; ctx.lineWidth=1.6; ctx.strokeRect(-5,-4,10,8); ctx.restore(); } }
   else if (L.kind==='letter'){ drawEnvelope(ctx,84*k,!!L.cork); }
+  else if (L.kind==='map'){ const it=L.got.items[0]; drawMapPiece(ctx,74*k,it?it.n:1,S.time); if (L.phase==='glint') drawGlint(L); }
   else if (L.kind==='find'){ const it=L.got.items[0], id=it&&it.type==='find'?it.id:null, r=id?FINDS[id].rarity:'common';
     if (L.phase!=='fly' && r!=='common') drawRays(0,-6,RAR[r].color,.35+.1*Math.sin(S.time*2),70+rarRank(r)*12);
     if (id) drawFind(ctx,id,70*k,S.time); else drawPouch(ctx,56*k);
-    if (L.phase==='glint'){ const g=1-L.st/.6; ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.translate(18,-18); ctx.rotate(g*2); ctx.fillStyle='rgba(255,250,230,'+(1-g).toFixed(2)+')';
-      for (let i=0;i<4;i++){ ctx.rotate(Math.PI/2); ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(3,-3); ctx.lineTo(0,-16*(1-g*.5)); ctx.lineTo(-3,-3); ctx.closePath(); ctx.fill(); } ctx.restore(); } }
+    if (L.phase==='glint') drawGlint(L); }
   ctx.restore();
   if (L.phase==='ready' && L.kind==='crate') drawLootLabels(L);
   if (L.phase==='ready' && (L.kind==='bottle'||L.kind==='letter')){ ctx.globalAlpha=.78+.22*Math.sin(S.time*4); lootLabel(L.x,L.y+44,L.kind==='bottle'?'TAP TO UNCORK':'TAP TO OPEN',PAPER,14); ctx.globalAlpha=1; }
 }
+/** The four-point glint as a find comes up. */
+function drawGlint(L){ const g=1-L.st/.6; ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.translate(18,-18); ctx.rotate(g*2); ctx.fillStyle='rgba(255,250,230,'+(1-g).toFixed(2)+')';
+      for (let i=0;i<4;i++){ ctx.rotate(Math.PI/2); ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(3,-3); ctx.lineTo(0,-16*(1-g*.5)); ctx.lineTo(-3,-3); ctx.closePath(); ctx.fill(); } ctx.restore(); }
 function lootLabel(x,y,text,col,size){ ctx.font='800 '+(size||12)+'px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.lineWidth=4; ctx.strokeStyle='rgba(20,22,34,.85)'; ctx.strokeText(text,x,y); ctx.fillStyle=col; ctx.fillText(text,x,y); }
 function drawLootLabels(L){ const cw=crateW(L.ti)*(L.fitK||1), R=RAR[L.tier], hv=L.hv||0, pulseA=.78+.22*Math.sin(S.time*4);
   // the crate's name and pips sit above it, unless a tip or a short screen leaves no room: then below
@@ -176,15 +179,14 @@ function drawSnagUnder(){ const b=S.bob, k=sc(b.y), u=S.wait&&S.wait.phase==='sn
   ctx.save(); ctx.globalAlpha=.25+.35*u; ctx.fillStyle='rgba(12,26,34,.8)'; ctx.beginPath(); ctx.ellipse(b.x,b.y+6*k,18*k*(.6+.4*u),7*k*(.6+.4*u),0,0,7); ctx.fill(); ctx.restore(); }
 
 /* ---------- the haul card ---------- */
-const KIND_LABEL={curio:'curio', artifact:'artifact', keepsake:'keepsake'};
 function pipsHTML(r){ const n=rarRank(r)+1; return '<span class="pips" aria-label="'+RAR[r].label+'">'+Array.from({length:LOOT_TIERS.length},(_,i)=>'<i class="'+(i<n?'on':'')+'"></i>').join('')+'</span>'; }
 function freePocket(){ const FS=findsState(); return FS.equip.length<FS.pockets; }
 /** One thing from inside, in a dashed slot that's laid out first, so you can see how many are coming. */
 function haulSlotHTML(it,i){ return '<div class="hl-slot" style="--i:'+i+'"><div class="hl-pop" style="--i:'+i+'" data-r="'+itemRarity(it)+'">'+haulItemHTML(it,i)+'</div></div>'; }
 function haulItemHTML(it,i){ const st=' style="--i:'+i+'"';
   if (it.type==='find'){ const D=FINDS[it.id], art=D.kind==='artifact', eq=findsState().equip.includes(it.id);
-    return '<div class="hl-item rf" data-r="'+D.rarity+'"'+st+'><canvas class="hl-art" data-find="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[D.rarity].label+' '+KIND_LABEL[D.kind]+' · <b>New</b></span><h3>'+D.name+'</h3>'+
-      '<p>'+(D.eff||D.lore)+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+(D.owner?'<p class="owner">This belongs to '+OWNERS[D.owner].name+'. Give it back from your journal’s Finds page.</p>':'')+
+    return '<div class="hl-item rf" data-r="'+D.rarity+'"'+st+'><canvas class="hl-art" data-find="'+it.id+'"></canvas><div class="hl-txt"><span class="k">'+RAR[D.rarity].label+' '+findKind(D)+' · <b>New</b></span><h3>'+D.name+'</h3>'+
+      '<p>'+(D.eff||D.lore)+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+combosHTML(it.id)+(D.owner?'<p class="owner">This belongs to '+OWNERS[D.owner].name+'. Give it back from your journal’s Finds page.</p>':'')+
       (art?(eq?'<p class="on">In a pocket. Working now.</p>':freePocket()?'<button class="btn sm" type="button" data-pocket="'+it.id+'">Put it in a pocket</button>':'<p class="pk-note">Your pockets are full. Swap it in from your tackle bag.</p>'):'')+
       (D.kind==='keepsake'?'<p class="on">Working now, from your shelf.</p>':'')+'</div></div>'; }
   if (it.type==='paint'){ const P=PAINTS[it.id];
@@ -196,14 +198,18 @@ function haulItemHTML(it,i){ const st=' style="--i:'+i+'"';
       '<p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+(on?'<p class="on">On your '+ROD().name+'.</p>':T.kind==='bait'?'<p class="on">In your tackle bag.</p>':'<button class="btn sm" type="button" data-rigit="'+it.id+'">Put it on your '+ROD().name+'</button>')+'</div></div>'; }
   if (it.type==='note'){ const N=NOTES[it.id];
     return '<div class="hl-item rf" data-r="common"'+st+'><canvas class="hl-art" data-notekind="'+N.kind+'"></canvas><div class="hl-txt"><span class="k">'+noteKind(N)+'</span><h3>'+noteTitle(it.id)+'</h3><p>Kept with your notes in the journal.</p><button class="btn sm" type="button" data-read="'+it.id+'">Read it</button></div></div>'; }
+  if (it.type==='map'){ const whole=it.n>=MAPS.pieces, pin=modFlag('mapPin'), reg=(relicState().map||{}).reg;
+    return '<div class="hl-item rf" data-r="uncommon"'+st+'><canvas class="hl-art map" data-map="'+it.n+'"></canvas><div class="hl-txt"><span class="k">Treasure map · piece '+Math.min(it.n,MAPS.pieces)+' of '+MAPS.pieces+'</span><h3>'+(whole?'The map is whole':'A piece of a map')+'</h3><p>'+
+      (whole?'It rings a stretch of '+REGION_NAME[reg||REG()]+'. Cast inside the ring to dig up what’s buried there.'+(pin?' Your Cartographer’s Pin marks the exact spot.':''):(MAPS.pieces-it.n===1?'One more piece':(MAPS.pieces-it.n)+' more pieces')+' and it shows where something is buried'+(reg&&reg!==REG()?'':' in '+REGION_NAME[reg||REG()])+'.')+'</p></div></div>'; }
   if (it.type==='spare') return '<div class="hl-item spare"'+st+'><div class="hl-txt"><span class="k">Spare coins</span><h3><span class="coin"></span>+'+it.n.toLocaleString()+'</h3><p>You’ve found every '+RAR[it.rarity].label.toLowerCase()+' thing this could have held, so it paid in coins.</p></div></div>';
   return ''; }
 function haulTitle(L){ const g=L.got;
-  if (L.kind==='crate') return CRATES[L.tier].name;
+  if (L.kind==='crate') return g.cache?'A buried cache':CRATES[L.tier].name;
+  if (L.kind==='map') return g.items[0]&&g.items[0].n>=MAPS.pieces?'The map is whole':'A piece of a map';
   const it=g.items[0]; if (it && it.type==='find') return 'You found something';
   return 'Treasure'; }
 function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
-  const tier=L.kind==='crate'?L.tier:first&&first.type==='find'?FINDS[first.id].rarity:'common';
+  const tier=L.kind==='crate'?L.tier:first&&first.type==='find'?FINDS[first.id].rarity:L.kind==='map'?'uncommon':'common';
   el.dataset.r=tier; el.dataset.kind=L.kind; el.classList.remove('out');
   let h='<div class="hl-top"><span class="rarity">'+RAR[tier].label+'</span>'+pipsHTML(tier)+'</div><h2>'+haulTitle(L)+'</h2>';
   const base=g.base==null?g.coins:g.base;
@@ -214,7 +220,7 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   const n=g.items.length, last=.35+Math.max(0,n-1)*.55;
   h+='<button class="btn primary" id="hlGo" type="button" style="animation-delay:'+(last+.3).toFixed(2)+'s">Collect</button>';
   el.innerHTML=h; el.hidden=false; ovOpen('haul',()=>{ lootEnd(); });
-  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear],canvas[data-decor],canvas[data-rune]'));
+  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear],canvas[data-decor],canvas[data-rune],canvas[data-map]'));
   // the coins count up, then each item arrives with its own sound
   if (base){ const b=$('hlCoins'), t0=performance.now(), dur=REDUCED?1:Math.min(1100,350+base*.25); sfx.coin(6);
     (function step(now){ if (!b.isConnected) return; const k=Math.min(1,(now-t0)/dur); b.textContent=Math.round(base*(1-Math.pow(1-k,3))).toLocaleString(); if (k<1) requestAnimationFrame(step); else tallyCoins(); })(t0); }
@@ -231,7 +237,7 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   const cardTop=window.innerHeight-(parseFloat(getComputedStyle(el).bottom)||18)-el.offsetHeight, room=cardTop-14-(L.kind==='crate'?crateW(L.ti)*1.02+L.hv:90)-64;
   L.lift=Math.min(L.to.y,cardTop-14); if (L.kind==='crate' && room<0) L.fit=Math.max(.5,1+room/(crateW(L.ti)*1.02));
 }
-const itemRarity=it=>it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
+const itemRarity=it=>it.type==='map'?'uncommon':it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
 function hideHaul(){ const el=$('haul'); if (el.hidden) return; ovClosed('haul'); el.classList.add('out'); setTimeout(()=>{ el.hidden=true; el.classList.remove('out'); el.innerHTML=''; },REDUCED?0:250); }
 /** Paints tiles in two passes, every size read before any canvas is resized, so the page lays out once. */
 /** Tiles are sized by their layout box, not their box on screen, so a sheet mid-zoom or a badge popping in doesn't
@@ -241,6 +247,7 @@ function paintTiles(list){ const d=Math.min(window.devicePixelRatio||1,2), rs=[.
 function paintTile(cv,r,d){ r=r||{width:cv.offsetWidth,height:cv.offsetHeight}; d=d||Math.min(window.devicePixelRatio||1,2); if (!r.width) return;
   cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); const s=Math.min(r.width,r.height)*.86;
   if (cv.dataset.find){ if (cv.dataset.sil) drawFindSilhouette(x,cv.dataset.find,s); else drawFind(x,cv.dataset.find,s,0); }
+  else if (cv.dataset.map) drawTreasureMap(x,r.width,r.height,+cv.dataset.map);
   else if (cv.dataset.paint) drawHullSwatch(x,cv.dataset.paint,s);
   else if (cv.dataset.gear) drawTackle(x,cv.dataset.gear,s,S.time);
   else if (cv.dataset.hook) drawBareHook(x,s);

@@ -33,6 +33,8 @@ function rollTreasure(c){
   const w=Object.assign({},TREASURE.kinds);
   if (!nextBottleNote(c,true)){ w.pouch+=w.bottle; w.bottle=0; }      // every note read: the bottle's share goes to coins
   if (!pickLoose(c,true)){ w.pouch+=w.find; w.find=0; }
+  // a treasure map's pieces (game/relics.js): only while there's a map to add to; with the Cartographer's Pin, every 5th treasure
+  if (!mapCan(c)){ w.pouch+=w.map; w.map=0; } else if (pinMapDue(c)) return {kind:'map'};
   if (letterCan(c)) w.letter=TREASURE.letter.weight;
   const kind=pickW(w); return kind==='crate'?{kind, tier:rollCrateTier(c)}:{kind};
 }
@@ -85,7 +87,7 @@ function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',
   const out={kind:loot.kind, tier:loot.tier||null, coins:0, glimmer:0, items:[]};
   const glim=([a,b])=>a+Math.floor(Math.random()*(b-a+1));
   const where={t:Date.now(), hr:save.clock, reg:x.region, spot:c.spot||'open', src:loot.kind==='crate'?loot.tier:loot.kind};
-  const give=id=>{ FS.have[id]=Object.assign({},where); FS.fresh.push(id); out.items.push({type:'find',id}); };
+  const give=(id,w)=>{ FS.have[id]=Object.assign({},w||where); FS.fresh.push(id); out.items.push({type:'find',id}); };
   const note=id=>{ if (!FS.notes.includes(id)) FS.notes.push(id); out.items.push({type:'note',id}); };
   const spare=r=>{ const n=Math.round(crateCoins(r,c)*.5); out.coins+=n; out.items.push({type:'spare',n,rarity:r}); };   // half a crate of that tier
   FS.treasure++;
@@ -93,9 +95,11 @@ function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',
   else if (loot.kind==='geode') out.glimmer=glim(GLIMMER.geode[x.region]||GLIMMER.geode.lake);
   else if (loot.kind==='bottle'){ const id=nextBottleNote(c); FS.bottles++; if (id) note(id); else spare('common'); }
   else if (loot.kind==='letter'){ const id=nextLetter(); if (id){ FS.letters[id]='waiting'; note(id); } else spare('uncommon'); }   // Pell collects it on his next stop
-  else if (loot.kind==='find'){ const id=pickLoose(c); if (id) give(id); else spare('common'); }
+  else if (loot.kind==='find'){ const id=loot.id&&!FS.have[loot.id]?loot.id:pickLoose(c); if (id) give(id,loot.id===id?storyWhere(where):null); else spare('common'); }   // a story relic (game/relics.js), or a loose find
+  else if (loot.kind==='map'){ const m=addMapPiece(c); out.items.push({type:'map', n:m.n}); }
   else if (loot.kind==='crate'){ const C=CRATES[loot.tier]; FS.crates[loot.tier]=(FS.crates[loot.tier]||0)+1;
     out.coins=crateCoins(loot.tier,c); out.glimmer=glim(GLIMMER.crate[loot.tier]);
+    if (loot.cache){ out.cache=true; cacheDug(give,where); }   // a treasure map's cache: the first holds the Cartographer's Pin
     for (const it of C.items){
       if (it.chance!=null && !(Math.random()<it.chance)) continue;
       if (it.note && Math.random()<it.note){ const id=nextBottleNote(c); if (id){ note(id); continue; } }
@@ -120,7 +124,7 @@ function grantDecor(k,id){ const t=tanks()[k]; t.stored=t.stored||[]; if (!t.sto
 /* ---------- the snag and the haul ---------- */
 /** What the line feels like with treasure on it: a dead weight. Crates get heavier and snag more by tier. */
 function haulOf(loot){ const C=loot.kind==='crate'?CRATES[loot.tier]:TREASURE.haul[loot.kind], tier=loot.kind==='crate'?loot.tier:'common';
-  return {name:loot.kind==='crate'?C.name:'Something', rarity:tier, beh:'weight', pull:C.pull, reel:C.reel, snags:C.snags||0, len:loot.kind==='crate'?30+5*rarRank(tier):16, loot:true,
+  return {name:loot.cache?'Buried cache':loot.kind==='crate'?C.name:'Something', rarity:tier, beh:'weight', pull:C.pull, reel:C.reel, snags:C.snags||0, len:loot.kind==='crate'?30+5*rarRank(tier):16, loot:true,
     tip:C.snags?'Hold to haul it up. When it catches on the bottom, let go, then haul hard.':'Hold to haul it up. Let go if the ring turns red.'}; }
 /** The quiet ran out and treasure came instead of a fish: the bobber drifts, dips and drags. */
 function startSnag(loot){ const w=S.wait, b=S.bob; w.phase='snag'; w.loot=loot; w.lucky=inLucky(b.x,b.y); w.snagT=rand(.9,1.6); w.drag=Math.random()<.5?-1:1; w.fish=null; w.sh=null;
