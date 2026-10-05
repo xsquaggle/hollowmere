@@ -173,4 +173,5 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/kitchen.test.cjs` | 68 | The four stations, meals, mush |
 | `tests/idle.test.cjs` | 274 | Traps, the smoke rack, time away |
 | `tests/orders.test.cjs` | 287 | Supper orders and reputation |
+| `tests/rarity.test.cjs` | 152 | Moon phases, rare bites, mutations, the dry run, the Mythic's sell |
 | `tests/weather.test.cjs` | 136 | Weather and its fish |
