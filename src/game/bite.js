@@ -15,7 +15,8 @@ function startWaiting(){
 function biteWait(spot){ const c={spot}; return rand(.75,2.1)*modMul('wait',c)*modMul('bite',c); }
 function spawnApproach(){
   const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.bow=atBowFoot(b.x,b.y);
-  w.fish=S.tut?'perch':w.echo||rollFish(b.spot,w.lucky,{bow:w.bow, path:onMoonpath(b.x,b.y)}); const F=FISH[w.fish];
+  // the rare bites and the dry run count once a cast (as the simulator does); a fish that comes back after a spook is an ordinary one
+  w.fish=S.tut?'perch':w.echo||(w.rolled?pickW(poolFor(b.spot,w.lucky)):rollFish(b.spot,w.lucky,{bow:w.bow, path:onMoonpath(b.x,b.y)})); w.rolled=true; const F=FISH[w.fish];
   const ang=rand(0,Math.PI*2), d=w.echo?rand(40,60):rand(85,150);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
   w.sh={x,y,ang:Math.atan2(b.y-y,b.x-x),alpha:0,flee:false};

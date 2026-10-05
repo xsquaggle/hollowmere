@@ -86,11 +86,11 @@ function wxFishFor(reg,spot){ const out=[], F=WX_FISH[reg]; if (!F) return out; 
 /** One line for the clock tap: what the weather is doing to the fishing here. */
 function wxLine(){ const k=wxNow(), reg=REG(), F=WX_FISH[reg]||{}, known=id=>(save.fish[id]||{}).caught>0, nm=id=>known(id)?'the '+FISH[id].name+' is':'something new is';
   const where=' at '+REGION_NAME[reg];
+  if (bowFoot()) return 'A rainbow'+where+'. Where it comes down on the water, catches come up mutated twice as often.';
+  if (isNight(save.clock) && reg==='lake' && moonpathOn()) return 'A full moon over the lake. The moonpath lies across the deep pool tonight.';
   if (k==='rain') return 'Rain'+where+'. Fish bite sooner and '+nm(F.rain.fish)+' rising, but the drops make nibbles hard to read.';
   if (k==='fog') return 'Fog'+where+'. Fish hide in the far water until they reach your bobber, and '+nm(F.fog.fish)+' rising.'+(reg==='lake' && !isNight(save.clock)?' Lantern Carp come up by day.':'');
   if (k==='cloudy') return 'Overcast'+where+'. Grey and quiet, and '+(known(F.rain.fish)?'the '+FISH[F.rain.fish].name+' is':'rain fish are')+' starting to stir.';
-  if (bowFoot()) return 'A rainbow'+where+'. Where it comes down on the water, catches come up mutated twice as often.';
-  if (isNight(save.clock) && reg==='lake' && moonpathOn()) return 'A full moon over the lake. The moonpath lies across the deep pool tonight.';
   return (isNight(save.clock)?'A clear night':'Clear skies')+where+'.'+(isNight(save.clock)?'':' The gulls are out, so watch for Gull Luck.')+(wxMist()?' A little dawn mist brings up the odd fog fish.':''); }
 /* Turning weather: a word when rain or fog comes in or clears, and a tip the first time each one comes. */
 var WXT={reg:null, kind:null};

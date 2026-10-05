@@ -141,7 +141,7 @@ function simulate(st,n){
       // landed: the game's own catch roll, then the card
       const wander=!!wanderCount(reg); if (wander) out.wanders++;
       const k=catchRoll(id,perfect,{spot,lucky,wander,bow:at.bow}), rar=F.rarity, prev=out.records[id]; dryEnd(rar);
-      if (k.mut){ const M=MUTS[k.mut]; out.muts[k.mut]=(out.muts[k.mut]||0)+1; out.mutGlimmer+=M.glimmer; out.glimmer+=M.glimmer; out.mutCoins+=k.value*(1-1/(M.value*(k.mut==='twin'?2:1))); }
+      if (k.mut){ const M=MUTS[k.mut]; out.muts[k.mut]=(out.muts[k.mut]||0)+1; out.mutGlimmer+=M.glimmer; out.glimmer+=M.glimmer; out.mutCoins+=k.value*(1-1/(M.value*(k.mut==='twin'?2:1)*(k.mut==='giant'?k.size/FISH[id].size[1]:1))); }
       out.landed++; out.coins+=k.value; out.tiers[rar]=(out.tiers[rar]||0)+1; out.tierCoins[rar]=(out.tierCoins[rar]||0)+k.value; out.species[id]=(out.species[id]||0)+1;
       if (prev!=null && k.w>prev){ out.pbs++; const b=GLIMMER.record[rar]||2; out.pbGlimmer+=b; out.glimmer+=b; }   // records pay Glimmer
       if (perfect && echoRoll(id,spot)) echo={fish:id,spot};

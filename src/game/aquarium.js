@@ -188,7 +188,7 @@ function aqDraw(){
     c.font='600 12.5px Nunito, system-ui, sans-serif'; c.fillText(tk.owned?'Move fish here from your keepnet.':'Set it up below to keep sea fish.',b.x+b.w/2,b.y+b.h*.42+12); }
 }
 function aqLoop(now){ if (!AQ.open) return; const dt=Math.min(.05,(now-AQ.last)/1000||0); AQ.last=now; aqUpdate(dt); aqDraw(); requestAnimationFrame(aqLoop); }
-function lovedBy(d){ const out=[]; if (d.all) return 'Every fish'; if (d.beh) out.push(...d.beh.map(bh=>BEH[bh]+'s')); if (d.ids) out.push(...d.ids.map(id=>FISH[id].name)); if (d.rar) out.push('Rare and legendary fish'); return out.join(', '); }
+function lovedBy(d){ const out=[]; if (d.all) return 'Every fish'; if (d.beh) out.push(...d.beh.map(bh=>BEH[bh]+'s')); if (d.ids) out.push(...d.ids.map(id=>FISH[id].name)); if (d.rar) out.push('Rare fish and rarer'); return out.join(', '); }
 function aqTipsUI(){ const k=AQ.tank, tk=tanks()[k], btn=$('aqCollect'); if (!btn) return; const n=Math.floor(tk.tips); btn.textContent=n>=1?'Collect +'+n.toLocaleString():'Tip jar empty'; btn.setAttribute('aria-label',n>=1?'Collect '+n.toLocaleString()+' coins in tips':'The tip jar is empty'); btn.disabled=n<1;
   const r=$('aqRate'); if (r) r.textContent=tk.owned?('Visitors tip about '+tipRate(k).toFixed(1)+' coins a minute. The jar holds '+jarHours(k)+' hours of tips.'):''; }
 function aqUI(){

@@ -94,7 +94,7 @@
 #cPips{display:inline-flex}#cPips:empty{display:none}
 #cName.inked{animation:inkIn 1.8s steps(18,end) .3s both}
 @keyframes inkIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
-#cSell.armed{background:#B9493A;color:#fff;border-color:#7A2B21}
-#card[data-mut] #cTags span:first-child{background:#5E7F3E}
-#card[data-mut="glassy"] #cTags span:first-child{background:#5B8CA6}#card[data-mut="twin"] #cTags span:first-child{background:#B5733A}#card[data-mut="giant"] #cTags span:first-child{background:#7A5A34}
+#cSell.armed,#panel .btn.armed{background:#B9493A;color:#fff;border-color:#7A2B21}
+#cTags span.mut{background:#5E7F3E}
+#card[data-mut="glassy"] #cTags span.mut{background:#5B8CA6}#card[data-mut="twin"] #cTags span.mut{background:#B5733A}#card[data-mut="giant"] #cTags span.mut{background:#7A5A34}
 @media (prefers-reduced-motion: reduce){#cName.inked{animation:none}}

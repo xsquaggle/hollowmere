@@ -70,8 +70,8 @@ function showCard(){
   if (L.isNew && save.kitchenOpen){ const rid=recipeLearnedBy(L.id); if (rid) tags.push('New recipe: '+RECIPES[rid].name); }
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
   const ord=!L.needFor && orderShort(L.id); L.orderFor=ord&&ord.n>0?ord.T:null; if (L.orderFor && !L.isNew) tags.push('For '+TOWNSFOLK[L.orderFor.who].name+'’s supper order');
-  if (r.caught===MASTERY.catches) tags.push('Mastered: reels get easier'); else if (r.caught<MASTERY.catches) tags.push('Mastery '+r.caught+'/'+MASTERY.catches);
-  $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]);
+  if (r.caught>=MASTERY.catches && r.caught-(L.mut==='twin'?2:1)<MASTERY.catches) tags.push('Mastered: reels get easier'); else if (r.caught<MASTERY.catches) tags.push('Mastery '+r.caught+'/'+MASTERY.catches);
+  $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]); if (L.mut) $('cTags').children[0].className='mut';
   // runes that did something for this catch
   const runes=[]; if (L.wander) runes.push(runeTag('wanderer','Wanderer ×2 · '+L.wander+' of '+ENCH.wanderer.first)); if (L.echo) runes.push(runeTag('echo','Echo: another waits here'));
   if (enchOn('deep') && rarRank(F.rarity)>=rarRank('rare')) runes.push(runeTag('deep','Lure of the Deep')); if (enchOn('nightglass') && ((F.night && isNight(L.hr)) || (F.wx==='fog' && L.wx==='fog'))) runes.push(runeTag('nightglass','Nightglass'));

@@ -12,7 +12,7 @@ function startReel(id,perfect){
   else if (first && F.beh==='sleeper') coachShow('New fish: Sleepers barely fight. The hard part was the patience before the bite.',6);
   else if (first && F.beh==='sulker') coachShow('New fish: Sulkers dive. When it dives, let go, then reel hard when it comes back up.',6);
   else if (first && F.beh==='ghost') coachShow('New fish: Ghosts fade from sight mid-fight. Keep your ring where the line points until it surfaces.',7);
-  else if (first && F.rarity==='legendary') coachShow('Something huge. Reel in short bursts and let go whenever the ring turns red.',6);
+  else if (first && rarRank(F.rarity)>=rarRank('legendary')) coachShow('Something huge. Reel in short bursts and let go whenever the ring turns red.',6);
 }
 /** A fresh fight with fish `id`, hooked at `from` (the bobber). */
 function newFight(id,perfect,from,lucky,tut,spot){
@@ -42,7 +42,7 @@ const GHOST_FADE=1.5;
         steer(R,dt): where the ring goes this step, ev: [], why: ''} */
 function fightStep(R,dt,io){
   const F=R.F, ev=io.ev, tm=R.mod.tm, tut=io.tut;
-  if (F.beh2 && !R.beh2 && R.dist<.5){ R.beh2=true; R.dive=R.warn=R.surge=0; R.nextJump=rand(.6,1.2); ev.push('beh2'); }   // halfway in, it fights another way (data/fish.js: beh2)
+  if (F.beh2 && !R.beh2 && R.dist<.5){ R.beh2=true; R.dive=R.warn=R.surge=0; R.jump=null; R.nextJump=rand(.6,1.2); ev.push('beh2'); }   // halfway in, it fights another way (data/fish.js: beh2)
   const beh=R.beh2?F.beh2:F.beh, weight=beh==='weight', quick=rarRank(F.rarity)>=rarRank('legendary') && !weight, calm=F.rarity==='common';
   if (tut==='reel1'||tut==='reel2'){ /* direction is scripted by the tutorial */ }
   else if (beh==='darter'){

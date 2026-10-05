@@ -9,7 +9,7 @@ function rollMutation(id,ctx){ const F=FISH[id]; if (rarRank(F.rarity)>=rarRank(
   const m=modMul('mutation',Object.assign({fish:id},ctx)); let x=Math.random();
   for (const k of MUT_ORDER){ x-=MUTS[k].chance*m; if (x<0) return k; }
   return null; }
-/** The chance any mutation comes up, with the bonuses here and now (for the Bonuses page and the report). */
+/** The chance any mutation comes up, with the bonuses here and now (read by the tests). */
 function mutationChance(ctx){ const m=modMul('mutation',ctx||{}); return Math.min(1,MUT_ORDER.reduce((a,k)=>a+MUTS[k].chance*m,0)); }
 /** The mutations found for a species, in journal order. Tidies the record's list on first read. */
 function mutsFound(id){ const r=save.fish[id]; if (!r) return []; if (!Array.isArray(r.muts)) r.muts=[]; r.muts=r.muts.filter((k,i,a)=>MUTS[k] && a.indexOf(k)===i);

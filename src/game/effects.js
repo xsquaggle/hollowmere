@@ -18,6 +18,6 @@ function updateHint(){
   else if (s==='casting') setHint('');
   else if (s==='waiting') setHint(vet?(inLucky(S.bob.x,S.bob.y)?'Gull luck · ':'')+spotName(S.bob.spot):(inLucky(S.bob.x,S.bob.y)?'Gull luck! ':'')+spotName(S.bob.spot)+'. Wait for the bobber to plunge. Tap to twitch it.');
   else if (s==='bite') setHint('');
-  else if (s==='reeling') { const R=S.reel; setHint(R.loot?(vet?'':R.F.tip):vet?'':R.fam ? 'Mastered: your rod tracks it for you. Hold to reel.' : 'Hold to reel. Slide to keep your ring under the fish. '+BEH_TIP[R.F.beh]); }
+  else if (s==='reeling') { const R=S.reel; setHint(R.loot?(vet?'':R.F.tip):vet?'':R.fam ? 'Mastered: your rod tracks it for you. Hold to reel.' : 'Hold to reel. Slide to keep your ring under the fish. '+BEH_TIP[R.beh2?R.F.beh2:R.F.beh]); }
   else setHint('');
 }

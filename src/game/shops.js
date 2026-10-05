@@ -21,7 +21,8 @@ function openNet(){
     if (c.dataset.sm) drawSmokedFish(x,c.dataset.f,r.width*.78,c.dataset.sm==='del'?100:+c.dataset.u||0,c.dataset.sm==='del'); else drawFish(x,c.dataset.f,r.width*.8,false); });
   document.querySelectorAll('#panel [data-hang]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.hang, f=save.net[i]; if (!f || hangFish(i)<0) return; sfx.rig('bait'); news(FISH[f.id].name+' is on the smoke rack in the kitchen','good'); openNet(); }));
   const sell=idxs=>{ const set=new Set(idxs); let sum=0; save.net=save.net.filter((f,i)=>{ if (set.has(i)){ sum+=f.value; return false; } return true; }); persist(); if (sum) addCoins(sum); openNet(); };
-  document.querySelectorAll('[data-sell]').forEach(b=>b.addEventListener('click',()=>sell([+b.dataset.sell])));
+  document.querySelectorAll('[data-sell]').forEach(b=>b.addEventListener('click',()=>{ const f=save.net[+b.dataset.sell];   // a Mythic asks twice, as on the card
+    if (f && rarRank(FISH[f.id].rarity)>=rarRank('mythic') && !b.dataset.armed){ b.dataset.armed='1'; b.textContent='Sell it? Tap again'; b.classList.add('armed'); return; } sell([+b.dataset.sell]); }));
   document.querySelectorAll('#panel [data-tank]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.tank, f=save.net[i]; if (!f || !tankRoom(f.id)) return; save.net.splice(i,1); addToTank(f); persist(); sfx.plop(); news(FISH[f.id].name+' is in the aquarium','good'); openNet(); }));
   const sc=$('sellCommons'); if (sc) sc.addEventListener('click',()=>sell(save.net.map((f,i)=>FISH[f.id].rarity==='common'?i:-1).filter(i=>i>=0)));
   const sa=$('sellAll'); if (sa){ let armed=false; sa.addEventListener('click',()=>{ const rare=save.net.some(f=>FISH[f.id].rarity!=='common');
