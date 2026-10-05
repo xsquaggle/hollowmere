@@ -53,13 +53,13 @@ const FISH = {
             lore:'Pale as the fog it swims in, and warmer in the hand than it looks.', hint:'Glimpsed in the deep pool on foggy mornings.'},
   mackerel:{name:'Squall Mackerel', rarity:'uncommon', beh:'darter', wx:'rain', pull:1.05, reel:4.2, value:30, size:[26,44], len:44, h:.2, color:'#4F8A8B', fin:'#2F5C60', window:1.05,
             lore:'Rides in under the squalls, a whole school at a time, and leaves just as fast.', hint:'Rides in under the rain squalls.'},
-  gar:     {name:'Steeple Gar', rarity:'epic', beh:'leaper', extra:true, pull:1.55, reel:10, value:260, size:[90,150], len:84, h:.1, color:'#7F866A', fin:'#5B6248', window:.82,
+  gar:     {name:'Steeple Gar', rarity:'epic', beh:'leaper', extra:true, pull:1.55, reel:10, value:170, size:[90,150], len:84, h:.1, color:'#7F866A', fin:'#5B6248', window:.82,
             lore:'Rests nose-up, like the church steeple it hides behind. The steeple is underwater too.', hint:'Something long and thin hangs nose-up in the deep pool, most of all in the evening.'},
-  angler:  {name:'Gaslight Angler', rarity:'epic', beh:'sulker', night:true, extra:true, pull:1.6, reel:11, value:480, size:[45,80], len:58, h:.4, color:'#5A4E58', fin:'#3D3440', window:.8,
+  angler:  {name:'Gaslight Angler', rarity:'epic', beh:'sulker', night:true, extra:true, pull:1.6, reel:11, value:850, size:[45,80], len:58, h:.4, color:'#5A4E58', fin:'#3D3440', window:.8,
             lore:'Its lure burns like an old gas lamp. Ships used to steer for it, which is how the trench filled up with ships.', hint:'A small light wanders in the trench after dark.'},
   shiner:  {name:'Prism Shiner', rarity:'exotic', beh:'darter', secret:true, extra:true, pull:1.15, reel:7.5, value:1200, size:[9,16], len:32, h:.25, color:'#D4E7EA', fin:'#A9CFDA', window:.62,
             lore:'It swallows the ends of rainbows. That’s why nobody ever reaches one.', hint:'Seen where the colours touch the water.'},
-  calf:    {name:'Moonwhale Calf', rarity:'mythic', beh:'sulker', beh2:'leaper', extra:true, noTank:true, pull:2, reel:22, value:10000, size:[380,520], len:124, h:.3, color:'#5F6F8A', fin:'#45536C', window:.65,
+  calf:    {name:'Moonwhale Calf', rarity:'mythic', beh:'sulker', beh2:'leaper', extra:true, noTank:true, pull:2, reel:22, value:6000, size:[380,520], len:124, h:.3, color:'#5F6F8A', fin:'#45536C', window:.65,
             lore:'Too big for this lake. Where is its mother?', hint:'Something enormous breaches far out on full-moon nights. It isn’t alone.'},
   gurnard: {name:'Foghorn Gurnard', rarity:'rare', beh:'ghost', wx:'fog', pull:1.4, reel:7.5, value:160, size:[28,52], len:46, h:.28, color:'#C25A4B', fin:'#E59A5C', window:.9,
             lore:'Grunts like a foghorn. The lighthouse keepers used to steer by it.', hint:'Grunts from the sea stacks when the fog is in.'}
@@ -80,8 +80,8 @@ const RAR = {
 const POOLS = {
   open: {perch:70, reedwhisker:6, leafjack:12, mossback:3},
   pads: {leafjack:55, perch:25, mossback:8},
-  deep: {perch:28, mossback:40, leafjack:12, gar:5, mayor:6},
-  far:  {perch:22, leafjack:30, mossback:26, reedwhisker:4, gar:3, mayor:3},
+  deep: {perch:28, mossback:40, leafjack:12, gar:2, mayor:6},
+  far:  {perch:22, leafjack:30, mossback:26, reedwhisker:4, gar:2, mayor:3},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
@@ -91,18 +91,18 @@ const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:20, bream:6},
   kelp: {kelpeel:46, sprat:24, bream:20, grouper:5},
-  deep: {grouper:30, bream:28, sprat:24, kelpeel:10, angler:4, saltjaw:4},
-  far:  {bream:34, sprat:28, grouper:20, kelpeel:10, angler:2, saltjaw:2}
+  deep: {grouper:30, bream:28, sprat:24, kelpeel:10, angler:2, saltjaw:4},
+  far:  {bream:34, sprat:28, grouper:20, kelpeel:10, angler:1, saltjaw:2}
 };
 const RARE_BITES={
-  shiner:{region:'lake', bow:true, chance:.1},
-  calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/200, path:2}
+  shiner:{region:'lake', bow:true, chance:.035},
+  calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2}
 };
 const DRY={from:80, to:200, max:2};
 const MUTS={
-  mossy: {name:'Mossy', value:2, chance:1/90, glimmer:3, desc:'Moss and tiny plants grow along its back.'},
-  glassy:{name:'Glassy', value:3, chance:1/160, glimmer:5, desc:'See-through, with its bones showing.'},
-  twin:  {name:'Twin', value:1, chance:1/110, glimmer:3, desc:'Two on one hook.'},
-  giant: {name:'Giant', value:1, chance:1/130, glimmer:4, size:[1.25,1.55], desc:'Far past the usual size.'}
+  mossy: {name:'Mossy', value:2.5, chance:1/70, glimmer:1, desc:'Moss and tiny plants grow along its back.'},
+  glassy:{name:'Glassy', value:4, chance:1/130, glimmer:2, desc:'See-through, with its bones showing.'},
+  twin:  {name:'Twin', value:1, chance:1/90, glimmer:1, desc:'Two on one hook.'},
+  giant: {name:'Giant', value:1, chance:1/100, glimmer:2, size:[1.25,1.55], desc:'Far past the usual size.'}
 };
 const MUT_ORDER=['mossy','glassy','twin','giant'];

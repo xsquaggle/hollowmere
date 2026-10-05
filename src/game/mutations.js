@@ -5,6 +5,7 @@
    Each species' record keeps the mutations found (save.fish[id].muts), for its journal page. */
 /** Which mutation a catch comes up with, or null. ctx: {spot, lucky, bow}. */
 function rollMutation(id,ctx){ const F=FISH[id]; if (rarRank(F.rarity)>=rarRank('mythic')) return null;
+  if (RARITY_CTL.mut && !SIMULATING){ const k=RARITY_CTL.mut; RARITY_CTL.mut=null; return k; }
   const m=modMul('mutation',Object.assign({fish:id},ctx)); let x=Math.random();
   for (const k of MUT_ORDER){ x-=MUTS[k].chance*m; if (x<0) return k; }
   return null; }

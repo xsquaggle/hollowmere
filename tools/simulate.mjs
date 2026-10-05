@@ -12,6 +12,8 @@
 //   node tools/simulate.mjs --weather                 how often each weather comes, and what each one does to a few setups
 //   node tools/simulate.mjs --orders                  what supper orders pay beside active fishing, and how long the standings take
 //   node tools/simulate.mjs --compare-luck           the standard report, before and after step 12's luck curve
+//   node tools/simulate.mjs --rarity                  Epic, Exotic and Mythic shares, mutations, and the rainbow's foot and full moon
+//   node tools/simulate.mjs --spot deep --hour 23 --moon 4 --path   one moon phase (4 is full), casting onto the moonpath; --bow casts at the rainbow's foot
 //   node tools/simulate.mjs --json                   machine-readable output
 import { existsSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
@@ -41,6 +43,18 @@ const STANDARD = [
   ['  + Banquet Pie ★★★ and every tank set', { rod: 'deepwater', region: 'coast', spot: 'deep', hour: 22, meal: { id: 'pie', stars: 3 }, sets: 'all' }],
   ['New player · Brasscap Pro, lake, every spot', { rod: 'brasscap', spot: 'mix', player: 'new' }],
 ];
+const RARITY_RUNS = [
+  ['Willow Switch · lake, open water, noon', { rod: 'willow' }],
+  ['Ash Caster · lake, deep pool, dusk (Steeple Gar)', { rod: 'ash', spot: 'deep', hour: 18.5 }],
+  ['Heronwood · lake, far water, noon (Steeple Gar)', { rod: 'heronwood', spot: 'far' }],
+  ['Deepwater Caster · coast, trench, night (Gaslight Angler)', { rod: 'deepwater', region: 'coast', spot: 'deep', hour: 22 }],
+  ['Saltline · coast, open water, noon', { rod: 'saltline', region: 'coast' }],
+  ['Willow Switch · rainbow\'s foot (Prism Shiner)', { rod: 'willow', hour: 14, bow: true }],
+  ['  + Odd Water', { rod: 'willow', hour: 14, bow: true, ench: ['odd'] }],
+  ['Brasscap Pro · deep pool, full moon, night', { rod: 'brasscap', spot: 'deep', hour: 23, moon: 4 }],
+  ['  on the moonpath', { rod: 'brasscap', spot: 'deep', hour: 23, moon: 4, path: true }],
+  ['Brasscap Pro · deep pool, new moon, night', { rod: 'brasscap', spot: 'deep', hour: 23, moon: 0 }],
+];
 function custom() {
   const st = {};
   for (const k of ['rod', 'spot', 'region', 'sets', 'player', 'reel', 'line', 'bait', 'wx']) if (opt[k]) st[k] = opt[k];
@@ -50,6 +64,7 @@ function custom() {
   if (opt.meal) { const [id, s] = String(opt.meal).split(':'); st.meal = { id, stars: +(s || 3) }; }
   if (opt.parts) st.parts = opt.parts === 'all' ? 'all' : String(opt.parts).split(',');
   if (opt.mastery) st.mastery = true; if (opt.lucky) st.lucky = true;
+  if (opt.moon != null) st.moon = +opt.moon; if (opt.bow) st.bow = true; if (opt.path) st.path = true;
   return [['Custom setup', st]];
 }
 // every reel, line and bait against the plain rig, each where it can show what it does: night pieces after dark
@@ -83,11 +98,12 @@ function runeRuns() { const rows = [];
     rows.push(['No runes · ' + base.rod + ', ' + (base.region || 'lake') + ' ' + base.spot + ', ' + base.hour + 'h', base]);
     for (const id of ids) rows.push(['  + ' + id, Object.assign({}, base, { ench: [id] })]); }
   return rows; }
-const runs = opt.tackle ? tackleRuns() : opt.runes ? runeRuns() : Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'lucky', 'player', 'reel', 'line', 'bait', 'ench', 'wx'].includes(k)) ? custom() : STANDARD;
+const runs = opt.tackle ? tackleRuns() : opt.runes ? runeRuns() : Object.keys(opt).some(k => ['rod', 'spot', 'region', 'hour', 'meal', 'sets', 'parts', 'mastery', 'lucky', 'player', 'reel', 'line', 'bait', 'ench', 'wx', 'moon', 'bow', 'path'].includes(k)) ? custom() : STANDARD;
 const casts = +(opt.casts || 1000);
 if (opt.idle) { await idleReport(); process.exit(0); }
 if (opt.orders) { await ordersReport(); process.exit(0); }
 if (opt.weather) { await weatherReport(); process.exit(0); }
+if (opt.rarity) { await rarityReport(); process.exit(0); }
 /** Supper orders: the tips a typical ticket pays at a few stages, per minute of cooking, beside active fishing; and
     the Town reputation a steady cook earns, evening by evening, to each standing. */
 async function ordersReport() {
@@ -118,6 +134,22 @@ async function ordersReport() {
   for (const x of r.rep) console.log(`| ${x.name} | ${x.at} | ${x.evenings} | ${x.hours} |`);
   console.log('\nA Delicacy order (Ottilie, plate only) beside selling the Delicacy. It takes the Delicacy, so it adds the difference, per hook-hour of smoking:\n\n| Fish (fresh) | Delicacy sells for | Order at 2 stars | at 3 stars | Adds per hook-hour at 3 stars |\n| --- | ---: | ---: | ---: | ---: |');
   for (const d of r.del) console.log(`| ${d.id} (${d.v}) | ${d.worth} | ${d.t2} | ${d.t3} | +${d.extra} |`);
+}
+/** Rarity in full (step 21): where each Epic lives, the Prism Shiner at the rainbow's foot, the Moonwhale Calf on
+    full-moon nights, and what mutations add everywhere. Rare fish need many casts, so these runs are long. */
+async function rarityReport() {
+  const browser = await chromium.launch(); const p = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  const errors = []; p.on('pageerror', e => errors.push(String(e)));
+  await p.goto('file://' + page + '?nointro'); await p.waitForTimeout(500);
+  const n = opt.casts ? +opt.casts : 20000;
+  const rows = await p.evaluate(({ runs, n }) => runs.map(([label, st]) => [label, window.__hm.simulate(Object.assign({ treasure: false }, st), n)]), { runs: RARITY_RUNS, n });
+  await browser.close();
+  if (errors.length) { console.error('Page errors:\n  ' + errors.join('\n  ')); process.exit(1); }
+  if (opt.json) { console.log(JSON.stringify(rows, null, 1)); return; }
+  const f = (o, k) => (o[k] || 0).toFixed(1) + '%';
+  console.log(`\n${n.toLocaleString()} casts each, steady player, no treasure. Share of the catch (and of fish coins) by tier, the Exotic and Mythic catches counted, and mutations:\n`);
+  console.log('| Setup | Coins/hour | Epic | Epic coins | Exotic | Mythic | Mutated | Mutation coins | Mutation Glimmer/hour |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |');
+  for (const [label, r] of rows) console.log(`| ${label.trim()} | ${r.coinsPerHour.toLocaleString()} | ${f(r.tierShare, 'epic')} | ${f(r.tierCoinShare, 'epic')} | ${r.tiers.exotic || 0} | ${r.tiers.mythic || 0} | ${r.mutShare}% | ${r.mutCoinShare}% | ${r.mutGlimmerPerHour} |`);
 }
 /** The weather: how much of the time each kind holds in each water (counted over many days of the game's own
     forecast), then a few setups in each weather beside clear, with the share of the catch the weather's own fish make

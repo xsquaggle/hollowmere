@@ -60,6 +60,9 @@ const wxMist = () => { const v=wxInfo(), h=save.clock; return (v.kind==='clear'|
    still last night. Playtest can pin the phase (save.wx.moon). */
 const moonNightDay = () => (save.day||0)-((((save.clock%24)+24)%24)<12?1:0);
 /** The moon's phase tonight: 0 new, MOON.full full. */
+/** The moon's phase in words: tonight's, or phase `p`. */
+const MOON_NAMES=['New moon','Waxing crescent','First quarter','Waxing gibbous','Full moon','Waning gibbous','Last quarter','Waning crescent'];
+function moonName(p){ const c=MOON.cycle, k=p==null?moonPhase():p; return MOON_NAMES[Math.round(k/c*8)%8]; }
 function moonPhase(){ const w=wxState(); if (w.moon!=null) return w.moon; const c=MOON.cycle; return (((moonNightDay()+MOON.offset)%c)+c)%c; }
 const fullMoon = () => moonPhase()===MOON.full;
 /** Whether a full moon is up and showing: the moonpath lies on the water. Cloud and fog hide it. */
@@ -86,6 +89,8 @@ function wxLine(){ const k=wxNow(), reg=REG(), F=WX_FISH[reg]||{}, known=id=>(sa
   if (k==='rain') return 'Rain'+where+'. Fish bite sooner and '+nm(F.rain.fish)+' rising, but the drops make nibbles hard to read.';
   if (k==='fog') return 'Fog'+where+'. Fish hide in the far water until they reach your bobber, and '+nm(F.fog.fish)+' rising.'+(reg==='lake' && !isNight(save.clock)?' Lantern Carp come up by day.':'');
   if (k==='cloudy') return 'Overcast'+where+'. Grey and quiet, and '+(known(F.rain.fish)?'the '+FISH[F.rain.fish].name+' is':'rain fish are')+' starting to stir.';
+  if (bowFoot()) return 'A rainbow'+where+'. Where it comes down on the water, catches come up mutated twice as often.';
+  if (isNight(save.clock) && reg==='lake' && moonpathOn()) return 'A full moon over the lake. The moonpath lies across the deep pool tonight.';
   return (isNight(save.clock)?'A clear night':'Clear skies')+where+'.'+(isNight(save.clock)?'':' The gulls are out, so watch for Gull Luck.')+(wxMist()?' A little dawn mist brings up the odd fog fish.':''); }
 /* Turning weather: a word when rain or fog comes in or clears, and a tip the first time each one comes. */
 var WXT={reg:null, kind:null};

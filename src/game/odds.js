@@ -3,10 +3,10 @@
 function poolFor(spot,lucky){
   const h=save.clock, night=isNight(h), coastal=REG()==='coast', w=Object.assign({},(coastal?POOLS_COAST:POOLS)[spot]||(coastal?POOLS_COAST.open:POOLS.open));
   // the water itself: who comes up at night, and the Mayor's dawns
-  if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; if (w.angler) w.angler*=2.5; } }
+  if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
   if (w.mayor && ((h>=5 && h<8) || modFlag('mayorWakes',{spot}))) w.mayor*=3;   // the Mayor's dawns, or the Mayor's Spectacles
-  if (w.gar && h>=17 && h<21) w.gar*=2.5;                                        // the Steeple Gar's evenings
+  if (w.gar && h>=17 && h<21) w.gar*=1.8;                                        // the Steeple Gar's evenings
   // the weather (game/weather.js): its own fish come up, the Mossback rises to the pads in rain, and fog brings the
   // night fish up by day. They crowd out the fish no rarer than themselves, never the rarer ones: those keep the share
   // they had, so a wet day never quietly makes the Mayor harder to find.
@@ -35,8 +35,11 @@ function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
     if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock))) continue;
     if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
   return null; }
+/** Playtest: the next fish to bite, and the next mutation, picked by hand (game/playtest.js). */
+const RARITY_CTL={fish:null, mut:null};
 /** The fish that takes this cast. A long run without a Legendary, where one could have bitten, counts toward DRY. */
-function rollFish(spot,lucky,at){ const hi=rareBite(spot,lucky,at); if (hi) return hi;
+function rollFish(spot,lucky,at){ if (RARITY_CTL.fish && !SIMULATING){ const f=RARITY_CTL.fish; RARITY_CTL.fish=null; return f; }
+  const hi=rareBite(spot,lucky,at); if (hi) return hi;
   const w=poolFor(spot,lucky), id=pickW(w);
   if (rarRank(FISH[id].rarity)<rarRank('legendary') && Object.keys(w).some(k=>FISH[k].rarity==='legendary')) save.stats.dry=(save.stats.dry||0)+1;
   return id; }

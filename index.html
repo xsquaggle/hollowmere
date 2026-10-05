@@ -474,6 +474,23 @@ body:not([data-state="idle"]) .corner button{pointer-events:none!important}
 @keyframes drain{from{width:100%}to{width:0}}
 #cAuto{font-size:12px;color:#7A7468;text-align:center;margin:0}
 
+/* Step 21: the Epic, Exotic and Mythic frames; a Mythic's name inked in by pen; the sell button that asks twice; mutation tags */
+#card[data-r="epic"]{border:4px solid var(--c-epic);background:linear-gradient(115deg,var(--paper) 38%,#E9DDF6 50%,var(--paper) 62%) 0 0/300% 100%;
+  box-shadow:0 6px 0 #4E3077,0 0 0 5px rgba(132,86,190,.28),0 18px 50px rgba(0,0,0,.5);animation:cardIn .55s cubic-bezier(.2,1.4,.4,1),foil 2.2s linear infinite}
+@property --prism{syntax:'<angle>';inherits:false;initial-value:0deg}
+#card[data-r="exotic"]{border:5px solid transparent;background:linear-gradient(var(--paper),var(--paper)) padding-box,conic-gradient(from var(--prism),#E06B5B,#E9A05A,#E8D27A,#8CC77E,#6FA9D8,#7A7BCB,#A07AC2,#E06B5B) border-box;
+  box-shadow:0 6px 0 #1F6B63,0 0 24px rgba(111,169,216,.45),0 18px 50px rgba(0,0,0,.5);animation:cardIn .6s cubic-bezier(.2,1.4,.4,1),prismSpin 4s linear infinite}
+@keyframes prismSpin{to{--prism:360deg}}
+#card[data-r="mythic"]{border:4px double var(--c-mythic);background:radial-gradient(120% 80% at 50% 0,#F4F5F9,var(--paper) 70%);
+  box-shadow:0 6px 0 #1A1922,0 0 0 6px rgba(200,206,222,.45),0 0 60px rgba(225,232,250,.5),0 18px 50px rgba(0,0,0,.6);animation:cardIn .9s cubic-bezier(.2,1.2,.4,1)}
+#card[data-r="epic"] .rarity{background:var(--c-epic)}#card[data-r="exotic"] .rarity{background:linear-gradient(90deg,#C8605A,#C99A2E,#3F9A6A,#3F7FB8,#7A5BB0)}#card[data-r="mythic"] .rarity{background:var(--c-mythic)}
+#cPips{display:inline-flex;margin-left:auto}#cPips:empty{display:none}
+#cName.inked{animation:inkIn 1.8s steps(18,end) .3s both}
+@keyframes inkIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+#cSell.armed{background:#B9493A;color:#fff;border-color:#7A2B21}
+#card[data-mut] #cTags span:first-child{background:#5E7F3E}
+#card[data-mut="glassy"] #cTags span:first-child{background:#5B8CA6}#card[data-mut="twin"] #cTags span:first-child{background:#B5733A}#card[data-mut="giant"] #cTags span:first-child{background:#7A5A34}
+@media (prefers-reduced-motion: reduce){#cName.inked{animation:none}}
 /* Loot: rarity frames shared by every treasure card, the haul card a crate opens onto, and inked notes */
 /* Rarity frames follow the rarity kit: each tier keeps the one below's weight and adds a layer. Pips repeat the
    tier as a count, so rarity never rests on color alone. */
@@ -1021,6 +1038,9 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 #coachText{margin:0;font-weight:700;font-size:15px;line-height:1.3}
 @media (prefers-reduced-motion: reduce){#card,#card.out,.panel,#toast.show,.stamp{animation-duration:.01s!important}}
 .entry canvas.rod-art,.rod-art{display:block;width:100%;max-width:300px;height:58px;margin:-2px 0 2px}
+.entry .fishpips{display:flex;margin:3px 0 1px}.entry .fishpips i{width:6px;height:6px}
+.entry p.muts{font-size:12px;color:#6B665C}.entry p.muts b{color:#3F5E2C}.entry p.muts i{font-style:normal;opacity:.5}
+.entry p.riddle{font-style:italic}
 /* Playtest > Balance: the simulator's form and its report */
 .bal-form{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin:0 0 12px}
 .bal-form label{display:grid;gap:3px}
@@ -1164,13 +1184,13 @@ const FISH = {
             lore:'Pale as the fog it swims in, and warmer in the hand than it looks.', hint:'Glimpsed in the deep pool on foggy mornings.'},
   mackerel:{name:'Squall Mackerel', rarity:'uncommon', beh:'darter', wx:'rain', pull:1.05, reel:4.2, value:30, size:[26,44], len:44, h:.2, color:'#4F8A8B', fin:'#2F5C60', window:1.05,
             lore:'Rides in under the squalls, a whole school at a time, and leaves just as fast.', hint:'Rides in under the rain squalls.'},
-  gar:     {name:'Steeple Gar', rarity:'epic', beh:'leaper', extra:true, pull:1.55, reel:10, value:260, size:[90,150], len:84, h:.1, color:'#7F866A', fin:'#5B6248', window:.82,
+  gar:     {name:'Steeple Gar', rarity:'epic', beh:'leaper', extra:true, pull:1.55, reel:10, value:170, size:[90,150], len:84, h:.1, color:'#7F866A', fin:'#5B6248', window:.82,
             lore:'Rests nose-up, like the church steeple it hides behind. The steeple is underwater too.', hint:'Something long and thin hangs nose-up in the deep pool, most of all in the evening.'},
-  angler:  {name:'Gaslight Angler', rarity:'epic', beh:'sulker', night:true, extra:true, pull:1.6, reel:11, value:480, size:[45,80], len:58, h:.4, color:'#5A4E58', fin:'#3D3440', window:.8,
+  angler:  {name:'Gaslight Angler', rarity:'epic', beh:'sulker', night:true, extra:true, pull:1.6, reel:11, value:850, size:[45,80], len:58, h:.4, color:'#5A4E58', fin:'#3D3440', window:.8,
             lore:'Its lure burns like an old gas lamp. Ships used to steer for it, which is how the trench filled up with ships.', hint:'A small light wanders in the trench after dark.'},
   shiner:  {name:'Prism Shiner', rarity:'exotic', beh:'darter', secret:true, extra:true, pull:1.15, reel:7.5, value:1200, size:[9,16], len:32, h:.25, color:'#D4E7EA', fin:'#A9CFDA', window:.62,
             lore:'It swallows the ends of rainbows. That’s why nobody ever reaches one.', hint:'Seen where the colours touch the water.'},
-  calf:    {name:'Moonwhale Calf', rarity:'mythic', beh:'sulker', beh2:'leaper', extra:true, noTank:true, pull:2, reel:22, value:10000, size:[380,520], len:124, h:.3, color:'#5F6F8A', fin:'#45536C', window:.65,
+  calf:    {name:'Moonwhale Calf', rarity:'mythic', beh:'sulker', beh2:'leaper', extra:true, noTank:true, pull:2, reel:22, value:6000, size:[380,520], len:124, h:.3, color:'#5F6F8A', fin:'#45536C', window:.65,
             lore:'Too big for this lake. Where is its mother?', hint:'Something enormous breaches far out on full-moon nights. It isn’t alone.'},
   gurnard: {name:'Foghorn Gurnard', rarity:'rare', beh:'ghost', wx:'fog', pull:1.4, reel:7.5, value:160, size:[28,52], len:46, h:.28, color:'#C25A4B', fin:'#E59A5C', window:.9,
             lore:'Grunts like a foghorn. The lighthouse keepers used to steer by it.', hint:'Grunts from the sea stacks when the fog is in.'}
@@ -1191,8 +1211,8 @@ const RAR = {
 const POOLS = {
   open: {perch:70, reedwhisker:6, leafjack:12, mossback:3},
   pads: {leafjack:55, perch:25, mossback:8},
-  deep: {perch:28, mossback:40, leafjack:12, gar:5, mayor:6},
-  far:  {perch:22, leafjack:30, mossback:26, reedwhisker:4, gar:3, mayor:3},
+  deep: {perch:28, mossback:40, leafjack:12, gar:2, mayor:6},
+  far:  {perch:22, leafjack:30, mossback:26, reedwhisker:4, gar:2, mayor:3},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
@@ -1202,19 +1222,19 @@ const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:20, bream:6},
   kelp: {kelpeel:46, sprat:24, bream:20, grouper:5},
-  deep: {grouper:30, bream:28, sprat:24, kelpeel:10, angler:4, saltjaw:4},
-  far:  {bream:34, sprat:28, grouper:20, kelpeel:10, angler:2, saltjaw:2}
+  deep: {grouper:30, bream:28, sprat:24, kelpeel:10, angler:2, saltjaw:4},
+  far:  {bream:34, sprat:28, grouper:20, kelpeel:10, angler:1, saltjaw:2}
 };
 const RARE_BITES={
-  shiner:{region:'lake', bow:true, chance:.1},
-  calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/200, path:2}
+  shiner:{region:'lake', bow:true, chance:.035},
+  calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2}
 };
 const DRY={from:80, to:200, max:2};
 const MUTS={
-  mossy: {name:'Mossy', value:2, chance:1/90, glimmer:3, desc:'Moss and tiny plants grow along its back.'},
-  glassy:{name:'Glassy', value:3, chance:1/160, glimmer:5, desc:'See-through, with its bones showing.'},
-  twin:  {name:'Twin', value:1, chance:1/110, glimmer:3, desc:'Two on one hook.'},
-  giant: {name:'Giant', value:1, chance:1/130, glimmer:4, size:[1.25,1.55], desc:'Far past the usual size.'}
+  mossy: {name:'Mossy', value:2.5, chance:1/70, glimmer:1, desc:'Moss and tiny plants grow along its back.'},
+  glassy:{name:'Glassy', value:4, chance:1/130, glimmer:2, desc:'See-through, with its bones showing.'},
+  twin:  {name:'Twin', value:1, chance:1/90, glimmer:1, desc:'Two on one hook.'},
+  giant: {name:'Giant', value:1, chance:1/100, glimmer:2, size:[1.25,1.55], desc:'Far past the usual size.'}
 };
 const MUT_ORDER=['mossy','glassy','twin','giant'];
 
@@ -1330,7 +1350,8 @@ const BOW_FOOT={depth:.4, r:.1};
 
 /* People: what Ottilie and Barnaby say, the banquet guests' lines, and the uncle's letter in the opening. */
 const OTT_LINES = ['Fish don’t bite for folks who fidget.','Lantern Carp only come up after dark, kid.','Reeds’ll eat your line. My Reedcutter won’t.','Want to reach the deep pool? You’ll need more rod than that.',
-  'That heron’s been stealing my bait for years.','Your uncle fished that deep pool every dawn. Never said why.','If a gull stops in midair, run.'];
+  'That heron’s been stealing my bait for years.','Your uncle fished that deep pool every dawn. Never said why.','If a gull stops in midair, run.',
+  'Your uncle swore something lives where the rainbow comes down. Never caught it.','Full moon tonight? Mind the deep pool. Something out there is looking for its little one.'];
 const BAR_LINES=['Ahoy! Barnaby Quill, boats and bait and the odd bit of advice.','Lake’s a puddle, friend. Out past the marsh the water gets deep enough to forget the sun.',
   'Coast folk talk about lights moving under the swell at night. They don’t fish there after dark.','Your uncle bought his first skiff off me. Paid in fish. Came back quieter.','Tap me when you’re ready to see what’s out there.'];
 const BANQUET_LINES=[['Ottilie','Your uncle never managed it, you know. Fifty years of dawns.'],['Barnaby','Best pie on the whole coast, and I’ve eaten most of them.'],['Pell','I delivered the forks! Express.'],['The baker','He’s still wearing the chain. Somebody should say something.'],['Ottilie','Well. To the Mayor.']];
@@ -1952,10 +1973,10 @@ function tierMul(rar,c){ c=Object.assign({},c,{rarity:rar}); const cap=RAR[rar].
 function poolFor(spot,lucky){
   const h=save.clock, night=isNight(h), coastal=REG()==='coast', w=Object.assign({},(coastal?POOLS_COAST:POOLS)[spot]||(coastal?POOLS_COAST.open:POOLS.open));
   // the water itself: who comes up at night, and the Mayor's dawns
-  if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; if (w.angler) w.angler*=2.5; } }
+  if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
   if (w.mayor && ((h>=5 && h<8) || modFlag('mayorWakes',{spot}))) w.mayor*=3;   // the Mayor's dawns, or the Mayor's Spectacles
-  if (w.gar && h>=17 && h<21) w.gar*=2.5;                                        // the Steeple Gar's evenings
+  if (w.gar && h>=17 && h<21) w.gar*=1.8;                                        // the Steeple Gar's evenings
   // the weather (game/weather.js): its own fish come up, the Mossback rises to the pads in rain, and fog brings the
   // night fish up by day. They crowd out the fish no rarer than themselves, never the rarer ones: those keep the share
   // they had, so a wet day never quietly makes the Mayor harder to find.
@@ -1984,8 +2005,11 @@ function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
     if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock))) continue;
     if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
   return null; }
+/** Playtest: the next fish to bite, and the next mutation, picked by hand (game/playtest.js). */
+const RARITY_CTL={fish:null, mut:null};
 /** The fish that takes this cast. A long run without a Legendary, where one could have bitten, counts toward DRY. */
-function rollFish(spot,lucky,at){ const hi=rareBite(spot,lucky,at); if (hi) return hi;
+function rollFish(spot,lucky,at){ if (RARITY_CTL.fish && !SIMULATING){ const f=RARITY_CTL.fish; RARITY_CTL.fish=null; return f; }
+  const hi=rareBite(spot,lucky,at); if (hi) return hi;
   const w=poolFor(spot,lucky), id=pickW(w);
   if (rarRank(FISH[id].rarity)<rarRank('legendary') && Object.keys(w).some(k=>FISH[k].rarity==='legendary')) save.stats.dry=(save.stats.dry||0)+1;
   return id; }
@@ -2670,6 +2694,7 @@ function updateLost(dt){
    Each species' record keeps the mutations found (save.fish[id].muts), for its journal page. */
 /** Which mutation a catch comes up with, or null. ctx: {spot, lucky, bow}. */
 function rollMutation(id,ctx){ const F=FISH[id]; if (rarRank(F.rarity)>=rarRank('mythic')) return null;
+  if (RARITY_CTL.mut && !SIMULATING){ const k=RARITY_CTL.mut; RARITY_CTL.mut=null; return k; }
   const m=modMul('mutation',Object.assign({fish:id},ctx)); let x=Math.random();
   for (const k of MUT_ORDER){ x-=MUTS[k].chance*m; if (x<0) return k; }
   return null; }
@@ -4924,6 +4949,9 @@ const wxMist = () => { const v=wxInfo(), h=save.clock; return (v.kind==='clear'|
    still last night. Playtest can pin the phase (save.wx.moon). */
 const moonNightDay = () => (save.day||0)-((((save.clock%24)+24)%24)<12?1:0);
 /** The moon's phase tonight: 0 new, MOON.full full. */
+/** The moon's phase in words: tonight's, or phase `p`. */
+const MOON_NAMES=['New moon','Waxing crescent','First quarter','Waxing gibbous','Full moon','Waning gibbous','Last quarter','Waning crescent'];
+function moonName(p){ const c=MOON.cycle, k=p==null?moonPhase():p; return MOON_NAMES[Math.round(k/c*8)%8]; }
 function moonPhase(){ const w=wxState(); if (w.moon!=null) return w.moon; const c=MOON.cycle; return (((moonNightDay()+MOON.offset)%c)+c)%c; }
 const fullMoon = () => moonPhase()===MOON.full;
 /** Whether a full moon is up and showing: the moonpath lies on the water. Cloud and fog hide it. */
@@ -4950,6 +4978,8 @@ function wxLine(){ const k=wxNow(), reg=REG(), F=WX_FISH[reg]||{}, known=id=>(sa
   if (k==='rain') return 'Rain'+where+'. Fish bite sooner and '+nm(F.rain.fish)+' rising, but the drops make nibbles hard to read.';
   if (k==='fog') return 'Fog'+where+'. Fish hide in the far water until they reach your bobber, and '+nm(F.fog.fish)+' rising.'+(reg==='lake' && !isNight(save.clock)?' Lantern Carp come up by day.':'');
   if (k==='cloudy') return 'Overcast'+where+'. Grey and quiet, and '+(known(F.rain.fish)?'the '+FISH[F.rain.fish].name+' is':'rain fish are')+' starting to stir.';
+  if (bowFoot()) return 'A rainbow'+where+'. Where it comes down on the water, catches come up mutated twice as often.';
+  if (isNight(save.clock) && reg==='lake' && moonpathOn()) return 'A full moon over the lake. The moonpath lies across the deep pool tonight.';
   return (isNight(save.clock)?'A clear night':'Clear skies')+where+'.'+(isNight(save.clock)?'':' The gulls are out, so watch for Gull Luck.')+(wxMist()?' A little dawn mist brings up the odd fog fish.':''); }
 /* Turning weather: a word when rain or fog comes in or clears, and a tip the first time each one comes. */
 var WXT={reg:null, kind:null};
@@ -9669,10 +9699,14 @@ function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
 function speciesHTML(regs){ let h='<div class="entries">';
   regs.forEach(rg=>{ h+='<h3 class="j-reg">'+REGION_NAME[rg]+'</h3>'; REGION_FISH[rg].forEach(id=>{ const F=FISH[id], r=save.fish[id]||{caught:0,best:0,seen:false};
     if (r.caught>0){ const m=Math.min(MASTERY.catches,r.caught), pb=r.pb;
-      h+='<div class="entry"><canvas data-f="'+id+'"></canvas><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+'</span><h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p><div class="mast"><i style="width:'+Math.round(m/MASTERY.catches*100)+'%"></i></div><p>'+(r.caught>=MASTERY.catches?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/'+MASTERY.catches)+'</p></div></div>'; }
-    else h+='<div class="entry"><canvas data-f="'+id+'" data-sil="1"></canvas><div><span class="r" style="color:#7A7468">'+(r.seen?'Seen, not caught':'Undiscovered')+'</span><h3>???</h3><p>'+(r.seen?F.hint:'Keep fishing to find this one.')+'</p></div></div>';
+      h+='<div class="entry"><canvas data-f="'+id+'"></canvas><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+(F.beh2?' then '+BEH[F.beh2]:'')+'</span>'+rarPipsHTML(F.rarity)+'<h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p>'+mutLineHTML(id)+'<div class="mast"><i style="width:'+Math.round(m/MASTERY.catches*100)+'%"></i></div><p>'+(r.caught>=MASTERY.catches?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/'+MASTERY.catches)+'</p></div></div>'; }
+    else h+='<div class="entry"><canvas data-f="'+id+'" data-sil="1"></canvas><div><span class="r" style="color:#7A7468">'+(r.seen?'Seen, not caught':F.secret?'A secret':'Undiscovered')+'</span><h3>???</h3><p'+(F.secret&&!r.seen?' class="riddle"':'')+'>'+(r.seen||F.secret?F.hint:'Keep fishing to find this one.')+'</p></div></div>';
   }); });
   return h+'</div>'; }
+/** The mutations found for a species, as a line under its lore: the ones still to find show as dashes. Fish too rare to
+    mutate (Mythic and up) get none. */
+function mutLineHTML(id){ if (rarRank(FISH[id].rarity)>=rarRank('mythic')) return ''; const got=mutsFound(id);
+  return '<p class="muts">Mutations: '+MUT_ORDER.map(k=>got.includes(k)?'<b>'+MUTS[k].name+'</b>':'<i aria-label="not found yet">—</i>').join(' · ')+'</p>'; }
 function recordsHTML(regs){ const s=save.stats, all=regs.flatMap(rg=>REGION_FISH[rg]).filter(id=>(save.fish[id]||{}).pb);
   const best=list=>list.reduce((b,id)=>!b||save.fish[id].pb.w>save.fish[b].pb.w?id:b,null);
   let h='<div class="seg units" aria-label="Units"><button type="button" data-units="imperial" class="'+(imperial()?'on':'')+'">lb · in</button><button type="button" data-units="metric" class="'+(!imperial()?'on':'')+'">kg · cm</button></div>';
@@ -9865,6 +9899,8 @@ function simSave(st){
   else { const ids=(st.ench||[]).filter(id=>ENCH[id]).slice(0,RODS[s.rod].ench||1); s.ench={own:Object.fromEntries(ids.map(id=>[id,1])), rig:{[s.rod]:ids}}; }
   s.glimmer=0; s.day=0; s.wander=null;
   s.wx={seed:7, force:WX_ORDER.includes(st.wx)?st.wx:'clear', seen:{}};      // the weather is pinned for a run: clear unless named
+  if (Number.isInteger(st.moon)) s.wx.moon=st.moon;                          // and the moon, when named (MOON.full is full)
+  s.stats.dry=0;
   return s;
 }
 /** Plays one fight (a fish or a haul) through the game's fight step, the way player P would. Returns {end, ft, why}. */
@@ -9896,7 +9932,7 @@ function simulate(st,n){
     SIMULATING=true; save=simSave(st); MODC.dirty=true; TREASURE_CTL.off=st.treasure===false;
     const reg=REG(), spots=st.spot==='mix'?Object.keys(reg==='coast'?POOLS_COAST:POOLS):[st.spot];
     const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0,snag:0,washout:0,eaten:0}, perfect:0, hooked:0, coins:0, pbs:0, glimmer:0, pbGlimmer:0, echoes:0, wanders:0, secs:0, fightSecs:0,
-      tiers:{}, species:{}, records:{}, treasure:{rolled:0,hauled:0,lost:0,coins:0,finds:0,kinds:{},crates:{}}};
+      tiers:{}, species:{}, records:{}, muts:{}, tierCoins:{}, mutCoins:0, mutGlimmer:0, treasure:{rolled:0,hauled:0,lost:0,coins:0,finds:0,kinds:{},crates:{}}};
     const io={t:0,holding:true,tut:null,tilt:0,reeling:false,ev:[],why:''};
     let echo=null;                                                   // Echo: the next cast at that spot bites at once
     const dayLen=modFlag('timeStop')?0:1440/modMul('clock');
@@ -9925,7 +9961,7 @@ function simulate(st,n){
         t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
-      const id=ech||pickW(poolFor(spot,lucky)), F=FISH[id];
+      const at={bow:!!st.bow, path:!!st.path}, id=ech||rollFish(spot,lucky,at), F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
       t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
@@ -9943,12 +9979,13 @@ function simulate(st,n){
       if (Math.random()<modAdd('eaten',fc)){ out.lost.eaten++; out.secs+=t+1.2; continue; }
       // landed: the game's own catch roll, then the card
       const wander=!!wanderCount(reg); if (wander) out.wanders++;
-      const k=catchRoll(id,perfect,{spot,lucky,wander}), rar=F.rarity, prev=out.records[id];
-      out.landed++; out.coins+=k.value; out.tiers[rar]=(out.tiers[rar]||0)+1; out.species[id]=(out.species[id]||0)+1;
+      const k=catchRoll(id,perfect,{spot,lucky,wander,bow:at.bow}), rar=F.rarity, prev=out.records[id]; dryEnd(rar);
+      if (k.mut){ const M=MUTS[k.mut]; out.muts[k.mut]=(out.muts[k.mut]||0)+1; out.mutGlimmer+=M.glimmer; out.glimmer+=M.glimmer; out.mutCoins+=k.value*(1-1/(M.value*(k.mut==='twin'?2:1))); }
+      out.landed++; out.coins+=k.value; out.tiers[rar]=(out.tiers[rar]||0)+1; out.tierCoins[rar]=(out.tierCoins[rar]||0)+k.value; out.species[id]=(out.species[id]||0)+1;
       if (prev!=null && k.w>prev){ out.pbs++; const b=GLIMMER.record[rar]||2; out.pbGlimmer+=b; out.glimmer+=b; }   // records pay Glimmer
       if (perfect && echoRoll(id,spot)) echo={fish:id,spot};
       if (prev==null || k.w>prev) out.records[id]=k.w;
-      t+=RAR[rar].land*(rar==='rare'||rar==='legendary'?1.03:1)+(rar==='common'?2.2:3.2);
+      t+=RAR[rar].land*(rarRank(rar)>=rarRank('rare')?1.03:1)+(rar==='common'?2.2:3.2)+(rarRank(rar)>=rarRank('mythic')?4:0);   // a Mythic's card takes its time
       out.secs+=t;
     }
     const hours=out.secs/3600, pct=x=>Math.round(x*1000)/10;
@@ -9956,6 +9993,11 @@ function simulate(st,n){
     out.coinsPerHour=Math.round((out.coins+out.treasure.coins)/hours); out.catchesPerHour=Math.round(out.landed/hours); out.glimmerPerHour=Math.round(out.glimmer/hours*10)/10;
     out.secsPerCast=Math.round(out.secs/n*10)/10; out.fightAvg=Math.round(out.fightSecs/Math.max(1,out.hooked)*10)/10;
     out.coinsPerCatch=Math.round(out.coins/Math.max(1,out.landed)*10)/10; out.landRate=pct(out.landed/Math.max(1,n-out.treasure.rolled)); out.perfectRate=pct(out.perfect/Math.max(1,out.hooked));
+    // rarity: each tier's share of the catch and of the coins, and what mutations add
+    out.tierShare=Object.fromEntries(Object.entries(out.tiers).map(([r,v])=>[r,pct(v/Math.max(1,out.landed))]));
+    out.tierCoinShare=Object.fromEntries(Object.entries(out.tierCoins).map(([r,v])=>[r,pct(v/Math.max(1,out.coins))])); delete out.tierCoins;
+    out.mutShare=pct(Object.values(out.muts).reduce((a,v)=>a+v,0)/Math.max(1,out.landed)); out.mutCoinShare=pct(out.mutCoins/Math.max(1,out.coins)); out.mutGlimmerPerHour=Math.round(out.mutGlimmer/hours*10)/10;
+    out.mutCoins=Math.round(out.mutCoins);
     out.treasure.oneIn=out.treasure.rolled?Math.round(n/out.treasure.rolled*10)/10:null;
     const lc={spot:spots[0],lucky:!!st.lucky};
     out.luck={points:Math.round(luckPoints(lc)*100)/100,
@@ -10091,14 +10133,24 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
     '<label for="tWx">Weather<output id="tWxO">'+(wxState().force?WX[wxState().force].name+' (pinned)':WX[wxNow()].name)+'</output><select id="tWx"><option value="">As the sky has it</option>'+WX_ORDER.map(k=>'<option value="'+k+'"'+(wxState().force===k?' selected':'')+'>'+WX[k].name+', pinned</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Each water has its own weather, turning every few in-game hours. Pinning holds it here and at the coast until you set it back.</span></label>'+
     '<label for="tLoot">Next cast pulls up<output id="tLootO">'+(TREASURE_CTL.force?lootName(TREASURE_CTL.force):'A fish')+'</output><select id="tLoot"><option value="">A fish, as usual</option>'+
       [['pouch','A coin pouch'],['geode','A Glimmer geode'],['bottle','A message bottle'],['letter','A drowned letter'],['find','A find']].concat(LOOT_TIERS.map(t=>['crate:'+t,aOrAn(CRATES[t].name.toLowerCase())])).map(([v,l])=>'<option value="'+v+'">'+l+'</option>').join('')+
-      '</select><span class="note" style="grid-column:1/-1;margin:0">Treasure turns up on its own about once in 12 casts. This picks the next one, so you can see every crate open.</span></label></div>'+
+      '</select><span class="note" style="grid-column:1/-1;margin:0">Treasure turns up on its own about once in 12 casts. This picks the next one, so you can see every crate open.</span></label>'+
+    '<label for="tFish">Next fish to bite<output id="tFishO">'+(RARITY_CTL.fish?FISH[RARITY_CTL.fish].name:'As the water has it')+'</output><select id="tFish"><option value="">As the water has it</option>'+
+      Object.keys(FISH).map(id=>'<option value="'+id+'"'+(RARITY_CTL.fish===id?' selected':'')+'>'+FISH[id].name+' ('+RAR[FISH[id].rarity].label+')</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Picks the next fish, wherever you cast, to see each tier’s hook, landing and card.</span></label>'+
+    '<label for="tMut">Next mutation<output id="tMutO">'+(RARITY_CTL.mut?MUTS[RARITY_CTL.mut].name:'Left to chance')+'</output><select id="tMut"><option value="">Left to chance</option>'+
+      MUT_ORDER.map(k=>'<option value="'+k+'"'+(RARITY_CTL.mut===k?' selected':'')+'>'+MUTS[k].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">The next fish you land comes up with this (not a Mythic, and not in the first lesson).</span></label>'+
+    '<label for="tMoon">Moon<output id="tMoonO">'+moonName()+'</output><select id="tMoon"><option value="">As the sky has it</option>'+
+      Array.from({length:MOON.cycle},(_,i)=>'<option value="'+i+'"'+(wxState().moon===i?' selected':'')+'>'+moonName(i)+', pinned</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">A full moon puts the moonpath across the deep pool at night, where the Moonwhale Calf bites.</span></label></div>'+
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
-    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
+    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="bowBtn" type="button">'+(wxState().bow?'Clear the rainbow':'Rainbow now')+'</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
   bindPlaytestTabs();
   [['tHook','hook'],['tTension','tension'],['tWait','wait']].forEach(([id,k])=>{ $(id).addEventListener('input',e=>{ save.tune[k]=+e.target.value; $(id+'O').textContent=(+e.target.value).toFixed(2)+'×'; persist(); }); });
   $('tClock').addEventListener('input',e=>{ save.clock=+e.target.value; $('tClockO').textContent=clockText(save.clock); buildBg(); persist(); });
   $('tWx').addEventListener('change',e=>{ const w=wxState(); if (e.target.value) w.force=e.target.value; else delete w.force; persist(); WXT.kind=null; buildBg(); $('tWxO').textContent=w.force?WX[w.force].name+' (pinned)':WX[wxNow()].name; });
   $('coinBtn').addEventListener('click',()=>{ addCoins(1000); });
+  $('tFish').addEventListener('change',e=>{ RARITY_CTL.fish=e.target.value||null; $('tFishO').textContent=RARITY_CTL.fish?FISH[RARITY_CTL.fish].name:'As the water has it'; });
+  $('tMut').addEventListener('change',e=>{ RARITY_CTL.mut=e.target.value||null; $('tMutO').textContent=RARITY_CTL.mut?MUTS[RARITY_CTL.mut].name:'Left to chance'; });
+  $('tMoon').addEventListener('change',e=>{ const w=wxState(); if (e.target.value!=='') w.moon=+e.target.value; else delete w.moon; persist(); buildBg(); $('tMoonO').textContent=moonName(); });
+  $('bowBtn').addEventListener('click',()=>{ const w=wxState(); if (w.bow) delete w.bow; else w.bow=true; persist(); buildBg(); closeSheet(); if (w.bow && isNight(save.clock)) toast('Rainbows only come by day','warn'); });
   // traps, the smoke rack and the clock all move on an hour, as if you'd been away (game/away.js)
   $('hourBtn').addEventListener('click',()=>{ const ms=3600000; trapGiftCheck(); for (const T of trapState().list) T.t-=ms; smokeTick(); for (const h of smokeState().hooks) if (h) h.t-=ms;
     const info=applyAway(ms); closeSheet(); news('An hour went by'+(info&&info.fish?': your traps hold '+info.fish+' fish':''),'good'); });
