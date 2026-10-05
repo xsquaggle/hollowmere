@@ -79,9 +79,10 @@ module.exports = [
     name: 'a new personal record pays Glimmer instead of coins, the chip arrives on the HUD, and the kit is pointed out once',
     async run({ newPage, openGame, veteran, readSave, until, visible, landFish }) {
       const page = await newPage();
-      await openGame(page, { save: veteran() });
+      // the kitchen already open and seen: its 8-second tip would otherwise queue ahead of the etching kit's
+      await openGame(page, { save: veteran({ kitchenOpen: true, kitchenSeen: true }) });
       const FISH = await page.evaluate(() => Object.fromEntries(Object.keys(window.__hm.FISH).map(k => [k, 1])));
-      await openGame(page, { save: veteran({ coins: 500, fish: tinyRecords(FISH) }) });
+      await openGame(page, { save: veteran({ coins: 500, fish: tinyRecords(FISH), kitchenOpen: true, kitchenSeen: true }) });
       assert.ok(!(await visible(page, '#glimChip')), 'no Glimmer chip before the first Glimmer');
       await landFish(page);
       const L = await page.evaluate(() => ({ pb: window.__S.land.pbBeat, g: window.__S.land.pbGlim, mut: window.__S.land.mutGlim || 0, rar: window.__S.land.F.rarity, rec: window.__hm.GLIMMER.record }));
