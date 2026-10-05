@@ -80,8 +80,8 @@ const RAR = {
 const POOLS = {
   open: {perch:70, reedwhisker:6, leafjack:12, mossback:3},
   pads: {leafjack:55, perch:25, mossback:8},
-  deep: {perch:28, mossback:40, leafjack:12, gar:2, mayor:6},
-  far:  {perch:22, leafjack:30, mossback:26, reedwhisker:4, gar:2, mayor:3},
+  deep: {perch:40, mossback:11, leafjack:20, gar:2.5, mayor:1},
+  far:  {perch:22, leafjack:30, mossback:10, reedwhisker:4, gar:2, mayor:.8},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
@@ -89,10 +89,10 @@ const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the 
 const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
-  rocks:{wrasse:58, sprat:14, grouper:20, bream:6},
+  rocks:{wrasse:58, sprat:14, grouper:9, bream:6},
   kelp: {kelpeel:46, sprat:24, bream:20, grouper:5},
-  deep: {grouper:30, bream:28, sprat:24, kelpeel:10, angler:2, saltjaw:4},
-  far:  {bream:34, sprat:28, grouper:20, kelpeel:10, angler:1, saltjaw:2}
+  deep: {grouper:14, bream:28, sprat:34, kelpeel:10, angler:2.5, saltjaw:.9},
+  far:  {bream:34, sprat:28, grouper:10, kelpeel:10, angler:1, saltjaw:.6}
 };
 const RARE_BITES={
   shiner:{region:'lake', bow:true, chance:.035},

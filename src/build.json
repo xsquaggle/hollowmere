@@ -38,6 +38,7 @@
     "data/idle.js",
     "data/orders.js",
     "data/shack.js",
+    "data/pace.js",
     "data/stats.js",
     "game/mods.js",
     "game/odds.js",
@@ -111,6 +112,7 @@
     "game/sim.js",
     "game/idle-sim.js",
     "game/balance.js",
+    "game/pace.js",
     "game/playtest.js",
     "game/boot.js"
   ],

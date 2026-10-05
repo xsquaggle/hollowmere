@@ -1,0 +1,6 @@
+/* Pace: when a steady player reaches each thing, from the depth gate's whole-run report (step 24).
+   PACE_SIM[key]  minutes of play until it, the median of 11 runs of `npm run sim -- --career --runs 11 --pace`
+                  (paste its output here after a balance change). Keys: rod:<id>, boat, part:<id>, fix:<id>
+                  (the fix-up list), pocket:<n> (the vest's nth pocket), rune:<id>, fish:<id> (the first one caught).
+                  Playtest > Pace (game/pace.js) sets a real run beside these. */
+const PACE_SIM={'fish:perch':5, 'fish:leafjack':5, 'fish:mossback':5, 'rod:reedcutter':5, 'rod:ash':20, 'fish:lantern':21, 'rune:swift':25, 'fish:mayor':26, 'rod:heronwood':26, 'fish:gar':34, 'rune:magpie':48, 'fish:reedwhisker':62, 'rod:brasscap':69, 'fish:char':73, 'rune:deep':76, 'fix:roof':104, 'rune:nightglass':111, 'rune:storm':149, 'boat':166, 'fish:bream':172, 'fish:sprat':172, 'fish:kelpeel':172, 'fish:grouper':172, 'fish:angler':177, 'rod:saltline':186, 'rune:wanderer':196, 'fish:saltjaw':213, 'fish:gurnard':218, 'part:hold':219, 'fix:net':247, 'rune:odd':256, 'fish:wrasse':256, 'rod:gale':288, 'pocket:2':293, 'rune:echo':311, 'part:sonar':312, 'part:keel':332, 'fix:lamp':333, 'fix:stove':381, 'pocket:3':394, 'fix:cabinet':439, 'rod:deepwater':467, 'pocket:4':486, 'fix:panel':513, 'fix:knock':543, 'pocket:5':600};

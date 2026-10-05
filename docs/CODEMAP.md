@@ -131,13 +131,14 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/playtest.js` | 47 | The hidden Playtest sheet (the wrench, or a long press on the clock) |
 | `src/game/balance.js` | 90 | Playtest > Balance: run the simulator on any setup |
 | `src/game/sim.js` | 163 | The balance simulator: the 1,000-cast report |
+| `src/game/pace.js` | 45 | The pace log: minutes of play and when each rod, part, fix, pocket, rune and species first came (`paceTick`, `paceKeys`), and Playtest > Pace beside the simulator's run (`paceHTML`) |
 
 ## Content tables (`src/data/`)
 
 | File | Lines | Tables |
 | --- | --- | --- |
 | `src/data/fish.js` | 77 | `FISH`, `RAR`, `BEH`, `POOLS`, `POOLS_COAST`, `REGION_FISH`, spot names |
-| `src/data/gear.js` | 48 | `RODS`, `SEA_RODS`, boat `PARTS`, `PAINTS` |
+| `src/data/gear.js` | 50 | `RODS`, `SEA_RODS`, `BOAT` (the skiff's price), boat `PARTS`, `PAINTS` |
 | `src/data/world.js` | 9 | `REGION_NAME`, `MAP_PLACES` |
 | `src/data/weather.js` | 42 | `WX`, `WX_TABLE`, `WX_FISH`, weather lines |
 | `src/data/people.js` | 7 | Ottilie's, Barnaby's and banquet lines, the uncle's letter |
@@ -151,6 +152,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/data/idle.js` | 41 | `TRAPS`, `FITTINGS`, `SMOKE`, `AWAY` |
 | `src/data/orders.js` | 87 | `ORDERS`, `TOWNSFOLK`, `STANDINGS`, `UPGRADES`, `VISITS`, `PLATTER` |
 | `src/data/shack.js` | 34 | `FIXUP` (the uncle's fix-up list), `WALL` (plaques and what a mount does), `SHELF`, `MARKS`, `TRAPDOOR` |
+| `src/data/pace.js` | 6 | `PACE_SIM`: minutes until each thing in the simulator's whole run (`npm run sim -- --career --runs 11 --pace`) |
 | `src/data/stats.js` | 51 | `STATS` (everything a bonus can change), `MASTERY` |
 
 ## Styles (`src/styles/`)
@@ -163,7 +165,7 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | --- | --- | --- |
 | `tools/build.mjs` | 91 | The build: `build/cast-lab.html`, `build/test.html`, and the web app at the root. `--check` fails if the committed app is stale |
 | `tools/check-content.mjs` | 417 | Checks every content table, and that this map lists every file |
-| `tools/simulate.mjs` | 201 | The balance simulator from the command line (`npm run sim`) |
+| `tools/simulate.mjs` | 346 | The balance simulator from the command line (`npm run sim`), with the depth gate's whole run (`--career`) and builds (`--builds`) |
 | `tests/run.cjs` | 38 | Runs the Playwright suite against `build/test.html` |
 | `tests/helpers.cjs` | 106 | Shared helpers: cast, hook, reel and tap like a player, and `page.room` to go through the shack to a room |
 | `tests/fishing.test.cjs` | 59 | The core loop and the record moment |
@@ -183,3 +185,4 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/weather.test.cjs` | 136 | Weather and its fish |
 | `tests/relics.test.cjs` | 229 | Story relics, treasure maps, the Moon Jar, the almanac, combos |
 | `tests/shack.test.cjs` | 202 | The shack: the fix-up list, mounting and the wall bonus, the rod rack, the knock-through, the room at five phone sizes, odd saves |
+| `tests/depth.test.cjs` | 52 | The depth gate: rare and Legendary odds near the design doc, the pace log and Playtest > Pace |

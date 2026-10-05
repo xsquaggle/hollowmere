@@ -2,7 +2,7 @@
 window.__S=S; window.__K=K; window.__AQ=AQ; window.__MU=MU;
 // treasure stays off in the test build unless a test turns it on, so fishing tests always get a fish
 TREASURE_CTL.off=true;
-window.__hm={ get save(){ return save; }, FISH, RODS, REGION_FISH, RECIPES, DECOR, TANKS, STATS, FINDS, CRATES, TREASURE, NOTES, TACKLE, simulate, modList,
+window.__hm={ get save(){ return save; }, FISH, RODS, ROD_ORDER, SEA_RODS, BOAT, PARTS, PAINTS, POCKETS, REGION_FISH, RECIPES, DECOR, TANKS, STATS, FINDS, CRATES, TREASURE, NOTES, TACKLE, simulate, modList,
   gear:{ state:()=>gearState(), grant:(id,n)=>grantGear(id,n), rig:id=>rigGear(id), rigFor:r=>rigFor(r), load:id=>loadBait(id), on:()=>baitOn(), tick:()=>tickBait(), check:()=>baitCheck() },
   art:{ // the scene's trap art on one sheet, drawn into the main canvas and handed back as a picture
     trapSheet(){ ctx.setTransform(DPR,0,0,DPR,0,0); ctx.fillStyle='#3F8597'; ctx.fillRect(0,0,W,H); const k=1.6;
@@ -42,6 +42,7 @@ window.__hm={ get save(){ return save; }, FISH, RODS, REGION_FISH, RECIPES, DECO
     ghost:()=>({rings:GHOSTFX.rings.length, wake:GHOSTFX.wake.length}), signs:(R,dt)=>ghostSigns(R,dt), combos:id=>combosHTML(id), seen:id=>comboSeen(id), known:id=>comboKnown(id),
     // pockets changed mid-frame: read the bonuses afresh
     landed:()=>moonFishLanded(), pocket:id=>{ findsState().equip.push(id); MODC.dirty=true; } },
+  PACE_SIM, pace:{ state:()=>paceState(), keys:()=>paceKeys(), tick:dt=>paceTick(dt), touch:()=>{ PACE.touch=S.time; }, idle:()=>{ PACE.touch=-1e9; }, html:()=>paceHTML() },
   FIXUP, WALL,
   openNet:()=>openNet(), closeSheet:()=>closeSheet(),
   shack:{ state:()=>shackState(), open:()=>openShack(), close:()=>closeShack(), fix:id=>buyFix(id), canMount:f=>canMount(f), tankCap:()=>shackTankCap(), curios:()=>shelfCurios(),

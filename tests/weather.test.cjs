@@ -88,8 +88,9 @@ module.exports = [
     name: 'Rain coming in is news, with a first-time tip; the scene rains, and old saves get a sky of their own',
     async run({ newPage, openGame, veteran, readSave, until }) {
       const page = await newPage();
-      // an old save with no weather, and one with junk in it
-      await openGame(page, { save: veteran({ clock: 12 }) });
+      // an old save with no weather, and one with junk in it. Its kitchen is already open, so the kitchen's 8-second tip
+      // isn't queued ahead of the rain tip (that made the wait below run out on a busy machine)
+      await openGame(page, { save: veteran({ clock: 12, kitchenOpen: true, kitchenSeen: true }) });
       const fresh = await page.evaluate(() => { const w = window.__hm.wx.state(); return { seed: w.seed, seen: w.seen, force: w.force }; });
       assert.ok(Number.isInteger(fresh.seed) && fresh.seed > 0, 'an old save is given a seed');
       assert.deepEqual(fresh.seen, {}); assert.equal(fresh.force, undefined);

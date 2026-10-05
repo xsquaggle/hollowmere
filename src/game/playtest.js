@@ -3,8 +3,9 @@ let PTAB='tools';
 $('labBtn').addEventListener('click',()=>{ if (S.state!=='loot') openPlaytest(); });
 function openPlaytest(tab){ if (tab) PTAB=tab;
   const head='<div class="panel-head"><div><h2>Playtest</h2><p>Build '+BUILD+' · numbers for tuning</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
-    '<div class="seg" role="tablist">'+[['tools','Tools'],['balance','Balance']].map(([k,l])=>'<button type="button" role="tab" data-pt="'+k+'" aria-selected="'+(PTAB===k)+'" class="'+(PTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+    '<div class="seg" role="tablist">'+[['tools','Tools'],['balance','Balance'],['pace','Pace']].map(([k,l])=>'<button type="button" role="tab" data-pt="'+k+'" aria-selected="'+(PTAB===k)+'" class="'+(PTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
   if (PTAB==='balance'){ openSheet(head+balanceFormHTML()); bindPlaytestTabs(); bindBalance(); return; }
+  if (PTAB==='pace'){ openSheet(head+paceHTML()); bindPlaytestTabs(); return; }
   const s=save.stats, fishCasts=s.casts-(s.hauls||0), rate=fishCasts>0?Math.round(s.catches/fishCasts*100):0, t=save.tune;   // treasure casts aren't missed fish
   const sl=(id,label,v,hint)=>'<label for="'+id+'">'+label+'<output id="'+id+'O">'+v.toFixed(2)+'×</output><input type="range" id="'+id+'" min="0.5" max="1.6" step="0.05" value="'+v+'"><span class="note" style="grid-column:1/-1;margin:0">'+hint+'</span></label>';
   openSheet(head+
@@ -26,6 +27,8 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
     '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="jarBtn" type="button">Fill the Moon Jar</button><button class="btn" id="wallBtn" type="button">Fill the wall</button><button class="btn" id="mapBtn2" type="button">Finish the map</button><button class="btn" id="bowBtn" type="button">'+(wxState().bow?'Clear the rainbow':'Rainbow now')+'</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
   bindPlaytestTabs();
+  // anything the tools hand over or change makes the pace log's times less telling (game/pace.js)
+  $('panel').querySelectorAll('button:not([data-pt]):not(#closeS), select, input').forEach(el=>el.addEventListener(el.tagName==='BUTTON'?'click':'change',()=>{ paceState().tools=true; persist(); }));
   [['tHook','hook'],['tTension','tension'],['tWait','wait']].forEach(([id,k])=>{ $(id).addEventListener('input',e=>{ save.tune[k]=+e.target.value; $(id+'O').textContent=(+e.target.value).toFixed(2)+'×'; persist(); }); });
   $('tClock').addEventListener('input',e=>{ save.clock=+e.target.value; $('tClockO').textContent=clockText(save.clock); buildBg(); persist(); });
   $('tWx').addEventListener('change',e=>{ const w=wxState(); if (e.target.value) w.force=e.target.value; else delete w.force; persist(); WXT.kind=null; buildBg(); $('tWxO').textContent=w.force?WX[w.force].name+' (pinned)':WX[wxNow()].name; });

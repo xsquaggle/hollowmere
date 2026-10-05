@@ -20,13 +20,14 @@ each build.
 | 21 | Rarity in full: two Epic fish, the Prism Shiner at the rainbow's foot and the Moonwhale Calf on full-moon nights; the moon's phases and moonpath; four mutations and the Odd Water rune; Epic-to-Mythic hook, landing and card moments; a dry run that lifts the Legendaries (build 22) |
 | 22 | Story relics: the Wet Almanac's forecast, the Moon Jar, the Drowned Bell and the Cartographer's Pin, each found its own way; treasure maps in three pieces with a cache to dig; combo chips, with the Tuning Fork's wake on a ghost (build 23) |
 | 23 | Shack upgrades: one shack button opens the front room, with doors to the tank room and the kitchen; the trophy wall (3 plaques growing to 8, each species mounted is worth more when caught), the curio shelf and glass-front cabinet, the rod rack, and your uncle's fix-up list of seven jobs with the trapdoor still locked (build 24) |
+| 24 | The depth gate: rare and Legendary odds brought to the design doc's table, rods, the boat and the late jobs repriced so the lake and the coast take about 9 hours, a whole-run simulator and a builds report, and Playtest > Pace for the friend playtest (build 25) |
 
 ## Next
 
-13 waits for friends to be available; the rest go in order.
+13 and 24's friend playtest wait for friends to be available; the rest go in order.
 
 - **13.** Friend playtest, and the bottom-bar regroup.
-- **24.** The depth gate: a balance pass and a friend playtest.
+- **24.** The depth gate's friend playtest (the balance pass shipped in build 25). Playtest > Pace sets their run beside the simulator's.
 - **25–32.** Phase C: new places and the story.
   - Rootwood River.
   - Saltmarsh.

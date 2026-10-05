@@ -44,7 +44,7 @@ const CRATES={
   mythic:   {name:'Mythic chest', look:'Ink black and silver', weight:1.2, pull:1.6, reel:9, snags:3, fish:64, floor:640, items:[{prize:'mythic'}, {lean:'exotic'}, {lean:'legendary'}, {gear:'mythic', chance:.3}]}
 };
 const OWNERS={ottilie:{name:'Ottilie'}, barnaby:{name:'Barnaby'}, pell:{name:'Pell'}};
-const POCKETS={start:1, max:5, costs:[1500, 6000, 18000, 45000]};
+const POCKETS={start:1, max:5, costs:[1500, 5000, 12000, 20000]};
 const FINDS={
   // curios: one of a kind, to collect, and some to give back
   toyboat: {name:'Tin Toy Boat', kind:'curio', rarity:'common', region:'lake', owner:'ottilie', lore:'A child’s tin steamer, red once. Scratched on the hull: O., AGE 7.',

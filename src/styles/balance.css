@@ -21,3 +21,6 @@
 .bal-tab th+th,.bal-tab td+td{text-align:right}
 .bal-tab td{padding:5px 0;border-top:1px solid rgba(43,42,51,.1);font-weight:700}
 .bal-notes{margin-bottom:4px}
+/* Playtest > Pace: what this run hasn't reached yet is greyed; a time half or twice the simulator's is marked */
+.pace-tab tr.pace-todo td{color:#9A9488}
+.pace-tab td.pace-far{color:#B2493A;font-weight:800}
