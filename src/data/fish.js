@@ -9,7 +9,9 @@
               extra:true for fish that don't count toward finishing a water (Barnaby never waits on them); secret:true
               for a fish found by experimenting, whose journal page shows a riddle (hint) once it's been seen; beh2 for a
               fish that changes how it fights halfway in; noTank:true for one too big for any tank. shared:true for a fish
-              that lives in more than one water (it's on each one's journal page and in each one's pools).
+              that lives in more than one water (it's on each one's journal page and in each one's pools). dark:true for a
+              Hollow fish that bites in the dark (the rest there need light, unless they glow: game/hollow.js); noSell:true
+              for one that can't be sold (the Sleeper's Scale goes in the Godly Ledger instead).
    RAR[tier]  how a rarity looks and sounds, in order from common to godly; pips (1 to 8) so rarity never rests on color
               alone; prism and ink for the tiers whose color shifts or bleeds. luckCap is the most luck can multiply
               its odds (see game/mods.js); Godly's sits below Mythic's on purpose, so no build makes Godly routine.
@@ -21,7 +23,8 @@
               Drowned Bell in a pocket for the Bellmouth, the Lantern Rod lit for the Lampwick Eel, the bell tower ringing for the
               Choir Fish, a drowned page on the hook for the Paper Carp); churn:true only while the seventh wave has the water
               stirred round your float (data/coast.js: SWELL); at: only when that's true where the float lies (refl: on a lit
-              window's reflection in the Drowned Quarter at night).
+              window's reflection in the Drowned Quarter at night; shaft: in the Hollow's midday shaft of lake light; eye: in
+              the Hollow's eye while it's open). moon:'new' on new-moon nights. flag:'cursed' with the Bonewhistle in hand.
    DRY        soft bad-luck protection, up to Legendary only: after `from` casts in a row where a Legendary could have
               bitten and didn't, its odds creep up, reaching ×max at `to`. Landing a Legendary or rarer starts it over.
    MUTS       mutations, rolled on landing (game/landing.js: catchRoll) on anything below Mythic: chance per catch before
@@ -29,7 +32,7 @@
               species' biggest it grows. cursed:true only with cursed gear in hand (the Bonewhistle: STATS.cursed).
               MUT_ORDER is the order the journal lists them.
    ORDER      the lake journal's order, the same fish as REGION_FISH.lake.  REGION_FISH  which species live in each region, in journal order.
-   POOLS      lake bite weights per spot; POOLS_COAST, POOLS_RIVER, POOLS_MARSH and POOLS_QUARTER the same for the other waters. Night, dawn, the tide, rods,
+   POOLS      lake bite weights per spot; POOLS_COAST, POOLS_RIVER, POOLS_MARSH, POOLS_QUARTER and POOLS_HOLLOW the same for the other waters. Night, dawn, the tide, rods,
               meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench");
               SPOT_REG  a spot's own name in one water (the coast's deep water is the Dark trench, the river's the Millpool).
               'mud' is no spot: it's the marsh's banks while the tide is out, where a cast only goes splat (game/marsh.js), and
@@ -133,7 +136,28 @@ const FISH = {
   papercarp:{name:'Paper Carp', rarity:'epic', beh:'leaper', secret:true, extra:true, pull:1.45, reel:9, value:500, size:[26,46], len:42, h:.34, color:'#E4DCC8', fin:'#BCB299', window:.86,
             lore:'Folded, somehow, from a letter: a word or two still shows along its side. It never eats the pages. It reads them.', hint:'Something in the Quarter reads anything that floats.'},
   choir:   {name:'Choir Fish', rarity:'legendary', beh:'leaper', pull:1.75, reel:14, value:1600, size:[90,140], len:80, h:.26, color:'#9AA6B8', fin:'#6A7488', window:.72,
-            lore:'Sings in harmony with something below it.', hint:'Something answers the bell tower, but only while its bell rings.'}
+            lore:'Sings in harmony with something below it.', hint:'Something answers the bell tower, but only while its bell rings.'},
+  // the Hollow (data/hollow.js): fish that need light to bite, unless they glow or live by sound
+  lampless:{name:'Lampless Perch', rarity:'common', beh:'darter', pull:.9, reel:2.8, value:12, size:[14,28], len:34, h:.27, color:'#CFC6BA', fin:'#ADA294', window:1.4,
+            lore:'Its stripes have faded from so long without light. It keeps them anyway, out of habit.', hint:'Common in the lantern’s light.'},
+  sporeloach:{name:'Spore Loach', rarity:'common', beh:'sleeper', glow:true, pull:.85, reel:3.2, value:14, size:[12,24], len:38, h:.15, color:'#47555A', fin:'#34403F', window:1.5,
+            lore:'It grazes the glowing spores off the rocks and glows for an hour after, like a child who’s eaten a lantern.', hint:'Grazes the glowing shelf under the far wall.'},
+  echobream:{name:'Echo Bream', rarity:'uncommon', beh:'tugger', pull:1.05, reel:4.4, value:42, size:[24,44], len:42, h:.38, color:'#8E8A76', fin:'#67644F', window:1.1,
+            lore:'Every drip in the Hollow rings twice: once on the water, once in the Echo Bream. It keeps the sound in its rings.', hint:'Rings under the drip line.'},
+  keyhole: {name:'Keyhole Eel', rarity:'uncommon', beh:'sulker', pull:1.05, reel:4.6, value:46, size:[50,95], len:62, h:.1, color:'#3C434C', fin:'#2A3038', window:1.1,
+            lore:'There’s a keyhole in its side. Every key in town has been tried in it. One of them turned.', hint:'Coils in the dark round the eye.'},
+  koi:     {name:'Eyeless Koi', rarity:'rare', beh:'ghost', dark:true, pull:1.3, reel:7, value:150, size:[40,72], len:52, h:.3, color:'#EEE7DF', fin:'#E6CEC6', window:.92,
+            lore:'Swims toward sound, not light.', hint:'Something pale comes to a twitch in the dark.'},
+  glasscarp:{name:'Looking-Glass Carp', rarity:'epic', beh:'leaper', extra:true, pull:1.55, reel:10, value:600, size:[50,90], len:58, h:.34, color:'#AEB6BA', fin:'#7E888E', window:.82,
+            lore:'Its scales are silvered like an old mirror. Look into one and you see the lake above, the right way up.', hint:'Something silvered rises to the light from the roof, at midday.'},
+  mothmouth:{name:'Mothmouth', rarity:'legendary', beh:'darter', pull:1.85, reel:15, value:2200, size:[120,170], len:90, h:.26, color:'#8C8273', fin:'#6C6253', window:.72,
+            lore:'It has followed every light ever lowered into the Hollow. Your uncle’s, for years. Now yours.', hint:'Something huge waits out in the dark for a light to follow.'},
+  inkling: {name:'Inkling', rarity:'exotic', beh:'ghost', extra:true, secret:true, pull:1.2, reel:8, value:1200, size:[16,30], len:36, h:.26, color:'#221F2C', fin:'#16141D', window:.62,
+            lore:'It writes on the water as it swims. The words are in your handwriting.', hint:'Something in the Hollow only writes for a cursed rod.'},
+  drownedmoon:{name:'Drowned Moon', rarity:'mythic', beh:'sulker', beh2:'leaper', glow:true, extra:true, noTank:true, pull:1.95, reel:21, value:8000, size:[180,260], len:96, h:.78, color:'#E2E0D4', fin:'#BAB8AC', window:.66,
+            lore:'The moon’s reflection, the night the lake closed. It never found its way back up.', hint:'On new-moon nights, something round and pale swims down here, where the moon isn’t.'},
+  scale:   {name:'The Sleeper’s Scale', rarity:'godly', beh:'sleeper', glow:true, extra:true, secret:true, noTank:true, noSell:true, pull:1.3, reel:16, value:0, size:[640,900], len:132, h:.3, color:'#F5EEDA', fin:'#E6D6A6', window:1.1,
+            lore:'Not a fish. Something that is dreaming the fish.', hint:'At 3:12, with every light put out, something in the eye opens its own.'}
 };
 const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'];
 const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper', ghost:'Ghost'};
@@ -156,16 +180,18 @@ const POOLS = {
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed', wash:'The wash', wreck:'The wreck', riffle:'Riffle', leaves:'Leaf drift', roots:'Undercut roots',
-  flats:'Flooded flats', pans:'Tide pools', mud:'Mud', doors:'Doorways', windows:'Front rooms', post:'Post office'};
+  flats:'Flooded flats', pans:'Tide pools', mud:'Mud', doors:'Doorways', windows:'Front rooms', post:'Post office', lamp:'Lantern light', spores:'Spore shelf', drip:'Drip line'};
 const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench', wash:'in the wash', wreck:'by the wreck',
   riffle:'in the riffle', leaves:'under the falling leaves', roots:'among the roots', 'river:open':'in the run', 'river:deep':'in the millpool',
   flats:'on the flooded flats', pans:'in a tide pool', 'marsh:open':'in the creek', 'marsh:deep':'in the sluice pool', 'marsh:far':'in the channel',
-  doors:'in a doorway', windows:'in a front room', post:'in the post office', 'quarter:open':'on Lantern Row', 'quarter:deep':'in the bell tower', 'quarter:far':'in the square'};
+  doors:'in a doorway', windows:'in a front room', post:'in the post office', 'quarter:open':'on Lantern Row', 'quarter:deep':'in the bell tower', 'quarter:far':'in the square',
+  lamp:'in the lantern’s light', spores:'by the spore shelf', drip:'under the drip line', 'hollow:open':'in the dark', 'hollow:deep':'in the eye', 'hollow:far':'in the far dark'};
 const SPOT_REG = {coast:{deep:'Dark trench'}, river:{open:'The run', deep:'Millpool'}, marsh:{open:'The creek', deep:'Sluice pool', far:'The channel'},
-  quarter:{open:'Lantern Row', deep:'The bell tower', far:'The square'}};
+  quarter:{open:'Lantern Row', deep:'The bell tower', far:'The square'}, hollow:{open:'The dark', deep:'The eye', far:'The far dark'}};
 const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'], coast:['sprat','wrasse','spindrift','kelpeel','bream','herring','mackerel','grouper','conger','gurnard','angler','comber','saltjaw'],
   river:['brook','stone','leafjack','spatefin','barbel','grayling','clockfin','gristle'], marsh:['mudlark','dab','croaker','smelt','whiting','mullet','bellmouth','lampwick','reeve'],
-  quarter:['gudgeon','roach','hingejaw','drainpipe','laceshad','sturgeon','hearth','papercarp','choir']};
+  quarter:['gudgeon','roach','hingejaw','drainpipe','laceshad','sturgeon','hearth','papercarp','choir'],
+  hollow:['lampless','sporeloach','echobream','keyhole','koi','glasscarp','mothmouth','inkling','drownedmoon','scale']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:9, bream:6},
@@ -206,6 +232,17 @@ const POOLS_QUARTER = {
   deep:   {gudgeon:30, hingejaw:24, roach:12, sturgeon:12},
   far:    {gudgeon:40, roach:22, hingejaw:14, sturgeon:5}
 };
+/* The Hollow: the lantern's pool and the glowing spore shelf are lit, and so the fish there bite where they are; the dark,
+   the drip line, the eye and the far dark are where the rarer fish live, and they follow a float into the light before
+   they'll bite (game/hollow.js). The Eyeless Koi bites in the dark. The Mothmouth waits out in the dark and in the eye. */
+const POOLS_HOLLOW = {
+  lamp:  {lampless:62, sporeloach:12, echobream:8, keyhole:4},
+  spores:{sporeloach:56, lampless:20, echobream:8, keyhole:5},
+  open:  {lampless:34, echobream:22, keyhole:14, sporeloach:8, koi:5},
+  drip:  {echobream:32, lampless:20, keyhole:14, koi:8},
+  deep:  {keyhole:28, echobream:16, lampless:14, koi:10, mothmouth:1.2},
+  far:   {echobream:22, keyhole:18, lampless:20, koi:8, mothmouth:.9}
+};
 const RARE_BITES={
   shiner:{region:'lake', bow:true, chance:.035},
   calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2},
@@ -215,7 +252,11 @@ const RARE_BITES={
   comber:{region:'coast', spots:['open','far','rocks','wash','kelp','wreck'], churn:true, chance:1/16},
   choir:{region:'quarter', spots:['deep'], flag:'ringing', chance:1/6},
   hearth:{region:'quarter', spots:['open'], night:true, at:'refl', chance:1/7},
-  papercarp:{region:'quarter', flag:'page', chance:1/5}
+  papercarp:{region:'quarter', flag:'page', chance:1/5},
+  glasscarp:{region:'hollow', at:'shaft', chance:1/12},
+  inkling:{region:'hollow', flag:'cursed', chance:1/45},
+  drownedmoon:{region:'hollow', spots:['deep','far','open','drip'], moon:'new', night:true, chance:1/90},
+  scale:{region:'hollow', spots:['deep'], at:'eye', chance:1/50000}
 };
 const DRY={from:80, to:200, max:2};
 const MUTS={

@@ -54,6 +54,10 @@ function modSources(){
   dreadMods(add);
   // Gull Luck: a lucky splash zone doubles the odds of every fish above common while you fish in it
   add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true, rarityMin:'uncommon'}});
+  // A falling star's zone: Exotic and rarer bite more often where it came down (game/omens.js)
+  add('event','Falling star','luck',STAR.x,{omen:true, when:{star:true, rarityMin:'exotic'}});
+  // An omen over a water: Mythic and Godly bite more often there while it lasts. Never shown, never put into words
+  if (save.omen && save.omen.left>0 && save.omen.reg) add('event','Omen','luck',OMEN.x,{omen:true, hide:true, when:{region:save.omen.reg, rarityMin:'mythic'}});
   // The rainbow's foot: a fish hooked where it touches the water comes up mutated twice as often (game/moon.js)
   add('event',"Rainbow's foot",'mutation',2,{when:{bow:true}});
   // Fresh water: back after a long while, rarer fish bite more often for a few casts (game/away.js)
@@ -69,9 +73,9 @@ function modSources(){
 }
 function modList(){ if (MODC.list && MODC.at===MODC.frame && !MODC.dirty) return MODC.list;
   MODC.list=modSources(); MODC.at=MODC.frame; MODC.dirty=false; return MODC.list; }
-/** The context a stat is read in. Region, time and weather come from the game; callers add spot, fish, rarity or lucky.
-    A fish brings its rarity along. */
-function modCtx(c){ const x=Object.assign({region:REG(), night:nightNow(), wx:wxNow()}, c);
+/** The context a stat is read in. Region, time and weather come from the game (outdoors: anywhere but under the lake,
+    in the Hollow); callers add spot, fish, rarity or lucky. A fish brings its rarity along. */
+function modCtx(c){ const x=Object.assign({region:REG(), night:nightNow(), wx:wxNow()}, c); if (x.outdoors==null) x.outdoors=x.region!=='hollow';
   if (x.fish){ if (!x.rarity) x.rarity=FISH[x.fish].rarity; if (!x.beh) x.beh=FISH[x.fish].beh; } return x; }
 const rarRank=r=>Object.keys(RAR).indexOf(r);
 function modMatch(m,c){ const w=m.when; if (!w) return true;

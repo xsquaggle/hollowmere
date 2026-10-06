@@ -12,14 +12,15 @@ function catchRoll(id,perfect,ctx){ const F=FISH[id], mut=ctx&&ctx.tut?null:roll
   return {size,build,w,value,stars:qualityOf(id,size,perfect),mut}; }
 function startLand(){
   humStop(); const R=S.reel, F=R.F, spot=(S.bob&&S.bob.spot)||'open';
-  // the Hungry Hook takes its share before you can keep the fish
-  const eaten=!S.tut && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
+  // the Hungry Hook takes its share before you can keep the fish, but never a fish for the Ledger
+  const eaten=!S.tut && !F.noSell && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
   const wander=S.tut||eaten?0:wanderCount(REG());   // Wanderer: the day's first catches in this water
   const {size,build,w:wgt,value,mut}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky,wander:!!wander,bow:!!R.bow,tut:!!S.tut});
   S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,wx:wxNow(),rod:save.rod,value,mut,burst:false,isNew:rec(R.id).caught===0,eaten,wander,moon:!!(S.bob&&S.bob.moon)};
   if (S.land.moon) moonFishLanded();   // the Moon Jar's light is spent on the fish it lit (game/relics.js)
-  // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast
-  if (R.perfect && !S.tut && !eaten && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
+  // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast (never a Godly one:
+  // there's only ever the one)
+  if (R.perfect && !S.tut && !eaten && !F.noSell && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
   const rk=rarRank(F.rarity), big=rk>=rarRank('legendary');
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
   sfx.out(F.rarity); buzz(big?[0,40,60,40,60,120]:rk>=rarRank('epic')?[0,30,40,60]:40); shake(big?6:rk>=rarRank('epic')?4:2);
@@ -91,6 +92,7 @@ function showCard(){
   const rs=$('cRec'), pbEl=$('cPB'); rs.hidden=pbEl.hidden=!L.pbBeat; rs.hidden=!L.pbBeat||L.pbMinor; pbEl.classList.toggle('minor',!!L.pbMinor); rs.parentNode.classList.toggle('rec',!!L.pbBeat&&!L.pbMinor); rs.style.animationDelay=pbEl.style.animationDelay=REDUCED?'0s':'';
   if (L.pbBeat) pbEl.innerHTML='<span class="t">'+(L.pbMinor?'New best, just':'New personal record')+'</span><b id="cPBw">'+fmtW(L.prev.w)+'</b><em>was '+fmtW(L.prev.w)+'</em>'+(L.pbGlim?'<i class="bonus"><span class="glim" aria-hidden="true"></span>+'+L.pbGlim+'<span class="sr"> Glimmer</span></i>':'');
   card.hidden=false; S.cardAt=S.time; cardScene(L); paintTiles($('cTags').querySelectorAll('canvas[data-rune]'));   // once the card is laid out
+  $('cSell').hidden=false; if (F.noSell) ledgerCard(L);   // the Sleeper's Scale goes into the Ledger (game/godly.js)
   cardMoment(L);   // Epic and up: the card's own chord; a Mythic's name inks in (game/rarity-fx.js)
   if (L.mutGlim) setTimeout(()=>glimmerTally(L.mutGlim,{x:W/2,y:H*.5}),L.pbBeat?3400:900);
   if (L.mut && !save.stats.mutTip){ save.stats.mutTip=true; persist(); setTimeout(()=>{ if (S.state==='result') coachFor(mutTip(L.mut),8); },1200); }
@@ -105,12 +107,14 @@ function dismissCard(action){
   if (S.state!=='result') return;
   action=action||S.cardDefault||'sell';
   const L=S.land, card=$('card');
+  if (L.F.noSell) action='ledger';   // never sold or kept: into the Ledger (game/godly.js)
   if (action==='keep' && save.net.length>=netCap()) action='sell';
   if (action==='sell' && rarRank(L.F.rarity)>=rarRank('mythic') && !S.sellArmed){ S.sellArmed=true; $('cSell').textContent='Sell it? Tap again'; $('cSell').classList.add('armed'); return; }   // a Mythic is never sold by accident
   if (action==='tank' && !tankRoom(L.id)) action=save.net.length<netCap()?'keep':'sell';
   if (action==='mount' && !canMount(keptFish(L))) action=save.net.length<netCap()?'keep':'sell';
   card.classList.add('out'); setTimeout(()=>{ card.hidden=true; card.classList.remove('out'); },250);
-  if (action==='sell') addCoins(L.value);
+  if (action==='ledger') ledgerWrite(L);
+  else if (action==='sell') addCoins(L.value);
   else if (action==='tank'){ addToTank(keptFish(L)); sfx.plop(); news('Off to the aquarium','good'); }
   else if (action==='mount'){ mountFish(keptFish(L)); shSfx.mount(); buzz([0,18,120,18]); shackPulse(); news(L.F.name+' is up on the trophy wall in your shack','gold'); }
   else { save.net.push(keptFish(L)); persist();
@@ -120,6 +124,7 @@ function dismissCard(action){
   if (L.isNew){ $('journalBtn').classList.remove('pulse'); void $('journalBtn').offsetWidth; $('journalBtn').classList.add('pulse'); }
   const finishing=S.tut==='card'; if (finishing){ save.tutorialDone=true; S.tut=null; persist(); }
   S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); kitchenUnlockCheck(); relicAfterCatch(L); pellAfterCatch(L); dreadAfterCatch(L,action);   // the Moon Jar fills, Ottilie's almanac (game/relics.js); an answer on a Postman Sturgeon (game/pell.js); Dread (game/dread.js)
+  godlyAfter(L);   // the first Sleeper's Scale: the Hollow lit, and the Stillwater Mirror (game/godly.js)
   if (!save.backupHinted && !save.lastBackup && !isStandalone() && save.stats.catches>=40){ save.backupHinted=true; persist(); coachFor('Your game lives in this browser. Tap the gear, then Save, to make a backup code and keep it safe.',8); }
   if (finishing) coachFor('You’re ready. Rarer fish fight in new ways, and the deep pool hides the best ones.',6); else if (!S.tut && !coachTimer) coachOff();
 }

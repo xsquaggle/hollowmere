@@ -17,7 +17,7 @@
 .pips{display:inline-flex;gap:3px;align-items:center}
 .pips i{width:7px;height:7px;border-radius:50%;background:rgba(43,42,51,.15);box-shadow:inset 0 0 0 1px rgba(43,42,51,.3)}
 .pips i.on{background:var(--pip,var(--c-common));box-shadow:inset 0 0 0 1px rgba(0,0,0,.3)}
-[data-r="uncommon"] .pips{--pip:var(--c-uncommon)}[data-r="rare"] .pips{--pip:var(--c-rare)}[data-r="epic"] .pips{--pip:var(--c-epic)}[data-r="legendary"] .pips{--pip:var(--c-legendary)}[data-r="exotic"] .pips{--pip:var(--c-exotic)}[data-r="mythic"] .pips{--pip:#C4C8D4}
+[data-r="uncommon"] .pips{--pip:var(--c-uncommon)}[data-r="rare"] .pips{--pip:var(--c-rare)}[data-r="epic"] .pips{--pip:var(--c-epic)}[data-r="legendary"] .pips{--pip:var(--c-legendary)}[data-r="exotic"] .pips{--pip:var(--c-exotic)}[data-r="mythic"] .pips{--pip:#C4C8D4}[data-r="godly"] .pips{--pip:var(--c-godly)}
 
 /* The haul card: rises from the bottom like a catch card, then lays the contents out one at a time */
 #haul{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:min(360px,calc(100% - 32px));max-height:min(72%,600px);overflow-y:auto;overscroll-behavior:contain;
@@ -43,7 +43,7 @@
 .hl-items{display:grid;gap:8px}
 /* each item pops into its dashed slot; the pop rides a wrapper so a tier's foil shimmer on the item keeps running */
 .hl-pop{display:grid;animation:hlIn .55s calc(.35s + var(--i,0) * .55s) cubic-bezier(.2,1.5,.4,1) both}
-.hl-pop[data-r="legendary"],.hl-pop[data-r="exotic"],.hl-pop[data-r="mythic"]{animation:hlIn .55s calc(.35s + var(--i,0) * .55s) cubic-bezier(.2,1.5,.4,1) both,hlGlow 1.6s calc(.9s + var(--i,0) * .55s) ease-out both}
+.hl-pop[data-r="legendary"],.hl-pop[data-r="exotic"],.hl-pop[data-r="mythic"],.hl-pop[data-r="godly"]{animation:hlIn .55s calc(.35s + var(--i,0) * .55s) cubic-bezier(.2,1.5,.4,1) both,hlGlow 1.6s calc(.9s + var(--i,0) * .55s) ease-out both}
 .hl-item{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;padding:10px 10px 10px 8px}
 .hl-slot{border:1.5px dashed rgba(43,42,51,.22);border-radius:10px;min-height:84px;display:grid;animation:slotIn .3s calc(.1s + var(--i,0) * .12s) ease-out both}
 .hl-slot>.hl-pop{margin:-1.5px}
@@ -97,3 +97,6 @@
 #haul[data-r="mythic"] .hl-item:not([data-r="mythic"]){background-color:var(--paper);color:var(--ink)}
 #haul[data-r="mythic"] .hl-item.spare{background:var(--paper)}
 .rf[data-r="mythic"] .btn.primary{background:var(--paper);color:var(--ink);box-shadow:0 2px 0 #000}
+/* Step 29: the Stillwater Mirror comes up out of the Hollow's eye: the haul in Godly's gold and light */
+#haul[data-r="godly"]{border:4px double var(--c-godly);background:radial-gradient(130% 80% at 50% 0,#FFF8E2,var(--paper) 70%);box-shadow:0 6px 0 #6E5822,0 0 0 6px rgba(255,241,196,.5),0 0 50px rgba(255,236,170,.55),0 18px 50px rgba(0,0,0,.5);animation:cardIn .9s cubic-bezier(.2,1.2,.4,1)}
+#haul[data-r="godly"] .rarity{background:var(--c-godly);color:#3A2E10}

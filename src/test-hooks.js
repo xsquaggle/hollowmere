@@ -2,7 +2,7 @@
 window.__S=S; window.__K=K; window.__AQ=AQ; window.__MU=MU;
 // treasure stays off in the test build unless a test turns it on, so fishing tests always get a fish
 TREASURE_CTL.off=true;
-window.__hm={ get save(){ return save; }, FISH, RODS, QUARTER, PELL_Q, ROD_ORDER, SEA_RODS, QUEST_RODS, BOAT, RIVER, WREN, TWIN, PARTS, PAINTS, POCKETS, REGION_FISH, RECIPES, DECOR, TANKS, STATS, FINDS, CRATES, TREASURE, NOTES, TACKLE, simulate, modList,
+window.__hm={ get save(){ return save; }, POOLS_BY, FISH, RODS, QUARTER, PELL_Q, ROD_ORDER, SEA_RODS, QUEST_RODS, BOAT, RIVER, WREN, TWIN, PARTS, PAINTS, POCKETS, REGION_FISH, RECIPES, DECOR, TANKS, STATS, FINDS, CRATES, TREASURE, NOTES, TACKLE, simulate, modList,
   gear:{ state:()=>gearState(), grant:(id,n)=>grantGear(id,n), rig:id=>rigGear(id), rigFor:r=>rigFor(r), load:id=>loadBait(id), on:()=>baitOn(), tick:()=>tickBait(), check:()=>baitCheck() },
   art:{ // the scene's trap art on one sheet, drawn into the main canvas and handed back as a picture
     trapSheet(){ ctx.setTransform(DPR,0,0,DPR,0,0); ctx.fillStyle='#3F8597'; ctx.fillRect(0,0,W,H); const k=1.6;
@@ -92,4 +92,14 @@ window.__hm={ get save(){ return save; }, FISH, RODS, QUARTER, PELL_Q, ROD_ORDER
         while (!out && n<4000){ out=limpStep(R,1/30,{ev, steer:()=>0, holding:true, t}); t+=1/30; n++; } return {secs:t, out, clicks:ev.filter(e=>e==='click').length, tension:R.tension}; } },
     call:{ blow:()=>blowConch(), wait:()=>callWait(), on:(x,y)=>onConch(x,y), pos:()=>conchPos() },
     story:house=>{ const H0=G.q.holes.find(h=>h.house===house); return storyLoot({x:(H0.x0+H0.x1)/2, y:H0.base-4, spot:H0.spot, hole:H0}); },
+    mods:()=>{ MODC.dirty=true; return modList(); } },
+  hollow:{ HS, OM, GOD, HOLLOW, MIRROR_STARS, OMEN, STAR, haul:loot=>{ S.reel={loot, x:W/2, y:H*.5, lucky:false}; S.bob=null; startLoot(); }, tips:()=>[$('coachText').textContent].concat(COACHQ.map(c=>c.text)).join('\n'), state:()=>hollowState(), open:()=>hollowOpen(), drained:()=>hollowDrained(), trapdoor:()=>trapdoorOpen(), climb:()=>climbDown(),
+    due:()=>({log3:log3Due(), log4:log4Due(), log5:log5Due()}), grey:()=>greyHasPage(), greyPos:()=>greyPos(), onGrey:(x,y)=>onGrey(x,y), takePage:()=>takeGreyPage(),
+    bell:{ here:()=>lakeBellHere(), pos:()=>lakeBellPos(), on:(x,y)=>onLakeBell(x,y), ring:()=>ringLakeBell() },
+    G:()=>({hollow:G.hollow, deep:G.deep, lantern:G.lantern, near:G.near, hz:HZ, w:W, h:H}), spot:(x,y)=>hollowSpot(x,y), lit:(x,y,k)=>hollowLit(x,y,k), lights:()=>hollowLights().map(L=>({k:L.k, a:L.a})),
+    needs:id=>hollowNeedsLight(id), shaft:()=>shaftNow(), litUp:()=>hollowLitUp(), lamp:()=>toggleLamp(), onLamp:(x,y)=>onHollowLamp(x,y), at:(x,y)=>hollowAt({x,y}),
+    eye:{ ready:()=>eyeReady(), time:()=>eyeTime(), k:()=>HS.eye, update:dt=>eyeUpdate(dt) }, arrive:()=>hollowArrive(), confess:()=>ottConfession(),
+    omen:{ start:()=>omenStart(), on:()=>omenOn(), state:()=>omenState(), k:()=>OM.k, hush:()=>waterHush(), held:()=>dripsHeld(), update:dt=>omenUpdate(dt) },
+    star:{ sky:()=>starSky(), fall:()=>starFall(), update:dt=>starUpdate(dt), z:()=>SC.star&&{phase:SC.star.phase, x:SC.star.x, y:SC.star.y, r:SC.star.r, t:SC.star.t}, in:(x,y)=>inStar(x,y), gullBusy:()=>gullBusy(), clear:()=>{ SC.star=null; SC.nextStar=null; } },
+    godly:{ ledger:()=>ledger(), still:()=>godlyStill(), light:()=>godlyLight(), mirrorOn:()=>mirrorOn(), stars:()=>mirrorStars().map(s=>({x:s.x, y:s.y})), onStar:(x,y)=>onMirrorStar(x,y), after:L=>godlyAfter(L), html:id=>ledgerHTML(id) },
     mods:()=>{ MODC.dirty=true; return modList(); } } };

@@ -75,13 +75,17 @@ function drawWater(){
   const sx=SC.lightX||W*.3, la=SC.lightA||0;
   if (la>.02) for (let i=0;i<14;i++){ const y=HZ+3+i*i*1.5, w=W*.05*(1-i/16)+Math.sin(S.time*1.5+i)*4;
     ctx.fillStyle='rgba('+SC.lightRGB+','+((.42-i*.025)*la).toFixed(3)+')'; ctx.fillRect(sx-w,y,w*2,1.5+i*.15); }
-  const own=REG()==='river'||REG()==='marsh'||REG()==='quarter';   // the river, the marsh and the Quarter draw their own water (game/river-art.js, marsh-art.js, quarter-art.js); no sails or lake swell there
+  // the river, the marsh, the Quarter and the Hollow draw their own water (game/river-art.js, marsh-art.js,
+  // quarter-art.js, hollow-art.js); no sails or lake swell there
+  const own=REG()==='river'||REG()==='marsh'||REG()==='quarter'||REG()==='hollow';
+  // the swell lies down while the lake drains and under an omen (game/omens.js)
+  const hu=waterHush();
   if (!own) drawBoat();
   ctx.lineCap='round';
   if (!own) for (const v of SC.waves){
     const y0=HZ+5+v.fy*(H-HZ-50), k=sc(y0), span=W*1.2;
-    const x=((v.fx*span+S.time*v.dr*(6+k*10))%span)-W*.1, y=y0+Math.sin(S.time*1.1+v.ph)*1.4*k, w=(5+k*13)*v.len;
-    ctx.strokeStyle='rgba(222,238,242,'+(.08+.16*k+.05*Math.sin(S.time*1.7+v.ph)).toFixed(3)+')'; ctx.lineWidth=.8+k*1.4;
+    const x=((v.fx*span+S.time*v.dr*(6+k*10)*(1-.7*hu))%span)-W*.1, y=y0+Math.sin(S.time*1.1+v.ph)*1.4*k*(1-hu), w=(5+k*13)*v.len;
+    ctx.strokeStyle='rgba(222,238,242,'+((.08+.16*k+.05*Math.sin(S.time*1.7+v.ph))*(1-.8*hu)).toFixed(3)+')'; ctx.lineWidth=.8+k*1.4;
     ctx.beginPath(); ctx.moveTo(x-w,y); ctx.quadraticCurveTo(x,y+w*.32,x+w,y); ctx.stroke();
   }
   for (const gl of SC.glints){
@@ -90,11 +94,11 @@ function drawWater(){
     ctx.fillStyle='rgba(255,240,210,'+a.toFixed(3)+')'; ctx.beginPath(); ctx.moveTo(x,y-r); ctx.lineTo(x+r*.3,y); ctx.lineTo(x,y+r); ctx.lineTo(x-r*.3,y); ctx.closePath(); ctx.fill();
     ctx.fillRect(x-r,y-.4,r*2,.8);
   }
-  drawMoonpath(); drawBreach(); drawBowFoot(); drawWxWater(); drawLucky();
+  drawMoonpath(); drawBreach(); drawBowFoot(); drawWxWater(); drawLucky(); drawStar(); drawMirrorStars();
   if (SC.jump){ const j=SC.jump, u=j.t/j.dur, k=sc(j.y), hgt=Math.sin(Math.PI*u)*26*k;
-    ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,{river:'brook',marsh:'mullet'}[REG()]||'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
+    ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,{river:'brook',marsh:'mullet',hollow:'lampless'}[REG()]||'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
 }
-function drawDeep(){
+function drawDeep(){ if (REG()==='hollow') return;   // the Hollow's deep is the eye (drawHollowWater)
   const d=G.deep; ctx.save(); ctx.translate(d.x,d.y);
   const g=ctx.createRadialGradient(0,0,2,0,0,d.rx); g.addColorStop(0,'rgba(8,24,32,.55)'); g.addColorStop(.7,'rgba(8,24,32,.3)'); g.addColorStop(1,'rgba(8,24,32,0)');
   ctx.scale(1,d.ry/d.rx); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,d.rx*1.15,0,Math.PI*2); ctx.fill();
@@ -115,6 +119,7 @@ function drawPads(){
   if (REG()==='river'){ drawRiverWater(); return; }
   if (REG()==='marsh'){ drawMarshWater(); return; }
   if (REG()==='quarter'){ drawQuarterWater(); return; }
+  if (REG()==='hollow'){ drawHollowWater(); return; }
   G.padClusters.forEach((c,ci)=>{ SC.pads[ci].forEach((p,i)=>{
     const {x,y,r}=padPos(ci,i);
     ctx.save(); ctx.translate(x,y); ctx.scale(1,.42);
@@ -172,6 +177,7 @@ function drawReeds(){
   if (REG()==='river'){ drawRiverBanks(); return; }
   if (REG()==='marsh'){ drawMarshNear(); return; }
   if (REG()==='quarter'){ drawQuarterNear(); return; }
+  if (REG()==='hollow'){ drawHollowNear(); return; }
   drawBank(SC.bank.L,-1); drawBank(SC.bank.R,1);
   drawRock(W*.075,H*.635,11); drawRock(W*.145,H*.775,8); drawRock(W*.905,H*.735,10);
   ctx.lineCap='round';
@@ -208,6 +214,7 @@ function lanternGlow(k){
   ctx.restore();
 }
 function nightShade(){
+  if (REG()==='hollow'){ drawHollowDark(); lanternRodLight(hollowLitUp()?.3:1); return; }   // the cave's own dark (game/hollow-art.js)
   if (PAL.dark<.01) return;
   const g=ctx.createLinearGradient(0,HZ,0,H*.62); g.addColorStop(0,'rgba(10,14,36,0)'); g.addColorStop(1,'rgba(10,14,36,'+PAL.dark.toFixed(3)+')');
   ctx.fillStyle=g; ctx.fillRect(-20,HZ,W+40,H-HZ+20);
@@ -232,12 +239,14 @@ function onKeepnet(x,y){ const p=netPos(); return x>p.x-26 && x<p.x+26 && y>p.y-
 function updateScenery(dt){
   for (const c of SC.clouds){ c.x+=c.sp*dt*.5; if (c.x>1.3) c.x=-.3; }
   SC.nextBirds-=dt;
-  if (SC.nextBirds<=0 && PAL.dark>.3) SC.nextBirds=4;
+  // no birds at night, under an omen, or under the lake
+  if (SC.nextBirds<=0 && (PAL.dark>.3 || REG()==='hollow' || omenOn())) SC.nextBirds=4;
   if (SC.nextBirds<=0){ const dir=Math.random()<.5?1:-1, n=2+Math.floor(Math.random()*4), m=[];
     for (let i=0;i<n;i++) m.push({dx:i*11+rand(-2,2), dy:(i%2?1:-1)*Math.ceil(i/2)*5+rand(-1,1), ph:rand(0,6.28), s:rand(4.5,6.5)});
-    SC.birds.push({x:dir>0?-30:W+30, y:rand(HZ*.15,HZ*.62), dir, sp:rand(22,34), members:m, dropAt:(!SC.lucky && !SC.gull && !S.tut && Math.random()<.45 && gullWeather())?rand(W*.25,W*.75):null}); SC.nextBirds=(REG()==='coast'?rand(5,10):rand(9,18))*(gullWeather()?1:3); }
+    SC.birds.push({x:dir>0?-30:W+30, y:rand(HZ*.15,HZ*.62), dir, sp:rand(22,34), members:m, dropAt:(!SC.lucky && !SC.gull && !SC.star && !S.tut && Math.random()<.45 && gullWeather())?rand(W*.25,W*.75):null}); SC.nextBirds=(REG()==='coast'?rand(5,10):rand(9,18))*(gullWeather()?1:3); }
   for (const f of SC.birds){ f.x+=f.dir*f.sp*dt;
-    // a gull drops out to make a Gull Luck splash, but never during a treasure moment
+    // a gull drops out to make a Gull Luck splash, but never during a treasure moment or while a star's zone is up (game/omens.js)
+    if (f.dropAt!=null && SC.star) f.dropAt=null;
     if (f.dropAt!=null && f.members.length>1 && S.state!=='loot' && (f.dir>0?f.x>=f.dropAt:f.x<=f.dropAt)){ const m=f.members.pop(); f.dropAt=null;
       SC.gull={x:f.x+m.dx*f.dir*-1, y:f.y+m.dy, t:0, phase:'stop', dir:f.dir, s:m.s, ph:m.ph}; tone(1650,.12,{vol:.05,type:'triangle'}); } }
   const g=SC.gull;

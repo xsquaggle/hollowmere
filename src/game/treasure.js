@@ -43,10 +43,12 @@ function rollCrateTier(c){ const w={}; for (const t in CRATES) w[t]=CRATES[t].we
 /* ---------- what can still turn up ---------- */
 const lootable = id => !FINDS[id].from;   // reward keepsakes (from a returned curio, or from the town) never turn up loose
 /** The next note in a bottle: the uncle's logbook pages come in order (page 1 in the third bottle, page 2
-    a few bottles on), the rest in any order, sea notes only at sea. `peek` just asks whether there is one. */
+    a few bottles on, page 3 in the next once the Drowned Quarter's open: game/hollow.js), the rest in any order, sea
+    notes only at sea. `peek` just asks whether there is one. */
 function nextBottleNote(c,peek){ const FS=findsState(), read=new Set(FS.notes), reg=modCtx(c).region;
   if (!read.has('log1') && FS.bottles>=2) return 'log1';
   if (read.has('log1') && !read.has('log2') && FS.bottles>=6) return 'log2';
+  if (log3Due()) return 'log3';
   const open=Object.keys(NOTES).filter(id=>NOTES[id].kind==='bottle' && !read.has(id) && (!NOTES[id].region || NOTES[id].region===reg));
   if (open.length) return peek?open[0]:open[Math.floor(Math.random()*open.length)];
   return !read.has('log1')?'log1':!read.has('log2')?'log2':null; }
@@ -89,7 +91,7 @@ function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',
   const glim=([a,b])=>a+Math.floor(Math.random()*(b-a+1));
   const where={t:Date.now(), hr:save.clock, reg:x.region, spot:c.spot||'open', src:loot.kind==='crate'?loot.tier:loot.kind};
   const give=(id,w)=>{ FS.have[id]=Object.assign({},w||where); FS.fresh.push(id); out.items.push({type:'find',id}); };
-  const note=id=>{ if (!FS.notes.includes(id)) FS.notes.push(id); out.items.push({type:'note',id}); };
+  const note=id=>{ if (!FS.notes.includes(id)) FS.notes.push(id); out.items.push({type:'note',id}); if (id==='log3') uncleMap(c,out); };   // page 3 comes with your uncle's map (game/hollow.js)
   const spare=r=>{ const n=Math.round(crateCoins(r,c)*.5); out.coins+=n; out.items.push({type:'spare',n,rarity:r}); };   // half a crate of that tier
   FS.treasure++;
   if (loot.kind==='pouch') out.coins=Math.max(5,Math.round(spotValue(c)*rand(TREASURE.pouch[0],TREASURE.pouch[1])*lm));
@@ -101,7 +103,7 @@ function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',
   else if (loot.kind==='rod'){ const id=loot.id; if (!save.rods.includes(id)) save.rods.push(id); if (id==='bonewhistle') quarterState().bw=1; out.items.push({type:'rod', id}); }   // a rod of its own (the Bonewhistle: game/dread.js)
   else if (loot.kind==='crate'){ const C=CRATES[loot.tier]; FS.crates[loot.tier]=(FS.crates[loot.tier]||0)+1;
     out.coins=crateCoins(loot.tier,c); out.glimmer=glim(GLIMMER.crate[loot.tier]);
-    if (loot.cache){ out.cache=true; cacheDug(give,where); }   // a treasure map's cache: the first holds the Cartographer's Pin
+    if (loot.cache){ out.cache=true; cacheDug(give,where); if (log4Due()) note('log4'); }   // a treasure map's cache: the first holds the Cartographer's Pin; the next after page 3, page 4
     for (const it of C.items){
       if (it.chance!=null && !(Math.random()<it.chance)) continue;
       if (it.note && Math.random()<it.note){ const id=nextBottleNote(c); if (id){ note(id); continue; } }

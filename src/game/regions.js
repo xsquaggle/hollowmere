@@ -1,15 +1,15 @@
 /* ---------- Regions ---------- */
-const REG = () => save.region==='coast' && save.boat ? 'coast' : save.region==='river' && save.ferry ? 'river' : save.region==='marsh' && save.marsh ? 'marsh' : save.region==='quarter' && quarterOpen() ? 'quarter' : 'lake';
+const REG = () => save.region==='coast' && save.boat ? 'coast' : save.region==='river' && save.ferry ? 'river' : save.region==='marsh' && save.marsh ? 'marsh' : save.region==='quarter' && quarterOpen() ? 'quarter' : save.region==='hollow' && hollowOpen() ? 'hollow' : 'lake';
 /** Whether you can get to a water: the lake always, the river once Ottilie's ferry runs, the coast once you have a boat,
     the marsh once Wren's punt runs there (her first quest, game/wren.js), the Drowned Quarter once Pell's rowboat is
-    fixed (game/pell.js). */
-const regionOpen = r => r==='lake' || (r==='river' && !!save.ferry) || (r==='coast' && !!save.boat) || (r==='marsh' && !!save.marsh) || (r==='quarter' && quarterOpen());
+    fixed (game/pell.js), the Hollow once you've climbed down through the shack's trapdoor (game/hollow.js). */
+const regionOpen = r => r==='lake' || (r==='river' && !!save.ferry) || (r==='coast' && !!save.boat) || (r==='marsh' && !!save.marsh) || (r==='quarter' && quarterOpen()) || (r==='hollow' && hollowOpen());
 /** The waters in the order the journal and the HUD count them. */
-const WATERS=['lake','river','marsh','quarter','coast'];
+const WATERS=['lake','river','marsh','quarter','hollow','coast'];
 /** A spot's name in a water (the coast's deep water is the Dark trench, the river's the Millpool, the marsh's the Sluice pool). */
 function spotName(sp,reg){ reg=reg||REG(); return (SPOT_REG[reg]||{})[sp] || SPOT_NAME[sp]; }
 /** Each water's spots and their bite weights. */
-const POOLS_BY = {lake:POOLS, coast:POOLS_COAST, river:POOLS_RIVER, marsh:POOLS_MARSH, quarter:POOLS_QUARTER};
+const POOLS_BY = {lake:POOLS, coast:POOLS_COAST, river:POOLS_RIVER, marsh:POOLS_MARSH, quarter:POOLS_QUARTER, hollow:POOLS_HOLLOW};
 const poolsOf = reg => POOLS_BY[reg] || POOLS;
 /** The water a fish calls home: the first one it lives in. */
 const regionOf = id => Object.keys(REGION_FISH).find(r=>REGION_FISH[r].includes(id)) || 'lake';
@@ -34,6 +34,7 @@ function layoutRegion(){
   } else if (REG()==='river'){ layoutRiver();
   } else if (REG()==='marsh'){ layoutMarsh();
   } else if (REG()==='quarter'){ layoutQuarter();
+  } else if (REG()==='hollow'){ layoutHollow();
   } else {
     G.deep={x:W*.64, y:HZ+(H-HZ)*.3, rx:W*.19, ry:(H-HZ)*.075};
     G.kelp=[]; G.stacks=[];

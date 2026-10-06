@@ -30,7 +30,7 @@ const oneOf = (where, v, list, what) => { if (!list.includes(v)) bad(where, `${J
 const sameSet = (where, a, b, what) => { const A = [...a].sort().join(), B = [...b].sort().join(); if (A !== B) bad(where, `${what} differ: [${[...a]}] vs [${[...b]}]`); };
 const noDupes = (where, list) => { const seen = new Set(); for (const x of list) { if (seen.has(x)) bad(where, 'listed twice: ' + x); seen.add(x); } };
 
-const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, POOLS_RIVER, POOLS_MARSH, POOLS_QUARTER, RARE_BITES, SPOT_NAME, SPOT_REG, REGION_FISH, REGION_NAME, MAP_PLACES,
+const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, POOLS_RIVER, POOLS_MARSH, POOLS_QUARTER, POOLS_HOLLOW, HOLLOW, MIRROR_STARS, OMEN, STAR, OTT_CONFESS, RARE_BITES, SPOT_NAME, SPOT_REG, REGION_FISH, REGION_NAME, MAP_PLACES,
   RODS, ROD_ORDER, SEA_RODS, QUEST_RODS, PARTS, PAINTS, OTT_LINES, BAR_LINES, BANQUET_LINES, LETTER,
   TANKS, TIP_BASE, DECOR, TANK_SETS, SPICES, SPICE_ORDER, SIDES, FLESH, COOK_NAME, RECIPES, RECIPE_ORDER, MUSH, MEAL_STR, MEAL_CASTS,
   CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER,
@@ -44,7 +44,9 @@ const FIDS = keys(FISH), RARS = keys(RAR), BEHS = keys(BEH), REGIONS = keys(REGI
 for (const id of FIDS) {
   const F = FISH[id], w = 'FISH.' + id;
   if (!/^[a-z][a-z0-9]*$/.test(id)) bad(w, 'ids are lowercase letters and digits');
-  need(w, F, { name: 'str', pull: 'num+', reel: 'num+', value: 'num+', len: 'num+', h: 'num+', color: 'hex', fin: 'hex', window: 'num+', lore: 'str', hint: 'str', size: 'arr' });
+  // a fish you can't sell (the Sleeper's Scale goes into the Ledger: game/godly.js) is worth nothing, and never kept in a tank
+  if (F.noSell && (F.value !== 0 || !F.noTank)) bad(w, 'a fish you can\'t sell is worth 0, and noTank too');
+  need(w, F, { name: 'str', pull: 'num+', reel: 'num+', value: F.noSell ? 'num0' : 'num+', len: 'num+', h: 'num+', color: 'hex', fin: 'hex', window: 'num+', lore: 'str', hint: 'str', size: 'arr' });
   oneOf(w + '.rarity', F.rarity, RARS, 'rarity'); oneOf(w + '.beh', F.beh, BEHS, 'behavior');
   if (Array.isArray(F.size) && !(F.size.length === 2 && F.size[0] > 0 && F.size[0] < F.size[1])) bad(w, 'size should be [min, max] cm with 0 < min < max');
   if (F.h >= 1) bad(w, 'h is body height as a share of length, so below 1');
@@ -60,7 +62,7 @@ for (const id of FIDS) { const n = keys(REGION_FISH).filter(r => REGION_FISH[r].
   if (n < 1) bad('FISH.' + id, 'lives in no water (REGION_FISH)'); else if (n > 1 && !FISH[id].shared) bad('FISH.' + id, `lives in ${n} waters; mark it shared: true if that's meant`);
   else if (n === 1 && FISH[id].shared) bad('FISH.' + id, 'is shared: true but lives in one water'); }
 if (REGION_FISH.lake) sameSet('ORDER', ORDER, REGION_FISH.lake, 'ORDER and the lake fish');
-const POOLS_OF = { lake: POOLS, coast: POOLS_COAST, river: POOLS_RIVER, marsh: POOLS_MARSH, quarter: POOLS_QUARTER };
+const POOLS_OF = { lake: POOLS, coast: POOLS_COAST, river: POOLS_RIVER, marsh: POOLS_MARSH, quarter: POOLS_QUARTER, hollow: POOLS_HOLLOW };
 sameSet('POOLS', keys(POOLS_OF), REGIONS, 'waters with pools and REGION_NAME');
 for (const reg of keys(SPOT_REG || {})) { oneOf('SPOT_REG.' + reg, reg, REGIONS, 'region'); for (const sp of keys(SPOT_REG[reg])) if (!(POOLS_OF[reg] || {})[sp]) bad('SPOT_REG.' + reg + '.' + sp, 'is not a spot in that water'); }
 // a rare bite's region is one water or a list of them; wx is a weather kind, and flag a STATS flag (the Drowned Bell's, the Lantern Rod's)
@@ -69,9 +71,10 @@ for (const id of keys(RARE_BITES)) { const B = RARE_BITES[id], regs = [].concat(
   if (B.wx !== undefined) oneOf('RARE_BITES.' + id + '.wx', B.wx, keys(WX), 'weather');
   if (B.flag !== undefined && !(STATS[B.flag] && STATS[B.flag].kind === 'flag')) bad('RARE_BITES.' + id + '.flag', B.flag + ' is not a flag in STATS');
   for (const sp of B.spots || []) if (!regs.some(r => (POOLS_OF[r] || {})[sp])) bad('RARE_BITES.' + id + '.spots', sp + ' is not a spot in its waters');
-  if (B.at !== undefined) oneOf('RARE_BITES.' + id + '.at', B.at, ['bow', 'path', 'churn', 'lit', 'refl'], 'cast condition (game/bite.js: spawnApproach)');
+  if (B.at !== undefined) oneOf('RARE_BITES.' + id + '.at', B.at, ['bow', 'path', 'churn', 'lit', 'refl', 'shaft', 'eye'], 'cast condition (game/bite.js: spawnApproach)');
+  if (B.moon !== undefined) oneOf('RARE_BITES.' + id + '.moon', B.moon, ['full', 'new'], 'moon');
   if (RARE_BITES[id].top !== undefined && !(RARE_BITES[id].top > 0 && RARE_BITES[id].top < 1)) bad('RARE_BITES.' + id + '.top', 'a share of the hour, between 0 and 1'); }
-const regionOfPools = [['POOLS', POOLS, 'lake'], ['POOLS_COAST', POOLS_COAST, 'coast'], ['POOLS_RIVER', POOLS_RIVER, 'river'], ['POOLS_MARSH', POOLS_MARSH, 'marsh'], ['POOLS_QUARTER', POOLS_QUARTER, 'quarter']];
+const regionOfPools = [['POOLS', POOLS, 'lake'], ['POOLS_COAST', POOLS_COAST, 'coast'], ['POOLS_RIVER', POOLS_RIVER, 'river'], ['POOLS_MARSH', POOLS_MARSH, 'marsh'], ['POOLS_QUARTER', POOLS_QUARTER, 'quarter'], ['POOLS_HOLLOW', POOLS_HOLLOW, 'hollow']];
 for (const [name, pools, reg] of regionOfPools) for (const spot of keys(pools)) {
   const w = name + '.' + spot; oneOf(w, spot, keys(SPOT_NAME), 'spot');
   for (const [id, wt] of Object.entries(pools[spot])) { oneOf(w, id, REGION_FISH[reg] || [], reg + ' fish'); if (!(isNum(wt) && wt > 0)) bad(w + '.' + id, 'weight should be a positive number'); }
@@ -138,7 +141,7 @@ const FORMS = ['fillet', 'skewer', 'wrap', 'steak', 'whole'], DISHES = ['bowl', 
 const BOOSTS = keys(STATS).filter(k => STATS[k].kind === 'mul' || STATS[k].kind === 'luck');                       // meal boosts are modifiers on these stats
 sameSet('SPICE_ORDER', [...SPICE_ORDER, ...(SPICE_MORE || [])], keys(SPICES), 'SPICE_ORDER and SPICE_MORE, and SPICES'); noDupes('SPICE_ORDER', [...SPICE_ORDER, ...(SPICE_MORE || [])]);
 for (const k of keys(SPICES)) need('SPICES.' + k, SPICES[k], { name: 'str', short: 'str', col: 'hex', glass: 'hex', lid: 'hex' });
-for (const id of FIDS) if (!isHex(FLESH[id])) bad('FLESH', 'no cooked color for ' + id);
+for (const id of FIDS) if (!FISH[id].noSell && !isHex(FLESH[id])) bad('FLESH', 'no cooked color for ' + id);   // a fish that's never kept is never cooked
 noDupes('RECIPE_ORDER', RECIPE_ORDER); sameSet('RECIPE_ORDER', RECIPE_ORDER, keys(RECIPES), 'RECIPE_ORDER and RECIPES');
 for (const id of keys(RECIPES)) { const R = RECIPES[id], w = 'RECIPES.' + id;
   need(w, R, { name: 'str', eff: 'str', blurb: 'str', speed: 'num+', need: 'arr', boost: 'arr', zone: 'arr' });
@@ -155,7 +158,8 @@ need('MUSH', MUSH, { name: 'str', eff: 'str', casts: 'num+' });
 if (!(MEAL_STR.length === 3 && MEAL_CASTS.length === 3)) bad('MEAL_STR/MEAL_CASTS', 'one entry per star (3)');
 
 /* ---------- music ---------- */
-const scenes = [...REGIONS.flatMap(r => ['day', 'dusk', 'night'].map(t => r + '_' + t)), 'kitchen', 'aquarium', 'banquet', 'intro'];
+// the Hollow has no day or night, so one mood (game/music.js: audioScene)
+const scenes = [...REGIONS.flatMap(r => r === 'hollow' ? ['hollow'] : ['day', 'dusk', 'night'].map(t => r + '_' + t)), 'kitchen', 'aquarium', 'banquet', 'intro'];
 for (const s of scenes) if (!MOODS[s]) bad('MOODS', 'no mood for ' + s);
 sameSet('AMB_LV', keys(AMB_LV), keys(MOODS), 'ambience scenes and music moods');
 for (const [m, M] of Object.entries(MOODS)) { const w = 'MOODS.' + m; need(w, M, { bpm: 'num+', prog: 'arr', scale: 'arr' }); oneOf(w + '.beats', M.beats, [3, 4], 'meter'); if (!M.silent) oneOf(w + '.inst', M.inst, ['pluck', 'bell'], 'instrument');
@@ -169,7 +173,7 @@ for (const r of RARS) { const c = RAR[r].luckCap; if (r === RARS[0]) { if (c !==
 // ceilings climb with rarity, except Godly's, which sits below Mythic's on purpose (see data/fish.js)
 for (let i = 2; i < RARS.length; i++) if (RARS[i] !== 'godly' && RAR[RARS[i]].luckCap < RAR[RARS[i - 1]].luckCap) bad('RAR.' + RARS[i], 'rarer tiers should have a ceiling at least as high as the tier below');
 for (const r of RARS) if (RAR[r].luckCap > 4) bad('RAR.' + r, 'a luck ceiling above ×4 lets luck run away (the design caps Mythic at ×4)');
-const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true, false], fish: FIDS, beh: BEHS, rarity: RARS, rarityMin: RARS, lucky: [true], wander: [true], wx: keys(WX) };
+const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true, false], fish: FIDS, beh: BEHS, rarity: RARS, rarityMin: RARS, lucky: [true], star: [true], starlit: [true], wander: [true], wx: keys(WX), outdoors: [true, false] };
 const checkMod = (w, m) => {
   const st = STATS[m.stat]; if (!st) return bad(w, `unknown stat ${JSON.stringify(m.stat)} (see data/stats.js)`);
   if (st.kind === 'flag') { if (m.v !== undefined) bad(w, m.stat + ' is a flag and takes no v'); }
@@ -197,7 +201,8 @@ if (!WX.clear) bad('WX', 'needs clear: the first day and the tutorial are always
 for (const [k, X] of Object.entries(WX)) { const w = 'WX.' + k; need(w, X, { name: 'str', on: 'str', mods: 'arr' });
   for (const f of ['cloud', 'rain', 'fog']) if (!(X.look && X.look[f] >= 0 && X.look[f] <= 1)) bad(w + '.look.' + f, 'should be 0 to 1');
   X.mods.forEach((m, i) => checkMod(`${w}.mods[${i}]`, m)); }
-for (const reg of REGIONS) { const T = WX_TABLE[reg], w = 'WX_TABLE.' + reg; if (!T) { bad(w, 'no weather table for this region'); continue; }
+// the Hollow has no sky, so no weather table (game/weather.js: always clear down there)
+for (const reg of REGIONS) { const T = WX_TABLE[reg], w = 'WX_TABLE.' + reg; if (reg === 'hollow'){ if (T) bad(w, 'the Hollow has no sky, so no weather'); continue; } if (!T) { bad(w, 'no weather table for this region'); continue; }
   sameSet(w, keys(T), keys(WX), 'weather kinds'); for (const [k, v] of Object.entries(T)) if (!(v > 0)) bad(w + '.' + k, 'weight should be above 0'); }
 if (!(WX_FOG_HOUR.length === 24 / WX_SPELL.hours && WX_FOG_HOUR.every(v => v > 0))) bad('WX_FOG_HOUR', 'one weight above 0 per spell of the day');
 if (!(24 % WX_SPELL.hours === 0 && WX_SPELL.keep >= 0 && WX_SPELL.keep < 1 && WX_SPELL.ease > 0 && WX_SPELL.ease < WX_SPELL.hours && Number.isInteger(WX_SPELL.every) && WX_SPELL.every > 1)) bad('WX_SPELL', 'hours divides 24, keep in [0, 1), ease shorter than a spell, every a whole number above 1');
@@ -444,6 +449,33 @@ if (!(RODS.bonewhistle && RODS.bonewhistle.cursed && QUEST_RODS.includes('bonewh
 for (const id of RIDS) if (RODS[id].cursed && !(RODS[id].mods || []).some(m => m.stat === 'cursed')) bad('RODS.' + id, 'a cursed rod carries the cursed flag');
 for (const id of keys(D.MUTS)) if (D.MUTS[id].cursed && !(STATS.cursed && STATS.cursed.kind === 'flag')) bad('MUTS.' + id, 'a cursed mutation needs the cursed flag in STATS');
 
+/* ---------- the Hollow (data/hollow.js) ---------- */
+need('HOLLOW', HOLLOW, { way: 'obj', spots: 'obj', light: 'obj', draw: 'obj', follow: 'obj', grey: '01', eye: 'obj' });
+if (!(HOLLOW.way.drain > 0)) bad('HOLLOW.way.drain', 'seconds the lake takes to drain, above 0');
+{ const S = HOLLOW.spots;
+  for (const [k, z] of Object.entries(S)) { if (k === 'far') continue; const w = 'HOLLOW.spots.' + k;
+    if (!POOLS_HOLLOW[k]) bad(w, 'not a spot in POOLS_HOLLOW');
+    if (!(z.d >= 0 && z.d <= 1 && z.x - z.rx >= 0 && z.x + z.rx <= 1 && z.rx > 0 && z.ry > 0)) bad(w, 'd inside [0, 1], and x \u00b1 rx inside the width'); }
+  // the spore shelf lies under the far wall, so only the near spots must sit in front of the far water
+  for (const k of ['lamp', 'deep', 'drip']) if (!(S[k] && S[k].d < S.far)) bad('HOLLOW.spots.' + k, 'in front of the far water');
+  if (!(S.far > 0 && S.far < 1)) bad('HOLLOW.spots.far', 'a share of the way out, inside (0, 1)'); }
+{ const L = HOLLOW.light; for (const k of ['lamp', 'rod', 'float']) if (!(L[k] > 0)) bad('HOLLOW.light.' + k, 'above 0');
+  for (const k of ['fungus', 'lit']) if (!(L[k] > 0 && L[k] <= 1)) bad('HOLLOW.light.' + k, 'between 0 and 1');
+  const Sh = L.shaft; if (!(Sh.hours[0] >= 0 && Sh.hours[0] < Sh.peak && Sh.peak < Sh.hours[1] && Sh.hours[1] <= 24)) bad('HOLLOW.light.shaft', 'hours [from, to] inside the day, with the peak between');
+  if (!(Sh.spot.d > 0 && Sh.spot.d < HOLLOW.spots.far && Sh.spot.rx > 0 && Sh.spot.ry > 0)) bad('HOLLOW.light.shaft.spot', 'on the near water, with a size'); }
+if (!(HOLLOW.draw.speed > 0 && HOLLOW.draw.hold > 0 && HOLLOW.draw.hold < 1)) bad('HOLLOW.draw', 'speed above 0, hold a short press (under a second)');
+if (!(HOLLOW.follow.bored > HOLLOW.follow.twitch && HOLLOW.follow.twitch > 0)) bad('HOLLOW.follow', 'a twitch buys less time than a fish waits');
+if (!(HOLLOW.eye.flicker > 0 && HOLLOW.eye.glow > 0 && HOLLOW.eye.glow <= 24)) bad('HOLLOW.eye', 'flicker above 0, glow at most a day');
+if (!(MIRROR_STARS.n >= 1 && MIRROR_STARS.r > 0 && MIRROR_STARS.d[0] >= 0 && MIRROR_STARS.d[0] < MIRROR_STARS.d[1] && MIRROR_STARS.d[1] <= 1)) bad('MIRROR_STARS', 'at least one star, a size, d as [nearest, farthest] inside [0, 1]');
+for (const [k, o] of [['OMEN', OMEN], ['STAR', STAR]]) { if (!(o.every[0] > 0 && o.every[0] <= o.every[1])) bad(k + '.every', '[soonest, latest]');
+  if (!(o.dur > 0 && o.x > 1)) bad(k, 'dur above 0, x above 1'); }
+if (!(OMEN.dur < OMEN.every[0] * 60)) bad('OMEN.dur', 'shorter than the gap between omens');
+if (!(STAR.dur < STAR.every[0] && STAR.r > 0)) bad('STAR', 'a zone shorter than the gap between stars, with a size');
+if (!(OMEN.from >= 0)) bad('OMEN.from', 'catches before the first omen, 0 or more');
+if (!isStr(OTT_CONFESS)) bad('OTT_CONFESS', 'what Ottilie says, in words');
+if (!(RODS.mirror && QUEST_RODS.includes('mirror') && (RODS.mirror.mods || []).some(m => m.stat === 'mirror'))) bad('RODS.mirror', 'a quest rod with the mirror flag (game/godly.js: mirrorOn)');
+for (const id of FIDS.filter(id => FISH[id].noSell)) if (FISH[id].rarity !== 'godly') bad('FISH.' + id, 'only a Godly fish goes into the Ledger instead of being sold');
+
 /* ---------- idle play: traps, the smoke rack, time away ---------- */
 // the river has none: the current carries a trap off
 for (const reg of keys(TRAPS)) oneOf('TRAPS.' + reg, reg, REGIONS, 'region');
@@ -525,7 +557,7 @@ need('PLATTER', PLATTER, { name: 'str', dish: 'str', side: 'str', zone: 'arr' })
 { const { PACE_SIM, BOAT, FIXUP, POCKETS, ENCH, PARTS } = D;
   if (!(BOAT && BOAT.price > 0)) bad('BOAT', 'the skiff needs a price');
   const known = k => { const [kind, id] = k.split(':');
-    return kind === 'rod' ? !!RODS[id] : kind === 'boat' || kind === 'ferry' || kind === 'marsh' || kind === 'quarter' ? id === undefined : kind === 'part' ? !!PARTS[id] : kind === 'fix' ? FIXUP.some(L => L.id === id && L.cost)
+    return kind === 'rod' ? !!RODS[id] : kind === 'boat' || kind === 'ferry' || kind === 'marsh' || kind === 'quarter' || kind === 'hollow' ? id === undefined : kind === 'part' ? !!PARTS[id] : kind === 'fix' ? FIXUP.some(L => L.id === id && L.cost)
       : kind === 'pocket' ? +id > POCKETS.start && +id <= POCKETS.max : kind === 'rune' ? !!ENCH[id] : kind === 'fish' ? !!FISH[id] : false; };
   for (const [k, m] of Object.entries(PACE_SIM || {})) { if (!known(k)) bad('PACE_SIM.' + k, 'names nothing the pace log looks for'); if (!(isNum(m) && m >= 0)) bad('PACE_SIM.' + k, 'should be minutes'); } }
 

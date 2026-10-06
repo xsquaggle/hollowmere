@@ -21,7 +21,7 @@ Its source lives in `src/` as small files, and a build pastes them together. `do
 | --- | --- |
 | `src/index.html` | The page skeleton: head, markup, and where the styles and scripts go |
 | `src/data/` | Content tables: fish, rods and boat parts, places, people's lines, aquarium, kitchen, music |
-| `src/game/` | The game itself, one file per system (casting, reeling, kitchen stations, saves…). Scene art: `angler.js`, `dock.js`, `folk.js`, `coast.js`, `river-art.js`, `wren-art.js`, `marsh-art.js`, `coast-sea-art.js`, `quarter-art.js` |
+| `src/game/` | The game itself, one file per system (casting, reeling, kitchen stations, saves…). Scene art: `angler.js`, `dock.js`, `folk.js`, `coast.js`, `river-art.js`, `wren-art.js`, `marsh-art.js`, `coast-sea-art.js`, `quarter-art.js`, `hollow-art.js`, `hollow-fish-art.js` |
 | `src/styles/` | Styles, one file per screen |
 | `src/fonts/` | Nunito, Young Serif and Caveat, subset to WOFF, plus their licenses |
 | `src/build.json` | The order files are pasted in. Scripts share one closure, so a file can use anything listed before it |
@@ -116,10 +116,17 @@ opening or water) and runs the pages and the bell; `pell.js` is Pell's sheet and
 Bonewhistle, Dread, the eye and the ink shadow, `tidecaller.js` the conch; the art is in `quarter-art.js`. Playtest's
 Quarter menu steps through all of it, and `npm run sim -- --region quarter --rod bonewhistle --dread 50` holds Dread.
 
+**The Hollow.** The way down, the cave's spots and lights, leading a fish in, the eye, omens and falling stars are
+tuned in `src/data/hollow.js`. `src/game/hollow.js` runs the uncle's pages 3 to 5, the bell on the lake dock, the
+trapdoor, the dark (`hollowLit`: is the float in a light), fish that follow a float in the dark, and the eye;
+`godly.js` is the Godly moment, the Ledger and the Stillwater Mirror, and `omens.js` the omens and falling stars. The
+art is in `hollow-art.js` and `hollow-fish-art.js`. Playtest's Hollow menu hands over the pages and the bell, drains
+the lake, readies the eye, starts an omen and drops a star; `npm run sim -- --region hollow --spot deep` fishes it.
+
 **Pacing (the depth gate).** `npm run sim -- --career` plays whole runs from the first cast, buying rods, the boat
 and everything else as the coins come in, and lists when each thing happens and the longest waits with nothing new.
 `--builds` puts four builds on one rod and water. Rare and Legendary odds follow the design doc's table, and prices
-are set so the lake and the coast take about 9 hours (about 10.5 with Rootwood River, the Saltmarsh, the rest of the coast and the Drowned Quarter). In the game, Playtest > Pace logs a real run's minutes of
+are set so the lake and the coast take about 9 hours (about 10.5 with Rootwood River, the Saltmarsh, the rest of the coast, the Drowned Quarter and the Hollow). In the game, Playtest > Pace logs a real run's minutes of
 play beside the simulator's (`src/game/pace.js`, `src/data/pace.js`); after a balance change, paste
 `npm run sim -- --career --runs 11 --pace` into `src/data/pace.js`.
 

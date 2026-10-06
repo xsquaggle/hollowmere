@@ -107,6 +107,9 @@ function lootEnd(){ const L=S.loot; hideHaul(); closeNote(true); S.loot=null; S.
     coachFor('Artifacts only work from a vest pocket. You have one to start. Pocket and swap them in your tackle bag.',8); }
   else if (fresh && FS.treasure<=2) coachFor('Everything you find is kept on the Finds page of your journal.',6);
   if (L && L.kind==='letter') letterToPell(L.got.items[0]&&L.got.items[0].id);
+  // page 3's bottle shows only the page, so the uncle's map folded into it is told here (game/hollow.js: uncleMap)
+  const um=L && L.kind==='bottle' && L.got.items.find(it=>it.type==='map' && it.uncle), m=um && relicState().map;
+  if (m) coachFor('Your uncle’s map was folded into the page, and it makes your map whole. Cast inside its ring '+(m.reg===REG()?'out there':'in '+REGION_NAME[m.reg])+' to dig up what he buried.',9);
 }
 /** Coins already in the save (openLoot kept them) count up on the HUD. */
 function tallyCoins(){ coinTally(Math.max(300,Math.min(1200,300+Math.abs(save.coins-coinShown)*.4))); sfx.coin(6); }
@@ -202,10 +205,10 @@ function haulItemHTML(it,i){ const st=' style="--i:'+i+'"';
   if (it.type==='note'){ const N=NOTES[it.id];
     return '<div class="hl-item rf" data-r="common"'+st+'><canvas class="hl-art" data-notekind="'+N.kind+'"></canvas><div class="hl-txt"><span class="k">'+noteKind(N)+'</span><h3>'+noteTitle(it.id)+'</h3><p>Kept with your notes in the journal.</p><button class="btn sm" type="button" data-read="'+it.id+'">Read it</button></div></div>'; }
   if (it.type==='map'){ const whole=it.n>=MAPS.pieces, pin=modFlag('mapPin'), reg=(relicState().map||{}).reg;
-    return '<div class="hl-item rf" data-r="uncommon"'+st+'><canvas class="hl-art map" data-map="'+it.n+'"></canvas><div class="hl-txt"><span class="k">Treasure map · piece '+Math.min(it.n,MAPS.pieces)+' of '+MAPS.pieces+'</span><h3>'+(whole?'The map is whole':'A piece of a map')+'</h3><p>'+
+    return '<div class="hl-item rf" data-r="uncommon"'+st+'><canvas class="hl-art map" data-map="'+it.n+'"></canvas><div class="hl-txt"><span class="k">Treasure map · piece '+Math.min(it.n,MAPS.pieces)+' of '+MAPS.pieces+'</span><h3>'+(it.uncle?'Your uncle’s map':whole?'The map is whole':'A piece of a map')+'</h3><p>'+(it.uncle?'Folded into the page, and it makes your map whole. ':'')+
       (whole?'It rings a stretch of '+REGION_NAME[reg||REG()]+'. Cast inside the ring to dig up what’s buried there.'+(pin?' Your Cartographer’s Pin marks the exact spot.':''):(MAPS.pieces-it.n===1?'One more piece':(MAPS.pieces-it.n)+' more pieces')+' and it shows where something is buried'+(reg&&reg!==REG()?'':' in '+REGION_NAME[reg||REG()])+'.')+'</p></div></div>'; }
   if (it.type==='rod'){ const R=RODS[it.id];
-    return '<div class="hl-item rf hl-rod" data-r="epic"'+st+'><div class="hl-txt"><span class="k">'+(R.cursed?'Cursed rod':'Rod')+' · <b>New</b></span><h3>'+R.name+'</h3><canvas class="rod-art" data-rodart="'+it.id+'" aria-hidden="true"></canvas><p>'+R.blurb+'</p><p class="down">'+R.perk+'</p>'+
+    return '<div class="hl-item rf hl-rod" data-r="'+itemRarity(it)+'"'+st+'><div class="hl-txt"><span class="k">'+(R.cursed?'Cursed rod':'Rod')+' · <b>New</b></span><h3>'+R.name+'</h3><canvas class="rod-art" data-rodart="'+it.id+'" aria-hidden="true"></canvas><p>'+R.blurb+'</p><p class="down">'+R.perk+'</p>'+
       (save.rod===it.id?'<p class="on">In your hands.</p>':'<button class="btn sm" type="button" data-holdrod="'+it.id+'">Hold it</button><p class="mini">It’s on your rack and in your bag, if you’d rather not.</p>')+'</div></div>'; }
   if (it.type==='spare') return '<div class="hl-item spare"'+st+'><div class="hl-txt"><span class="k">Spare coins</span><h3><span class="coin"></span>+'+it.n.toLocaleString()+'</h3><p>You’ve found every '+RAR[it.rarity].label.toLowerCase()+' thing this could have held, so it paid in coins.</p></div></div>';
   return ''; }
@@ -213,10 +216,11 @@ function haulTitle(L){ const g=L.got;
   if (L.kind==='crate') return g.cache?'A buried cache':CRATES[L.tier].name;
   if (L.kind==='map') return g.items[0]&&g.items[0].n>=MAPS.pieces?'The map is whole':'A piece of a map';
   const it=g.items[0]; if (it && it.type==='find') return 'You found something';
+  if (L.kind==='mirror') return 'Up from where the eye was';   // after the Sleeper's Scale (game/godly.js)
   if (it && it.type==='rod') return 'Something came up out of the tower';
   return 'Treasure'; }
 function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
-  const tier=L.kind==='crate'?L.tier:first&&first.type==='find'?FINDS[first.id].rarity:L.kind==='map'?'uncommon':L.kind==='rod'?'epic':'common';
+  const tier=L.kind==='crate'?L.tier:first&&first.type==='find'?FINDS[first.id].rarity:L.kind==='map'?'uncommon':L.kind==='rod'?'epic':L.kind==='mirror'?'godly':'common';
   el.dataset.r=tier; el.dataset.kind=L.kind; el.classList.remove('out');
   let h='<div class="hl-top"><span class="rarity">'+RAR[tier].label+'</span>'+pipsHTML(tier)+'</div><h2>'+haulTitle(L)+'</h2>';
   const base=g.base==null?g.coins:g.base;
@@ -245,7 +249,7 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   const cardTop=window.innerHeight-(parseFloat(getComputedStyle(el).bottom)||18)-el.offsetHeight, room=cardTop-14-(L.kind==='crate'?crateW(L.ti)*1.02+L.hv:90)-64;
   L.lift=Math.min(L.to.y,cardTop-14); if (L.kind==='crate' && room<0) L.fit=Math.max(.5,1+room/(crateW(L.ti)*1.02));
 }
-const itemRarity=it=>it.type==='rod'?'epic':it.type==='map'?'uncommon':it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
+const itemRarity=it=>it.type==='rod'?(it.id==='mirror'?'godly':'epic'):it.type==='map'?'uncommon':it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
 function hideHaul(){ const el=$('haul'); if (el.hidden) return; ovClosed('haul'); el.classList.add('out'); setTimeout(()=>{ el.hidden=true; el.classList.remove('out'); el.innerHTML=''; },REDUCED?0:250); }
 /** Paints tiles in two passes, every size read before any canvas is resized, so the page lays out once. */
 /** Tiles are sized by their layout box, not their box on screen, so a sheet mid-zoom or a badge popping in doesn't

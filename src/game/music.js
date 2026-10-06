@@ -46,6 +46,7 @@ function audioScene(){ if (typeof INTRO!=='undefined' && INTRO.active && INTRO.q
   if (typeof K!=='undefined' && K.open) return K.mode==='banquet'?'banquet':'kitchen';
   if (typeof AQ!=='undefined' && AQ.open) return 'aquarium';
   if (typeof SH!=='undefined' && SH.open) return 'aquarium';
+  if (REG()==='hollow') return 'hollow';   // no day or night in the Hollow
   return REG()+'_'+timeOfDay(); }
 const MU={on:false,mood:null,next:0,bar:0,beat:0,timer:0,mel:null,duckT:0,duckV:1,fade:1};
 function musicStart(){ if (!AC||MU.on) return; MU.on=true; MU.next=AC.currentTime+.2; MU.timer=setInterval(musicTick,80); ambStart(); }
@@ -97,6 +98,12 @@ function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{},
     if (k==='rain') v=wet*(out?.55:.12); if (k==='drum') v=wet*(out?.25:.5);
     AMBL[k].g.gain.setTargetAtTime(v*.5,t,k==='surf'||k==='hiss'?.25:1.2); }
   const r=Math.random, tod=timeOfDay(), p=(rand(-1,1)), coast=sc.startsWith('coast'), river=sc.startsWith('river'), marsh=sc.startsWith('marsh'), lake=sc.startsWith('lake')||sc==='intro'||sc==='banquet';
+  // at 3:12, once the Quarter's open, the tower's bell is heard from the lake, faintly, under the water (game/quarter.js:
+  // towerToll), and from above in the Hollow
+  if (lake && quarterOpen() && bellNatural() && r()<.016) ambDeepBell(rand(-.6,-.2));
+  if (sc==='hollow' && bellNatural() && r()<.02) ambDeepBell(rand(-.3,.3));
+  // under an omen the place holds its breath: no birds, no frogs, no drips (game/omens.js)
+  if (omenOn()) return;
   // the weather (game/weather.js): birds keep their heads down in rain and fog, frogs love the rain, and fog brings a
   // foghorn off the coast and a bell somewhere under the lake
   const hush=1-.67*Math.max(wet,fog);
@@ -127,13 +134,16 @@ function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{},
   if (marsh && fog>.5 && r()<.0016*fog) ambDeepBell(.5);
   // the Drowned Quarter: old timbers creaking, gulls on the chimneys by day, bubbles from the drowned rooms, the lap of
   // water in a doorway, and in fog a bell somewhere further down the street. At 3:12 the tower rings (game/quarter.js:
-  // towerToll), and from the lake it's heard faintly, under the water.
+  // towerToll).
   const quarter=sc.startsWith('quarter');
   if (quarter && r()<.006) ambCreak(p*.8);
   if (quarter && tod!=='night' && r()<.008*hush) ambGull(p);
   if (quarter && r()<.03) ambBubble(p*.7);
   if (quarter && fog>.5 && r()<.0016*fog) ambDeepBell(p*.5);
-  if (lake && quarterOpen() && bellNatural() && r()<.016) ambDeepBell(rand(-.6,-.2));
+  // the Hollow: drips off the stalactites, each one ringing back off the far wall, and a bubble now and then. A Godly
+  // fish on the line holds the drips still (game/godly.js)
+  if (sc==='hollow' && !dripsHeld() && r()<.16) ambDrip(p);
+  if (sc==='hollow' && r()<.012) ambBubble(p*.4);
   if (sc==='aquarium' && r()<.45) ambBubble(p*.6);
   if (sc==='kitchen' && r()<.5) ambCrackle(p*.5);
 }
@@ -167,6 +177,8 @@ function ambToll(p){ const t=AC.currentTime+.05, f=147;
   for (const [m,v,d] of [[.5,.05,7],[1,.06,6],[1.2,.03,4],[1.5,.022,3.4],[2,.024,3],[2.5,.01,2.2],[3,.008,1.6]]) ambOsc('sine',f*m,0,t,d,v,p);
   ambOsc('triangle',f*4.2,0,t,.25,.012,p); }
 function ambDeepBell(p){ const t=AC.currentTime+.05; ambOsc('sine',196,0,t,4.5,.022,p); ambOsc('sine',196*2.4,0,t,2.2,.006,p); ambOsc('sine',196*.5,0,t+.02,3,.01,p); }
+/** One drip in the Hollow, and its echo off the far wall a moment later, quieter. */
+function ambDrip(p){ const t=AC.currentTime+rand(0,.1), f=rand(900,1500); ambOsc('sine',f,f*.55,t,.08,.03,p); ambOsc('sine',f*.98,f*.55,t+rand(.28,.4),.08,.012,-p*.6); ambOsc('sine',f*.97,f*.55,t+rand(.6,.75),.08,.005,-p*.2); }
 function ambBubble(p){ const t=AC.currentTime+rand(0,.08), f=rand(500,900); ambOsc('sine',f,f*rand(1.8,2.6),t,.035,.025,p); }
 function ambCrackle(p){ const t=AC.currentTime+rand(0,.08), s=AC.createBufferSource(); s.buffer=noiseBuf; const f=AC.createBiquadFilter(); f.type='bandpass'; f.frequency.value=rand(1500,4000); f.Q.value=3;
   const g=AC.createGain(), d=rand(.008,.03); g.gain.setValueAtTime(rand(.02,.07),t); g.gain.exponentialRampToValueAtTime(.0001,t+d); s.connect(f); f.connect(g); panNode(g,p).connect(AMB); s.start(t,rand(0,.9)); s.stop(t+d+.01); }

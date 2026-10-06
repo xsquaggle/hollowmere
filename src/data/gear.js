@@ -4,7 +4,8 @@
               sea:true for Tacklegram rods; mods, the perk as modifiers (see data/stats.js and game/mods.js);
               ench, how many enchantment sockets it has (1 to 3: data/enchant.js).
    quest:true for a rod someone gives you rather than sells (the Twin Spool and the Lantern Rod are Wren's, the Tidecaller is
-   Pell's, and the Bonewhistle comes up out of the bell tower). cursed:true for cursed gear (data/quarter.js: DREAD).
+   Pell's, the Bonewhistle comes up out of the bell tower, and the Stillwater Mirror up out of the Hollow's eye after the
+   Sleeper's Scale: game/godly.js). cursed:true for cursed gear (data/quarter.js: DREAD).
    ROD_ORDER  Ottilie's shop ladder (each rod about 2.5 times the last, set by the depth gate's whole-run report).  SEA_RODS  the Tacklegram ladder.  PARTS (with their mods), PAINTS  boat upgrades and colors
               (a paint with crate: only comes in loot crates; the rest are sold on Tacklegram).
    A modifier is {stat, v, when?, omen?}: stat names an entry in STATS; when limits it to a region, spot, time
@@ -33,6 +34,10 @@ const RODS = {
               blurb:'Pale as a knucklebone and hollow all the way down. When the wind takes it, it whistles a note you feel in your teeth.',
               perk:'Cursed. Fish come straight in, with no fight. Catches can come up Inked, worth five times as much. Every catch builds Dread.',
               mods:[{stat:'limp'}, {stat:'cursed'}]},
+  mirror:    {name:'Stillwater Mirror', price:0, quest:true, ench:3, reach:1, line:2.1, reel:1.55, luck:.9, value:1.8, snag:0, reedBoost:1.3, color:'#2C3446', where:'The horizon',
+              blurb:'Your uncle’s: a blank of black glass bound in silver, so still it holds the sky the way the lake does on a windless night.',
+              perk:'On a clear night, outdoors, the stars show in the water. Cast onto one, and Exotic and rarer fish bite three times as often.',
+              mods:[{stat:'mirror'}, {stat:'luck', omen:true, v:3, when:{starlit:true, rarityMin:'exotic'}}]},
   saltline:  {name:'Saltline Rod', price:5000, ench:3, reach:1, line:1.6, reel:1.3, luck:.45, value:1.4, snag:0, reedBoost:1.3, color:'#3E6E8A', where:'Open water', sea:true,
               blurb:'Braided salt-cured line on a blue fiberglass blank.', perk:'Swells hit your line half as hard.', mods:[{stat:'swell', v:.5}]},
   gale:      {name:'Gale Rod', price:11000, ench:3, reach:1, line:1.8, reel:1.4, luck:.6, value:1.55, snag:0, reedBoost:1.3, color:'#CFC6B2', where:'Open water', sea:true,
@@ -45,7 +50,7 @@ const RODS = {
 const ROD_ORDER=['willow','reedcutter','ash','heronwood','brasscap'];
 const SEA_RODS=['saltline','gale','deepwater'];
 /* QUEST_RODS  rods from people, not shops; ALL_RODS  every rod in the order the bag, the rack and Playtest list them. */
-const QUEST_RODS=['twin','lanternrod','tidecaller','bonewhistle'];
+const QUEST_RODS=['twin','lanternrod','tidecaller','bonewhistle','mirror'];
 const ALL_RODS=[...ROD_ORDER,...QUEST_RODS,...SEA_RODS];
 /* BOAT  Barnaby's skiff: what it costs. */
 const BOAT={price:3000};

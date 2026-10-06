@@ -21,6 +21,7 @@ function drawLand(x,main){
   if (REG()==='river'){ drawRiverLand(x,main); return; }
   if (REG()==='marsh'){ drawMarshLand(x,main); return; }
   if (REG()==='quarter'){ drawQuarterLand(x,main); return; }
+  if (REG()==='hollow') return;
   hillPath(x,H*.075,.011,.027,1.2,.4); x.fillStyle=PAL.hillFar; x.fill();
   hillPath(x,H*.048,.018,.04,3.1,2.2); x.fillStyle=PAL.hillNear; x.fill();
   x.beginPath(); x.moveTo(0,HZ); for (const [px,py] of treePts(1)) x.lineTo(px,py); x.lineTo(W,HZ); x.closePath(); x.fillStyle=PAL.trees; x.fill();
@@ -52,6 +53,7 @@ function buildBg(){
   const c=document.createElement('canvas'); c.width=Math.round(W*DPR); c.height=Math.round(H*DPR);
   const x=c.getContext('2d'); x.setTransform(DPR,0,0,DPR,0,0);
   PAL=palAt(save.clock); SC.bgHour=save.clock; const P=PAL;
+  if (REG()==='hollow'){ buildHollowBg(x); SC.bg=c; return; }   // no sky down there: the cave (game/hollow-art.js)
   const g=x.createLinearGradient(0,0,0,HZ); g.addColorStop(0,P.skyTop); g.addColorStop(.45,P.skyMid); g.addColorStop(.82,P.skyLow); g.addColorStop(1,P.skyHz);
   x.fillStyle=g; x.fillRect(0,0,W,HZ+1);
   sseed=91; for (let i=0;i<34;i++){ x.fillStyle='rgba(255,242,222,'+((.25+sr()*.5)*P.stars).toFixed(2)+')'; x.beginPath(); x.arc(sr()*W,sr()*HZ*.42,sr()*1.1+.3,0,Math.PI*2); x.fill(); }
@@ -96,6 +98,7 @@ function layoutScenery(){
 }
 function drawSky(){
   if (SC.bg) ctx.drawImage(SC.bg,0,0,W,H);
+  if (REG()==='hollow') return;
   for (const c of SC.clouds) drawCloud(c.x*W,c.y*HZ,c.s);
   drawWxSky(); drawBeam();
   for (const p of SC.smoke){ ctx.fillStyle='rgba(205,195,215,'+(.4*(1-p.life/p.max)).toFixed(3)+')'; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); }

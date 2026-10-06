@@ -22,6 +22,7 @@ function spotAt(x,y){
   if (REG()==='river') return riverSpot(x,y);
   if (REG()==='marsh') return marshSpot(x,y);
   if (REG()==='quarter') return quarterSpot(x,y);
+  if (REG()==='hollow') return hollowSpot(x,y);
   const d=G.deep, dx=(x-d.x)/d.rx, dy=(y-d.y)/d.ry; if (dx*dx+dy*dy<1.25) return 'deep';
   for (const p of (G.padClusters||[G.pads])) if (Math.hypot(x-p.x,(y-p.y)*1.8) < p.r*1.15) return 'pads';
   if (y < lerp(G.near,HZ+26,.8)) return 'far';

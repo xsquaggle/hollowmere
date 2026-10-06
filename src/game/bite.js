@@ -2,7 +2,8 @@
 function startWaiting(){
   const lucky=inLucky(S.bob.x,S.bob.y);
   // one roll per cast: this cast pulls up treasure, or a fish. A story relic or a map's cache waiting right here comes first (game/relics.js).
-  const loot=S.tut?null:storyLoot(S.bob)||rollTreasure({spot:S.bob.spot,lucky});
+  // A cast into the Hollow's open eye never pulls up treasure (game/hollow.js).
+  const loot=S.tut?null:storyLoot(S.bob)||(hollowAt(S.bob).eye?null:rollTreasure({spot:S.bob.spot,lucky,star:inStar(S.bob.x,S.bob.y)}));
   // Echo: one waits where you hooked the last, and bites at once. If treasure comes up first, it keeps waiting.
   const E=S.echo, here=!S.tut && !!E && E.reg===REG() && E.spot===S.bob.spot, echo=here && !loot ? E.fish : null; S.echo=here && loot ? E : null;
   S.wait={phase:'empty', t:echo?.35:biteWait(S.bob.spot)*(S.bob.spot==='deep'?1.2:1), fish:null, sh:null, nib:0, nibT:0, tw:[], attract:1, lucky, echo, loot};
@@ -20,8 +21,10 @@ function spawnApproach(){
   const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.bow=atBowFoot(b.x,b.y);
   // the rare bites and the dry run count once a cast (as the simulator does); a fish that comes back after a spook is an ordinary one
   // at the coast, a fish the seventh wave's churn or the lighthouse beam brought (game/coast-sea.js)
-  // in the Drowned Quarter at night, a float on a lit window's reflection (refl: game/quarter.js)
-  const at={bow:w.bow, path:onMoonpath(b.x,b.y), churn:!!w.churn, lit:!!w.lit, refl:quarterRefl(b.x,b.y)};
+  // in the Drowned Quarter at night, a float on a lit window's reflection (refl: game/quarter.js); in the Hollow, the shaft
+  // of light from the roof or the open eye (game/hollow.js); a fallen star's zone (game/omens.js), or a star in the water
+  // with the Stillwater Mirror (game/godly.js)
+  const at=Object.assign({bow:w.bow, path:onMoonpath(b.x,b.y), churn:!!w.churn, lit:!!w.lit, refl:quarterRefl(b.x,b.y), star:inStar(b.x,b.y), starlit:onMirrorStar(b.x,b.y)},hollowAt(b));
   w.fish=S.tut?'perch':w.echo||(w.rolled?pickW(poolFor(b.spot,w.lucky,at)):rollFish(b.spot,w.lucky,at)); w.rolled=true; const F=FISH[w.fish];
   const d=w.echo?rand(40,60):rand(85,150), mA=REG()==='marsh'?marshApproachFrom(b,d):null, ang=mA!=null?mA:rand(0,Math.PI*2);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
@@ -32,6 +35,7 @@ function spawnApproach(){
 }
 function updateWaiting(dt){
   if (!riverWaiting(dt) || !marshWaiting(dt)) return;   // the river carries the float (game/river.js); the tide can strand it (game/marsh.js)
+  hollowWaiting(dt);   // in the Hollow, holding the line draws the float in, and a fish in the dark follows it (game/hollow.js)
   coastWaiting(dt);   // the seventh wave and the lighthouse beam bring a fish sooner (game/coast-sea.js)
   const w=S.wait, b=S.bob;
   if (w.ink){ inkWaiting(dt); return; }   // after an Inked catch, the ink comes first (game/dread.js)
@@ -45,7 +49,7 @@ function updateWaiting(dt){
         const sp=(20+F.len*.35)*w.attract*sc(sh.y)*(F.beh==='sleeper'?.5:1)/(w.bm||1)*(w.echo?2.2:1);
         sh.ang=angLerp(sh.ang, Math.atan2(dy,dx)+Math.sin(S.time*2.2)*.5*Math.min(1,d/70), dt*3);
         sh.x+=Math.cos(sh.ang)*sp*dt; sh.y+=Math.sin(sh.ang)*sp*dt*.6;
-        if (d<10+F.len*.2*sc(sh.y)){ w.phase='nibble'; w.nib=S.tut?1:w.echo?0:nibbles(F); w.nibT=S.tut?1.2:w.echo?.15:rand(.5,1.1)*(w.bm||1); }
+        if (d<10+F.len*.2*sc(sh.y) && !hollowFollows(w,b)){ w.phase='nibble'; w.nib=S.tut?1:w.echo?0:nibbles(F); w.nibT=S.tut?1.2:w.echo?.15:rand(.5,1.1)*(w.bm||1); }
       } else if (w.phase==='nibble'){
         sh.ang=angLerp(sh.ang,Math.atan2(b.y-sh.y,b.x-sh.x),dt*2);
         const hx=b.x-Math.cos(sh.ang)*F.len*.38*sc(b.y), hy=b.y-Math.sin(sh.ang)*F.len*.2*sc(b.y);
@@ -71,6 +75,7 @@ function twitch(){
   if (w.fish && w.phase!=='empty' && FISH[w.fish].beh==='sleeper'){ spook('Something sleepy swam off. Some fish hate twitching.'); return; }
   if (w.phase==='nibble'){ spook('Too early! Wait for the plunge.'); return; }
   if (w.tw.length>=4){ spook('Easy. Too much twitching spooks them.'); return; }
+  if (hollowTwitch(w)) return;   // a fish following in the Hollow's dark stays interested (game/hollow.js)
   const p=modMul('twitch',{spot:b.spot}); // the Ash Caster's perk doubles it
   if (w.phase==='empty') w.t=Math.max(.3,w.t*(.65-.2*(p-1)));
   else if (w.phase==='approach') w.attract=Math.min(2.3+.7*(p-1),w.attract+.45*p);

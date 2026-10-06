@@ -134,8 +134,10 @@ function drawMailBoat(x,y){ const c=ctx, t=S.time; c.lineJoin='round'; c.lineCap
 
 /* ---------- the heron on the right pile: it looks about, preens now and then, and blinks ---------- */
 const HERON_ACT={preen:0, next:9, at:null};
-function drawHeron(px,py){ const d=SC.heron.dir, t=S.time, c=ctx, dt=clamp(t-(HERON_ACT.at==null?t:HERON_ACT.at),0,.1); HERON_ACT.at=t;
+function drawHeron(px,py,page){ const d=SC.heron.dir, t=S.time, c=ctx, dt=clamp(t-(HERON_ACT.at==null?t:HERON_ACT.at),0,.1); HERON_ACT.at=t;
   HERON_ACT.next-=dt; if (HERON_ACT.next<=0){ HERON_ACT.preen=1.8; HERON_ACT.next=rand(9,16); } HERON_ACT.preen=Math.max(0,HERON_ACT.preen-dt);
+  // holding a logbook page in his beak (game/hollow.js), he doesn't preen
+  if (page) HERON_ACT.preen=0;
   const pr=HERON_ACT.preen>0?Math.sin(Math.min(1,(1.8-HERON_ACT.preen)/1.8)*Math.PI):0, blink=(t%3.7)<.12;
   c.save(); c.translate(px,py); c.scale(d,1); c.lineJoin='round'; c.lineCap='round';
   // legs
@@ -158,9 +160,15 @@ function drawHeron(px,py){ const d=SC.heron.dir, t=S.time, c=ctx, dt=clamp(t-(HE
   c.fillStyle='#D3D8DC'; c.beginPath(); c.ellipse(0,0,3.8,2.8,0,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=1; c.stroke();
   c.fillStyle='#2B2A33'; c.beginPath(); c.moveTo(-1.6,-2.4); c.quadraticCurveTo(-4.2,-2.6,-6,-1.8); c.lineTo(-1.6,-1.2); c.closePath(); c.fill();
   c.strokeStyle=INK; c.lineWidth=2.6; c.beginPath(); c.moveTo(2.6,-.2); c.lineTo(11.6,1.2); c.stroke(); c.strokeStyle='#D9A441'; c.lineWidth=1.5; c.stroke();
+  // the page: folded in half, hanging from the beak, swinging a little
+  if (page){ c.save(); c.translate(8.6,1); c.rotate(.25+Math.sin(t*1.7)*.12); c.fillStyle='#E9DDBF'; c.beginPath(); c.moveTo(-3.4,0); c.lineTo(3.6,-.4); c.lineTo(4,7.2); c.lineTo(-3,7.6); c.closePath(); c.fill();
+    c.fillStyle='#CDBE98'; c.beginPath(); c.moveTo(-3.4,0); c.lineTo(3.6,-.4); c.lineTo(3.7,1.6); c.lineTo(-3.3,2); c.closePath(); c.fill();
+    c.strokeStyle='rgba(60,48,36,.55)'; c.lineWidth=.6; for (const y of [3.4,4.8,6.1]){ c.beginPath(); c.moveTo(-2,y); c.lineTo(2.6,y-.3); c.stroke(); }
+    c.strokeStyle=INK; c.lineWidth=.9; c.beginPath(); c.moveTo(-3.4,0); c.lineTo(3.6,-.4); c.lineTo(4,7.2); c.lineTo(-3,7.6); c.closePath(); c.stroke(); c.restore(); }
   if (blink){ c.strokeStyle=INK; c.lineWidth=.9; c.beginPath(); c.moveTo(.4,-.6); c.lineTo(2,-.6); c.stroke(); }
   else { c.fillStyle='#F2CF63'; c.beginPath(); c.arc(1.2,-.6,1.1,0,Math.PI*2); c.fill(); c.fillStyle=INK; c.beginPath(); c.arc(1.4,-.6,.55,0,Math.PI*2); c.fill(); }
-  c.restore(); c.restore(); }
+  c.restore(); c.restore();
+  if (page && S.state==='idle') folkBang(px+d*4,py-58); }
 
 /* ---------- the frog on the lily pads: it blinks, puffs its throat to croak, and hops ---------- */
 function drawFrog(){
