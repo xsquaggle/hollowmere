@@ -171,8 +171,9 @@ module.exports = [
     async run({ newPage, openGame, veteran }) {
       const page = await newPage();
       await openGame(page, { save: veteran() });
+      // the Hungry Hook's runs are 6,000 casts: a rare fish swings coins per catch, and at 1,500 about 1 run in 100 fell under 1.7x
       const r = await page.evaluate(() => { const s = window.__hm.simulate;
-        return { plain: s({ rod: 'ash', spot: 'mix' }, 3000), magpie: s({ rod: 'ash', spot: 'mix', artifacts: ['magpie'] }, 3000), none: s({ rod: 'ash', spot: 'mix', treasure: false }, 500), hook: s({ rod: 'brasscap', artifacts: ['hungryhook'] }, 1500), brass: s({ rod: 'brasscap' }, 1500) }; });
+        return { plain: s({ rod: 'ash', spot: 'mix' }, 3000), magpie: s({ rod: 'ash', spot: 'mix', artifacts: ['magpie'] }, 3000), none: s({ rod: 'ash', spot: 'mix', treasure: false }, 500), hook: s({ rod: 'brasscap', artifacts: ['hungryhook'] }, 6000), brass: s({ rod: 'brasscap' }, 6000) }; });
       const T = r.plain.treasure;
       assert.ok(T.oneIn > 9 && T.oneIn < 16, 'about one cast in 12 is treasure (got 1 in ' + T.oneIn + ')');
       assert.ok(T.kinds.crate / T.rolled > 0.15 && T.kinds.crate / T.rolled < 0.38, 'about a quarter of treasure is crates');
