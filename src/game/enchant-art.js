@@ -20,7 +20,10 @@ const RUNE_GLYPH={
   storm(c){ c.moveTo(-.7,-.12); c.bezierCurveTo(-.3,-.12,-.08,-.7,.22,-.5); c.bezierCurveTo(.5,-.3,.2,.08,-.08,-.12); c.bezierCurveTo(-.3,-.3,.1,-.62,.36,-.3); c.quadraticCurveTo(.5,-.12,.72,-.12);
     for (const [x,y] of [[-.46,.18],[-.08,.12],[.3,.18],[-.28,.48],[.1,.44],[.48,.48]]){ c.moveTo(x+.07,y); c.lineTo(x-.03,y+.2); } },
   echo(c){ c.moveTo(-.12,0); c.quadraticCurveTo(-.36,-.24,-.62,0); c.quadraticCurveTo(-.36,.24,-.12,0); c.moveTo(-.62,0); c.lineTo(-.82,-.14); c.lineTo(-.82,.14); c.closePath();
-    c.moveTo(.16,-.36); c.quadraticCurveTo(.34,0,.16,.36); c.moveTo(.38,-.58); c.quadraticCurveTo(.66,0,.38,.58); }
+    c.moveTo(.16,-.36); c.quadraticCurveTo(.34,0,.16,.36); c.moveTo(.38,-.58); c.quadraticCurveTo(.66,0,.38,.58); },
+  homebody(c){ c.moveTo(-.62,-.06); c.lineTo(0,-.62); c.lineTo(.62,-.06); c.moveTo(-.46,-.2); c.lineTo(-.46,.62); c.lineTo(.46,.62); c.lineTo(.46,-.2);   // a little house,
+    c.moveTo(-.14,.62); c.lineTo(-.14,.24); c.quadraticCurveTo(0,.1,.14,.24); c.lineTo(.14,.62);   // its door,
+    c.moveTo(.3,-.36); c.lineTo(.3,-.58); c.moveTo(.3,-.7); c.quadraticCurveTo(.46,-.78,.4,-.9); }   // and a curl of smoke from the chimney
 };
 /** A rune token, centred, `s` across. o: {glow 0..1, glowR (how far the glow may reach, so it fades out inside a
     small canvas instead of being cut off square), p (how much of the glyph is drawn, for etching), empty, dim}. */

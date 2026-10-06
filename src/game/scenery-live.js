@@ -74,9 +74,10 @@ function drawWater(){
   const sx=SC.lightX||W*.3, la=SC.lightA||0;
   if (la>.02) for (let i=0;i<14;i++){ const y=HZ+3+i*i*1.5, w=W*.05*(1-i/16)+Math.sin(S.time*1.5+i)*4;
     ctx.fillStyle='rgba('+SC.lightRGB+','+((.42-i*.025)*la).toFixed(3)+')'; ctx.fillRect(sx-w,y,w*2,1.5+i*.15); }
-  drawBoat();
+  const river=REG()==='river';   // the river draws its own current (game/river-art.js); no sails or lake swell there
+  if (!river) drawBoat();
   ctx.lineCap='round';
-  for (const v of SC.waves){
+  if (!river) for (const v of SC.waves){
     const y0=HZ+5+v.fy*(H-HZ-50), k=sc(y0), span=W*1.2;
     const x=((v.fx*span+S.time*v.dr*(6+k*10))%span)-W*.1, y=y0+Math.sin(S.time*1.1+v.ph)*1.4*k, w=(5+k*13)*v.len;
     ctx.strokeStyle='rgba(222,238,242,'+(.08+.16*k+.05*Math.sin(S.time*1.7+v.ph)).toFixed(3)+')'; ctx.lineWidth=.8+k*1.4;
@@ -90,7 +91,7 @@ function drawWater(){
   }
   drawMoonpath(); drawBreach(); drawBowFoot(); drawWxWater(); drawLucky();
   if (SC.jump){ const j=SC.jump, u=j.t/j.dur, k=sc(j.y), hgt=Math.sin(Math.PI*u)*26*k;
-    ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
+    ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,river?'brook':'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
 }
 function drawDeep(){
   const d=G.deep; ctx.save(); ctx.translate(d.x,d.y);
@@ -110,6 +111,7 @@ function drawFlower(x,y,s,kind){
 }
 function drawPads(){
   if (REG()==='coast'){ drawKelp(); return; }
+  if (REG()==='river'){ drawRiverWater(); return; }
   G.padClusters.forEach((c,ci)=>{ SC.pads[ci].forEach((p,i)=>{
     const {x,y,r}=padPos(ci,i);
     ctx.save(); ctx.translate(x,y); ctx.scale(1,.42);
@@ -164,6 +166,7 @@ function drawRock(x,y,r){ const c=ctx;
 }
 function drawReeds(){
   if (REG()==='coast'){ drawStacks(); return; }
+  if (REG()==='river'){ drawRiverBanks(); return; }
   drawBank(SC.bank.L,-1); drawBank(SC.bank.R,1);
   drawRock(W*.075,H*.635,11); drawRock(W*.145,H*.775,8); drawRock(W*.905,H*.735,10);
   ctx.lineCap='round';
@@ -213,7 +216,7 @@ function nightShade(){
 const OTT = {say:'', sayT:0, next:14};
 function ottPos(){ return {x:W/2-118, y:H-150}; }
 function onOttilie(x,y){ if (REG()!=='lake') return false; const o=ottPos(); return x>o.x-34 && x<o.x+34 && y>o.y-62 && y<o.y+14; }
-function ottHasNews(){ if (!save.metOttilie) return save.stats.catches>=3; if (ownerHas('ottilie').length) return true; const n=ROD_ORDER.find(id=>!save.rods.includes(id)); return !!n && save.coins>=RODS[n].price; }
+function ottHasNews(){ if (!save.metOttilie) return save.stats.catches>=3; if (ownerHas('ottilie').length) return true; if (ferryAsk() && !save.ferry && (!save.ferrySeen || save.coins>=RIVER.ferry.price)) return true; const n=ROD_ORDER.find(id=>!save.rods.includes(id)); return !!n && save.coins>=RODS[n].price; }
 function wrapText(t,max){ const words=t.split(' '), out=[]; let line='';
   for (const w of words){ const test=line?line+' '+w:w; if (ctx.measureText(test).width>max && line){ out.push(line); line=w; } else line=test; }
   if (line) out.push(line); return out; }
@@ -245,6 +248,7 @@ function updateScenery(dt){
       (S.state==='loot'?news:toast)('Splat! Gull luck: '+trimNum(gullMul())+'× rarity zone','gold'); S.particles.push({x:d.tx+34,y:d.ty-46,vx:6,vy:-18,g:0,life:0,max:1.3,r:0,c:'rgba(0,0,0,',word:'PLOP!'}); } }
   if (SC.lucky){ SC.lucky.t+=dt; if (SC.lucky.t>=SC.lucky.dur) SC.lucky=null; }
   SC.birds=SC.birds.filter(f=>f.x>-120 && f.x<W+120);
+  updateRiverLeaves(dt);
   if (SC.boat){ SC.boat.x+=SC.boat.dir*SC.boat.sp*dt; if (SC.boat.x<-60||SC.boat.x>W+60) SC.boat=null; }
   else { SC.nextBoat-=dt; if (SC.nextBoat<=0){ const dir=Math.random()<.5?1:-1;
     SC.boat={x:dir>0?-40:W+40, dir, sp:rand(8,13), sail:['#EFE3CC','#E9C9A8','#D9E3E8'][Math.floor(Math.random()*3)]}; SC.nextBoat=rand(18,32); } }

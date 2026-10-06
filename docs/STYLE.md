@@ -46,7 +46,10 @@ The bar holds for every screen: the fishing scene, every overlay (aquarium, kitc
 
 Step 16, the art pass, brought everything older up to this bar: the scene in part one (build 16), the aquarium and kitchen in part two (build 17). Light comes from the upper left everywhere.
 
-- **Scene art** lives in `src/game/angler.js`, `dock.js`, `folk.js` and `coast.js`.
+- **Scene art** lives in `src/game/angler.js`, `dock.js`, `folk.js`, `coast.js`, `river-art.js` and `wren-art.js`.
+- **Rootwood River** (build 26) is deep greens and amber under trees. Its far bank is close, so its wood is strong green, not hazed like the lake's far hills: a back row of crowns, the shade under the near canopy with the trunks in it, the near crowns over the top with sunlit edges. The mill (stone below, plaster and timber above, a slate roof and a smoking chimney) turns its waterwheel at the foot of the far bank. Roots hang into the undercut on the right. The current is drawn as streaks and foam running left to right, faster in the middle; leaves fall from the alder overhead and float off on it; light through the leaves drifts on the water by day. Wren's plank boathouse stands on stilts on the near-left bank, its round window full of glowing jars. Every colour goes through `rvTone`, which fades the day colours toward the palette's own shade at night, so the river follows the clock like the other waters.
+- **Wren** is young, in a rust apron over a mustard jumper, brass goggles pushed up into dark curls, holding up a jar that glows green. She shifts from foot to foot and leans in to peer at the jar now and then.
+- **River fish** each have a silhouette of their own: the Brook Ribbon thin with a silver band and dusky marks, the Stonegrinder pebble-mottled, the Barkskin Barbel furrowed like bark with four barbels, the Clockfin Trout's spots set round like a dial and its gill cover's two hands, the Wisp Grayling's tall violet sail, and Old Gristle's sturgeon body, shovel snout, rows of bony plates and long upper tail.
 - **Aquarium art** lives in `src/game/aquarium-art.js`. Each decor piece draws from an anchor on the sand, split into a still part (painted once) and a moving part. The shop's and crates' decor icons come from the same drawings, so they always match the tank.
 - **Kitchen art** lives in `src/game/kitchen-art.js`. The board, the stove and the whole fish on the board are painted once per scale.
 - **Enchantment art** lives in `src/game/enchant-art.js`. A rune is a brass-rimmed slate token with its glyph cut in and lit in the rune's own color, and the same drawing serves the tray, the sockets, the rod and the catch card. Glimmer is a pale blue-violet crystal. A glow is kept inside its canvas, so it never ends in a hard square edge.
@@ -121,4 +124,6 @@ flower along its back, a Twin is a second fish a touch smaller behind the first,
 
 Soft, wooden and watery, all procedural (Web Audio): plucks and bells for music, and clicks, splashes and canvas or
 leather for interactions. The weather has its own beds: rain on the water and the roof, a drop now and then on the
-boards, a foghorn off the coast and a bell under the lake in fog, and the music muffled a little in rain and more in fog. Each sound is short and slightly varied, so repeats don't grate.
+boards, a foghorn off the coast and a bell under the lake in fog, and the music muffled a little in rain and more in fog.
+The river has a rush of moving water under everything, woodpeckers and creaking boughs by day, and a soft two-note tick
+as each in-game hour turns (the Clockfin's minutes). Each sound is short and slightly varied, so repeats don't grate.

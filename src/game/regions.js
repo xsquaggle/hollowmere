@@ -1,8 +1,18 @@
 /* ---------- Regions ---------- */
-const REG = () => save.region==='coast' && save.boat ? 'coast' : 'lake';
-function spotName(sp){ return REG()==='coast' && sp==='deep' ? 'Dark trench' : SPOT_NAME[sp]; }
+const REG = () => save.region==='coast' && save.boat ? 'coast' : save.region==='river' && save.ferry ? 'river' : 'lake';
+/** Whether you can get to a water: the lake always, the river once Ottilie's ferry runs, the coast once you have a boat. */
+const regionOpen = r => r==='lake' || (r==='river' && !!save.ferry) || (r==='coast' && !!save.boat);
+/** A spot's name in a water (the coast's deep water is the Dark trench, the river's the Millpool). */
+function spotName(sp,reg){ reg=reg||REG(); return (SPOT_REG[reg]||{})[sp] || SPOT_NAME[sp]; }
+/** Each water's spots and their bite weights. */
+const POOLS_BY = {lake:POOLS, coast:POOLS_COAST, river:POOLS_RIVER};
+const poolsOf = reg => POOLS_BY[reg] || POOLS;
+/** The water a fish calls home: the first one it lives in. */
+const regionOf = id => Object.keys(REGION_FISH).find(r=>REGION_FISH[r].includes(id)) || 'lake';
 /** Every lake fish caught, not counting the ones only weather brings up or the extras (Epic and rarer), so Barnaby never waits on the sky or on luck. */
-function lakeDone(){ return REGION_FISH.lake.every(id=>FISH[id].wx || FISH[id].extra || (save.fish[id]||{}).caught>0); }
+function lakeDone(){ return waterDone('lake'); }
+/** Every fish of a water caught, leaving out the weather's and the extras, as lakeDone. Wren's Twin Spool waits on the river's. */
+function waterDone(reg){ return REGION_FISH[reg].every(id=>FISH[id].wx || FISH[id].extra || (save.fish[id]||{}).caught>0); }
 function hexRGB(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]; }
 function mixP(key,hex,t){ const a=(PAL[key+'R']||'0,0,0').split(',').map(Number), b=hexRGB(hex); return 'rgb('+a.map((v,i)=>Math.round(lerp(v,b[i],t))).join(',')+')'; }
 
@@ -17,6 +27,7 @@ function layoutRegion(){
     sseed=77; SC.kelp=G.kelp.map(c=>{ const arr=[]; const n=c.r>W*.1?20:11;
       for (let i=0;i<n;i++){ const a=sr()*6.28, d=Math.sqrt(sr()); arr.push({ox:Math.cos(a)*d, oy:Math.sin(a)*d, len:.5+sr()*.7, ph:sr()*6.28, bulb:sr()<.5}); } return arr; });
     SC.bank={L:[],R:[]}; SC.tails=[];
+  } else if (REG()==='river'){ layoutRiver();
   } else {
     G.deep={x:W*.64, y:HZ+(H-HZ)*.3, rx:W*.19, ry:(H-HZ)*.075};
     G.kelp=[]; G.stacks=[];

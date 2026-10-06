@@ -7,7 +7,7 @@ const WOOD={a:'#7A5D43', b:'#71543C', c:'#806248', grain:'rgba(52,34,22,.34)', l
 /** The dock's shape on this screen: its far end, the two edges, and where the piles stand. */
 function dockGeo(){ const cx=W/2, top=H-128, bw=78, bb=110; return {cx, top, bw, bb, lp:cx-bw-1, rp:cx+bw+1}; }
 /** Paints the boards, piles and coiled rope into SC.dock, once per screen size. */
-function buildDock(){ if (REG()!=='lake'){ SC.dock=null; return; }
+function buildDock(){ if (REG()==='coast'){ SC.dock=null; return; }
   const D=dockGeo(), {cx,top,bw,bb}=D, h=H-top+40, c=document.createElement('canvas'); c.width=Math.round(W*DPR); c.height=Math.round(h*DPR);
   const x=c.getContext('2d'); x.setTransform(DPR,0,0,DPR,0,-(top-40)*DPR); sseed=404;
   // the deck's shadow on the water, and the side beams showing under the board ends
@@ -86,9 +86,10 @@ function drawDock(){
   drawPail(cx+48,top+47);
   drawBaitOnDock(cx+30,top+56);
   drawTrapProp();
-  if (!S.grey) drawHeron(D.rp,top-25);   // unless he's off guarding a trap (game/trap-scene.js)
+  const lake=REG()==='lake';   // at the river it's Ottilie's ferry landing: Grey stays home, and Wren is on her boathouse ramp
+  if (lake && !S.grey) drawHeron(D.rp,top-25);   // unless he's off guarding a trap (game/trap-scene.js)
   drawKeepnet();
-  drawOttilie();
+  if (lake) drawOttilie(); else { drawWren(); drawOtterThief(); }
   drawDockLantern(D.lp,top);   // in front of Ottilie's punt: the pile stands nearer than her boat
   drawBarnaby(); }
 /** A painted wooden tackle box, lid ajar, a lure hanging over the edge. */

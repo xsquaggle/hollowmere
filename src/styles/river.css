@@ -1,0 +1,31 @@
+/* Rootwood River: Wren's boathouse sheet (her bench, the Twin Spool, the corkboard) and Ottilie's ferry card */
+#panel .mini{font-size:12px;color:#6B665C;line-height:1.4;margin:4px 0 0}
+#panel .need{margin:0;font-size:11.5px;font-weight:800;color:#8A6A3A}
+.wren-say{font-style:italic;color:#5A4A3A;border-left:3px solid #A4553A;padding:2px 0 2px 10px}
+.wren-cut{margin-bottom:10px}
+.wren-cut .btn{justify-self:start}
+.wren-rune{grid-template-columns:64px 1fr;box-shadow:0 0 0 1.5px var(--rc) inset;background:linear-gradient(90deg,rgba(201,138,94,.1),transparent 60%)}
+.wren-rune canvas{width:64px;height:64px}
+.wren-rune p.down{color:#8A5A4A;font-size:12px}
+/* the Twin Spool's list of river fish */
+.wren-fish{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin:0 0 12px}
+.wf{display:grid;justify-items:center;gap:2px;border:1.5px dashed rgba(43,42,51,.25);border-radius:10px;padding:6px 4px;background:rgba(43,42,51,.04)}
+.wf canvas{width:84px;height:38px}
+.wf span{font-size:11.5px;font-weight:800;color:#8A857A;text-align:center;line-height:1.2}
+.wf.got{border-style:solid;border-color:rgba(78,123,76,.5);background:rgba(110,143,90,.1)}
+.wf.got span{color:#3F5E2C}
+/* the corkboard: notes pinned at an angle, blank cards for what's still to find */
+.cork{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px;padding:14px;border-radius:10px;margin:0 0 10px;
+  background:#B98A5C radial-gradient(rgba(90,58,34,.35) 1px,transparent 1.4px) 0 0/7px 7px;box-shadow:inset 0 0 0 4px #7A5636,inset 0 0 0 5.5px #2B2A33}
+.pin-note{position:relative;background:#F4ECD8;padding:16px 10px 10px;border-radius:2px;transform:rotate(var(--r));box-shadow:0 3px 6px rgba(43,42,51,.3)}
+.pin-note::before{content:'';position:absolute;top:5px;left:50%;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:#B4503F;box-shadow:0 0 0 1.2px #2B2A33,1px 2px 2px rgba(0,0,0,.3)}
+.pin-note p{margin:0;font-size:12.5px;line-height:1.4;color:#3B3530;font-style:italic}
+.pin-note.blank{background:rgba(244,236,216,.45);box-shadow:none}
+.pin-note.blank p{color:#8A7A6A;text-align:center;font-style:normal;font-weight:800}
+.pin-note.fresh{animation:pinIn .5s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes pinIn{from{transform:rotate(var(--r)) scale(.6);opacity:0}}
+/* Ottilie's ferry */
+.ferry-card{grid-template-columns:1fr;justify-items:start}
+.ferry-card canvas.ferry-art{width:100%;max-width:300px;height:110px;justify-self:center}
+.ferry-card .btn{margin-top:10px}
+@media (prefers-reduced-motion: reduce){.pin-note.fresh{animation:none}}

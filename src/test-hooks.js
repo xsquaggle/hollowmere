@@ -2,7 +2,7 @@
 window.__S=S; window.__K=K; window.__AQ=AQ; window.__MU=MU;
 // treasure stays off in the test build unless a test turns it on, so fishing tests always get a fish
 TREASURE_CTL.off=true;
-window.__hm={ get save(){ return save; }, FISH, RODS, ROD_ORDER, SEA_RODS, BOAT, PARTS, PAINTS, POCKETS, REGION_FISH, RECIPES, DECOR, TANKS, STATS, FINDS, CRATES, TREASURE, NOTES, TACKLE, simulate, modList,
+window.__hm={ get save(){ return save; }, FISH, RODS, ROD_ORDER, SEA_RODS, QUEST_RODS, BOAT, RIVER, WREN, TWIN, PARTS, PAINTS, POCKETS, REGION_FISH, RECIPES, DECOR, TANKS, STATS, FINDS, CRATES, TREASURE, NOTES, TACKLE, simulate, modList,
   gear:{ state:()=>gearState(), grant:(id,n)=>grantGear(id,n), rig:id=>rigGear(id), rigFor:r=>rigFor(r), load:id=>loadBait(id), on:()=>baitOn(), tick:()=>tickBait(), check:()=>baitCheck() },
   art:{ // the scene's trap art on one sheet, drawn into the main canvas and handed back as a picture
     trapSheet(){ ctx.setTransform(DPR,0,0,DPR,0,0); ctx.fillStyle='#3F8597'; ctx.fillRect(0,0,W,H); const k=1.6;
@@ -54,4 +54,10 @@ window.__hm={ get save(){ return save; }, FISH, RODS, ROD_ORDER, SEA_RODS, BOAT,
   tierMul:(r,c)=>tierMul(r,c), modMul:(s,c)=>modMul(s,c), luckPoints:c=>luckPoints(c),
   // the luck rule before step 12 (every source multiplied, no caps), for before-and-after reports
   legacyLuck(on){ if (on && !window.__curveTier){ window.__curveTier=tierMul; tierMul=(rar,c)=>{ if (!RAR[rar].luckCap) return 1; c=Object.assign({},c,{rarity:rar}); let v=1; for (const m of modsFor('luck',c)) v*=m.omen?m.v:1+m.v; return v; }; }
-    else if (!on && window.__curveTier){ tierMul=window.__curveTier; window.__curveTier=null; } } };
+    else if (!on && window.__curveTier){ tierMul=window.__curveTier; window.__curveTier=null; } },
+  // Rootwood River (step 25): the current, the ferry, Homebody, the otter, Wren and the Twin Spool
+  river:{ RV, G:()=>({deep:G.deep, leaves:G.leaves, riffle:G.riffle, rootsX:G.rootsX, rootsY:G.rootsY, near:G.near, hz:HZ, w:W, h:H}), spot:(x,y)=>riverSpot(x,y), drift:(x,y)=>driftSpeed(x,y),
+    travel:r=>travelTo(r), reg:()=>REG(), ask:()=>ferryAsk(), fix:()=>fixFerry(), homeDays:()=>homeDays(), homeMul:()=>homeMul(), otter:()=>RV.otter&&{phase:RV.otter.phase,x:RV.otter.x,y:RV.otter.y},
+    otterTick:dt=>otterUpdate(dt), tapOtter:()=>tapOtter(), onOtter:(x,y)=>onOtter(x,y), sockets:r=>socketsOf(r), avail:id=>enchAvail(id), mods:()=>{ MODC.dirty=true; return modList(); },
+    wren:{ open:t=>openWren(t), state:()=>wrenState(), pos:()=>wrenPos(), cut:r=>cutSocket(r), give:()=>giveTwin(), ready:()=>twinReady(), news:()=>wrenHasNews(), notes:()=>notesUp().map(N=>N.id), quest:()=>riverQuestFish() },
+    twin:{ on:()=>twinOn(), wait:()=>twinWait(), land:()=>{ twinLand(S.bob); return S.bob2&&{x:S.bob2.x,y:S.bob2.y}; }, bite:()=>twinBite(), strike:(x,y)=>twinStrike(x,y) } } };

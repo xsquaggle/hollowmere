@@ -9,7 +9,7 @@
    Playtest and the balance simulator can pin the weather with save.wx.force. Everything here reads only the save, so
    the simulator's stand-in save has weather of its own (see game/mods.js). */
 var WXM={save:null};                        // the last answer, while nothing it depends on has changed
-const WX_REGN={lake:1, coast:2};
+const WX_REGN={lake:1, coast:2, river:3};
 /** The save's weather state, tidied on first read: a seed for the sky, a pinned kind (Playtest), tips already shown. */
 function wxState(){ let w=save.wx; if (!w || typeof w!=='object' || Array.isArray(w)) w=save.wx={};
   if (!Number.isInteger(w.seed) || w.seed<1) w.seed=1+Math.floor(Math.random()*2147483646);
@@ -36,7 +36,7 @@ function wxAt(reg,B,seed){ seed=seed||wxState().seed; return wxRoll(reg,wxStart(
     a rainbow, each 0 to 1). Cached until the save, the clock, the region or a pinned kind changes. */
 function wxInfo(){
   const w=wxState(), M=WXM;
-  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
+  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.ferry===save.ferry && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
   const reg=REG(), h=(((save.clock%24)+24)%24), into=h%WX_SPELL.hours; let from, to, t;
   if (w.force){ from=to=w.force; t=1; }
   else if (!save.tutorialDone){ from=to='clear'; t=1; }
@@ -48,7 +48,7 @@ function wxInfo(){
   // a rainbow, by day, in the hour or two after rain gives way
   if (from==='rain' && to!=='rain' && !w.force && h>=7 && h<18.5) v.bow=clamp((t-.5)/.4,0,1)*clamp((2.4-into)/.8,0,1);
   if (w.bow && !isNight(h)) v.bow=1;                                   // Playtest: a rainbow now
-  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
+  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,ferry:save.ferry,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
   return v; }
 /** The weather the fishing uses here and now: 'clear', 'cloudy', 'rain' or 'fog'. */
 const wxNow = () => wxInfo().kind;

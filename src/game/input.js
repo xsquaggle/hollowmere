@@ -6,9 +6,10 @@ cv.addEventListener('pointerdown',e=>{
     case 'idle':
       if (S.place){ placeDown(x,y); break; }                                       // setting a trap: a marked spot, or the trap itself
       { const T=onTrapProp(x,y); if (T){ startPlacing(T,{x,y}); break; } }      // the trap waiting on the dock or the deck
-      S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y),onTrap:trapAt(x,y),onJar:onJar(x,y)}; setState('aiming'); break;
-    case 'waiting': twitch(); break;
-    case 'bite': hook(); break;
+      if (onOtter(x,y)){ tapOtter(); break; }                                   // the river's otter, after your bait
+      S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onWren:onWren(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y),onTrap:trapAt(x,y),onJar:onJar(x,y)}; setState('aiming'); break;
+    case 'waiting': if (!riverPress()) twitch(); break;   // on the river a twitch waits to see if it's a hold (game/river.js)
+    case 'bite': S.tapX=x; S.tapY=y; hook(); break;
     case 'reeling': leapTap(); S.holding=true; S.pressX=x; S.pressTilt=S.tilt; break;
     case 'result': if (S.time-S.cardAt>.5) dismissCard(S.cardDefault); break;
     case 'loot': lootTap(); break;
@@ -22,6 +23,7 @@ cv.addEventListener('pointermove',e=>{
 function up(e){
   S.pointers.delete(e.pointerId);
   if (S.state==='aiming') release();
+  else if (S.state==='waiting' || RV.down!=null) riverRelease();
   else if (S.place) placeUp(e.clientX,e.clientY);
   if (S.state==='reeling') S.holding=S.pointers.size>0;
 }

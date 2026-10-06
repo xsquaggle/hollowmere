@@ -47,7 +47,7 @@ function mapSVG(){
   t+='<path d="'+ROUTE_D+'" fill="none" stroke="#B4584A" stroke-width="2" stroke-dasharray="4 5" opacity=".55"/>';
   t+='<path id="routeLive" d="'+ROUTE_D+'" fill="none" stroke="#B4584A" stroke-width="3" stroke-linecap="round"/>';
   // places
-  Object.entries(MAP_PLACES).forEach(([id,p])=>{ const open=p.built && (id==='lake' || save.boat), here=id===REG();
+  Object.entries(MAP_PLACES).forEach(([id,p])=>{ const open=p.built && regionOpen(id), here=id===REG();
     t+='<g class="pin'+(open?'':' locked')+'" data-place="'+id+'" tabindex="0" role="button" aria-label="'+p.name+'">'+
       '<circle cx="'+p.x+'" cy="'+p.y+'" r="16" fill="transparent"/>'+
       (()=>{ const L=LBL[id], w=p.name.length*(open?7:6), x0=L[2]==='end'?p.x+L[0]-w:L[2]==='middle'?p.x+L[0]-w/2:p.x+L[0];
@@ -68,22 +68,25 @@ function showMap(goTo,first){
     '<div class="map-card" id="mapCard"></div><button class="btn" id="mapClose" type="button">Close</button></div>';
   layer.hidden=false; noise(.5,{vol:.08,f:2400,to:900,q:.6});
   const svg=layer.querySelector('svg'), route=svg.querySelector('#routeLive'), boat=svg.querySelector('#mapBoat'), len=route.getTotalLength();
+  // the route runs lake, river, coast: each water sits at its own point along it (the river's is worked out from its pin)
+  const U={lake:0, coast:1, river:routeU(route,len,MAP_PLACES.river)}, farthest=regionOpen('coast')?1:regionOpen('river')?U.river:0;
   const place=u=>{ const p=route.getPointAtLength(len*clamp(u,0,1)); boat.setAttribute('transform','translate('+p.x.toFixed(1)+' '+(p.y+Math.sin(performance.now()/300)*1.2).toFixed(1)+')'); };
   const showRoute=u=>{ route.style.strokeDasharray=len; route.style.strokeDashoffset=String(len*(1-clamp(u,0,1))); };
-  let at=here==='coast'?1:0; place(at); showRoute(save.boat?at:0);
+  let at=U[here]||0; place(at); showRoute(farthest);
   let bobbing=true; (function bob(){ if (!bobbing||layer.hidden) return; place(at); requestAnimationFrame(bob); })();
   const card=$('mapCard');
-  const select=id=>{ const p=MAP_PLACES[id], open=p.built && (id==='lake'||save.boat), isHere=id===REG(), n=REGION_FISH[id]?REGION_FISH[id].filter(f=>(save.fish[f]||{}).caught>0).length:0;
+  const select=id=>{ const p=MAP_PLACES[id], open=p.built && regionOpen(id), isHere=id===REG(), n=REGION_FISH[id]?REGION_FISH[id].filter(f=>(save.fish[f]||{}).caught>0).length:0;
     svg.querySelectorAll('.pin').forEach(g=>g.classList.toggle('sel',g.dataset.place===id));
-    card.innerHTML='<div><span class="r">'+(isHere?'You are here':open?'Charted':'Uncharted')+'</span><h3>'+p.name+'</h3><p>'+(id==='coast'&&!save.boat?'Barnaby sells boats that can get you here.':p.desc)+'</p>'+
+    card.innerHTML='<div><span class="r">'+(isHere?'You are here':open?'Charted':'Uncharted')+'</span><h3>'+p.name+'</h3><p>'+(id==='coast'&&!save.boat?'Barnaby sells boats that can get you here.':id==='river'&&!save.ferry?'Ottilie’s ferry runs up the river, once it’s mended.':p.desc)+'</p>'+
       (REGION_FISH[id]&&open?'<p class="mini">Journal: '+n+' of '+REGION_FISH[id].length+' species</p>':'')+'</div>'+
-      (open && !isHere?'<button class="btn" id="sailBtn" type="button">Sail here</button>':'');
+      (open && !isHere?'<button class="btn" id="sailBtn" type="button">'+(id==='river'||(here==='river'&&id==='lake'&&!save.boat)?'Take the ferry':'Sail here')+'</button>':'');
     const sb=$('sailBtn'); if (sb) sb.addEventListener('click',()=>sail(id)); tone(700,.05,{vol:.05,type:'triangle'}); };
-  const sail=to=>{ if (to===REG()) return; bobbing=false; $('mapClose').hidden=true; card.innerHTML='<p class="sailing">'+(first?'The map unrolls. ':'')+'Setting sail for '+MAP_PLACES[to].name+'…</p>';
-    const t0=performance.now(), dur=REDUCED?400:2400, from=REG()==='coast'?1:0, toU=to==='coast'?1:0;
+  const sail=to=>{ if (to===REG()) return; bobbing=false; $('mapClose').hidden=true; const ferry=to==='river'||(REG()==='river'&&to==='lake'&&!save.boat);
+    card.innerHTML='<p class="sailing">'+(first?'The map unrolls. ':'')+(ferry?'All aboard Ottilie’s ferry for ':'Setting sail for ')+MAP_PLACES[to].name+'…</p>';
+    const t0=performance.now(), dur=REDUCED?400:2400*Math.max(.45,Math.abs(U[to]-at)), from=at, toU=U[to];
     noise(1.6,{vol:.1,f:700,to:250,type:'lowpass'});
     (function step(now){ const k=Math.min(1,(now-t0)/dur), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2, u=lerp(from,toU,e);
-      place(u); showRoute(Math.max(u,toU===1?u:from));
+      place(u); showRoute(Math.max(u,farthest));
       if (k<1) requestAnimationFrame(step); else setTimeout(()=>{ closeMap(); travelTo(to,first); },250); })(t0); };
   svg.querySelectorAll('.pin').forEach(g=>{ const go=()=>select(g.dataset.place); g.addEventListener('click',go); g.addEventListener('keydown',e=>{ if (e.key==='Enter'||e.key===' ') go(); }); });
   $('mapClose').addEventListener('click',closeMap);
@@ -91,12 +94,18 @@ function showMap(goTo,first){
   select(goTo||here);
   if (goTo && goTo!==here) setTimeout(()=>sail(goTo),first?1100:300);
 }
+/** How far along the route (0 to 1) its nearest point to a place lies. */
+function routeU(route,len,p){ let best=0, bd=1e9; for (let i=0;i<=120;i++){ const q=route.getPointAtLength(len*i/120), d=Math.hypot(q.x-p.x,q.y-p.y); if (d<bd){ bd=d; best=i/120; } } return best; }
 function closeMap(){ const layer=$('mapLayer'); if (layer.hidden) return; ovClosed('map'); layer.classList.add('closing'); setTimeout(()=>{ layer.hidden=true; layer.classList.remove('closing'); layer.innerHTML=''; },REDUCED?0:280); }
 function travelTo(to,first){
+  if (to!==REG()) homeMoved(to);   // Homebody starts counting again (game/river.js)
   save.region=to; persist();
   S.bob=null; S.wait=null; S.reel=null; S.land=null; SC.lucky=null; SC.jump=null; SC.drop=null; SC.gull=null; S.swell=null;
   layoutScenery(); buildBg(); updateHud(); setState('idle');
   toast(REGION_NAME[to],'gold');
+  if (to==='river' && !save.riverSeen){ save.riverSeen=true; persist();
+    setTimeout(()=>coachFor('Rootwood River! The current carries your float downstream, left to right. Cast upstream and let it drift through the spots. Hold the screen to swing it in toward the bank.',10),900);
+    setTimeout(()=>{ if (!S.tut && !(save.wren&&save.wren.met)) coachFor('That’s Wren on her boathouse ramp. Tap her: she enchants rods.',7); },12000); }
   if (to==='coast' && !save.coastSeen){ save.coastSeen=true; persist();
     setTimeout(()=>coachFor('Welcome to Gullrock Coast! Swells roll in from the sea. A cast that lands in a breaking swell washes out, and a swell hitting your line spikes the tension, so let go as it passes.',9),900);
     setTimeout(()=>{ if (!S.tut) coachFor('Ottilie mailed you her old waterproof phone. Tap Phone to order sea rods and boat parts from Tacklegram.',8); },11000); }

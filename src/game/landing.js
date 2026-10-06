@@ -158,7 +158,7 @@ function fitHud(){ const hud=$('hud'); if (!hud) return; const g=save.glimmer||0
 window.addEventListener('resize',fitHud);
 if (document.fonts) document.fonts.ready.then(()=>{ HUD.sig=''; fitHud(); });   // the display font changes every width
 function updateHud(){
-  const all=REGION_FISH.lake.concat(save.boat?REGION_FISH.coast:[]), n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
-  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('shackBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; ordersBadge(); $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
+  const all=[...new Set(['lake','river','coast'].filter(regionOpen).flatMap(r=>REGION_FISH[r]))], n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
+  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat && !save.ferry; $('shackBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; ordersBadge(); $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
   updateGlimChip(); fitHud(); $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
 }

@@ -19,7 +19,8 @@
     "styles/orders.css",
     "styles/shack.css",
     "styles/sheets.css",
-    "styles/balance.css"
+    "styles/balance.css",
+    "styles/river.css"
   ],
   "js": [
     "game/core.js",
@@ -38,6 +39,7 @@
     "data/idle.js",
     "data/orders.js",
     "data/shack.js",
+    "data/river.js",
     "data/pace.js",
     "data/stats.js",
     "game/mods.js",
@@ -83,6 +85,11 @@
     "game/render.js",
     "game/regions.js",
     "game/coast.js",
+    "game/river.js",
+    "game/river-art.js",
+    "game/twin.js",
+    "game/wren.js",
+    "game/wren-art.js",
     "game/barnaby.js",
     "game/map.js",
     "game/tacklegram.js",

@@ -178,8 +178,9 @@ async function weatherReport() {
   const errors = []; p.on('pageerror', e => errors.push(String(e)));
   await p.goto('file://' + page + '?nointro'); await p.waitForTimeout(500);
   const r = await p.evaluate((casts) => { const hm = window.__hm, out = { shares: {}, rows: [], storm: [] }, days = 400;
-    for (const reg of ['lake', 'coast']) { const a = {}; for (const seed of [1, 2, 3]) { const s = hm.wx.shares(reg, days, seed); for (const k in s) a[k] = (a[k] || 0) + s[k] / 3; } out.shares[reg] = a; }
+    for (const reg of ['lake', 'river', 'coast']) { const a = {}; for (const seed of [1, 2, 3]) { const s = hm.wx.shares(reg, days, seed); for (const k in s) a[k] = (a[k] || 0) + s[k] / 3; } out.shares[reg] = a; }
     const setups = [['Willow Switch · lake open, noon', { rod: 'willow' }, 'lake'], ['Ash Caster · lake deep, 9 AM', { rod: 'ash', spot: 'deep', hour: 9 }, 'lake'], ['Brasscap Pro · lake, every spot', { rod: 'brasscap', spot: 'mix' }, 'lake'],
+      ['Brasscap Pro · river, every spot', { rod: 'brasscap', region: 'river', spot: 'mix' }, 'river'],
       ['Saltline · coast, every spot', { rod: 'saltline', region: 'coast', spot: 'mix' }, 'coast'], ['Deepwater · coast, every spot', { rod: 'deepwater', region: 'coast', spot: 'mix' }, 'coast']];
     for (const [label, st, reg] of setups) { const base = hm.simulate(Object.assign({ wx: 'clear' }, st), casts), row = { label, reg, clear: base.coinsPerHour, kinds: {} };
       let day = 0, wet = 0; const sh = out.shares[reg];
@@ -206,6 +207,7 @@ async function idleReport() {
       const t = I.trapsPerHour(reg, hrs, fits); out.traps.push({ reg, fit: fits ? fits[0] : 'none', hrs, ...t }); }
     for (const reg of ['lake', 'coast']) for (const sp of hm.TRAPS[reg].spots) { const e = I.trapExpect(reg, sp.id); out.traps.push({ reg, spot: sp.id, each: Math.round(e.value * 10) / 10, mix: e.mix }); }
     const stages = [['Willow Switch · lake open, noon', { rod: 'willow' }, 'lake'], ['Ash Caster · lake deep, dusk', { rod: 'ash', spot: 'deep', hour: 18.5 }, 'lake'], ['Brasscap Pro · lake, every spot', { rod: 'brasscap', spot: 'mix' }, 'lake'],
+      ['Brasscap Pro · river, every spot', { rod: 'brasscap', region: 'river', spot: 'mix' }, 'river'],
       ['Saltline · coast, every spot', { rod: 'saltline', region: 'coast', spot: 'mix' }, 'coast'], ['Deepwater · coast, every spot', { rod: 'deepwater', region: 'coast', spot: 'mix' }, 'coast']];
     const pc = (x, y) => Math.round(x / y * 1000) / 10;
     for (const [label, st, reg] of stages) { const a = hm.simulate(st, casts); const both = reg === 'coast', L = I.trapsPerHour('lake', 2), R = both ? I.trapsPerHour('coast', 2) : { coins: 0, fish: 0, glimmer: 0 };
@@ -253,9 +255,11 @@ for (const m of modes) {
 
 /** A whole run (the depth gate, step 24): a steady player starts with the Willow Switch and nothing else, fishes the
     spot that pays best at this hour with what they own (and one stretch in four somewhere else, as players wander),
+    in any water they can reach (the river once Ottilie's ferry is fixed, the coast once they have the boat),
     and buys things as the coins come in. Each stretch is 10 casts through the game's own simulator, at a real
     player's pace (half the simulator's), with the in-game clock turning a day every 24 minutes of play.
-    Shopping: rods and the boat first; anything over half the price of the next of those goes on everything else,
+    Wren's Twin Spool comes once every river fish is caught (but the weather's and the extras), and counts as a rod
+    as good as the sold rod with the same numbers. Shopping: rods, the ferry and the boat first; anything over half the price of the next of those goes on everything else,
     cheapest first (traps, fittings, tackle, boat parts, paint, tanks, decor, the fix-up list, vest pockets). Runes are etched
     with Glimmer as it comes in, cheapest first. Counted toward income: rods, spots and the hour, treasure, mastery,
     the boat's parts, the fix-up list and the trophy wall (each plaque the most valuable species caught, at its biggest,
@@ -267,17 +271,22 @@ async function careerReport() {
   await p.goto('file://' + page + '?nointro'); await p.waitForTimeout(500);
   const runs = +(opt.runs || 5), cap = +(opt.hours || 30) * 60;
   const res = await p.evaluate(({ runs, cap, player }) => {
-    const hm = window.__hm, REACH = { lake: { open: 0, reeds: 0, pads: .23, deep: .51, far: .8 }, coast: { open: 0, kelp: .19, rocks: .34, deep: .43, far: .8 } };
+    const hm = window.__hm, REACH = { lake: { open: 0, reeds: 0, pads: .23, deep: .51, far: .8 }, river: { open: 0, riffle: 0, leaves: .3, deep: .7, roots: .82 }, coast: { open: 0, kelp: .19, rocks: .34, deep: .43, far: .8 } };
+    // a quest rod ranks just above the sold rod it matches or beats on every number; sold rods rank by price
+    const rank = id => { const R = hm.RODS[id]; if (!R.quest) return R.price;
+      return 1 + Math.max(0, ...hm.ROD_ORDER.concat(hm.SEA_RODS).filter(o => ['reach', 'line', 'reel', 'luck', 'value'].every(k => hm.RODS[o][k] <= R[k])).map(o => hm.RODS[o].price)); };
     const bucket = h => h < 5 || h >= 20 ? 22 : h < 8 ? 6.5 : h < 17 ? 12 : 18.5, probe = {};
     const rate = (rod, region, spot, hour) => { const k = rod + region + spot + hour;
       return probe[k] ?? (probe[k] = hm.simulate({ rod, region, spot, hour, player, catches: 300 }, 400).coinsPerHour); };
     function career() {
-      const C = { coins: 0, glim: 0, min: 0, rods: ['willow'], boat: false, fish: {}, fix: [], parts: [], runes: [], have: {}, events: [] };
+      const C = { coins: 0, glim: 0, min: 0, rods: ['willow'], boat: false, ferry: false, fish: {}, fix: [], parts: [], runes: [], have: {}, events: [] };
       const ev = (key, label, kind) => C.events.push({ key, label, kind, min: C.min });
       const items = [], add = (key, label, price, kind, needs) => items.push({ key, label, price, kind, needs: needs || (() => true) });
       const lakeDone = () => hm.REGION_FISH.lake.every(id => hm.FISH[id].wx || hm.FISH[id].extra || C.fish[id]);
       hm.ROD_ORDER.slice(1).forEach((id, i) => add('rod:' + id, hm.RODS[id].name, hm.RODS[id].price, 'rod', () => C.rods.includes(hm.ROD_ORDER[i])));
       add('boat', 'The boat', hm.BOAT.price, 'rod', () => C.rods.includes('brasscap') || lakeDone());
+      add('ferry', 'Ottilie’s ferry', hm.RIVER.ferry.price, 'rod', () => hm.REGION_FISH.lake.filter(id => C.fish[id]).length >= hm.RIVER.ferry.species);
+      const riverDone = () => hm.REGION_FISH.river.every(id => hm.FISH[id].wx || hm.FISH[id].extra || C.fish[id]);
       hm.SEA_RODS.forEach((id, i) => add('rod:' + id, hm.RODS[id].name, hm.RODS[id].price, 'rod', () => C.boat && (i === 0 || C.rods.includes(hm.SEA_RODS[i - 1]))));
       const boat = () => C.boat;
       hm.TRAPS.lake.traps.forEach((t, i) => t.price && add('trap:lake' + i, t.name, t.price, 'idle'));
@@ -294,7 +303,7 @@ async function careerReport() {
       hm.POCKETS.costs.forEach((c, i) => add('pocket:' + (i + 2), 'Vest pocket ' + (i + 2), c, 'pocket', () => i === 0 || C.have['pocket:' + (i + 1)]));
       const runes = Object.keys(hm.ENCH).sort((a, b) => hm.ENCH[a].cost - hm.ENCH[b].cost);
       const buy = it => { C.coins -= it.price; C.have[it.key] = true; items.splice(items.indexOf(it), 1); ev(it.key, it.label, it.kind);
-        if (it.key.startsWith('rod:')) C.rods.push(it.key.slice(4)); if (it.key === 'boat') C.boat = true;
+        if (it.key.startsWith('rod:')) C.rods.push(it.key.slice(4)); if (it.key === 'boat') C.boat = true; if (it.key === 'ferry') C.ferry = true;
         if (it.key.startsWith('fix:')) C.fix.push(it.key.slice(4)); if (it.key.startsWith('part:')) C.parts.push(it.key.slice(5)); };
       let n = 0;
       while (C.min < cap && items.length) {
@@ -304,11 +313,12 @@ async function careerReport() {
           if (prog && C.coins >= prog.price) { buy(prog); again = true; continue; }
           const keep = prog ? prog.price * .5 : 0, rest = items.filter(it => it.kind !== 'rod' && it.needs()).sort((a, b) => a.price - b.price)[0];
           if (rest && C.coins - rest.price >= keep) { buy(rest); again = true; } }
-        while (runes.length && C.glim >= hm.ENCH[runes[0]].cost) { const id = runes.shift(); C.glim -= hm.ENCH[id].cost; C.runes.push(id); ev('rune:' + id, hm.ENCH[id].name, 'rune'); }
+        // runes as the Glimmer comes in, cheapest first; Wren's own once you've met her up the river
+        for (let i; (i = runes.findIndex(id => !hm.ENCH[id].need || C.ferry)) >= 0 && C.glim >= hm.ENCH[runes[i]].cost;) { const id = runes.splice(i, 1)[0]; C.glim -= hm.ENCH[id].cost; C.runes.push(id); ev('rune:' + id, hm.ENCH[id].name, 'rune'); }
         // fish: the best-paying spot this hour, or one stretch in four somewhere else
-        const hour = bucket((9 + C.min) % 24), regions = C.boat ? ['lake', 'coast'] : ['lake'];
-        // the best rod owned, in either water: the game lets sea rods fish the lake too
-        const best = C.rods.slice().sort((a, b) => hm.RODS[b].price - hm.RODS[a].price)[0];
+        const hour = bucket((9 + C.min) % 24), regions = ['lake'].concat(C.ferry ? ['river'] : [], C.boat ? ['coast'] : []);
+        // the best rod owned, in any water: the game lets sea rods fish the lake and the river too
+        const best = C.rods.slice().sort((a, b) => rank(b) - rank(a))[0];
         const opts = []; for (const reg of regions) { const rod = best; for (const sp in REACH[reg]) if (hm.RODS[rod].reach >= REACH[reg][sp]) opts.push({ rod, reg, sp }); }
         let pick; if (n++ % 4 === 3) pick = opts[Math.floor(Math.random() * opts.length)];
         else pick = opts.reduce((a, o) => rate(o.rod, o.reg, o.sp, hour) > rate(a.rod, a.reg, a.sp, hour) ? o : a);
@@ -320,6 +330,7 @@ async function careerReport() {
         C.coins += out.coins + out.treasure.coins; C.glim += out.glimmer; C.min += out.secs * 2 / 60;
         for (const id in out.species) { if (!C.fish[id]) ev('fish:' + id, hm.FISH[id].name, 'fish'); C.fish[id] = (C.fish[id] || 0) + out.species[id]; }
         if (!C.lake && lakeDone()) { C.lake = true; ev('lakeDone', 'Every lake fish', 'fish'); }
+        if (C.ferry && !C.rods.includes('twin') && riverDone()) { C.rods.push('twin'); ev('rod:twin', hm.RODS.twin.name, 'rod'); }
       }
       return { events: C.events, end: C.min, left: items.map(it => it.label) };
     }
@@ -334,7 +345,7 @@ async function careerReport() {
   const hm = m => (m = Math.round(m)) < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0');
   const rows = Object.entries(by).map(([key, x]) => ({ ...x, key, m: med(x.t), lo: Math.min(...x.t), hi: Math.max(...x.t), runs: x.t.length })).sort((a, b) => a.m - b.m);
   // --pace: the medians the pace log (game/pace.js) compares a real run with, as data/pace.js's table
-  if (opt.pace) { const keep = rows.filter(r => /^(rod|boat|part|fix|pocket|rune|fish)/.test(r.key) && r.runs * 2 > runs);
+  if (opt.pace) { const keep = rows.filter(r => /^(rod|boat|ferry|part|fix|pocket|rune|fish)/.test(r.key) && r.runs * 2 > runs);
     console.log('const PACE_SIM={' + keep.map(r => `'${r.key}':${Math.round(r.m)}`).join(', ') + '};'); return; }
   console.log(`\n${runs} runs from the first cast, ${opt.player || 'steady'} player at a real pace. Median time each thing happens (fastest to slowest run):\n`);
   console.log('| When | What | Kind | Range |\n| ---: | --- | --- | --- |');

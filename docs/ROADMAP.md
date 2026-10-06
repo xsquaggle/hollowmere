@@ -21,6 +21,7 @@ each build.
 | 22 | Story relics: the Wet Almanac's forecast, the Moon Jar, the Drowned Bell and the Cartographer's Pin, each found its own way; treasure maps in three pieces with a cache to dig; combo chips, with the Tuning Fork's wake on a ghost (build 23) |
 | 23 | Shack upgrades: one shack button opens the front room, with doors to the tank room and the kitchen; the trophy wall (3 plaques growing to 8, each species mounted is worth more when caught), the curio shelf and glass-front cabinet, the rod rack, and your uncle's fix-up list of seven jobs with the trapdoor still locked (build 24) |
 | 24 | The depth gate: rare and Legendary odds brought to the design doc's table, rods, the boat and the late jobs repriced so the lake and the coast take about 9 hours, a whole-run simulator and a builds report, and Playtest > Pace for the friend playtest (build 25) |
+| 25 | Rootwood River: Ottilie's ferry, a current that carries the float, seven new fish (the Clockfin as the hour turns, Old Gristle at dusk), Wren's bench (rune sockets and Homebody) and corkboard, the Twin Spool, and an otter after your bait (build 26) |
 
 ## Next
 
@@ -28,8 +29,7 @@ each build.
 
 - **13.** Friend playtest, and the bottom-bar regroup.
 - **24.** The depth gate's friend playtest (the balance pass shipped in build 25). Playtest > Pace sets their run beside the simulator's.
-- **25–32.** Phase C: new places and the story.
-  - Rootwood River.
+- **26–32.** Phase C: new places and the story (Rootwood River shipped in build 26).
   - Saltmarsh.
   - The rest of Gullrock Coast.
   - The Drowned Quarter.

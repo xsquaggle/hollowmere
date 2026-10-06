@@ -9,12 +9,14 @@ function startWaiting(){
   setState('waiting');
   if (echo) return;
   if (S.bob.spot==='reeds') S.wait.t/=modMul('reedBite',{spot:'reeds'});
+  S.wait.t*=twinWait();
   if (S.tut){ S.tut='wait'; S.wait.t=.8; coach('Nice cast! Now wait. A fish will swim over to your bobber.','2 of 4'); }
 }
 /** The quiet before a fish shows up: Playtest tuning and anything that brings a bite sooner (which also speeds
     the swim over and the nibbles: spawnApproach). */
 function biteWait(spot){ const c={spot}; return rand(.75,2.1)*modMul('wait',c)*modMul('bite',c); }
 function spawnApproach(){
+  if (!S.wait.echo) twinPick();   // with two floats out, the fish heads for either one
   const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.bow=atBowFoot(b.x,b.y);
   // the rare bites and the dry run count once a cast (as the simulator does); a fish that comes back after a spook is an ordinary one
   w.fish=S.tut?'perch':w.echo||(w.rolled?pickW(poolFor(b.spot,w.lucky)):rollFish(b.spot,w.lucky,{bow:w.bow, path:onMoonpath(b.x,b.y)})); w.rolled=true; const F=FISH[w.fish];
@@ -26,6 +28,7 @@ function spawnApproach(){
   w.phase='approach'; w.attract=1;
 }
 function updateWaiting(dt){
+  if (!riverWaiting(dt)) return;   // the river carries the float (game/river.js)
   const w=S.wait, b=S.bob;
   if (w.sh){ const sh=w.sh;
     if (sh.flee){ sh.x+=Math.cos(sh.ang)*170*dt; sh.y+=Math.sin(sh.ang)*85*dt; sh.alpha-=dt*1.6; if (sh.alpha<=0) w.sh=null; }
@@ -75,7 +78,7 @@ function triggerBite(){
   const w=S.wait, b=S.bob, F=FISH[w.fish];
   S.bite={t:0, win:F.window*modMul('hook',{fish:w.fish,spot:b.spot,lucky:w.lucky}), fish:w.fish};
   b.plunge=1; splash(b.x,b.y,9); ripple(b.x,b.y,34); sfx.bite(); buzz(30); pulse(.45);
-  toast('Tap!','big'); setState('bite');
+  toast('Tap!','big'); setState('bite'); twinBite();
   if (S.tut){ S.tut='bite'; coach('It’s biting! Tap anywhere on the screen now!','3 of 4', true); }
 }
 function updateBite(dt){
@@ -87,6 +90,7 @@ function updateBite(dt){
 }
 function hook(){
   if (S.bite.loot) return hookHaul();
+  if (S.bite.twin) twinStrike(S.tapX,S.tapY);
   const b=S.bite, F=FISH[b.fish], R=RAR[F.rarity];
   const perfect=b.t<=.3*modMul('perfect',{fish:b.fish,spot:S.bob.spot,lucky:!!(S.wait&&S.wait.lucky)});
   if (perfect){ save.stats.perfect++; toast('Perfect hook!','good'); } else toast('Hooked!','');
@@ -99,5 +103,5 @@ function hook(){
   else if (rk>=rarRank('legendary')){ S.darkT=.5; setTimeout(()=>toast(F.rarity==='exotic'?'Something strange…':'Something enormous…','gold'),350); }
   else if (rk>=rarRank('epic')) S.darkT=.3;
   else if (F.rarity==='rare') S.darkT=.18;
-  startReel(b.fish,perfect);
+  twinIn(); startReel(b.fish,perfect);
 }
