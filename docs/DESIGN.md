@@ -21,11 +21,11 @@ It's a personal game for the owner and friends: free, with no ads, purchases or 
 6. **Rarity:** most fish are Common to Legendary. Above them, Epic fish live in a few spots, and the Exotic and Mythic fish only bite under a sky that calls for them: the Prism Shiner where the rainbow comes down, the Moonwhale Calf on full-moon nights. Any fish below Mythic can come up mutated (Mossy, Glassy, Twin or Giant), worth more and a little Glimmer. Every tier from Epic up has its own moment on the hook, in the air and on the card, and a long run without a Legendary makes one likelier.
 7. **Story relics:** four artifacts the story hands you, never found loose or in a crate. Ottilie gives you the Wet Almanac (a forecast from the clock) once you've caught the lake's rain and fog fish; the Moon Jar waits on the moonpath on a full-moon night and keeps night catches' light for one daytime cast; the Drowned Bell lies in the deep pool, found in fog before dawn, and rings while a ghost fades; the Cartographer's Pin is in your first treasure map's cache and marks every map after. Treasure maps come up in three pieces and ring a stretch of water to dig. Each relic shows its combos as chips, "???" until you've seen one happen.
 8. **The shack:** your uncle's front room, one button on the bar, with doors to the tank room and the kitchen. Mount fish on the trophy wall (while a species is up, each one you catch is worth more, more again if the mount is your record), see your finds on the curio shelf, pick a rod off the rack, and work down his fix-up list: each job costs coins and does something (a dry roof and more plaques, a bigger keepnet, a lamp for night fish, a stove for longer meals, a cabinet, oak panels, a knock-through for bigger tanks). The trapdoor stays locked for now.
-9. **Go further:** reach new water (Stillwater Lake, then Rootwood River on Ottilie's ferry, then Gullrock Coast by boat) with new fish, people and secrets. Each water has a mechanic of its own: the river's current carries your float downstream, and holding the line swings it in. Up the river, Wren the apprentice enchanter cuts extra rune sockets, teaches Homebody (worth more the longer you stay in one water), pins her theories on a corkboard, and strings the Twin Spool, a two-float rod, for one of every river fish.
+9. **Go further:** reach new water (Stillwater Lake, then Rootwood River on Ottilie's ferry, the Saltmarsh in Wren's punt, and Gullrock Coast by boat) with new fish, people and secrets. Each water has a mechanic of its own: the river's current carries your float downstream, and holding the line swings it in; the marsh's tide turns about every six hours, baring mud banks (a cast on the mud goes splat) with tide pools on them at low water and flooding the flats at high water, biggest at the spring tides of the full and new moon. Up the river, Wren the apprentice enchanter cuts extra rune sockets, teaches Homebody (worth more the longer you stay in one water), pins her theories on a corkboard, and gives quests: show her a fish that glows and she poles you down to the marsh; catch her a marsh light (the Will-o'-Whiting) and she gives you the Lantern Rod; one of every river fish and she strings the Twin Spool, a two-float rod.
 
 Pacing follows the design doc: Legendaries about 1 cast in 80 (1 in 25 at the best spots and hours), rares 10 to 20%,
 each rod about 2.5 times the last, something new every 10 to 20 minutes early and every 30 to 45 later. With the lake,
-the river and the coast, a steady player owns everything in about 10 hours (`npm run sim -- --career`).
+the river, the marsh and the coast, a steady player owns everything in about 10 hours (`npm run sim -- --career`).
 
 Every bonus is a modifier in one pipeline (`src/game/mods.js`). The Bonuses page and the balance simulator read it,
 so nothing is balanced by guesswork: `npm run sim` reports the numbers.
@@ -33,7 +33,7 @@ so nothing is balanced by guesswork: `npm run sim` reports the numbers.
 ## Tone
 
 Warm, curious and a little uncanny: a naturalist's field journal come to life. Characters are kind and slightly
-odd. Ottilie runs the ferry and sells rods, Barnaby sells boats, Pell carries the mail, and Wren, up the river, enchants rods and keeps jars of light.
+odd. Ottilie runs the ferry and sells rods, Barnaby sells boats, Pell carries the mail, and Wren, up the river, enchants rods, keeps jars of light and is sure the marsh lights are fish.
 
 ## What it is not
 

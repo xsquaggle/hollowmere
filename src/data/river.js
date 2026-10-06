@@ -12,7 +12,9 @@
                   tin; tap it within tap seconds and it drops a pebble (Glimmer), otherwise it takes casts of bait.
    WREN.sockets   Glimmer to cut a rod's second and third socket at her bench (a rod has at most 3).
    WREN.hello     her first words; lines: what she says now and then; quest: what she asks for the Twin Spool.
-   WREN.notes     her corkboard, silly theories first: each is pinned once its `when` has happened (game/wren.js: noteOn).
+   WREN.notes     her corkboard, silly theories first: each is pinned once its `when` has happened (game/wren.js: noteOn):
+                  a fish caught, 'met' (you've met her), 'ghost' (any ghost fish), 'letter' (a drowned letter read) or
+                  'marshSeen' (you've been to Saltmarsh). Her marsh lines and quests are in data/marsh.js.
    TWIN           the Twin Spool's second float: spread (how far apart the floats land, a share of the screen's width
                   at the near water), wait (the quiet before a bite, times this with two baits in), both (the chance a
                   bite on one float comes with a bite on the other, when you pick which to strike). */
@@ -37,7 +39,12 @@ const WREN={
     {id:'ghosts', when:'ghost', text:'Ghost fish fade the way you forget a dream. Are they leaving, or are we?'},
     {id:'crusts', when:'gristle', text:'Old Gristle turns up at six for crusts. The mill stopped sixty years ago. Somebody still feeds it.'},
     {id:'letters', when:'letter', text:'Pell reads the drowned letters out loud. Like he’s expecting someone to answer.'},
-    {id:'calf', when:'calf', text:'The Calf’s mother is too big for the lake. So where does she go when she dives?'}
+    {id:'calf', when:'calf', text:'The Calf’s mother is too big for the lake. So where does she go when she dives?'},
+    {id:'tide', when:'marshSeen', text:'The marsh tide comes in a little later every day. So does the lake. Lakes shouldn’t have tides.'},
+    {id:'lights', when:'whiting', text:'The marsh lights ARE fish. I said so. Nobody listened. Now they have to.'},
+    {id:'bell', when:'bellmouth', text:'The Bellmouth rings in B flat. So did the clock-tower bell. I checked the old hymn book.'},
+    {id:'wick', when:'lampwick', text:'The street lamps went out the night of the flood. All that lamp oil went somewhere. The Lampwick Eel knows where.'},
+    {id:'reeve', when:'reeve', text:'Old Reeve swims the sea wall at every spring tide. Who told it the wall was leaking? And is it?'}
   ]
 };
 const TWIN={spread:.16, wait:.6, both:.18};

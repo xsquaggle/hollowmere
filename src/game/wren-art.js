@@ -1,10 +1,11 @@
 /* ---------- Wren on her boathouse ramp (game/wren.js) ---------- */
 /* Drawn like the other folk (game/folk.js): ink outlines, 3 to 4 values a shape, light from the upper left. She's young,
    in a rust apron over a mustard jumper, brass goggles pushed up into a mop of dark curls, and holds up one of her jars,
-   which glows. She shifts from foot to foot and peers into the jar now and then. */
-function drawWren(){
-  const o=wrenPos(), t=S.time, c=ctx, x=o.x, y=o.y, sway=Math.sin(t*1.3)*.8, peer=Math.max(0,Math.sin(t*.45))>.92?1:0;
-  c.fillStyle='rgba(20,12,8,.3)'; c.beginPath(); c.ellipse(x+1,y+10,16,3.6,0,0,Math.PI*2); c.fill();
+   which glows. She shifts from foot to foot and peers into the jar now and then. In the marsh she stands in her punt
+   (game/marsh-art.js: drawWrenPunt), raised by dy, its hull drawn over her boots. */
+function drawWren(dy){
+  const o=wrenPos(), t=S.time, c=ctx, x=o.x, y=o.y+(dy||0), sway=Math.sin(t*1.3)*.8, peer=Math.max(0,Math.sin(t*.45))>.92?1:0;
+  if (dy==null){ c.fillStyle='rgba(20,12,8,.3)'; c.beginPath(); c.ellipse(x+1,y+10,16,3.6,0,0,Math.PI*2); c.fill(); }
   c.save(); c.translate(x+sway*.3,y); c.lineJoin='round'; c.lineCap='round';
   // boots and legs
   c.strokeStyle=INK; c.lineWidth=4.8; c.beginPath(); c.moveTo(-4,-10); c.lineTo(-5,6); c.moveTo(4,-10); c.lineTo(5+sway*.4,6); c.stroke();

@@ -31,7 +31,7 @@ const MOON_JAR={fill:8, fullMoon:2};
 const COMBOS={
   wake:     {a:'tuningfork', with:'Ghost fish', live:true, eff:'A faded ghost fish leaves a glowing wake on the water.'},
   twinspool:{a:'hungryhook', with:'Twin Spool', eff:'It eats the fish you didn’t pick, and grows hungrier for it.'},
-  lantern:  {a:'moonjar', with:'Lantern Rod', eff:'Fish shadows show their rarity in the moonlight.'},
+  lantern:  {a:'moonjar', with:'Lantern Rod', live:true, eff:'In the Lantern Rod’s light, fish coming to the float are tinted by their rarity.'},
   tide:     {a:'almanac', with:'Tidecaller', eff:'The Tidecaller calls rain twice as often.'},
   tower:    {a:'bell', with:'The bell tower', eff:'Ring it in the Drowned Quarter, and the tower answers.'},
   lodestone:{a:'pin', with:'Lodestone Rod', eff:'Map caches pull toward your line.'}

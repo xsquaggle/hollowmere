@@ -60,4 +60,10 @@ window.__hm={ get save(){ return save; }, FISH, RODS, ROD_ORDER, SEA_RODS, QUEST
     travel:r=>travelTo(r), reg:()=>REG(), ask:()=>ferryAsk(), fix:()=>fixFerry(), homeDays:()=>homeDays(), homeMul:()=>homeMul(), otter:()=>RV.otter&&{phase:RV.otter.phase,x:RV.otter.x,y:RV.otter.y},
     otterTick:dt=>otterUpdate(dt), tapOtter:()=>tapOtter(), onOtter:(x,y)=>onOtter(x,y), sockets:r=>socketsOf(r), avail:id=>enchAvail(id), mods:()=>{ MODC.dirty=true; return modList(); },
     wren:{ open:t=>openWren(t), state:()=>wrenState(), pos:()=>wrenPos(), cut:r=>cutSocket(r), give:()=>giveTwin(), ready:()=>twinReady(), news:()=>wrenHasNews(), notes:()=>notesUp().map(N=>N.id), quest:()=>riverQuestFish() },
-    twin:{ on:()=>twinOn(), wait:()=>twinWait(), land:()=>{ twinLand(S.bob); return S.bob2&&{x:S.bob2.x,y:S.bob2.y}; }, bite:()=>twinBite(), strike:(x,y)=>twinStrike(x,y) } } };
+    twin:{ on:()=>twinOn(), wait:()=>twinWait(), land:()=>{ twinLand(S.bob); return S.bob2&&{x:S.bob2.x,y:S.bob2.y}; }, bite:()=>twinBite(), strike:(x,y)=>twinStrike(x,y) } },
+  // the Saltmarsh (step 26): the tide, the mud banks, Wren's two quests and the Lantern Rod
+  marsh:{ TIDE, BANKS, WREN_Q, MSH, MSA, tide:()=>Object.assign({},tideNow()), line:()=>tideLine(), mark:()=>tideMark(), until:low=>tideUntil(low),
+    G:()=>({deep:G.deep, banks:(G.banks||[]).map(B=>({id:B.id, x:B.x, y:B.y, rx:B.rx, ry:B.ry, salt:!!B.salt, s:bankS(B,tideNow().level), pans:B.pans.map(P=>Object.assign(panXY(B,P),{out:panOut(B,P,bankS(B,tideNow().level))}))})), shore:G.shore, near:G.near, hz:HZ, w:W, h:H}),
+    spot:(x,y)=>marshSpot(x,y), bank:(x,y)=>bankSpot(x,y), mud:(x,y)=>marshMud(x,y), travel:r=>travelTo(r), mudCast:(x,y)=>marshMudCast(x,y), wait:dt=>marshWaiting(dt||.3),
+    approach:(b,d)=>marshApproachFrom(b,d), update:dt=>marshUpdate(dt), mods:()=>{ MODC.dirty=true; return modList(); },
+    glowFish:()=>glowFish(), glowReady:()=>glowReady(), lightsReady:()=>lightsReady(), giveGlow:()=>giveGlow(), giveLantern:()=>giveLantern(), news:()=>questNews() } };

@@ -44,6 +44,8 @@ const STATS={
   reveal:   {name:'Rarity reveal', kind:'flag', hint:'Approaching fish flash their rarity color.'},
   sonar:    {name:'Sonar readout', kind:'flag', hint:'A readout names what’s coming before it bites.'},
   twin:     {name:'Two floats', kind:'flag', hint:'Each cast lands two floats. The first bite is yours, and when both bite at once, you pick.'},
+  lantern:  {name:'Lantern light', kind:'flag', when:{night:true}, hint:'After dark your rod’s lamp lights the water round the float, and fish show in it as they come.'},
+  bellmouth:{name:'The bell rings', kind:'flag', when:{region:'marsh'}, hint:'In the marsh rain, the Bellmouth comes up to the bell.'},
   noWashout:{name:'Swell-proof casts', kind:'flag', when:{region:'coast'}, hint:'Casts never wash out in a swell.'},
   autoTilt: {name:'Rod tracks the fish', kind:'flag', hint:'Your rod follows a mastered fish for you.'},
   mayorWakes:{name:'The Mayor wakes', kind:'flag', when:{region:'lake'}, hint:'Mayor Bartholomew bites at any hour, as he does at dawn.'},

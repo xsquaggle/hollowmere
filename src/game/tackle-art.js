@@ -129,6 +129,14 @@ function rigLayout(w,h){ const hx=w*.06, hy=h*.8, tx=w*.88, ty=h*.2, ang=Math.at
   const at=(k,d)=>{ const b=Math.sin(k*Math.PI*.9)*h*.035*k, x=hx+Math.cos(ang)*len*k, y=hy+Math.sin(ang)*len*k+b; return {x:x+ux*(d||0), y:y+uy*(d||0)}; };
   const reel=at(.17,h*.2);
   return {hx,hy,tx,ty,ang,len,at, reel, line:at(.58,h*.06), bait:{x:tx+w*.02, y:h*.7}}; }
+/** The Lantern Rod's little lamp, hung just under its tip, lit. */
+function rigLamp(c,tip,h,t){ const s=h/150, sw=REDUCED?0:Math.sin((t||0)*1.6)*.12; c.save(); c.translate(tip.x,tip.y); c.rotate(sw); c.scale(s,s);
+  c.strokeStyle=INK; c.lineWidth=1.2; c.beginPath(); c.moveTo(0,0); c.lineTo(0,8); c.stroke();
+  const g=c.createRadialGradient(0,17,0,0,17,16); g.addColorStop(0,'rgba(255,206,130,.55)'); g.addColorStop(1,'rgba(255,206,130,0)'); c.fillStyle=g; c.fillRect(-16,1,32,32);
+  c.fillStyle='#6A4A2E'; c.fillRect(-5,8,10,3); c.fillRect(-5,23,10,2.6);
+  c.fillStyle='#FFD98C'; c.fillRect(-4,11,8,12); c.fillStyle='#FFF6D6'; c.beginPath(); c.ellipse(0,18,1.6,3,0,0,Math.PI*2); c.fill();
+  c.strokeStyle=INK; c.lineWidth=1.4; c.strokeRect(-4.5,11,9,12); c.beginPath(); c.moveTo(0,11); c.lineTo(0,23); c.stroke();
+  c.restore(); }
 function drawRig(c,w,h,rod,rig,bait,t,fx){ const R=RODS[rod]||RODS.willow, L=rigLayout(w,h), at=L.at, ang=L.ang;
   c.save(); c.lineCap='round'; c.lineJoin='round';
   const swing=REDUCED?0:Math.sin((t||0)*1.3)*.06, tip=at(1), hook={x:L.bait.x+Math.sin(swing)*h*.3, y:L.bait.y-h*.06}, lc=LINE_COL[rig.line]||LINE_COL.cotton;
@@ -150,6 +158,7 @@ function drawRig(c,w,h,rod,rig,bait,t,fx){ const R=RODS[rod]||RODS.willow, L=rig
   for (const g of guides){ c.beginPath(); c.arc(g.eye.x,g.eye.y,g.r*.8,0,7); c.strokeStyle=INK; c.lineWidth=2.2; c.stroke(); c.strokeStyle='#C9CCD3'; c.lineWidth=1; c.stroke();
     c.strokeStyle=BRASS; c.lineWidth=h*.03; const b=g.base; c.beginPath(); c.moveTo(b.x-3*Math.cos(ang),b.y-3*Math.sin(ang)); c.lineTo(b.x+3*Math.cos(ang),b.y+3*Math.sin(ang)); c.stroke(); }
   c.beginPath(); c.arc(tip.x,tip.y,h*.014,0,7); c.fillStyle=BRASS; c.fill(); c.strokeStyle=INK; c.lineWidth=1.6; c.stroke();
+  if (rod==='lanternrod') rigLamp(c,tip,h,t);
   // the cork grip, its butt cap and the reel seat
   c.save(); c.translate(L.hx,L.hy); c.rotate(ang); const gl=L.len*.15, gh=h*.11;
   rrect(c,-gl*.1,-gh/2,gl,gh,gh*.45); c.fillStyle='#C9A577'; c.fill(); c.save(); c.clip(); c.fillStyle='rgba(120,80,40,.35)';

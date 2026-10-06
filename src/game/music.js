@@ -92,11 +92,11 @@ function ambStart(){ if (ambOn||!AC) return; ambOn=true;
   ambBed('rain','bandpass',2600,.35,.07,.25); ambBed('drum','lowpass',340,.5,.11,.3); }   // rain on the water, and on the roof and the boards
 let ambClock=0;
 function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{}, t=AC.currentTime; ambClock+=.08;
-  const X=wxLook(), wet=X.rain, fog=X.fog*(X.mist?0:1), out=sc.startsWith('lake')||sc.startsWith('coast')||sc.startsWith('river');   // the dawn mist stays quiet
+  const X=wxLook(), wet=X.rain, fog=X.fog*(X.mist?0:1), out=sc.startsWith('lake')||sc.startsWith('coast')||sc.startsWith('river')||sc.startsWith('marsh');   // the dawn mist stays quiet
   for (const k in AMBL){ let v=L[k]||0; if ((k==='surf'||k==='hiss') && v){ const ph=(ambClock%8.5)/8.5, w=ph<.4?Math.pow(ph/.4,1.6):Math.pow(1-(ph-.4)/.6,1.2); v*=k==='surf'?.35+.65*w:w*w; }
     if (k==='rain') v=wet*(out?.55:.12); if (k==='drum') v=wet*(out?.25:.5);
     AMBL[k].g.gain.setTargetAtTime(v*.5,t,k==='surf'||k==='hiss'?.25:1.2); }
-  const r=Math.random, tod=timeOfDay(), p=(rand(-1,1)), coast=sc.startsWith('coast'), river=sc.startsWith('river'), lake=sc.startsWith('lake')||sc==='intro'||sc==='banquet';
+  const r=Math.random, tod=timeOfDay(), p=(rand(-1,1)), coast=sc.startsWith('coast'), river=sc.startsWith('river'), marsh=sc.startsWith('marsh'), lake=sc.startsWith('lake')||sc==='intro'||sc==='banquet';
   // the weather (game/weather.js): birds keep their heads down in rain and fog, frogs love the rain, and fog brings a
   // foghorn off the coast and a bell somewhere under the lake
   const hush=1-.67*Math.max(wet,fog);
@@ -116,6 +116,15 @@ function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{},
   if (river && tod!=='day' && r()<.04) ambCricket(p);
   if (river && tod==='night' && r()<.002) ambOwl(p);
   if (coast && tod!=='day' && r()<.004) ambBuoy(p);
+  // the marsh: curlews by day, the Croaking Bass and a bittern's boom at dusk, insects and the marsh lights' faint
+  // chime after dark, and in fog a foghorn far off and the drowned church's bell
+  if (marsh && tod==='day' && r()<.006*hush) ambCurlew(p);
+  if (marsh && tod==='dusk' && r()<.014) ambFrog(p);
+  if (marsh && tod==='dusk' && r()<.0025) ambBittern(p*.6);
+  if (marsh && tod!=='day' && r()<.035) ambCricket(p);
+  if (marsh && tod==='night' && r()<.004) ambWisp(p);
+  if (marsh && fog>.5 && r()<.002*fog) ambFoghorn(p*.4);
+  if (marsh && fog>.5 && r()<.0016*fog) ambDeepBell(.5);
   if (sc==='aquarium' && r()<.45) ambBubble(p*.6);
   if (sc==='kitchen' && r()<.5) ambCrackle(p*.5);
 }
@@ -135,6 +144,9 @@ function ambWoodpecker(p){ const t=AC.currentTime+.05, n=10+Math.floor(rand(0,8)
   for (let i=0;i<n;i++){ ambOsc('triangle',f,f*.6,t+at,.025,.022*(1-i/n*.5),p); at+=.045+i*.0025; } }
 /** The waterwheel turning over: a low wooden creak, then a slosh. */
 function ambCreak(p){ const t=AC.currentTime+.05; ambOsc('sawtooth',95,70,t,.35,.012,p); ambOsc('triangle',190,140,t+.05,.3,.01,p); ambPatter(p); }
+function ambCurlew(p){ const t=AC.currentTime+.05; ambOsc('sine',1500,2300,t,.42,.028,p); for (let i=0;i<5;i++) ambOsc('sine',2300+i*40,2500+i*30,t+.5+i*.09,.07,.022,p); }
+function ambBittern(p){ const t=AC.currentTime+.05; for (let i=0;i<3;i++){ ambOsc('sine',150,105,t+.15+i*1.1,.6,.05,p); ambOsc('sine',75,60,t+.1+i*1.1,.25,.03,p); } }
+function ambWisp(p){ const t=AC.currentTime+.05, f=rand(2300,2800); ambOsc('sine',f,0,t,1.4,.008,p); ambOsc('sine',f*1.5,0,t+.12,1,.005,p); }
 function ambBuoy(p){ const t=AC.currentTime+.05; ambOsc('sine',330,0,t,3.5,.03,p); ambOsc('sine',330*2.76,0,t,1.2,.008,p); }
 function ambPatter(p){ const t=AC.currentTime+rand(0,.08), s=AC.createBufferSource(); s.buffer=noiseBuf; const f=AC.createBiquadFilter(); f.type='bandpass'; f.frequency.value=rand(2500,6000); f.Q.value=4;   // one drop on the boards
   const g=AC.createGain(); g.gain.setValueAtTime(rand(.015,.04),t); g.gain.exponentialRampToValueAtTime(.0005,t+.03); s.connect(f); f.connect(g); panNode(g,p).connect(AMB); s.start(t,rand(0,.5),.05); }

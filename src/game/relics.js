@@ -62,7 +62,10 @@ function addMapPiece(c){ const r=relicState(); if (!mapCan(c)) return r.map;
   r.map.n++; return r.map; }
 /** Where the map's cache lies on screen. Its depth and angle are kept rather than its pixels, so it stays put
     through a resize, and casting at that depth and angle always reaches it. */
-function mapXY(m){ const ty=lerp(G.near,HZ+26,Math.min(m.depth,Math.max(MAPS.depth[0],castReach()*.95))); return {x:clamp(W/2+Math.tan(m.th)*(G.player.y-ty)*.85,W*.1,W*.9), y:ty}; }
+function mapXY(m){ const ty=lerp(G.near,HZ+26,Math.min(m.depth,Math.max(MAPS.depth[0],castReach()*.95))), p={x:clamp(W/2+Math.tan(m.th)*(G.player.y-ty)*.85,W*.1,W*.9), y:ty};
+  // the marsh: never under the saltings, which only a spring tide covers, but in the water just off their edge
+  if (REG()==='marsh') for (const B of G.banks||[]) if (B.salt && Math.hypot((p.x-B.x)/B.rx,(p.y-B.y)/B.ry)<1.3) p.y=Math.max(p.y,B.y+B.ry*1.3);
+  return p; }
 /** 'pin' on the Cartographer's Pin's mark, 'ring' inside the whole map's ring, or null. */
 function mapAt(x,y){ const m=relicState().map; if (!m || m.n<MAPS.pieces || m.reg!==REG()) return null;
   const p=mapXY(m), k=sc(p.y), d=Math.hypot(x-p.x,(y-p.y)*2.2);
@@ -125,13 +128,18 @@ function almanacNote(k,at){ const F=WX_FISH[REG()]||{}, known=id=>(save.fish[id]
   if (k==='rain') return F.rain?(known(F.rain.fish)?FISH[F.rain.fish].name+' rising':'Rain fish rising'):'Bites come sooner';
   if (k==='fog') return F.fog?(known(F.fog.fish)?FISH[F.fog.fish].name+' about':'Fog fish about'):'Fish hide far out';
   if (k==='cloudy') return 'Grey and quiet'; return isNight(at%24)?'A clear night':'Gulls out by day'; }
+/** In the marsh, the next high and low water, and whether it's spring tides or neaps. */
+function almanacTide(){ if (REG()!=='marsh') return ''; const T=tideNow(), h=(((save.clock%24)+24)%24), at=u=>{ const t=h+u; return (t>=24?'tomorrow ':'')+clockText(t%24); };
+  const hi=['High water',tideUntil(false)], lo=['Low water',tideUntil(true)], [a,b]=hi[1]<lo[1]?[hi,lo]:[lo,hi];
+  return '<div class="al-moon al-tide"><span class="al-ico"><svg viewBox="0 0 16 16" aria-hidden="true">'+TIDE_SVG[tideMark()]+'</svg></span><div><b>'+a[0]+' '+at(a[1])+', '+b[0].toLowerCase()+' '+at(b[1])+'</b><span>'+
+    (T.spring?'Spring tides: the biggest there are, at the full moon and the new.':T.neap?'Neap tides: the water barely turns.':'The tides grow toward the full moon and the new.')+'</span></div></div>'; }
 function openAlmanac(){ const now=wxNow(), h=(((save.clock%24)+24)%24), rows=almanacRows(), m=almanacMoon(), pinned=!!wxState().force;
   const ico=(k,at)=>wxIconSVG(k+((isNight(at%24)||PERIOD(at%24)==='Evening')?'-n':'-d'));
   const when=at=>(at>=24?'Tomorrow ':'')+clockText(at%24);
   const row=(label,k,note,at,cls)=>'<li class="'+(cls||'')+'"><span class="al-ico">'+ico(k,at)+'</span><span class="al-t">'+label+'</span><b>'+WX[k].name+'</b><span class="al-n">'+note+'</span></li>';
   let html='<div class="panel-head"><div><h2>Wet Almanac</h2><p>'+REGION_NAME[REG()]+' · in pencil, in a careful hand</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
     '<div class="almanac"><ol class="al-rows">'+row('Now',now,almanacNote(now,h),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind,r.at),r.at)).join('')+'</ol>'+
-    '<div class="al-moon"><span class="al-ico">'+moonSVG(m.p)+'</span><div><b>'+(h>=5&&h<20?'Tonight: ':'')+m.name+'</b><span>'+(m.toFull===0?'Full moon tonight.':'Full moon in '+m.toFull+' night'+(m.toFull===1?'':'s')+'.')+'</span></div></div>'+
+    '<div class="al-moon"><span class="al-ico">'+moonSVG(m.p)+'</span><div><b>'+(h>=5&&h<20?'Tonight: ':'')+m.name+'</b><span>'+(m.toFull===0?'Full moon tonight.':'Full moon in '+m.toFull+' night'+(m.toFull===1?'':'s')+'.')+'</span></div></div>'+almanacTide()+
     '<p class="note al-line">'+wxLine()+'</p>'+(pinned?'<p class="note">The weather is pinned in Playtest, so the almanac reads it as staying.</p>':'')+'</div>';
   openSheet(html); $('closeS').addEventListener('click',closeSheet); noise(.35,{vol:.08,f:2400,to:1200,q:.7}); }
 

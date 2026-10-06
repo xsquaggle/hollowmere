@@ -1,5 +1,6 @@
 /* ---------- Personal aquarium ---------- */
-function tankOf(id){ return REGION_FISH.coast.includes(id)?'salt':'fresh'; }
+/** The tank a fish lives in: the salt tank for the coast's fish and the marsh's (brackish, but closer to the sea), fresh for the rest. */
+function tankOf(id){ return ['coast','marsh'].includes(regionOf(id))?'salt':'fresh'; }
 function tanks(){ save.tanks=save.tanks||{}; for (const k in TANKS){ const t=save.tanks[k]=save.tanks[k]||{lvl:0,fish:[],owned:k==='fresh'}; t.decor=t.decor||[]; if (typeof t.tips!=='number') t.tips=0; if (!t.tipT) t.tipT=Date.now(); } return save.tanks; }
 function tankCap(k){ return TANKS[k].caps[tanks()[k].lvl]; }
 function tankRoom(id){ if (FISH[id].noTank) return false; const k=tankOf(id), t=tanks()[k]; return t.owned && t.fish.length<tankCap(k); }
@@ -193,7 +194,7 @@ function aqTipsUI(){ const k=AQ.tank, tk=tanks()[k], btn=$('aqCollect'); if (!bt
   const r=$('aqRate'); if (r) r.textContent=tk.owned?('Visitors tip about '+tipRate(k).toFixed(1)+' coins a minute. The jar holds '+jarHours(k)+' hours of tips.'):''; }
 function aqUI(){
   const k=AQ.tank, T=TANKS[k], tk=tanks()[k], cap=tankCap(k), sets=TANK_SETS.filter(s=>s.tank===k), done=new Set(setsDone().map(s=>s.id));
-  $('aqTabs').innerHTML=Object.keys(TANKS).map(id=>{ const locked=id==='salt' && !save.boat; return '<button data-tank="'+id+'" class="'+(id===k?'on':'')+'"'+(locked?' disabled':'')+'>'+TANKS[id].name+(locked?' · needs a boat':'')+'</button>'; }).join('');
+  $('aqTabs').innerHTML=Object.keys(TANKS).map(id=>{ const locked=id==='salt' && !save.boat && !save.marsh; return '<button data-tank="'+id+'" class="'+(id===k?'on':'')+'"'+(locked?' disabled':'')+'>'+TANKS[id].name+(locked?' · needs a boat':'')+'</button>'; }).join('');
   $('aqActions').innerHTML=tk.owned?'<button class="btn" id="aqFeed">Feed</button><button class="btn" id="aqCollect">Collect tips</button><button class="btn" id="aqShopBtn">Shop ▾</button>'
     :'<button class="btn primary" id="aqBuy">Set up the saltwater tank · '+T.unlock.toLocaleString()+'</button>';
   $('aqSets').innerHTML=sets.map(s=>'<div class="aq-set'+(done.has(s.id)?' done':'')+'"><b>'+(done.has(s.id)?'✓ ':'')+s.name+'</b><span>'+s.need+'</span><em>'+s.bonus+'</em></div>').join('');
@@ -253,7 +254,7 @@ function openAquarium(tank){ ovOpen('aqua',()=>{ const c=$('aqCard'); if (c && !
   L.innerHTML='<div class="aq-stage"><canvas id="aqCanvas"></canvas><div class="aq-top"><div><h2>Your aquarium</h2><p id="aqCount"></p></div><button class="btn" id="aqClose" type="button">Close</button></div>'+
     '<div class="aq-tabs" id="aqTabs"></div><div class="aq-bottom"><button class="aq-peek" id="aqPeek" type="button">▾ Tank shop below</button><div class="row" id="aqActions"></div><div class="aq-sets" id="aqSets"></div></div><div class="aq-card" id="aqCard" hidden></div></div>'+
     '<div class="aq-shop" id="aqShop"></div>';
-  L.hidden=false; L.scrollTop=0; AQ.open=true; AQ.tank=tank||(REG()==='coast' && tanks().salt.owned?'salt':'fresh'); AQ.sel=null;
+  L.hidden=false; L.scrollTop=0; AQ.open=true; AQ.tank=tank||((REG()==='coast' || REG()==='marsh') && tanks().salt.owned?'salt':'fresh'); AQ.sel=null;
   AQ.cv=$('aqCanvas'); AQ.ctx=AQ.cv.getContext('2d'); AQ.sig=null; aqUI(); aqLayout(); aqBuild();
   // the buttons and set cards can change height (fonts arriving, a card's text wrapping), so the tank follows them
   if (window.ResizeObserver){ AQ.ro=new ResizeObserver(()=>{ if (AQ.open && aqRefit()) aqDraw(); }); AQ.ro.observe(L.querySelector('.aq-bottom')); AQ.ro.observe(L.querySelector('.aq-stage')); }

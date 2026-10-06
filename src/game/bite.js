@@ -20,7 +20,7 @@ function spawnApproach(){
   const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.bow=atBowFoot(b.x,b.y);
   // the rare bites and the dry run count once a cast (as the simulator does); a fish that comes back after a spook is an ordinary one
   w.fish=S.tut?'perch':w.echo||(w.rolled?pickW(poolFor(b.spot,w.lucky)):rollFish(b.spot,w.lucky,{bow:w.bow, path:onMoonpath(b.x,b.y)})); w.rolled=true; const F=FISH[w.fish];
-  const ang=rand(0,Math.PI*2), d=w.echo?rand(40,60):rand(85,150);
+  const d=w.echo?rand(40,60):rand(85,150), mA=REG()==='marsh'?marshApproachFrom(b,d):null, ang=mA!=null?mA:rand(0,Math.PI*2);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
   w.sh={x,y,ang:Math.atan2(b.y-y,b.x-x),alpha:0,flee:false};
   w.bm=S.tut?1:modMul('bite',{spot:b.spot,fish:w.fish,lucky:w.lucky});   // bait and the like: a quicker swim over and shorter nibbles
@@ -28,7 +28,7 @@ function spawnApproach(){
   w.phase='approach'; w.attract=1;
 }
 function updateWaiting(dt){
-  if (!riverWaiting(dt)) return;   // the river carries the float (game/river.js)
+  if (!riverWaiting(dt) || !marshWaiting(dt)) return;   // the river carries the float (game/river.js); the tide can strand it (game/marsh.js)
   const w=S.wait, b=S.bob;
   if (w.sh){ const sh=w.sh;
     if (sh.flee){ sh.x+=Math.cos(sh.ang)*170*dt; sh.y+=Math.sin(sh.ang)*85*dt; sh.alpha-=dt*1.6; if (sh.alpha<=0) w.sh=null; }

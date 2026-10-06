@@ -1,10 +1,14 @@
 /* ---------- Bite odds: which fish each spot offers, and the rod in hand ---------- */
 /** Each fish's weight in this spot's pool, here and now. */
 function poolFor(spot,lucky){
-  const h=save.clock, night=nightNow(), reg=REG(), coastal=reg==='coast', river=reg==='river', P=poolsOf(reg), w=Object.assign({},P[spot]||P.open);
-  // the water itself: who comes up at night, the Mayor's dawns, Old Gristle's six o'clock crusts
+  const h=save.clock, night=nightNow(), reg=REG(), coastal=reg==='coast', river=reg==='river', marsh=reg==='marsh', P=poolsOf(reg), w=Object.assign({},P[spot]||P.open);
+  // the water itself: who comes up at night, the Mayor's dawns, Old Gristle's six o'clock crusts, the Croaking Bass's dusk
+  // and Old Reeve's spring tides
   if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
   else if (river){ if (night){ if (w.barbel) w.barbel*=1.6; if (w.brook) w.brook*=.7; } }
+  else if (marsh){ if (night) for (const k in MARSH.night) if (w[k]) w[k]*=MARSH.night[k];
+    if (w.croaker && h>=MARSH.croak.from && h<MARSH.croak.to) w.croaker*=MARSH.croak.x;
+    if (w.reeve && tideNow().spring) w.reeve*=MARSH.reeve.x; }
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
   if (w.mayor && ((h>=5 && h<8) || modFlag('mayorWakes',{spot}))) w.mayor*=3;   // the Mayor's dawns, or the Mayor's Spectacles
   if (w.gar && h>=17 && h<21) w.gar*=1.8;                                        // the Steeple Gar's evenings
@@ -15,7 +19,7 @@ function poolFor(spot,lucky){
   const wx=wxNow(), dry=Object.assign({},w);
   for (const e of wxFishFor(reg,spot)) w[e.fish]=(w[e.fish]||0)+e.w;
   if (wx==='rain' && reg==='lake' && spot==='pads' && w.mossback) w.mossback*=2;
-  if (wx==='fog' && !night){ if (coastal){ if (w.kelpeel) w.kelpeel*=1.4; } else if (river){ if (w.barbel) w.barbel*=1.3; } else { const nl={deep:18,open:24,pads:10}[spot]||4; w.lantern=(w.lantern||0)+nl/4; } }
+  if (wx==='fog' && !night){ if (coastal){ if (w.kelpeel) w.kelpeel*=1.4; } else if (river){ if (w.barbel) w.barbel*=1.3; } else if (reg==='lake'){ const nl={deep:18,open:24,pads:10}[spot]||4; w.lantern=(w.lantern||0)+nl/4; } }
   { let top=-1, T0=0, T1=0, hi=0; for (const k in w){ if (w[k]!==dry[k]) top=Math.max(top,rarRank(FISH[k].rarity)); T1+=w[k]; T0+=dry[k]||0; }
     for (const k in dry) if (rarRank(FISH[k].rarity)>top) hi+=dry[k];
     if (top>=0 && hi>0 && T0>hi){ const x=(T1-hi)/(T0-hi); for (const k in dry) if (rarRank(FISH[k].rarity)>top) w[k]*=x; } }
@@ -29,12 +33,13 @@ function poolFor(spot,lucky){
 /* ---------- Which fish bites: the rarest first, then the spot's own fish ---------- */
 const RARE_ORDER=Object.keys(RARE_BITES).sort((a,b)=>rarRank(FISH[b].rarity)-rarRank(FISH[a].rarity));
 /** Whether one of the rare bites (RARE_BITES) takes this cast. `at` says where the bobber sits: at the rainbow's
-    foot (bow), on the moonpath (path). Each is checked at its own chance, rarest first, only where and when it can bite;
-    luck lifts it up to its rarity's cap. None of them can bite here and now: the spot's own fish, as always. */
+    foot (bow), on the moonpath (path). Each is checked at its own chance, rarest first, only where and when it can bite
+    (in its weather, with its flag on: the Drowned Bell in a pocket, the Lantern Rod lit); luck lifts it up to its
+    rarity's cap. None of them can bite here and now: the spot's own fish, as always. */
 function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
   for (const id of RARE_ORDER){ const B=RARE_BITES[id];
-    if (B.region!==reg || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
-    if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top))) continue;
+    if (!(Array.isArray(B.region)?B.region.includes(reg):B.region===reg) || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
+    if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top)) || (B.wx && wxNow()!==B.wx) || (B.flag && !modFlag(B.flag,{spot}))) continue;
     if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
   return null; }
 /** Whether the in-game clock is within `share` of an hour past the hour (the Clockfin's few minutes). */

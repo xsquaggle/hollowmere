@@ -1,11 +1,14 @@
 /* ---------- Regions ---------- */
-const REG = () => save.region==='coast' && save.boat ? 'coast' : save.region==='river' && save.ferry ? 'river' : 'lake';
-/** Whether you can get to a water: the lake always, the river once Ottilie's ferry runs, the coast once you have a boat. */
-const regionOpen = r => r==='lake' || (r==='river' && !!save.ferry) || (r==='coast' && !!save.boat);
-/** A spot's name in a water (the coast's deep water is the Dark trench, the river's the Millpool). */
+const REG = () => save.region==='coast' && save.boat ? 'coast' : save.region==='river' && save.ferry ? 'river' : save.region==='marsh' && save.marsh ? 'marsh' : 'lake';
+/** Whether you can get to a water: the lake always, the river once Ottilie's ferry runs, the coast once you have a boat,
+    the marsh once Wren's punt runs there (her first quest, game/wren.js). */
+const regionOpen = r => r==='lake' || (r==='river' && !!save.ferry) || (r==='coast' && !!save.boat) || (r==='marsh' && !!save.marsh);
+/** The waters in the order the journal and the HUD count them. */
+const WATERS=['lake','river','marsh','coast'];
+/** A spot's name in a water (the coast's deep water is the Dark trench, the river's the Millpool, the marsh's the Sluice pool). */
 function spotName(sp,reg){ reg=reg||REG(); return (SPOT_REG[reg]||{})[sp] || SPOT_NAME[sp]; }
 /** Each water's spots and their bite weights. */
-const POOLS_BY = {lake:POOLS, coast:POOLS_COAST, river:POOLS_RIVER};
+const POOLS_BY = {lake:POOLS, coast:POOLS_COAST, river:POOLS_RIVER, marsh:POOLS_MARSH};
 const poolsOf = reg => POOLS_BY[reg] || POOLS;
 /** The water a fish calls home: the first one it lives in. */
 const regionOf = id => Object.keys(REGION_FISH).find(r=>REGION_FISH[r].includes(id)) || 'lake';
@@ -28,6 +31,7 @@ function layoutRegion(){
       for (let i=0;i<n;i++){ const a=sr()*6.28, d=Math.sqrt(sr()); arr.push({ox:Math.cos(a)*d, oy:Math.sin(a)*d, len:.5+sr()*.7, ph:sr()*6.28, bulb:sr()<.5}); } return arr; });
     SC.bank={L:[],R:[]}; SC.tails=[];
   } else if (REG()==='river'){ layoutRiver();
+  } else if (REG()==='marsh'){ layoutMarsh();
   } else {
     G.deep={x:W*.64, y:HZ+(H-HZ)*.3, rx:W*.19, ry:(H-HZ)*.075};
     G.kelp=[]; G.stacks=[];

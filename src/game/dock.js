@@ -4,12 +4,18 @@
    for whatever's on the hook, the keepnet swaying on its line. Light comes from the upper left. */
 const WOOD={a:'#7A5D43', b:'#71543C', c:'#806248', grain:'rgba(52,34,22,.34)', light:'rgba(255,236,200,.16)', gap:'#2A1D15', beam:'#4A3628', beamL:'#5E4634',
   pile:'#5A4232', pileD:'#3E2D22', pileL:'#73573F', rope:'#C2A26A', ropeD:'#8E7444', moss:'#5F7A43', wet:'#2E2722'};
+/** The marsh's boardwalk: the same oak, weathered silver-grey, with lichen on it. */
+const WOOD_MARSH={a:'#8A8578', b:'#7D786B', c:'#948E80', grain:'rgba(40,36,30,.32)', light:'rgba(255,250,235,.14)', gap:'#2A2620', beam:'#4E4840', beamL:'#625B50',
+  pile:'#5E584E', pileD:'#433E36', pileL:'#787163', top:'#8E897C', rope:'#B8A57A', ropeD:'#857652', moss:'#6E7A4A', wet:'#2E2A24'};
+const dockWood = () => REG()==='marsh' ? WOOD_MARSH : WOOD;
 /** The dock's shape on this screen: its far end, the two edges, and where the piles stand. */
 function dockGeo(){ const cx=W/2, top=H-128, bw=78, bb=110; return {cx, top, bw, bb, lp:cx-bw-1, rp:cx+bw+1}; }
 /** Paints the boards, piles and coiled rope into SC.dock, once per screen size. */
 function buildDock(){ if (REG()==='coast'){ SC.dock=null; return; }
   const D=dockGeo(), {cx,top,bw,bb}=D, h=H-top+40, c=document.createElement('canvas'); c.width=Math.round(W*DPR); c.height=Math.round(h*DPR);
   const x=c.getContext('2d'); x.setTransform(DPR,0,0,DPR,0,-(top-40)*DPR); sseed=404;
+  // the marsh's boardwalk is older: silvered boards laid crooked, lichen on them, its piles leaning
+  const marsh=REG()==='marsh', WOOD=dockWood(), J=marsh?1.9:.7;
   // the deck's shadow on the water, and the side beams showing under the board ends
   x.fillStyle='rgba(8,20,26,.38)'; x.beginPath(); x.ellipse(cx,top+6,bw+8,9,0,0,Math.PI*2); x.fill();
   for (const s of [-1,1]){ x.fillStyle=WOOD.beam; x.beginPath(); x.moveTo(cx+s*bw,top); x.lineTo(cx+s*(bw+3),top+3); x.lineTo(cx+s*(bb+6),H); x.lineTo(cx+s*bb,H); x.closePath(); x.fill();
@@ -17,7 +23,7 @@ function buildDock(){ if (REG()==='coast'){ SC.dock=null; return; }
   // the boards, laid across the dock, narrower toward the far end
   const rows=9, e=t=>t*t*.55+t*.45;
   for (let i=0;i<rows;i++){ const y0=lerp(top,H,e(i/rows)), y1=lerp(top,H,e((i+1)/rows)), w0=lerp(bw,bb,(y0-top)/(H-top)), w1=lerp(bw,bb,(y1-top)/(H-top)), bh=y1-y0;
-    const jag=()=>sr()*1.4-.7, L0=cx-w0+jag(), R0=cx+w0+jag(), L1=cx-w1+jag(), R1=cx+w1+jag();
+    const jag=()=>sr()*J*2-J, L0=cx-w0+jag(), R0=cx+w0+jag(), L1=cx-w1+jag(), R1=cx+w1+jag();
     x.fillStyle=WOOD.gap; x.beginPath(); x.moveTo(cx-w0,y0); x.lineTo(cx+w0,y0); x.lineTo(cx+w1,y1); x.lineTo(cx-w1,y1); x.closePath(); x.fill();
     const board=()=>{ x.beginPath(); x.moveTo(L0,y0+.6); x.lineTo(R0,y0+.6); x.lineTo(R1,y1-1.1); x.lineTo(L1,y1-1.1); x.closePath(); };
     board(); x.fillStyle=[WOOD.a,WOOD.b,WOOD.c][Math.floor(sr()*3)]; x.fill();
@@ -28,6 +34,7 @@ function buildDock(){ if (REG()==='coast'){ SC.dock=null; return; }
       while (px<cx+w1+4){ const len=18+sr()*44, amp=sr()*1.2; x.beginPath(); x.moveTo(px,fy); x.bezierCurveTo(px+len*.3,fy-amp,px+len*.7,fy+amp,px+len,fy+(sr()-.5)); x.stroke(); px+=len+4+sr()*10; } }
     if (sr()<.55){ const kx=cx+(sr()*2-1)*w0*.7, ky=y0+bh*(.35+sr()*.3); x.strokeStyle='rgba(52,34,22,.5)'; x.lineWidth=.9; x.beginPath(); x.ellipse(kx,ky,2.6+sr()*1.6,bh*.18,0,0,Math.PI*2); x.stroke();
       x.fillStyle='rgba(52,34,22,.45)'; x.beginPath(); x.ellipse(kx,ky,1.1,bh*.07,0,0,Math.PI*2); x.fill(); }
+    if (marsh) for (let l=0;l<3;l++){ const lx=cx+(sr()*2-1)*w0*.85, ly=y0+bh*(.25+sr()*.5); x.fillStyle=sr()<.5?'rgba(196,204,140,.55)':'rgba(222,214,170,.5)'; x.beginPath(); x.ellipse(lx,ly,2+sr()*3,bh*.16,0,0,Math.PI*2); x.fill(); }
     // light along the top of each board, and its shadow edge
     x.fillStyle=WOOD.light; x.fillRect(cx-w1,y0+.6,w1*2,Math.max(1,bh*.14));
     x.fillStyle='rgba(20,12,8,.18)'; x.fillRect(cx-w1,y1-1.1-bh*.14,w1*2,bh*.14);
@@ -42,34 +49,34 @@ function buildDock(){ if (REG()==='coast'){ SC.dock=null; return; }
   x.save(); x.beginPath(); x.moveTo(cx-bw*.3,top+2); x.lineTo(cx+bw*.3,top+2); x.lineTo(cx+bb*.4,H); x.lineTo(cx-bb*.4,H); x.closePath(); x.fillStyle='rgba(255,238,205,.06)'; x.fill(); x.restore();
   x.strokeStyle=INK; x.lineWidth=2; x.beginPath(); x.moveTo(cx-bw,top); x.lineTo(cx+bw,top); x.moveTo(cx-bw,top); x.lineTo(cx-bb,H); x.moveTo(cx+bw,top); x.lineTo(cx+bb,H); x.stroke();
   // the two piles at the far end, wrapped in rope, wet and mossy where they meet the water
-  for (const px of [D.lp,D.rp]) dockPile(x,px,top);
+  for (const px of [D.lp,D.rp]){ if (marsh){ x.save(); x.translate(px,top+12); x.rotate(px<cx?-.07:.05); x.translate(-px,-(top+12)); } dockPile(x,px,top,WOOD); if (marsh) x.restore(); }
   // a coil of rope by the left pile
-  ropeCoil(x,cx-58,top+16,9);
+  ropeCoil(x,cx-58,top+16,9,WOOD);
   SC.dock={c, y:top-40, h, key:dockKey()}; }
-const dockKey = () => W+'x'+H+'@'+DPR;
-function dockPile(x,px,top){ const w=9.6, y0=top-25, y1=top+12;
-  x.fillStyle=WOOD.pile; x.fillRect(px-w/2,y0,w,y1-y0);
-  x.fillStyle=WOOD.pileD; x.fillRect(px+w*.12,y0,w*.38,y1-y0);
-  x.fillStyle=WOOD.pileL; x.fillRect(px-w/2+1,y0,w*.2,y1-y0);
+const dockKey = () => W+'x'+H+'@'+DPR+REG();
+function dockPile(x,px,top,P){ P=P||WOOD; const w=9.6, y0=top-25, y1=top+12;
+  x.fillStyle=P.pile; x.fillRect(px-w/2,y0,w,y1-y0);
+  x.fillStyle=P.pileD; x.fillRect(px+w*.12,y0,w*.38,y1-y0);
+  x.fillStyle=P.pileL; x.fillRect(px-w/2+1,y0,w*.2,y1-y0);
   x.strokeStyle='rgba(30,20,14,.4)'; x.lineWidth=.7; for (const f of [-.18,.02,.3]){ x.beginPath(); x.moveTo(px+f*w,y0+3); x.lineTo(px+f*w+.4,y1-2); x.stroke(); }
   // wet below the deck line, with moss on the shady side
-  x.fillStyle=WOOD.wet; x.globalAlpha=.75; x.fillRect(px-w/2,top+3,w,y1-top-3); x.globalAlpha=1;
-  x.fillStyle=WOOD.moss; x.beginPath(); x.moveTo(px-w/2,y1-1); x.quadraticCurveTo(px-w*.3,y1-4.5,px-w*.05,y1-3); x.quadraticCurveTo(px+w*.2,y1-5.5,px+w/2,y1-2.5); x.lineTo(px+w/2,y1); x.lineTo(px-w/2,y1); x.closePath(); x.fill();
+  x.fillStyle=P.wet; x.globalAlpha=.75; x.fillRect(px-w/2,top+3,w,y1-top-3); x.globalAlpha=1;
+  x.fillStyle=P.moss; x.beginPath(); x.moveTo(px-w/2,y1-1); x.quadraticCurveTo(px-w*.3,y1-4.5,px-w*.05,y1-3); x.quadraticCurveTo(px+w*.2,y1-5.5,px+w/2,y1-2.5); x.lineTo(px+w/2,y1); x.lineTo(px-w/2,y1); x.closePath(); x.fill();
   x.fillStyle='rgba(120,160,90,.6)'; for (const f of [-.25,.15]){ x.beginPath(); x.arc(px+f*w,y1-3.2,.8,0,Math.PI*2); x.fill(); }
   x.strokeStyle=INK; x.lineWidth=1.3; x.strokeRect(px-w/2,y0,w,y1-y0);
   // the cut top: end grain in rings
-  x.fillStyle='#8A6A4C'; x.beginPath(); x.ellipse(px,y0,w/2,2.4,0,0,Math.PI*2); x.fill(); x.stroke();
+  x.fillStyle=P.top||'#8A6A4C'; x.beginPath(); x.ellipse(px,y0,w/2,2.4,0,0,Math.PI*2); x.fill(); x.stroke();
   x.strokeStyle='rgba(60,40,26,.5)'; x.lineWidth=.6; x.beginPath(); x.ellipse(px,y0,w*.3,1.4,0,0,Math.PI*2); x.stroke(); x.beginPath(); x.ellipse(px,y0,w*.12,.6,0,0,Math.PI*2); x.stroke();
   // rope wrapped three times, with its twist showing
   for (let i=0;i<3;i++){ const ry=top-13+i*2.6; x.strokeStyle=INK; x.lineWidth=2.8; x.beginPath(); x.moveTo(px-w/2-.6,ry+1.3); x.quadraticCurveTo(px,ry-.6,px+w/2+.6,ry+1.1); x.stroke();
-    x.strokeStyle=WOOD.rope; x.lineWidth=1.8; x.stroke();
-    x.strokeStyle=WOOD.ropeD; x.lineWidth=.7; for (let k=-3;k<=3;k++){ const tx=px+k*1.3; x.beginPath(); x.moveTo(tx-.5,ry-.1+Math.abs(k)*.08); x.lineTo(tx+.5,ry+1.7+Math.abs(k)*.08); x.stroke(); } } }
+    x.strokeStyle=P.rope; x.lineWidth=1.8; x.stroke();
+    x.strokeStyle=P.ropeD; x.lineWidth=.7; for (let k=-3;k<=3;k++){ const tx=px+k*1.3; x.beginPath(); x.moveTo(tx-.5,ry-.1+Math.abs(k)*.08); x.lineTo(tx+.5,ry+1.7+Math.abs(k)*.08); x.stroke(); } } }
 /** A flat coil of rope, three turns and a loose end. */
-function ropeCoil(x,cx,cy,r){
+function ropeCoil(x,cx,cy,r,P){ P=P||WOOD;
   for (let i=0;i<3;i++){ const rr=r-i*2.6; x.strokeStyle=INK; x.lineWidth=3.2; x.beginPath(); x.ellipse(cx,cy,rr,rr*.42,0,0,Math.PI*2); x.stroke();
-    x.strokeStyle=WOOD.rope; x.lineWidth=2.1; x.stroke();
-    x.strokeStyle=WOOD.ropeD; x.lineWidth=.6; for (let a=0;a<Math.PI*2;a+=.5){ const px=cx+Math.cos(a)*rr, py=cy+Math.sin(a)*rr*.42; x.beginPath(); x.moveTo(px-.6,py-.6); x.lineTo(px+.6,py+.6); x.stroke(); } }
-  x.strokeStyle=INK; x.lineWidth=3.2; x.beginPath(); x.moveTo(cx+r,cy); x.quadraticCurveTo(cx+r+6,cy+3,cx+r+4,cy+8); x.stroke(); x.strokeStyle=WOOD.rope; x.lineWidth=2.1; x.stroke();
+    x.strokeStyle=P.rope; x.lineWidth=2.1; x.stroke();
+    x.strokeStyle=P.ropeD; x.lineWidth=.6; for (let a=0;a<Math.PI*2;a+=.5){ const px=cx+Math.cos(a)*rr, py=cy+Math.sin(a)*rr*.42; x.beginPath(); x.moveTo(px-.6,py-.6); x.lineTo(px+.6,py+.6); x.stroke(); } }
+  x.strokeStyle=INK; x.lineWidth=3.2; x.beginPath(); x.moveTo(cx+r,cy); x.quadraticCurveTo(cx+r+6,cy+3,cx+r+4,cy+8); x.stroke(); x.strokeStyle=P.rope; x.lineWidth=2.1; x.stroke();
   x.fillStyle='rgba(255,240,210,.18)'; x.beginPath(); x.ellipse(cx-r*.4,cy-r*.2,r*.4,r*.12,0,0,Math.PI*2); x.fill(); }
 
 /* ---------- live parts ---------- */
@@ -86,10 +93,10 @@ function drawDock(){
   drawPail(cx+48,top+47);
   drawBaitOnDock(cx+30,top+56);
   drawTrapProp();
-  const lake=REG()==='lake';   // at the river it's Ottilie's ferry landing: Grey stays home, and Wren is on her boathouse ramp
+  const lake=REG()==='lake';   // at the river it's Ottilie's ferry landing: Grey stays home, and Wren is on her boathouse ramp; in the marsh, in her punt
   if (lake && !S.grey) drawHeron(D.rp,top-25);   // unless he's off guarding a trap (game/trap-scene.js)
   drawKeepnet();
-  if (lake) drawOttilie(); else { drawWren(); drawOtterThief(); }
+  if (lake) drawOttilie(); else if (REG()==='marsh') drawWrenPunt(); else { drawWren(); drawOtterThief(); }
   drawDockLantern(D.lp,top);   // in front of Ottilie's punt: the pile stands nearer than her boat
   drawBarnaby(); }
 /** A painted wooden tackle box, lid ajar, a lure hanging over the edge. */

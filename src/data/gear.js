@@ -3,7 +3,7 @@
               snag (chance the reeds catch the line); reedBoost (reed fish bite this much sooner); color; where; perk;
               sea:true for Tacklegram rods; mods, the perk as modifiers (see data/stats.js and game/mods.js);
               ench, how many enchantment sockets it has (1 to 3: data/enchant.js).
-   quest:true for a rod someone gives you rather than sells (the Twin Spool is Wren's).
+   quest:true for a rod someone gives you rather than sells (the Twin Spool and the Lantern Rod are Wren's).
    ROD_ORDER  Ottilie's shop ladder (each rod about 2.5 times the last, set by the depth gate's whole-run report).  SEA_RODS  the Tacklegram ladder.  PARTS (with their mods), PAINTS  boat upgrades and colors
               (a paint with crate: only comes in loot crates; the rest are sold on Tacklegram).
    A modifier is {stat, v, when?, omen?}: stat names an entry in STATS; when limits it to a region, spot, time
@@ -22,6 +22,9 @@ const RODS = {
               perk:'Perfect-hook window 50% wider.', mods:[{stat:'perfect', v:1.5}]},
   twin:      {name:'Twin Spool', price:0, quest:true, ench:2, reach:1, line:1.4, reel:1.25, luck:.35, value:1.25, snag:0, reedBoost:1.3, color:'#6E8F5A', where:'The horizon',
               blurb:'Wren’s work: two spools on one reel, wound with something that hums.', perk:'Casts two floats. The first fish to bite is yours, and when both bite at once, you pick.', mods:[{stat:'twin'}]},
+  lanternrod:{name:'Lantern Rod', price:0, quest:true, ench:2, reach:1, line:1.4, reel:1.25, luck:.35, value:1.25, snag:0, reedBoost:1.3, color:'#A8743E', where:'The horizon',
+              blurb:'Wren’s work: a little lamp hung at the tip, lit from one of her jars.', perk:'Lights the water at night: fish show in its light as they come, the perfect-hook window is 50% wider, and night fish bite 25% more often.',
+              mods:[{stat:'lantern'}, {stat:'night', v:1.25}, {stat:'perfect', v:1.5, when:{night:true}}]},
   saltline:  {name:'Saltline Rod', price:5000, ench:3, reach:1, line:1.6, reel:1.3, luck:.45, value:1.4, snag:0, reedBoost:1.3, color:'#3E6E8A', where:'Open water', sea:true,
               blurb:'Braided salt-cured line on a blue fiberglass blank.', perk:'Swells hit your line half as hard.', mods:[{stat:'swell', v:.5}]},
   gale:      {name:'Gale Rod', price:11000, ench:3, reach:1, line:1.8, reel:1.4, luck:.6, value:1.55, snag:0, reedBoost:1.3, color:'#CFC6B2', where:'Open water', sea:true,
@@ -34,7 +37,7 @@ const RODS = {
 const ROD_ORDER=['willow','reedcutter','ash','heronwood','brasscap'];
 const SEA_RODS=['saltline','gale','deepwater'];
 /* QUEST_RODS  rods from people, not shops; ALL_RODS  every rod in the order the bag, the rack and Playtest list them. */
-const QUEST_RODS=['twin'];
+const QUEST_RODS=['twin','lanternrod'];
 const ALL_RODS=[...ROD_ORDER,...QUEST_RODS,...SEA_RODS];
 /* BOAT  Barnaby's skiff: what it costs. */
 const BOAT={price:3000};

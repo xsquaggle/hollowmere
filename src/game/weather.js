@@ -9,7 +9,7 @@
    Playtest and the balance simulator can pin the weather with save.wx.force. Everything here reads only the save, so
    the simulator's stand-in save has weather of its own (see game/mods.js). */
 var WXM={save:null};                        // the last answer, while nothing it depends on has changed
-const WX_REGN={lake:1, coast:2, river:3};
+const WX_REGN={lake:1, coast:2, river:3, marsh:4};
 /** The save's weather state, tidied on first read: a seed for the sky, a pinned kind (Playtest), tips already shown. */
 function wxState(){ let w=save.wx; if (!w || typeof w!=='object' || Array.isArray(w)) w=save.wx={};
   if (!Number.isInteger(w.seed) || w.seed<1) w.seed=1+Math.floor(Math.random()*2147483646);
@@ -36,7 +36,7 @@ function wxAt(reg,B,seed){ seed=seed||wxState().seed; return wxRoll(reg,wxStart(
     a rainbow, each 0 to 1). Cached until the save, the clock, the region or a pinned kind changes. */
 function wxInfo(){
   const w=wxState(), M=WXM;
-  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.ferry===save.ferry && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
+  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.ferry===save.ferry && M.marsh===save.marsh && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
   const reg=REG(), h=(((save.clock%24)+24)%24), into=h%WX_SPELL.hours; let from, to, t;
   if (w.force){ from=to=w.force; t=1; }
   else if (!save.tutorialDone){ from=to='clear'; t=1; }
@@ -48,7 +48,7 @@ function wxInfo(){
   // a rainbow, by day, in the hour or two after rain gives way
   if (from==='rain' && to!=='rain' && !w.force && h>=7 && h<18.5) v.bow=clamp((t-.5)/.4,0,1)*clamp((2.4-into)/.8,0,1);
   if (w.bow && !isNight(h)) v.bow=1;                                   // Playtest: a rainbow now
-  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,ferry:save.ferry,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
+  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,ferry:save.ferry,marsh:save.marsh,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
   return v; }
 /** The weather the fishing uses here and now: 'clear', 'cloudy', 'rain' or 'fog'. */
 const wxNow = () => wxInfo().kind;
@@ -83,8 +83,9 @@ function wxFishFor(reg,spot){ const out=[], F=WX_FISH[reg]; if (!F) return out; 
   for (const k in F){ const E=F[k], w=E.pools[spot]; if (!w) continue;
     const share=kind===k?1:(WX_SOME[k]||{})[kind] || (mist && (WX_SOME[k]||{}).mist) || 0; if (share>0) out.push({fish:E.fish, w:w*share}); }
   return out; }
-/** One line for the clock tap: what the weather is doing to the fishing here. */
-function wxLine(){ const k=wxNow(), reg=REG(), F=WX_FISH[reg]||{}, known=id=>(save.fish[id]||{}).caught>0, nm=id=>known(id)?'the '+FISH[id].name+' is':'something new is';
+/** One line for the clock tap: what the weather is doing to the fishing here, and in the marsh, the tide (game/marsh.js). */
+function wxLine(){ return wxSky()+(REG()==='marsh'?' '+tideLine():''); }
+function wxSky(){ const k=wxNow(), reg=REG(), F=WX_FISH[reg]||{}, known=id=>(save.fish[id]||{}).caught>0, nm=id=>known(id)?'the '+FISH[id].name+' is':'something new is';
   const where=' at '+REGION_NAME[reg];
   if (bowFoot()) return 'A rainbow'+where+'. Where it comes down on the water, catches come up mutated twice as often.';
   if (isNight(save.clock) && reg==='lake' && moonpathOn()) return 'A full moon over the lake. The moonpath lies across the deep pool tonight.';
@@ -111,7 +112,7 @@ function wxTurned(was,k){
       :'Fog hides fish in the far water until they reach your bobber. Fog fish come up'+(REG()==='lake'?', and Lantern Carp rise by day.':'.'),8); }
 }
 /** The clock chip: the time, a small mark for the weather (with the sun or moon beside it), and its spoken label. */
-function wxIcon(){ const k=wxNow(), night=isNight(save.clock)||PERIOD(save.clock)==='Evening'; return k+(night?'-n':'-d'); }
+function wxIcon(){ const k=wxNow(), night=isNight(save.clock)||PERIOD(save.clock)==='Evening'; return k+(night?'-n':'-d')+(REG()==='marsh'?'-'+tideMark():''); }
 const WX_SVG={
   sun:'<circle cx="8" cy="8" r="3.3" fill="#E8C77E" stroke="#2B2A33" stroke-width=".9"/><path d="M8 1.4v1.8M8 12.8v1.8M1.4 8h1.8M12.8 8h1.8M3.3 3.3l1.3 1.3M11.4 11.4l1.3 1.3M3.3 12.7l1.3-1.3M11.4 4.6l1.3-1.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>',
   moon:'<path d="M10.6 2.2a6 6 0 1 0 3.2 9.6A5 5 0 0 1 10.6 2.2Z" fill="#E9E2CC" stroke="#2B2A33" stroke-width=".9"/>',
@@ -125,6 +126,13 @@ function wxIconSVG(key){ const [k,dn]=key.split('-'), n=dn==='n', S2=WX_SVG;
   const body=k==='clear'?(n?S2.moon:S2.sun):k==='cloudy'?(n?S2.moonS:S2.sunS)+S2.cloud:k==='rain'?S2.rainCloud:(n?S2.moonS:S2.sunS)+S2.fog;
   return '<svg viewBox="0 0 16 16" aria-hidden="true">'+body+'</svg>'; }
 /** Puts the time and the weather mark in the clock chip (the mark only when it changes). */
-function setClock(text){ const ico=$('wxIco'), key=wxIcon();
+/** The tide's mark beside the clock in the marsh: a wave with the way it's going, or flat at slack water. */
+const TIDE_SVG={in:'<path d="M3 13.6h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8 11V3.4M5 6.2 8 3.2l3 3" fill="none" stroke="#9CC6E6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  out:'<path d="M3 13.6h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8 3v7.6M5 7.8l3 3 3-3" fill="none" stroke="#C9A884" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  high:'<path d="M2 6.6c2-1.4 4-1.4 6 0s4 1.4 6 0" fill="none" stroke="#9CC6E6" stroke-width="1.6" stroke-linecap="round"/><path d="M3 13.6h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>',
+  low:'<path d="M2 12c2-1.4 4-1.4 6 0s4 1.4 6 0" fill="none" stroke="#C9A884" stroke-width="1.6" stroke-linecap="round"/><path d="M3 3.4h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".5"/>'};
+const TIDE_SAY={in:'the tide coming in', out:'the tide going out', high:'high water', low:'low water'};
+function setClock(text){ const ico=$('wxIco'), key=wxIcon(), tk=REG()==='marsh'?tideMark():'', ti=$('tideIco');
   if (ico && ico.dataset.k!==key){ ico.dataset.k=key; ico.innerHTML=wxIconSVG(key); }
-  $('clockT').textContent=text; $('clock').setAttribute('aria-label',clockText(save.clock)+', '+WX[wxNow()].name.toLowerCase()); }
+  if (ti && ti.dataset.k!==tk){ const was=ti.hidden; ti.dataset.k=tk; ti.hidden=!tk; ti.innerHTML=tk?'<svg viewBox="0 0 16 16" aria-hidden="true">'+TIDE_SVG[tk]+'</svg>':''; if (was!==ti.hidden) fitHud(); }
+  $('clockT').textContent=text; $('clock').setAttribute('aria-label',clockText(save.clock)+', '+WX[wxNow()].name.toLowerCase()+(tk?', '+TIDE_SAY[tk]:'')); }

@@ -10,12 +10,16 @@ const MOODS={
   river_day: {bpm:88, beats:4, prog:[[50,'maj'],[47,'m7'],[43,'maj7'],[45,'sus']], scale:[62,64,66,69,71,74,76,78], arp:.62, mel:.3, pad:.018, inst:'pluck', bass:1, whistle:1},
   river_dusk:{bpm:70, beats:4, prog:[[47,'m7'],[43,'maj7'],[50,'maj'],[45,'sus']], scale:[59,62,64,66,69,71,74], arp:.45, mel:.28, pad:.03, inst:'pluck', bass:1, motif:1},
   river_night:{bpm:56,beats:4, prog:[[47,'m9'],[43,'maj7'],[38,'maj7'],[45,'sus']], scale:[59,62,64,66,69,71,74], arp:.24, mel:.3, pad:.04, inst:'bell', motif:1},
+  marsh_day: {bpm:70, beats:4, prog:[[45,'m9'],[43,'six'],[41,'maj7'],[40,'sus']], scale:[57,60,62,64,67,69,72,74], arp:.38, mel:.24, pad:.036, inst:'pluck', whistle:1},
+  marsh_dusk:{bpm:62, beats:4, prog:[[43,'m7'],[46,'maj7'],[41,'maj9'],[45,'sus']], scale:[55,58,60,62,65,67,70], arp:.3, mel:.24, pad:.042, inst:'pluck', motif:1},
+  marsh_night:{bpm:52,beats:4, prog:[[41,'m9'],[44,'maj7'],[39,'maj7'],[43,'sus']], scale:[53,56,58,60,63,65,68], arp:.18, mel:.28, pad:.048, inst:'bell', motif:1},
   kitchen:   {bpm:96, beats:4, prog:[[41,'maj7'],[38,'m7'],[46,'maj7'],[48,'dom']], scale:[65,67,69,72,74,77], arp:.6, swing:.17, mel:.2, pad:.02, inst:'pluck', bass:1, whistle:1},
   aquarium:  {bpm:60, beats:4, prog:[[48,'maj9'],[45,'m9'],[41,'maj9'],[43,'sus']], scale:[72,74,76,79,81,84], arp:.32, mel:.2, pad:.034, inst:'bell'},
   banquet:   {bpm:126,beats:3, prog:[[48,'maj'],[41,'maj'],[43,'dom'],[48,'maj']], scale:[72,74,76,77,79,81,84], waltz:1, mel:.85, pad:0, inst:'pluck', accordion:1, bass:1},
   intro:     {bpm:60, beats:4, prog:[[50,'m9']], scale:[], silent:1}
 };
-// the Hollowmere motif, which the lake (and the river) hums at dusk and at night
+// the Hollowmere motif, which the lake (and the river and the marsh) hums at dusk and at night
 const MOTIF=[[76,1],[79,1],[81,1.5],[79,.5],[76,1],[74,2]];
 const AMB_LV={ lake_day:{water:.55,wind:.22}, lake_dusk:{water:.5,wind:.14}, lake_night:{water:.42,wind:.12}, coast_day:{surf:1,hiss:.3,wind:.42}, coast_dusk:{surf:.9,hiss:.24,wind:.3},
-  coast_night:{surf:.8,hiss:.18,wind:.3}, river_day:{rush:.62,water:.22,wind:.2}, river_dusk:{rush:.56,water:.2,wind:.12}, river_night:{rush:.5,water:.18,wind:.1}, aquarium:{room:.5,water:.12}, kitchen:{room:.75}, banquet:{water:.25,wind:.1}, intro:{water:.4,wind:.3} };
+  coast_night:{surf:.8,hiss:.18,wind:.3}, river_day:{rush:.62,water:.22,wind:.2}, river_dusk:{rush:.56,water:.2,wind:.12}, river_night:{rush:.5,water:.18,wind:.1},
+  marsh_day:{water:.34,wind:.42}, marsh_dusk:{water:.32,wind:.3}, marsh_night:{water:.28,wind:.26}, aquarium:{room:.5,water:.12}, kitchen:{room:.75}, banquet:{water:.25,wind:.1}, intro:{water:.4,wind:.3} };

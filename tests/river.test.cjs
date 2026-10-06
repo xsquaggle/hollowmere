@@ -28,7 +28,7 @@ module.exports = [
       await until(page, () => window.__hm.river.reg() === 'river', null, { timeout: 9000, what: 'the ferry up the river' });
       const after = await readSave(page);
       assert.equal(after.region, 'river'); assert.equal(after.riverSeen, true);
-      assert.match(await text(page, '#species'), /\/18$/, 'the journal counts the river\'s new fish (the Leafjack lives in both)');
+      assert.match(await text(page, '#species'), /\/19$/, 'the journal counts the river\'s new fish (the Leafjack lives in both)');
       await until(page, () => /current carries your float/.test(document.getElementById('coachText').textContent), null, { timeout: 15000, what: 'the river\'s first tip' });
     },
   },
@@ -144,17 +144,17 @@ module.exports = [
       assert.equal(await page.evaluate(() => window.__hm.river.wren.cut('ash')), false, 'three is the most');
       // the corkboard: her first theory, and the ones the Leafjack and the Mayor already answer; the rest wait on what you find
       await page.click('[data-wt="board"]');
-      assert.match(await text(page, '#panel'), /3 of 8 theories pinned/);
+      assert.match(await text(page, '#panel'), /3 of 13 theories pinned/);
       // every river fish but the weather's and the Clockfin: the Twin Spool
       const q = await page.evaluate(() => window.__hm.river.wren.quest());
       assert.deepEqual(q.sort(), ['barbel', 'brook', 'gristle', 'leafjack', 'stone']);
       await page.evaluate(ids => { for (const id of ids) window.__hm.save.fish[id] = { caught: 1, best: 0, seen: true }; }, q);
-      await page.click('[data-wt="twin"]');
+      await page.click('[data-wt="quests"]');
       assert.match(await text(page, '#panel'), /5 of 5 river fish caught/);
       await page.click('#wrenTwin');
       s = await readSave(page);
       assert.ok(s.rods.includes('twin') && s.wren.twin);
-      await page.click('#wrenEquip');
+      await page.click('[data-equip="twin"]');
       assert.equal((await readSave(page)).rod, 'twin');
       assert.equal(await page.evaluate(() => window.__hm.river.wren.notes().length), 4, 'Old Gristle pinned one more');
     },
@@ -170,7 +170,9 @@ module.exports = [
       await until(page, () => window.__S.state === 'waiting', null, { what: 'the floats to land' });
       const r = await page.evaluate(() => { const S = window.__S, T = window.__hm.river.twin, out = {};
         out.two = !!S.bob2; out.wait = T.wait(); out.apart = S.bob2 && Math.abs(S.bob2.x - S.bob.x);
-        // force a bite with both floats under, then tap nearer the second
+        // force a bite with both floats under, then tap nearer the second (both moved upstream first, so the current
+        // can't carry them off the edge before the fish comes)
+        const dx = Math.min(S.bob.x, S.bob2.x) - innerWidth * .15; S.bob.x -= dx; S.bob2.x -= dx;
         S.wait.t = 0; return out; });
       assert.equal(r.two, true, 'a second float'); assert.equal(r.wait, .6, 'two baits: the quiet is shorter'); assert.ok(r.apart > 20, 'landed apart');
       await until(page, () => window.__S.state === 'bite', null, { timeout: 15000, what: 'a bite' });

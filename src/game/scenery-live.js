@@ -74,10 +74,10 @@ function drawWater(){
   const sx=SC.lightX||W*.3, la=SC.lightA||0;
   if (la>.02) for (let i=0;i<14;i++){ const y=HZ+3+i*i*1.5, w=W*.05*(1-i/16)+Math.sin(S.time*1.5+i)*4;
     ctx.fillStyle='rgba('+SC.lightRGB+','+((.42-i*.025)*la).toFixed(3)+')'; ctx.fillRect(sx-w,y,w*2,1.5+i*.15); }
-  const river=REG()==='river';   // the river draws its own current (game/river-art.js); no sails or lake swell there
-  if (!river) drawBoat();
+  const own=REG()==='river'||REG()==='marsh';   // the river and the marsh draw their own current and tide (game/river-art.js, marsh-art.js); no sails or lake swell there
+  if (!own) drawBoat();
   ctx.lineCap='round';
-  if (!river) for (const v of SC.waves){
+  if (!own) for (const v of SC.waves){
     const y0=HZ+5+v.fy*(H-HZ-50), k=sc(y0), span=W*1.2;
     const x=((v.fx*span+S.time*v.dr*(6+k*10))%span)-W*.1, y=y0+Math.sin(S.time*1.1+v.ph)*1.4*k, w=(5+k*13)*v.len;
     ctx.strokeStyle='rgba(222,238,242,'+(.08+.16*k+.05*Math.sin(S.time*1.7+v.ph)).toFixed(3)+')'; ctx.lineWidth=.8+k*1.4;
@@ -91,7 +91,7 @@ function drawWater(){
   }
   drawMoonpath(); drawBreach(); drawBowFoot(); drawWxWater(); drawLucky();
   if (SC.jump){ const j=SC.jump, u=j.t/j.dur, k=sc(j.y), hgt=Math.sin(Math.PI*u)*26*k;
-    ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,river?'brook':'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
+    ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,{river:'brook',marsh:'mullet'}[REG()]||'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
 }
 function drawDeep(){
   const d=G.deep; ctx.save(); ctx.translate(d.x,d.y);
@@ -112,6 +112,7 @@ function drawFlower(x,y,s,kind){
 function drawPads(){
   if (REG()==='coast'){ drawKelp(); return; }
   if (REG()==='river'){ drawRiverWater(); return; }
+  if (REG()==='marsh'){ drawMarshWater(); return; }
   G.padClusters.forEach((c,ci)=>{ SC.pads[ci].forEach((p,i)=>{
     const {x,y,r}=padPos(ci,i);
     ctx.save(); ctx.translate(x,y); ctx.scale(1,.42);
@@ -167,6 +168,7 @@ function drawRock(x,y,r){ const c=ctx;
 function drawReeds(){
   if (REG()==='coast'){ drawStacks(); return; }
   if (REG()==='river'){ drawRiverBanks(); return; }
+  if (REG()==='marsh'){ drawMarshNear(); return; }
   drawBank(SC.bank.L,-1); drawBank(SC.bank.R,1);
   drawRock(W*.075,H*.635,11); drawRock(W*.145,H*.775,8); drawRock(W*.905,H*.735,10);
   ctx.lineCap='round';
@@ -211,6 +213,7 @@ function nightShade(){
   if (lp && PAL.dark>.15 && S.state!=='casting'){ ctx.save(); ctx.globalCompositeOperation='lighter';
     const bg=ctx.createRadialGradient(lp.x,lp.y,0,lp.x,lp.y,14); bg.addColorStop(0,'rgba(140,255,170,'+(.55*PAL.dark).toFixed(2)+')'); bg.addColorStop(1,'rgba(140,255,170,0)');
     ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(lp.x,lp.y,14,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+  lanternRodLight();   // the Lantern Rod's light (game/marsh-art.js)
   const L=SC.lamp; if (L && PAL.beam>.3){ ctx.save(); ctx.globalCompositeOperation='lighter'; const hg=ctx.createRadialGradient(L.x,L.y,0,L.x,L.y,8); hg.addColorStop(0,'rgba(255,236,190,'+(.5*PAL.dark).toFixed(2)+')'); hg.addColorStop(1,'rgba(255,236,190,0)'); ctx.fillStyle=hg; ctx.fillRect(L.x-8,L.y-8,16,16); ctx.restore(); }
 }
 const OTT = {say:'', sayT:0, next:14};
@@ -236,7 +239,8 @@ function updateScenery(dt){
       SC.gull={x:f.x+m.dx*f.dir*-1, y:f.y+m.dy, t:0, phase:'stop', dir:f.dir, s:m.s, ph:m.ph}; tone(1650,.12,{vol:.05,type:'triangle'}); } }
   const g=SC.gull;
   if (g){ g.t+=dt;
-    if (g.phase==='stop' && g.t>.9){ g.phase='drop'; SC.drop={x:g.x,y:g.y+5,vy:0,k:0,tx:clamp(g.x+rand(-50,50),34,W-34),ty:rand(HZ+50,G.near-10),y0:g.y}; tone(1500,.75,{to:260,vol:.07}); }
+    if (g.phase==='stop' && g.t>.9){ g.phase='drop'; SC.drop={x:g.x,y:g.y+5,vy:0,k:0,tx:clamp(g.x+rand(-50,50),34,W-34),ty:rand(HZ+50,G.near-10),y0:g.y};
+      for (let i=0;i<8 && !onWater(SC.drop.tx,SC.drop.ty);i++){ SC.drop.tx=rand(34,W-34); SC.drop.ty=rand(HZ+50,G.near-10); } tone(1500,.75,{to:260,vol:.07}); }
     else if (g.phase==='drop' && g.t>1.7){ g.phase='leave'; }
     else if (g.phase==='leave'){ g.x+=g.dir*75*dt; g.y-=12*dt; if (g.x<-40||g.x>W+40) SC.gull=null; } }
   const d=SC.drop;
@@ -259,7 +263,7 @@ function updateScenery(dt){
   if (SC.jump){ const j=SC.jump; j.t+=dt; if (j.t>=j.dur){ splash(j.x+j.dir*14*sc(j.y),j.y,6); ripple(j.x+j.dir*14*sc(j.y),j.y,20); SC.jump=null; } }
   else { SC.nextJump-=dt; if (SC.nextJump<=0){ SC.nextJump=rand(8,15);
     const x=rand(30,W-30), y=rand(HZ+40,H-260), b=S.bob;
-    if (!b || Math.hypot(x-b.x,y-b.y)>80){ SC.jump={x,y,t:0,dur:.75,dir:Math.random()<.5?1:-1}; splash(x,y,5); ripple(x,y,16); } } }
+    if ((!b || Math.hypot(x-b.x,y-b.y)>80) && onWater(x,y)){ SC.jump={x,y,t:0,dur:.75,dir:Math.random()<.5?1:-1}; splash(x,y,5); ripple(x,y,16); } } }
   const f=SC.frog;
   if (REG()!=='lake' || !SC.pads[0]){}
   else if (f.hop){ f.hop.t+=dt; if (f.hop.t>=.5){ f.pad=f.hop.to; f.hop=null; const p=padPos(0,f.pad); ripple(p.x,p.y,14); splash(p.x,p.y,3); } }
@@ -279,25 +283,32 @@ function updateScenery(dt){
 }
 function drawAmbient(dt){
   for (const f of S.ambient){
-    let x=f.x*W, y=f.y*H;
+    let x=f.x*W, y=f.y*H; if (!onWater(x,y)) continue;
     ctx.save(); ctx.translate(x,y); ctx.rotate(f.a); ctx.scale(1,.55);
     drawFish(ctx,'perch',f.len*sc(y),true,f.alpha*(f.flee>0?.6:1),Math.sin(S.time*6+f.len));
     ctx.restore();
   }
 }
+/** Whether (x, y) is open water: anywhere but on a marsh bank the tide has left out. */
+const onWater = (x,y) => REG()!=='marsh' || !marshMud(x,y);
 function updateAmbient(dt){
   for (const f of S.ambient){
     f.turn-=dt; if (f.turn<=0){ f.turn=rand(1.5,3.5); f.ta=f.a+rand(-1.2,1.2); }
     if (f.ta!==undefined) f.a=angLerp(f.a,f.ta,dt*1.2);
     const sp=f.sp*(f.flee>0?5:1); f.flee=Math.max(0,f.flee-dt);
-    f.x+=Math.cos(f.a)*sp*dt/W; f.y+=Math.sin(f.a)*sp*dt*.5/H;
+    const nx=f.x+Math.cos(f.a)*sp*dt/W, ny=f.y+Math.sin(f.a)*sp*dt*.5/H;
+    // the marsh: it turns back from the mud, and if a bank comes up under it, it heads off it for the water
+    if (!onWater(nx*W,ny*H)){ const B=!onWater(f.x*W,f.y*H) && bankOf(f.x*W,f.y*H);
+      if (!B){ f.ta=f.a+Math.PI; f.a=angLerp(f.a,f.ta,dt*4); continue; }
+      f.a=f.ta=Math.atan2(2*(f.y*H-B.y),f.x*W-B.x); }
+    f.x=nx; f.y=ny;
     if (f.x<.05||f.x>.95) f.ta=Math.atan2(Math.sin(f.a),-Math.cos(f.a)), f.x=clamp(f.x,.05,.95);
     const yMin=(HZ+30)/H, yMax=(H-210)/H;
     if (f.y<yMin||f.y>yMax) f.ta=Math.atan2(-Math.sin(f.a),Math.cos(f.a)), f.y=clamp(f.y,yMin,yMax);
   }
 }
 function drawRipples(){
-  ctx.lineWidth=1.4;
-  for (const r of S.ripples){ const k=r.life; ctx.strokeStyle='rgba(225,238,242,'+(.55*(1-k)).toFixed(3)+')';
+  ctx.lineWidth=1.4; const marsh=REG()==='marsh';
+  for (const r of S.ripples){ const k=r.life; if (marsh && marshMud(r.x,r.y)) continue; ctx.strokeStyle='rgba(225,238,242,'+(.55*(1-k)).toFixed(3)+')';
     ctx.beginPath(); ctx.ellipse(r.x,r.y,r.r,r.r*.38,0,0,Math.PI*2); ctx.stroke(); }
 }

@@ -102,7 +102,7 @@ const FINDS={
   moonjar: {name:'Moon Jar', kind:'artifact', rarity:'epic', region:'lake', from:'story', lore:'A preserving jar with a wire bail. Leave it open under a full moon and it keeps a little of the light.',
             eff:'Night catches fill it. Tap it on the dock by day and your next cast is fished as if it were night.', mods:[{stat:'moonJar'}]},
   bell:    {name:'Drowned Bell', kind:'artifact', rarity:'legendary', region:'lake', from:'story', lore:'A hand bell from the clock tower, green with the lake. It is never quite silent.',
-            eff:'Ghost fish ring like a bell while they fade, so you can follow them.', mods:[{stat:'ghostRings'}]},
+            eff:'Ghost fish ring like a bell while they fade, so you can follow them. In the marsh rain, something comes up to it.', mods:[{stat:'ghostRings'}, {stat:'bellmouth'}]},
   pin:     {name:'Cartographer’s Pin', kind:'artifact', rarity:'epic', region:'any', from:'story', lore:'A brass map pin with a compass rose for a head. Whoever drew the treasure maps marked every cache with it.',
             eff:'Treasure maps mark the exact spot, and every 5th treasure is a map piece.', mods:[{stat:'mapPin'}]},
   // keepsakes: they work from the shelf
