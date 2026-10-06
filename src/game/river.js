@@ -40,8 +40,9 @@ function driftFloat(b,dt){ const C=RIVER.current, held=RV.mend && S.pointers.siz
 /** Each frame on the river while a float is out. A fish that's nibbling holds the float where it is. */
 function riverWaiting(dt){ if (REG()!=='river' || !S.bob || !S.wait) return true;
   const w=S.wait; if (w.phase==='snag') return true;
+  // a nibble holds both floats nearly still, so they keep their distance
+  if (w.phase==='nibble'){ for (const b of [S.bob,S.bob2]) if (b) b.x=Math.min(W-16,b.x+driftSpeed(b.x,b.y)*.15*dt); return true; }
   if (S.bob2 && !driftFloat(S.bob2,dt)){ ripple(S.bob2.x,S.bob2.y,12); S.bob2=null; }
-  if (w.phase==='nibble'){ const v=driftSpeed(S.bob.x,S.bob.y)*.15; S.bob.x=Math.min(W-16,S.bob.x+v*dt); return true; }
   if (driftFloat(S.bob,dt)) return true;
   if (w.sh){ w.sh.flee=true; w.sh.ang+=Math.PI; }
   if (!save.riverDrift){ save.riverDrift=true; persist(); coachFor('The current carried your float away. Cast upstream, to the left, so it drifts past the spots on its way down.',7); }
@@ -98,7 +99,9 @@ function otterUpdate(dt){
   if (!O && RV.idle>RIVER.otter.idle){ RV.idle=0; const D=dockGeo(); RV.otter={phase:'come', x:W+30, y:D.top+44, tx:D.cx+64, t:0}; tone(880,.05,{vol:.03,type:'triangle'}); }
   if (O){ O.t+=dt;
     if (O.phase==='come'){ O.x=lerp(O.x,O.tx,Math.min(1,dt*2.2)); if (Math.abs(O.x-O.tx)<2){ O.phase='sniff'; O.t=0; } }
-    else if (O.phase==='sniff' && O.t>RIVER.otter.tap){ const id=otterBait(); if (id){ const g=gearState(); g.left[id]=Math.max(0,g.left[id]-RIVER.otter.casts); if (!g.left[id]) g.lastBait=id; persist(); updateBagBtn(); }
+    // cast or walk off, and it slips back into the water empty-pawed
+    else if (O.phase==='sniff' && !quiet){ O.phase='dive'; O.t=0; }
+    else if (O.phase==='sniff' && O.t>RIVER.otter.tap){ const id=otterBait(); if (id){ const g=gearState(); g.left[id]=Math.max(0,g.left[id]-RIVER.otter.casts); if (!g.left[id]) g.lastBait=id; persist(); baitCheck(); updateBagBtn(); }
       news('An otter made off with some of your '+(id?TACKLE[id].name.toLowerCase():'bait'),''); O.phase='dive'; O.t=0; }
     else if ((O.phase==='dive'||O.phase==='thanks') && O.t>1.1){ splash(O.x,O.y+8,8); RV.otter=null; } }
   // one swimming across midstream, a head and a V of ripples

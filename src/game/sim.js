@@ -29,6 +29,9 @@ const SIM_PLAYERS={
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
                  coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]},
                  river:{open:[0,.3], riffle:[0,.12], leaves:[.3,.38], deep:[.7,.78], roots:[.82,.9]}};
+/** On the river, how far a float can drift across the screen through each spot before it's off the right edge (shares of
+    the width, from where a player casts into it): the riffle and the roots lie to the right, so their runway is short. */
+const RIVER_RUN={open:.8, leaves:.62, deep:.75, riffle:.18, roots:.4};
 /** A stand-in save for a setup. tanks, parts, fish, finds and gear can be copied from a real save ("Use my setup"). */
 function simSave(st){
   const s=fresh(), now=Date.now(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
@@ -113,11 +116,9 @@ function simulate(st,n){
       const tw=modMul('twitch',cx); let wait=biteWait(spot)*(spot==='deep'?1.2:1)/modMul('reedBite',cx);
       if (P.twitch) wait=Math.max(.3,wait*(.65-.2*(tw-1)));
       if (twin) wait*=TWIN.wait;
-      // on the river, a float cast in at the left drifts across the water: too long a wait and the current takes it
-      if (reg==='river'){ const C=RIVER.current, gone=W*.8/(C.speed*W*(spot==='deep'?C.pool:currentAt(depth))*sc(y)); if (wait>gone){ out.lost.drift++; out.secs+=t+gone+.7; continue; } }
-      save.day=dayLen?Math.floor(out.secs/dayLen):0;
+      save.day=dayLen?Math.floor(out.secs/dayLen):0;                   // an in-game day is 24 minutes of play, or as artifacts make it
       // the river's Clockfin bites only as the hour turns, so there the casts sweep the minutes of the hour named
-      if (reg==='river' && !st.pin) save.clock=Math.floor(st.hour)+(c%12)/12+.02;                   // an in-game day is 24 minutes of play, or as artifacts make it
+      if (reg==='river' && !st.pin) save.clock=Math.floor(st.hour)+(c%12)/12+.02;
       // treasure instead of a fish (rolled once per cast, as the bobber lands): a haul through the fight step, and what's inside.
       // An Echo bites at once instead, unless treasure comes up first: then it keeps waiting.
       const loot=rollTreasure(cx), pend=echo; echo=loot?pend:null;
@@ -135,11 +136,15 @@ function simulate(st,n){
       // a fish swims over and nibbles
       const at={bow:!!st.bow, path:!!st.path}; let id=ech||rollFish(spot,lucky,at);
       // the Twin Spool: now and then both floats go under, and the player strikes the one with the better fish
-      if (twin && !ech && Math.random()<TWIN.both){ const id2=rollFish(spot,lucky,at); out.twins++; if (FISH[id2].value>FISH[id].value) id=id2; }
+      if (twin && !ech && Math.random()<TWIN.both){ const id2=pickW(poolFor(spot,lucky)); out.twins++; if (FISH[id2].value>FISH[id].value) id=id2; }
       const F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
       t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
+      // on the river the float drifts from where it lands until a fish starts nibbling: the quiet and the swim over. Past
+      // the spot's runway (RIVER_RUN, the share of the width from where it's cast in to the right edge) the current takes it
+      if (reg==='river' && !ech){ const C=RIVER.current, gone=W*RIVER_RUN[spot]/(C.speed*W*(spot==='deep'?C.pool:currentAt(depth))*sc(y));
+        if (t-1.6>gone){ out.lost.drift++; out.secs+=1.6+gone+.7; continue; } }
       const nib=ech?0:nibbles(F);
       t+=ech?.15:rand(.5,1.1)*bm; for (let i=0;i<nib;i++) t+=(F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*bm;
       // the bite

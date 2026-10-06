@@ -2129,7 +2129,7 @@ const TWIN={spread:.16, wait:.6, both:.18};
                   (paste its output here after a balance change). Keys: rod:<id>, boat, ferry, part:<id>, fix:<id>
                   (the fix-up list), pocket:<n> (the vest's nth pocket), rune:<id>, fish:<id> (the first one caught).
                   Playtest > Pace (game/pace.js) sets a real run beside these. */
-const PACE_SIM={'fish:leafjack':5, 'fish:perch':5, 'rod:reedcutter':5, 'fish:mossback':5, 'rune:swift':16, 'rod:ash':20, 'fish:lantern':21, 'fish:char':27, 'fish:gar':37, 'rod:heronwood':42, 'rune:magpie':43, 'fish:mayor':49, 'fish:reedwhisker':58, 'ferry':60, 'fish:stone':68, 'fish:brook':68, 'fish:barbel':68, 'rune:deep':80, 'rod:brasscap':88, 'fish:clockfin':94, 'fix:roof':113, 'fish:gristle':114, 'rod:twin':114, 'rune:nightglass':114, 'rune:storm':136, 'boat':136, 'fish:sprat':141, 'fish:bream':141, 'fish:kelpeel':141, 'fish:grouper':147, 'rod:saltline':154, 'fish:angler':170, 'fish:saltjaw':177, 'rune:wanderer':178, 'fish:gurnard':194, 'part:hold':194, 'rune:odd':223, 'fix:net':247, 'fish:wrasse':255, 'rod:gale':267, 'rune:homebody':270, 'pocket:2':277, 'part:sonar':292, 'part:keel':312, 'rune:echo':320, 'fix:lamp':325, 'fix:stove':378, 'pocket:3':392, 'fix:cabinet':449, 'rod:deepwater':464, 'pocket:4':503, 'fix:panel':527, 'fix:knock':559, 'pocket:5':605};
+const PACE_SIM={'fish:perch':5, 'fish:leafjack':5, 'rod:reedcutter':10, 'fish:mossback':10, 'rune:swift':16, 'fish:reedwhisker':21, 'rod:ash':21, 'fish:lantern':21, 'fish:gar':34, 'rod:heronwood':35, 'rune:magpie':39, 'fish:mayor':45, 'fish:char':50, 'ferry':52, 'fish:stone':58, 'fish:barbel':58, 'fish:brook':59, 'rune:deep':75, 'fish:clockfin':83, 'rod:brasscap':99, 'fish:grayling':99, 'fish:gristle':104, 'rod:twin':104, 'fix:roof':107, 'rune:nightglass':112, 'boat':124, 'fish:bream':130, 'fish:grouper':130, 'fish:sprat':133, 'fish:kelpeel':133, 'rune:storm':146, 'fish:angler':153, 'rod:saltline':165, 'fish:saltjaw':169, 'rune:wanderer':175, 'part:hold':193, 'rune:odd':230, 'fix:net':238, 'fish:wrasse':273, 'rune:homebody':276, 'pocket:2':280, 'part:sonar':289, 'fish:gurnard':289, 'part:keel':299, 'fix:lamp':306, 'rod:gale':311, 'rune:echo':337, 'fix:stove':383, 'pocket:3':388, 'fix:cabinet':435, 'rod:deepwater':453, 'pocket:4':494, 'fix:panel':507, 'fix:knock':552, 'pocket:5':605};
 
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
@@ -7223,8 +7223,9 @@ function driftFloat(b,dt){ const C=RIVER.current, held=RV.mend && S.pointers.siz
 /** Each frame on the river while a float is out. A fish that's nibbling holds the float where it is. */
 function riverWaiting(dt){ if (REG()!=='river' || !S.bob || !S.wait) return true;
   const w=S.wait; if (w.phase==='snag') return true;
+  // a nibble holds both floats nearly still, so they keep their distance
+  if (w.phase==='nibble'){ for (const b of [S.bob,S.bob2]) if (b) b.x=Math.min(W-16,b.x+driftSpeed(b.x,b.y)*.15*dt); return true; }
   if (S.bob2 && !driftFloat(S.bob2,dt)){ ripple(S.bob2.x,S.bob2.y,12); S.bob2=null; }
-  if (w.phase==='nibble'){ const v=driftSpeed(S.bob.x,S.bob.y)*.15; S.bob.x=Math.min(W-16,S.bob.x+v*dt); return true; }
   if (driftFloat(S.bob,dt)) return true;
   if (w.sh){ w.sh.flee=true; w.sh.ang+=Math.PI; }
   if (!save.riverDrift){ save.riverDrift=true; persist(); coachFor('The current carried your float away. Cast upstream, to the left, so it drifts past the spots on its way down.',7); }
@@ -7281,7 +7282,9 @@ function otterUpdate(dt){
   if (!O && RV.idle>RIVER.otter.idle){ RV.idle=0; const D=dockGeo(); RV.otter={phase:'come', x:W+30, y:D.top+44, tx:D.cx+64, t:0}; tone(880,.05,{vol:.03,type:'triangle'}); }
   if (O){ O.t+=dt;
     if (O.phase==='come'){ O.x=lerp(O.x,O.tx,Math.min(1,dt*2.2)); if (Math.abs(O.x-O.tx)<2){ O.phase='sniff'; O.t=0; } }
-    else if (O.phase==='sniff' && O.t>RIVER.otter.tap){ const id=otterBait(); if (id){ const g=gearState(); g.left[id]=Math.max(0,g.left[id]-RIVER.otter.casts); if (!g.left[id]) g.lastBait=id; persist(); updateBagBtn(); }
+    // cast or walk off, and it slips back into the water empty-pawed
+    else if (O.phase==='sniff' && !quiet){ O.phase='dive'; O.t=0; }
+    else if (O.phase==='sniff' && O.t>RIVER.otter.tap){ const id=otterBait(); if (id){ const g=gearState(); g.left[id]=Math.max(0,g.left[id]-RIVER.otter.casts); if (!g.left[id]) g.lastBait=id; persist(); baitCheck(); updateBagBtn(); }
       news('An otter made off with some of your '+(id?TACKLE[id].name.toLowerCase():'bait'),''); O.phase='dive'; O.t=0; }
     else if ((O.phase==='dive'||O.phase==='thanks') && O.t>1.1){ splash(O.x,O.y+8,8); RV.otter=null; } }
   // one swimming across midstream, a head and a V of ripples
@@ -7584,7 +7587,7 @@ function openWren(tab){ audioInit(); const w=wrenState(), first=!w.met;
   document.querySelectorAll('#panel [data-wt]').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.wt===WREN_TAB) return; tone(900,.04,{vol:.04,type:'triangle'}); openWren(b.dataset.wt); $('panel').scrollTop=0; }));
   const cut=$('wrenCut'); if (cut) cut.addEventListener('click',()=>{ if (cutSocket(save.rod)) openWren('bench'); });
   const tw=$('wrenTwin'); if (tw) tw.addEventListener('click',()=>{ if (giveTwin()) openWren('twin'); });
-  const eq=$('wrenEquip'); if (eq) eq.addEventListener('click',()=>{ save.rod='twin'; persist(); sfx.hook(false); news('Equipped the Twin Spool','good'); openWren('twin'); });
+  const eq=$('wrenEquip'); if (eq) eq.addEventListener('click',()=>{ if (!save.rods.includes('twin')) save.rods.push('twin'); save.rod='twin'; persist(); sfx.hook(false); news('Equipped the Twin Spool','good'); openWren('twin'); });
   paintRodArt(document.querySelectorAll('#panel canvas[data-rodart]')); paintTiles(document.querySelectorAll('#panel canvas[data-rune]')); paintFishTiles(document.querySelectorAll('#panel canvas[data-wf]'));
   if (WREN_TAB==='board'){ for (const N of notesUp()) w.seen[N.id]=1; persist(); }
   if (first) setTimeout(()=>{ if (!$('sheet').hidden) coachFor('Wren cut you in on Homebody. Etch it from the tray in your tackle bag, like the rest.',7); },1200); }
@@ -11641,6 +11644,9 @@ const SIM_PLAYERS={
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
                  coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]},
                  river:{open:[0,.3], riffle:[0,.12], leaves:[.3,.38], deep:[.7,.78], roots:[.82,.9]}};
+/** On the river, how far a float can drift across the screen through each spot before it's off the right edge (shares of
+    the width, from where a player casts into it): the riffle and the roots lie to the right, so their runway is short. */
+const RIVER_RUN={open:.8, leaves:.62, deep:.75, riffle:.18, roots:.4};
 /** A stand-in save for a setup. tanks, parts, fish, finds and gear can be copied from a real save ("Use my setup"). */
 function simSave(st){
   const s=fresh(), now=Date.now(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
@@ -11725,11 +11731,9 @@ function simulate(st,n){
       const tw=modMul('twitch',cx); let wait=biteWait(spot)*(spot==='deep'?1.2:1)/modMul('reedBite',cx);
       if (P.twitch) wait=Math.max(.3,wait*(.65-.2*(tw-1)));
       if (twin) wait*=TWIN.wait;
-      // on the river, a float cast in at the left drifts across the water: too long a wait and the current takes it
-      if (reg==='river'){ const C=RIVER.current, gone=W*.8/(C.speed*W*(spot==='deep'?C.pool:currentAt(depth))*sc(y)); if (wait>gone){ out.lost.drift++; out.secs+=t+gone+.7; continue; } }
-      save.day=dayLen?Math.floor(out.secs/dayLen):0;
+      save.day=dayLen?Math.floor(out.secs/dayLen):0;                   // an in-game day is 24 minutes of play, or as artifacts make it
       // the river's Clockfin bites only as the hour turns, so there the casts sweep the minutes of the hour named
-      if (reg==='river' && !st.pin) save.clock=Math.floor(st.hour)+(c%12)/12+.02;                   // an in-game day is 24 minutes of play, or as artifacts make it
+      if (reg==='river' && !st.pin) save.clock=Math.floor(st.hour)+(c%12)/12+.02;
       // treasure instead of a fish (rolled once per cast, as the bobber lands): a haul through the fight step, and what's inside.
       // An Echo bites at once instead, unless treasure comes up first: then it keeps waiting.
       const loot=rollTreasure(cx), pend=echo; echo=loot?pend:null;
@@ -11747,11 +11751,15 @@ function simulate(st,n){
       // a fish swims over and nibbles
       const at={bow:!!st.bow, path:!!st.path}; let id=ech||rollFish(spot,lucky,at);
       // the Twin Spool: now and then both floats go under, and the player strikes the one with the better fish
-      if (twin && !ech && Math.random()<TWIN.both){ const id2=rollFish(spot,lucky,at); out.twins++; if (FISH[id2].value>FISH[id].value) id=id2; }
+      if (twin && !ech && Math.random()<TWIN.both){ const id2=pickW(poolFor(spot,lucky)); out.twins++; if (FISH[id2].value>FISH[id].value) id=id2; }
       const F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
       t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
+      // on the river the float drifts from where it lands until a fish starts nibbling: the quiet and the swim over. Past
+      // the spot's runway (RIVER_RUN, the share of the width from where it's cast in to the right edge) the current takes it
+      if (reg==='river' && !ech){ const C=RIVER.current, gone=W*RIVER_RUN[spot]/(C.speed*W*(spot==='deep'?C.pool:currentAt(depth))*sc(y));
+        if (t-1.6>gone){ out.lost.drift++; out.secs+=1.6+gone+.7; continue; } }
       const nib=ech?0:nibbles(F);
       t+=ech?.15:rand(.5,1.1)*bm; for (let i=0;i<nib;i++) t+=(F.beh==='sleeper'?rand(1,1.8):rand(.55,1.4))*bm;
       // the bite

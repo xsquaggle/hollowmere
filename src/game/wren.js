@@ -33,7 +33,7 @@ function openWren(tab){ audioInit(); const w=wrenState(), first=!w.met;
   document.querySelectorAll('#panel [data-wt]').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.wt===WREN_TAB) return; tone(900,.04,{vol:.04,type:'triangle'}); openWren(b.dataset.wt); $('panel').scrollTop=0; }));
   const cut=$('wrenCut'); if (cut) cut.addEventListener('click',()=>{ if (cutSocket(save.rod)) openWren('bench'); });
   const tw=$('wrenTwin'); if (tw) tw.addEventListener('click',()=>{ if (giveTwin()) openWren('twin'); });
-  const eq=$('wrenEquip'); if (eq) eq.addEventListener('click',()=>{ save.rod='twin'; persist(); sfx.hook(false); news('Equipped the Twin Spool','good'); openWren('twin'); });
+  const eq=$('wrenEquip'); if (eq) eq.addEventListener('click',()=>{ if (!save.rods.includes('twin')) save.rods.push('twin'); save.rod='twin'; persist(); sfx.hook(false); news('Equipped the Twin Spool','good'); openWren('twin'); });
   paintRodArt(document.querySelectorAll('#panel canvas[data-rodart]')); paintTiles(document.querySelectorAll('#panel canvas[data-rune]')); paintFishTiles(document.querySelectorAll('#panel canvas[data-wf]'));
   if (WREN_TAB==='board'){ for (const N of notesUp()) w.seen[N.id]=1; persist(); }
   if (first) setTimeout(()=>{ if (!$('sheet').hidden) coachFor('Wren cut you in on Homebody. Etch it from the tray in your tackle bag, like the rest.',7); },1200); }

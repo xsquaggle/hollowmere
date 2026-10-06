@@ -116,10 +116,15 @@ module.exports = [
         R.tapOtter(); out.glim = s.glimmer; out.after = R.otter().phase;
         // leave the next one be, and it takes a cast of bait
         R.otterTick(2); R.otterTick(41); for (let i = 0; i < 300 && R.otter() && R.otter().phase !== 'dive'; i++) R.otterTick(1 / 30);
-        out.left = s.gear.left.grubs; return out; });
+        out.left = s.gear.left.grubs;
+        // one sniffing at the tin when you pick up the rod slips away empty-pawed
+        R.otterTick(2); R.otterTick(41); for (let i = 0; i < 120 && R.otter() && R.otter().phase === 'come'; i++) R.otterTick(1 / 30);
+        window.__hm.setState('aim'); R.otterTick(1 / 30); out.cast = R.otter() && R.otter().phase; for (let i = 0; i < 200; i++) R.otterTick(1 / 30);
+        window.__hm.setState('idle'); out.kept = s.gear.left.grubs; return out; });
       assert.equal(r.came, 'sniff'); assert.equal(r.on, true);
       assert.ok(r.glim >= 2 && r.glim <= 4, 'a pebble of 2 to 4 Glimmer: ' + r.glim); assert.equal(r.after, 'thanks');
       assert.equal(r.left, 4, 'the next otter made off with one cast of grubs');
+      assert.equal(r.cast, 'dive', 'casting sends a sniffing otter off'); assert.equal(r.kept, 4, 'without your bait');
     },
   },
   {
