@@ -19,7 +19,7 @@ function poolFor(spot,lucky){
   const wx=wxNow(), dry=Object.assign({},w);
   for (const e of wxFishFor(reg,spot)) w[e.fish]=(w[e.fish]||0)+e.w;
   if (wx==='rain' && reg==='lake' && spot==='pads' && w.mossback) w.mossback*=2;
-  if (wx==='fog' && !night){ if (coastal){ if (w.kelpeel) w.kelpeel*=1.4; } else if (river){ if (w.barbel) w.barbel*=1.3; } else if (marsh){} else { const nl={deep:18,open:24,pads:10}[spot]||4; w.lantern=(w.lantern||0)+nl/4; } }
+  if (wx==='fog' && !night){ if (coastal){ if (w.kelpeel) w.kelpeel*=1.4; } else if (river){ if (w.barbel) w.barbel*=1.3; } else if (reg==='lake'){ const nl={deep:18,open:24,pads:10}[spot]||4; w.lantern=(w.lantern||0)+nl/4; } }
   { let top=-1, T0=0, T1=0, hi=0; for (const k in w){ if (w[k]!==dry[k]) top=Math.max(top,rarRank(FISH[k].rarity)); T1+=w[k]; T0+=dry[k]||0; }
     for (const k in dry) if (rarRank(FISH[k].rarity)>top) hi+=dry[k];
     if (top>=0 && hi>0 && T0>hi){ const x=(T1-hi)/(T0-hi); for (const k in dry) if (rarRank(FISH[k].rarity)>top) w[k]*=x; } }

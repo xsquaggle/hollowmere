@@ -167,8 +167,11 @@ module.exports = [
       await page.click('[data-equip="lanternrod"]');
       s = await readSave(page); assert.equal(s.rod, 'lanternrod');
       await page.click('#closeS'); await page.waitForTimeout(350);
-      const mods = await page.evaluate(() => window.__hm.marsh.mods().filter(m => m.src === 'rod' && (m.stat === 'lantern' || m.stat === 'night')).map(m => [m.stat, m.v]));
-      assert.deepEqual(mods.map(m => m[0]).sort(), ['lantern', 'night']);
+      const mods = await page.evaluate(() => window.__hm.marsh.mods().filter(m => m.src === 'rod' && ['lantern', 'night', 'perfect'].includes(m.stat)).map(m => [m.stat, m.v]));
+      assert.deepEqual(mods.map(m => m[0]).sort(), ['lantern', 'night', 'perfect']);
+      // in its light you see the bite: the perfect-hook window is wider after dark, and only then
+      const perfect = await page.evaluate(() => [window.__hm.modMul('perfect', { night: true }), window.__hm.modMul('perfect', { night: false })]);
+      assert.deepEqual(perfect, [1.5, 1], 'the perfect-hook window is 50% wider at night, and as it was by day');
       // a cast at night with its lamp lit: the float sits in its light while a fish comes
       await page.mouse.move(195, 560); await page.mouse.down();
       for (let i = 1; i <= 10; i++) { await page.mouse.move(195, 560 + 14 * i); await page.waitForTimeout(16); }
