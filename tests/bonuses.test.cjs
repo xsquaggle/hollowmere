@@ -74,7 +74,7 @@ module.exports = [
       await openGame(page, { save: veteran({ coins: 777, rod: 'ash', rods: ['willow', 'ash'] }) });
       const before = await readSave(page);
       const r = await page.evaluate(() => { const s = window.__hm.simulate;
-        return { willow: s({ rod: 'willow' }, 1000), brass: s({ rod: 'brasscap' }, 1000), deep: s({ rod: 'ash', spot: 'deep', hour: 6.5 }, 1000), willowDeep: s({ rod: 'willow', spot: 'deep' }, 50), newb: s({ rod: 'brasscap', spot: 'mix', player: 'new' }, 1000) }; });
+        return { willow: s({ rod: 'willow' }, 3000), brass: s({ rod: 'brasscap' }, 3000), deep: s({ rod: 'ash', spot: 'deep', hour: 6.5 }, 1000), willowDeep: s({ rod: 'willow', spot: 'deep' }, 50), newb: s({ rod: 'brasscap', spot: 'mix', player: 'new' }, 1000) }; });
       for (const [k, x] of Object.entries(r)) {
         const lost = Object.values(x.lost).reduce((a, b) => a + b, 0), tiers = Object.values(x.tiers).reduce((a, b) => a + b, 0);
         assert.equal(x.landed + lost + x.treasure.rolled, x.casts, k + ': every cast lands, is lost, or pulls up treasure');
