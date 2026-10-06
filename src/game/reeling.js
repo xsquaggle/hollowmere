@@ -27,7 +27,7 @@ function newHaul(loot,perfect,from,lucky,spot){
   return fightOf(haulOf(loot),perfect,from,{id:null,loot,lucky,tut:false,mod,fam:false});
 }
 function fightOf(F,perfect,from,o){ const weight=F.beh==='weight';
-  return {lucky:o.lucky,id:o.id,loot:o.loot||null,F,perfect,fam:o.fam,mod:o.mod,dist:1,dir:0,tgt:0,dirT:o.tut?99:rand(1.2,1.8),tension:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
+  return {lucky:o.lucky,id:o.id,loot:o.loot||null,F,perfect,fam:o.fam,mod:o.mod,dist:1,dir:0,tgt:0,dirT:o.tut?99:rand(1.2,1.8),tension:o.limp?0:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
     from:{x:from.x,y:from.y},x:from.x,y:from.y,jump:null,nextJump:rand(2,3),dive:0,warn:0,nextDive:weight?snagGap(F):rand(2.4,3.4),surge:0,fade:0,nextFade:rand(2.2,3),
     click:0,splashT:0,buzzT:0,ph:weight?rand(0,6.28):0,limp:!!o.limp}; }
 /** Seconds between the bottom snagging a haul: heavier crates catch more often. */

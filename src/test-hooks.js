@@ -2,7 +2,7 @@
 window.__S=S; window.__K=K; window.__AQ=AQ; window.__MU=MU;
 // treasure stays off in the test build unless a test turns it on, so fishing tests always get a fish
 TREASURE_CTL.off=true;
-window.__hm={ get save(){ return save; }, FISH, RODS, ROD_ORDER, SEA_RODS, QUEST_RODS, BOAT, RIVER, WREN, TWIN, PARTS, PAINTS, POCKETS, REGION_FISH, RECIPES, DECOR, TANKS, STATS, FINDS, CRATES, TREASURE, NOTES, TACKLE, simulate, modList,
+window.__hm={ get save(){ return save; }, FISH, RODS, QUARTER, PELL_Q, ROD_ORDER, SEA_RODS, QUEST_RODS, BOAT, RIVER, WREN, TWIN, PARTS, PAINTS, POCKETS, REGION_FISH, RECIPES, DECOR, TANKS, STATS, FINDS, CRATES, TREASURE, NOTES, TACKLE, simulate, modList,
   gear:{ state:()=>gearState(), grant:(id,n)=>grantGear(id,n), rig:id=>rigGear(id), rigFor:r=>rigFor(r), load:id=>loadBait(id), on:()=>baitOn(), tick:()=>tickBait(), check:()=>baitCheck() },
   art:{ // the scene's trap art on one sheet, drawn into the main canvas and handed back as a picture
     trapSheet(){ ctx.setTransform(DPR,0,0,DPR,0,0); ctx.fillStyle='#3F8597'; ctx.fillRect(0,0,W,H); const k=1.6;
@@ -73,4 +73,23 @@ window.__hm={ get save(){ return save; }, FISH, RODS, ROD_ORDER, SEA_RODS, QUEST
     G:()=>({wreck:G.wreck, stacks:(G.stacks||[]).map(s=>({x:s.x,y:s.y,r:s.r,h:s.h})), deep:G.deep, kelp:G.kelp, near:G.near, hz:HZ, w:W, h:H}),
     washOf:i=>washOf(G.stacks[i]), washAt:(x,y)=>washAt(x,y), washBreak:(i,big)=>washBreak(i,big), atWreck:(x,y)=>atWreck(x,y), spot:(x,y)=>coastSpot(x,y),
     beamOn:()=>beamOn(), beamAngle:t=>beamAngle(t), beamFoot:()=>beamFoot(), beamOnAt:(x,y)=>beamOnAt(x,y), wait:dt=>coastWaiting(dt||.1), update:dt=>coastUpdate(dt||.1),
-    pool:(sp,l,at)=>poolFor(sp,l,at), mods:()=>{ MODC.dirty=true; return modList(); } } };
+    pool:(sp,l,at)=>poolFor(sp,l,at), mods:()=>{ MODC.dirty=true; return modList(); } },
+  quarter:{ QS, PL, DR, TC, MAIL, state:()=>quarterState(), open:()=>quarterOpen(), abs:()=>absHour(), travel:r=>travelTo(r), reg:()=>REG(), rod:id=>{ if (id){ save.rod=id; MODC.dirty=true; } return save.rod; },
+    G:()=>{ const q=G.q; return q&&{holes:q.holes.map(h=>({kind:h.kind, house:h.house, spot:h.spot, x:(h.x0+h.x1)/2, y:(h.y0+h.y1)/2, base:h.base})), solids:q.solids.map(o=>({kind:o.kind, id:o.id||null, x0:o.x0, x1:o.x1, y0:o.y0, base:o.base})),
+      mail:q.mail, box:q.box, tower:{x:q.tower.x, base:q.tower.base}, refl:(q.refl||[]).length, deep:G.deep, near:G.near, hz:HZ, w:W, h:H}; },
+    hit:(x,y)=>{ const h=quarterHit(x,y); return {kind:h.kind, spot:h.spot, house:h.house||null, solid:h.solid?h.solid.kind:null}; }, foot:(x,y)=>{ const f=quarterFoot(x,y); return {x:f.x, y:f.y, spot:f.hit.spot}; },
+    aim:(x,y)=>{ const a=quarterAim({target:{x,y}}); return a&&{text:a.text, post:!!a.post, danger:!!a.danger, x:a.mark.x, y:a.mark.y}; },
+    land:(x,y)=>{ const c={to:{x,y}}; quarterLand(c); return {x:c.to.x, y:c.to.y, spot:c.spot, house:c.hole?c.hole.house:null}; },
+    post:house=>postLetter(G.q.holes.find(h=>h.house===house)), refl:(x,y)=>quarterRefl(x,y), from:house=>quarterFrom({x:0, hole:G.q.holes.find(h=>h.house===house)}),
+    bell:{ ringing:()=>bellRinging(), natural:()=>bellNatural(), cooling:()=>bellCooling(), ring:()=>ringBell() },
+    pages:{ list:()=>QS.pages.map(p=>({x:p.x, y:p.y, env:!!p.env})), spawn:env=>{ QS.forceEnv=!!env; QS.pageT=0; quarterPages(.01); return QS.pages.length; }, scoop:i=>scoopPage(QS.pages[i==null?QS.pages.length-1:i]),
+      at:(x,y)=>!!pageAt(x,y), drift:any=>driftLetter(any), cast:()=>pageCast(), spent:()=>pageSpent() },
+    pell:{ open:()=>openPell(), met:k=>pellMet(k), step:k=>pellStep(k), news:()=>pellHasNews(), fix:()=>fixRowboat(), claim:k=>claimStep(k), clip:id=>clipLetter(id), due:()=>replyDue(),
+      afterCatch:L=>pellAfterCatch(L), reads:()=>pellReads(), on:(x,y)=>onPell(x,y), at:()=>mailAt(), update:dt=>pellUpdate(dt), mail:()=>({state:MAIL.state, say:MAIL.say, sayT:MAIL.sayT, hold:MAIL.hold}) },
+    dread:{ state:()=>dreadState(), tick:()=>dreadTick(), afterCatch:(L,a)=>dreadAfterCatch(L,a), sold:f=>dreadSold(f), looks:()=>lakeLooks(), eye:()=>DR.eye&&{t:DR.eye.t, took:DR.eye.took, n:DR.eye.n},
+      inkDue:()=>inkDue(), startInk:()=>startInk(), ink:()=>S.wait&&S.wait.ink&&{phase:S.wait.ink.phase, x:S.wait.ink.x, y:S.wait.ink.y}, inkWait:dt=>inkWaiting(dt), strike:()=>inkStrike(),
+      limp:(F,from,mod)=>{ const R={F, dist:1, from, dir:0, onIt:0, tension:0, slack:0, click:0, splashT:1, mod:mod||{reel:1}, x:from.x, y:from.y}, ev=[]; let t=0, out=null, n=0;
+        while (!out && n<4000){ out=limpStep(R,1/30,{ev, steer:()=>0, holding:true, t}); t+=1/30; n++; } return {secs:t, out, clicks:ev.filter(e=>e==='click').length, tension:R.tension}; } },
+    call:{ blow:()=>blowConch(), wait:()=>callWait(), on:(x,y)=>onConch(x,y), pos:()=>conchPos() },
+    story:house=>{ const H0=G.q.holes.find(h=>h.house===house); return storyLoot({x:(H0.x0+H0.x1)/2, y:H0.base-4, spot:H0.spot, hole:H0}); },
+    mods:()=>{ MODC.dirty=true; return modList(); } } };

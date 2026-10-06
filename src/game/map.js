@@ -120,7 +120,7 @@ function travelTo(to,first){
     setTimeout(()=>{ if (!S.tut) coachFor('Tide pools left on the mud keep fish trapped, and they bite fast. When the tide floods the flats, the mullet come up to graze.',8); },13000); }
   if (to==='quarter' && !save.quarterSeen){ save.quarterSeen=true; persist();
     setTimeout(()=>coachFor('The Drowned Quarter. Walls and roofs stop a cast short, so aim through the doors and windows: the float goes into the drowned rooms, and different fish live in each.',10),900);
-    setTimeout(()=>{ if (!S.tut) coachFor('Pell’s moored at the post office steps. Tap him for his round.',7); },12500); }
+    setTimeout(()=>{ if (!S.tut) coachFor('Pell’s moored by the post office. Tap him for his round.',7); },12500); }
   if (to==='coast' && !save.coastSeen){ save.coastSeen=true; persist();
     setTimeout(()=>coachFor('Welcome to Gullrock Coast! Swells roll in from the sea. A cast that lands in a breaking swell washes out, and a swell hitting your line spikes the tension, so let go as it passes.',9),900);
     setTimeout(()=>{ if (!S.tut) coachFor('Ottilie mailed you her old waterproof phone. Tap Phone to order sea rods and boat parts from Tacklegram.',8); },11000); }

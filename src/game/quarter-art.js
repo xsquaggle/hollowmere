@@ -7,7 +7,7 @@
    dark water the float sits on). The layers are redrawn as the light changes (rvKey). What moves each frame: the water
    lapping at every wall and swaying the reflections, bubbles out of the doorways, the drowned pages, the bell and its
    rope, the clock's hands trembling while it rings, the weather vane, the post office's sign, a shutter, the gulls on
-   the chimneys and the pillar box, the cat on No. 9's roof, Pell in his boat at the post office steps, and the rowboat
+   the chimneys and the pillar box, the cat on No. 9's roof, Pell in his boat at the post office's corner, and the rowboat
    you're in. Colours go through rvTone (game/river-art.js), so the Quarter follows the clock. */
 const QA={key:'', near:null, refl:null, rooms:null, swing:0, ang:0, av:0, vane:0, gulls:[], cat:null, bubbles:[], bubT:1, shutter:0, flap:0};
 const HOUSE_COL=[{wall:'#8E5644', dark:'#6A3E31', light:'#A86A54', brick:1, paper:'#7A5A64'},   // soot-dark brick
@@ -278,8 +278,8 @@ function drawPage(c,p,t){ const k=sc(p.y), a=p.a*(p.gone?Math.max(0,1-p.gone/1.2
   c.fillStyle='rgba(8,20,22,.25)'; c.fillRect(-10,-6,22,15);
   if (p.env) drawDriftEnvelope(c); else drawDriftPage(c,p);
   c.restore();
-  // a glint to say it can be picked up
-  if (!p.gone && !quarterHidden(p.x,p.y)){ const g=Math.pow(Math.max(0,Math.sin(t*1.7+p.ph)),8); if (g>.05){ c.fillStyle='rgba(255,248,225,'+(g*.8).toFixed(2)+')'; c.beginPath(); c.arc(p.x+6*k,p.y-3*k,1.4+g*1.6,0,Math.PI*2); c.fill(); } } }
+  // a glint to say it can be picked up: an envelope's is gold, and catches the eye more often
+  if (!p.gone && !quarterHidden(p.x,p.y)){ const g=Math.pow(Math.max(0,Math.sin(t*(p.env?2.4:1.7)+p.ph)),p.env?4:8); if (g>.05){ c.fillStyle=(p.env?'rgba(255,226,140,':'rgba(255,248,225,')+(g*.8).toFixed(2)+')'; c.beginPath(); c.arc(p.x+6*k,p.y-3*k,1.4+g*(p.env?2.4:1.6),0,Math.PI*2); c.fill(); } } }
 
 function drawDriftPage(c,p){ c.fillStyle='#DCD3BC'; c.beginPath(); c.moveTo(-11,-8); c.lineTo(9,-8); c.lineTo(11,-5); c.lineTo(11,8); c.lineTo(-11,8); c.closePath(); c.fill();
   c.fillStyle='#C3B99E'; c.beginPath(); c.moveTo(9,-8); c.lineTo(11,-5); c.lineTo(9,-5); c.closePath(); c.fill();
@@ -298,7 +298,7 @@ function drawQuarterNear(){ if (!QA.near) return; const c=ctx, t=S.time, q=G.q;
   const T=q.tower; if (T) drawTowerLive(c,T,t);
   if (q.po) drawPostSign(c,q.po,t);
   drawShutter(c,t);
-  // Pell at the post office steps, in his mail boat
+  // Pell at the post office's corner, in his mail boat
   if (q.mail){ const m=q.mail; c.save(); c.translate(m.x,m.y+Math.sin(t*1.3)*1.1*m.s); c.scale(m.s,m.s); drawMailBoat(0,0); c.restore(); }
   for (const g of QA.gulls) drawGullSitting(g.x,g.y+(g.preen>0?Math.sin(g.preen*9)*.6:0),g.k*1.2,t+g.ph);
   if (QA.cat) drawQuarterCat(c,QA.cat,t);

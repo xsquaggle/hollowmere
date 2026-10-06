@@ -8,5 +8,5 @@
 .sack-row.blank{opacity:.55}
 .sack-row.blank canvas{filter:grayscale(1)}
 .sack-row .btn{justify-self:end}
-.hl-item.rod{grid-template-columns:1fr}
-.hl-item.rod canvas.rod-art{max-width:none;height:64px;margin:2px 0}
+.hl-item.hl-rod{grid-template-columns:1fr}
+.hl-item.hl-rod canvas.rod-art{max-width:none;height:64px;margin:2px 0}

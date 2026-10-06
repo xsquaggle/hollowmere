@@ -1,6 +1,7 @@
 /* ---------- The pace log: how long a run takes to reach each thing (the depth gate, step 24) ----------
    Counts minutes of play: the page showing and someone touching it in the last PACE_IDLE seconds, in a room too.
-   Every few seconds it notes anything new the save holds (a rod, the boat, the ferry, the punt to the marsh, a boat
+   Every few seconds it notes anything new the save holds (a rod, the boat, the ferry, the punt to the marsh, Pell's
+   rowboat to the Drowned Quarter, a boat
    part, a line of the fix-up list, a vest pocket, a rune or a species caught) with the minute it came. Playtest > Pace sets the log beside the
    simulator's whole run (data/pace.js), so a friend's phone shows where the game ran slow or fast for them.
    save.pace = {secs, log:[[key, minute]], seen:{key:1}, late:true when the log began on a save already under way,
@@ -18,6 +19,7 @@ function paceKeys(){ const k=[];
   if (save.boat) k.push('boat');
   if (save.ferry) k.push('ferry');
   if (save.marsh) k.push('marsh');
+  if (save.quarter && save.quarter.row) k.push('quarter');
   for (const id of save.parts||[]) if (PARTS[id]) k.push('part:'+id);
   for (const id of (isObj(save.shack) && Array.isArray(save.shack.fix) ? save.shack.fix : [])) if (FIXUP.some(L=>L.id===id)) k.push('fix:'+id);
   const n=isObj(save.finds) ? +save.finds.pockets||0 : 0; for (let i=POCKETS.start+1;i<=Math.min(n,POCKETS.max);i++) k.push('pocket:'+i);
@@ -32,6 +34,7 @@ function paceTick(dt){ if (SIMULATING || INTRO.active || document.hidden || S.ti
 /** What a key is called in the table. */
 function paceName(k){ const [kind,raw]=String(k).split(':'), id=String(raw).replace(/[<>&"]/g,'');   // a log read from a pasted backup code could hold anything
   if (kind==='rod') return RODS[id]?RODS[id].name:id; if (kind==='boat') return 'The boat'; if (kind==='ferry') return 'Ottilie’s ferry'; if (kind==='marsh') return 'Wren’s punt to Saltmarsh';
+  if (kind==='quarter') return 'Pell’s rowboat to the Drowned Quarter';
   if (kind==='part') return PARTS[id]?PARTS[id].name:id; if (kind==='fix'){ const L=FIXUP.find(L=>L.id===id); return L?L.name:id; }
   if (kind==='pocket') return 'Vest pocket '+id; if (kind==='rune') return ENCH[id]?ENCH[id].name:id;
   if (kind==='fish') return FISH[id]?FISH[id].name:id; return String(k).replace(/[<>&"]/g,''); }

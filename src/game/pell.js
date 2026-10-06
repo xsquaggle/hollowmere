@@ -2,14 +2,15 @@
 /* Pell was nine when the water came, with a satchel and a round. Now he runs the mail boat (game/tacklegram.js: MAIL),
    and once you have a boat of your own he asks you to fix the post office's old rowboat, which rows you out over the
    drowned west end of town (game/quarter.js). His round, in order (PELL_Q): the rowboat; Edith's letter posted through
-   No. 4's door; the first answer a Postman Sturgeon brings up; Albert's letter posted into the bell tower; the three
-   letters the post office never sent, which float out of its window among the drowned pages, posted. Each step's
+   No. 4's door; the first answer a Postman Sturgeon brings up; Albert's letter posted into the bell tower (it comes up
+   at the lake, or floats out of the post office window among the drowned pages); the three letters the post office
+   never sent, which float out the same way, posted. Each step's
    reward waits on his sheet once it's met.
    A letter's state (save.finds.letters, game/treasure.js): waiting (for Pell to collect), delivered (he has it: the
    Quarter's letters go in his sack, to be posted), posted (through its door). One letter at a time can be clipped to
    your line (save.quarter.clip); cast it through its door and it's posted (postLetter, from game/quarter.js). Each
    posted letter's answer (NOTES r_<id>) comes back on the next Postman Sturgeon you land, and Pell reads it out.
-   He's reached in his boat at the post office steps in the Quarter, and at the lake whenever his mail boat stops at
+   He's reached in his boat at the post office's corner in the Quarter, and at the lake whenever his mail boat stops at
    your dock (he calls in on his own when he has something for you). The map's Drowned Quarter card opens his sheet
    too, so the rowboat can always be fixed. */
 const PL={next:16, callT:20, hello:false};
@@ -35,7 +36,7 @@ function pellHasNews(){ if (!save.tutorialDone) return false; const q=quarterSta
   return PELL_STEPS.some(k=>pellStep(k)==='ready'); }
 
 /* ---------- where he is, and what he says ---------- */
-/** A tap on Pell: in his boat at the post office steps, or on his mail boat while it's stopped at your dock. */
+/** A tap on Pell: in his boat at the post office's corner, or on his mail boat while it's stopped at your dock. */
 function onPell(x,y){ if (S.state!=='idle') return false; const m=mailAt(), s=m.s;
   if (REG()==='quarter') return !!(G.q && G.q.mail) && x>m.x-42*s && x<m.x+46*s && y>m.y-48*s && y<m.y+12*s;
   return MAIL.state==='stopped' && !!save.boat && x>m.x-42 && x<m.x+48 && y>m.y-48 && y<m.y+12; }
@@ -141,5 +142,5 @@ function replyDue(){ const FS=findsState(); return LETTER_ORDER.find(id=>FS.lett
 function pellAfterCatch(L){ if (!L || L.id!=='sturgeon' || SIMULATING) return; const re=replyDue(); if (!re) return;
   const id=replyOf(re), FS=findsState(); FS.notes.push(id); FS.letters[id]='waiting'; persist(); updateJournalDot();
   news('The Postman Sturgeon was carrying a letter','gold');
-  const show=()=>{ if (S.state==="idle" && $("sheet").hidden && $("note").hidden){ openNote(id,{fresh:true, done:()=>letterToPell(id)}); } else setTimeout(show,900); };
+  const show=()=>{ if (S.state==='idle' && $('sheet').hidden && $('note').hidden){ openNote(id,{fresh:true, done:()=>letterToPell(id)}); } else setTimeout(show,900); };
   setTimeout(show,800); }

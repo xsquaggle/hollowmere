@@ -57,7 +57,8 @@ function lakeLooks(){ const d=dreadTick(); if (d.v<100) return;
     coachFor('The lake looked back. '+(bits.length?'It took '+bits.join(' and ')+'. ':'It found nothing of its own to take. ')+'Dread is empty, for now.',10); news('The lake looked back','bad'); },4400); }
 function updateEye(dt){ const E=DR.eye; if (!E) return; E.t+=dt;
   // the coins it's owed fly from your purse down into it
-  if (E.took>0 && E.t>1.5 && E.t<2.6 && Math.random()<dt*28){ const n=1; for (let i=0;i<n;i++) S.particles.push({x:rand(24,70),y:DR.hudB-24,vx:(E.x-40)/1.1+rand(-30,30),vy:rand(20,90),g:160,life:0,max:1.1,r:rand(2.6,3.6),c:'rgba(233,190,82,',rect:true,spin:rand(-10,10)}); }
+  if (E.took>0 && E.t>1.5 && E.t<2.6 && Math.random()<dt*28){ const x=rand(24,70), y=DR.hudB-24, t=rand(1,1.25), g=160, ex=E.x+rand(-30,30), ey=E.y+rand(-6,6);
+    S.particles.push({x, y, vx:(ex-x)/t, vy:(ey-y-g*t*t/2)/t, g, life:0, max:t, r:rand(2.6,3.6), c:'rgba(233,190,82,', rect:true, spin:rand(-10,10)}); }
   if (E.t>5.2) DR.eye=null; }
 /** The eye in the water: the surface darkens, lids part on a pale iris that turns to look at you, it blinks once, and
     it closes. Drawn under the fish and the float (game/render.js). */
@@ -111,7 +112,7 @@ function drawBoneInk(b,mx,my,t){ if (!holdingBone()) return; const v=save.dread?
 /* ---------- no fight ---------- */
 /** A Bonewhistle fish comes straight in: no turns, no tension, no slack. It drifts in on its own, faster as you reel. */
 function limpStep(R,dt,io){ const ev=io.ev, F=R.F;
-  io.tilt=io.steer(R,dt); R.dir=lerp(R.dir,Math.sin(io.t*.5+(R.ph||0))*.12,Math.min(1,dt*1.5)); R.onIt+=dt; R.tension=Math.max(0,R.tension-dt*2); R.slack=0;
+  io.tilt=io.steer(R,dt); R.dir=lerp(R.dir,Math.sin(io.t*.5+(R.ph||0))*.12,Math.min(1,dt*1.5)); R.onIt+=dt; R.tension=0; R.slack=0;
   const spd=(io.holding?1/Math.min(F.reel,3.2):1/7)*R.mod.reel; io.reeling=io.holding; R.dist-=spd*dt;
   if (io.holding){ R.click+=spd*dt; while (R.click>.03){ R.click-=.03; ev.push('click'); } }
   const k=1-R.dist, by=lerp(R.from.y,Math.min(G.near+22,H-140),k), bx=lerp(R.from.x,W/2,k);

@@ -1214,8 +1214,8 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 .sack-row.blank{opacity:.55}
 .sack-row.blank canvas{filter:grayscale(1)}
 .sack-row .btn{justify-self:end}
-.hl-item.rod{grid-template-columns:1fr}
-.hl-item.rod canvas.rod-art{max-width:none;height:64px;margin:2px 0}
+.hl-item.hl-rod{grid-template-columns:1fr}
+.hl-item.hl-rod canvas.rod-art{max-width:none;height:64px;margin:2px 0}
 </style>
 
 </head>
@@ -1401,23 +1401,23 @@ const FISH = {
             lore:'Its tail burns like a candle wick and never goes out. Wren swears it was a candle once.', hint:'Rises where rain meets lantern light.'},
   reeve:   {name:'Old Reeve', rarity:'legendary', beh:'darter', pull:1.8, reel:14.5, value:1200, size:[90,130], len:84, h:.24, color:'#7A888C', fin:'#55636A', window:.72,
             lore:'The marsh-reeve kept the sea wall for forty years. Something still swims its length at every spring tide, checking for leaks.', hint:'Something big patrols the channel and the sluice pool at the spring tides.'},
-  gudgeon: {name:'Sooty Gudgeon', rarity:'common', beh:'darter', pull:.85, reel:2.6, value:7, size:[10,20], len:30, h:.24, color:'#6E6C68', fin:'#4C4A47', window:1.4,
+  gudgeon: {name:'Sooty Gudgeon', rarity:'common', beh:'darter', pull:.85, reel:2.6, value:8, size:[10,20], len:30, h:.24, color:'#6E6C68', fin:'#4C4A47', window:1.4,
             lore:'Lives in the drowned chimneys. It goes in grey and comes out black, and it never minds which.', hint:'Common all along Lantern Row.'},
-  roach:   {name:'Parlour Roach', rarity:'common', beh:'sleeper', pull:.8, reel:3, value:8, size:[16,30], len:34, h:.3, color:'#A3A9A6', fin:'#C2584A', window:1.5,
+  roach:   {name:'Parlour Roach', rarity:'common', beh:'sleeper', pull:.8, reel:3, value:9, size:[16,30], len:34, h:.3, color:'#A3A9A6', fin:'#C2584A', window:1.5,
             lore:'Keeps to the front rooms, and to the best chair in them. It has a red eye for anyone who sits there.', hint:'Dozes in the front rooms, behind the windows.'},
-  hingejaw:{name:'Hingejaw', rarity:'uncommon', beh:'darter', pull:1.05, reel:4.2, value:25, size:[20,38], len:38, h:.3, color:'#7D8463', fin:'#596046', window:1.1,
+  hingejaw:{name:'Hingejaw', rarity:'uncommon', beh:'darter', pull:1.05, reel:4.2, value:30, size:[20,38], len:38, h:.3, color:'#7D8463', fin:'#596046', window:1.1,
             lore:'It lives in doorframes and slams shut when startled.', hint:'Lurks in the doorways.'},
-  drainpipe:{name:'Drainpipe Eel', rarity:'uncommon', beh:'sulker', wx:'rain', pull:1.05, reel:4.4, value:24, size:[45,85], len:60, h:.09, color:'#5E534B', fin:'#433B35', window:1.15,
+  drainpipe:{name:'Drainpipe Eel', rarity:'uncommon', beh:'sulker', wx:'rain', pull:1.05, reel:4.4, value:32, size:[45,85], len:60, h:.09, color:'#5E534B', fin:'#433B35', window:1.15,
             lore:'Comes down the drainpipes in the rain, all the way from gutters it remembers.', hint:'Comes down the drainpipes when it rains.'},
-  laceshad:{name:'Lace Shad', rarity:'rare', beh:'ghost', wx:'fog', pull:1.25, reel:6.6, value:70, size:[28,48], len:44, h:.28, color:'#C8CBC6', fin:'#98A2A6', window:.95,
+  laceshad:{name:'Lace Shad', rarity:'rare', beh:'ghost', wx:'fog', pull:1.25, reel:6.6, value:110, size:[28,48], len:44, h:.28, color:'#C8CBC6', fin:'#98A2A6', window:.95,
             lore:'Its fins are as fine as the curtains it hides in. When the fog is in, it drifts out through the windows.', hint:'Drifts out of the windows when the fog is in.'},
-  sturgeon:{name:'Postman Sturgeon', rarity:'rare', beh:'tugger', pull:1.35, reel:7.4, value:90, size:[70,130], len:70, h:.16, color:'#5F6F7F', fin:'#3F4D5B', window:.92,
+  sturgeon:{name:'Postman Sturgeon', rarity:'rare', beh:'tugger', pull:1.35, reel:7.4, value:150, size:[70,130], len:70, h:.16, color:'#5F6F7F', fin:'#3F4D5B', window:.92,
             lore:'Always carries a letter. The letters are addressed to people who still live in town.', hint:'Does its round of the post office, mostly in the morning.'},
   hearth:  {name:'Hearthfish', rarity:'epic', beh:'darter', night:true, glow:true, extra:true, pull:1.5, reel:9.5, value:480, size:[30,52], len:46, h:.32, color:'#B6643C', fin:'#7C3A22', window:.84,
             lore:'Warm to the touch, like a hearthstone. It only rises where a window is lit, and only in the reflection.', hint:'At night, something warm swims in the reflections of the lit windows.'},
-  papercarp:{name:'Paper Carp', rarity:'epic', beh:'leaper', secret:true, extra:true, pull:1.45, reel:9, value:420, size:[26,46], len:42, h:.34, color:'#E4DCC8', fin:'#BCB299', window:.86,
+  papercarp:{name:'Paper Carp', rarity:'epic', beh:'leaper', secret:true, extra:true, pull:1.45, reel:9, value:500, size:[26,46], len:42, h:.34, color:'#E4DCC8', fin:'#BCB299', window:.86,
             lore:'Folded, somehow, from a letter: a word or two still shows along its side. It never eats the pages. It reads them.', hint:'Something in the Quarter reads anything that floats.'},
-  choir:   {name:'Choir Fish', rarity:'legendary', beh:'leaper', pull:1.75, reel:14, value:1300, size:[90,140], len:80, h:.26, color:'#9AA6B8', fin:'#6A7488', window:.72,
+  choir:   {name:'Choir Fish', rarity:'legendary', beh:'leaper', pull:1.75, reel:14, value:1600, size:[90,140], len:80, h:.26, color:'#9AA6B8', fin:'#6A7488', window:.72,
             lore:'Sings in harmony with something below it.', hint:'Something answers the bell tower, but only while its bell rings.'}
 };
 const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'];
@@ -1487,8 +1487,8 @@ const POOLS_QUARTER = {
   open:   {gudgeon:58, roach:16, hingejaw:8, sturgeon:2.5},
   doors:  {hingejaw:46, gudgeon:24, roach:10, sturgeon:4},
   windows:{roach:52, gudgeon:20, hingejaw:10, sturgeon:3},
-  post:   {sturgeon:14, gudgeon:34, roach:22, hingejaw:12},
-  deep:   {gudgeon:34, hingejaw:22, roach:14, sturgeon:6},
+  post:   {sturgeon:16, gudgeon:34, roach:22, hingejaw:12},
+  deep:   {gudgeon:30, hingejaw:24, roach:12, sturgeon:12},
   far:    {gudgeon:40, roach:22, hingejaw:14, sturgeon:5}
 };
 const RARE_BITES={
@@ -1498,8 +1498,8 @@ const RARE_BITES={
   bellmouth:{region:'marsh', spots:['open','deep','far','flats'], wx:'rain', flag:'bellmouth', chance:1/14},
   lampwick:{region:['marsh','lake'], spots:['reeds','open'], night:true, wx:'rain', flag:'lantern', chance:1/12},
   comber:{region:'coast', spots:['open','far','rocks','wash','kelp','wreck'], churn:true, chance:1/16},
-  choir:{region:'quarter', spots:['deep'], flag:'ringing', chance:1/4},
-  hearth:{region:'quarter', spots:['open','doors','windows','post'], night:true, at:'refl', chance:1/7},
+  choir:{region:'quarter', spots:['deep'], flag:'ringing', chance:1/6},
+  hearth:{region:'quarter', spots:['open'], night:true, at:'refl', chance:1/7},
   papercarp:{region:'quarter', flag:'page', chance:1/5}
 };
 const DRY={from:80, to:200, max:2};
@@ -2392,8 +2392,8 @@ const COAST_LINES={
    PELL     hello: his first words in the Quarter; lines: what he says now and then while you fish near him; wait:
             the news when he's come by the lake dock with something for you, and call: what he says then; reads: what
             he says as he takes a letter that came up for the Quarter; noboat: his ask before you have a boat; posted:
-            what he says as a letter goes in at its door; where: where a letter on his round turns up (sack: the
-            letters the post office never sent, which drift out of its window among the pages: game/quarter.js).
+            what he says as a letter goes in at its door; where: where a letter on his round turns up (Albert's, and
+            the letters the post office never sent, drift out of its window among the pages: game/quarter.js).
             post: where each letter is posted (a house in the scene, game/quarter.js: QHOUSES).
    DREAD    the Bonewhistle's curse, 0 to 100. gain: Dread per catch with it, by rarity; inked: how much more an Inked
             catch adds; fade: how much it falls each in-game hour you aren't holding it; luck: the luck points it lends
@@ -2437,7 +2437,7 @@ const PELL={
   noboat:'There’s a place I’d show you, if you had a boat. Under the lake, where the old town was. Come and find me when you’ve one of your own.',
   call:'Over here! I’ve something for you.',
   posted:['In it goes. Good shot.','Through the door. My father would have tipped his cap.','That’s gone in. Mind, it’s a long way back up.'],
-  where:{edith:'It’s in his sack somewhere.', albert:'It comes up out of the deep pool at the lake now and then, and out of the post office here.',
+  where:{edith:'It’s in his sack somewhere.', albert:'It comes up out of the deep pool at the lake now and then. Or watch the post office window here: it’ll float out with the pages.',
          sack:'They drift out of the post office window with the drowned pages. Watch the water for an envelope.'}
 };
 const DREAD={
@@ -2447,12 +2447,13 @@ const DREAD={
 const CALL={hours:2, cool:24};
 
 /* Pace: when a steady player reaches each thing, from the depth gate's whole-run report (step 24; Rootwood River
-   added in step 25, the Saltmarsh in step 26, Gullrock Coast's later fish and spots in step 27).
+   added in step 25, the Saltmarsh in step 26, Gullrock Coast's later fish and spots in step 27, the Drowned Quarter
+   and Pell's round in step 28).
    PACE_SIM[key]  minutes of play until it, the median of 11 runs of `npm run sim -- --career --runs 11 --pace`
-                  (paste its output here after a balance change). Keys: rod:<id>, boat, ferry, marsh, part:<id>, fix:<id>
+                  (paste its output here after a balance change). Keys: rod:<id>, boat, ferry, marsh, quarter, part:<id>, fix:<id>
                   (the fix-up list), pocket:<n> (the vest's nth pocket), rune:<id>, fish:<id> (the first one caught).
                   Playtest > Pace (game/pace.js) sets a real run beside these. */
-const PACE_SIM={'fish:leafjack':5, 'fish:perch':5, 'rod:reedcutter':6, 'fish:mossback':10, 'rune:swift':20, 'fish:lantern':21, 'fish:reedwhisker':21, 'rod:ash':24, 'rod:heronwood':42, 'fish:gar':44, 'rune:magpie':46, 'fish:char':52, 'fish:mayor':52, 'ferry':63, 'marsh':69, 'rune:deep':73, 'fish:brook':78, 'fish:stone':79, 'fish:barbel':80, 'fish:mudlark':83, 'fish:dab':83, 'fish:mullet':85, 'rod:brasscap':86, 'fish:clockfin':92, 'fish:gristle':94, 'rod:twin':94, 'rune:nightglass':100, 'boat':108, 'fish:reeve':110, 'fish:bream':113, 'fish:grouper':113, 'fish:sprat':113, 'fish:kelpeel':113, 'fish:herring':119, 'fish:angler':122, 'fish:croaker':126, 'fix:roof':127, 'rod:saltline':138, 'rune:storm':143, 'fish:saltjaw':151, 'part:hold':189, 'fish:comber':194, 'rune:wanderer':196, 'fix:net':214, 'fish:gurnard':218, 'rune:odd':248, 'pocket:2':252, 'part:sonar':265, 'part:keel':280, 'fish:wrasse':280, 'rod:gale':284, 'rune:homebody':284, 'fix:lamp':290, 'fish:spindrift':290, 'rune:echo':327, 'fix:stove':343, 'pocket:3':353, 'fix:cabinet':413, 'rod:deepwater':432, 'pocket:4':466, 'fix:panel':485, 'fix:knock':518, 'pocket:5':569};
+const PACE_SIM={'fish:leafjack':5, 'fish:perch':5, 'fish:mossback':6, 'rod:reedcutter':10, 'rod:ash':20, 'fish:lantern':21, 'rune:swift':21, 'fish:gar':35, 'fish:reedwhisker':38, 'rod:heronwood':44, 'fish:mayor':44, 'rune:magpie':48, 'fish:char':50, 'ferry':61, 'marsh':67, 'fish:stone':76, 'rune:deep':77, 'fish:brook':77, 'fish:mudlark':84, 'fish:dab':84, 'fish:mullet':85, 'fish:barbel':90, 'fish:croaker':102, 'rod:brasscap':103, 'fix:roof':107, 'rune:nightglass':107, 'fish:clockfin':117, 'fish:gristle':117, 'boat':126, 'fish:bream':131, 'fish:sprat':131, 'fish:grouper':131, 'fish:reeve':133, 'fish:angler':138, 'fish:kelpeel':138, 'rod:twin':141, 'rune:storm':147, 'rod:saltline':158, 'fish:herring':167, 'fish:saltjaw':176, 'rune:wanderer':197, 'part:hold':198, 'quarter':210, 'fish:gudgeon':216, 'fish:roach':216, 'fish:hingejaw':216, 'fish:wrasse':219, 'fix:net':219, 'fish:sturgeon':220, 'fish:papercarp':222, 'rune:odd':233, 'rod:tidecaller':252, 'fish:spindrift':260, 'pocket:2':268, 'fish:gurnard':268, 'rune:homebody':271, 'fish:hearth':282, 'rod:gale':306, 'part:sonar':310, 'rune:echo':325, 'part:keel':332, 'fix:lamp':349, 'fix:stove':370, 'pocket:3':376, 'fish:comber':379, 'rod:deepwater':435, 'fix:cabinet':443, 'pocket:4':475, 'fix:panel':504, 'fix:knock':548, 'pocket:5':595};
 
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
@@ -3274,7 +3275,7 @@ function newHaul(loot,perfect,from,lucky,spot){
   return fightOf(haulOf(loot),perfect,from,{id:null,loot,lucky,tut:false,mod,fam:false});
 }
 function fightOf(F,perfect,from,o){ const weight=F.beh==='weight';
-  return {lucky:o.lucky,id:o.id,loot:o.loot||null,F,perfect,fam:o.fam,mod:o.mod,dist:1,dir:0,tgt:0,dirT:o.tut?99:rand(1.2,1.8),tension:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
+  return {lucky:o.lucky,id:o.id,loot:o.loot||null,F,perfect,fam:o.fam,mod:o.mod,dist:1,dir:0,tgt:0,dirT:o.tut?99:rand(1.2,1.8),tension:o.limp?0:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
     from:{x:from.x,y:from.y},x:from.x,y:from.y,jump:null,nextJump:rand(2,3),dive:0,warn:0,nextDive:weight?snagGap(F):rand(2.4,3.4),surge:0,fade:0,nextFade:rand(2.2,3),
     click:0,splashT:0,buzzT:0,ph:weight?rand(0,6.28):0,limp:!!o.limp}; }
 /** Seconds between the bottom snagging a haul: heavier crates catch more often. */
@@ -6053,7 +6054,7 @@ function haulItemHTML(it,i){ const st=' style="--i:'+i+'"';
     return '<div class="hl-item rf" data-r="uncommon"'+st+'><canvas class="hl-art map" data-map="'+it.n+'"></canvas><div class="hl-txt"><span class="k">Treasure map · piece '+Math.min(it.n,MAPS.pieces)+' of '+MAPS.pieces+'</span><h3>'+(whole?'The map is whole':'A piece of a map')+'</h3><p>'+
       (whole?'It rings a stretch of '+REGION_NAME[reg||REG()]+'. Cast inside the ring to dig up what’s buried there.'+(pin?' Your Cartographer’s Pin marks the exact spot.':''):(MAPS.pieces-it.n===1?'One more piece':(MAPS.pieces-it.n)+' more pieces')+' and it shows where something is buried'+(reg&&reg!==REG()?'':' in '+REGION_NAME[reg||REG()])+'.')+'</p></div></div>'; }
   if (it.type==='rod'){ const R=RODS[it.id];
-    return '<div class="hl-item rf rod" data-r="epic"'+st+'><div class="hl-txt"><span class="k">'+(R.cursed?'Cursed rod':'Rod')+' · <b>New</b></span><h3>'+R.name+'</h3><canvas class="rod-art" data-rodart="'+it.id+'" aria-hidden="true"></canvas><p>'+R.blurb+'</p><p class="down">'+R.perk+'</p>'+
+    return '<div class="hl-item rf hl-rod" data-r="epic"'+st+'><div class="hl-txt"><span class="k">'+(R.cursed?'Cursed rod':'Rod')+' · <b>New</b></span><h3>'+R.name+'</h3><canvas class="rod-art" data-rodart="'+it.id+'" aria-hidden="true"></canvas><p>'+R.blurb+'</p><p class="down">'+R.perk+'</p>'+
       (save.rod===it.id?'<p class="on">In your hands.</p>':'<button class="btn sm" type="button" data-holdrod="'+it.id+'">Hold it</button><p class="mini">It’s on your rack and in your bag, if you’d rather not.</p>')+'</div></div>'; }
   if (it.type==='spare') return '<div class="hl-item spare"'+st+'><div class="hl-txt"><span class="k">Spare coins</span><h3><span class="coin"></span>+'+it.n.toLocaleString()+'</h3><p>You’ve found every '+RAR[it.rarity].label.toLowerCase()+' thing this could have held, so it paid in coins.</p></div></div>';
   return ''; }
@@ -9158,7 +9159,7 @@ function drawWrenPunt(){ const o=wrenPos(), t=S.time, bob=Math.sin(t*1.25)*1.2, 
 /* Old Hollowmere's west end, drowned to its first floors. You row out over it in Pell's old post-office rowboat, once
    it's fixed (his sheet: game/pell.js). The scene is the street seen down its length: Lantern Row's terrace on the left
    (No. 4 nearest the street, the bakery at No. 6 beside it), the post office on the right with Pell's mail boat at its
-   steps, two cottages in front of it drowned to their roofs (No. 9's attic window just clears the water), lamp posts
+   corner, two cottages in front of it drowned to their roofs (No. 9's attic window just clears the water), lamp posts
    standing up out of the street, and at the end of it the bell tower, leaning, its clock stopped at 3:12.
    Every building is a solid with openings in it. A cast that would come down behind a wall hits it (Tok!) and drops at
    its foot; one aimed at a doorway or a window goes through it into the drowned room, and the float sits there, seen
@@ -9201,7 +9202,7 @@ function layoutQuarter(){
   // drowned roofs further down the street, either side, breaking the water to their eaves
   sseed=811; for (const [fx,d,w] of [[.2,.55,92],[.33,.58,74],[.66,.56,86],[.8,.6,90]]){ const b=dy(d), s=sc(b);
     q.roofs.push(solid({kind:'roof', x0:W*fx-w*s/2, x1:W*fx+w*s/2, y0:b-34*s, y1:b, base:b, s, d, far:true, chim:sr()<.7?sr():null, hue:Math.floor(sr()*3)})); }
-  // the post office on the right of the street: two big arched openings at the water, and the boat Pell keeps at its steps
+  // the post office on the right of the street: two big arched openings at the water, and the boat Pell keeps at its corner
   { const b=dy(R.post), s=sc(b), x0=W*QUARTER.lane[1], w=150*s;
     const P=q.po=solid({kind:'post', x0, x1:x0+w, y0:b-130*s, y1:b, base:b, s, d:R.post, w});
     hole(P,'bigwin',x0+w*.27,44,24,'post','post',true); hole(P,'podoor',x0+w*.68,28,36,'post','post',true);
@@ -9209,7 +9210,8 @@ function layoutQuarter(){
     let xx=x0+w; sseed=823; let n=1; while (xx<W+4){ const hw=(70+sr()*14)*s, H0=solid({kind:'house', id:'no'+n, x0:xx, x1:xx+hw, y0:b-104*s, y1:b, base:b, s, d:R.post, w:hw, hue:Math.floor(sr()*4), right:true});
       hole(H0,'door',xx+hw*.3,20,26,'doors'); hole(H0,'window',xx+hw*.72,26,18,'windows'); q.houses.push(H0); xx+=hw; n+=2; }
     q.box={x:x0+w*.9, y:b+7*s, s};
-    q.mail={x:x0+w*.3, y:b+16*s, s:s*.92};
+    // Pell's boat is tied up at the corner, clear of the windows
+    q.mail={x:x0-26*s, y:b+20*s, s:s*.92};
     solid({kind:'mail', x0:q.mail.x-40*q.mail.s, x1:q.mail.x+44*q.mail.s, y0:q.mail.y-38*q.mail.s, y1:q.mail.y+8*q.mail.s, base:q.mail.y+8*q.mail.s, s, d:R.post-.04});
     solid({kind:'box', x0:q.box.x-7*s, x1:q.box.x+7*s, y0:q.box.y-18*s, y1:q.box.y, base:q.box.y, s, d:R.post-.02}); }
   // Lantern Row on the left: No. 4 against the street, the bakery at No. 6, then on out of sight
@@ -9227,7 +9229,7 @@ function layoutQuarter(){
     hole(N9,'dormer',x9-4*s,20,16,'windows','no9'); q.roofs.push(N9);
     q.roofs.push(solid({kind:'cottage', id:'no11', x0:x9+w/2, x1:x9+w/2+80*s, y0:b-40*s, y1:b, base:b, s, d, chim:.7})); }
   // cast-iron lamp posts standing up out of the street
-  for (const [fx,d] of [[.3,.15],[.43,.47],[.57,.62]]){ const b=dy(d), s=sc(b), x=W*fx;
+  for (const [fx,d] of [[.24,.15],[.43,.47],[.57,.62]]){ const b=dy(d), s=sc(b), x=W*fx;
     q.lamps.push(solid({kind:'lamp', x, x0:x-5*s, x1:x+5*s, y0:b-50*s, y1:b, base:b, s, d})); }
   // nearest first, for hit tests; the art draws them farthest first
   q.solids.sort((a,b)=>b.base-a.base);
@@ -9245,7 +9247,7 @@ function inSolid(S,x,y){
   if (S.kind==='house'){ const eave=S.base-80*S.s; if (y>=eave) return true; return y>=S.y0+((x>S.x1-S.w*.12||x<S.x0+S.w*.12)?6*S.s:0); }
   if (S.kind==='roof'||S.kind==='wing'||S.kind==='cottage'){ const u=(x-S.x0)/(S.x1-S.x0), slope=Math.min(u,1-u)/.16; return y>=S.y0+(S.y1-S.y0)*.85*(1-Math.min(1,slope))+(S.chim!=null&&Math.abs(u-S.chim)<.07?-20*S.s:0); }
   if (S.kind==='lamp') return Math.abs(x-S.x)<(y<S.base-36*S.s?6*S.s:2.6*S.s);
-  return true; }
+  return y>=S.y0; }
 const inHole = (H0,x,y) => x>=H0.x0-3 && x<=H0.x1+3 && y>=H0.y0-3 && y<=H0.y1+1;
 /** What a cast aimed at (x, y) meets: an opening (the float goes in), a wall (it drops at the foot), or water. */
 function quarterHit(x,y){ const q=G.q; if (!q) return {kind:'water', spot:'open'};
@@ -9308,7 +9310,7 @@ function handBell(v){ tone(1568,.5,{vol:.07*v,type:'sine'}); tone(1568*2.4,.3,{v
 /** Pages float out of the post office's big window and drift up the street toward the boat. */
 function quarterPages(dt){ const q=G.q; if (!q || !q.po) return; const P=QUARTER.page;
   QS.pageT-=dt; if (QS.pageT<=0 && QS.pages.length<P.most && S.state!=='loot'){ QS.pageT=rand(P.every[0],P.every[1]); const H0=q.po.holes[0], s=H0.s;
-    // once Pell's asked for them, the letters the post office never sent come out with the pages, one at a time
+    // once Pell's asked for them, the letters the post office has kept come out with the pages, one at a time
     const env=QS.forceEnv?!!driftLetter(true):!!driftLetter() && !QS.pages.some(p=>p.env) && Math.random()<.5; QS.forceEnv=false;
     QS.pages.push({x:lerp(H0.x0,H0.x1,rand(.2,.8)), y:H0.base-2*s, vx:-rand(5,11), vy:rand(5,9), r:rand(-.6,.6), vr:rand(-.25,.25), ph:rand(0,6.28), a:0, t:0, ink:Math.floor(rand(0,3)), env}); }
   for (const p of QS.pages){ const k=sc(p.y); p.t+=dt; p.x+=p.vx*k*dt+Math.sin(S.time*.4+p.ph)*2*k*dt; p.y+=p.vy*k*dt; p.r+=p.vr*dt; p.a=Math.min(1,p.a+dt*.8);
@@ -9317,8 +9319,11 @@ function quarterPages(dt){ const q=G.q; if (!q || !q.po) return; const P=QUARTER
 /** The drifting page under a tap, if any (it has to be out in the street, not still behind the wall). */
 function pageAt(x,y){ if (REG()!=='quarter' || S.state!=='idle') return null;
   for (const p of QS.pages){ const k=sc(p.y); if (!p.gone && !quarterHidden(p.x,p.y) && Math.hypot(x-p.x,(y-p.y)*1.4)<24*k+6) return p; } return null; }
-/** The next of the post office's never-sent letters to drift out, once Pell's asked for them (game/pell.js). */
-function driftLetter(any){ if (!any && !(save.quarter && save.quarter.done && save.quarter.done.tower)) return null; const FS=findsState(); return PELL.sack.find(id=>!FS.letters[id])||null; }
+/** The next letter to drift out of the post office window, once Pell's asked for it (game/pell.js): Albert's, while
+    his round is on the bell tower and it hasn't turned up yet, then the post office's three never-sent letters. */
+function driftLetter(any){ const d=(save.quarter&&save.quarter.done)||{}, FS=findsState();
+  if (!FS.letters.albert && (any || d.answer)) return 'albert';
+  if (!any && !d.tower) return null; return PELL.sack.find(id=>!FS.letters[id])||null; }
 /** Scoop a page onto the hook: it goes out on your next cast, and something in the Quarter reads them. An envelope
     is one of the letters the post office never sent: it opens, and goes to Pell. */
 function scoopPage(p){ const q=quarterState(); QS.pages=QS.pages.filter(o=>o!==p);
@@ -9379,7 +9384,7 @@ const afloat = () => REG()==='coast' || REG()==='quarter';
    dark water the float sits on). The layers are redrawn as the light changes (rvKey). What moves each frame: the water
    lapping at every wall and swaying the reflections, bubbles out of the doorways, the drowned pages, the bell and its
    rope, the clock's hands trembling while it rings, the weather vane, the post office's sign, a shutter, the gulls on
-   the chimneys and the pillar box, the cat on No. 9's roof, Pell in his boat at the post office steps, and the rowboat
+   the chimneys and the pillar box, the cat on No. 9's roof, Pell in his boat at the post office's corner, and the rowboat
    you're in. Colours go through rvTone (game/river-art.js), so the Quarter follows the clock. */
 const QA={key:'', near:null, refl:null, rooms:null, swing:0, ang:0, av:0, vane:0, gulls:[], cat:null, bubbles:[], bubT:1, shutter:0, flap:0};
 const HOUSE_COL=[{wall:'#8E5644', dark:'#6A3E31', light:'#A86A54', brick:1, paper:'#7A5A64'},   // soot-dark brick
@@ -9650,8 +9655,8 @@ function drawPage(c,p,t){ const k=sc(p.y), a=p.a*(p.gone?Math.max(0,1-p.gone/1.2
   c.fillStyle='rgba(8,20,22,.25)'; c.fillRect(-10,-6,22,15);
   if (p.env) drawDriftEnvelope(c); else drawDriftPage(c,p);
   c.restore();
-  // a glint to say it can be picked up
-  if (!p.gone && !quarterHidden(p.x,p.y)){ const g=Math.pow(Math.max(0,Math.sin(t*1.7+p.ph)),8); if (g>.05){ c.fillStyle='rgba(255,248,225,'+(g*.8).toFixed(2)+')'; c.beginPath(); c.arc(p.x+6*k,p.y-3*k,1.4+g*1.6,0,Math.PI*2); c.fill(); } } }
+  // a glint to say it can be picked up: an envelope's is gold, and catches the eye more often
+  if (!p.gone && !quarterHidden(p.x,p.y)){ const g=Math.pow(Math.max(0,Math.sin(t*(p.env?2.4:1.7)+p.ph)),p.env?4:8); if (g>.05){ c.fillStyle=(p.env?'rgba(255,226,140,':'rgba(255,248,225,')+(g*.8).toFixed(2)+')'; c.beginPath(); c.arc(p.x+6*k,p.y-3*k,1.4+g*(p.env?2.4:1.6),0,Math.PI*2); c.fill(); } } }
 
 function drawDriftPage(c,p){ c.fillStyle='#DCD3BC'; c.beginPath(); c.moveTo(-11,-8); c.lineTo(9,-8); c.lineTo(11,-5); c.lineTo(11,8); c.lineTo(-11,8); c.closePath(); c.fill();
   c.fillStyle='#C3B99E'; c.beginPath(); c.moveTo(9,-8); c.lineTo(11,-5); c.lineTo(9,-5); c.closePath(); c.fill();
@@ -9670,7 +9675,7 @@ function drawQuarterNear(){ if (!QA.near) return; const c=ctx, t=S.time, q=G.q;
   const T=q.tower; if (T) drawTowerLive(c,T,t);
   if (q.po) drawPostSign(c,q.po,t);
   drawShutter(c,t);
-  // Pell at the post office steps, in his mail boat
+  // Pell at the post office's corner, in his mail boat
   if (q.mail){ const m=q.mail; c.save(); c.translate(m.x,m.y+Math.sin(t*1.3)*1.1*m.s); c.scale(m.s,m.s); drawMailBoat(0,0); c.restore(); }
   for (const g of QA.gulls) drawGullSitting(g.x,g.y+(g.preen>0?Math.sin(g.preen*9)*.6:0),g.k*1.2,t+g.ph);
   if (QA.cat) drawQuarterCat(c,QA.cat,t);
@@ -9785,14 +9790,15 @@ function quarterArtUpdate(dt){ const q=G.q; if (!q) return;
 /* Pell was nine when the water came, with a satchel and a round. Now he runs the mail boat (game/tacklegram.js: MAIL),
    and once you have a boat of your own he asks you to fix the post office's old rowboat, which rows you out over the
    drowned west end of town (game/quarter.js). His round, in order (PELL_Q): the rowboat; Edith's letter posted through
-   No. 4's door; the first answer a Postman Sturgeon brings up; Albert's letter posted into the bell tower; the three
-   letters the post office never sent, which float out of its window among the drowned pages, posted. Each step's
+   No. 4's door; the first answer a Postman Sturgeon brings up; Albert's letter posted into the bell tower (it comes up
+   at the lake, or floats out of the post office window among the drowned pages); the three letters the post office
+   never sent, which float out the same way, posted. Each step's
    reward waits on his sheet once it's met.
    A letter's state (save.finds.letters, game/treasure.js): waiting (for Pell to collect), delivered (he has it: the
    Quarter's letters go in his sack, to be posted), posted (through its door). One letter at a time can be clipped to
    your line (save.quarter.clip); cast it through its door and it's posted (postLetter, from game/quarter.js). Each
    posted letter's answer (NOTES r_<id>) comes back on the next Postman Sturgeon you land, and Pell reads it out.
-   He's reached in his boat at the post office steps in the Quarter, and at the lake whenever his mail boat stops at
+   He's reached in his boat at the post office's corner in the Quarter, and at the lake whenever his mail boat stops at
    your dock (he calls in on his own when he has something for you). The map's Drowned Quarter card opens his sheet
    too, so the rowboat can always be fixed. */
 const PL={next:16, callT:20, hello:false};
@@ -9818,7 +9824,7 @@ function pellHasNews(){ if (!save.tutorialDone) return false; const q=quarterSta
   return PELL_STEPS.some(k=>pellStep(k)==='ready'); }
 
 /* ---------- where he is, and what he says ---------- */
-/** A tap on Pell: in his boat at the post office steps, or on his mail boat while it's stopped at your dock. */
+/** A tap on Pell: in his boat at the post office's corner, or on his mail boat while it's stopped at your dock. */
 function onPell(x,y){ if (S.state!=='idle') return false; const m=mailAt(), s=m.s;
   if (REG()==='quarter') return !!(G.q && G.q.mail) && x>m.x-42*s && x<m.x+46*s && y>m.y-48*s && y<m.y+12*s;
   return MAIL.state==='stopped' && !!save.boat && x>m.x-42 && x<m.x+48 && y>m.y-48 && y<m.y+12; }
@@ -9924,7 +9930,7 @@ function replyDue(){ const FS=findsState(); return LETTER_ORDER.find(id=>FS.lett
 function pellAfterCatch(L){ if (!L || L.id!=='sturgeon' || SIMULATING) return; const re=replyDue(); if (!re) return;
   const id=replyOf(re), FS=findsState(); FS.notes.push(id); FS.letters[id]='waiting'; persist(); updateJournalDot();
   news('The Postman Sturgeon was carrying a letter','gold');
-  const show=()=>{ if (S.state==="idle" && $("sheet").hidden && $("note").hidden){ openNote(id,{fresh:true, done:()=>letterToPell(id)}); } else setTimeout(show,900); };
+  const show=()=>{ if (S.state==='idle' && $('sheet').hidden && $('note').hidden){ openNote(id,{fresh:true, done:()=>letterToPell(id)}); } else setTimeout(show,900); };
   setTimeout(show,800); }
 
 /* ---------- The Bonewhistle and Dread: a cursed rod, the ink that haunts a cast, and the lake looking back (data/quarter.js: DREAD) ---------- */
@@ -9986,7 +9992,8 @@ function lakeLooks(){ const d=dreadTick(); if (d.v<100) return;
     coachFor('The lake looked back. '+(bits.length?'It took '+bits.join(' and ')+'. ':'It found nothing of its own to take. ')+'Dread is empty, for now.',10); news('The lake looked back','bad'); },4400); }
 function updateEye(dt){ const E=DR.eye; if (!E) return; E.t+=dt;
   // the coins it's owed fly from your purse down into it
-  if (E.took>0 && E.t>1.5 && E.t<2.6 && Math.random()<dt*28){ const n=1; for (let i=0;i<n;i++) S.particles.push({x:rand(24,70),y:DR.hudB-24,vx:(E.x-40)/1.1+rand(-30,30),vy:rand(20,90),g:160,life:0,max:1.1,r:rand(2.6,3.6),c:'rgba(233,190,82,',rect:true,spin:rand(-10,10)}); }
+  if (E.took>0 && E.t>1.5 && E.t<2.6 && Math.random()<dt*28){ const x=rand(24,70), y=DR.hudB-24, t=rand(1,1.25), g=160, ex=E.x+rand(-30,30), ey=E.y+rand(-6,6);
+    S.particles.push({x, y, vx:(ex-x)/t, vy:(ey-y-g*t*t/2)/t, g, life:0, max:t, r:rand(2.6,3.6), c:'rgba(233,190,82,', rect:true, spin:rand(-10,10)}); }
   if (E.t>5.2) DR.eye=null; }
 /** The eye in the water: the surface darkens, lids part on a pale iris that turns to look at you, it blinks once, and
     it closes. Drawn under the fish and the float (game/render.js). */
@@ -10040,7 +10047,7 @@ function drawBoneInk(b,mx,my,t){ if (!holdingBone()) return; const v=save.dread?
 /* ---------- no fight ---------- */
 /** A Bonewhistle fish comes straight in: no turns, no tension, no slack. It drifts in on its own, faster as you reel. */
 function limpStep(R,dt,io){ const ev=io.ev, F=R.F;
-  io.tilt=io.steer(R,dt); R.dir=lerp(R.dir,Math.sin(io.t*.5+(R.ph||0))*.12,Math.min(1,dt*1.5)); R.onIt+=dt; R.tension=Math.max(0,R.tension-dt*2); R.slack=0;
+  io.tilt=io.steer(R,dt); R.dir=lerp(R.dir,Math.sin(io.t*.5+(R.ph||0))*.12,Math.min(1,dt*1.5)); R.onIt+=dt; R.tension=0; R.slack=0;
   const spd=(io.holding?1/Math.min(F.reel,3.2):1/7)*R.mod.reel; io.reeling=io.holding; R.dist-=spd*dt;
   if (io.holding){ R.click+=spd*dt; while (R.click>.03){ R.click-=.03; ev.push('click'); } }
   const k=1-R.dist, by=lerp(R.from.y,Math.min(G.near+22,H-140),k), bx=lerp(R.from.x,W/2,k);
@@ -10472,7 +10479,7 @@ function travelTo(to,first){
     setTimeout(()=>{ if (!S.tut) coachFor('Tide pools left on the mud keep fish trapped, and they bite fast. When the tide floods the flats, the mullet come up to graze.',8); },13000); }
   if (to==='quarter' && !save.quarterSeen){ save.quarterSeen=true; persist();
     setTimeout(()=>coachFor('The Drowned Quarter. Walls and roofs stop a cast short, so aim through the doors and windows: the float goes into the drowned rooms, and different fish live in each.',10),900);
-    setTimeout(()=>{ if (!S.tut) coachFor('Pell’s moored at the post office steps. Tap him for his round.',7); },12500); }
+    setTimeout(()=>{ if (!S.tut) coachFor('Pell’s moored by the post office. Tap him for his round.',7); },12500); }
   if (to==='coast' && !save.coastSeen){ save.coastSeen=true; persist();
     setTimeout(()=>coachFor('Welcome to Gullrock Coast! Swells roll in from the sea. A cast that lands in a breaking swell washes out, and a swell hitting your line spikes the tension, so let go as it passes.',9),900);
     setTimeout(()=>{ if (!S.tut) coachFor('Ottilie mailed you her old waterproof phone. Tap Phone to order sea rods and boat parts from Tacklegram.',8); },11000); }
@@ -10500,7 +10507,7 @@ function grant(o){
   else if (o.kind==='gear' && TACKLE[o.id]){ grantGear(o.id); fitNewGear(o.id); }
 }
 function itemName(o){ return o.kind==='rod'?RODS[o.id].name:o.kind==='part'?PARTS[o.id].name:o.kind==='gear'?(TACKLE[o.id]||{}).name:PAINTS[o.id].name+' paint'; }
-/** Where Pell's mail boat is: coming up to your dock, or moored at the post office steps in the Drowned Quarter
+/** Where Pell's mail boat is: coming up to your dock, or moored at the post office's corner in the Drowned Quarter
     (drawn with the street there: game/quarter-art.js). */
 function mailAt(){ const q=REG()==='quarter' && G.q && G.q.mail;
   if (q) return {x:q.x, y:q.y+Math.sin(S.time*1.3)*1.1*q.s, s:q.s, moored:true};
@@ -14309,6 +14316,11 @@ function openTrapShop(){ const s=trapState();
    or in fog so does a float the lighthouse beam crosses (the beam's glow fish likelier). Both happen by chance as often
    as the clocks line up with the wait, and a player who times casts to them (SIM_PLAYERS seventh, beam) gets more.
    The wash only lies by a stack after a swell breaks there, so a cast to it waits for one, and is never washed out.
+   In the Drowned Quarter every cast goes in where it's aimed (through its door or window; no wall in the way), the
+   player scoops up a drowned page as one drifts by (SIM_PLAYERS pages: how many of them), so the Paper Carp gets its
+   chance on the cast after, and at night aims for the lit windows' reflections in the street (refl) for the
+   Hearthfish. The bell tower rings with the clock (3:12 to 4:12). The Bonewhistle's Dread is held at st.dread for the
+   run (0 unless named): its luck counts, the lake looking back and the ink shadow don't.
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
@@ -14322,9 +14334,9 @@ function openTrapShop(){ const s=trapState();
    comes back untouched. */
 const SIM_PLAYERS={
   steady:{name:'Steady player', react:()=>.2+.38*Math.pow(Math.random(),1.6), easeReact:()=>rand(.12,.32), track:5, easeAt:.8, easeFor:.45,
-          twitch:true, dives:.8, tugs:.7, jumps:.85, swells:.5, seventh:.1, beam:.2},
+          twitch:true, dives:.8, tugs:.7, jumps:.85, swells:.5, seventh:.1, beam:.2, pages:.8, refl:.5},
   new:   {name:'New player', react:()=>.28+.6*Math.pow(Math.random(),1.3), easeReact:()=>rand(.25,.6), track:3, easeAt:.9, easeFor:.35,
-          twitch:false, dives:.4, tugs:.35, jumps:.5, swells:.15, seventh:.03, beam:.08}
+          twitch:false, dives:.4, tugs:.35, jumps:.5, swells:.15, seventh:.03, beam:.08, pages:.4, refl:.15}
 };
 /* Where each spot sits on the cast's 0 (shore) to 1 (horizon) scale: [nearest edge, middle]. The rod's reach
    has to cover the nearest edge. Worked out from the layout in game/layout.js and game/regions.js on a
@@ -14332,14 +14344,15 @@ const SIM_PLAYERS={
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
                  coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], wash:[.34,.45], deep:[.43,.53], wreck:[.72,.77], far:[.8,.9]},
                  river:{open:[0,.3], riffle:[0,.12], leaves:[.3,.38], deep:[.7,.78], roots:[.82,.9]},
-                 marsh:{open:[0,.3], reeds:[0,.15], flats:[.13,.3], pans:[.28,.35], deep:[.43,.5], far:[.8,.9]}};
+                 marsh:{open:[0,.3], reeds:[0,.15], flats:[.13,.3], pans:[.28,.35], deep:[.43,.5], far:[.8,.9]},
+                 quarter:{open:[0,.3], windows:[.2,.3], doors:[.3,.33], post:[.36,.36], deep:[.64,.69], far:[.82,.9]}};
 /** On the river, how far a float can drift across the screen through each spot before it's off the right edge (shares of
     the width, from where a player casts into it): the riffle and the roots lie to the right, so their runway is short. */
 const RIVER_RUN={open:.8, leaves:.62, deep:.75, riffle:.18, roots:.4};
 /** A stand-in save for a setup. tanks, parts, fish, finds and gear can be copied from a real save ("Use my setup"). */
 function simSave(st){
   const s=fresh(), now=Date.now(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
-  s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.marsh=s.region==='marsh'||!!st.marsh; s.ferry=s.region==='river'||s.marsh||!!st.ferry; s.clock=st.hour==null?12:st.hour;
+  s.region=st.region||'lake'; s.boat=s.region==='coast'||s.region==='quarter'||!!st.boat; s.marsh=s.region==='marsh'||!!st.marsh; s.ferry=s.region==='river'||s.marsh||!!st.ferry; s.clock=st.hour==null?12:st.hour;
   s.rod=st.rod||'willow'; s.rods=[s.rod]; s.parts=st.parts==='all'?Object.keys(PARTS):(st.parts||[]).slice();
   s.tune=Object.assign(fresh().tune,st.tune||save.tune);
   s.stats.catches=st.catches==null?100:st.catches;            // a player well past the first treasure
@@ -14372,6 +14385,9 @@ function simSave(st){
   if (st.enchSave) s.ench=JSON.parse(JSON.stringify(st.enchSave));
   else { const ids=(st.ench||[]).filter(id=>ENCH[id]).slice(0,RODS[s.rod].ench||1); s.ench={own:Object.fromEntries(ids.map(id=>[id,1])), rig:{[s.rod]:ids}}; }
   s.glimmer=0; s.day=0; s.wander=null;
+  // the Drowned Quarter: Pell's rowboat fixed. The Bonewhistle's Dread, held where it's named for the run
+  if (s.region==='quarter' || st.quarter) s.quarter={row:true, done:{rowboat:1}};
+  if (st.dread>0) s.dread={v:Math.min(100,+st.dread), at:s.clock, owed:0};
   s.wx={seed:7, force:WX_ORDER.includes(st.wx)?st.wx:'clear', seen:{}};      // the weather is pinned for a run: clear unless named
   if (Number.isInteger(st.moon)) s.wx.moon=st.moon;                          // and the moon, when named (MOON.full is full)
   s.stats.dry=0;
@@ -14410,6 +14426,7 @@ function simulate(st,n){
     const io={t:0,holding:true,tut:null,tilt:0,reeling:false,ev:[],why:''};
     let echo=null;                                                   // Echo: the next cast at that spot bites at once
     const tide0=Math.random();                                       // where in its turn the marsh's tide starts the run
+    const PG=QUARTER.page; let pageAt=rand(0,PG.every[1]);          // the Quarter: when the next drowned page drifts by
     const dayLen=modFlag('timeStop')?0:1440/modMul('clock');
     for (let c=0;c<n;c++){
       let spot=echo?echo.spot:spots[c%spots.length];   // an Echo waiting: the player casts back to it
@@ -14430,6 +14447,8 @@ function simulate(st,n){
       if (reg==='river' && !st.pin) save.clock=Math.floor(st.hour)+(c%12)/12+.02;
       // treasure instead of a fish (rolled once per cast, as the bobber lands): a haul through the fight step, and what's inside.
       // An Echo bites at once instead, unless treasure comes up first: then it keeps waiting.
+      // the Quarter: a drowned page the player scooped up as it drifted by goes out with this cast
+      if (reg==='quarter'){ const pg=out.secs>=pageAt; if (pg) pageAt=out.secs+rand(PG.every[0],PG.every[1])/P.pages; if (!!save.quarter.page!==pg){ save.quarter.page=pg?2:0; MODC.dirty=true; } }
       const loot=rollTreasure(cx), pend=echo; echo=loot?pend:null;
       const ech=!loot && pend ? pend.fish : null; if (ech){ wait=.35; out.echoes++; }
       if (loot){ const T=out.treasure; T.rolled++;
@@ -14443,7 +14462,7 @@ function simulate(st,n){
         t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'||loot.kind==='map'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
-      const at={bow:!!st.bow, path:!!st.path};
+      const at={bow:!!st.bow, path:!!st.path, refl:reg==='quarter' && spot==='open' && isNight(save.clock) && Math.random()<P.refl};
       // the coast: the seventh wave's churn, and the lighthouse beam at night, each bring a fish at once
       if (reg==='coast' && !ech){ const sevenP=(SWELL.big.churn+wait)/(SWELL.period*SWELL.set), beamP=(wait+BEAM.width/(BEAM.span[1]-BEAM.span[0])*BEAM.turn/2)/BEAM.turn;
         if (Math.random()<sevenP+(1-sevenP)*P.seventh){ at.churn=true; wait=Math.min(wait,rand(0,wait)+SWELL.big.in); }
@@ -14527,7 +14546,10 @@ const BAL_TIMES=[[6.5,'Dawn'],[12,'Noon'],[18.5,'Dusk'],[22,'Night']];
 const balTime=h=>h>=5&&h<8?6.5:isNight(h)?22:h>=17?18.5:12;
 function balMine(){ const m=save.meal, rig=rigFor(save.rod);
   return {region:REG(), spot:'open', hour:balTime(save.clock), rod:save.rod, reel:rig.reel, line:rig.line, bait:baitOn()||'', meal:mealActive()?m.id:'', stars:mealActive()?m.stars:3,
-    sets:'mine', parts:'mine', mastery:'mine', shack:'mine', finds:'mine', runes:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000}; }
+    sets:'mine', parts:'mine', mastery:'mine', shack:'mine', finds:'mine', runes:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000,
+    dread:BAL_DREAD.reduce((a,o)=>Math.abs(o-dreadNow())<Math.abs(a-dreadNow())?o:a)}; }
+const BAL_DREAD=[0,25,50,75,99];
+const dreadNow = () => save.dread ? clamp(+save.dread.v||0,0,100) : 0;
 function balanceFormHTML(){
   const f=BAL.form||(BAL.form=balMine());
   const sel=(id,label,opts,v)=>'<label for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(([k,l])=>'<option value="'+k+'"'+(String(k)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
@@ -14542,6 +14564,7 @@ function balanceFormHTML(){
     sel('bHour','Time',BAL_TIMES.map(([h,l])=>[h,l]),f.hour)+
     (f.region==='marsh'?sel('bTide','Tide',[['turn','Turning, as it does'],...TIDE_PINS.map(([v,l])=>[v,l+', held'])],f.tide||'turn'):'')+
     sel('bRod','Rod',ALL_RODS.map(id=>[id,RODS[id].name]),f.rod)+
+    (RODS[f.rod]&&RODS[f.rod].cursed?sel('bDread','Dread',BAL_DREAD.map(v=>[v,v?String(v):'None']),f.dread==null?50:f.dread):'')+
     sel('bReel','Reel',TACKLE_ORDER.reel.map(id=>[id,TACKLE[id].name]),f.reel||'clicker')+
     sel('bLine','Line',TACKLE_ORDER.line.map(id=>[id,TACKLE[id].name]),f.line||'cotton')+
     sel('bBait','Bait',[['','Bare hook'],...TACKLE_ORDER.bait.map(id=>[id,TACKLE[id].name])],f.bait||'')+
@@ -14570,9 +14593,10 @@ function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:
   if (f.runes==='mine' || !f.runes) st.enchSave=enchState(); else if (f.runes!=='none') st.ench=[f.runes];
   if (f.treasure==='no') st.treasure=false;
   if (f.region==='marsh' && f.tide!=null && f.tide!=='turn') st.tide=+f.tide;
+  if (RODS[f.rod] && RODS[f.rod].cursed) st.dread=f.dread==null?50:+f.dread;   // the Bonewhistle's Dread, held for the run
   return st; }
 function bindBalance(){
-  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bShack:'shack',bFinds:'finds',bRunes:'runes',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n',bTide:'tide'};
+  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bShack:'shack',bFinds:'finds',bRunes:'runes',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n',bTide:'tide',bDread:'dread'};
   for (const [id,k] of Object.entries(ids)) if ($(id)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
     if (k==='region') BAL.form.spot='open';
     if (k==='region' || k==='rod'){ const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; }
@@ -14618,7 +14642,8 @@ function balanceResultHTML(r,prev){
 
 /* ---------- The pace log: how long a run takes to reach each thing (the depth gate, step 24) ----------
    Counts minutes of play: the page showing and someone touching it in the last PACE_IDLE seconds, in a room too.
-   Every few seconds it notes anything new the save holds (a rod, the boat, the ferry, the punt to the marsh, a boat
+   Every few seconds it notes anything new the save holds (a rod, the boat, the ferry, the punt to the marsh, Pell's
+   rowboat to the Drowned Quarter, a boat
    part, a line of the fix-up list, a vest pocket, a rune or a species caught) with the minute it came. Playtest > Pace sets the log beside the
    simulator's whole run (data/pace.js), so a friend's phone shows where the game ran slow or fast for them.
    save.pace = {secs, log:[[key, minute]], seen:{key:1}, late:true when the log began on a save already under way,
@@ -14636,6 +14661,7 @@ function paceKeys(){ const k=[];
   if (save.boat) k.push('boat');
   if (save.ferry) k.push('ferry');
   if (save.marsh) k.push('marsh');
+  if (save.quarter && save.quarter.row) k.push('quarter');
   for (const id of save.parts||[]) if (PARTS[id]) k.push('part:'+id);
   for (const id of (isObj(save.shack) && Array.isArray(save.shack.fix) ? save.shack.fix : [])) if (FIXUP.some(L=>L.id===id)) k.push('fix:'+id);
   const n=isObj(save.finds) ? +save.finds.pockets||0 : 0; for (let i=POCKETS.start+1;i<=Math.min(n,POCKETS.max);i++) k.push('pocket:'+i);
@@ -14650,6 +14676,7 @@ function paceTick(dt){ if (SIMULATING || INTRO.active || document.hidden || S.ti
 /** What a key is called in the table. */
 function paceName(k){ const [kind,raw]=String(k).split(':'), id=String(raw).replace(/[<>&"]/g,'');   // a log read from a pasted backup code could hold anything
   if (kind==='rod') return RODS[id]?RODS[id].name:id; if (kind==='boat') return 'The boat'; if (kind==='ferry') return 'Ottilie’s ferry'; if (kind==='marsh') return 'Wren’s punt to Saltmarsh';
+  if (kind==='quarter') return 'Pell’s rowboat to the Drowned Quarter';
   if (kind==='part') return PARTS[id]?PARTS[id].name:id; if (kind==='fix'){ const L=FIXUP.find(L=>L.id===id); return L?L.name:id; }
   if (kind==='pocket') return 'Vest pocket '+id; if (kind==='rune') return ENCH[id]?ENCH[id].name:id;
   if (kind==='fish') return FISH[id]?FISH[id].name:id; return String(k).replace(/[<>&"]/g,''); }

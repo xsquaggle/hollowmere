@@ -20,7 +20,7 @@ function grant(o){
   else if (o.kind==='gear' && TACKLE[o.id]){ grantGear(o.id); fitNewGear(o.id); }
 }
 function itemName(o){ return o.kind==='rod'?RODS[o.id].name:o.kind==='part'?PARTS[o.id].name:o.kind==='gear'?(TACKLE[o.id]||{}).name:PAINTS[o.id].name+' paint'; }
-/** Where Pell's mail boat is: coming up to your dock, or moored at the post office steps in the Drowned Quarter
+/** Where Pell's mail boat is: coming up to your dock, or moored at the post office's corner in the Drowned Quarter
     (drawn with the street there: game/quarter-art.js). */
 function mailAt(){ const q=REG()==='quarter' && G.q && G.q.mail;
   if (q) return {x:q.x, y:q.y+Math.sin(S.time*1.3)*1.1*q.s, s:q.s, moored:true};

@@ -116,23 +116,23 @@ const FISH = {
             lore:'Its tail burns like a candle wick and never goes out. Wren swears it was a candle once.', hint:'Rises where rain meets lantern light.'},
   reeve:   {name:'Old Reeve', rarity:'legendary', beh:'darter', pull:1.8, reel:14.5, value:1200, size:[90,130], len:84, h:.24, color:'#7A888C', fin:'#55636A', window:.72,
             lore:'The marsh-reeve kept the sea wall for forty years. Something still swims its length at every spring tide, checking for leaks.', hint:'Something big patrols the channel and the sluice pool at the spring tides.'},
-  gudgeon: {name:'Sooty Gudgeon', rarity:'common', beh:'darter', pull:.85, reel:2.6, value:7, size:[10,20], len:30, h:.24, color:'#6E6C68', fin:'#4C4A47', window:1.4,
+  gudgeon: {name:'Sooty Gudgeon', rarity:'common', beh:'darter', pull:.85, reel:2.6, value:8, size:[10,20], len:30, h:.24, color:'#6E6C68', fin:'#4C4A47', window:1.4,
             lore:'Lives in the drowned chimneys. It goes in grey and comes out black, and it never minds which.', hint:'Common all along Lantern Row.'},
-  roach:   {name:'Parlour Roach', rarity:'common', beh:'sleeper', pull:.8, reel:3, value:8, size:[16,30], len:34, h:.3, color:'#A3A9A6', fin:'#C2584A', window:1.5,
+  roach:   {name:'Parlour Roach', rarity:'common', beh:'sleeper', pull:.8, reel:3, value:9, size:[16,30], len:34, h:.3, color:'#A3A9A6', fin:'#C2584A', window:1.5,
             lore:'Keeps to the front rooms, and to the best chair in them. It has a red eye for anyone who sits there.', hint:'Dozes in the front rooms, behind the windows.'},
-  hingejaw:{name:'Hingejaw', rarity:'uncommon', beh:'darter', pull:1.05, reel:4.2, value:25, size:[20,38], len:38, h:.3, color:'#7D8463', fin:'#596046', window:1.1,
+  hingejaw:{name:'Hingejaw', rarity:'uncommon', beh:'darter', pull:1.05, reel:4.2, value:30, size:[20,38], len:38, h:.3, color:'#7D8463', fin:'#596046', window:1.1,
             lore:'It lives in doorframes and slams shut when startled.', hint:'Lurks in the doorways.'},
-  drainpipe:{name:'Drainpipe Eel', rarity:'uncommon', beh:'sulker', wx:'rain', pull:1.05, reel:4.4, value:24, size:[45,85], len:60, h:.09, color:'#5E534B', fin:'#433B35', window:1.15,
+  drainpipe:{name:'Drainpipe Eel', rarity:'uncommon', beh:'sulker', wx:'rain', pull:1.05, reel:4.4, value:32, size:[45,85], len:60, h:.09, color:'#5E534B', fin:'#433B35', window:1.15,
             lore:'Comes down the drainpipes in the rain, all the way from gutters it remembers.', hint:'Comes down the drainpipes when it rains.'},
-  laceshad:{name:'Lace Shad', rarity:'rare', beh:'ghost', wx:'fog', pull:1.25, reel:6.6, value:70, size:[28,48], len:44, h:.28, color:'#C8CBC6', fin:'#98A2A6', window:.95,
+  laceshad:{name:'Lace Shad', rarity:'rare', beh:'ghost', wx:'fog', pull:1.25, reel:6.6, value:110, size:[28,48], len:44, h:.28, color:'#C8CBC6', fin:'#98A2A6', window:.95,
             lore:'Its fins are as fine as the curtains it hides in. When the fog is in, it drifts out through the windows.', hint:'Drifts out of the windows when the fog is in.'},
-  sturgeon:{name:'Postman Sturgeon', rarity:'rare', beh:'tugger', pull:1.35, reel:7.4, value:90, size:[70,130], len:70, h:.16, color:'#5F6F7F', fin:'#3F4D5B', window:.92,
+  sturgeon:{name:'Postman Sturgeon', rarity:'rare', beh:'tugger', pull:1.35, reel:7.4, value:150, size:[70,130], len:70, h:.16, color:'#5F6F7F', fin:'#3F4D5B', window:.92,
             lore:'Always carries a letter. The letters are addressed to people who still live in town.', hint:'Does its round of the post office, mostly in the morning.'},
   hearth:  {name:'Hearthfish', rarity:'epic', beh:'darter', night:true, glow:true, extra:true, pull:1.5, reel:9.5, value:480, size:[30,52], len:46, h:.32, color:'#B6643C', fin:'#7C3A22', window:.84,
             lore:'Warm to the touch, like a hearthstone. It only rises where a window is lit, and only in the reflection.', hint:'At night, something warm swims in the reflections of the lit windows.'},
-  papercarp:{name:'Paper Carp', rarity:'epic', beh:'leaper', secret:true, extra:true, pull:1.45, reel:9, value:420, size:[26,46], len:42, h:.34, color:'#E4DCC8', fin:'#BCB299', window:.86,
+  papercarp:{name:'Paper Carp', rarity:'epic', beh:'leaper', secret:true, extra:true, pull:1.45, reel:9, value:500, size:[26,46], len:42, h:.34, color:'#E4DCC8', fin:'#BCB299', window:.86,
             lore:'Folded, somehow, from a letter: a word or two still shows along its side. It never eats the pages. It reads them.', hint:'Something in the Quarter reads anything that floats.'},
-  choir:   {name:'Choir Fish', rarity:'legendary', beh:'leaper', pull:1.75, reel:14, value:1300, size:[90,140], len:80, h:.26, color:'#9AA6B8', fin:'#6A7488', window:.72,
+  choir:   {name:'Choir Fish', rarity:'legendary', beh:'leaper', pull:1.75, reel:14, value:1600, size:[90,140], len:80, h:.26, color:'#9AA6B8', fin:'#6A7488', window:.72,
             lore:'Sings in harmony with something below it.', hint:'Something answers the bell tower, but only while its bell rings.'}
 };
 const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'];
@@ -202,8 +202,8 @@ const POOLS_QUARTER = {
   open:   {gudgeon:58, roach:16, hingejaw:8, sturgeon:2.5},
   doors:  {hingejaw:46, gudgeon:24, roach:10, sturgeon:4},
   windows:{roach:52, gudgeon:20, hingejaw:10, sturgeon:3},
-  post:   {sturgeon:14, gudgeon:34, roach:22, hingejaw:12},
-  deep:   {gudgeon:34, hingejaw:22, roach:14, sturgeon:6},
+  post:   {sturgeon:16, gudgeon:34, roach:22, hingejaw:12},
+  deep:   {gudgeon:30, hingejaw:24, roach:12, sturgeon:12},
   far:    {gudgeon:40, roach:22, hingejaw:14, sturgeon:5}
 };
 const RARE_BITES={
@@ -213,8 +213,8 @@ const RARE_BITES={
   bellmouth:{region:'marsh', spots:['open','deep','far','flats'], wx:'rain', flag:'bellmouth', chance:1/14},
   lampwick:{region:['marsh','lake'], spots:['reeds','open'], night:true, wx:'rain', flag:'lantern', chance:1/12},
   comber:{region:'coast', spots:['open','far','rocks','wash','kelp','wreck'], churn:true, chance:1/16},
-  choir:{region:'quarter', spots:['deep'], flag:'ringing', chance:1/4},
-  hearth:{region:'quarter', spots:['open','doors','windows','post'], night:true, at:'refl', chance:1/7},
+  choir:{region:'quarter', spots:['deep'], flag:'ringing', chance:1/6},
+  hearth:{region:'quarter', spots:['open'], night:true, at:'refl', chance:1/7},
   papercarp:{region:'quarter', flag:'page', chance:1/5}
 };
 const DRY={from:80, to:200, max:2};

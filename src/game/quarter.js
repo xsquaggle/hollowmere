@@ -2,7 +2,7 @@
 /* Old Hollowmere's west end, drowned to its first floors. You row out over it in Pell's old post-office rowboat, once
    it's fixed (his sheet: game/pell.js). The scene is the street seen down its length: Lantern Row's terrace on the left
    (No. 4 nearest the street, the bakery at No. 6 beside it), the post office on the right with Pell's mail boat at its
-   steps, two cottages in front of it drowned to their roofs (No. 9's attic window just clears the water), lamp posts
+   corner, two cottages in front of it drowned to their roofs (No. 9's attic window just clears the water), lamp posts
    standing up out of the street, and at the end of it the bell tower, leaning, its clock stopped at 3:12.
    Every building is a solid with openings in it. A cast that would come down behind a wall hits it (Tok!) and drops at
    its foot; one aimed at a doorway or a window goes through it into the drowned room, and the float sits there, seen
@@ -45,7 +45,7 @@ function layoutQuarter(){
   // drowned roofs further down the street, either side, breaking the water to their eaves
   sseed=811; for (const [fx,d,w] of [[.2,.55,92],[.33,.58,74],[.66,.56,86],[.8,.6,90]]){ const b=dy(d), s=sc(b);
     q.roofs.push(solid({kind:'roof', x0:W*fx-w*s/2, x1:W*fx+w*s/2, y0:b-34*s, y1:b, base:b, s, d, far:true, chim:sr()<.7?sr():null, hue:Math.floor(sr()*3)})); }
-  // the post office on the right of the street: two big arched openings at the water, and the boat Pell keeps at its steps
+  // the post office on the right of the street: two big arched openings at the water, and the boat Pell keeps at its corner
   { const b=dy(R.post), s=sc(b), x0=W*QUARTER.lane[1], w=150*s;
     const P=q.po=solid({kind:'post', x0, x1:x0+w, y0:b-130*s, y1:b, base:b, s, d:R.post, w});
     hole(P,'bigwin',x0+w*.27,44,24,'post','post',true); hole(P,'podoor',x0+w*.68,28,36,'post','post',true);
@@ -53,7 +53,8 @@ function layoutQuarter(){
     let xx=x0+w; sseed=823; let n=1; while (xx<W+4){ const hw=(70+sr()*14)*s, H0=solid({kind:'house', id:'no'+n, x0:xx, x1:xx+hw, y0:b-104*s, y1:b, base:b, s, d:R.post, w:hw, hue:Math.floor(sr()*4), right:true});
       hole(H0,'door',xx+hw*.3,20,26,'doors'); hole(H0,'window',xx+hw*.72,26,18,'windows'); q.houses.push(H0); xx+=hw; n+=2; }
     q.box={x:x0+w*.9, y:b+7*s, s};
-    q.mail={x:x0+w*.3, y:b+16*s, s:s*.92};
+    // Pell's boat is tied up at the corner, clear of the windows
+    q.mail={x:x0-26*s, y:b+20*s, s:s*.92};
     solid({kind:'mail', x0:q.mail.x-40*q.mail.s, x1:q.mail.x+44*q.mail.s, y0:q.mail.y-38*q.mail.s, y1:q.mail.y+8*q.mail.s, base:q.mail.y+8*q.mail.s, s, d:R.post-.04});
     solid({kind:'box', x0:q.box.x-7*s, x1:q.box.x+7*s, y0:q.box.y-18*s, y1:q.box.y, base:q.box.y, s, d:R.post-.02}); }
   // Lantern Row on the left: No. 4 against the street, the bakery at No. 6, then on out of sight
@@ -71,7 +72,7 @@ function layoutQuarter(){
     hole(N9,'dormer',x9-4*s,20,16,'windows','no9'); q.roofs.push(N9);
     q.roofs.push(solid({kind:'cottage', id:'no11', x0:x9+w/2, x1:x9+w/2+80*s, y0:b-40*s, y1:b, base:b, s, d, chim:.7})); }
   // cast-iron lamp posts standing up out of the street
-  for (const [fx,d] of [[.3,.15],[.43,.47],[.57,.62]]){ const b=dy(d), s=sc(b), x=W*fx;
+  for (const [fx,d] of [[.24,.15],[.43,.47],[.57,.62]]){ const b=dy(d), s=sc(b), x=W*fx;
     q.lamps.push(solid({kind:'lamp', x, x0:x-5*s, x1:x+5*s, y0:b-50*s, y1:b, base:b, s, d})); }
   // nearest first, for hit tests; the art draws them farthest first
   q.solids.sort((a,b)=>b.base-a.base);
@@ -89,7 +90,7 @@ function inSolid(S,x,y){
   if (S.kind==='house'){ const eave=S.base-80*S.s; if (y>=eave) return true; return y>=S.y0+((x>S.x1-S.w*.12||x<S.x0+S.w*.12)?6*S.s:0); }
   if (S.kind==='roof'||S.kind==='wing'||S.kind==='cottage'){ const u=(x-S.x0)/(S.x1-S.x0), slope=Math.min(u,1-u)/.16; return y>=S.y0+(S.y1-S.y0)*.85*(1-Math.min(1,slope))+(S.chim!=null&&Math.abs(u-S.chim)<.07?-20*S.s:0); }
   if (S.kind==='lamp') return Math.abs(x-S.x)<(y<S.base-36*S.s?6*S.s:2.6*S.s);
-  return true; }
+  return y>=S.y0; }
 const inHole = (H0,x,y) => x>=H0.x0-3 && x<=H0.x1+3 && y>=H0.y0-3 && y<=H0.y1+1;
 /** What a cast aimed at (x, y) meets: an opening (the float goes in), a wall (it drops at the foot), or water. */
 function quarterHit(x,y){ const q=G.q; if (!q) return {kind:'water', spot:'open'};
@@ -152,7 +153,7 @@ function handBell(v){ tone(1568,.5,{vol:.07*v,type:'sine'}); tone(1568*2.4,.3,{v
 /** Pages float out of the post office's big window and drift up the street toward the boat. */
 function quarterPages(dt){ const q=G.q; if (!q || !q.po) return; const P=QUARTER.page;
   QS.pageT-=dt; if (QS.pageT<=0 && QS.pages.length<P.most && S.state!=='loot'){ QS.pageT=rand(P.every[0],P.every[1]); const H0=q.po.holes[0], s=H0.s;
-    // once Pell's asked for them, the letters the post office never sent come out with the pages, one at a time
+    // once Pell's asked for them, the letters the post office has kept come out with the pages, one at a time
     const env=QS.forceEnv?!!driftLetter(true):!!driftLetter() && !QS.pages.some(p=>p.env) && Math.random()<.5; QS.forceEnv=false;
     QS.pages.push({x:lerp(H0.x0,H0.x1,rand(.2,.8)), y:H0.base-2*s, vx:-rand(5,11), vy:rand(5,9), r:rand(-.6,.6), vr:rand(-.25,.25), ph:rand(0,6.28), a:0, t:0, ink:Math.floor(rand(0,3)), env}); }
   for (const p of QS.pages){ const k=sc(p.y); p.t+=dt; p.x+=p.vx*k*dt+Math.sin(S.time*.4+p.ph)*2*k*dt; p.y+=p.vy*k*dt; p.r+=p.vr*dt; p.a=Math.min(1,p.a+dt*.8);
@@ -161,8 +162,11 @@ function quarterPages(dt){ const q=G.q; if (!q || !q.po) return; const P=QUARTER
 /** The drifting page under a tap, if any (it has to be out in the street, not still behind the wall). */
 function pageAt(x,y){ if (REG()!=='quarter' || S.state!=='idle') return null;
   for (const p of QS.pages){ const k=sc(p.y); if (!p.gone && !quarterHidden(p.x,p.y) && Math.hypot(x-p.x,(y-p.y)*1.4)<24*k+6) return p; } return null; }
-/** The next of the post office's never-sent letters to drift out, once Pell's asked for them (game/pell.js). */
-function driftLetter(any){ if (!any && !(save.quarter && save.quarter.done && save.quarter.done.tower)) return null; const FS=findsState(); return PELL.sack.find(id=>!FS.letters[id])||null; }
+/** The next letter to drift out of the post office window, once Pell's asked for it (game/pell.js): Albert's, while
+    his round is on the bell tower and it hasn't turned up yet, then the post office's three never-sent letters. */
+function driftLetter(any){ const d=(save.quarter&&save.quarter.done)||{}, FS=findsState();
+  if (!FS.letters.albert && (any || d.answer)) return 'albert';
+  if (!any && !d.tower) return null; return PELL.sack.find(id=>!FS.letters[id])||null; }
 /** Scoop a page onto the hook: it goes out on your next cast, and something in the Quarter reads them. An envelope
     is one of the letters the post office never sent: it opens, and goes to Pell. */
 function scoopPage(p){ const q=quarterState(); QS.pages=QS.pages.filter(o=>o!==p);

@@ -15,8 +15,8 @@
    PELL     hello: his first words in the Quarter; lines: what he says now and then while you fish near him; wait:
             the news when he's come by the lake dock with something for you, and call: what he says then; reads: what
             he says as he takes a letter that came up for the Quarter; noboat: his ask before you have a boat; posted:
-            what he says as a letter goes in at its door; where: where a letter on his round turns up (sack: the
-            letters the post office never sent, which drift out of its window among the pages: game/quarter.js).
+            what he says as a letter goes in at its door; where: where a letter on his round turns up (Albert's, and
+            the letters the post office never sent, drift out of its window among the pages: game/quarter.js).
             post: where each letter is posted (a house in the scene, game/quarter.js: QHOUSES).
    DREAD    the Bonewhistle's curse, 0 to 100. gain: Dread per catch with it, by rarity; inked: how much more an Inked
             catch adds; fade: how much it falls each in-game hour you aren't holding it; luck: the luck points it lends
@@ -60,7 +60,7 @@ const PELL={
   noboat:'There’s a place I’d show you, if you had a boat. Under the lake, where the old town was. Come and find me when you’ve one of your own.',
   call:'Over here! I’ve something for you.',
   posted:['In it goes. Good shot.','Through the door. My father would have tipped his cap.','That’s gone in. Mind, it’s a long way back up.'],
-  where:{edith:'It’s in his sack somewhere.', albert:'It comes up out of the deep pool at the lake now and then, and out of the post office here.',
+  where:{edith:'It’s in his sack somewhere.', albert:'It comes up out of the deep pool at the lake now and then. Or watch the post office window here: it’ll float out with the pages.',
          sack:'They drift out of the post office window with the drowned pages. Watch the water for an envelope.'}
 };
 const DREAD={
