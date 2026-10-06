@@ -82,8 +82,10 @@ module.exports = [
       // the kitchen already open and seen: its 8-second tip would otherwise queue ahead of the etching kit's
       await openGame(page, { save: veteran({ kitchenOpen: true, kitchenSeen: true }) });
       const FISH = await page.evaluate(() => Object.fromEntries(Object.keys(window.__hm.FISH).map(k => [k, 1])));
-      // so are the ferry's, the trap's, the first record's and the first mutation's: queued together they ran past the wait below
-      const seen = { ferryTold: true, pbSeen: true, traps: { gift: true }, stats: { catches: 30, casts: 40, mutTip: true } };
+      // so are the ferry's, the trap's, the first record's and the first mutation's: queued together they ran past the wait below.
+      // With the tips quiet, Ottilie's almanac (due with every lake fish caught) would open over the bag, so it's already given
+      const seen = { ferryTold: true, pbSeen: true, traps: { gift: true }, stats: { catches: 30, casts: 40, mutTip: true },
+        finds: { have: { almanac: { t: Date.now(), reg: 'lake', spot: 'open', src: 'story' } } } };
       await openGame(page, { save: veteran({ coins: 500, fish: tinyRecords(FISH), kitchenOpen: true, kitchenSeen: true, ...seen }) });
       assert.ok(!(await visible(page, '#glimChip')), 'no Glimmer chip before the first Glimmer');
       await landFish(page);
