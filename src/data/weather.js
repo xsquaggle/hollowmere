@@ -3,7 +3,8 @@
                 data/stats.js; they show on the Bonuses page as the weather's); look (how much cloud, rain and fog it
                 brings, 0 to 1).
    WX_ORDER     the kinds in the order the Playtest picker lists them.
-   WX_TABLE     how often each kind comes up when the weather turns, per region (weights). The marsh is the foggiest.
+   WX_TABLE     how often each kind comes up when the weather turns, per region (weights). The marsh is the foggiest; fog
+                sits over the Drowned Quarter more than the open lake.
    WX_FOG_HOUR  fog's weight times this, by the 4-hour spell it starts in (midnight, 4 AM, 8 AM, noon, 4 PM, 8 PM): fog
                 is a morning thing.
    WX_SPELL     hours: the weather can turn at the start of each spell this long. keep: the chance a spell keeps the
@@ -31,7 +32,8 @@ const WX_TABLE={
   lake: {clear:38, cloudy:27, rain:20, fog:15},
   river:{clear:34, cloudy:30, rain:22, fog:14},
   coast:{clear:34, cloudy:26, rain:22, fog:18},
-  marsh:{clear:22, cloudy:24, rain:20, fog:34}
+  marsh:{clear:22, cloudy:24, rain:20, fog:34},
+  quarter:{clear:30, cloudy:28, rain:20, fog:22}
 };
 const WX_FOG_HOUR=[.6, 3, 1.4, .25, .25, .6];
 const WX_SPELL={hours:4, keep:.5, ease:.75, every:12};
@@ -43,7 +45,9 @@ const WX_FISH={
   coast:{rain:{fish:'mackerel', pools:{open:16, far:14, kelp:6, rocks:4, deep:6, wash:5, wreck:4}},
          fog: {fish:'gurnard', pools:{rocks:10, deep:9, far:6, open:2, kelp:2, wash:6, wreck:8}}},
   marsh:{rain:{fish:'smelt', pools:{open:14, reeds:8, flats:10, pans:4, deep:6, far:10}},
-         fog: {fish:'whiting', pools:{far:16, flats:12, open:8, deep:8, reeds:4, pans:3}}}
+         fog: {fish:'whiting', pools:{far:16, flats:12, open:8, deep:8, reeds:4, pans:3}}},
+  quarter:{rain:{fish:'drainpipe', pools:{open:12, doors:14, windows:6, post:8, deep:6, far:8}},
+         fog: {fish:'laceshad', pools:{windows:16, doors:8, post:10, open:4, deep:8, far:10}}}
 };
 const WX_SOME={rain:{cloudy:.25}, fog:{mist:1/3}};
 const DAWN_MIST={from:5, to:8, look:.4};

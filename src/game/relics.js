@@ -24,6 +24,8 @@ function storyLoot(b){ if (TREASURE_CTL.off || !save.tutorialDone || S.tut || SI
   const reg=REG(), h=(((save.clock%24)+24)%24), B=STORY.bell;
   if (!hasFind('moonjar') && reg===FINDS.moonjar.region && onMoonpath(b.x,b.y)) return {kind:'find', id:'moonjar'};
   if (!hasFind('bell') && reg===FINDS.bell.region && b.spot===B.spot && wxNow()===B.wx && h>=B.hours[0] && h<B.hours[1]) return {kind:'find', id:'bell'};
+  // the Bonewhistle, out of the bell tower's door while the bell rings (game/dread.js)
+  if (reg==='quarter' && b.hole && b.hole.house==='tower' && !(save.quarter||{}).bw && bellRinging()) return {kind:'rod', id:'bonewhistle'};
   const at=mapAt(b.x,b.y);
   if (at==='pin' || (at==='ring' && Math.random()<MAPS.chance)) return {kind:'crate', tier:cacheTier({spot:b.spot}), cache:true};
   return null; }
@@ -87,7 +89,7 @@ function jarFill(L){ if (!modFlag('moonJar') || L.moon || L.eaten || !isNight(L.
     if (!r.jarTip){ r.jarTip=1; persist(); coachLater('Your Moon Jar is full. Come daytime, tap it on the dock, and your next cast is fished as if it were night.',8); } } }
 const JAR={pour:0, glow:0};
 /** Where the jar sits: on the dock by the tackle box, or on the skiff's deck. */
-function jarPos(){ return REG()==='coast'?{x:W/2-52, y:H-112+(S.bob_y||0)}:{x:W/2-80, y:H-128+44}; }
+function jarPos(){ return afloat()?{x:W/2-52, y:H-112+(S.bob_y||0)}:{x:W/2-80, y:H-128+44}; }
 function onJar(x,y){ if (!modFlag('moonJar') || S.state!=='idle') return false; const p=jarPos(); return Math.hypot(x-p.x,(y-p.y+10)*1.2)<28; }
 function tapJar(){ const r=relicState(); audioInit(); tone(1400,.05,{vol:.05,type:'sine'}); buzz(8); JAR.glow=1;
   if (r.armed){ toast('The moonlight is waiting. Cast!',''); return; }

@@ -54,7 +54,12 @@ const STATS={
   moonJar:  {name:'Moonlight in a jar', kind:'flag', hint:'Night catches fill the Moon Jar. Spend it by day and one cast is fished as if at night.'},
   ghostRings:{name:'Ghosts ring', kind:'flag', hint:'A faded ghost fish rings like a bell, so you can follow it.'},
   ghostWake:{name:'Ghost wake', kind:'flag', hint:'A faded ghost fish leaves a glowing wake on the water.'},
-  mapPin:   {name:'Map pin', kind:'flag', hint:'Treasure maps mark the exact spot, and every 5th treasure is a map piece.'}
+  mapPin:   {name:'Map pin', kind:'flag', hint:'Treasure maps mark the exact spot, and every 5th treasure is a map piece.'},
+  ringing:  {name:'The bell tower rings', kind:'flag', when:{region:'quarter'}, hint:'While the bell tower’s bell rings, the Choir Fish answers it.'},
+  page:     {name:'A drowned page', kind:'flag', when:{region:'quarter'}, hint:'A drowned page on the hook, for one cast. Something in the Quarter reads them.'},
+  callRain: {name:'Call the rain', kind:'flag', hint:'Blow the Tidecaller’s conch, and rain comes where you are.'},
+  limp:     {name:'No fight', kind:'flag', hint:'A hooked fish comes straight in.'},
+  cursed:   {name:'Cursed', kind:'flag', hint:'Catches can come up Inked, worth five times as much. Every catch builds Dread.'}
 };
 /* Mastery: catch this many of a species and it reels in faster, with your rod following it. */
 const MASTERY={catches:10, reel:1.65};

@@ -41,12 +41,15 @@ function findsHTML(){ const FS=findsState(), arts=findList('artifact').filter(ha
   // notes
   const notes=FS.notes.filter(id=>NOTES[id]);
   if (notes.length) h+='<section class="fd-card"><header><h3>Notes</h3><span>'+notes.length+'</span></header>'+notes.map(id=>{ const N=NOTES[id];
-    return '<button type="button" class="fd-note" data-read="'+id+'"><canvas data-notekind="'+N.kind+'"></canvas><div><span class="k">'+noteKind(N)+(N.kind==='letter'?' · '+letterState(id):'')+'</span><h4>'+noteTitle(id)+'</h4></div><span class="go">Read</span></button>'; }).join('')+'</section>';
+    return '<button type="button" class="fd-note" data-read="'+id+'"><canvas data-notekind="'+N.kind+'"></canvas><div><span class="k">'+noteKind(N)+(N.kind==='letter'||N.kind==='reply'?' · '+letterState(id):'')+'</span><h4>'+noteTitle(id)+'</h4></div><span class="go">Read</span></button>'; }).join('')+'</section>';
   const crates=LOOT_TIERS.filter(t=>FS.crates[t]);
   if (crates.length) h+='<section class="fd-card"><header><h3>Crates opened</h3><span>'+crates.reduce((a,t)=>a+FS.crates[t],0)+'</span></header><div class="fd-crates">'+crates.map(t=>'<span class="rf" data-r="'+t+'"><i style="background:'+RAR[t].color+'"></i>'+FS.crates[t]+' '+RAR[t].label+'</span>').join('')+'</div></section>';
   return h; }
 const rarInk = r => ({common:'#7A7468', uncommon:'#4E7B3E', rare:'#3B78B0', epic:'#7448A8', legendary:'#9A7322', exotic:'#24857A', mythic:'#3A3848', godly:'#9A7A22'})[r]||'#7A7468';
-function letterState(id){ const s=findsState().letters[id]; return s==='delivered'?'Delivered':s==='waiting'?'Waiting for Pell':'Not delivered'; }
+function letterState(id){ const s=findsState().letters[id];
+  if (s==='posted') return 'Posted';
+  if (s==='delivered' && PELL.post[id] && quarterOpen()) return (save.quarter||{}).clip===id?'On your line':'In Pell’s sack';   // the Drowned Quarter's letters are posted by you (game/pell.js)
+  return s==='delivered'?'Delivered':s==='waiting'?'Waiting for Pell':'Not delivered'; }
 function findDetailHTML(id){ if (!id || !FINDS[id]) return ''; const D=FINDS[id], FS=findsState(), have=hasFind(id);
   if (!have) return '<div class="fd-detail none"><h4>Not found yet</h4><p>'+(D.from==='story'?RAR[D.rarity].label+' relic. '+STORY[id].hint:D.from==='return'?'Someone in town might give you this, if you find what they lost.':D.from==='town'?'The town might give you this one day, if your cooking wins them over.':
     aOrAn(RAR[D.rarity].label.toLowerCase()+' '+D.kind).replace(/^a/,'A')+(rarRank(D.rarity)>=rarRank('exotic')?', only ever found in '+LOOT_TIERS.slice(rarRank(D.rarity)).map(cratesOf).join(' and ')+'.':D.region==='any'?'. It could turn up anywhere.':', somewhere around '+REGION_NAME[D.region]+'.'))+'</p></div>';

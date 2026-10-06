@@ -1,5 +1,5 @@
 /* ---------- Map and travel ---------- */
-const LBL={lake:[0,24,'middle'],coast:[0,-16,'middle'],river:[-12,4,'end'],marsh:[-10,-10,'end'],ocean:[-2,22,'middle']};
+const LBL={lake:[0,24,'middle'],coast:[0,-16,'middle'],river:[-12,4,'end'],marsh:[-10,-10,'end'],quarter:[0,-32,'middle'],ocean:[-2,22,'middle']};
 const ROUTE_D='M112 352 C134 336 142 318 150 300 C160 278 186 258 212 238 C236 220 248 196 262 172 C266 164 270 158 274 154';
 function mapSVG(){
   const tree=(x,y,s=1)=>'<g transform="translate('+x+' '+y+') scale('+s+')"><path d="M0 -9 L5 0 L-5 0 Z" fill="#7E9A63" stroke="#2B2A33" stroke-width=".8"/><path d="M0 0 V3" stroke="#2B2A33" stroke-width="1"/></g>';
@@ -30,6 +30,10 @@ function mapSVG(){
   t+='<ellipse cx="100" cy="368" rx="58" ry="36" fill="#AFCDD2" stroke="#2B2A33" stroke-width="1.6"/>';
   t+='<ellipse cx="100" cy="368" rx="46" ry="26" fill="none" stroke="#2B2A33" stroke-width=".7" opacity=".3"/><ellipse cx="114" cy="362" rx="12" ry="6" fill="#86AEB6" opacity=".7"/>';
   [[66,330],[76,327],[86,329],[58,336]].forEach(([x,y])=>t+=house(x,y));
+  // the drowned quarter at the lake's west end: roofs and the leaning bell tower just breaking the water, and the way Pell rows out to it
+  t+='<g opacity="'+(regionOpen('quarter')?.9:.45)+'" stroke="#2B2A33" stroke-width=".7"><path d="M48 360 l4 -4 l4 4 Z M78 362 l3 -3 l3 3 Z M52 346 l3 -3 l3 3 Z" fill="#8A93A0"/>'+
+     '<g transform="translate(76 349) rotate(-6)"><rect x="-1.6" y="-9" width="3.2" height="9" fill="#C9BFA4"/><path d="M-2.4 -9 L0 -13 L2.4 -9 Z" fill="#46505C"/><circle cy="-6" r=".9" fill="#F3EAD7"/></g></g>';
+  if (regionOpen('quarter')) t+='<path d="M98 364 Q84 360 72 356" fill="none" stroke="#B4584A" stroke-width="1.6" stroke-dasharray="3 3" opacity=".7"/>';
   t+='<path d="M96 404 v8 M104 404 v8 M96 408 h8" stroke="#2B2A33" stroke-width="1"/>';
   // the river and the marsh
   t+='<path d="M140 346 C150 326 146 314 152 300 C160 280 186 260 212 240 C226 230 232 224 240 214" fill="none" stroke="#8FB9C2" stroke-width="6" stroke-linecap="round"/>';
@@ -61,9 +65,9 @@ function mapSVG(){
   t+='<rect x="3" y="3" width="354" height="474" fill="none" stroke="#2B2A33" stroke-width="1.5" opacity=".5" pointer-events="none"/>';
   return '<svg viewBox="0 0 360 480" role="img" aria-label="Map of Hollowmere and the coast">'+t+'</svg>';
 }
-/** How you get from one water to another: Wren's punt to and from the marsh, Ottilie's ferry up the river, or your own boat. */
-const wayTo = (to,here) => to==='marsh' || (here==='marsh' && (to==='river' || !save.boat)) ? 'punt' : to==='river' || (here==='river' && to==='lake' && !save.boat) ? 'ferry' : 'sail';
-const WAY={sail:['Sail here','Setting sail for '], ferry:['Take the ferry','All aboard Ottilie’s ferry for '], punt:['Ride in Wren’s punt','Into Wren’s punt, for ']};
+/** How you get from one water to another: Pell's rowboat out to the Drowned Quarter and back, Wren's punt to and from the marsh, Ottilie's ferry up the river, or your own boat. */
+const wayTo = (to,here) => to==='quarter' || (here==='quarter' && to==='lake') ? 'row' : to==='marsh' || (here==='marsh' && (to==='river' || !save.boat)) ? 'punt' : to==='river' || (here==='river' && to==='lake' && !save.boat) ? 'ferry' : 'sail';
+const WAY={sail:['Sail here','Setting sail for '], ferry:['Take the ferry','All aboard Ottilie’s ferry for '], punt:['Ride in Wren’s punt','Into Wren’s punt, for '], row:['Row out','Rowing Pell’s old boat out to ']};
 function showMap(goTo,first){
   audioInit(); ovOpen('map',()=>{ closeMap(); });
   const layer=$('mapLayer'), here=REG();
@@ -72,18 +76,20 @@ function showMap(goTo,first){
   layer.hidden=false; noise(.5,{vol:.08,f:2400,to:900,q:.6});
   const svg=layer.querySelector('svg'), route=svg.querySelector('#routeLive'), boat=svg.querySelector('#mapBoat'), len=route.getTotalLength();
   // the route runs lake, river, marsh, coast: each water sits at its own point along it (the river's and the marsh's are worked out from their pins)
-  const U={lake:0, coast:1, river:routeU(route,len,MAP_PLACES.river), marsh:routeU(route,len,MAP_PLACES.marsh)}, farthest=regionOpen('coast')?1:regionOpen('marsh')?U.marsh:regionOpen('river')?U.river:0;
-  const place=u=>{ const p=route.getPointAtLength(len*clamp(u,0,1)); boat.setAttribute('transform','translate('+p.x.toFixed(1)+' '+(p.y+Math.sin(performance.now()/300)*1.2).toFixed(1)+')'); };
+  // the Drowned Quarter is off the route, rowed out to from the lake: its leg runs from -1 (the Quarter) to 0 (the lake)
+  const U={lake:0, quarter:-1, coast:1, river:routeU(route,len,MAP_PLACES.river), marsh:routeU(route,len,MAP_PLACES.marsh)}, farthest=regionOpen('coast')?1:regionOpen('marsh')?U.marsh:regionOpen('river')?U.river:0;
+  const start=route.getPointAtLength(0), place=u=>{ const Q=MAP_PLACES.quarter, p=u<0?{x:lerp(start.x,Q.x,-u), y:lerp(start.y,Q.y+4,-u)}:route.getPointAtLength(len*clamp(u,0,1)); boat.setAttribute('transform','translate('+p.x.toFixed(1)+' '+(p.y+Math.sin(performance.now()/300)*1.2).toFixed(1)+')'); };
   const showRoute=u=>{ route.style.strokeDasharray=len; route.style.strokeDashoffset=String(len*(1-clamp(u,0,1))); };
-  let at=U[here]||0; place(at); showRoute(farthest);
+  let at=U[here]!=null?U[here]:0; place(at); showRoute(farthest);
   let bobbing=true; (function bob(){ if (!bobbing||layer.hidden) return; place(at); requestAnimationFrame(bob); })();
   const card=$('mapCard');
   const select=id=>{ const p=MAP_PLACES[id], open=p.built && regionOpen(id), isHere=id===REG(), n=REGION_FISH[id]?REGION_FISH[id].filter(f=>(save.fish[f]||{}).caught>0).length:0;
     svg.querySelectorAll('.pin').forEach(g=>g.classList.toggle('sel',g.dataset.place===id));
-    card.innerHTML='<div><span class="r">'+(isHere?'You are here':open?'Charted':'Uncharted')+'</span><h3>'+p.name+'</h3><p>'+(id==='coast'&&!save.boat?'Barnaby sells boats that can get you here.':id==='river'&&!save.ferry?'Ottilie’s ferry runs up the river, once it’s mended.':id==='marsh'&&!save.marsh?((save.wren||{}).met?'Wren knows the way down through the reeds. She wants to see a fish that glows first.':'Somebody up Rootwood River must know the way down through the reeds.'):p.desc)+'</p>'+
+    card.innerHTML='<div><span class="r">'+(isHere?'You are here':open?'Charted':'Uncharted')+'</span><h3>'+p.name+'</h3><p>'+(id==='coast'&&!save.boat?'Barnaby sells boats that can get you here.':id==='river'&&!save.ferry?'Ottilie’s ferry runs up the river, once it’s mended.':id==='marsh'&&!save.marsh?((save.wren||{}).met?'Wren knows the way down through the reeds. She wants to see a fish that glows first.':'Somebody up Rootwood River must know the way down through the reeds.'):id==='quarter'&&!open?(save.boat?'Old Hollowmere, under the lake’s west end. Pell’s old post-office rowboat could take you out over it, once it’s fixed.':'Old Hollowmere, under the lake’s west end. Pell, the postman, says you’d need a boat of your own first.'):p.desc)+'</p>'+
       (REGION_FISH[id]&&open?'<p class="mini">Journal: '+n+' of '+REGION_FISH[id].length+' species</p>':'')+'</div>'+
-      (open && !isHere?'<button class="btn" id="sailBtn" type="button">'+WAY[wayTo(id,here)][0]+'</button>':'');
-    const sb=$('sailBtn'); if (sb) sb.addEventListener('click',()=>sail(id)); tone(700,.05,{vol:.05,type:'triangle'}); };
+      (open && !isHere?'<button class="btn" id="sailBtn" type="button">'+WAY[wayTo(id,here)][0]+'</button>':id==='quarter'&&!open&&save.boat?'<button class="btn" id="pellBtn" type="button">Pell’s rowboat</button>':'');
+    const sb=$('sailBtn'); if (sb) sb.addEventListener('click',()=>sail(id));
+    const pb=$('pellBtn'); if (pb) pb.addEventListener('click',()=>{ closeMap(); setTimeout(openPell,300); }); tone(700,.05,{vol:.05,type:'triangle'}); };
   const sail=to=>{ if (to===REG()) return; bobbing=false; $('mapClose').hidden=true;
     card.innerHTML='<p class="sailing">'+(first?'The map unrolls. ':'')+WAY[wayTo(to,REG())][1]+MAP_PLACES[to].name+'…</p>';
     const t0=performance.now(), dur=REDUCED?400:2400*Math.max(.45,Math.abs(U[to]-at)), from=at, toU=U[to];
@@ -102,7 +108,7 @@ function routeU(route,len,p){ let best=0, bd=1e9; for (let i=0;i<=120;i++){ cons
 function closeMap(){ const layer=$('mapLayer'); if (layer.hidden) return; ovClosed('map'); layer.classList.add('closing'); setTimeout(()=>{ layer.hidden=true; layer.classList.remove('closing'); layer.innerHTML=''; },REDUCED?0:280); }
 function travelTo(to,first){
   if (to!==REG()) homeMoved(to);   // Homebody starts counting again (game/river.js)
-  save.region=to; persist();
+  save.region=to; persist(); mailMoved(); QS.pages=[];
   S.bob=null; S.wait=null; S.reel=null; S.land=null; SC.lucky=null; SC.jump=null; SC.drop=null; SC.gull=null; S.swell=null;
   layoutScenery(); buildBg(); updateHud(); setState('idle');
   toast(REGION_NAME[to],'gold');
@@ -112,6 +118,9 @@ function travelTo(to,first){
   if (to==='marsh' && !save.marshSeen){ save.marshSeen=true; persist();
     setTimeout(()=>coachFor('Saltmarsh! The tide comes in and goes out about every six hours. As it falls, mud banks come up out of the water, and a cast on the mud goes splat. Tap the clock to see when it turns.',10),900);
     setTimeout(()=>{ if (!S.tut) coachFor('Tide pools left on the mud keep fish trapped, and they bite fast. When the tide floods the flats, the mullet come up to graze.',8); },13000); }
+  if (to==='quarter' && !save.quarterSeen){ save.quarterSeen=true; persist();
+    setTimeout(()=>coachFor('The Drowned Quarter. Walls and roofs stop a cast short, so aim through the doors and windows: the float goes into the drowned rooms, and different fish live in each.',10),900);
+    setTimeout(()=>{ if (!S.tut) coachFor('Pell’s moored at the post office steps. Tap him for his round.',7); },12500); }
   if (to==='coast' && !save.coastSeen){ save.coastSeen=true; persist();
     setTimeout(()=>coachFor('Welcome to Gullrock Coast! Swells roll in from the sea. A cast that lands in a breaking swell washes out, and a swell hitting your line spikes the tension, so let go as it passes.',9),900);
     setTimeout(()=>{ if (!S.tut) coachFor('Ottilie mailed you her old waterproof phone. Tap Phone to order sea rods and boat parts from Tacklegram.',8); },11000); }

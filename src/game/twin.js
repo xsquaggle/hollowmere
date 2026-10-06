@@ -7,6 +7,7 @@ const twinOn = () => !S.tut && modFlag('twin');
 function twinLand(b){ S.bob2=null; if (!twinOn()) return;
   const k=sc(b.y), dx=TWIN.spread*W*k*(b.x>W/2?-1:1), x=clamp(b.x+dx,18,W-18), y=clamp(b.y+rand(-6,6)*k,HZ+14,G.near);
   const spot=spotAt(x,y); if (spot==='mud'){ mudSplat(x,y,.5); return; }   // the marsh: the second float lands on a bank that's out
+  if (spot==='wall') return;   // the Quarter: it hit a wall, and only the first float's in the water
   S.bob2={x,y,spot,dip:1,jerk:0,nibble:0,plunge:0}; splash(x,y,6); ripple(x,y,30); }
 /** Two baits in the water: the quiet before a bite is shorter. */
 const twinWait = () => S.bob2 ? TWIN.wait : 1;

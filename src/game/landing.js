@@ -115,11 +115,11 @@ function dismissCard(action){
   else if (action==='mount'){ mountFish(keptFish(L)); shSfx.mount(); buzz([0,18,120,18]); shackPulse(); news(L.F.name+' is up on the trophy wall in your shack','gold'); }
   else { save.net.push(keptFish(L)); persist();
     SC.netPop=1; sfx.plop(); buzz(12); news('Into the keepnet','good');
-    if (!save.netSeen){ save.netSeen=true; persist(); setTimeout(()=>coachFor('Kept fish go in your keepnet, hanging '+(REG()==='coast'?'over the side of your boat':'off the dock')+'. Tap it anytime to see them or sell them.',7),700);
+    if (!save.netSeen){ save.netSeen=true; persist(); setTimeout(()=>coachFor('Kept fish go in your keepnet, hanging '+(afloat()?'over the side of your boat':'off the dock')+'. Tap it anytime to see them or sell them.',7),700);
       if (!save.aquaSeen) setTimeout(()=>{ if (S.state==='idle') coachFor('Your uncle’s old fish tank still works. Tap the shack at the bottom, then the tank room door, to visit your aquarium and move fish in.',8); },9000); } }
   if (L.isNew){ $('journalBtn').classList.remove('pulse'); void $('journalBtn').offsetWidth; $('journalBtn').classList.add('pulse'); }
   const finishing=S.tut==='card'; if (finishing){ save.tutorialDone=true; S.tut=null; persist(); }
-  S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); kitchenUnlockCheck(); relicAfterCatch(L);   // the Moon Jar fills, Ottilie's almanac (game/relics.js)
+  S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); kitchenUnlockCheck(); relicAfterCatch(L); pellAfterCatch(L); dreadAfterCatch(L,action);   // the Moon Jar fills, Ottilie's almanac (game/relics.js); an answer on a Postman Sturgeon (game/pell.js); Dread (game/dread.js)
   if (!save.backupHinted && !save.lastBackup && !isStandalone() && save.stats.catches>=40){ save.backupHinted=true; persist(); coachFor('Your game lives in this browser. Tap the gear, then Save, to make a backup code and keep it safe.',8); }
   if (finishing) coachFor('You’re ready. Rarer fish fight in new ways, and the deep pool hides the best ones.',6); else if (!S.tut && !coachTimer) coachOff();
 }

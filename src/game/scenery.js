@@ -20,6 +20,7 @@ function drawLand(x,main){
   if (REG()==='coast'){ drawCoastLand(x,main); return; }
   if (REG()==='river'){ drawRiverLand(x,main); return; }
   if (REG()==='marsh'){ drawMarshLand(x,main); return; }
+  if (REG()==='quarter'){ drawQuarterLand(x,main); return; }
   hillPath(x,H*.075,.011,.027,1.2,.4); x.fillStyle=PAL.hillFar; x.fill();
   hillPath(x,H*.048,.018,.04,3.1,2.2); x.fillStyle=PAL.hillNear; x.fill();
   x.beginPath(); x.moveTo(0,HZ); for (const [px,py] of treePts(1)) x.lineTo(px,py); x.lineTo(W,HZ); x.closePath(); x.fillStyle=PAL.trees; x.fill();
@@ -66,7 +67,8 @@ function buildBg(){
   drawLand(x,true);
   const ws=REG()==='coast'?[mixP('w0','#94BCCB',.3),mixP('w1','#2F8098',.38),mixP('w2','#1B6276',.38),mixP('w3','#0E3A4A',.3)]
     :REG()==='river'?[mixP('w0','#A7B98E',.4),mixP('w1','#557A55',.45),mixP('w2','#34583F',.45),mixP('w3','#1E3527',.35)]
-    :REG()==='marsh'?[mixP('w0','#BCC4B4',.4),mixP('w1','#7A8E86',.45),mixP('w2','#55706C',.45),mixP('w3','#33484A',.35)]:[P.w0,P.w1,P.w2,P.w3];
+    :REG()==='marsh'?[mixP('w0','#BCC4B4',.4),mixP('w1','#7A8E86',.45),mixP('w2','#55706C',.45),mixP('w3','#33484A',.35)]
+    :REG()==='quarter'?[mixP('w0','#A6B8B2',.36),mixP('w1','#4C706A',.44),mixP('w2','#2D4F4D',.46),mixP('w3','#18302F',.4)]:[P.w0,P.w1,P.w2,P.w3];
   const wg=x.createLinearGradient(0,HZ,0,H); wg.addColorStop(0,ws[0]); wg.addColorStop(.1,ws[1]); wg.addColorStop(.45,ws[2]); wg.addColorStop(1,ws[3]);
   x.fillStyle=wg; x.fillRect(0,HZ,W,H-HZ);
   x.save(); x.beginPath(); x.rect(0,HZ,W,H-HZ); x.clip(); x.translate(0,HZ); x.scale(1,-.72); x.translate(0,-HZ); x.globalAlpha=.3; drawLand(x,false); x.restore();

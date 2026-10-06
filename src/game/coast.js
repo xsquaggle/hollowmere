@@ -120,7 +120,7 @@ function drawSwell(){
   for (let i=0;i<(big?11:6);i++){ const fx=((i*73+S.time*30)%(W+40))-20; ctx.fillStyle='rgba(245,250,250,'+(a*.8).toFixed(2)+')'; ctx.beginPath(); ctx.arc(fx,y-2*k*B+Math.sin(fx*.03+S.time*2)*3*k*B,2.2*k*B,0,Math.PI*2); ctx.fill(); }
 }
 function updateSwell(dt){
-  if (REG()!=='coast'){ S.swell=null; S.kick=0; G.player.y=G.playerBaseY; G.rodBase.y=G.rodBaseY; return; }
+  if (REG()!=='coast'){ S.swell=null; S.kick=0; G.player.y=G.playerBaseY; G.rodBase.y=G.rodBaseY; S.bob_y=0; return; }   // Pell's rowboat rocks on its own (game/quarter.js)
   if (!S.swell){ CS.warned=-1; CS.wash=CS.wash.map(()=>0); }
   const sw=S.swell||(S.swell={t:2.5,y:null,prev:null,hit:false,n:-1,big:false});
   // the swells come every SWELL.period seconds, and every seventh is a big one (game/coast-sea.js)

@@ -68,7 +68,7 @@ function lootLand(){ const L=S.loot, k=L.kind; L.x=L.to.x; L.y=L.to.y; L.rot=0; 
   const heavy=k==='crate'; shake(heavy?2.5+L.ti*1.4:1.2); sfx.thud(heavy?L.ti:-1); buzz(heavy?[0,26+L.ti*8]:14);
   drip(L.x,L.y-8,heavy?14+L.ti*2:6); splash(L.x,L.y,heavy?8+L.ti*2:4,'rgba(205,228,236,');
   S.darkT=heavy?.3+L.ti*.04:.22;
-  if (k==='find'||k==='map'){ L.phase='glint'; L.st=.6; sfx.glint(); const it=L.got.items[0]; if (it && it.id==='bell') sfxGhostBell(L.x); return; }   // the Drowned Bell rings as it comes up
+  if (k==='find'||k==='map'||k==='rod'){ L.phase='glint'; L.st=k==='rod'?1.1:.6; sfx.glint(); const it=L.got.items[0]; if (it && it.id==='bell') sfxGhostBell(L.x); if (k==='rod'){ boneWhistle(1.6); S.darkT=.45; } return; }   // the Drowned Bell rings as it comes up; the Bonewhistle whistles
   L.phase='ready';
   const FS=findsState();
   if (heavy && FS.treasure===1) coachShow('A crate! Tap it to open it.',6);
@@ -129,6 +129,9 @@ function drawLoot(){ const L=S.loot; if (!L) return; const ti=L.ti, R=RAR[L.tier
   else if (L.kind==='bottle'){ drawBottle(ctx,76*k,S.time); if (L.cork){ ctx.save(); ctx.translate(-14,-30+L.cork.y*.3); ctx.rotate(L.cork.r); ctx.fillStyle='#B68A5E'; ctx.fillRect(-5,-4,10,8); ctx.strokeStyle=INK; ctx.lineWidth=1.6; ctx.strokeRect(-5,-4,10,8); ctx.restore(); } }
   else if (L.kind==='letter'){ drawEnvelope(ctx,84*k,!!L.cork); }
   else if (L.kind==='map'){ const it=L.got.items[0]; drawMapPiece(ctx,74*k,it?it.n:1,S.time); if (L.phase==='glint') drawGlint(L); }
+  else if (L.kind==='rod'){ const it=L.got.items[0], id=it?it.id:'bonewhistle', w=170*k, h=96*k;
+    if (L.phase!=='fly'){ ctx.save(); ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(0,0,4,0,0,w*.6); g.addColorStop(0,'rgba(150,140,200,'+(.22+.06*Math.sin(S.time*2)).toFixed(3)+')'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(-w*.7,-w*.7,w*1.4,w*1.4); ctx.restore(); }
+    ctx.save(); ctx.translate(-w/2,-h*.55); drawRig(ctx,w,h,id,{reel:'clicker',line:'cotton'},null,S.time); ctx.restore(); if (L.phase==='glint') drawGlint(L); }
   else if (L.kind==='find'){ const it=L.got.items[0], id=it&&it.type==='find'?it.id:null, r=id?FINDS[id].rarity:'common';
     if (L.phase!=='fly' && r!=='common') drawRays(0,-6,RAR[r].color,.35+.1*Math.sin(S.time*2),70+rarRank(r)*12);
     if (id) drawFind(ctx,id,70*k,S.time); else drawPouch(ctx,56*k);
@@ -201,15 +204,19 @@ function haulItemHTML(it,i){ const st=' style="--i:'+i+'"';
   if (it.type==='map'){ const whole=it.n>=MAPS.pieces, pin=modFlag('mapPin'), reg=(relicState().map||{}).reg;
     return '<div class="hl-item rf" data-r="uncommon"'+st+'><canvas class="hl-art map" data-map="'+it.n+'"></canvas><div class="hl-txt"><span class="k">Treasure map · piece '+Math.min(it.n,MAPS.pieces)+' of '+MAPS.pieces+'</span><h3>'+(whole?'The map is whole':'A piece of a map')+'</h3><p>'+
       (whole?'It rings a stretch of '+REGION_NAME[reg||REG()]+'. Cast inside the ring to dig up what’s buried there.'+(pin?' Your Cartographer’s Pin marks the exact spot.':''):(MAPS.pieces-it.n===1?'One more piece':(MAPS.pieces-it.n)+' more pieces')+' and it shows where something is buried'+(reg&&reg!==REG()?'':' in '+REGION_NAME[reg||REG()])+'.')+'</p></div></div>'; }
+  if (it.type==='rod'){ const R=RODS[it.id];
+    return '<div class="hl-item rf rod" data-r="epic"'+st+'><div class="hl-txt"><span class="k">'+(R.cursed?'Cursed rod':'Rod')+' · <b>New</b></span><h3>'+R.name+'</h3><canvas class="rod-art" data-rodart="'+it.id+'" aria-hidden="true"></canvas><p>'+R.blurb+'</p><p class="down">'+R.perk+'</p>'+
+      (save.rod===it.id?'<p class="on">In your hands.</p>':'<button class="btn sm" type="button" data-holdrod="'+it.id+'">Hold it</button><p class="mini">It’s on your rack and in your bag, if you’d rather not.</p>')+'</div></div>'; }
   if (it.type==='spare') return '<div class="hl-item spare"'+st+'><div class="hl-txt"><span class="k">Spare coins</span><h3><span class="coin"></span>+'+it.n.toLocaleString()+'</h3><p>You’ve found every '+RAR[it.rarity].label.toLowerCase()+' thing this could have held, so it paid in coins.</p></div></div>';
   return ''; }
 function haulTitle(L){ const g=L.got;
   if (L.kind==='crate') return g.cache?'A buried cache':CRATES[L.tier].name;
   if (L.kind==='map') return g.items[0]&&g.items[0].n>=MAPS.pieces?'The map is whole':'A piece of a map';
   const it=g.items[0]; if (it && it.type==='find') return 'You found something';
+  if (it && it.type==='rod') return 'Something came up out of the tower';
   return 'Treasure'; }
 function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
-  const tier=L.kind==='crate'?L.tier:first&&first.type==='find'?FINDS[first.id].rarity:L.kind==='map'?'uncommon':'common';
+  const tier=L.kind==='crate'?L.tier:first&&first.type==='find'?FINDS[first.id].rarity:L.kind==='map'?'uncommon':L.kind==='rod'?'epic':'common';
   el.dataset.r=tier; el.dataset.kind=L.kind; el.classList.remove('out');
   let h='<div class="hl-top"><span class="rarity">'+RAR[tier].label+'</span>'+pipsHTML(tier)+'</div><h2>'+haulTitle(L)+'</h2>';
   const base=g.base==null?g.coins:g.base;
@@ -220,7 +227,7 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   const n=g.items.length, last=.35+Math.max(0,n-1)*.55;
   h+='<button class="btn primary" id="hlGo" type="button" style="animation-delay:'+(last+.3).toFixed(2)+'s">Collect</button>';
   el.innerHTML=h; el.hidden=false; ovOpen('haul',()=>{ lootEnd(); });
-  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear],canvas[data-decor],canvas[data-rune],canvas[data-map]'));
+  paintTiles(el.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-gear],canvas[data-decor],canvas[data-rune],canvas[data-map]')); paintRodArt(el.querySelectorAll('canvas[data-rodart]'));
   // the coins count up, then each item arrives with its own sound
   if (base){ const b=$('hlCoins'), t0=performance.now(), dur=REDUCED?1:Math.min(1100,350+base*.25); sfx.coin(6);
     (function step(now){ if (!b.isConnected) return; const k=Math.min(1,(now-t0)/dur); b.textContent=Math.round(base*(1-Math.pow(1-k,3))).toLocaleString(); if (k<1) requestAnimationFrame(step); else tallyCoins(); })(t0); }
@@ -232,12 +239,13 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   el.querySelectorAll('[data-pocket]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); if (!pocketIt(b.dataset.pocket)) return; b.outerHTML='<p class="on">In a pocket. Working now.</p>';
     if (!freePocket()) el.querySelectorAll('[data-pocket]').forEach(o=>{ o.outerHTML='<p class="pk-note">Your pockets are full now. Swap it in from your tackle bag.</p>'; }); }));
   el.querySelectorAll('[data-read]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); openNote(b.dataset.read,{}); }));
+  el.querySelectorAll('[data-holdrod]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); const id=b.dataset.holdrod; if (!save.rods.includes(id)) return; save.rod=id; persist(); MODC.dirty=true; sfx.hook(false); b.nextSibling&&b.nextSibling.remove(); b.outerHTML='<p class="on">In your hands.</p>'; }));
   el.querySelectorAll('[data-rigit]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); const id=b.dataset.rigit; if (!rigGear(id)) return; sfx.rig(TACKLE[id].kind); b.outerHTML='<p class="on">On your '+ROD().name+'.</p>'; }));
   // keep the open crate in view above the card
   const cardTop=window.innerHeight-(parseFloat(getComputedStyle(el).bottom)||18)-el.offsetHeight, room=cardTop-14-(L.kind==='crate'?crateW(L.ti)*1.02+L.hv:90)-64;
   L.lift=Math.min(L.to.y,cardTop-14); if (L.kind==='crate' && room<0) L.fit=Math.max(.5,1+room/(crateW(L.ti)*1.02));
 }
-const itemRarity=it=>it.type==='map'?'uncommon':it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
+const itemRarity=it=>it.type==='rod'?'epic':it.type==='map'?'uncommon':it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
 function hideHaul(){ const el=$('haul'); if (el.hidden) return; ovClosed('haul'); el.classList.add('out'); setTimeout(()=>{ el.hidden=true; el.classList.remove('out'); el.innerHTML=''; },REDUCED?0:250); }
 /** Paints tiles in two passes, every size read before any canvas is resized, so the page lays out once. */
 /** Tiles are sized by their layout box, not their box on screen, so a sheet mid-zoom or a badge popping in doesn't
@@ -257,7 +265,7 @@ function paintTile(cv,r,d){ r=r||{width:cv.offsetWidth,height:cv.offsetHeight}; 
   else if (cv.dataset.trap) drawTrapIcon(x,cv.dataset.trap,s);
   else if (cv.dataset.fitting) drawFittingIcon(x,cv.dataset.fitting,s);
   else if (cv.dataset.runeempty) drawRune(x,null,s*.8,{empty:true});
-  else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
+  else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter'||cv.dataset.notekind==='reply') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
 function drawHullSwatch(c,id,s){ const P=PAINTS[id]; c.save(); c.scale(s/100,s/100); laInk(c);
   c.fillStyle='rgba(60,110,130,.25)'; laEll(c,0,24,44,7); c.fill();
   c.beginPath(); c.moveTo(-44,-4); c.lineTo(44,-8); c.quadraticCurveTo(50,-6,44,6); c.quadraticCurveTo(0,26,-38,16); c.closePath(); c.fillStyle=P.shift?prismAt(S.time,0,52):P.hull; c.fill(); c.stroke();
@@ -269,14 +277,14 @@ function drawLogbook(c,s){ c.save(); c.scale(s/100,s/100); c.rotate(-.1); laInk(
   c.font='600 13px Caveat, cursive'; c.fillStyle='#B4433A'; c.textAlign='center'; c.fillText('3:12',2,6); c.strokeStyle='#B4433A'; c.lineWidth=1.6; laEll(c,2,2,14,8); c.stroke(); c.restore(); }
 
 /* ---------- notes: bottles, logbook pages and letters, inked in by hand ---------- */
-const noteKind=N=>N.kind==='letter'?'A drowned letter':N.kind==='logbook'?'Your uncle’s logbook':'A note in a bottle';
-function noteTitle(id){ const N=NOTES[id]; if (N.kind==='letter') return 'For '+N.to; if (N.kind==='logbook') return 'Logbook, page '+N.page; return '“'+N.lines[0].replace(/[,:.]$/,'')+'…”'; }
+const noteKind=N=>N.kind==='letter'?'A drowned letter':N.kind==='reply'?'An answer, from the Quarter':N.kind==='logbook'?'Your uncle’s logbook':'A note in a bottle';
+function noteTitle(id){ const N=NOTES[id]; if (N.kind==='letter'||N.kind==='reply') return 'For '+N.to; if (N.kind==='logbook') return 'Logbook, page '+N.page; return '“'+N.lines[0].replace(/[,:.]$/,'')+'…”'; }
 let NOTE_DONE=null;
 function openNote(id,o){ if (!id || !NOTES[id]) { if (o&&o.done) o.done(); return; } o=o||{}; const N=NOTES[id], el=$('note'); NOTE_DONE=o.done||null;
   let t=.5, lines=''; N.lines.forEach((ln,i)=>{ const d=Math.max(.45,ln.length*.045); lines+='<span class="ln'+(i===0?' first':'')+(i===N.lines.length-1&&/^—/.test(ln)?' sig':'')+'" style="--s:'+t.toFixed(2)+'s;--d:'+d.toFixed(2)+'s">'+ln+'</span>'; t+=d+.12; });
-  const head=N.kind==='letter'?'<div class="nt-env"><span class="nt-to">To '+N.to+'</span><span class="nt-mark">HOLLOWMERE<br>MAR 1966</span></div>':N.kind==='logbook'?'<div class="nt-log">Your uncle’s logbook · page '+N.page+'</div>':'';
-  const foot=N.kind==='letter'&&o.fresh?'Give it to Pell':o.fresh?'Keep it':'Close';
-  el.innerHTML='<div class="nt-paper" data-kind="'+N.kind+'" role="dialog" aria-label="'+noteKind(N)+'">'+head+lines+'<button class="btn primary nt-go" id="ntGo" type="button" style="animation-delay:'+(REDUCED?0:t).toFixed(2)+'s">'+foot+'</button></div>';
+  const env=N.kind==='letter'||N.kind==='reply', head=env?'<div class="nt-env"><span class="nt-to">To '+N.to+'</span><span class="nt-mark">'+(N.kind==='reply'?'LANTERN ROW<br>MAR 1966':'HOLLOWMERE<br>MAR 1966')+'</span></div>':N.kind==='logbook'?'<div class="nt-log">Your uncle’s logbook · page '+N.page+'</div>':'';
+  const foot=env&&o.fresh?'Give it to Pell':o.fresh?'Keep it':'Close';
+  el.innerHTML='<div class="nt-paper" data-kind="'+(env?'letter':N.kind)+'" role="dialog" aria-label="'+noteKind(N)+'">'+head+lines+'<button class="btn primary nt-go" id="ntGo" type="button" style="animation-delay:'+(REDUCED?0:t).toFixed(2)+'s">'+foot+'</button></div>';
   el.hidden=false; el.classList.remove('out'); ovOpen('note',()=>{ closeNote(); });
   const paper=el.querySelector('.nt-paper'); paper.addEventListener('click',e=>{ if (e.target.id!=='ntGo'){ paper.classList.add('done'); penStop(); } });
   $('ntGo').addEventListener('click',e=>{ e.stopPropagation(); closeNote(); });
@@ -294,7 +302,14 @@ function closeNote(silent){ const el=$('note'); if (el.hidden) return; ovClosed(
 
 /* ---------- drowned letters go to Pell ---------- */
 /** Calls Pell's mail boat for letters waiting to go. They're marked waiting the moment they land (openLoot). */
-function letterToPell(id){ if (!id || !lettersWaiting()) return; if (MAIL.state==='away'){ MAIL.state='waiting'; MAIL.t=4; } news('Pell’s mail boat will collect the letter',''); }
+function letterToPell(id){ if (!id || !lettersWaiting()) return; const here=REG()==='quarter';
+  if (MAIL.state==='away'){ MAIL.state='waiting'; MAIL.t=here?.6:4; } if (!here) news('Pell’s mail boat will collect the letter',''); }
+/** Pell takes the next letter waiting and reads out who it's for. The Drowned Quarter's letters go in his sack, to be
+    posted (in the Quarter, with nothing on your line, he clips it on for you: game/pell.js); an answer, he reads. */
 function pellReads(){ if (S.state==='loot') return null;   // not while you're still holding it; the boat comes round again
-  const FS=findsState(), id=LETTER_ORDER.find(k=>FS.letters[k]==='waiting'); if (!id) return null; FS.letters[id]='delivered'; persist();
-  const N=NOTES[id]; return id==='keeper'?'For the Keeper of the Bait Shack. That’s you, I believe. You keep it.':'For '+N.to+'. I’ll see it gets there.'; }
+  const FS=findsState(), id=[...LETTER_ORDER,...REPLY_ORDER].find(k=>FS.letters[k]==='waiting'); if (!id) return null; FS.letters[id]='delivered'; persist();
+  const N=NOTES[id]; if (N.kind==='reply') return N.pell;
+  if (id==='keeper') return 'For the Keeper of the Bait Shack. That’s you, I believe. You keep it.';
+  if (PELL.post[id] && quarterOpen()){ const q=quarterState(); if (REG()==='quarter' && !q.clip){ q.clip=id; persist(); return 'For '+N.to+'. Clip it on, and post it through '+QHOUSES[PELL.post[id]]+'.'; }
+    return 'For '+N.to+'. '+PELL.reads; }
+  return 'For '+N.to+'. I’ll see it gets there.'; }

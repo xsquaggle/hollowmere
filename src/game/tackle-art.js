@@ -137,6 +137,45 @@ function rigLamp(c,tip,h,t){ const s=h/150, sw=REDUCED?0:Math.sin((t||0)*1.6)*.1
   c.fillStyle='#FFD98C'; c.fillRect(-4,11,8,12); c.fillStyle='#FFF6D6'; c.beginPath(); c.ellipse(0,18,1.6,3,0,0,Math.PI*2); c.fill();
   c.strokeStyle=INK; c.lineWidth=1.4; c.strokeRect(-4.5,11,9,12); c.beginPath(); c.moveTo(0,11); c.lineTo(0,23); c.stroke();
   c.restore(); }
+/** The Tidecaller's blank: grey ash, its grain running along it, and a brass ferrule gone green halfway up.
+    W(k) is the blank's width at k along it (0 grip, 1 tip). */
+function rigTide(c,at,W,ang,h){ c.save(); c.lineCap='butt'; c.setLineDash([h*.05,h*.025]); c.strokeStyle='rgba(26,36,44,.32)'; c.lineWidth=Math.max(.6,h*.006);
+  for (const d of [-.2,.18]){ c.beginPath(); for (let i=0;i<=30;i++){ const k=.2+i/30*.76, p=at(k,W(k)*d); if (i) c.lineTo(p.x,p.y); else c.moveTo(p.x,p.y); } c.stroke(); } c.setLineDash([]);
+  // the ferrule: brass at its rims, the rest gone to verdigris, lit along the top
+  const f=at(.56), fl=h*.075, fh=W(.56)*.5+h*.013; c.translate(f.x,f.y); c.rotate(ang);
+  c.fillStyle='#6E9E88'; c.fillRect(-fl/2,-fh,fl,fh*2); c.fillStyle='#B8954F'; c.fillRect(-fl/2,-fh,fl*.2,fh*2); c.fillRect(fl*.32,-fh,fl*.18,fh*2);
+  c.fillStyle='rgba(168,214,190,.75)'; c.beginPath(); c.ellipse(-fl*.08,fh*.25,fl*.14,fh*.35,.4,0,7); c.ellipse(fl*.16,-fh*.3,fl*.08,fh*.25,-.3,0,7); c.fill();
+  c.fillStyle='rgba(255,255,255,.4)'; c.fillRect(-fl/2,-fh,fl,fh*.42); c.strokeStyle=INK; c.lineWidth=1.3; c.strokeRect(-fl/2,-fh,fl,fh*2); c.beginPath(); c.moveTo(-fl*.3,-fh); c.lineTo(-fl*.3,fh); c.moveTo(fl*.32,-fh); c.lineTo(fl*.32,fh); c.stroke();
+  c.restore(); }
+/** The Tidecaller's conch, on a tarred cord bound round the butt, swinging a little: cream and tan, knobbed at the
+    shoulder, its lip flared open and pink inside. */
+function rigConch(c,L,h,t){ const gl=L.len*.15, gh=h*.11, ca=Math.cos(L.ang), sa=Math.sin(L.ang), lx=gl*.34, ly=gh*.5, s=h/150, sw=REDUCED?0:Math.sin((t||0)*1.4)*.1;
+  c.save(); c.translate(L.hx,L.hy); c.rotate(L.ang); c.lineCap='round'; c.strokeStyle=INK; c.lineWidth=2.4; c.beginPath(); for (const x of [gl*.3,gl*.38]){ c.moveTo(x+gh*.08,-gh*.5); c.lineTo(x-gh*.08,gh*.5); } c.stroke();
+  c.strokeStyle='#8E6E46'; c.lineWidth=1.2; c.stroke(); c.restore();
+  c.save(); c.translate(L.hx+lx*ca-ly*sa,L.hy+lx*sa+ly*ca); c.rotate(sw); c.scale(s,s); c.lineCap='round'; c.lineJoin='round';
+  c.strokeStyle=INK; c.lineWidth=2.6; c.beginPath(); c.moveTo(0,0); c.lineTo(0,6); c.stroke(); c.strokeStyle='#8E6E46'; c.lineWidth=1.2; c.stroke();
+  c.translate(0,6); c.rotate(-1.05); const P=new Path2D(); P.moveTo(0,0); P.quadraticCurveTo(3,3,7,6); P.quadraticCurveTo(10,9,9,14); P.quadraticCurveTo(8,19,4,23); P.lineTo(1,27);
+  P.lineTo(-2,22); P.quadraticCurveTo(-8,19,-8,13); P.quadraticCurveTo(-8,8,-4,6); P.quadraticCurveTo(-2,3,0,0); P.closePath();
+  c.fillStyle='#E6CFAE'; c.fill(P); c.save(); c.clip(P); c.fillStyle='#C7A27A'; c.beginPath(); c.ellipse(8,15,5,10,0,0,7); c.fill(); c.fillStyle='#F7EBD6'; c.beginPath(); c.ellipse(-3,8,3,4,.3,0,7); c.fill();
+  c.strokeStyle='rgba(120,88,56,.6)'; c.lineWidth=1; c.beginPath(); c.moveTo(-2,3); c.quadraticCurveTo(1,5,4,3.5); c.moveTo(-4,6.5); c.quadraticCurveTo(2,9,8,7); c.stroke(); c.restore();
+  c.fillStyle='#E9A497'; c.beginPath(); c.ellipse(-3.6,15,3.2,6.4,.15,0,7); c.fill(); c.fillStyle='#F6D2C4'; c.beginPath(); c.ellipse(-3.2,14,1.4,3.6,.15,0,7); c.fill();
+  c.strokeStyle=INK; c.lineWidth=1.6; c.stroke(P); c.lineWidth=1.1; c.beginPath(); c.ellipse(-3.6,15,3.2,6.4,.15,0,7); c.stroke();
+  c.fillStyle='#F4E6CC'; for (const [x,y] of [[6,7],[9,11]]){ c.beginPath(); c.arc(x,y,1.5,0,7); c.fill(); c.stroke(); }
+  c.restore(); }
+/** The Bonewhistle's blank: pale as a knucklebone, pored, swelling to knuckles at its joints, holed like a whistle
+    near the butt, and now and then a cold shimmer running up it. */
+function rigBone(c,at,W,ang,h,t){ c.save();
+  c.fillStyle='rgba(120,108,86,.35)'; for (let i=0;i<16;i++){ const k=.2+((i*37)%29)/29*.74, p=at(k,W(k)*(((i*53)%7)/7-.5)*.5); c.beginPath(); c.arc(p.x,p.y,Math.max(.4,h*.004),0,7); c.fill(); }
+  // a knuckle at each joint: two bone ends swelling either side of the crease, lit from the upper left
+  for (const k of [.56,.72,.86]){ const p=at(k), r=W(k)*.5+h*.01, lob=x=>{ c.beginPath(); c.ellipse(x,0,r*.95,r*1.25,0,0,7); }; c.save(); c.translate(p.x,p.y); c.rotate(ang);
+    c.strokeStyle=INK; c.lineWidth=2.6; for (const x of [-r*.7,r*.7]){ lob(x); c.stroke(); } c.fillStyle='#E7E0CB'; for (const x of [-r*.7,r*.7]){ lob(x); c.fill(); }
+    c.save(); lob(-r*.7); c.ellipse(r*.7,0,r*.95,r*1.25,0,0,7); c.clip(); c.fillStyle='rgba(150,136,106,.5)'; c.fillRect(-r*2,r*.35,r*4,r); c.fillStyle='rgba(255,252,244,.85)'; for (const x of [-r*.85,r*.55]){ c.beginPath(); c.ellipse(x,-r*.6,r*.36,r*.22,-.3,0,7); c.fill(); } c.restore();
+    c.strokeStyle='rgba(43,42,51,.75)'; c.lineWidth=1; c.beginPath(); c.moveTo(0,-r*.9); c.quadraticCurveTo(r*.12,0,0,r*.9); c.stroke(); c.restore(); }
+  for (const k of [.235,.262,.289]){ const p=at(k), r=Math.max(.9,W(k)*.26); c.fillStyle='#2A2630'; c.beginPath(); c.arc(p.x,p.y,r,0,7); c.fill();
+    c.strokeStyle='rgba(255,252,240,.75)'; c.lineWidth=.8; c.beginPath(); c.arc(p.x,p.y,r,.1,1.9); c.stroke(); }
+  const u=REDUCED?.5:((t||0)*.16)%1.5; if (u<1){ const p=at(.2+u*.78), R=h*.08; c.globalCompositeOperation='lighter';
+    const g=c.createRadialGradient(p.x,p.y,0,p.x,p.y,R); g.addColorStop(0,'rgba(180,192,255,.42)'); g.addColorStop(1,'rgba(150,160,255,0)'); c.fillStyle=g; c.beginPath(); c.arc(p.x,p.y,R,0,7); c.fill(); }
+  c.restore(); }
 function drawRig(c,w,h,rod,rig,bait,t,fx){ const R=RODS[rod]||RODS.willow, L=rigLayout(w,h), at=L.at, ang=L.ang;
   c.save(); c.lineCap='round'; c.lineJoin='round';
   const swing=REDUCED?0:Math.sin((t||0)*1.3)*.06, tip=at(1), hook={x:L.bait.x+Math.sin(swing)*h*.3, y:L.bait.y-h*.06}, lc=LINE_COL[rig.line]||LINE_COL.cotton;
@@ -145,6 +184,8 @@ function drawRig(c,w,h,rod,rig,bait,t,fx){ const R=RODS[rod]||RODS.willow, L=rig
   for (const pass of [0,1]) for (let i=0;i<segs;i++){ const k0=.06+i/segs*.94, k1=.06+(i+1)/segs*.94, a=at(k0), b=at(k1);
     c.strokeStyle=pass?R.color:INK; c.lineWidth=wAt(i/segs)+(pass?0:2.6); c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); }
   c.strokeStyle='rgba(255,255,255,.25)'; c.lineWidth=1.2; const s0=at(.14,h*.012), s1=at(.8,h*.004); c.beginPath(); c.moveTo(s0.x,s0.y); c.lineTo(s1.x,s1.y); c.stroke();
+  // the quest rods' own: the Tidecaller's grain and green ferrule, the Bonewhistle's knuckles and holes
+  const W=k=>wAt((k-.06)/.94); if (rod==='tidecaller') rigTide(c,at,W,ang,h); if (rod==='bonewhistle') rigBone(c,at,W,ang,h,t);
   // rune sockets on the blank (game/enchant-art.js): the runes etched on a rod you own, empty seats on one you don't
   drawRigRunes(c,w,h,L,save.rods.includes(rod)?enchFor(rod):Array((R.ench||1)).fill(null),t,fx);
   // the guides stand on top of the blank; the line runs from the reel through each one to the tip, then down to the hook
@@ -166,6 +207,7 @@ function drawRig(c,w,h,rod,rig,bait,t,fx){ const R=RODS[rod]||RODS.willow, L=rig
   c.strokeStyle=INK; c.lineWidth=2.4; rrect(c,-gl*.1,-gh/2,gl,gh,gh*.45); c.stroke();
   rrect(c,-gl*.2,-gh*.42,gl*.12,gh*.84,3); c.fillStyle='#4A4C54'; c.fill(); c.stroke();
   rrect(c,gl*.86,-gh*.4,gl*.42,gh*.8,3); c.fillStyle=BRASS; c.fill(); c.stroke(); c.restore();
+  if (rod==='tidecaller') rigConch(c,L,h,t);
   // the reel, seated on top
   c.save(); c.translate(L.reel.x,L.reel.y); c.rotate(ang); drawTackle(c,rig.reel,h*.44,t); c.restore();
   // what's on the hook

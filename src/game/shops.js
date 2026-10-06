@@ -24,7 +24,7 @@ function openNet(){
   document.querySelectorAll('#panel [data-mount]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.mount, f=save.net[i]; if (!f) return; save.net.splice(i,1);
     const at=mountFish(f); if (at<0){ save.net.splice(i,0,f); return; } shSfx.mount(); buzz([0,18,120,18]); shackPulse(); news(FISH[f.id].name+' is up on the trophy wall in your shack','gold'); openNet(); }));
   document.querySelectorAll('#panel [data-hang]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.hang, f=save.net[i]; if (!f || hangFish(i)<0) return; sfx.rig('bait'); news(FISH[f.id].name+' is on the smoke rack in the kitchen','good'); openNet(); }));
-  const sell=idxs=>{ const set=new Set(idxs); let sum=0; save.net=save.net.filter((f,i)=>{ if (set.has(i)){ sum+=f.value; return false; } return true; }); persist(); if (sum) addCoins(sum); openNet(); };
+  const sell=idxs=>{ const set=new Set(idxs); let sum=0; save.net=save.net.filter((f,i)=>{ if (set.has(i)){ sum+=f.value; dreadSold(f); return false; } return true; }); persist(); if (sum) addCoins(sum); openNet(); };
   document.querySelectorAll('[data-sell]').forEach(b=>b.addEventListener('click',()=>{ const f=save.net[+b.dataset.sell];   // a Mythic asks twice, as on the card
     if (f && rarRank(FISH[f.id].rarity)>=rarRank('mythic') && !b.dataset.armed){ b.dataset.armed='1'; b.textContent='Sell it? Tap again'; b.classList.add('armed'); return; } sell([+b.dataset.sell]); }));
   document.querySelectorAll('#panel [data-tank]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.tank, f=save.net[i]; if (!f || !tankRoom(f.id)) return; save.net.splice(i,1); addToTank(f); persist(); sfx.plop(); news(FISH[f.id].name+' is in the aquarium','good'); openNet(); }));

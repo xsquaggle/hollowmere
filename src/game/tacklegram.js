@@ -7,8 +7,9 @@ function maxStat(k){ return Math.max(...Object.values(RODS).map(r=>r[k])); }
 function statBar(label,v,k,cv){ const max=maxStat(k);
   return '<div class="sbar"><span>'+label+'</span><div><i style="width:'+Math.round(v/max*100)+'%;background:'+(v>cv+1e-6?'#5E9B4E':v<cv-1e-6?'#C0705C':'#8A8578')+'"></i><b style="left:calc('+Math.round(cv/max*100)+'% - 1px)"></b></div></div>'; }
 
-const MAIL={state:'away',x:-90,t:0,items:[],say:'',sayT:0};
-const lettersWaiting = () => LETTER_ORDER.some(id=>findsState().letters[id]==='waiting');
+const MAIL={state:'away',x:-90,t:0,items:[],say:'',sayT:0,sayMax:5,hold:0,asked:false};
+/** A drowned letter, or an answer to one you posted (game/pell.js), waiting for Pell to collect it. */
+const lettersWaiting = () => { const L=findsState().letters; return LETTER_ORDER.some(id=>L[id]==='waiting') || REPLY_ORDER.some(id=>L[id]==='waiting'); };
 /** The hull's color right now: Aurora drifts through the colors; everything else is its paint. */
 function hullColor(){ const P=PAINTS[save.paint]||PAINTS.blue; return P.shift?prismAt(S.time*.5,0,46):P.hull; }
 function queueOrder(kind,id){ save.pending=save.pending||[]; save.pending.push({kind,id}); persist(); if (MAIL.state==='away'){ MAIL.state='waiting'; MAIL.t=REG()==='lake'?.5:5; } }
@@ -19,29 +20,44 @@ function grant(o){
   else if (o.kind==='gear' && TACKLE[o.id]){ grantGear(o.id); fitNewGear(o.id); }
 }
 function itemName(o){ return o.kind==='rod'?RODS[o.id].name:o.kind==='part'?PARTS[o.id].name:o.kind==='gear'?(TACKLE[o.id]||{}).name:PAINTS[o.id].name+' paint'; }
+/** Where Pell's mail boat is: coming up to your dock, or moored at the post office steps in the Drowned Quarter
+    (drawn with the street there: game/quarter-art.js). */
+function mailAt(){ const q=REG()==='quarter' && G.q && G.q.mail;
+  if (q) return {x:q.x, y:q.y+Math.sin(S.time*1.3)*1.1*q.s, s:q.s, moored:true};
+  return {x:MAIL.x, y:H-240+Math.sin(S.time*1.8)*1.2, s:1, moored:false}; }
 function updateMail(dt){
+  if (MAIL.sayT>0 && MAIL.state!=='stopped'){ MAIL.sayT-=dt; if (MAIL.sayT<=0) MAIL.say=''; }   // in the Quarter he talks from his boat whenever
   if (MAIL.state==='away') return;
-  MAIL.t-=dt; const stopX=W*.27;
-  if (MAIL.state==='waiting'){ if (MAIL.t<=0){ MAIL.state='coming'; MAIL.x=-90; tone(523,.18,{vol:.07,type:'triangle'}); tone(659,.22,{vol:.07,type:'triangle',delay:.2}); } }
-  else if (MAIL.state==='coming'){ MAIL.x=lerp(MAIL.x,stopX,Math.min(1,dt*1.1)); if (Math.random()<dt*4) tone(rand(90,110),.06,{vol:.04,type:'square'});
+  MAIL.t-=dt; const stopX=W*.27, moored=REG()==='quarter';
+  if (MAIL.state==='waiting'){ if (MAIL.t<=0){ if (moored){ MAIL.state='stopped'; MAIL.t=.6; } else { MAIL.state='coming'; MAIL.x=-90; tone(523,.18,{vol:.07,type:'triangle'}); tone(659,.22,{vol:.07,type:'triangle',delay:.2}); } } }
+  else if (MAIL.state==='coming'){ if (moored){ MAIL.state='stopped'; MAIL.t=.6; return; } MAIL.x=lerp(MAIL.x,stopX,Math.min(1,dt*1.1)); if (Math.random()<dt*4) tone(rand(90,110),.06,{vol:.04,type:'square'});
     if (Math.abs(MAIL.x-stopX)<3){ MAIL.state='stopped'; MAIL.t=1.4; if ((save.pending||[]).length) S.particles.push({x:MAIL.x+10,y:H-262,vx:(W/2-MAIL.x-10)/1.1,vy:-180,g:300,life:0,max:1.1,r:5,c:'rgba(178,128,78,',rect:true,spin:4}); } }
   else if (MAIL.state==='stopped'){
     if (MAIL.sayT>0){ MAIL.sayT-=dt; if (MAIL.sayT<=0){ MAIL.say=''; MAIL.t=.5; } return; }   // Pell finishes reading out an address
     if (MAIL.t<=0){
       const got=(save.pending||[]).splice(0); got.forEach(grant); persist();
-      if (got.length){ sfx.out('uncommon'); buzz([0,30,40,30]); news('Delivered: '+got.map(itemName).join(', '),'gold'); updateHud(); bagRefresh(); }
-      const line=pellReads(); if (line){ MAIL.say=line; MAIL.sayT=5; tone(587,.16,{vol:.06,type:'triangle'}); tone(784,.2,{vol:.06,type:'triangle',delay:.16}); return; }
-      MAIL.state='leaving'; } }
-  else if (MAIL.state==='leaving'){ MAIL.x-=dt*80; if (MAIL.x<-120){ MAIL.state=(save.pending||[]).length||lettersWaiting()?'waiting':'away'; MAIL.t=4; } }
+      if (got.length){ sfx.out('uncommon'); buzz([0,30,40,30]); news('Delivered: '+got.map(itemName).join(', '),'gold'); updateHud(); bagRefresh();
+        if (moored){ const m=mailAt(); S.particles.push({x:m.x,y:m.y-20*m.s,vx:(W/2-m.x)/1.1,vy:-220,g:300,life:0,max:1.1,r:5,c:'rgba(178,128,78,',rect:true,spin:4}); } }
+      const line=pellReads(); if (line){ pellSay(line,5); return; }
+      // he came by with something to tell you (game/pell.js): he waits a little while to be tapped
+      if (MAIL.hold>0 && !moored && pellHasNews()){ if (!MAIL.asked){ MAIL.asked=true; pellSay(PELL.call,4); return; } MAIL.hold-=dt; return; }
+      MAIL.hold=0; MAIL.asked=false; MAIL.state='leaving'; } }
+  else if (MAIL.state==='leaving'){ MAIL.x-=dt*80; if (moored || MAIL.x<-120){ MAIL.state=(save.pending||[]).length||lettersWaiting()?'waiting':'away'; MAIL.t=4; } }
 }
+/** After a trip on the map: the mail boat starts its run again wherever you are now. */
+function mailMoved(){ if (MAIL.state!=='away'){ MAIL.state='waiting'; MAIL.t=2; MAIL.x=-90; } MAIL.say=''; MAIL.sayT=0; MAIL.hold=0; MAIL.asked=false; }
 function drawMail(){
-  if (MAIL.state==='away' || MAIL.state==='waiting') return;
-  const x=MAIL.x, y=H-240+Math.sin(S.time*1.8)*1.2;
-  drawMailBoat(x,y);
-  if (MAIL.state==='stopped' && MAIL.sayT>0){ ctx.font='700 12px Nunito, system-ui, sans-serif'; const lines=wrapText(MAIL.say,W*.6), bw=Math.max(...lines.map(l=>ctx.measureText(l).width))+18, bh=lines.length*15+12;
-    const a=Math.min(1,MAIL.sayT*3,(5-MAIL.sayT)*4), bx=clamp(x-20,16,W-bw-16), by=y-52; ctx.globalAlpha=a; ctx.fillStyle=PAPER; ctx.strokeStyle=INK; ctx.lineWidth=1.5; rrect(ctx,bx,by-bh,bw,bh,8); ctx.fill(); ctx.stroke();
+  const m=mailAt(), here=MAIL.state==='coming'||MAIL.state==='stopped'||MAIL.state==='leaving';
+  if (!m.moored && !here) return;
+  const x=m.x, y=m.y, s=m.s, by=y-(m.moored?46*s:52);
+  if (!m.moored) drawMailBoat(x,y);
+  if (MAIL.sayT>0){ ctx.font='700 12px Nunito, system-ui, sans-serif'; const lines=wrapText(MAIL.say,W*.6), bw=Math.max(...lines.map(l=>ctx.measureText(l).width))+18, bh=lines.length*15+12, mx=MAIL.sayMax||5;
+    const a=Math.min(1,MAIL.sayT*3,(mx-MAIL.sayT)*4), bx=clamp(x-20,16,W-bw-16); ctx.globalAlpha=Math.max(0,a); ctx.fillStyle=PAPER; ctx.strokeStyle=INK; ctx.lineWidth=1.5; rrect(ctx,bx,by-bh,bw,bh,8); ctx.fill(); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x+4,by); ctx.lineTo(x+9,by+8); ctx.lineTo(x+14,by); ctx.fillStyle=PAPER; ctx.fill(); ctx.fillStyle=INK; ctx.textAlign='left'; lines.forEach((l,i)=>ctx.fillText(l,bx+9,by-bh+18+i*15)); ctx.globalAlpha=1; }
-  else if (MAIL.state==='stopped' && (save.pending||[]).length){ ctx.font='800 13px Nunito, system-ui, sans-serif'; ctx.fillStyle=PAPER; ctx.lineWidth=3; ctx.strokeStyle=INK; ctx.strokeText('Parcel for you!',x+8,y-50); ctx.fillText('Parcel for you!',x+8,y-50); }
+  else if (MAIL.state==='stopped' && (save.pending||[]).length){ ctx.font='800 13px Nunito, system-ui, sans-serif'; ctx.textAlign='left'; ctx.fillStyle=PAPER; ctx.lineWidth=3; ctx.strokeStyle=INK; ctx.strokeText('Parcel for you!',x+8,by+2); ctx.fillText('Parcel for you!',x+8,by+2); }
+  else if ((m.moored || MAIL.state==='stopped') && S.state==='idle' && pellHasNews()){   // something for you: a little ! over his cap
+    const bob=Math.sin(S.time*3)*2, cx=x+7.5*s, cy=by-6+bob; ctx.fillStyle=PAPER; ctx.strokeStyle=INK; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(cx,cy-8,9,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx-3,cy); ctx.lineTo(cx,cy+5); ctx.lineTo(cx+3,cy); ctx.fill(); ctx.font='900 13px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=DANGER; ctx.fillText('!',cx,cy-3.5); }
 }
 
 function renderApp(tab){

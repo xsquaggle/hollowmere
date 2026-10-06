@@ -75,7 +75,7 @@ function drawWater(){
   const sx=SC.lightX||W*.3, la=SC.lightA||0;
   if (la>.02) for (let i=0;i<14;i++){ const y=HZ+3+i*i*1.5, w=W*.05*(1-i/16)+Math.sin(S.time*1.5+i)*4;
     ctx.fillStyle='rgba('+SC.lightRGB+','+((.42-i*.025)*la).toFixed(3)+')'; ctx.fillRect(sx-w,y,w*2,1.5+i*.15); }
-  const own=REG()==='river'||REG()==='marsh';   // the river and the marsh draw their own current and tide (game/river-art.js, marsh-art.js); no sails or lake swell there
+  const own=REG()==='river'||REG()==='marsh'||REG()==='quarter';   // the river, the marsh and the Quarter draw their own water (game/river-art.js, marsh-art.js, quarter-art.js); no sails or lake swell there
   if (!own) drawBoat();
   ctx.lineCap='round';
   if (!own) for (const v of SC.waves){
@@ -114,6 +114,7 @@ function drawPads(){
   if (REG()==='coast'){ drawSeaBeam(); drawWash(); drawWreck(); drawKelp(); return; }
   if (REG()==='river'){ drawRiverWater(); return; }
   if (REG()==='marsh'){ drawMarshWater(); return; }
+  if (REG()==='quarter'){ drawQuarterWater(); return; }
   G.padClusters.forEach((c,ci)=>{ SC.pads[ci].forEach((p,i)=>{
     const {x,y,r}=padPos(ci,i);
     ctx.save(); ctx.translate(x,y); ctx.scale(1,.42);
@@ -170,6 +171,7 @@ function drawReeds(){
   if (REG()==='coast'){ drawStacks(); return; }
   if (REG()==='river'){ drawRiverBanks(); return; }
   if (REG()==='marsh'){ drawMarshNear(); return; }
+  if (REG()==='quarter'){ drawQuarterNear(); return; }
   drawBank(SC.bank.L,-1); drawBank(SC.bank.R,1);
   drawRock(W*.075,H*.635,11); drawRock(W*.145,H*.775,8); drawRock(W*.905,H*.735,10);
   ctx.lineCap='round';
@@ -225,7 +227,7 @@ function wrapText(t,max){ const words=t.split(' '), out=[]; let line='';
   for (const w of words){ const test=line?line+' '+w:w; if (ctx.measureText(test).width>max && line){ out.push(line); line=w; } else line=test; }
   if (line) out.push(line); return out; }
 function netCap(){ return modAdd('netCap'); }
-function netPos(){ return REG()==='coast' ? {x:W/2+108, y:H-128+(S.bob_y||0)} : {x:W/2+104, y:H-104}; }
+function netPos(){ return afloat() ? {x:W/2+108, y:H-128+(S.bob_y||0)} : {x:W/2+104, y:H-104}; }
 function onKeepnet(x,y){ const p=netPos(); return x>p.x-26 && x<p.x+26 && y>p.y-34 && y<p.y+26; }
 function updateScenery(dt){
   for (const c of SC.clouds){ c.x+=c.sp*dt*.5; if (c.x>1.3) c.x=-.3; }

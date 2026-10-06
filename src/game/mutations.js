@@ -1,4 +1,4 @@
-/* ---------- Mutations: Mossy, Glassy, Twin and Giant ---------- */
+/* ---------- Mutations: Mossy, Glassy, Twin, Giant, and Inked (cursed gear only: game/dread.js) ---------- */
 /* Any catch below Mythic can come up mutated (MUTS in data/fish.js), rolled once as it lands (catchRoll). The chance is
    each mutation's own, times every bonus to STATS.mutation: Odd Water, and casting at the rainbow's foot. A mutated
    catch pays a little Glimmer, is worth more, and looks mutated wherever it's drawn (drawMutation, from drawFish).
@@ -6,11 +6,11 @@
 /** Which mutation a catch comes up with, or null. ctx: {spot, lucky, bow}. */
 function rollMutation(id,ctx){ const F=FISH[id]; if (rarRank(F.rarity)>=rarRank('mythic')) return null;
   if (RARITY_CTL.mut && !SIMULATING){ const k=RARITY_CTL.mut; RARITY_CTL.mut=null; return k; }
-  const m=modMul('mutation',Object.assign({fish:id},ctx)); let x=Math.random();
-  for (const k of MUT_ORDER){ x-=MUTS[k].chance*m; if (x<0) return k; }
+  const c=Object.assign({fish:id},ctx), m=modMul('mutation',c), cursed=modFlag('cursed',c); let x=Math.random();
+  for (const k of MUT_ORDER){ if (MUTS[k].cursed && !cursed) continue; x-=MUTS[k].chance*m; if (x<0) return k; }   // Inked comes only on cursed gear (game/dread.js)
   return null; }
 /** The chance any mutation comes up, with the bonuses here and now (read by the tests). */
-function mutationChance(ctx){ const m=modMul('mutation',ctx||{}); return Math.min(1,MUT_ORDER.reduce((a,k)=>a+MUTS[k].chance*m,0)); }
+function mutationChance(ctx){ const m=modMul('mutation',ctx||{}), cursed=modFlag('cursed',ctx||{}); return Math.min(1,MUT_ORDER.reduce((a,k)=>a+(MUTS[k].cursed && !cursed?0:MUTS[k].chance*m),0)); }
 /** The mutations found for a species, in journal order. Tidies the record's list on first read. */
 function mutsFound(id){ const r=save.fish[id]; if (!r) return []; if (!Array.isArray(r.muts)) r.muts=[]; r.muts=r.muts.filter((k,i,a)=>MUTS[k] && a.indexOf(k)===i);
   return MUT_ORDER.filter(k=>r.muts.includes(k)); }

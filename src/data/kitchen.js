@@ -18,7 +18,8 @@ const FLESH={perch:'#F4CDB0', reedwhisker:'#EFD9C2', lantern:'#F7D9A0', leafjack
   gar:'#F2DCC4', angler:'#F7EDE2', shiner:'#F3E2DA', calf:'#D9A79A',
   brook:'#F3D7C2', stone:'#E9D6BE', spatefin:'#F2CDB4', barbel:'#EDDCC0', grayling:'#F4E6DE', clockfin:'#F5C7A8', gristle:'#E8D0A8',
   mudlark:'#EADBC6', dab:'#F6EDE2', croaker:'#F1DCC8', smelt:'#EFE6D6', whiting:'#F7F0E6', mullet:'#EBD3C2', bellmouth:'#E6D8C0', lampwick:'#E9DCC8', reeve:'#F2E4D6',
-  spindrift:'#F4EAE0', herring:'#E6C9B8', conger:'#F2E8DC', comber:'#EFD8CA'};
+  spindrift:'#F4EAE0', herring:'#E6C9B8', conger:'#F2E8DC', comber:'#EFD8CA',
+  gudgeon:'#EADFD2', roach:'#F2D2C2', hingejaw:'#E8DCC6', drainpipe:'#EEE2D0', laceshad:'#F6F0EA', sturgeon:'#F0D8C0', hearth:'#F7C9A2', papercarp:'#F3EBDD', choir:'#F1E4E0'};
 const COOK_NAME={pan:'Pan-fry', grill:'Grill'};
 /* Each recipe: what it needs from the keepnet, how each station plays, and what the meal does.
    need: [{id or rar, n}]; smoked:true takes a smoked fish of any kind from the keepnet (it skips the Clean station).

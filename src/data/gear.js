@@ -3,7 +3,8 @@
               snag (chance the reeds catch the line); reedBoost (reed fish bite this much sooner); color; where; perk;
               sea:true for Tacklegram rods; mods, the perk as modifiers (see data/stats.js and game/mods.js);
               ench, how many enchantment sockets it has (1 to 3: data/enchant.js).
-   quest:true for a rod someone gives you rather than sells (the Twin Spool and the Lantern Rod are Wren's).
+   quest:true for a rod someone gives you rather than sells (the Twin Spool and the Lantern Rod are Wren's, the Tidecaller is
+   Pell's, and the Bonewhistle comes up out of the bell tower). cursed:true for cursed gear (data/quarter.js: DREAD).
    ROD_ORDER  Ottilie's shop ladder (each rod about 2.5 times the last, set by the depth gate's whole-run report).  SEA_RODS  the Tacklegram ladder.  PARTS (with their mods), PAINTS  boat upgrades and colors
               (a paint with crate: only comes in loot crates; the rest are sold on Tacklegram).
    A modifier is {stat, v, when?, omen?}: stat names an entry in STATS; when limits it to a region, spot, time
@@ -25,6 +26,13 @@ const RODS = {
   lanternrod:{name:'Lantern Rod', price:0, quest:true, ench:2, reach:1, line:1.4, reel:1.25, luck:.35, value:1.25, snag:0, reedBoost:1.3, color:'#A8743E', where:'The horizon',
               blurb:'Wren’s work: a little lamp hung at the tip, lit from one of her jars.', perk:'Lights the water at night: fish show in its light as they come, the perfect-hook window is 50% wider, and night fish bite 25% more often.',
               mods:[{stat:'lantern'}, {stat:'night', v:1.25}, {stat:'perfect', v:1.5, when:{night:true}}]},
+  tidecaller:{name:'Tidecaller', price:0, quest:true, ench:3, reach:1, line:1.7, reel:1.35, luck:.55, value:1.5, snag:0, reedBoost:1.3, color:'#4E6A78', where:'The horizon',
+              blurb:'The old postmaster’s rod: grey ash, a brass ferrule gone green, and a conch on a cord at the butt.', perk:'Blow the conch to call the rain where you are, for two in-game hours. Once a day.',
+              mods:[{stat:'callRain'}]},
+  bonewhistle:{name:'Bonewhistle', price:0, quest:true, cursed:true, ench:2, reach:1, line:1.6, reel:1.3, luck:.45, value:1.4, snag:0, reedBoost:1.3, color:'#D8D0BC', where:'The horizon',
+              blurb:'Pale as a knucklebone and hollow all the way down. When the wind takes it, it whistles a note you feel in your teeth.',
+              perk:'Cursed. Fish come straight in, with no fight. Catches can come up Inked, worth five times as much. Every catch builds Dread.',
+              mods:[{stat:'limp'}, {stat:'cursed'}]},
   saltline:  {name:'Saltline Rod', price:5000, ench:3, reach:1, line:1.6, reel:1.3, luck:.45, value:1.4, snag:0, reedBoost:1.3, color:'#3E6E8A', where:'Open water', sea:true,
               blurb:'Braided salt-cured line on a blue fiberglass blank.', perk:'Swells hit your line half as hard.', mods:[{stat:'swell', v:.5}]},
   gale:      {name:'Gale Rod', price:11000, ench:3, reach:1, line:1.8, reel:1.4, luck:.6, value:1.55, snag:0, reedBoost:1.3, color:'#CFC6B2', where:'Open water', sea:true,
@@ -37,7 +45,7 @@ const RODS = {
 const ROD_ORDER=['willow','reedcutter','ash','heronwood','brasscap'];
 const SEA_RODS=['saltline','gale','deepwater'];
 /* QUEST_RODS  rods from people, not shops; ALL_RODS  every rod in the order the bag, the rack and Playtest list them. */
-const QUEST_RODS=['twin','lanternrod'];
+const QUEST_RODS=['twin','lanternrod','tidecaller','bonewhistle'];
 const ALL_RODS=[...ROD_ORDER,...QUEST_RODS,...SEA_RODS];
 /* BOAT  Barnaby's skiff: what it costs. */
 const BOAT={price:3000};

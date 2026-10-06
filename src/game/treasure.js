@@ -35,7 +35,7 @@ function rollTreasure(c){
   if (!pickLoose(c,true)){ w.pouch+=w.find; w.find=0; }
   // a treasure map's pieces (game/relics.js): only while there's a map to add to; with the Cartographer's Pin, every 5th treasure
   if (!mapCan(c)){ w.pouch+=w.map; w.map=0; } else if (pinMapDue(c)) return {kind:'map'};
-  if (letterCan(c)) w.letter=TREASURE.letter.weight;
+  if (letterCan(c)) w.letter=TREASURE.letter.waters[modCtx(c).region].weight;
   const kind=pickW(w); return kind==='crate'?{kind, tier:rollCrateTier(c)}:{kind};
 }
 function rollCrateTier(c){ const w={}; for (const t in CRATES) w[t]=CRATES[t].weight*tierMul(t,c); return pickW(w); }
@@ -50,8 +50,9 @@ function nextBottleNote(c,peek){ const FS=findsState(), read=new Set(FS.notes), 
   const open=Object.keys(NOTES).filter(id=>NOTES[id].kind==='bottle' && !read.has(id) && (!NOTES[id].region || NOTES[id].region===reg));
   if (open.length) return peek?open[0]:open[Math.floor(Math.random()*open.length)];
   return !read.has('log1')?'log1':!read.has('log2')?'log2':null; }
-function nextLetter(){ const FS=findsState(); return LETTER_ORDER.find(id=>!FS.letters[id])||null; }
-function letterCan(c){ const L=TREASURE.letter; return modCtx(c).region===L.region && L.spots.includes(c.spot) && save.stats.catches>=L.from && !!nextLetter(); }
+/** The next drowned letter that can come up in this water (each comes up in its own waters: NOTES[id].waters). */
+function nextLetter(c){ const FS=findsState(), reg=modCtx(c||{}).region; return LETTER_ORDER.find(id=>!FS.letters[id] && (NOTES[id].waters||['lake']).includes(reg))||null; }
+function letterCan(c){ const L=TREASURE.letter, Wt=L.waters[modCtx(c).region]; return !!Wt && Wt.spots.includes(c.spot) && save.stats.catches>=L.from && !!nextLetter(c); }
 /** A loose find: its rarity rolled from TREASURE.loose with luck, then one you don't have from this region. */
 function pickLoose(c,peek){ const FS=findsState(), reg=modCtx(c).region, w={};
   const ok=id=>!FS.have[id] && lootable(id) && TREASURE.loose[FINDS[id].rarity]!=null && (FINDS[id].region==='any' || FINDS[id].region===reg);
@@ -94,9 +95,10 @@ function openLoot(loot,c){ const FS=findsState(), x=modCtx(c), lm=modMul('loot',
   if (loot.kind==='pouch') out.coins=Math.max(5,Math.round(spotValue(c)*rand(TREASURE.pouch[0],TREASURE.pouch[1])*lm));
   else if (loot.kind==='geode') out.glimmer=glim(GLIMMER.geode[x.region]||GLIMMER.geode.lake);
   else if (loot.kind==='bottle'){ const id=nextBottleNote(c); FS.bottles++; if (id) note(id); else spare('common'); }
-  else if (loot.kind==='letter'){ const id=nextLetter(); if (id){ FS.letters[id]='waiting'; note(id); } else spare('uncommon'); }   // Pell collects it on his next stop
+  else if (loot.kind==='letter'){ const id=nextLetter(c); if (id){ FS.letters[id]='waiting'; note(id); } else spare('uncommon'); }   // Pell collects it on his next stop
   else if (loot.kind==='find'){ const id=loot.id&&!FS.have[loot.id]?loot.id:pickLoose(c); if (id) give(id,loot.id===id?storyWhere(where):null); else spare('common'); }   // a story relic (game/relics.js), or a loose find
   else if (loot.kind==='map'){ const m=addMapPiece(c); out.items.push({type:'map', n:m.n}); }
+  else if (loot.kind==='rod'){ const id=loot.id; if (!save.rods.includes(id)) save.rods.push(id); if (id==='bonewhistle') quarterState().bw=1; out.items.push({type:'rod', id}); }   // a rod of its own (the Bonewhistle: game/dread.js)
   else if (loot.kind==='crate'){ const C=CRATES[loot.tier]; FS.crates[loot.tier]=(FS.crates[loot.tier]||0)+1;
     out.coins=crateCoins(loot.tier,c); out.glimmer=glim(GLIMMER.crate[loot.tier]);
     if (loot.cache){ out.cache=true; cacheDug(give,where); }   // a treasure map's cache: the first holds the Cartographer's Pin
@@ -141,7 +143,7 @@ function hookHaul(){ const b=S.bite, perfect=b.t<=.3*modMul('perfect',{spot:S.bo
   toast(perfect?'Perfect hook!':'Hooked!',perfect?'good':''); sfx.hook(perfect); buzz(perfect?[0,20,30,20]:25); splash(S.bob.x,S.bob.y,8); pulse(.2);
   startReel(null,perfect); }
 function startHaul(loot,perfect){
-  S.reel=newHaul(loot,perfect,S.bob,!!(S.wait&&S.wait.lucky),S.bob.spot);
+  S.reel=newHaul(loot,perfect,quarterFrom(S.bob)||S.bob,!!(S.wait&&S.wait.lucky),S.bob.spot);
   S.holding=S.pointers.size>0; S.tilt=0; S.pressX=S.thumbX; S.pressTilt=0; humStart(); setState('reeling');
   const FS=findsState();
   if (!FS.treasure) coachShow('Something heavy, and it isn’t a fish. Hold to haul it up, and let go if the ring turns red.',7); }
