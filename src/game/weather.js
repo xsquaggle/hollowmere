@@ -6,16 +6,18 @@
    table, with fog leaning to the morning. The first in-game day (save.day 0) only rolls clear or overcast, and the
    sky stays clear until the tutorial is done.
    A change comes on over WX_SPELL.ease in-game hours: the look blends (wxLook), and the fishing turns over halfway.
+   Rain called with the Tidecaller's conch (save.wx.call: game/tidecaller.js) falls where it was called, for its hours.
    Playtest and the balance simulator can pin the weather with save.wx.force. Everything here reads only the save, so
    the simulator's stand-in save has weather of its own (see game/mods.js). */
 var WXM={save:null};                        // the last answer, while nothing it depends on has changed
-const WX_REGN={lake:1, coast:2, river:3, marsh:4};
+const WX_REGN={lake:1, coast:2, river:3, marsh:4, quarter:5};
 /** The save's weather state, tidied on first read: a seed for the sky, a pinned kind (Playtest), tips already shown. */
 function wxState(){ let w=save.wx; if (!w || typeof w!=='object' || Array.isArray(w)) w=save.wx={};
   if (!Number.isInteger(w.seed) || w.seed<1) w.seed=1+Math.floor(Math.random()*2147483646);
   if (w.force!=null && !WX_ORDER.includes(w.force)) delete w.force;
   if (w.moon!=null && !(Number.isInteger(w.moon) && w.moon>=0 && w.moon<MOON.cycle)) delete w.moon;
   if (w.bow!=null && w.bow!==true) delete w.bow;
+  if (w.call!=null && !(isObj(w.call) && typeof w.call.reg==='string' && w.call.until>w.call.from)) delete w.call;
   if (!w.seen || typeof w.seen!=='object' || Array.isArray(w.seen)) w.seen={};
   return w; }
 /** A number in [0, 1) from three integers: the same three always give the same number. */
@@ -36,19 +38,24 @@ function wxAt(reg,B,seed){ seed=seed||wxState().seed; return wxRoll(reg,wxStart(
     a rainbow, each 0 to 1). Cached until the save, the clock, the region or a pinned kind changes. */
 function wxInfo(){
   const w=wxState(), M=WXM;
-  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.ferry===save.ferry && M.marsh===save.marsh && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
+  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.ferry===save.ferry && M.marsh===save.marsh && M.quarter===quarterOpen() && M.call===w.call && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
   const reg=REG(), h=(((save.clock%24)+24)%24), into=h%WX_SPELL.hours; let from, to, t;
   if (w.force){ from=to=w.force; t=1; }
   else if (!save.tutorialDone){ from=to='clear'; t=1; }
   else { const B=wxSpell(); to=wxAt(reg,B,w.seed); from=B>0?wxAt(reg,B-1,w.seed):to; t=from===to?1:clamp(into/WX_SPELL.ease,0,1); }
+  // rain called with the Tidecaller's conch (game/tidecaller.js) comes in over a few in-game minutes, and goes the same way
+  const C=w.call; let called=false;
+  if (C && C.reg===reg && !w.force && save.tutorialDone){ const a=absHour(), nat=t<.5?from:to;
+    if (a>=C.from && a<C.until){ called=true; if (nat==='rain'){ from=to='rain'; t=1; } else { from=nat; to='rain'; t=clamp((a-C.from)/.4,0,1); } }
+    else if (a>=C.until && a<C.until+.5 && nat!=='rain'){ called=true; from='rain'; to=nat; t=clamp((a-C.until)/.5,0,1); } }
   const e=t*t*(3-2*t), A=WX[from].look, Z=WX[to].look, kind=t<.5?from:to;
   const v={kind, from, to, t, cloud:lerp(A.cloud,Z.cloud,e), rain:lerp(A.rain,Z.rain,e), fog:lerp(A.fog,Z.fog,e), mist:0, bow:0};
   // the dawn mist on fair mornings: thickest around six, gone by nine
   if (kind==='clear'||kind==='cloudy'){ const m=h<DAWN_MIST.from-.5||h>DAWN_MIST.to+1.5?0:h<6?(h-(DAWN_MIST.from-.5))/1.5:1-(h-6)/(DAWN_MIST.to+1.5-6); v.mist=clamp(m,0,1); }
   // a rainbow, by day, in the hour or two after rain gives way
-  if (from==='rain' && to!=='rain' && !w.force && h>=7 && h<18.5) v.bow=clamp((t-.5)/.4,0,1)*clamp((2.4-into)/.8,0,1);
+  if (from==='rain' && to!=='rain' && !w.force && !called && h>=7 && h<18.5) v.bow=clamp((t-.5)/.4,0,1)*clamp((2.4-into)/.8,0,1);
   if (w.bow && !isNight(h)) v.bow=1;                                   // Playtest: a rainbow now
-  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,ferry:save.ferry,marsh:save.marsh,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
+  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,ferry:save.ferry,marsh:save.marsh,quarter:quarterOpen(),call:w.call,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
   return v; }
 /** The weather the fishing uses here and now: 'clear', 'cloudy', 'rain' or 'fog'. */
 const wxNow = () => wxInfo().kind;

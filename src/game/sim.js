@@ -14,6 +14,11 @@
    or in fog so does a float the lighthouse beam crosses (the beam's glow fish likelier). Both happen by chance as often
    as the clocks line up with the wait, and a player who times casts to them (SIM_PLAYERS seventh, beam) gets more.
    The wash only lies by a stack after a swell breaks there, so a cast to it waits for one, and is never washed out.
+   In the Drowned Quarter every cast goes in where it's aimed (through its door or window; no wall in the way), the
+   player scoops up a drowned page as one drifts by (SIM_PLAYERS pages: how many of them), so the Paper Carp gets its
+   chance on the cast after, and at night aims for the lit windows' reflections in the street (refl) for the
+   Hearthfish. The bell tower rings with the clock (3:12 to 4:12). The Bonewhistle's Dread is held at st.dread for the
+   run (0 unless named): its luck counts, the lake looking back and the ink shadow don't.
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
@@ -27,9 +32,9 @@
    comes back untouched. */
 const SIM_PLAYERS={
   steady:{name:'Steady player', react:()=>.2+.38*Math.pow(Math.random(),1.6), easeReact:()=>rand(.12,.32), track:5, easeAt:.8, easeFor:.45,
-          twitch:true, dives:.8, tugs:.7, jumps:.85, swells:.5, seventh:.1, beam:.2},
+          twitch:true, dives:.8, tugs:.7, jumps:.85, swells:.5, seventh:.1, beam:.2, pages:.8, refl:.5},
   new:   {name:'New player', react:()=>.28+.6*Math.pow(Math.random(),1.3), easeReact:()=>rand(.25,.6), track:3, easeAt:.9, easeFor:.35,
-          twitch:false, dives:.4, tugs:.35, jumps:.5, swells:.15, seventh:.03, beam:.08}
+          twitch:false, dives:.4, tugs:.35, jumps:.5, swells:.15, seventh:.03, beam:.08, pages:.4, refl:.15}
 };
 /* Where each spot sits on the cast's 0 (shore) to 1 (horizon) scale: [nearest edge, middle]. The rod's reach
    has to cover the nearest edge. Worked out from the layout in game/layout.js and game/regions.js on a
@@ -37,14 +42,15 @@ const SIM_PLAYERS={
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
                  coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], wash:[.34,.45], deep:[.43,.53], wreck:[.72,.77], far:[.8,.9]},
                  river:{open:[0,.3], riffle:[0,.12], leaves:[.3,.38], deep:[.7,.78], roots:[.82,.9]},
-                 marsh:{open:[0,.3], reeds:[0,.15], flats:[.13,.3], pans:[.28,.35], deep:[.43,.5], far:[.8,.9]}};
+                 marsh:{open:[0,.3], reeds:[0,.15], flats:[.13,.3], pans:[.28,.35], deep:[.43,.5], far:[.8,.9]},
+                 quarter:{open:[0,.3], windows:[.2,.3], doors:[.3,.33], post:[.36,.36], deep:[.64,.69], far:[.82,.9]}};
 /** On the river, how far a float can drift across the screen through each spot before it's off the right edge (shares of
     the width, from where a player casts into it): the riffle and the roots lie to the right, so their runway is short. */
 const RIVER_RUN={open:.8, leaves:.62, deep:.75, riffle:.18, roots:.4};
 /** A stand-in save for a setup. tanks, parts, fish, finds and gear can be copied from a real save ("Use my setup"). */
 function simSave(st){
   const s=fresh(), now=Date.now(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
-  s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.marsh=s.region==='marsh'||!!st.marsh; s.ferry=s.region==='river'||s.marsh||!!st.ferry; s.clock=st.hour==null?12:st.hour;
+  s.region=st.region||'lake'; s.boat=s.region==='coast'||s.region==='quarter'||!!st.boat; s.marsh=s.region==='marsh'||!!st.marsh; s.ferry=s.region==='river'||s.marsh||!!st.ferry; s.clock=st.hour==null?12:st.hour;
   s.rod=st.rod||'willow'; s.rods=[s.rod]; s.parts=st.parts==='all'?Object.keys(PARTS):(st.parts||[]).slice();
   s.tune=Object.assign(fresh().tune,st.tune||save.tune);
   s.stats.catches=st.catches==null?100:st.catches;            // a player well past the first treasure
@@ -77,6 +83,9 @@ function simSave(st){
   if (st.enchSave) s.ench=JSON.parse(JSON.stringify(st.enchSave));
   else { const ids=(st.ench||[]).filter(id=>ENCH[id]).slice(0,RODS[s.rod].ench||1); s.ench={own:Object.fromEntries(ids.map(id=>[id,1])), rig:{[s.rod]:ids}}; }
   s.glimmer=0; s.day=0; s.wander=null;
+  // the Drowned Quarter: Pell's rowboat fixed. The Bonewhistle's Dread, held where it's named for the run
+  if (s.region==='quarter' || st.quarter) s.quarter={row:true, done:{rowboat:1}};
+  if (st.dread>0) s.dread={v:Math.min(100,+st.dread), at:s.clock, owed:0};
   s.wx={seed:7, force:WX_ORDER.includes(st.wx)?st.wx:'clear', seen:{}};      // the weather is pinned for a run: clear unless named
   if (Number.isInteger(st.moon)) s.wx.moon=st.moon;                          // and the moon, when named (MOON.full is full)
   s.stats.dry=0;
@@ -115,6 +124,7 @@ function simulate(st,n){
     const io={t:0,holding:true,tut:null,tilt:0,reeling:false,ev:[],why:''};
     let echo=null;                                                   // Echo: the next cast at that spot bites at once
     const tide0=Math.random();                                       // where in its turn the marsh's tide starts the run
+    const PG=QUARTER.page; let pageAt=rand(0,PG.every[1]);          // the Quarter: when the next drowned page drifts by
     const dayLen=modFlag('timeStop')?0:1440/modMul('clock');
     for (let c=0;c<n;c++){
       let spot=echo?echo.spot:spots[c%spots.length];   // an Echo waiting: the player casts back to it
@@ -135,6 +145,8 @@ function simulate(st,n){
       if (reg==='river' && !st.pin) save.clock=Math.floor(st.hour)+(c%12)/12+.02;
       // treasure instead of a fish (rolled once per cast, as the bobber lands): a haul through the fight step, and what's inside.
       // An Echo bites at once instead, unless treasure comes up first: then it keeps waiting.
+      // the Quarter: a drowned page the player scooped up as it drifted by goes out with this cast
+      if (reg==='quarter'){ const pg=out.secs>=pageAt; if (pg) pageAt=out.secs+rand(PG.every[0],PG.every[1])/P.pages; if (!!save.quarter.page!==pg){ save.quarter.page=pg?2:0; MODC.dirty=true; } }
       const loot=rollTreasure(cx), pend=echo; echo=loot?pend:null;
       const ech=!loot && pend ? pend.fish : null; if (ech){ wait=.35; out.echoes++; }
       if (loot){ const T=out.treasure; T.rolled++;
@@ -148,7 +160,7 @@ function simulate(st,n){
         t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'||loot.kind==='map'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
-      const at={bow:!!st.bow, path:!!st.path};
+      const at={bow:!!st.bow, path:!!st.path, refl:reg==='quarter' && spot==='open' && isNight(save.clock) && Math.random()<P.refl};
       // the coast: the seventh wave's churn, and the lighthouse beam at night, each bring a fish at once
       if (reg==='coast' && !ech){ const sevenP=(SWELL.big.churn+wait)/(SWELL.period*SWELL.set), beamP=(wait+BEAM.width/(BEAM.span[1]-BEAM.span[0])*BEAM.turn/2)/BEAM.turn;
         if (Math.random()<sevenP+(1-sevenP)*P.seventh){ at.churn=true; wait=Math.min(wait,rand(0,wait)+SWELL.big.in); }

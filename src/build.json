@@ -20,7 +20,8 @@
     "styles/shack.css",
     "styles/sheets.css",
     "styles/balance.css",
-    "styles/river.css"
+    "styles/river.css",
+    "styles/quarter.css"
   ],
   "js": [
     "game/core.js",
@@ -42,6 +43,7 @@
     "data/river.js",
     "data/marsh.js",
     "data/coast.js",
+    "data/quarter.js",
     "data/pace.js",
     "data/stats.js",
     "game/mods.js",
@@ -93,6 +95,11 @@
     "game/river-art.js",
     "game/marsh.js",
     "game/marsh-art.js",
+    "game/quarter.js",
+    "game/quarter-art.js",
+    "game/pell.js",
+    "game/dread.js",
+    "game/tidecaller.js",
     "game/twin.js",
     "game/wren.js",
     "game/wren-art.js",

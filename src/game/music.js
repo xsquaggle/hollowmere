@@ -92,7 +92,7 @@ function ambStart(){ if (ambOn||!AC) return; ambOn=true;
   ambBed('rain','bandpass',2600,.35,.07,.25); ambBed('drum','lowpass',340,.5,.11,.3); }   // rain on the water, and on the roof and the boards
 let ambClock=0;
 function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{}, t=AC.currentTime; ambClock+=.08;
-  const X=wxLook(), wet=X.rain, fog=X.fog*(X.mist?0:1), out=sc.startsWith('lake')||sc.startsWith('coast')||sc.startsWith('river')||sc.startsWith('marsh');   // the dawn mist stays quiet
+  const X=wxLook(), wet=X.rain, fog=X.fog*(X.mist?0:1), out=sc.startsWith('lake')||sc.startsWith('coast')||sc.startsWith('river')||sc.startsWith('marsh')||sc.startsWith('quarter');   // the dawn mist stays quiet
   for (const k in AMBL){ let v=L[k]||0; if ((k==='surf'||k==='hiss') && v){ const ph=(ambClock%8.5)/8.5, w=ph<.4?Math.pow(ph/.4,1.6):Math.pow(1-(ph-.4)/.6,1.2); v*=k==='surf'?.35+.65*w:w*w; }
     if (k==='rain') v=wet*(out?.55:.12); if (k==='drum') v=wet*(out?.25:.5);
     AMBL[k].g.gain.setTargetAtTime(v*.5,t,k==='surf'||k==='hiss'?.25:1.2); }
@@ -125,6 +125,15 @@ function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{},
   if (marsh && tod==='night' && r()<.004) ambWisp(p);
   if (marsh && fog>.5 && r()<.002*fog) ambFoghorn(p*.4);
   if (marsh && fog>.5 && r()<.0016*fog) ambDeepBell(.5);
+  // the Drowned Quarter: old timbers creaking, gulls on the chimneys by day, bubbles from the drowned rooms, the lap of
+  // water in a doorway, and in fog a bell somewhere further down the street. At 3:12 the tower rings (game/quarter.js:
+  // towerToll), and from the lake it's heard faintly, under the water.
+  const quarter=sc.startsWith('quarter');
+  if (quarter && r()<.006) ambCreak(p*.8);
+  if (quarter && tod!=='night' && r()<.008*hush) ambGull(p);
+  if (quarter && r()<.03) ambBubble(p*.7);
+  if (quarter && fog>.5 && r()<.0016*fog) ambDeepBell(p*.5);
+  if (lake && quarterOpen() && bellNatural() && r()<.016) ambDeepBell(rand(-.6,-.2));
   if (sc==='aquarium' && r()<.45) ambBubble(p*.6);
   if (sc==='kitchen' && r()<.5) ambCrackle(p*.5);
 }
@@ -153,6 +162,10 @@ function ambPatter(p){ const t=AC.currentTime+rand(0,.08), s=AC.createBufferSour
 function ambFoghorn(p){ const t=AC.currentTime+.05; for (const [f,v] of [[98,.05],[196,.022],[147,.018]]){ const o=AC.createOscillator(), g=AC.createGain(), fl=AC.createBiquadFilter(); o.type='sawtooth'; o.frequency.value=f;
     fl.type='lowpass'; fl.frequency.value=420; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+.5); g.gain.setValueAtTime(v,t+2.2); g.gain.exponentialRampToValueAtTime(.0004,t+3.6);
     o.connect(fl); fl.connect(g); panNode(g,p).connect(AMB); o.start(t); o.stop(t+3.7); } }
+/** One stroke of the Drowned Quarter's tower bell: a big bronze bell's hum, strike and partials, ringing on. */
+function ambToll(p){ const t=AC.currentTime+.05, f=147;
+  for (const [m,v,d] of [[.5,.05,7],[1,.06,6],[1.2,.03,4],[1.5,.022,3.4],[2,.024,3],[2.5,.01,2.2],[3,.008,1.6]]) ambOsc('sine',f*m,0,t,d,v,p);
+  ambOsc('triangle',f*4.2,0,t,.25,.012,p); }
 function ambDeepBell(p){ const t=AC.currentTime+.05; ambOsc('sine',196,0,t,4.5,.022,p); ambOsc('sine',196*2.4,0,t,2.2,.006,p); ambOsc('sine',196*.5,0,t+.02,3,.01,p); }
 function ambBubble(p){ const t=AC.currentTime+rand(0,.08), f=rand(500,900); ambOsc('sine',f,f*rand(1.8,2.6),t,.035,.025,p); }
 function ambCrackle(p){ const t=AC.currentTime+rand(0,.08), s=AC.createBufferSource(); s.buffer=noiseBuf; const f=AC.createBiquadFilter(); f.type='bandpass'; f.frequency.value=rand(1500,4000); f.Q.value=3;

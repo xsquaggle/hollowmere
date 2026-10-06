@@ -75,7 +75,7 @@ function drawWater(){
   const sx=SC.lightX||W*.3, la=SC.lightA||0;
   if (la>.02) for (let i=0;i<14;i++){ const y=HZ+3+i*i*1.5, w=W*.05*(1-i/16)+Math.sin(S.time*1.5+i)*4;
     ctx.fillStyle='rgba('+SC.lightRGB+','+((.42-i*.025)*la).toFixed(3)+')'; ctx.fillRect(sx-w,y,w*2,1.5+i*.15); }
-  const own=REG()==='river'||REG()==='marsh';   // the river and the marsh draw their own current and tide (game/river-art.js, marsh-art.js); no sails or lake swell there
+  const own=REG()==='river'||REG()==='marsh'||REG()==='quarter';   // the river, the marsh and the Quarter draw their own water (game/river-art.js, marsh-art.js, quarter-art.js); no sails or lake swell there
   if (!own) drawBoat();
   ctx.lineCap='round';
   if (!own) for (const v of SC.waves){
@@ -114,6 +114,7 @@ function drawPads(){
   if (REG()==='coast'){ drawSeaBeam(); drawWash(); drawWreck(); drawKelp(); return; }
   if (REG()==='river'){ drawRiverWater(); return; }
   if (REG()==='marsh'){ drawMarshWater(); return; }
+  if (REG()==='quarter'){ drawQuarterWater(); return; }
   G.padClusters.forEach((c,ci)=>{ SC.pads[ci].forEach((p,i)=>{
     const {x,y,r}=padPos(ci,i);
     ctx.save(); ctx.translate(x,y); ctx.scale(1,.42);
@@ -170,6 +171,7 @@ function drawReeds(){
   if (REG()==='coast'){ drawStacks(); return; }
   if (REG()==='river'){ drawRiverBanks(); return; }
   if (REG()==='marsh'){ drawMarshNear(); return; }
+  if (REG()==='quarter'){ drawQuarterNear(); return; }
   drawBank(SC.bank.L,-1); drawBank(SC.bank.R,1);
   drawRock(W*.075,H*.635,11); drawRock(W*.145,H*.775,8); drawRock(W*.905,H*.735,10);
   ctx.lineCap='round';
@@ -225,7 +227,7 @@ function wrapText(t,max){ const words=t.split(' '), out=[]; let line='';
   for (const w of words){ const test=line?line+' '+w:w; if (ctx.measureText(test).width>max && line){ out.push(line); line=w; } else line=test; }
   if (line) out.push(line); return out; }
 function netCap(){ return modAdd('netCap'); }
-function netPos(){ return REG()==='coast' ? {x:W/2+108, y:H-128+(S.bob_y||0)} : {x:W/2+104, y:H-104}; }
+function netPos(){ return afloat() ? {x:W/2+108, y:H-128+(S.bob_y||0)} : {x:W/2+104, y:H-104}; }
 function onKeepnet(x,y){ const p=netPos(); return x>p.x-26 && x<p.x+26 && y>p.y-34 && y<p.y+26; }
 function updateScenery(dt){
   for (const c of SC.clouds){ c.x+=c.sp*dt*.5; if (c.x>1.3) c.x=-.3; }
@@ -241,7 +243,7 @@ function updateScenery(dt){
   const g=SC.gull;
   if (g){ g.t+=dt;
     if (g.phase==='stop' && g.t>.9){ g.phase='drop'; SC.drop={x:g.x,y:g.y+5,vy:0,k:0,tx:clamp(g.x+rand(-50,50),34,W-34),ty:rand(HZ+50,G.near-10),y0:g.y};
-      for (let i=0;i<8 && !onWater(SC.drop.tx,SC.drop.ty);i++){ SC.drop.tx=rand(34,W-34); SC.drop.ty=rand(HZ+50,G.near-10); } tone(1500,.75,{to:260,vol:.07}); }
+      for (let i=0;i<8 && !castable(SC.drop.tx,SC.drop.ty);i++){ SC.drop.tx=rand(34,W-34); SC.drop.ty=rand(HZ+50,G.near-10); } tone(1500,.75,{to:260,vol:.07}); }
     else if (g.phase==='drop' && g.t>1.7){ g.phase='leave'; }
     else if (g.phase==='leave'){ g.x+=g.dir*75*dt; g.y-=12*dt; if (g.x<-40||g.x>W+40) SC.gull=null; } }
   const d=SC.drop;
@@ -264,7 +266,7 @@ function updateScenery(dt){
   if (SC.jump){ const j=SC.jump; j.t+=dt; if (j.t>=j.dur){ splash(j.x+j.dir*14*sc(j.y),j.y,6); ripple(j.x+j.dir*14*sc(j.y),j.y,20); SC.jump=null; } }
   else { SC.nextJump-=dt; if (SC.nextJump<=0){ SC.nextJump=rand(8,15);
     const x=rand(30,W-30), y=rand(HZ+40,H-260), b=S.bob;
-    if ((!b || Math.hypot(x-b.x,y-b.y)>80) && onWater(x,y)){ SC.jump={x,y,t:0,dur:.75,dir:Math.random()<.5?1:-1}; splash(x,y,5); ripple(x,y,16); } } }
+    if ((!b || Math.hypot(x-b.x,y-b.y)>80) && castable(x,y)){ SC.jump={x,y,t:0,dur:.75,dir:Math.random()<.5?1:-1}; splash(x,y,5); ripple(x,y,16); } } }
   const f=SC.frog;
   if (REG()!=='lake' || !SC.pads[0]){}
   else if (f.hop){ f.hop.t+=dt; if (f.hop.t>=.5){ f.pad=f.hop.to; f.hop=null; const p=padPos(0,f.pad); ripple(p.x,p.y,14); splash(p.x,p.y,3); } }
@@ -292,6 +294,8 @@ function drawAmbient(dt){
 }
 /** Whether (x, y) is open water: anywhere but on a marsh bank the tide has left out. */
 const onWater = (x,y) => REG()!=='marsh' || !marshMud(x,y);
+/** Whether a cast can reach (x, y): open water, and in the Quarter not behind a wall. */
+const castable = (x,y) => onWater(x,y) && !quarterHidden(x,y);
 function updateAmbient(dt){
   for (const f of S.ambient){
     f.turn-=dt; if (f.turn<=0){ f.turn=rand(1.5,3.5); f.ta=f.a+rand(-1.2,1.2); }

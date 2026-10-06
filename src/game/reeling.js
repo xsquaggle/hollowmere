@@ -2,7 +2,7 @@
 function startReel(id,perfect){
   if (S.bite && S.bite.loot) return startHaul(S.bite.loot,perfect);
   const F=FISH[id], first=rec(id).caught===0;
-  S.reel=newFight(id,perfect,S.bob,!!(S.wait&&S.wait.lucky),!!S.tut,S.bob.spot);
+  S.reel=newFight(id,perfect,quarterFrom(S.bob)||S.bob,!!(S.wait&&S.wait.lucky),!!S.tut,S.bob.spot);   // out of a drowned room, it fights in the street (game/quarter.js)
   S.reel.bow=!!(S.wait&&S.wait.bow);                                   // hooked at the rainbow's foot: mutations twice as likely
   S.holding=S.pointers.size>0; S.tilt=0; S.pressX=S.thumbX; S.pressTilt=0; humStart(); setState('reeling');
   if (S.tut){ S.tut='reel1'; coach('Hooked! Now press and hold your finger down to reel it in.','4 of 4'); }
@@ -19,7 +19,7 @@ function newFight(id,perfect,from,lucky,tut,spot){
   const F=FISH[id], c={fish:id,spot,lucky};
   // bonuses lock in when the fish is hooked
   const mod={tm:modMul('tension')*modMul('drag',c)/modMul('line',c), tug:modMul('tug',c), reel:modMul('reel',c)};
-  return fightOf(F,perfect,from,{id,lucky,tut,mod,fam:modFlag('autoTilt',c)});
+  return fightOf(F,perfect,from,{id,lucky,tut,mod,fam:modFlag('autoTilt',c),limp:!tut && modFlag('limp',c)});   // the Bonewhistle: no fight (game/dread.js)
 }
 /** A haul: treasure on the line (game/treasure.js). It comes up like a dead weight that catches on the bottom. */
 function newHaul(loot,perfect,from,lucky,spot){
@@ -27,9 +27,9 @@ function newHaul(loot,perfect,from,lucky,spot){
   return fightOf(haulOf(loot),perfect,from,{id:null,loot,lucky,tut:false,mod,fam:false});
 }
 function fightOf(F,perfect,from,o){ const weight=F.beh==='weight';
-  return {lucky:o.lucky,id:o.id,loot:o.loot||null,F,perfect,fam:o.fam,mod:o.mod,dist:1,dir:0,tgt:0,dirT:o.tut?99:rand(1.2,1.8),tension:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
+  return {lucky:o.lucky,id:o.id,loot:o.loot||null,F,perfect,fam:o.fam,mod:o.mod,dist:1,dir:0,tgt:0,dirT:o.tut?99:rand(1.2,1.8),tension:o.limp?0:perfect?.1:.2,slack:0,slackWarned:false,strain:0,onIt:0,
     from:{x:from.x,y:from.y},x:from.x,y:from.y,jump:null,nextJump:rand(2,3),dive:0,warn:0,nextDive:weight?snagGap(F):rand(2.4,3.4),surge:0,fade:0,nextFade:rand(2.2,3),
-    click:0,splashT:0,buzzT:0,ph:weight?rand(0,6.28):0}; }
+    click:0,splashT:0,buzzT:0,ph:weight?rand(0,6.28):0,limp:!!o.limp}; }
 /** Seconds between the bottom snagging a haul: heavier crates catch more often. */
 function snagGap(F){ return F.snags>=3?rand(2.2,3.4):F.snags===2?rand(2.8,4):rand(3.5,5); }
 /** Seconds a ghost stays faded: its marker leaves the gauge, and only the line shows where it went. */
@@ -42,6 +42,7 @@ const GHOST_FADE=1.5;
         steer(R,dt): where the ring goes this step, ev: [], why: ''} */
 function fightStep(R,dt,io){
   const F=R.F, ev=io.ev, tm=R.mod.tm, tut=io.tut;
+  if (R.limp) return limpStep(R,dt,io);   // the Bonewhistle's fish come straight in (game/dread.js)
   if (F.beh2 && !R.beh2 && R.dist<.5){ R.beh2=true; R.dive=R.warn=R.surge=0; R.jump=null; R.nextJump=rand(.6,1.2); ev.push('beh2'); }   // halfway in, it fights another way (data/fish.js: beh2)
   const beh=R.beh2?F.beh2:F.beh, weight=beh==='weight', quick=rarRank(F.rarity)>=rarRank('legendary') && !weight, calm=F.rarity==='common';
   if (tut==='reel1'||tut==='reel2'){ /* direction is scripted by the tutorial */ }
@@ -148,6 +149,7 @@ function fightShow(R,e){
     case 'splashdown': splash(R.x,R.y,14); ripple(R.x,R.y,30); break;
     case 'slackJump': toast('Slack! Tap while it jumps.','warn'); break;
     case 'click': sfx.click(); break;
+    case 'limp': ripple(R.x,R.y,12); break;
     case 'slackWarn': toast('Line’s slack. Hold!','warn'); break;
     case 'strain': buzz(18); pulse(.4,'217,97,76'); break;
     case 'splash': if (R.loot) haulBubbles(R); else if (!(R.fade>0)) splash(R.x,R.y,3+Math.round(R.tension*6)); break;

@@ -3,6 +3,8 @@
               a pouch's size (in catches' worth of coins). A geode holds
               Glimmer (data/enchant.js: GLIMMER.geode), and every crate holds some (GLIMMER.crate).
               Before the first treasure the odds are firstRate, and that first one is always a Common crate.
+              letter.waters: where drowned letters come up, and how often (each letter in its own waters: NOTES).
+              haul: how each kind hauls up (rod: the Bonewhistle, out of the bell tower: game/dread.js).
    CRATES     one per rarity, Common to Mythic. weight (before luck), pull and reel (the haul), snags (how often
               it catches on the bottom: 0 to 3), coins (fish: this many catches' worth at the spot you cast,
               floor: never less), items (what's inside, in order):
@@ -25,12 +27,15 @@
    OWNERS     who in town lost things (you give them back from the journal's Finds page).  POCKETS  the vest: pockets you start with, the most, and what Ottilie
               charges to sew each one after the first.
    NOTES      what's inside message bottles (kind bottle), the uncle's logbook pages (logbook) and drowned letters
-              (letter, with to: the address Pell reads out). Lines are written the way they're inked. */
+              (letter, with to: the address Pell reads out, and waters: where they come up as treasure). The Drowned
+              Quarter's letters are posted back through their doors (data/quarter.js: PELL.post), and each one's reply
+              (reply, re: the letter it answers) comes back on a Postman Sturgeon; pell: what he says as he takes it.
+              Lines are written the way they're inked. LETTER_ORDER: the order letters turn up in; REPLY_ORDER: their answers. */
 const TREASURE={
   rate:1/12, firstRate:1/4, from:8,
   kinds:{pouch:35, geode:14, bottle:20, find:5, crate:26, map:8},
-  letter:{weight:6, region:'lake', spots:['deep','far'], from:25},
-  haul:{pouch:{pull:.55, reel:2.2}, geode:{pull:.7, reel:2.8}, bottle:{pull:.5, reel:2.4}, find:{pull:.75, reel:3}, letter:{pull:.5, reel:2.6}, map:{pull:.45, reel:2.2}},
+  letter:{from:25, waters:{lake:{weight:6, spots:['deep','far']}, quarter:{weight:14, spots:['post','windows','doors']}}},
+  haul:{pouch:{pull:.55, reel:2.2}, geode:{pull:.7, reel:2.8}, bottle:{pull:.5, reel:2.4}, find:{pull:.75, reel:3}, letter:{pull:.5, reel:2.6}, map:{pull:.45, reel:2.2}, rod:{pull:.8, reel:3.2}},
   pouch:[1.5,3],
   loose:{common:50, uncommon:30, rare:14, epic:5, legendary:1}
 };
@@ -137,8 +142,22 @@ const NOTES={
   three:   {kind:'bottle', region:'lake', lines:['Three in the morning, and fog','down on the deep pool.','Something under it still','rings the hour.','I didn’t cast. I wish I had.']},
   log1:    {kind:'logbook', page:1, lines:['Day 212.','The perch keep coming up with','coins in their bellies.','Old coins, every one 1966.','Who is feeding them pennies','from sixty years ago?']},
   log2:    {kind:'logbook', page:2, lines:['Day 340.','3:12 again. The town hall clock,','my watch, the mantel clock.','All stopped at 3:12 the night','the town went under.','Ottilie won’t talk about it.','She was on the ferry.']},
-  edith:   {kind:'letter', to:'Mrs. Edith Crane, 4 Lantern Row', lines:['Edie,','the water’s up past the second','step again. The mayor says not','to worry. I worry anyway.','Save me a dance on Saturday.','— Walter']},
-  albert:  {kind:'letter', to:'Master Albert Finch, the Clock Tower', lines:['Albert,','the clock has stopped at 3:12','again. Please see to it before','the bell has to ring.','Father says it mustn’t ring.','— Josephine']},
-  keeper:  {kind:'letter', to:'The Keeper of the Bait Shack', lines:['To the new keeper,','we see your lantern at night.','It is good to have a light','on the water again.','Don’t fish the deep pool at dawn.','Or do. He never could stop.','— your neighbors']}
+  edith:   {kind:'letter', waters:['lake'], to:'Mrs. Edith Crane, 4 Lantern Row', lines:['Edie,','the water’s up past the second','step again. The mayor says not','to worry. I worry anyway.','Save me a dance on Saturday.','— Walter']},
+  albert:  {kind:'letter', waters:['lake','quarter'], to:'Master Albert Finch, the Clock Tower', lines:['Albert,','the clock has stopped at 3:12','again. Please see to it before','the bell has to ring.','Father says it mustn’t ring.','— Josephine']},
+  keeper:  {kind:'letter', waters:['lake'], to:'The Keeper of the Bait Shack', lines:['To the new keeper,','we see your lantern at night.','It is good to have a light','on the water again.','Don’t fish the deep pool at dawn.','Or do. He never could stop.','— your neighbors']},
+  bakery:  {kind:'letter', waters:['quarter'], to:'Mr. Harold Dunmore, the Bakery, 6 Lantern Row', lines:['Harold,','two loaves for Saturday,','and the seed cake, if you’ve','the heart for it.','Walter’s coming. He says.','— E. C.']},
+  ivy:     {kind:'letter', waters:['quarter'], to:'Miss Ivy Hale, the top room, 9 Lantern Row', lines:['Ivy,','if the water comes up the','stairs again tonight, stay in','the top room and wait for','the bell. Don’t come down.','— Mags, at No. 11']},
+  postmaster:{kind:'letter', waters:['quarter'], to:'The Postmaster, Hollowmere Post Office', lines:['Dear Postmaster,','if the town goes under,','will the letters still come?','Please say yes.','— Albert Finch (8)']},
+  r_edith: {kind:'reply', re:'edith', to:'The Keeper of the Bait Shack', lines:['Thank you for bringing','Walter’s letter. He was','always late. Tell the boy','with the satchel he can stop','waiting at the window now.','— E. C.'],
+            pell:'For the Keeper of the Bait Shack, from 4 Lantern Row. Postmarked 1966. That’s yours.'},
+  r_albert:{kind:'reply', re:'albert', to:'Pell, at the Post Office', lines:['Pell,','got Jo’s letter. I’ll see','to the clock. If the bell','rings, don’t ring back.','Not ever.','— Albert'],
+            pell:'For… me. Pell, at the Post Office. That’s Albert’s hand. I’d know it anywhere.'},
+  r_bakery:{kind:'reply', re:'bakery', to:'Bram, at the Bakery', lines:['Bram,','the starter’s in the blue','crock. Feed it Thursdays.','Don’t ever let it go out.','— Grandad'],
+            pell:'For Bram, at the bakery. I’ll run it up the hill. He’ll want to sit down first.'},
+  r_ivy:   {kind:'reply', re:'ivy', to:'Tam, with the balloon', lines:['Tam,','hold on to the string,','whatever happens.','— Ivy (I was eight too)'],
+            pell:'For Tam. Tam’s eight. And this is postmarked 1966.'},
+  r_postmaster:{kind:'reply', re:'postmaster', to:'The Keeper of the Bait Shack', lines:['Dear Keeper,','yes. The letters still come.','They only take a while.','Keep your lantern lit.','— The Postmaster'],
+            pell:'For the Keeper again. From the Postmaster. That was my father.'}
 };
-const LETTER_ORDER=['edith','albert','keeper'];
+const LETTER_ORDER=['edith','albert','keeper','bakery','ivy','postmaster'];
+const REPLY_ORDER=LETTER_ORDER.map(id=>'r_'+id).filter(id=>NOTES[id]);

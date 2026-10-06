@@ -47,8 +47,8 @@ module.exports = [
         out.saltjaw = [share(out.coast.clear, 'saltjaw'), share(out.coast.fogNight, 'saltjaw')];
         out.mist = (() => { hm.save.region = 'lake'; hm.save.boat = false; hm.save.wx.force = 'clear'; hm.save.clock = 6.5; const m = hm.pool('deep', false).char || 0; hm.save.clock = 10; return [m, hm.pool('deep', false).char || 0]; })();
         // every water keeps at least five fish you can catch in any weather, by day and by night
-        out.kinds = []; for (const reg of ['lake', 'river', 'marsh', 'coast']) for (const k of hm.WX_ORDER) for (const h of [10, 22]) { hm.save.region = reg; hm.save.boat = reg === 'coast'; hm.save.ferry = reg === 'river'; hm.save.marsh = reg === 'marsh'; hm.save.wx.force = k; hm.save.clock = h;
-          const ids = new Set(); for (const sp of Object.keys(reg === 'coast' ? { open: 1, far: 1, kelp: 1, rocks: 1, deep: 1 } : reg === 'river' ? { open: 1, riffle: 1, leaves: 1, deep: 1, roots: 1 } : reg === 'marsh' ? { open: 1, reeds: 1, flats: 1, pans: 1, deep: 1, far: 1 } : { open: 1, pads: 1, reeds: 1, far: 1, deep: 1 })) for (const id in hm.pool(sp, false)) ids.add(id); out.kinds.push([reg, k, h, ids.size]); }
+        out.kinds = []; for (const reg of ['lake', 'river', 'marsh', 'coast', 'quarter']) for (const k of hm.WX_ORDER) for (const h of [10, 22]) { hm.save.region = reg; hm.save.boat = reg === 'coast'; hm.save.ferry = reg === 'river'; hm.save.marsh = reg === 'marsh'; hm.save.wx.force = k; hm.save.clock = h;
+          const ids = new Set(); for (const sp of Object.keys(reg === 'coast' ? { open: 1, far: 1, kelp: 1, rocks: 1, deep: 1 } : reg === 'river' ? { open: 1, riffle: 1, leaves: 1, deep: 1, roots: 1 } : reg === 'marsh' ? { open: 1, reeds: 1, flats: 1, pans: 1, deep: 1, far: 1 } : reg === 'quarter' ? { open: 1, windows: 1, doors: 1, post: 1, deep: 1, far: 1 } : { open: 1, pads: 1, reeds: 1, far: 1, deep: 1 })) for (const id in hm.pool(sp, false)) ids.add(id); out.kinds.push([reg, k, h, ids.size]); }
         // only the weather fish say so
         out.wx = Object.keys(hm.FISH).filter(id => hm.FISH[id].wx).map(id => id + ':' + hm.FISH[id].wx).sort();
         return out; });
@@ -63,7 +63,7 @@ module.exports = [
       assert.ok(Math.abs(r.saltjaw[1] - r.saltjaw[0]) < 1e-9, 'the Saltjaw keeps its share in fog at night');
       assert.ok(r.mist[0] > 0 && r.mist[1] === 0, 'the dawn mist brings up a few Mist Char, gone by mid-morning');
       for (const [reg, k, h, n] of r.kinds) assert.ok(n >= 5, `${reg} in ${k} at ${h}:00 has ${n} kinds of fish`);
-      assert.deepEqual(r.wx, ['char:fog', 'dace:rain', 'grayling:fog', 'gurnard:fog', 'mackerel:rain', 'smelt:rain', 'spatefin:rain', 'whiting:fog']);
+      assert.deepEqual(r.wx, ['char:fog', 'dace:rain', 'drainpipe:rain', 'grayling:fog', 'gurnard:fog', 'laceshad:fog', 'mackerel:rain', 'smelt:rain', 'spatefin:rain', 'whiting:fog']);
     },
   },
   {

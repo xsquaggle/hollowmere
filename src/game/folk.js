@@ -104,7 +104,7 @@ function drawBarnaby(){
 
 /* ---------- Pell's mail boat: a red skiff with a POST board, mail sacks and a pennant ---------- */
 function drawMailBoat(x,y){ const c=ctx, t=S.time; c.lineJoin='round'; c.lineCap='round';
-  c.strokeStyle='rgba(225,238,242,.3)'; c.lineWidth=1.2; c.beginPath(); c.ellipse(x,H-232,42,5,0,0,Math.PI*2); c.stroke();
+  c.strokeStyle='rgba(225,238,242,.3)'; c.lineWidth=1.2; c.beginPath(); c.ellipse(x,y+8,42,5,0,0,Math.PI*2); c.stroke();
   const hull=()=>{ c.beginPath(); c.moveTo(x-38,y-3); c.lineTo(x+36,y-5); c.quadraticCurveTo(x+43,y-4,x+38,y+4); c.quadraticCurveTo(x,y+10,x-34,y+7); c.closePath(); };
   hull(); c.fillStyle='#B4433A'; c.fill(); c.save(); hull(); c.clip(); c.fillStyle='#8E3229'; c.fillRect(x-45,y+2.4,90,10); c.fillStyle='#CC5A4E'; c.fillRect(x-45,y-6,90,2.4);
   c.strokeStyle='rgba(60,20,14,.4)'; c.lineWidth=.8; c.beginPath(); c.moveTo(x-38,y+2.2); c.lineTo(x+40,y); c.stroke(); c.restore();

@@ -24,6 +24,7 @@ each build.
 | 25 | Rootwood River: Ottilie's ferry, a current that carries the float, seven new fish (the Clockfin as the hour turns, Old Gristle at dusk), Wren's bench (rune sockets and Homebody) and corkboard, the Twin Spool, and an otter after your bait (build 26) |
 | 26 | Saltmarsh: a tide that turns about every six hours, with mud banks that come out at low water (a cast on the mud goes splat), tide pools on them and flooded flats at high water, and spring tides at the full and new moon; nine new fish (Old Reeve at the spring tides, the Bellmouth answering the Drowned Bell, the Lampwick Eel in lantern light); Wren's punt and her two marsh quests; the Lantern Rod (build 27) |
 | 27 | Gullrock Coast finished: every seventh swell a big one that churns the water behind it, white water on the sea stacks where fish bite sooner, the wreck of the Marigold with more treasure, and the lighthouse beam at night; four new fish (the Spindrift Bass in the wash, the Beacon Herring in the beam, the Wreck Conger, and the Comber Tarpon behind the seventh wave), 13 coast fish in all (build 28) |
+| 28 | The Drowned Quarter: old Hollowmere under the lake, reached in Pell's fixed-up rowboat; casts go in through the drowned houses' doors and windows, and a wall stops one short; Pell's round of letters, posted through their doors, with answers on the Postman Sturgeon; the bell tower that rings at 3:12; the Tidecaller, which calls the rain; and the cursed Bonewhistle, whose fish come in without a fight while Dread builds until the lake looks back; nine new fish (build 29) |
 
 ## Next
 
@@ -31,8 +32,7 @@ each build.
 
 - **13.** Friend playtest, and the bottom-bar regroup.
 - **24.** The depth gate's friend playtest (the balance pass shipped in build 25). Playtest > Pace sets their run beside the simulator's.
-- **27–32.** Phase C: new places and the story (Rootwood River shipped in build 26, Saltmarsh in build 27, the rest of Gullrock Coast in build 28).
-  - The Drowned Quarter.
+- **27–32.** Phase C: new places and the story (Rootwood River shipped in build 26, Saltmarsh in build 27, the rest of Gullrock Coast in build 28, the Drowned Quarter in build 29).
   - The Hollow.
   - The story pass.
   - The full roster.

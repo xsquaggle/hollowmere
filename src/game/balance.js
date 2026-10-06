@@ -5,7 +5,10 @@ const BAL_TIMES=[[6.5,'Dawn'],[12,'Noon'],[18.5,'Dusk'],[22,'Night']];
 const balTime=h=>h>=5&&h<8?6.5:isNight(h)?22:h>=17?18.5:12;
 function balMine(){ const m=save.meal, rig=rigFor(save.rod);
   return {region:REG(), spot:'open', hour:balTime(save.clock), rod:save.rod, reel:rig.reel, line:rig.line, bait:baitOn()||'', meal:mealActive()?m.id:'', stars:mealActive()?m.stars:3,
-    sets:'mine', parts:'mine', mastery:'mine', shack:'mine', finds:'mine', runes:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000}; }
+    sets:'mine', parts:'mine', mastery:'mine', shack:'mine', finds:'mine', runes:'mine', treasure:'yes', lucky:'no', player:'steady', n:1000,
+    dread:BAL_DREAD.reduce((a,o)=>Math.abs(o-dreadNow())<Math.abs(a-dreadNow())?o:a)}; }
+const BAL_DREAD=[0,25,50,75,99];
+const dreadNow = () => save.dread ? clamp(+save.dread.v||0,0,100) : 0;
 function balanceFormHTML(){
   const f=BAL.form||(BAL.form=balMine());
   const sel=(id,label,opts,v)=>'<label for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(([k,l])=>'<option value="'+k+'"'+(String(k)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
@@ -20,6 +23,7 @@ function balanceFormHTML(){
     sel('bHour','Time',BAL_TIMES.map(([h,l])=>[h,l]),f.hour)+
     (f.region==='marsh'?sel('bTide','Tide',[['turn','Turning, as it does'],...TIDE_PINS.map(([v,l])=>[v,l+', held'])],f.tide||'turn'):'')+
     sel('bRod','Rod',ALL_RODS.map(id=>[id,RODS[id].name]),f.rod)+
+    (RODS[f.rod]&&RODS[f.rod].cursed?sel('bDread','Dread',BAL_DREAD.map(v=>[v,v?String(v):'None']),f.dread==null?50:f.dread):'')+
     sel('bReel','Reel',TACKLE_ORDER.reel.map(id=>[id,TACKLE[id].name]),f.reel||'clicker')+
     sel('bLine','Line',TACKLE_ORDER.line.map(id=>[id,TACKLE[id].name]),f.line||'cotton')+
     sel('bBait','Bait',[['','Bare hook'],...TACKLE_ORDER.bait.map(id=>[id,TACKLE[id].name])],f.bait||'')+
@@ -48,9 +52,10 @@ function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:
   if (f.runes==='mine' || !f.runes) st.enchSave=enchState(); else if (f.runes!=='none') st.ench=[f.runes];
   if (f.treasure==='no') st.treasure=false;
   if (f.region==='marsh' && f.tide!=null && f.tide!=='turn') st.tide=+f.tide;
+  if (RODS[f.rod] && RODS[f.rod].cursed) st.dread=f.dread==null?50:+f.dread;   // the Bonewhistle's Dread, held for the run
   return st; }
 function bindBalance(){
-  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bShack:'shack',bFinds:'finds',bRunes:'runes',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n',bTide:'tide'};
+  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bShack:'shack',bFinds:'finds',bRunes:'runes',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n',bTide:'tide',bDread:'dread'};
   for (const [id,k] of Object.entries(ids)) if ($(id)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
     if (k==='region') BAL.form.spot='open';
     if (k==='region' || k==='rod'){ const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; }

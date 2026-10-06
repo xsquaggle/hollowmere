@@ -20,7 +20,8 @@ function spawnApproach(){
   const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.bow=atBowFoot(b.x,b.y);
   // the rare bites and the dry run count once a cast (as the simulator does); a fish that comes back after a spook is an ordinary one
   // at the coast, a fish the seventh wave's churn or the lighthouse beam brought (game/coast-sea.js)
-  const at={bow:w.bow, path:onMoonpath(b.x,b.y), churn:!!w.churn, lit:!!w.lit};
+  // in the Drowned Quarter at night, a float on a lit window's reflection (refl: game/quarter.js)
+  const at={bow:w.bow, path:onMoonpath(b.x,b.y), churn:!!w.churn, lit:!!w.lit, refl:quarterRefl(b.x,b.y)};
   w.fish=S.tut?'perch':w.echo||(w.rolled?pickW(poolFor(b.spot,w.lucky,at)):rollFish(b.spot,w.lucky,at)); w.rolled=true; const F=FISH[w.fish];
   const d=w.echo?rand(40,60):rand(85,150), mA=REG()==='marsh'?marshApproachFrom(b,d):null, ang=mA!=null?mA:rand(0,Math.PI*2);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
@@ -33,6 +34,7 @@ function updateWaiting(dt){
   if (!riverWaiting(dt) || !marshWaiting(dt)) return;   // the river carries the float (game/river.js); the tide can strand it (game/marsh.js)
   coastWaiting(dt);   // the seventh wave and the lighthouse beam bring a fish sooner (game/coast-sea.js)
   const w=S.wait, b=S.bob;
+  if (w.ink){ inkWaiting(dt); return; }   // after an Inked catch, the ink comes first (game/dread.js)
   if (w.sh){ const sh=w.sh;
     if (sh.flee){ sh.x+=Math.cos(sh.ang)*170*dt; sh.y+=Math.sin(sh.ang)*85*dt; sh.alpha-=dt*1.6; if (sh.alpha<=0) w.sh=null; }
     else {
@@ -57,12 +59,12 @@ function updateWaiting(dt){
     }
   }
   if (w.phase==='snag') updateSnag(dt);
-  if (w.phase==='empty'){ w.t-=dt; if (w.t<=0){ if (w.loot) startSnag(w.loot); else spawnApproach(); } }
+  if (w.phase==='empty'){ w.t-=dt; if (w.t<=0){ if (w.loot) startSnag(w.loot); else if (inkDue()) startInk(); else spawnApproach(); } }
 }
 /** How many fake nibbles come before the bite: sleepers nibble most, and rarer fish tease more. */
 function nibbles(F){ const r=rarRank(F.rarity); return F.beh==='sleeper'?2+Math.floor(rand(0,3)):Math.floor(rand(0,r>=rarRank('epic')?5:r>=rarRank('rare')?4:3)); }
 function twitch(){
-  const w=S.wait, b=S.bob; w.tw=w.tw.filter(t=>S.time-t<2.5); w.tw.push(S.time);
+  const w=S.wait, b=S.bob; if (w.ink && inkStrike()) return; w.tw=w.tw.filter(t=>S.time-t<2.5); w.tw.push(S.time);
   b.jerk=1; ripple(b.x,b.y,18); sfx.twitch(); buzz(6);
   if (S.tut){ if (w.phase==='nibble') coach('Not yet! Wait until the bobber plunges all the way under.','2 of 4', true); else if (w.phase==='approach') w.attract=Math.min(2.3,w.attract+.45); return; }
   if (w.phase==='snag') return;                         // treasure doesn't spook

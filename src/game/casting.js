@@ -20,9 +20,14 @@ function release(){
   if (a && a.onWren && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openWren(); return; }
   if (a && a.onTrap && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); tapTrap(a.onTrap); return; }
   if (a && a.onJar && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); tapJar(); return; }
+  // the Drowned Quarter (game/quarter.js, game/pell.js): Pell in his boat, the hand bell on the bow, a drifting page; the Tidecaller's conch
+  if (a && a.onPell && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openPell(); return; }
+  if (a && a.onBell && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); ringBell(); return; }
+  if (a && a.onConch && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); blowConch(); return; }
+  if (a && a.onPage && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); scoopPage(a.onPage); return; }
   if (!a || !a.target || a.p<.12){ setState('idle'); if (S.tut) coach('Drag a little farther down before you let go.','1 of 4'); else toast('Pull back farther','warn'); return; }
   S.cast={t:0, dur:.4+.42*a.p, from:{x:G.rodBase.x+18,y:G.rodBase.y-88}, to:a.target, p:a.p, th:a.th, spot:a.spot};
-  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal(); tickBait(); S.cast.fresh=freshCast(); S.cast.moon=relicState().armed;   // the Moon Jar's moonlight goes with it (game/relics.js)
+  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal(); tickBait(); pageCast(); S.cast.fresh=freshCast(); S.cast.moon=relicState().armed;   // the Moon Jar's moonlight goes with it (game/relics.js)
   if (save.firstCast){ save.firstCast=false; persist(); }
   setState('casting');
 }
@@ -37,6 +42,7 @@ function lurePos(){
 function updateCast(dt){
   const c=S.cast; c.t+=dt;
   if (c.t-.1>=c.dur){
+    if (REG()==='quarter') quarterLand(c);   // a wall stops it short; a doorway or a window takes it in (game/quarter.js)
     const {x,y}=c.to;
     // a cast into the wash is never caught here: the swell that left it is already past the stack, and the next is far off
     // (the simulator counts on it; keep it so if SWELL's period or the band change)
@@ -52,7 +58,8 @@ function updateCast(dt){
       splash(x,y,6); ripple(x,y,18); sfx.snap(); buzz([0,30,30,30]); shake(2);
       toast('Snagged in the reeds!','warn'); coachFor('Reeds snag ordinary rods. Ottilie sells a Reedcutter that slices right through.',5);
       S.lost={t:0,pos:{x,y},snapped:false}; setState('lost'); return; }
-    S.bob={x,y,spot:c.spot,dip:1,jerk:0,nibble:0,plunge:0}; moonCastLanded(c,S.bob); twinLand(S.bob);   // the Twin Spool's second float (game/twin.js)
+    S.bob={x,y,spot:c.spot,dip:1,jerk:0,nibble:0,plunge:0,hole:c.hole||null}; moonCastLanded(c,S.bob); twinLand(S.bob);   // the Twin Spool's second float (game/twin.js)
+    quarterLanded(S.bob);   // a letter clipped to the line goes in at its door (game/pell.js)
     splash(x,y,8); ripple(x,y,40); ripple(x,y,24); sfx.plop(); buzz(8);
     if (c.fresh){ for (let i=0;i<8;i++) S.particles.push({x:x+rand(-14,14)*sc(y),y:y+rand(-4,4),vx:rand(-20,20),vy:rand(-40,-14),g:0,life:0,max:rand(.6,1),r:rand(1.4,2.2),c:'rgba(214,240,255,',glim:true}); }   // Fresh water
     for (const f of S.ambient){ if (Math.hypot(f.x*W-x,f.y*H-y)<90){ f.flee=1.2; f.a=Math.atan2(f.y*H-y,f.x*W-x); } }

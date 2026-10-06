@@ -4,7 +4,8 @@ function drawActive(){
     ctx.strokeStyle='rgba(120,240,170,'+(.55*(1-u)).toFixed(3)+')'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(b.x,b.y,8+u*70*sc(b.y),(8+u*70*sc(b.y))*.38,0,0,Math.PI*2); ctx.stroke(); }
   if ((S.state==='waiting'||S.state==='bite') && S.bob && ((S.wait&&S.wait.phase==='snag') || (S.bite&&S.bite.loot))) drawSnagUnder();
   drawTwinShadow();
-  if ((S.state==='waiting'||S.state==='bite') && S.wait && S.wait.sh){
+  if (S.state==='waiting' && S.wait && S.wait.ink) drawInk();   // the ink that comes after an Inked catch (game/dread.js)
+  else if ((S.state==='waiting'||S.state==='bite') && S.wait && S.wait.sh){
     const sh=S.wait.sh, F=FISH[S.wait.fish];
     ctx.save(); ctx.translate(sh.x,sh.y); ctx.rotate(sh.ang); ctx.scale(1,.55);
     drawFish(ctx,S.wait.fish,F.len*sc(sh.y),true,sh.alpha*.9*fogVis(sh.x,sh.y),Math.sin(S.time*(S.wait.phase==='nibble'?9:6))); ctx.restore();   // fog hides it in the far water
@@ -66,12 +67,14 @@ function drawRodAndLine(){
   const mx=(b.x+t.x)/2+bx*t.bend*22, my=(b.y+t.y)/2+by*t.bend*22;
   ctx.lineCap='round'; ctx.strokeStyle=ROD().color; ctx.lineWidth=save.rod==='reedcutter'?5:save.rod==='heronwood'?3.2:4; ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.quadraticCurveTo(mx,my,t.x,t.y); ctx.stroke();
   ctx.strokeStyle=BRASS; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.lineTo(lerp(b.x,mx,.25),lerp(b.y,my,.25)); ctx.stroke();
+  drawBoneInk(b,mx,my,t);   // Dread creeping up the Bonewhistle (game/dread.js)
   // runes etched on the rod glow softly along the blank
   const runes=enchFor(save.rod); if (runes.some(Boolean)){ ctx.save(); ctx.globalCompositeOperation='lighter';
     runes.forEach((id,i)=>{ if (!id) return; const u=.3+i*.07, x=(1-u)*(1-u)*b.x+2*u*(1-u)*mx+u*u*t.x, y=(1-u)*(1-u)*b.y+2*u*(1-u)*my+u*u*t.y, a=.5+.3*Math.sin(S.time*2+i*1.7);
       ctx.fillStyle=hexA(ENCH[id].color,(.22*a).toFixed(3)); ctx.beginPath(); ctx.arc(x,y,5.5,0,Math.PI*2); ctx.fill(); ctx.fillStyle=hexA(ENCH[id].color,(.85*a).toFixed(3)); ctx.beginPath(); ctx.arc(x,y,1.7,0,Math.PI*2); ctx.fill(); });
     ctx.restore(); }
   drawRodLantern(t);   // the Lantern Rod's lamp (game/marsh-art.js)
+  drawRodConch();   // the Tidecaller's conch (game/tidecaller.js)
   if (!lp || (S.lost && S.lost.snapped)) return;
   // the line in the color of whatever line is on the rod; it reddens as tension runs high
   const lid=rigFor(save.rod).line, LC=LINE_RGB[lid]||LINE_RGB.cotton, base=LC[0].split(',').map(Number);
@@ -124,6 +127,13 @@ function drawAim(){
   ctx.fillStyle='rgba(243,234,215,.75)';
   for (let i=1;i<14;i++){ const u=i/14, x=lerp(t.x,to.x,u), y=lerp(t.y,to.y,u)-Math.sin(Math.PI*u)*lift; ctx.beginPath(); ctx.arc(x,y,1.8,0,Math.PI*2); ctx.fill(); }
   const k=sc(to.y), pr=14*k+Math.sin(S.time*8)*2;
+  // the Drowned Quarter: through an opening the marker sits where the float will, on a wall it drops short (game/quarter.js)
+  const qa=REG()==='quarter'?quarterAim(a):null;
+  if (qa){ const m=qa.mark, mk=sc(m.y), mr=14*mk+Math.sin(S.time*8)*2; ctx.strokeStyle=qa.danger?DANGER:qa.col; ctx.lineWidth=2.5; if (qa.danger) ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.ellipse(m.x,m.y,mr,mr*.4,0,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+    if (qa.danger){ ctx.strokeStyle='rgba(246,199,182,.6)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(to.x-5,to.y-5); ctx.lineTo(to.x+5,to.y+5); ctx.moveTo(to.x+5,to.y-5); ctx.lineTo(to.x-5,to.y+5); ctx.stroke(); }
+    ctx.font='800 12px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.lineWidth=4; ctx.strokeStyle='rgba(20,22,34,.7)'; const ly=Math.min(m.y,to.y)-mr-8;
+    ctx.strokeText(qa.text,clamp(m.x,70,W-70),ly); ctx.fillStyle=qa.col; ctx.fillText(qa.text,clamp(m.x,70,W-70),ly); return; }
   const mud=a.spot==='mud';   // the marsh: a bank the tide's left out (game/marsh.js)
   ctx.strokeStyle=mud?DANGER:a.lucky?'#F2D47E':a.spot==='deep'?'#9FC3D6':a.spot==='pads'?'#B9D79A':a.spot==='reeds'?'#D8C48A':a.spot==='rocks'?'#D9CBB8':a.spot==='kelp'?'#B8C97A':a.spot==='flats'?'#D6CB98':a.spot==='pans'?'#A9D4DC':PAPER; ctx.lineWidth=2.5;
   if (mud) ctx.setLineDash([3,4]); ctx.beginPath(); ctx.ellipse(to.x,to.y,pr,pr*.4,0,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
@@ -175,7 +185,7 @@ function drawOverlays(){
   ctx.setTransform(DPR,0,0,DPR,0,0);
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.42,W/2,H*.5,Math.max(W,H)*.78); vg.addColorStop(0,'rgba(10,12,24,0)'); vg.addColorStop(1,'rgba(10,12,24,.36)');
   ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
-  drawGauge();
+  drawGauge(); drawDread();   // the Dread badge (game/dread.js)
   if (S.pulse>.01){ const g=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);
     g.addColorStop(0,'rgba('+S.pulseColor+',0)'); g.addColorStop(1,'rgba('+S.pulseColor+','+(S.pulse*.55).toFixed(3)+')'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H); }
 }
@@ -184,7 +194,7 @@ function render(){
   ctx.save();
   if (S.shake>.1) ctx.translate(rand(-1,1)*S.shake,rand(-1,1)*S.shake);
   if (Math.abs(S.zoom-1)>.001){ const cx=W/2, cy=H*.42; ctx.translate(cx,cy); ctx.scale(S.zoom,S.zoom); ctx.translate(-cx,-cy); }
-  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawRfxWater(); drawRelicWater(); drawGhostFx(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
+  drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawRfxWater(); drawRelicWater(); drawDreadWater(); drawGhostFx(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
   drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade(); drawWisps(); drawRain();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
   drawTrapMarkers(); drawRfxOver(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();

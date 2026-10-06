@@ -1,0 +1,12 @@
+/* The Drowned Quarter: Pell's sheet (game/pell.js), and the Bonewhistle's haul card (game/loot.js) */
+.pell-say{font-style:italic;color:#3E4A5C;border-left:3px solid #B4433A;padding:2px 0 2px 10px}
+.sack-list{display:grid;gap:2px}
+.sack-row{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;padding:4px 0}
+.sack-row canvas{width:40px;height:40px}
+.sack-row h4{margin:0;font-size:14px;line-height:1.25}
+.sack-row .mini{margin:2px 0 0}
+.sack-row.blank{opacity:.55}
+.sack-row.blank canvas{filter:grayscale(1)}
+.sack-row .btn{justify-self:end}
+.hl-item.hl-rod{grid-template-columns:1fr}
+.hl-item.hl-rod canvas.rod-art{max-width:none;height:64px;margin:2px 0}

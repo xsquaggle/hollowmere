@@ -11,7 +11,7 @@ const dockWood = () => REG()==='marsh' ? WOOD_MARSH : WOOD;
 /** The dock's shape on this screen: its far end, the two edges, and where the piles stand. */
 function dockGeo(){ const cx=W/2, top=H-128, bw=78, bb=110; return {cx, top, bw, bb, lp:cx-bw-1, rp:cx+bw+1}; }
 /** Paints the boards, piles and coiled rope into SC.dock, once per screen size. */
-function buildDock(){ if (REG()==='coast'){ SC.dock=null; return; }
+function buildDock(){ if (afloat()){ SC.dock=null; return; }
   const D=dockGeo(), {cx,top,bw,bb}=D, h=H-top+40, c=document.createElement('canvas'); c.width=Math.round(W*DPR); c.height=Math.round(h*DPR);
   const x=c.getContext('2d'); x.setTransform(DPR,0,0,DPR,0,-(top-40)*DPR); sseed=404;
   // the marsh's boardwalk is older: silvered boards laid crooked, lichen on them, its piles leaning
@@ -82,6 +82,7 @@ function ropeCoil(x,cx,cy,r,P){ P=P||WOOD;
 /* ---------- live parts ---------- */
 function drawDock(){
   if (REG()==='coast'){ drawSkiffDeck(); drawTrapProp(); drawMoonJarProp(); drawKeepnet(); return; }
+  if (REG()==='quarter'){ drawRowboat(); drawMoonJarProp(); drawKeepnet(); return; }   // Pell's rowboat (game/quarter-art.js): no traps in the Quarter
   const D=dockGeo(), {cx,top}=D;
   // ripples round the piles first, then the cached deck over them
   ctx.strokeStyle='rgba(225,238,242,'+(.22+.1*Math.sin(S.time*2)).toFixed(3)+')'; ctx.lineWidth=1.3;
@@ -162,7 +163,7 @@ function lanternBody(lx,ly,sw){ const c=ctx, fl=.86+.14*Math.sin(S.time*13)*Math
 /* ---------- the keepnet ---------- */
 function drawKeepnet(){
   const p=netPos(), n=save.net.length, pop=SC.netPop||0, sw=Math.sin(S.time*1.6)*.06, c=ctx;
-  const anchor=REG()==='coast'?{x:W/2+86,y:H-150+(S.bob_y||0)}:{x:W/2+79,y:H-128};
+  const anchor=afloat()?{x:W/2+86,y:H-150+(S.bob_y||0)}:{x:W/2+79,y:H-128};
   const hx=p.x, hy=p.y-22;   // the hoop hangs on its line from the dock or the gunwale
   c.strokeStyle=WOOD.rope; c.lineWidth=1.6; c.beginPath(); c.moveTo(anchor.x,anchor.y); c.quadraticCurveTo((anchor.x+hx)/2,anchor.y+10,hx+Math.sin(sw)*4,hy); c.stroke();
   c.strokeStyle='rgba(225,238,242,'+(.3+.15*Math.sin(S.time*2)).toFixed(2)+')'; c.lineWidth=1.3; c.beginPath(); c.ellipse(p.x,p.y+4,22,5,0,0,Math.PI*2); c.stroke();

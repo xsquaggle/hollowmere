@@ -7,7 +7,7 @@ cv.addEventListener('pointerdown',e=>{
       if (S.place){ placeDown(x,y); break; }                                       // setting a trap: a marked spot, or the trap itself
       { const T=onTrapProp(x,y); if (T){ startPlacing(T,{x,y}); break; } }      // the trap waiting on the dock or the deck
       if (onOtter(x,y)){ tapOtter(); break; }                                   // the river's otter, after your bait
-      S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onWren:onWren(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y),onTrap:trapAt(x,y),onJar:onJar(x,y)}; setState('aiming'); break;
+      S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onWren:onWren(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y),onTrap:trapAt(x,y),onJar:onJar(x,y),onPage:pageAt(x,y),onPell:onPell(x,y),onBell:onHandBell(x,y),onConch:onConch(x,y)}; setState('aiming'); break;
     case 'waiting': if (!riverPress()) twitch(); break;   // on the river a twitch waits to see if it's a hold (game/river.js)
     case 'bite': S.tapX=x; S.tapY=y; hook(); break;
     case 'reeling': leapTap(); S.holding=true; S.pressX=x; S.pressTilt=S.tilt; break;

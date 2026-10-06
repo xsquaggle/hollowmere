@@ -186,17 +186,18 @@ module.exports = [
     name: 'combo chips show “???” until a combo happens, and the Tuning Fork leaves a wake behind a faded ghost fish',
     async run({ newPage, openGame, veteran, readSave }) {
       const page = await newPage();
-      await openGame(page, { save: veteran({ finds: finds(['tuningfork', 'bell', 'almanac'], []) }) });
+      await openGame(page, { save: veteran({ finds: finds(['tuningfork', 'bell', 'almanac', 'pin'], []) }) });
       const r = await page.evaluate(() => { const hm = window.__hm, R = hm.relics, out = {}, ghost = { fade: .5, id: 'char', x: 200, y: 400 };
-        out.before = R.combos('tuningfork'); out.almanac = R.combos('almanac'); out.none = R.combos('magpie');
+        out.before = R.combos('tuningfork'); out.almanac = R.combos('almanac'); out.pin = R.combos('pin'); out.none = R.combos('magpie');
         R.signs(ghost, .1); out.unpocketed = R.ghost();
         R.pocket('tuningfork'); R.signs({ ...ghost, fade: 0 }, .1); out.solid = R.ghost();
         R.signs(ghost, .1); R.signs({ ...ghost, x: 220 }, .1); out.fork = R.ghost(); out.known = R.known('wake'); out.after = R.combos('tuningfork');
         R.pocket('bell'); R.signs({ ...ghost, x: 240 }, .1); out.bell = R.ghost();
-        R.seen('tide'); out.notLive = R.known('tide');
+        R.seen('lodestone'); out.notLive = R.known('lodestone');
         return out; });
       assert.match(r.before, /cb q/); assert.doesNotMatch(r.before, /Ghost fish/);
-      assert.match(r.almanac, /\?\?\?/, 'a combo whose partner isn’t in the game yet shows as ???');
+      assert.match(r.almanac, /\?\?\?/, 'a combo not seen yet shows as ???');
+      assert.match(r.pin, /\?\?\?/, 'and so does one whose partner isn’t in the game yet');
       assert.equal(r.none, '', 'finds without combos show no chips');
       assert.deepEqual(r.unpocketed, { rings: 0, wake: 0 }, 'nothing without the fork in a pocket');
       assert.deepEqual(r.solid, { rings: 0, wake: 0 }, 'nor while the ghost is in sight');

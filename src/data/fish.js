@@ -18,18 +18,22 @@
               at the rainbow's foot; moon:'full' and night:true on full-moon nights; path: how much likelier a cast onto
               the moonpath makes it; top: the share of each in-game hour, from the hour, when it can bite (the Clockfin's
               ten minutes past); wx: only in that weather; flag: only while that STATS flag is on (data/stats.js: the
-              Drowned Bell in a pocket for the Bellmouth, the Lantern Rod lit for the Lampwick Eel); churn:true only while the
-              seventh wave has the water stirred round your float (data/coast.js: SWELL).
+              Drowned Bell in a pocket for the Bellmouth, the Lantern Rod lit for the Lampwick Eel, the bell tower ringing for the
+              Choir Fish, a drowned page on the hook for the Paper Carp); churn:true only while the seventh wave has the water
+              stirred round your float (data/coast.js: SWELL); at: only when that's true where the float lies (refl: on a lit
+              window's reflection in the Drowned Quarter at night).
    DRY        soft bad-luck protection, up to Legendary only: after `from` casts in a row where a Legendary could have
               bitten and didn't, its odds creep up, reaching ×max at `to`. Landing a Legendary or rarer starts it over.
    MUTS       mutations, rolled on landing (game/landing.js: catchRoll) on anything below Mythic: chance per catch before
               bonuses (STATS.mutation), what it multiplies the value by, Glimmer it pays, and for Giant how far past the
-              species' biggest it grows. MUT_ORDER is the order the journal lists them.
+              species' biggest it grows. cursed:true only with cursed gear in hand (the Bonewhistle: STATS.cursed).
+              MUT_ORDER is the order the journal lists them.
    ORDER      the lake journal's order, the same fish as REGION_FISH.lake.  REGION_FISH  which species live in each region, in journal order.
-   POOLS      lake bite weights per spot; POOLS_COAST, POOLS_RIVER and POOLS_MARSH the same for the other waters. Night, dawn, the tide, rods,
+   POOLS      lake bite weights per spot; POOLS_COAST, POOLS_RIVER, POOLS_MARSH and POOLS_QUARTER the same for the other waters. Night, dawn, the tide, rods,
               meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench");
               SPOT_REG  a spot's own name in one water (the coast's deep water is the Dark trench, the river's the Millpool).
-              'mud' is no spot: it's the marsh's banks while the tide is out, where a cast only goes splat (game/marsh.js). The coast's wash
+              'mud' is no spot: it's the marsh's banks while the tide is out, where a cast only goes splat (game/marsh.js), and
+              nor is 'wall': in the Drowned Quarter, a house or the tower in the way, where a cast drops into the street (game/quarter.js). The coast's wash
               is the white water a swell leaves on a sea stack, there for a few seconds, and its wreck lies past the stacks (game/coast-sea.js). */
 const FISH = {
   perch:   {name:'Copper Perch', rarity:'common', beh:'darter', pull:0.9, reel:2.6, value:2, size:[14,26], len:34, h:.27, color:'#D08A4E', fin:'#A85E2C', window:1.4,
@@ -111,7 +115,25 @@ const FISH = {
   lampwick:{name:'Lampwick Eel', rarity:'epic', beh:'ghost', night:true, glow:true, secret:true, extra:true, shared:true, pull:1.45, reel:9, value:420, size:[40,95], len:62, h:.1, color:'#3E3A44', fin:'#2C2932', window:.9,
             lore:'Its tail burns like a candle wick and never goes out. Wren swears it was a candle once.', hint:'Rises where rain meets lantern light.'},
   reeve:   {name:'Old Reeve', rarity:'legendary', beh:'darter', pull:1.8, reel:14.5, value:1200, size:[90,130], len:84, h:.24, color:'#7A888C', fin:'#55636A', window:.72,
-            lore:'The marsh-reeve kept the sea wall for forty years. Something still swims its length at every spring tide, checking for leaks.', hint:'Something big patrols the channel and the sluice pool at the spring tides.'}
+            lore:'The marsh-reeve kept the sea wall for forty years. Something still swims its length at every spring tide, checking for leaks.', hint:'Something big patrols the channel and the sluice pool at the spring tides.'},
+  gudgeon: {name:'Sooty Gudgeon', rarity:'common', beh:'darter', pull:.85, reel:2.6, value:8, size:[10,20], len:30, h:.24, color:'#6E6C68', fin:'#4C4A47', window:1.4,
+            lore:'Lives in the drowned chimneys. It goes in grey and comes out black, and it never minds which.', hint:'Common all along Lantern Row.'},
+  roach:   {name:'Parlour Roach', rarity:'common', beh:'sleeper', pull:.8, reel:3, value:9, size:[16,30], len:34, h:.3, color:'#A3A9A6', fin:'#C2584A', window:1.5,
+            lore:'Keeps to the front rooms, and to the best chair in them. It has a red eye for anyone who sits there.', hint:'Dozes in the front rooms, behind the windows.'},
+  hingejaw:{name:'Hingejaw', rarity:'uncommon', beh:'darter', pull:1.05, reel:4.2, value:30, size:[20,38], len:38, h:.3, color:'#7D8463', fin:'#596046', window:1.1,
+            lore:'It lives in doorframes and slams shut when startled.', hint:'Lurks in the doorways.'},
+  drainpipe:{name:'Drainpipe Eel', rarity:'uncommon', beh:'sulker', wx:'rain', pull:1.05, reel:4.4, value:32, size:[45,85], len:60, h:.09, color:'#5E534B', fin:'#433B35', window:1.15,
+            lore:'Comes down the drainpipes in the rain, all the way from gutters it remembers.', hint:'Comes down the drainpipes when it rains.'},
+  laceshad:{name:'Lace Shad', rarity:'rare', beh:'ghost', wx:'fog', pull:1.25, reel:6.6, value:110, size:[28,48], len:44, h:.28, color:'#C8CBC6', fin:'#98A2A6', window:.95,
+            lore:'Its fins are as fine as the curtains it hides in. When the fog is in, it drifts out through the windows.', hint:'Drifts out of the windows when the fog is in.'},
+  sturgeon:{name:'Postman Sturgeon', rarity:'rare', beh:'tugger', pull:1.35, reel:7.4, value:150, size:[70,130], len:70, h:.16, color:'#5F6F7F', fin:'#3F4D5B', window:.92,
+            lore:'Always carries a letter. The letters are addressed to people who still live in town.', hint:'Does its round of the post office, mostly in the morning.'},
+  hearth:  {name:'Hearthfish', rarity:'epic', beh:'darter', night:true, glow:true, extra:true, pull:1.5, reel:9.5, value:480, size:[30,52], len:46, h:.32, color:'#B6643C', fin:'#7C3A22', window:.84,
+            lore:'Warm to the touch, like a hearthstone. It only rises where a window is lit, and only in the reflection.', hint:'At night, something warm swims in the reflections of the lit windows.'},
+  papercarp:{name:'Paper Carp', rarity:'epic', beh:'leaper', secret:true, extra:true, pull:1.45, reel:9, value:500, size:[26,46], len:42, h:.34, color:'#E4DCC8', fin:'#BCB299', window:.86,
+            lore:'Folded, somehow, from a letter: a word or two still shows along its side. It never eats the pages. It reads them.', hint:'Something in the Quarter reads anything that floats.'},
+  choir:   {name:'Choir Fish', rarity:'legendary', beh:'leaper', pull:1.75, reel:14, value:1600, size:[90,140], len:80, h:.26, color:'#9AA6B8', fin:'#6A7488', window:.72,
+            lore:'Sings in harmony with something below it.', hint:'Something answers the bell tower, but only while its bell rings.'}
 };
 const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'];
 const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper', ghost:'Ghost'};
@@ -134,13 +156,16 @@ const POOLS = {
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
 const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed', wash:'The wash', wreck:'The wreck', riffle:'Riffle', leaves:'Leaf drift', roots:'Undercut roots',
-  flats:'Flooded flats', pans:'Tide pools', mud:'Mud'};
+  flats:'Flooded flats', pans:'Tide pools', mud:'Mud', doors:'Doorways', windows:'Front rooms', post:'Post office'};
 const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench', wash:'in the wash', wreck:'by the wreck',
   riffle:'in the riffle', leaves:'under the falling leaves', roots:'among the roots', 'river:open':'in the run', 'river:deep':'in the millpool',
-  flats:'on the flooded flats', pans:'in a tide pool', 'marsh:open':'in the creek', 'marsh:deep':'in the sluice pool', 'marsh:far':'in the channel'};
-const SPOT_REG = {coast:{deep:'Dark trench'}, river:{open:'The run', deep:'Millpool'}, marsh:{open:'The creek', deep:'Sluice pool', far:'The channel'}};
+  flats:'on the flooded flats', pans:'in a tide pool', 'marsh:open':'in the creek', 'marsh:deep':'in the sluice pool', 'marsh:far':'in the channel',
+  doors:'in a doorway', windows:'in a front room', post:'in the post office', 'quarter:open':'on Lantern Row', 'quarter:deep':'in the bell tower', 'quarter:far':'in the square'};
+const SPOT_REG = {coast:{deep:'Dark trench'}, river:{open:'The run', deep:'Millpool'}, marsh:{open:'The creek', deep:'Sluice pool', far:'The channel'},
+  quarter:{open:'Lantern Row', deep:'The bell tower', far:'The square'}};
 const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'], coast:['sprat','wrasse','spindrift','kelpeel','bream','herring','mackerel','grouper','conger','gurnard','angler','comber','saltjaw'],
-  river:['brook','stone','leafjack','spatefin','barbel','grayling','clockfin','gristle'], marsh:['mudlark','dab','croaker','smelt','whiting','mullet','bellmouth','lampwick','reeve']};
+  river:['brook','stone','leafjack','spatefin','barbel','grayling','clockfin','gristle'], marsh:['mudlark','dab','croaker','smelt','whiting','mullet','bellmouth','lampwick','reeve'],
+  quarter:['gudgeon','roach','hingejaw','drainpipe','laceshad','sturgeon','hearth','papercarp','choir']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:9, bream:6},
@@ -169,19 +194,35 @@ const POOLS_MARSH = {
   deep: {mudlark:44, dab:20, croaker:3, mullet:9, reeve:.6},
   far:  {dab:36, mudlark:30, mullet:11, croaker:2, reeve:.5}
 };
+/* The Drowned Quarter: Lantern Row is the street you row along, the doorways and front rooms are cast into through the
+   doors and windows of the drowned houses, the post office is its own (the Postman Sturgeon's round, most of all in the
+   morning: data/quarter.js), and the bell tower and the square lie at the far end. The Choir Fish only answers the bell
+   (RARE_BITES), so no pool holds it. */
+const POOLS_QUARTER = {
+  open:   {gudgeon:58, roach:16, hingejaw:8, sturgeon:2.5},
+  doors:  {hingejaw:46, gudgeon:24, roach:10, sturgeon:4},
+  windows:{roach:52, gudgeon:20, hingejaw:10, sturgeon:3},
+  post:   {sturgeon:16, gudgeon:34, roach:22, hingejaw:12},
+  deep:   {gudgeon:30, hingejaw:24, roach:12, sturgeon:12},
+  far:    {gudgeon:40, roach:22, hingejaw:14, sturgeon:5}
+};
 const RARE_BITES={
   shiner:{region:'lake', bow:true, chance:.035},
   calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2},
   clockfin:{region:'river', top:1/6, chance:1/11},
   bellmouth:{region:'marsh', spots:['open','deep','far','flats'], wx:'rain', flag:'bellmouth', chance:1/14},
   lampwick:{region:['marsh','lake'], spots:['reeds','open'], night:true, wx:'rain', flag:'lantern', chance:1/12},
-  comber:{region:'coast', spots:['open','far','rocks','wash','kelp','wreck'], churn:true, chance:1/16}
+  comber:{region:'coast', spots:['open','far','rocks','wash','kelp','wreck'], churn:true, chance:1/16},
+  choir:{region:'quarter', spots:['deep'], flag:'ringing', chance:1/6},
+  hearth:{region:'quarter', spots:['open'], night:true, at:'refl', chance:1/7},
+  papercarp:{region:'quarter', flag:'page', chance:1/5}
 };
 const DRY={from:80, to:200, max:2};
 const MUTS={
   mossy: {name:'Mossy', value:2.5, chance:1/70, glimmer:1, desc:'Moss and tiny plants grow along its back.'},
   glassy:{name:'Glassy', value:4, chance:1/130, glimmer:2, desc:'See-through, with its bones showing.'},
   twin:  {name:'Twin', value:1, chance:1/90, glimmer:1, desc:'Two on one hook.'},
-  giant: {name:'Giant', value:1, chance:1/100, glimmer:2, size:[1.25,1.55], desc:'Far past the usual size.'}
+  giant: {name:'Giant', value:1, chance:1/100, glimmer:2, size:[1.25,1.55], desc:'Far past the usual size.'},
+  inked: {name:'Inked', value:5, chance:1/12, glimmer:3, cursed:true, desc:'Black as ink from nose to tail, and cold. It haunts the next cast.'}
 };
-const MUT_ORDER=['mossy','glassy','twin','giant'];
+const MUT_ORDER=['mossy','glassy','twin','giant','inked'];

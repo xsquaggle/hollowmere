@@ -2,7 +2,7 @@
 /** Each fish's weight in this spot's pool, here and now. `at` says what's going on at the float: at the coast, the
     lighthouse beam on it (lit). */
 function poolFor(spot,lucky,at){
-  const h=save.clock, night=nightNow(), reg=REG(), coastal=reg==='coast', river=reg==='river', marsh=reg==='marsh', P=poolsOf(reg), w=Object.assign({},P[spot]||P.open);
+  const h=save.clock, night=nightNow(), reg=REG(), coastal=reg==='coast', river=reg==='river', marsh=reg==='marsh', quarter=reg==='quarter', P=poolsOf(reg), w=Object.assign({},P[spot]||P.open);
   // the water itself: who comes up at night, the Mayor's dawns, Old Gristle's six o'clock crusts, the Croaking Bass's dusk
   // and Old Reeve's spring tides
   if (coastal){ if (night){ for (const k in COAST_NIGHT) if (w[k] && typeof COAST_NIGHT[k]==='number') w[k]*=COAST_NIGHT[k]; if (COAST_NIGHT.herring[spot]) w.herring=COAST_NIGHT.herring[spot]; }
@@ -12,6 +12,7 @@ function poolFor(spot,lucky,at){
   else if (marsh){ if (night) for (const k in MARSH.night) if (w[k]) w[k]*=MARSH.night[k];
     if (w.croaker && h>=MARSH.croak.from && h<MARSH.croak.to) w.croaker*=MARSH.croak.x;
     if (w.reeve && tideNow().spring) w.reeve*=MARSH.reeve.x; }
+  else if (quarter) quarterPool(w,spot,night);   // the Quarter's night fish, and the Postman Sturgeon's morning round (game/quarter.js)
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
   if (w.mayor && ((h>=5 && h<8) || modFlag('mayorWakes',{spot}))) w.mayor*=3;   // the Mayor's dawns, or the Mayor's Spectacles
   if (w.gar && h>=17 && h<21) w.gar*=1.8;                                        // the Steeple Gar's evenings
@@ -42,7 +43,7 @@ const RARE_ORDER=Object.keys(RARE_BITES).sort((a,b)=>rarRank(FISH[b].rarity)-rar
 function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
   for (const id of RARE_ORDER){ const B=RARE_BITES[id];
     if (!(Array.isArray(B.region)?B.region.includes(reg):B.region===reg) || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
-    if ((B.churn && !at.churn) || (B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top)) || (B.wx && wxNow()!==B.wx) || (B.flag && !modFlag(B.flag,{spot}))) continue;
+    if ((B.at && !at[B.at]) || (B.churn && !at.churn) || (B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top)) || (B.wx && wxNow()!==B.wx) || (B.flag && !modFlag(B.flag,{spot}))) continue;
     if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
   return null; }
 /** Whether the in-game clock is within `share` of an hour past the hour (the Clockfin's few minutes). */

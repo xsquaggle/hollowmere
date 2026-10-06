@@ -21,7 +21,7 @@ Its source lives in `src/` as small files, and a build pastes them together. `do
 | --- | --- |
 | `src/index.html` | The page skeleton: head, markup, and where the styles and scripts go |
 | `src/data/` | Content tables: fish, rods and boat parts, places, people's lines, aquarium, kitchen, music |
-| `src/game/` | The game itself, one file per system (casting, reeling, kitchen stations, saves…). Scene art: `angler.js`, `dock.js`, `folk.js`, `coast.js`, `river-art.js`, `wren-art.js`, `marsh-art.js`, `coast-sea-art.js` |
+| `src/game/` | The game itself, one file per system (casting, reeling, kitchen stations, saves…). Scene art: `angler.js`, `dock.js`, `folk.js`, `coast.js`, `river-art.js`, `wren-art.js`, `marsh-art.js`, `coast-sea-art.js`, `quarter-art.js` |
 | `src/styles/` | Styles, one file per screen |
 | `src/fonts/` | Nunito, Young Serif and Caveat, subset to WOFF, plus their licenses |
 | `src/build.json` | The order files are pasted in. Scripts share one closure, so a file can use anything listed before it |
@@ -110,10 +110,16 @@ in `layoutRegion`.
 `marsh-art.js`. Playtest can hold the tide at high or low water, or between, and the Balance tab and
 `npm run sim -- --region marsh --tide .5` can too; otherwise the simulator's casts sweep it through its turn.
 
+**The Drowned Quarter.** The street's layout, Pell's round, the bell, Dread and the Tidecaller's rain are in
+`src/data/quarter.js`. `src/game/quarter.js` builds the street as solids with openings (`quarterHit`: a wall, an
+opening or water) and runs the pages and the bell; `pell.js` is Pell's sheet and his letters, `dread.js` the
+Bonewhistle, Dread, the eye and the ink shadow, `tidecaller.js` the conch; the art is in `quarter-art.js`. Playtest's
+Quarter menu steps through all of it, and `npm run sim -- --region quarter --rod bonewhistle --dread 50` holds Dread.
+
 **Pacing (the depth gate).** `npm run sim -- --career` plays whole runs from the first cast, buying rods, the boat
 and everything else as the coins come in, and lists when each thing happens and the longest waits with nothing new.
 `--builds` puts four builds on one rod and water. Rare and Legendary odds follow the design doc's table, and prices
-are set so the lake and the coast take about 9 hours (about 10 with Rootwood River, the Saltmarsh and the rest of the coast). In the game, Playtest > Pace logs a real run's minutes of
+are set so the lake and the coast take about 9 hours (about 10.5 with Rootwood River, the Saltmarsh, the rest of the coast and the Drowned Quarter). In the game, Playtest > Pace logs a real run's minutes of
 play beside the simulator's (`src/game/pace.js`, `src/data/pace.js`); after a balance change, paste
 `npm run sim -- --career --runs 11 --pace` into `src/data/pace.js`.
 
