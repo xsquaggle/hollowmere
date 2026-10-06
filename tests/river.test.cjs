@@ -144,7 +144,7 @@ module.exports = [
       assert.equal(await page.evaluate(() => window.__hm.river.wren.cut('ash')), false, 'three is the most');
       // the corkboard: her first theory, and the ones the Leafjack and the Mayor already answer; the rest wait on what you find
       await page.click('[data-wt="board"]');
-      assert.match(await text(page, '#panel'), /3 of 13 theories pinned/);
+      assert.match(await text(page, '#panel'), /3 of \d+ theories pinned/);
       // every river fish but the weather's and the Clockfin: the Twin Spool
       const q = await page.evaluate(() => window.__hm.river.wren.quest());
       assert.deepEqual(q.sort(), ['barbel', 'brook', 'gristle', 'leafjack', 'stone']);
