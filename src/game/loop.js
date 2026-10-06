@@ -28,6 +28,7 @@ function frame(now){
   const dt=clamp((now-last)/1000,0,.05); last=now; MODC.frame++; S.time+=dt; musicFrame(dt); paceTick(dt);
   APP.liveT=(APP.liveT||30)-dt; if (APP.liveT<=0){ APP.liveT=30; persist(); }   // keeps lastPlayed close, for time away (game/away.js), in the rooms too
   if (AQ.open||K.open||SH.open){ update(dt,dt); requestAnimationFrame(frame); return; } // the world keeps turning while you're in a room
+  if (END.active && END.t>1){ update(dt,dt); requestAnimationFrame(frame); return; }   // and while you're at supper on Lantern Row (game/ending.js), which covers the screen
   let gdt=dt*(S.tut==='bite'?.35:1); if (S.freeze>0){ S.freeze-=dt; gdt=0; }
   S.tipT=(S.tipT||0)-dt; if (S.tipT<=0){ S.tipT=5; accrueTips(); }
   APP.snapT-=dt; if (APP.snapT<=0){ APP.snapT=600; snapshot('Autosave'); }

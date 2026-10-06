@@ -11,8 +11,13 @@
             at most `most` at once; a page scooped onto the hook lasts one cast. wall: how far in front of a wall a
             cast that hits it drops (in px at full scale).
    PELL_Q   Pell's round, in the order his sheet lists it: name; ask (what he says while it's open); thanks (what he
-            says when it's done); reward (a line under it): coins, glimmer, or rod (a quest rod he gives you).
-   PELL     hello: his first words in the Quarter; lines: what he says now and then while you fish near him; wait:
+            says when it's done); reward (a line under it): coins, glimmer, or rod (a quest rod he gives you). The last
+            step, supper, waits for your uncle's last page (data/hollow.js): then Pell brings you the Row's invitation
+            (NOTES.invite), and it's met once you've been to supper on Lantern Row (game/ending.js). how: what to do,
+            under the ask; after: a line under his thanks once it's done.
+   PELL     hello: his first words in the Quarter; lines: what he says now and then while you fish near him (later:
+            lines he adds once you've been down to the Hollow, and once you've been to supper on the Row); early: what he
+            says now and then instead, while you have the Row's invitation and the supper is still to come; wait:
             the news when he's come by the lake dock with something for you, and call: what he says then; reads: what
             he says as he takes a letter that came up for the Quarter; noboat: his ask before you have a boat; posted:
             what he says as a letter goes in at its door; where: where a letter on his round turns up (Albert's, and
@@ -39,13 +44,17 @@ const PELL_Q={
   rowboat:{name:'Pell’s rowboat', ask:'She was the post office’s boat, before. Needs new oars, a new rowlock and a good deal of caulking. Fix her up and I’ll show you where the round used to go.',
            thanks:'There she is. Row straight out past the deep pool and keep going. Lantern Row’s where it always was. It’s only wetter.', reward:'The Drowned Quarter opens, and Pell gives you the letter he could never deliver.'},
   lantern:{name:'4 Lantern Row', ask:'Mrs. Edith Crane, 4 Lantern Row. I’ve carried that letter longer than I’ve carried anything. Clip it to your line and cast it through her door.',
-           thanks:'Delivered. Fifty-odd years late and slightly damp, but delivered.', reward:'600 coins.', coins:600},
+           thanks:'Delivered. Sixty years late and slightly damp, but delivered.', reward:'600 coins.', coins:600},
   answer: {name:'Return to sender', ask:'Letters get answers. Something in the Quarter carries the post now. Catch it and bring me what it’s carrying.',
            thanks:'A reply. Postmarked 1966, and the ink’s still wet. Well. The post goes where it goes.', reward:'8 Glimmer.', glimmer:8},
   tower:  {name:'The bell tower', ask:'Master Albert Finch, the Clock Tower. That one comes up out of the deep pool now and then, and from the post office. Post it through the tower door.',
            thanks:'The clock’s stopped at 3:12. It always was. Some nights at 3:12 the bell still rings. Nobody hears it but the fish, and you, if you’re out there.', reward:'1,200 coins.', coins:1200},
   sack:   {name:'The rest of the sack', ask:'The post office kept its own letters. They float out of the windows now. Find the three that were never sent, and post them.',
-           thanks:'That’s the sack empty, first time since I was a boy. Here. My father’s rod. He used to call the rain down on a Monday so folk would stay in and write letters.', reward:'The Tidecaller.', rod:'tidecaller'}
+           thanks:'That’s the sack empty, first time since I was a boy. Here. My father’s rod. He used to call the rain down on a Monday so folk would stay in and write letters.', reward:'The Tidecaller.', rod:'tidecaller'},
+  supper: {name:'Supper on the Row', ask:'This came for you. Postmarked 1966, from Lantern Row. That was the night of the Saturday supper, the whole street at one long table. I was sent to bed before the dancing.',
+           how:'Row out to the Quarter for 3:12, while the bell rings, with the Stillwater Mirror in your hand.',
+           thanks:'You’ve a message for me? “The letters came, every one.” Well. Of course they did. Oh, and this came for me, in the same post.',
+           after:'Pell, at the Post Office. Postmarked 1966. He puts it in his pocket, unopened.', reward:'25 Glimmer.', glimmer:25}
 };
 const PELL={
   hello:'You came! Mind the chimneys, they’re closer than they look. This was my round, you know. Lantern Row, the square, the tower, back by the post office for tea.',
@@ -53,6 +62,9 @@ const PELL={
     'The Hingejaws live in the doorways. Knock first.','That sturgeon does my old round every morning. Better time than I ever kept.',
     'Mind the chimneys. And the gulls. Mostly the gulls.','The pages float out of the post office windows. Nobody ever sent them.',
     'I was nine when the water came. I had a satchel and a round, and I was very proud of both.'],
+  later:{hollow:['Your uncle asked me once if the tower ever rang back. I said no. I fibbed, a little.','Everything in the sack’s postmarked 1966 lately. Even the circulars.'],
+    supper:['The Row had its supper. I keep thinking I should have stayed up.','My father always said the post goes where it goes. I think he meant it.']},
+  early:'Supper’s at 3:12, when the bell rings. Everything on the Row is at 3:12, these days.',
   wait:'Pell’s waiting at the dock with something to tell you.',
   reads:'For the Quarter. I’ll keep it in the sack with the others.',
   post:{edith:'no4', albert:'tower', bakery:'no6', ivy:'no9', postmaster:'post'},

@@ -39,7 +39,8 @@
            (a range); it splashes down where a cast can reach and leaves a zone `r` px wide at full scale for `dur`
            seconds, where Exotic and rarer bites are `x` times as likely. Only one lucky moment at a time: no star
            falls while a Gull Luck zone is up or a gull is about to drop, and no gull drops while a star's zone is up.
-   OTT_CONFESS what Ottilie tells you, once, the first time you see her after the Hollow opens. */
+   OTT_CONFESS what Ottilie tells you, once, the first time you see her after the Hollow opens. From then on she calls you
+           Keeper (data/people.js: OTT_NAME). */
 const HOLLOW={
   way:{drain:60},
   spots:{
@@ -58,4 +59,4 @@ const HOLLOW={
 const MIRROR_STARS={n:9, r:9, d:[.25,.85]};
 const OMEN={every:[120,200], dur:180, x:5, from:40};
 const STAR={every:[90,240], dur:15, r:30, x:3};
-const OTT_CONFESS='I was on the ferry that night. Eight years old, ringing my bell for the last crossing. At twelve minutes past three the lake closed over the town. Not a wave. It closed, like an eye. Your uncle spent forty years looking for the way under the lid. I’m glad it was you that found it. Mind you come back up.';
+const OTT_CONFESS='I was on the ferry that night. Eight years old, ringing my bell for the last crossing home from the Row’s Saturday supper. At twelve minutes past three the lake closed over the town. Not a wave. It closed, like an eye. Your uncle spent forty years looking for the way under the lid. I’m glad it was you that found it. Mind you come back up, Keeper.';

@@ -31,6 +31,8 @@
               (letter, with to: the address Pell reads out, and waters: where they come up as treasure). The Drowned
               Quarter's letters are posted back through their doors (data/quarter.js: PELL.post), and each one's reply
               (reply, re: the letter it answers) comes back on a Postman Sturgeon; pell: what he says as he takes it.
+              The invite (kind invite) is Lantern Row's invitation to supper, which Pell brings you once you've read
+              your uncle's last page (data/quarter.js: PELL_Q.supper).
               Lines are written the way they're inked. LETTER_ORDER: the order letters turn up in; REPLY_ORDER: their answers. */
 const TREASURE={
   rate:1/12, firstRate:1/4, from:8,
@@ -60,7 +62,7 @@ const FINDS={
   thimble: {name:'Silver Thimble', kind:'curio', rarity:'common', region:'any', lore:'Sized for a very small tailor. Or a large mouse.'},
   key:     {name:'Rusty Key', kind:'curio', rarity:'common', region:'any', lore:'It fits no lock in town. Something in the lake has a keyhole.'},
   ferrybell:{name:'Ferry Bell', kind:'curio', rarity:'uncommon', region:'lake', owner:'ottilie', lore:'A brass hand bell. OTTILIE is scratched inside the rim in a child’s capitals.',
-            reward:{coins:300, keepsake:'knot', line:'My ferry bell! Forty years I rang that for every crossing. Take this knot. My mother tied it, and it’s never once let go.'}},
+            reward:{coins:300, keepsake:'knot', line:'My ferry bell! Fifty years I rang that for every crossing. Take this knot. My mother tied it, and it’s never once let go.'}},
   sealstamp:{name:'Wax Seal Stamp', kind:'curio', rarity:'uncommon', region:'any', owner:'pell', lore:'A brass seal with a little fish on its face. The wax on it is still soft.',
             reward:{coins:250, keepsake:'satchel', line:'The old post office seal. I had wondered where it went. Please, have my spare satchel. Things seem to turn up in it.'}},
   dollhand:{name:'Porcelain Hand', kind:'curio', rarity:'uncommon', region:'lake', lore:'A doll’s hand, waving. You wave back before you can stop yourself.'},
@@ -162,7 +164,8 @@ const NOTES={
   r_ivy:   {kind:'reply', re:'ivy', to:'Tam, with the balloon', lines:['Tam,','hold on to the string,','whatever happens.','— Ivy (I was eight too)'],
             pell:'For Tam. Tam’s eight. And this is postmarked 1966.'},
   r_postmaster:{kind:'reply', re:'postmaster', to:'The Keeper of the Bait Shack', lines:['Dear Keeper,','yes. The letters still come.','They only take a while.','Keep your lantern lit.','— The Postmaster'],
-            pell:'For the Keeper again. From the Postmaster. That was my father.'}
+            pell:'For the Keeper again. From the Postmaster. That was my father.'},
+  invite:  {kind:'invite', to:'The Keeper of the Bait Shack', lines:['Dear Keeper,','Lantern Row is having its supper,','the whole street at one table,','and there’s a place laid for you.','Come at 3:12, when the bell rings.','Bring the mirror, or you won’t','see us.','— E. Crane, for the Row']}
 };
 const LETTER_ORDER=['edith','albert','keeper','bakery','ivy','postmaster'];
 const REPLY_ORDER=LETTER_ORDER.map(id=>'r_'+id).filter(id=>NOTES[id]);

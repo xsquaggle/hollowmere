@@ -269,7 +269,7 @@ function paintTile(cv,r,d){ r=r||{width:cv.offsetWidth,height:cv.offsetHeight}; 
   else if (cv.dataset.trap) drawTrapIcon(x,cv.dataset.trap,s);
   else if (cv.dataset.fitting) drawFittingIcon(x,cv.dataset.fitting,s);
   else if (cv.dataset.runeempty) drawRune(x,null,s*.8,{empty:true});
-  else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter'||cv.dataset.notekind==='reply') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
+  else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter'||cv.dataset.notekind==='reply'||cv.dataset.notekind==='invite') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
 function drawHullSwatch(c,id,s){ const P=PAINTS[id]; c.save(); c.scale(s/100,s/100); laInk(c);
   c.fillStyle='rgba(60,110,130,.25)'; laEll(c,0,24,44,7); c.fill();
   c.beginPath(); c.moveTo(-44,-4); c.lineTo(44,-8); c.quadraticCurveTo(50,-6,44,6); c.quadraticCurveTo(0,26,-38,16); c.closePath(); c.fillStyle=P.shift?prismAt(S.time,0,52):P.hull; c.fill(); c.stroke();
@@ -281,14 +281,14 @@ function drawLogbook(c,s){ c.save(); c.scale(s/100,s/100); c.rotate(-.1); laInk(
   c.font='600 13px Caveat, cursive'; c.fillStyle='#B4433A'; c.textAlign='center'; c.fillText('3:12',2,6); c.strokeStyle='#B4433A'; c.lineWidth=1.6; laEll(c,2,2,14,8); c.stroke(); c.restore(); }
 
 /* ---------- notes: bottles, logbook pages and letters, inked in by hand ---------- */
-const noteKind=N=>N.kind==='letter'?'A drowned letter':N.kind==='reply'?'An answer, from the Quarter':N.kind==='logbook'?'Your uncle’s logbook':'A note in a bottle';
-function noteTitle(id){ const N=NOTES[id]; if (N.kind==='letter'||N.kind==='reply') return 'For '+N.to; if (N.kind==='logbook') return 'Logbook, page '+N.page; return '“'+N.lines[0].replace(/[,:.]$/,'')+'…”'; }
+const noteKind=N=>N.kind==='letter'?'A drowned letter':N.kind==='reply'?'An answer, from the Quarter':N.kind==='invite'?'An invitation, from Lantern Row':N.kind==='logbook'?'Your uncle’s logbook':'A note in a bottle';
+function noteTitle(id){ const N=NOTES[id]; if (N.kind==='letter'||N.kind==='reply'||N.kind==='invite') return 'For '+N.to; if (N.kind==='logbook') return 'Logbook, page '+N.page; return '“'+N.lines[0].replace(/[,:.]$/,'')+'…”'; }
 let NOTE_DONE=null;
 function openNote(id,o){ if (!id || !NOTES[id]) { if (o&&o.done) o.done(); return; } o=o||{}; const N=NOTES[id], el=$('note'); NOTE_DONE=o.done||null;
   let t=.5, lines=''; N.lines.forEach((ln,i)=>{ const d=Math.max(.45,ln.length*.045); lines+='<span class="ln'+(i===0?' first':'')+(i===N.lines.length-1&&/^—/.test(ln)?' sig':'')+'" style="--s:'+t.toFixed(2)+'s;--d:'+d.toFixed(2)+'s">'+ln+'</span>'; t+=d+.12; });
-  const env=N.kind==='letter'||N.kind==='reply', head=env?'<div class="nt-env"><span class="nt-to">To '+N.to+'</span><span class="nt-mark">'+(N.kind==='reply'?'LANTERN ROW<br>MAR 1966':'HOLLOWMERE<br>MAR 1966')+'</span></div>':N.kind==='logbook'?'<div class="nt-log">Your uncle’s logbook · page '+N.page+'</div>':'';
-  const foot=env&&o.fresh?'Give it to Pell':o.fresh?'Keep it':'Close';
-  el.innerHTML='<div class="nt-paper" data-kind="'+(env?'letter':N.kind)+'" role="dialog" aria-label="'+noteKind(N)+'">'+head+lines+'<button class="btn primary nt-go" id="ntGo" type="button" style="animation-delay:'+(REDUCED?0:t).toFixed(2)+'s">'+foot+'</button></div>';
+  const env=N.kind==='letter'||N.kind==='reply'||N.kind==='invite', head=env?'<div class="nt-env"><span class="nt-to">To '+N.to+'</span><span class="nt-mark">'+(N.kind!=='letter'?'LANTERN ROW<br>MAR 1966':'HOLLOWMERE<br>MAR 1966')+'</span></div>':N.kind==='logbook'?'<div class="nt-log">Your uncle’s logbook · page '+N.page+'</div>':'';
+  const foot=env&&o.fresh&&N.kind!=='invite'?'Give it to Pell':o.fresh?'Keep it':'Close';
+  el.innerHTML='<div class="nt-paper" data-kind="'+(N.kind==='invite'?'invite':env?'letter':N.kind)+'" role="dialog" aria-label="'+noteKind(N)+'">'+head+lines+'<button class="btn primary nt-go" id="ntGo" type="button" style="animation-delay:'+(REDUCED?0:t).toFixed(2)+'s">'+foot+'</button></div>';
   el.hidden=false; el.classList.remove('out'); ovOpen('note',()=>{ closeNote(); });
   const paper=el.querySelector('.nt-paper'); paper.addEventListener('click',e=>{ if (e.target.id!=='ntGo'){ paper.classList.add('done'); penStop(); } });
   $('ntGo').addEventListener('click',e=>{ e.stopPropagation(); closeNote(); });

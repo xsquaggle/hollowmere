@@ -17,6 +17,10 @@ function noteOn(N){ const w=N.when, caught=id=>(save.fish[id]||{}).caught>0;
   if (w==='ghost') return Object.keys(FISH).some(id=>FISH[id].beh==='ghost' && caught(id));
   if (w==='letter') return findsState().notes.some(id=>NOTES[id] && NOTES[id].kind==='letter');
   if (w==='marshSeen') return !!save.marshSeen;
+  if (w==='quarterSeen') return !!save.quarterSeen;
+  if (w==='bonewhistle') return save.rods.includes('bonewhistle');
+  if (w==='hollowSeen') return hollowOpen();
+  if (w==='supper') return !!storyState().supper;
   return caught(w); }
 const notesUp = () => WREN.notes.filter(noteOn);
 const riverQuestFish = () => REGION_FISH.river.filter(id=>!FISH[id].wx && !FISH[id].extra);
@@ -30,7 +34,7 @@ function wrenHasNews(){ const w=wrenState(); return !w.met || questNews() || not
 /** Now and then she says something, while you're fishing nearby: about the marsh, while you're in it. */
 function updateWren(dt){ if (!wrenHere()){ WR.sayT=0; return; }
   if (WR.sayT>0){ WR.sayT-=dt; return; }
-  WR.next-=dt; if (WR.next<=0 && S.state==='idle'){ WR.next=rand(28,48); if (wrenState().met && !wrenHasNews()){ const marsh=REG()==='marsh', L=marsh?WREN_MARSH.lines:WREN.lines;
+  WR.next-=dt; if (WR.next<=0 && S.state==='idle'){ WR.next=rand(28,48); if (wrenState().met && !wrenHasNews()){ const marsh=REG()==='marsh', L=[...(marsh?WREN_MARSH.lines:WREN.lines), ...wrenLater()];
     WR.say=marsh && save.rod==='lanternrod' && !nightNow() && Math.random()<.5 ? WREN_MARSH.day : L[Math.floor(Math.random()*L.length)]; WR.sayT=5; } } }
 
 /* ---------- her sheet ---------- */

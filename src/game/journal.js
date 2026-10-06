@@ -30,10 +30,16 @@ function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
 function speciesHTML(regs){ let h='<div class="entries">';
   regs.forEach(rg=>{ h+='<h3 class="j-reg">'+REGION_NAME[rg]+'</h3>'; REGION_FISH[rg].forEach(id=>{ const F=FISH[id], r=save.fish[id]||{caught:0,best:0,seen:false};
     if (r.caught>0){ const m=Math.min(MASTERY.catches,r.caught), pb=r.pb;
-      h+='<div class="entry"><canvas data-f="'+id+'"></canvas><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+(F.beh2?' then '+BEH[F.beh2]:'')+'</span>'+rarPipsHTML(F.rarity)+'<h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p>'+mutLineHTML(id)+ledgerHTML(id)+'<div class="mast"><i style="width:'+Math.round(m/MASTERY.catches*100)+'%"></i></div><p>'+(r.caught>=MASTERY.catches?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/'+MASTERY.catches)+'</p></div></div>'; }
+      h+='<div class="entry"><canvas data-f="'+id+'"></canvas><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+(F.beh2?' then '+BEH[F.beh2]:'')+'</span>'+rarPipsHTML(F.rarity)+'<h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p>'+memoryHTML(id)+mutLineHTML(id)+ledgerHTML(id)+'<div class="mast"><i style="width:'+Math.round(m/MASTERY.catches*100)+'%"></i></div><p>'+(r.caught>=MASTERY.catches?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/'+MASTERY.catches)+'</p></div></div>'; }
     else h+='<div class="entry"><canvas data-f="'+id+'" data-sil="1"></canvas><div><span class="r" style="color:#7A7468">'+(r.seen?'Seen, not caught':F.secret?'A secret':'Undiscovered')+'</span><h3>???</h3><p'+(F.secret&&!r.seen?' class="riddle"':'')+'>'+(r.seen||F.secret?F.hint:'Keep fishing to find this one.')+'</p></div></div>';
   }); });
   return h+'</div>'; }
+/** How many of a species you catch before its page shows what it remembers (data/stats.js: MASTERY.memory). */
+const memoryAt = id => MASTERY.memory[FISH[id].rarity]||MASTERY.catches;
+const memoryKnown = id => ((save.fish[id]||{}).caught||0)>=memoryAt(id);
+/** What a fish remembers of the old town, under its lore once you know it well enough; until then, how many more. */
+function memoryHTML(id){ const F=FISH[id]; if (!F.memory) return ''; if (memoryKnown(id)) return '<p class="memory">'+F.memory+'</p>';
+  const n=memoryAt(id)-((save.fish[id]||{}).caught||0); return '<p class="memory-to">Catch '+n+' more to learn what it remembers.</p>'; }
 /** The mutations found for a species, as a line under its lore: the ones still to find show as dashes. Fish too rare to
     mutate (Mythic and up) get none. */
 function mutLineHTML(id){ if (rarRank(FISH[id].rarity)>=rarRank('mythic')) return ''; const got=mutsFound(id);

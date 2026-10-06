@@ -102,4 +102,9 @@ window.__hm={ get save(){ return save; }, POOLS_BY, FISH, RODS, QUARTER, PELL_Q,
     omen:{ start:()=>omenStart(), on:()=>omenOn(), state:()=>omenState(), k:()=>OM.k, hush:()=>waterHush(), held:()=>dripsHeld(), update:dt=>omenUpdate(dt) },
     star:{ sky:()=>starSky(), fall:()=>starFall(), update:dt=>starUpdate(dt), z:()=>SC.star&&{phase:SC.star.phase, x:SC.star.x, y:SC.star.y, r:SC.star.r, t:SC.star.t}, in:(x,y)=>inStar(x,y), gullBusy:()=>gullBusy(), clear:()=>{ SC.star=null; SC.nextStar=null; } },
     godly:{ ledger:()=>ledger(), still:()=>godlyStill(), light:()=>godlyLight(), mirrorOn:()=>mirrorOn(), stars:()=>mirrorStars().map(s=>({x:s.x, y:s.y})), onStar:(x,y)=>onMirrorStar(x,y), after:L=>godlyAfter(L), html:id=>ledgerHTML(id) },
-    mods:()=>{ MODC.dirty=true; return modList(); } } };
+    mods:()=>{ MODC.dirty=true; return modList(); } },
+  // the story (game/story.js) and its ending, supper on Lantern Row (game/ending.js, game/ending-art.js)
+  story:{ END, EA, SUPPER_LINES, SUPPER_SEATS, OTT_SAY, OTT_NAME, OTT_LAST, WREN, PELL, state:()=>storyState(), chapters:()=>chaptersReached(), ottLine:()=>ottLine(), ottName:()=>ottName(), afterCatch:L=>storyAfterCatch(L),
+    wrenLater:()=>wrenLater(), pellLater:()=>pellLater(), pellIdle:()=>pellIdle(), notesUp:()=>notesUp().map(n=>n.id), memoryAt:id=>memoryAt(id), memoryHTML:id=>memoryHTML(id),
+    due:()=>supperDue(), check:()=>endingCheck(), start:r=>supperStart(!!r), next:()=>endNext(), skip:()=>endSkip(), close:()=>endClose(), hushed:()=>bellHushed(), natural:()=>bellNatural(),
+    focus:who=>eaFocusFor(who), draw:(c,st)=>{ eaLayout(); eaDraw(c,st); }, frame:()=>({phase:END.phase, i:END.i, flip:END.flip, out:END.out, speaker:END.speaker, walter:END.walter, dance:END.dance, cam:{...END.cam}}) } };

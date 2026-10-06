@@ -41,3 +41,6 @@
 .entry .ledger h4{margin:0 0 3px;font:400 14px/1.2 var(--display)}
 .entry .ledger ol{margin:0;padding-left:18px;font-size:12px;line-height:1.5;color:#4B4842;font-variant-numeric:tabular-nums}
 .entry p.riddle{font-style:italic}
+/* what a fish remembers: a second journal line, in the hand the letters are written in */
+.entry p.memory{margin-top:6px;padding-left:9px;border-left:2px solid rgba(201,161,90,.6);font:600 16px/1.25 'Caveat','Bradley Hand','Noteworthy','Segoe Print',cursive;color:#4A3E34}
+.entry p.memory-to{font-size:12px;color:#8A8274;font-style:italic}

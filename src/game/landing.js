@@ -63,6 +63,8 @@ function showCard(){
   if (L.pbBeat) save.stats.pbs=(save.stats.pbs||0)+1;
   L.pbMinor=L.pbBeat && (L.w-L.prev.w)/Math.max(1,L.prev.w)<.1 && rarRank(F.rarity)<rarRank('legendary') && L.stars<3 && L.mut!=='giant';
   persist();
+  // Ottilie may remark on it, at the lake (game/story.js)
+  storyAfterCatch(L);
   if (save.stats.catches===3 && !save.metOttilie) setTimeout(()=>{ if (S.state==='idle') coachFor('Ottilie is waving you over. Tap her ferry by the dock to see her rods.',7); },2200);
   const card=$('card'); card.dataset.r=F.rarity; if (L.mut) card.dataset.mut=L.mut; else delete card.dataset.mut; card.classList.remove('out');
   $('cRarity').textContent=RAR[F.rarity].label; $('cPips').innerHTML=rarPipsHTML(F.rarity); $('cNew').hidden=!L.isNew;
@@ -73,6 +75,7 @@ function showCard(){
   L.needFor=recipeNeeding(L.id); if (L.needFor && !L.isNew) tags.push('Needed for '+RECIPES[L.needFor].name);
   const ord=!L.needFor && orderShort(L.id); L.orderFor=ord&&ord.n>0?ord.T:null; if (L.orderFor && !L.isNew) tags.push('For '+TOWNSFOLK[L.orderFor.who].name+'’s supper order');
   if (r.caught>=MASTERY.catches && r.caught-(L.mut==='twin'?2:1)<MASTERY.catches) tags.push('Mastered: reels get easier'); else if (r.caught<MASTERY.catches) tags.push('Mastery '+r.caught+'/'+MASTERY.catches);
+  const mAt=memoryAt(L.id); if (F.memory && mAt>1 && r.caught>=mAt && r.caught-(L.mut==='twin'?2:1)<mAt) tags.push('A new line in the journal');
   $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]); if (L.mut) $('cTags').children[0].className='mut';
   // runes that did something for this catch
   const runes=[]; if (L.wander) runes.push(runeTag('wanderer','Wanderer ×2 · '+L.wander+' of '+ENCH.wanderer.first)); if (L.echo) runes.push(runeTag('echo','Echo: another waits here'));

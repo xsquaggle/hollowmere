@@ -43,6 +43,7 @@ function iWhistle(f,t,len,{vol=.028,dest=MUS}={}){ const o=AC.createOscillator()
   o.start(t); l.start(t); o.stop(t+len+.05); l.stop(t+len+.05); }
 function timeOfDay(){ const h=save.clock; return h>=5&&h<17?'day':h>=17&&h<20.5?'dusk':'night'; }
 function audioScene(){ if (typeof INTRO!=='undefined' && INTRO.active && INTRO.quiet) return 'intro';
+  if (typeof END!=='undefined' && END.active) return 'supper';   // supper on Lantern Row (game/ending.js)
   if (typeof K!=='undefined' && K.open) return K.mode==='banquet'?'banquet':'kitchen';
   if (typeof AQ!=='undefined' && AQ.open) return 'aquarium';
   if (typeof SH!=='undefined' && SH.open) return 'aquarium';
@@ -81,7 +82,7 @@ function musicFrame(dt){ if (!AC||!DUCK) return; MU.duckT=Math.max(0,MU.duckT-Ma
   DUCK.gain.setTargetAtTime(d,AC.currentTime,.25);
   // the weather muffles the music a little: fog most, rain on the hood less (game/weather.js)
   const L=wxLook(), cut=16000*Math.pow(4200/16000,L.fog)*Math.pow(7000/16000,L.rain*(1-L.fog));
-  MUSF.frequency.setTargetAtTime((typeof AQ!=='undefined'&&AQ.open)||(typeof SH!=='undefined'&&SH.open)?1500:cut,AC.currentTime,.4); }
+  MUSF.frequency.setTargetAtTime((typeof AQ!=='undefined'&&AQ.open)||(typeof SH!=='undefined'&&SH.open)?1500:typeof END!=='undefined'&&END.active?16000:cut,AC.currentTime,.4); }
 /* ambience: continuous beds plus little events */
 const AMBL={}; let ambOn=false;
 function ambBed(name,type,freq,q,lfoHz,lfoAmt){ const s=AC.createBufferSource(); s.buffer=ambBuf; s.loop=true; const f=AC.createBiquadFilter(); f.type=type; f.frequency.value=freq; f.Q.value=q;
@@ -93,7 +94,7 @@ function ambStart(){ if (ambOn||!AC) return; ambOn=true;
   ambBed('rain','bandpass',2600,.35,.07,.25); ambBed('drum','lowpass',340,.5,.11,.3); }   // rain on the water, and on the roof and the boards
 let ambClock=0;
 function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{}, t=AC.currentTime; ambClock+=.08;
-  const X=wxLook(), wet=X.rain, fog=X.fog*(X.mist?0:1), out=sc.startsWith('lake')||sc.startsWith('coast')||sc.startsWith('river')||sc.startsWith('marsh')||sc.startsWith('quarter');   // the dawn mist stays quiet
+  const X=sc==='supper'?{rain:0,fog:0,mist:0}:wxLook(), wet=X.rain, fog=X.fog*(X.mist?0:1), out=sc.startsWith('lake')||sc.startsWith('coast')||sc.startsWith('river')||sc.startsWith('marsh')||sc.startsWith('quarter');   // the dawn mist stays quiet
   for (const k in AMBL){ let v=L[k]||0; if ((k==='surf'||k==='hiss') && v){ const ph=(ambClock%8.5)/8.5, w=ph<.4?Math.pow(ph/.4,1.6):Math.pow(1-(ph-.4)/.6,1.2); v*=k==='surf'?.35+.65*w:w*w; }
     if (k==='rain') v=wet*(out?.55:.12); if (k==='drum') v=wet*(out?.25:.5);
     AMBL[k].g.gain.setTargetAtTime(v*.5,t,k==='surf'||k==='hiss'?.25:1.2); }

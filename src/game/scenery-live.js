@@ -282,8 +282,8 @@ function updateScenery(dt){
   else { f.t-=dt; if (f.croak>0) f.croak-=dt;
     if (f.t<=0){ if (Math.random()<.5){ let to=Math.floor(Math.random()*SC.pads[0].length); if (to===f.pad) to=(to+1)%SC.pads[0].length; f.hop={from:f.pad,to,t:0}; }
       else f.croak=.9; f.t=rand(4,9); } }
-  if (OTT.sayT>0) OTT.sayT-=dt; else { OTT.next-=dt; if (OTT.next<=0 && S.state==='idle'){ const wl=WX_LINES[wxNow()], L=wl && Math.random()<.5 ? wl : OTT_LINES;   // half the time, something about the weather
-    OTT.say=L[Math.floor(Math.random()*L.length)]; OTT.sayT=4.5; OTT.next=rand(20,35); } }
+  // what she says next: your last catch, the weather, your rod or the story so far (game/story.js: ottLine)
+  if (OTT.sayT>0) OTT.sayT-=dt; else { OTT.next-=dt; if (OTT.next<=0 && S.state==='idle'){ OTT.say=ottLine(); OTT.sayT=4.5; OTT.next=rand(20,35); } }
   const h=SC.heron; h.t-=dt; if (h.t<=0){ h.dir*=-1; h.t=rand(2.5,7); }
   for (const d of SC.dfly){
     if (!d.ready){ d.x=Math.random()<.5?W*.1:W*.9; d.y=H*.62; d.tx=d.x; d.ty=d.y; d.ready=true; }

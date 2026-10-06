@@ -21,11 +21,11 @@ Its source lives in `src/` as small files, and a build pastes them together. `do
 | --- | --- |
 | `src/index.html` | The page skeleton: head, markup, and where the styles and scripts go |
 | `src/data/` | Content tables: fish, rods and boat parts, places, people's lines, aquarium, kitchen, music |
-| `src/game/` | The game itself, one file per system (casting, reeling, kitchen stations, saves…). Scene art: `angler.js`, `dock.js`, `folk.js`, `coast.js`, `river-art.js`, `wren-art.js`, `marsh-art.js`, `coast-sea-art.js`, `quarter-art.js`, `hollow-art.js`, `hollow-fish-art.js` |
+| `src/game/` | The game itself, one file per system (casting, reeling, kitchen stations, saves…). Scene art: `angler.js`, `dock.js`, `folk.js`, `coast.js`, `river-art.js`, `wren-art.js`, `marsh-art.js`, `coast-sea-art.js`, `quarter-art.js`, `hollow-art.js`, `hollow-fish-art.js`, `ending-art.js` |
 | `src/styles/` | Styles, one file per screen |
 | `src/fonts/` | Nunito, Young Serif and Caveat, subset to WOFF, plus their licenses |
 | `src/build.json` | The order files are pasted in. Scripts share one closure, so a file can use anything listed before it |
-| `tools/` | `build.mjs` (the build) and `check-content.mjs` (the content checker) |
+| `tools/` | `build.mjs` (the build), `check-content.mjs` (the content checker), `simulate.mjs` (the balance simulator) and `story.mjs` (the story script) |
 | `tests/` | Play tests that drive the game in a phone-sized browser |
 | `index.html`, `sw.js`, `manifest.webmanifest`, `icons/`, `splash/`, `fonts/` | The built web app GitHub Pages serves. Don't edit these by hand |
 
@@ -39,6 +39,7 @@ npm run build    # build the web app and build/cast-lab.html
 npm test         # check, build, then play every test (about 10 minutes)
 npm run verify   # confirm the committed web app matches src/
 npm run sim      # the 1,000-cast balance report (also in the game: Playtest > Balance)
+npm run story    # write docs/STORY.md: every line of the story, in order
 npm run sim -- --rod brasscap --spot deep --hour 6.5 --meal pie:3 --sets all
 ```
 
@@ -122,6 +123,12 @@ trapdoor, the dark (`hollowLit`: is the float in a light), fish that follow a fl
 `godly.js` is the Godly moment, the Ledger and the Stillwater Mirror, and `omens.js` the omens and falling stars. The
 art is in `hollow-art.js` and `hollow-fish-art.js`. Playtest's Hollow menu hands over the pages and the bell, drains
 the lake, readies the eye, starts an omen and drops a star; `npm run sim -- --region hollow --spot deep` fishes it.
+
+**The story.** Every letter, logbook page, lore line and thing people say is in the content tables, and `npm run story`
+writes them out in the order you meet them, as `docs/STORY.md` (`npm run check` fails if it's stale). Ottilie's lines by
+chapter are `OTT_SAY` in `src/data/people.js` (`src/game/story.js` picks them); the end of chapter one, supper on Lantern Row,
+is `src/data/ending.js`, played by `src/game/ending.js` and drawn in `src/game/ending-art.js`, with the Row's folk in
+`src/game/row-folk.js`. Playtest > Tools > The story readies it and rows you there.
 
 **Pacing (the depth gate).** `npm run sim -- --career` plays whole runs from the first cast, buying rods, the boat
 and everything else as the coins come in, and lists when each thing happens and the longest waits with nothing new.
