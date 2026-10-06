@@ -170,7 +170,9 @@ module.exports = [
       await until(page, () => window.__S.state === 'waiting', null, { what: 'the floats to land' });
       const r = await page.evaluate(() => { const S = window.__S, T = window.__hm.river.twin, out = {};
         out.two = !!S.bob2; out.wait = T.wait(); out.apart = S.bob2 && Math.abs(S.bob2.x - S.bob.x);
-        // force a bite with both floats under, then tap nearer the second
+        // force a bite with both floats under, then tap nearer the second (both moved upstream first, so the current
+        // can't carry them off the edge before the fish comes)
+        const dx = Math.min(S.bob.x, S.bob2.x) - innerWidth * .15; S.bob.x -= dx; S.bob2.x -= dx;
         S.wait.t = 0; return out; });
       assert.equal(r.two, true, 'a second float'); assert.equal(r.wait, .6, 'two baits: the quiet is shorter'); assert.ok(r.apart > 20, 'landed apart');
       await until(page, () => window.__S.state === 'bite', null, { timeout: 15000, what: 'a bite' });

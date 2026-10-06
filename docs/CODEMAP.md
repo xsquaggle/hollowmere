@@ -195,5 +195,5 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/relics.test.cjs` | 236 | Story relics, treasure maps, the Moon Jar, the almanac, combos |
 | `tests/shack.test.cjs` | 202 | The shack: the fix-up list, mounting and the wall bonus, the rod rack, the knock-through, the room at five phone sizes, odd saves |
 | `tests/depth.test.cjs` | 56 | The depth gate: rare and Legendary odds near the design doc, the pace log and Playtest > Pace |
-| `tests/river.test.cjs` | 183 | Rootwood River: the ferry, the drifting float, its spots, fish and hours, Homebody, the otter, Wren, the Twin Spool |
+| `tests/river.test.cjs` | 185 | Rootwood River: the ferry, the drifting float, its spots, fish and hours, Homebody, the otter, Wren, the Twin Spool |
 | `tests/marsh.test.cjs` | 216 | Saltmarsh: Wren's glow quest and the punt, the tide and the moon, the mud splat and the stranded float, the tide's bites and pools, the Lantern Rod and the Lampwick Eel, the Bellmouth |
