@@ -48,8 +48,8 @@ function modSources(){
     add('mastery',n,'reel',MASTERY.reel,{when:{fish:id}}); add('mastery',n,'autoTilt',undefined,{when:{fish:id}}); }
   // the weather here and now (game/weather.js)
   { const k=wxNow(), K=WX[k]; for (const x of K.mods) L.push(Object.assign({src:'weather',name:K.name},x,{when:Object.assign({wx:k},x.when)})); }
-  // the tide in the marsh (game/marsh.js)
-  tideMods(add);
+  // the tide in the marsh (game/marsh.js), the wash and the wreck at the coast (game/coast-sea.js)
+  tideMods(add); coastMods(add);
   // Gull Luck: a lucky splash zone doubles the odds of every fish above common while you fish in it
   add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true, rarityMin:'uncommon'}});
   // The rainbow's foot: a fish hooked where it touches the water comes up mutated twice as often (game/moon.js)

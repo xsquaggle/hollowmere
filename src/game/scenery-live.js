@@ -40,6 +40,7 @@ function drawCloud(x,y,s,a=1){
 }
 /** The lighthouse beam sweeping round. It burns in fog by day too, and fog turns it into a broad, soft cone. */
 function drawBeam(){
+  if (REG()==='coast') return drawCoastLamp();   // the coast's lamp sweeps the water too (game/coast-sea-art.js)
   const L=SC.lamp, fog=wxLook().fog, on=Math.max(PAL.beam,fog*.85); if (!L || on<.03) return; ctx.save(); ctx.globalAlpha=on; const a=S.time*.8, d=Math.cos(a), flash=Math.max(0,1-Math.abs(d)*3.5);
   const len=W*.42*Math.abs(d)*(1+fog*.35), dir=d>0?1:-1, up=9+fog*14, dn=7+fog*12;
   if (len>4){ const g=ctx.createLinearGradient(L.x,L.y,L.x+dir*len,L.y); g.addColorStop(0,'rgba(255,228,170,'+(.32-fog*.08).toFixed(3)+')'); g.addColorStop(1,'rgba(255,228,170,0)');
@@ -110,7 +111,7 @@ function drawFlower(x,y,s,kind){
   ctx.fillStyle='#F2CF63'; ctx.beginPath(); ctx.arc(x,y-s*.12,s*.16,0,Math.PI*2); ctx.fill();
 }
 function drawPads(){
-  if (REG()==='coast'){ drawKelp(); return; }
+  if (REG()==='coast'){ drawSeaBeam(); drawWash(); drawWreck(); drawKelp(); return; }
   if (REG()==='river'){ drawRiverWater(); return; }
   if (REG()==='marsh'){ drawMarshWater(); return; }
   G.padClusters.forEach((c,ci)=>{ SC.pads[ci].forEach((p,i)=>{

@@ -19,7 +19,9 @@ function spawnApproach(){
   if (!S.wait.echo) twinPick();   // with two floats out, the fish heads for either one
   const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.bow=atBowFoot(b.x,b.y);
   // the rare bites and the dry run count once a cast (as the simulator does); a fish that comes back after a spook is an ordinary one
-  w.fish=S.tut?'perch':w.echo||(w.rolled?pickW(poolFor(b.spot,w.lucky)):rollFish(b.spot,w.lucky,{bow:w.bow, path:onMoonpath(b.x,b.y)})); w.rolled=true; const F=FISH[w.fish];
+  // at the coast, a fish the seventh wave's churn or the lighthouse beam brought (game/coast-sea.js)
+  const at={bow:w.bow, path:onMoonpath(b.x,b.y), churn:!!w.churn, lit:!!w.lit};
+  w.fish=S.tut?'perch':w.echo||(w.rolled?pickW(poolFor(b.spot,w.lucky,at)):rollFish(b.spot,w.lucky,at)); w.rolled=true; const F=FISH[w.fish];
   const d=w.echo?rand(40,60):rand(85,150), mA=REG()==='marsh'?marshApproachFrom(b,d):null, ang=mA!=null?mA:rand(0,Math.PI*2);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
   w.sh={x,y,ang:Math.atan2(b.y-y,b.x-x),alpha:0,flee:false};
@@ -29,6 +31,7 @@ function spawnApproach(){
 }
 function updateWaiting(dt){
   if (!riverWaiting(dt) || !marshWaiting(dt)) return;   // the river carries the float (game/river.js); the tide can strand it (game/marsh.js)
+  coastWaiting(dt);   // the seventh wave and the lighthouse beam bring a fish sooner (game/coast-sea.js)
   const w=S.wait, b=S.bob;
   if (w.sh){ const sh=w.sh;
     if (sh.flee){ sh.x+=Math.cos(sh.ang)*170*dt; sh.y+=Math.sin(sh.ang)*85*dt; sh.alpha-=dt*1.6; if (sh.alpha<=0) w.sh=null; }

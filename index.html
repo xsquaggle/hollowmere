@@ -1291,7 +1291,8 @@ const INK='#2B2A33', PAPER='#F3EAD7', BRASS='#C9A15A', DANGER='#D9614C', GOOD='#
               at the rainbow's foot; moon:'full' and night:true on full-moon nights; path: how much likelier a cast onto
               the moonpath makes it; top: the share of each in-game hour, from the hour, when it can bite (the Clockfin's
               ten minutes past); wx: only in that weather; flag: only while that STATS flag is on (data/stats.js: the
-              Drowned Bell in a pocket for the Bellmouth, the Lantern Rod lit for the Lampwick Eel).
+              Drowned Bell in a pocket for the Bellmouth, the Lantern Rod lit for the Lampwick Eel); churn:true only while the
+              seventh wave has the water stirred round your float (data/coast.js: SWELL).
    DRY        soft bad-luck protection, up to Legendary only: after `from` casts in a row where a Legendary could have
               bitten and didn't, its odds creep up, reaching ×max at `to`. Landing a Legendary or rarer starts it over.
    MUTS       mutations, rolled on landing (game/landing.js: catchRoll) on anything below Mythic: chance per catch before
@@ -1301,7 +1302,8 @@ const INK='#2B2A33', PAPER='#F3EAD7', BRASS='#C9A15A', DANGER='#D9614C', GOOD='#
    POOLS      lake bite weights per spot; POOLS_COAST, POOLS_RIVER and POOLS_MARSH the same for the other waters. Night, dawn, the tide, rods,
               meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench");
               SPOT_REG  a spot's own name in one water (the coast's deep water is the Dark trench, the river's the Millpool).
-              'mud' is no spot: it's the marsh's banks while the tide is out, where a cast only goes splat (game/marsh.js). */
+              'mud' is no spot: it's the marsh's banks while the tide is out, where a cast only goes splat (game/marsh.js). The coast's wash
+              is the white water a swell leaves on a sea stack, there for a few seconds, and its wreck lies past the stacks (game/coast-sea.js). */
 const FISH = {
   perch:   {name:'Copper Perch', rarity:'common', beh:'darter', pull:0.9, reel:2.6, value:2, size:[14,26], len:34, h:.27, color:'#D08A4E', fin:'#A85E2C', window:1.4,
             lore:'Its belly often holds old coins. Nobody knows who keeps dropping them.', hint:'Common in open water.'},
@@ -1325,6 +1327,14 @@ const FISH = {
             lore:'So old the barnacles have barnacles.', hint:'Lurks by the sea stacks and in the trench.'},
   saltjaw: {name:'Saltjaw', rarity:'legendary', beh:'darter', night:true, pull:1.85, reel:15, value:1500, size:[140,190], len:92, h:.16, color:'#7E8FA0', fin:'#5A6A7A', window:.7,
             lore:'Coast folk say it follows the lights under the swell.', hint:'Hunts the dark trench, mostly at night.'},
+  spindrift:{name:'Spindrift Bass', rarity:'uncommon', beh:'darter', pull:1.05, reel:4.2, value:32, size:[26,48], len:42, h:.3, color:'#C3CDD1', fin:'#8D9BA4', window:1.1,
+            lore:'Hunts in the foam a swell leaves on the rocks. Comes up white, and dries silver in your hands.', hint:'Hunts in the white water a swell leaves on the sea stacks.'},
+  herring: {name:'Beacon Herring', rarity:'uncommon', beh:'darter', night:true, glow:true, pull:.9, reel:3.8, value:26, size:[18,32], len:36, h:.22, color:'#6E8DA6', fin:'#4D6A82', window:1.2,
+            lore:'Every scale throws the lighthouse beam back. Ships have steered home by a shoal of them.', hint:'Rises at night, and comes to the lighthouse beam.'},
+  conger:  {name:'Wreck Conger', rarity:'rare', beh:'sulker', pull:1.5, reel:8.5, value:150, size:[90,180], len:72, h:.12, color:'#545A60', fin:'#3E4348', window:.88,
+            lore:'Has lived in the captain’s cabin so long it thinks it’s the captain.', hint:'Lives in the old wreck past the stacks, and comes out at night.'},
+  comber:  {name:'Comber Tarpon', rarity:'epic', beh:'leaper', extra:true, pull:1.6, reel:10.5, value:600, size:[120,200], len:82, h:.27, color:'#BCC8CE', fin:'#7F9BA7', window:.8,
+            lore:'Rides in on the seventh wave and out on the eighth. Its scales are as big as coins, and sailors keep one for luck.', hint:'Comes in behind the seventh wave, the big one.'},
   mayor:   {name:'Mayor Bartholomew', rarity:'legendary', beh:'darter', pull:1.75, reel:14, value:600, size:[110,150], len:86, h:.15, color:'#7D8A63', fin:'#58663F', window:.72,
             lore:"An ancient pike still wearing the mayor's chain of office.", hint:'Something huge circles the deep pool, most often at dawn.'},
   dace:    {name:'Drizzle Dace', rarity:'uncommon', beh:'leaper', wx:'rain', pull:.95, reel:3.9, value:16, size:[14,26], len:34, h:.24, color:'#A7B8C2', fin:'#6F8794', window:1.15,
@@ -1396,20 +1406,22 @@ const POOLS = {
   far:  {perch:22, leafjack:30, mossback:10, reedwhisker:4, gar:2, mayor:.8},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
-const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed', riffle:'Riffle', leaves:'Leaf drift', roots:'Undercut roots',
+const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed', wash:'The wash', wreck:'The wreck', riffle:'Riffle', leaves:'Leaf drift', roots:'Undercut roots',
   flats:'Flooded flats', pans:'Tide pools', mud:'Mud'};
-const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench',
+const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench', wash:'in the wash', wreck:'by the wreck',
   riffle:'in the riffle', leaves:'under the falling leaves', roots:'among the roots', 'river:open':'in the run', 'river:deep':'in the millpool',
   flats:'on the flooded flats', pans:'in a tide pool', 'marsh:open':'in the creek', 'marsh:deep':'in the sluice pool', 'marsh:far':'in the channel'};
 const SPOT_REG = {coast:{deep:'Dark trench'}, river:{open:'The run', deep:'Millpool'}, marsh:{open:'The creek', deep:'Sluice pool', far:'The channel'}};
-const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw'],
+const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'], coast:['sprat','wrasse','spindrift','kelpeel','bream','herring','mackerel','grouper','conger','gurnard','angler','comber','saltjaw'],
   river:['brook','stone','leafjack','spatefin','barbel','grayling','clockfin','gristle'], marsh:['mudlark','dab','croaker','smelt','whiting','mullet','bellmouth','lampwick','reeve']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:9, bream:6},
   kelp: {kelpeel:46, sprat:24, bream:20, grouper:5},
   deep: {grouper:14, bream:28, sprat:34, kelpeel:10, angler:2.5, saltjaw:.9},
-  far:  {bream:34, sprat:28, grouper:10, kelpeel:10, angler:1, saltjaw:.6}
+  far:  {bream:34, sprat:28, grouper:10, kelpeel:10, angler:1, saltjaw:.6},
+  wash: {spindrift:44, wrasse:24, sprat:18, grouper:7, bream:5},
+  wreck:{wrasse:30, sprat:20, grouper:14, conger:9, kelpeel:10, bream:12}
 };
 /* Rootwood River: the current carries the float from spot to spot (game/river.js), so these are where it is when a fish comes. */
 const POOLS_RIVER = {
@@ -1435,7 +1447,8 @@ const RARE_BITES={
   calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2},
   clockfin:{region:'river', top:1/6, chance:1/11},
   bellmouth:{region:'marsh', spots:['open','deep','far','flats'], wx:'rain', flag:'bellmouth', chance:1/14},
-  lampwick:{region:['marsh','lake'], spots:['reeds','open'], night:true, wx:'rain', flag:'lantern', chance:1/12}
+  lampwick:{region:['marsh','lake'], spots:['reeds','open'], night:true, wx:'rain', flag:'lantern', chance:1/12},
+  comber:{region:'coast', spots:['open','far','rocks','wash','kelp','wreck'], churn:true, chance:1/16}
 };
 const DRY={from:80, to:200, max:2};
 const MUTS={
@@ -1510,7 +1523,7 @@ const PAINTS={blue:{name:'Harbor Blue',hull:'#3E5A6E',price:0},red:{name:'Lobste
 const REGION_NAME = {lake:'Stillwater Lake', river:'Rootwood River', coast:'Gullrock Coast', marsh:'Saltmarsh'};
 const MAP_PLACES={
   lake:  {x:100,y:368,name:'Stillwater Lake',desc:'Your uncle’s lake. Lily pads, reed edges, a deep pool, and a mayor who never left.',built:true},
-  coast: {x:278,y:150,name:'Gullrock Coast',desc:'Sea stacks, kelp beds and a dark trench where the swells roll in.',built:true},
+  coast: {x:278,y:150,name:'Gullrock Coast',desc:'Sea stacks, kelp beds, a dark trench and the wreck of the Marigold, where the swells roll in.',built:true},
   river: {x:150,y:300,name:'Rootwood River',desc:'Ottilie’s ferry runs up it. Falling leaves, a waterwheel, and a current that carries your float.',built:true},
   marsh: {x:212,y:236,name:'Saltmarsh',desc:'Wren’s punt runs down to it. Fog, mud, and a tide that opens and drowns the spots every six hours.',built:true},
   ocean: {x:330,y:318,name:'Open Ocean',desc:'Uncharted. Barnaby says you’ll need a bigger boat.',built:false}
@@ -1558,8 +1571,8 @@ const WX_FISH={
          fog: {fish:'char', pools:{deep:18, far:20, open:4, pads:3}}},
   river:{rain:{fish:'spatefin', pools:{open:14, riffle:16, leaves:8, deep:6, roots:6}},
          fog: {fish:'grayling', pools:{open:8, deep:12, roots:14, leaves:4, riffle:3}}},
-  coast:{rain:{fish:'mackerel', pools:{open:16, far:14, kelp:6, rocks:4, deep:6}},
-         fog: {fish:'gurnard', pools:{rocks:10, deep:9, far:6, open:2, kelp:2}}},
+  coast:{rain:{fish:'mackerel', pools:{open:16, far:14, kelp:6, rocks:4, deep:6, wash:5, wreck:4}},
+         fog: {fish:'gurnard', pools:{rocks:10, deep:9, far:6, open:2, kelp:2, wash:6, wreck:8}}},
   marsh:{rain:{fish:'smelt', pools:{open:14, reeds:8, flats:10, pans:4, deep:6, far:10}},
          fog: {fish:'whiting', pools:{far:16, flats:12, open:8, deep:8, reeds:4, pans:3}}}
 };
@@ -1648,7 +1661,8 @@ const FLESH={perch:'#F4CDB0', reedwhisker:'#EFD9C2', lantern:'#F7D9A0', leafjack
   dace:'#F1E0CC', char:'#F4B9A0', mackerel:'#E8C7B4', gurnard:'#F6E6D8',
   gar:'#F2DCC4', angler:'#F7EDE2', shiner:'#F3E2DA', calf:'#D9A79A',
   brook:'#F3D7C2', stone:'#E9D6BE', spatefin:'#F2CDB4', barbel:'#EDDCC0', grayling:'#F4E6DE', clockfin:'#F5C7A8', gristle:'#E8D0A8',
-  mudlark:'#EADBC6', dab:'#F6EDE2', croaker:'#F1DCC8', smelt:'#EFE6D6', whiting:'#F7F0E6', mullet:'#EBD3C2', bellmouth:'#E6D8C0', lampwick:'#E9DCC8', reeve:'#F2E4D6'};
+  mudlark:'#EADBC6', dab:'#F6EDE2', croaker:'#F1DCC8', smelt:'#EFE6D6', whiting:'#F7F0E6', mullet:'#EBD3C2', bellmouth:'#E6D8C0', lampwick:'#E9DCC8', reeve:'#F2E4D6',
+  spindrift:'#F4EAE0', herring:'#E6C9B8', conger:'#F2E8DC', comber:'#EFD8CA'};
 const COOK_NAME={pan:'Pan-fry', grill:'Grill'};
 /* Each recipe: what it needs from the keepnet, how each station plays, and what the meal does.
    need: [{id or rar, n}]; smoked:true takes a smoked fish of any kind from the keepnet (it skips the Clean station).
@@ -2239,13 +2253,45 @@ const WREN_MARSH={
   day:'Lantern Rod in daylight? Bold.'
 };
 
+/* Gullrock Coast: the swells and the seventh wave, the wash they leave on the sea stacks, the wreck, and the lighthouse
+   beam at night (game/coast-sea.js, game/coast-sea-art.js; the swell itself rolls in game/coast.js).
+   SWELL   period: seconds from one swell to the next; travel: seconds one takes from the horizon to the boat. set: every
+           set-th swell is the seventh wave, a big one. big: how it differs. hit: how much harder it spikes your line's
+           tension; band: how much wider the strip it washes a cast out in; churn: seconds the water stays stirred after
+           it passes your float, when a fish that's waiting comes at once (in: seconds until it shows) and the Comber
+           Tarpon can be the one (RARE_BITES churn:true). warn: seconds before it rises on the horizon that the far water
+           darkens and the warning comes.
+   WASH    the white water a swell leaves as it breaks on a sea stack. last: seconds it lasts; reach: how far it spreads,
+           as a share of the stack's own radius (it spills toward the boat, the way the swell runs: down, as a share of
+           the radius); bite: what fishing in it multiplies the wait for a bite by. Fish in it: POOLS_COAST.wash.
+   WRECK   where the wreck lies: x across the screen (a share of the width), d out from the boat (0) to the horizon (1),
+           as the spots are placed; r: its size (a share of the width); treasure: how much likelier treasure is there.
+   BEAM    the lighthouse beam, at night and in fog. turn: seconds for one turn of the lamp; it sweeps the water for half
+           of it, from the far horizon round toward the boat. span: the angles it sweeps (radians down from level, seen
+           from the lighthouse); width: how wide it is (radians). glow: how much likelier glowing fish are to be the one
+           that comes when the beam crosses your float while you wait (it comes at once: in, seconds).
+   COAST_NIGHT  coast fish that feed after dark, and how much likelier they are then; herring: the Beacon Herring, which only
+           rises at night, by spot (a weight beside the spot's own fish, as the Lantern Carp's at the lake).
+   COAST_LINES  the coast's tips, each given once (game/coast-sea.js: coastTip). */
+const SWELL={period:7.5, travel:4.6, set:7, big:{hit:1.7, band:1.5, churn:5, in:.3, warn:2.4}};
+const WASH={last:4.2, reach:2.5, down:.7, bite:.65};
+const WRECK={x:.7, d:.77, r:.11, treasure:1.6};
+const BEAM={turn:14, span:[.03,1.95], width:.13, glow:3, in:.35};
+const COAST_NIGHT={saltjaw:3, kelpeel:1.4, conger:2.2, herring:{open:14, far:18, deep:5, wreck:6, kelp:4, rocks:3, wash:2}};
+const COAST_LINES={
+  seventh:'Every seventh swell’s a big one. Watch the far water go dark before it comes. Hits your line hard, but it stirs things up behind it.',
+  wash:'When a swell breaks on a sea stack it leaves white water for a few breaths. Cast in right behind it: fish hunt in the foam.',
+  wreck:'That’s the Marigold, resting past the stacks. Things wash out of her now and then, and something long and grey lives in her hold.',
+  beam:'At night the lighthouse beam sweeps the water. When it crosses your float, anything that glows comes looking.'
+};
+
 /* Pace: when a steady player reaches each thing, from the depth gate's whole-run report (step 24; Rootwood River
-   added in step 25, the Saltmarsh in step 26).
+   added in step 25, the Saltmarsh in step 26, Gullrock Coast's later fish and spots in step 27).
    PACE_SIM[key]  minutes of play until it, the median of 11 runs of `npm run sim -- --career --runs 11 --pace`
                   (paste its output here after a balance change). Keys: rod:<id>, boat, ferry, marsh, part:<id>, fix:<id>
                   (the fix-up list), pocket:<n> (the vest's nth pocket), rune:<id>, fish:<id> (the first one caught).
                   Playtest > Pace (game/pace.js) sets a real run beside these. */
-const PACE_SIM={'fish:perch':5, 'fish:leafjack':5, 'rod:reedcutter':6, 'fish:mossback':10, 'fish:lantern':20, 'rod:ash':21, 'rune:swift':21, 'rod:heronwood':34, 'fish:mayor':34, 'fish:gar':36, 'fish:reedwhisker':41, 'rune:magpie':45, 'ferry':63, 'fish:stone':68, 'fish:brook':68, 'marsh':68, 'fish:barbel':69, 'fish:char':75, 'rune:deep':84, 'rod:brasscap':86, 'fish:gristle':96, 'rod:twin':96, 'fish:mudlark':100, 'fish:clockfin':103, 'rune:nightglass':105, 'fish:mullet':106, 'fish:dab':106, 'boat':111, 'fish:sprat':116, 'fish:kelpeel':116, 'fish:bream':116, 'fix:roof':120, 'fish:grouper':122, 'fish:croaker':127, 'rod:saltline':132, 'rune:storm':143, 'fish:saltjaw':146, 'fish:reeve':151, 'fish:angler':157, 'part:hold':184, 'rune:wanderer':191, 'fix:net':215, 'rune:odd':233, 'fish:wrasse':237, 'fish:gurnard':242, 'pocket:2':258, 'part:sonar':259, 'rod:gale':262, 'part:keel':273, 'rune:homebody':277, 'fix:lamp':307, 'rune:echo':337, 'fix:stove':356, 'pocket:3':378, 'fix:cabinet':417, 'rod:deepwater':471, 'pocket:4':485, 'fix:panel':511, 'fix:knock':547, 'pocket:5':595};
+const PACE_SIM={'fish:leafjack':5, 'fish:perch':5, 'rod:reedcutter':6, 'fish:mossback':10, 'rune:swift':20, 'fish:lantern':21, 'fish:reedwhisker':21, 'rod:ash':24, 'rod:heronwood':42, 'fish:gar':44, 'rune:magpie':46, 'fish:char':52, 'fish:mayor':52, 'ferry':63, 'marsh':69, 'rune:deep':73, 'fish:brook':78, 'fish:stone':79, 'fish:barbel':80, 'fish:mudlark':83, 'fish:dab':83, 'fish:mullet':85, 'rod:brasscap':86, 'fish:clockfin':92, 'fish:gristle':94, 'rod:twin':94, 'rune:nightglass':100, 'boat':108, 'fish:reeve':110, 'fish:bream':113, 'fish:grouper':113, 'fish:sprat':113, 'fish:kelpeel':113, 'fish:herring':119, 'fish:angler':122, 'fish:croaker':126, 'fix:roof':127, 'rod:saltline':138, 'rune:storm':143, 'fish:saltjaw':151, 'part:hold':189, 'fish:comber':194, 'rune:wanderer':196, 'fix:net':214, 'fish:gurnard':218, 'rune:odd':248, 'pocket:2':252, 'part:sonar':265, 'part:keel':280, 'fish:wrasse':280, 'rod:gale':284, 'rune:homebody':284, 'fix:lamp':290, 'fish:spindrift':290, 'rune:echo':327, 'fix:stove':343, 'pocket:3':353, 'fix:cabinet':413, 'rod:deepwater':432, 'pocket:4':466, 'fix:panel':485, 'fix:knock':518, 'pocket:5':569};
 
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
@@ -2358,8 +2404,8 @@ function modSources(){
     add('mastery',n,'reel',MASTERY.reel,{when:{fish:id}}); add('mastery',n,'autoTilt',undefined,{when:{fish:id}}); }
   // the weather here and now (game/weather.js)
   { const k=wxNow(), K=WX[k]; for (const x of K.mods) L.push(Object.assign({src:'weather',name:K.name},x,{when:Object.assign({wx:k},x.when)})); }
-  // the tide in the marsh (game/marsh.js)
-  tideMods(add);
+  // the tide in the marsh (game/marsh.js), the wash and the wreck at the coast (game/coast-sea.js)
+  tideMods(add); coastMods(add);
   // Gull Luck: a lucky splash zone doubles the odds of every fish above common while you fish in it
   add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true, rarityMin:'uncommon'}});
   // The rainbow's foot: a fish hooked where it touches the water comes up mutated twice as often (game/moon.js)
@@ -2410,12 +2456,15 @@ function tierMul(rar,c){ c=Object.assign({},c,{rarity:rar}); const cap=RAR[rar].
   for (const m of modsFor('luck',c)) if (m.omen) v*=m.v; return v; }
 
 /* ---------- Bite odds: which fish each spot offers, and the rod in hand ---------- */
-/** Each fish's weight in this spot's pool, here and now. */
-function poolFor(spot,lucky){
+/** Each fish's weight in this spot's pool, here and now. `at` says what's going on at the float: at the coast, the
+    lighthouse beam on it (lit). */
+function poolFor(spot,lucky,at){
   const h=save.clock, night=nightNow(), reg=REG(), coastal=reg==='coast', river=reg==='river', marsh=reg==='marsh', P=poolsOf(reg), w=Object.assign({},P[spot]||P.open);
   // the water itself: who comes up at night, the Mayor's dawns, Old Gristle's six o'clock crusts, the Croaking Bass's dusk
   // and Old Reeve's spring tides
-  if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
+  if (coastal){ if (night){ for (const k in COAST_NIGHT) if (w[k] && typeof COAST_NIGHT[k]==='number') w[k]*=COAST_NIGHT[k]; if (COAST_NIGHT.herring[spot]) w.herring=COAST_NIGHT.herring[spot]; }
+    // the lighthouse beam crossing the float draws whatever glows (game/coast-sea.js)
+    if (at && at.lit) for (const k in w) if (FISH[k].glow) w[k]*=BEAM.glow; }
   else if (river){ if (night){ if (w.barbel) w.barbel*=1.6; if (w.brook) w.brook*=.7; } }
   else if (marsh){ if (night) for (const k in MARSH.night) if (w[k]) w[k]*=MARSH.night[k];
     if (w.croaker && h>=MARSH.croak.from && h<MARSH.croak.to) w.croaker*=MARSH.croak.x;
@@ -2450,7 +2499,7 @@ const RARE_ORDER=Object.keys(RARE_BITES).sort((a,b)=>rarRank(FISH[b].rarity)-rar
 function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
   for (const id of RARE_ORDER){ const B=RARE_BITES[id];
     if (!(Array.isArray(B.region)?B.region.includes(reg):B.region===reg) || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
-    if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top)) || (B.wx && wxNow()!==B.wx) || (B.flag && !modFlag(B.flag,{spot}))) continue;
+    if ((B.churn && !at.churn) || (B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top)) || (B.wx && wxNow()!==B.wx) || (B.flag && !modFlag(B.flag,{spot}))) continue;
     if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
   return null; }
 /** Whether the in-game clock is within `share` of an hour past the hour (the Clockfin's few minutes). */
@@ -2460,7 +2509,7 @@ const RARITY_CTL={fish:null, mut:null};
 /** The fish that takes this cast. A long run without a Legendary, where one could have bitten, counts toward DRY. */
 function rollFish(spot,lucky,at){ if (RARITY_CTL.fish && !SIMULATING){ const f=RARITY_CTL.fish; RARITY_CTL.fish=null; return f; }
   const hi=rareBite(spot,lucky,at); if (hi) return hi;
-  const w=poolFor(spot,lucky), id=pickW(w);
+  const w=poolFor(spot,lucky,at), id=pickW(w);
   if (rarRank(FISH[id].rarity)<rarRank('legendary') && Object.keys(w).some(k=>FISH[k].rarity==='legendary')) save.stats.dry=(save.stats.dry||0)+1;
   return id; }
 /** What the dry run multiplies the Legendaries' odds by: 1 until DRY.from casts, rising to DRY.max at DRY.to. */
@@ -2494,7 +2543,8 @@ const rec = id => save.fish[id] || (save.fish[id] = {caught:0, best:0, seen:fals
 /* ---------- Size, weight and records ---------- */
 // Weight follows length on each species' growth curve: grams = K·L³/100 (Fulton's condition factor), times a little variation in build.
 const BUILD_K={perch:1.25, reedwhisker:.9, lantern:1.6, leafjack:1.45, mossback:1.15, mayor:.62, sprat:.75, wrasse:1.3, kelpeel:.18, bream:1.7, grouper:1.9, saltjaw:.55, dace:1.0, char:1.05, mackerel:.95, gurnard:1.25, gar:.8, angler:3.5, shiner:1.45, calf:1.6,
-  mudlark:.2, lampwick:.2, dab:1.3, croaker:1.2, smelt:.7, whiting:.85, mullet:1.1, bellmouth:1.3, reeve:1.1};
+  mudlark:.2, lampwick:.2, dab:1.3, croaker:1.2, smelt:.7, whiting:.85, mullet:1.1, bellmouth:1.3, reeve:1.1,
+  spindrift:1.35, herring:.95, conger:.6, comber:1.0};
 const weighFish=(id,len,build)=>Math.max(4,(BUILD_K[id]||1)*len*len*len/100*(build||1));
 const rollBuild=()=>1+(Math.random()+Math.random()+Math.random()-1.5)*.13;
 function sizePct(id,len){ const F=FISH[id]; return clamp((len-F.size[0])/(F.size[1]-F.size[0]),0,1); }
@@ -2870,12 +2920,16 @@ function updateCast(dt){
   const c=S.cast; c.t+=dt;
   if (c.t-.1>=c.dur){
     const {x,y}=c.to;
-    if (REG()==='coast' && !noWashout() && S.swell && S.swell.y!=null && Math.abs(S.swell.y-y)<34*sc(y)){
+    // a cast into the wash is never caught here: the swell that left it is already past the stack, and the next is far off
+    // (the simulator counts on it; keep it so if SWELL's period or the band change)
+    if (REG()==='coast' && !noWashout() && S.swell && S.swell.y!=null && Math.abs(S.swell.y-y)<34*sc(y)*(S.swell.big?SWELL.big.band:1)){
       splash(x,y,12); ripple(x,y,30); noise(.4,{vol:.18,f:800,to:300,type:'lowpass'}); buzz(20);
-      toast('Washed out by the swell!','warn'); coachFor('Cast into the calm water between swells.',4);
+      toast(S.swell.big?'Washed out by the seventh wave!':'Washed out by the swell!','warn'); coachFor('Cast into the calm water between swells.',4);
       S.lost={t:0,pos:{x,y},snapped:false}; setState('lost'); return; }
     // the marsh: the tide may have moved since you aimed, and a cast onto a bank that's out goes splat (game/marsh.js)
     if (REG()==='marsh'){ c.spot=marshSpot(x,y); if (c.spot==='mud'){ marshMudCast(x,y); return; } }
+    // the coast: the white water may have come or gone while the cast was in the air (game/coast-sea.js)
+    if (REG()==='coast') c.spot=coastSpot(x,y);
     if (c.spot==='reeds' && !S.tut && Math.random()<modBase('snag',{spot:'reeds'})){
       splash(x,y,6); ripple(x,y,18); sfx.snap(); buzz([0,30,30,30]); shake(2);
       toast('Snagged in the reeds!','warn'); coachFor('Reeds snag ordinary rods. Ottilie sells a Reedcutter that slices right through.',5);
@@ -2909,7 +2963,9 @@ function spawnApproach(){
   if (!S.wait.echo) twinPick();   // with two floats out, the fish heads for either one
   const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.bow=atBowFoot(b.x,b.y);
   // the rare bites and the dry run count once a cast (as the simulator does); a fish that comes back after a spook is an ordinary one
-  w.fish=S.tut?'perch':w.echo||(w.rolled?pickW(poolFor(b.spot,w.lucky)):rollFish(b.spot,w.lucky,{bow:w.bow, path:onMoonpath(b.x,b.y)})); w.rolled=true; const F=FISH[w.fish];
+  // at the coast, a fish the seventh wave's churn or the lighthouse beam brought (game/coast-sea.js)
+  const at={bow:w.bow, path:onMoonpath(b.x,b.y), churn:!!w.churn, lit:!!w.lit};
+  w.fish=S.tut?'perch':w.echo||(w.rolled?pickW(poolFor(b.spot,w.lucky,at)):rollFish(b.spot,w.lucky,at)); w.rolled=true; const F=FISH[w.fish];
   const d=w.echo?rand(40,60):rand(85,150), mA=REG()==='marsh'?marshApproachFrom(b,d):null, ang=mA!=null?mA:rand(0,Math.PI*2);
   const x=clamp(b.x+Math.cos(ang)*d,20,W-20), y=clamp(b.y+Math.sin(ang)*d*.5,HZ+18,H-150);
   w.sh={x,y,ang:Math.atan2(b.y-y,b.x-x),alpha:0,flee:false};
@@ -2919,6 +2975,7 @@ function spawnApproach(){
 }
 function updateWaiting(dt){
   if (!riverWaiting(dt) || !marshWaiting(dt)) return;   // the river carries the float (game/river.js); the tide can strand it (game/marsh.js)
+  coastWaiting(dt);   // the seventh wave and the lighthouse beam bring a fish sooner (game/coast-sea.js)
   const w=S.wait, b=S.bob;
   if (w.sh){ const sh=w.sh;
     if (sh.flee){ sh.x+=Math.cos(sh.ang)*170*dt; sh.y+=Math.sin(sh.ang)*85*dt; sh.alpha-=dt*1.6; if (sh.alpha<=0) w.sh=null; }
@@ -3861,8 +3918,8 @@ window.addEventListener('pagehide',persistOnLeave);
 /* ---------- Drawing ---------- */
 /* Most fish share one body, shaped by their h (height as a share of length). A few have their own: the Steeple Gar's
    needle snout, the Gaslight Angler's great head, the Moonwhale Calf's whale's body and flukes, Old Gristle's
-   sturgeon's shovel snout and long upper tail, and the marsh eels' blunt heads and paddle tails (the Lampwick Eel's
-   burns at the tip like a wick). */
+   sturgeon's shovel snout and long upper tail, the marsh eels' blunt heads and paddle tails (the Lampwick Eel's
+   burns at the tip like a wick), the Wreck Conger's eel's body tapering to a point, and the Comber Tarpon's deep fork. */
 function fishPath(id,len){
   const F=FISH[id], h=len*F.h, p=new Path2D();
   if (id==='gar'){ p.moveTo(len*.5,-h*.06); p.lineTo(len*.24,-h*.36); p.bezierCurveTo(len*.12,-h*1.08,-len*.25,-h*1.0,-len*.4,-h*.32);
@@ -3887,6 +3944,8 @@ function tailPath(id,len){ const F=FISH[id], h=len*F.h, p=new Path2D();
   if (id==='gristle'){ p.moveTo(-len*.38,-h*.3); p.quadraticCurveTo(-len*.5,-h*1.1,-len*.63,-h*1.9); p.quadraticCurveTo(-len*.56,-h*.4,-len*.5,h*.2);
     p.quadraticCurveTo(-len*.52,h*.7,-len*.56,h*1.0); p.quadraticCurveTo(-len*.45,h*.6,-len*.38,h*.22); p.closePath(); return p; }   // a shark's tail: the top lobe far longer
   if (id==='mudlark'){ p.moveTo(-len*.38,-h*.7); p.quadraticCurveTo(-len*.56,-h*1.5,-len*.6,0); p.quadraticCurveTo(-len*.56,h*1.5,-len*.38,h*.7); p.closePath(); return p; }
+  if (id==='conger'){ p.moveTo(-len*.38,-h*.75); p.quadraticCurveTo(-len*.5,-h*.55,-len*.64,0); p.quadraticCurveTo(-len*.5,h*.55,-len*.38,h*.75); p.closePath(); return p; }   // a point, the fins running into it
+  if (id==='comber'){ p.moveTo(-len*.36,0); p.lineTo(-len*.62,-h*1.3); p.quadraticCurveTo(-len*.53,-h*.2,-len*.47,0); p.quadraticCurveTo(-len*.53,h*.2,-len*.62,h*1.3); p.closePath(); return p; }   // a tarpon's deep fork
   if (id==='lampwick'){ p.moveTo(-len*.38,-h*.7); p.quadraticCurveTo(-len*.48,-h*.6,-len*.53,-h*.12); p.lineTo(-len*.53,h*.12); p.quadraticCurveTo(-len*.48,h*.6,-len*.38,h*.7); p.closePath(); return p; }
   const k=id==='angler'?.62:1;
   p.moveTo(-len*.36,0); p.lineTo(-len*.6,-h*.85*k); p.quadraticCurveTo(-len*.5,0,-len*.6,h*.85*k); p.closePath(); return p; }
@@ -3896,19 +3955,20 @@ function whalePath(c,len){ c.fill(tailPath('calf',len)); c.fill(fishPath('calf',
    body heights; base: where it meets the back), and its eye (x, y as shares of length and height; r as a share of length). */
 const DORSAL={croaker:{a:.2,b:-.02,top:2.3,base:.85,spiny:true}, reeve:{a:.19,b:-.02,top:2.1,base:.86,spiny:true}, mullet:{a:.13,b:.01,top:1.9,base:.86,spiny:true},
   whiting:{a:.22,b:.07,top:1.85,base:.82}, mudlark:{a:.06,b:-.4,top:1.55,base:.86}, lampwick:{a:.06,b:-.4,top:1.5,base:.86}, dab:{a:.1,b:-.1,top:1.25,base:.8}, bellmouth:{a:.12,b:-.2,top:1.9,base:.82},
-  grayling:{a:.16,b:-.28,top:3.4,base:.8}, gristle:{a:-.2,b:-.34,top:1.5,base:.5}, brook:{a:.06,b:-.18,top:2,base:.8}, gar:{a:-.17,b:-.33,top:2.7,base:.78}, angler:{a:-.1,b:-.3,top:1.05,base:.6}, calf:{a:-.17,b:-.3,top:1.2,base:.86}, mayor:{a:.14,b:-.22,top:2.2,base:.8}};
+  grayling:{a:.16,b:-.28,top:3.4,base:.8}, gristle:{a:-.2,b:-.34,top:1.5,base:.5}, brook:{a:.06,b:-.18,top:2,base:.8}, gar:{a:-.17,b:-.33,top:2.7,base:.78}, angler:{a:-.1,b:-.3,top:1.05,base:.6}, calf:{a:-.17,b:-.3,top:1.2,base:.86},
+  spindrift:{a:.19,b:-.01,top:2.3,base:.86,spiny:true}, conger:{a:.2,b:-.46,top:2.1,base:.86}, comber:{a:.02,b:-.14,top:2.1,base:.82}, mayor:{a:.14,b:-.22,top:2.2,base:.8}};
 const DORSAL0={a:.14,b:-.22,top:1.65,base:.8};
 /* Fish with more than one fin along the back: the bass's soft second dorsal behind the spiny one, the whiting's three,
    the smelt's little adipose fin by the tail. */
 const FINS2={croaker:[{a:-.04,b:-.26,top:1.75,base:.8}], reeve:[{a:-.05,b:-.28,top:1.6,base:.82}], mullet:[{a:-.13,b:-.26,top:1.6,base:.78}],
-  whiting:[{a:.02,b:-.13,top:1.75,base:.8},{a:-.18,b:-.32,top:1.5,base:.72}], smelt:[{a:-.25,b:-.32,top:1.1,base:.6}]};
-const EELS=new Set(['mudlark','lampwick']);
-const EYE={mudlark:{x:.4,y:-.25,r:.03}, lampwick:{x:.4,y:-.25,r:.03}, dab:{x:.3,y:-.5,r:.042}, bellmouth:{x:.27,y:-.32,r:.04}, reeve:{x:.36,y:-.2,r:.036}, gristle:{x:.3,y:-.42,r:.022}, gar:{x:.21,y:-.12,r:.034}, angler:{x:.3,y:-.6,r:.036}, calf:{x:.33,y:.14,r:.018}};
+  whiting:[{a:.02,b:-.13,top:1.75,base:.8},{a:-.18,b:-.32,top:1.5,base:.72}], spindrift:[{a:-.04,b:-.26,top:1.7,base:.8}], smelt:[{a:-.25,b:-.32,top:1.1,base:.6}]};
+const EELS=new Set(['mudlark','lampwick','conger']);
+const EYE={mudlark:{x:.4,y:-.25,r:.03}, conger:{x:.4,y:-.3,r:.032}, comber:{x:.36,y:-.12,r:.05}, lampwick:{x:.4,y:-.25,r:.03}, dab:{x:.3,y:-.5,r:.042}, bellmouth:{x:.27,y:-.32,r:.04}, reeve:{x:.36,y:-.2,r:.036}, gristle:{x:.3,y:-.42,r:.022}, gar:{x:.21,y:-.12,r:.034}, angler:{x:.3,y:-.6,r:.036}, calf:{x:.33,y:.14,r:.018}};
 const EYE0={x:.34,y:-.18,r:.045};
 /* Up close, fish get more: past 44 px a gill line, a side fin, a darker back, a mouth and a glint in the eye; past 80 px
    fin rays, a lateral line and scales (except the catfish, the eel, and the bream, leafjack and mackerel, whose patterns
    already are their scales). Small fish in the scene stay simple, so they read at a glance. */
-const NO_SCALES=new Set(['reedwhisker','leafjack','kelpeel','bream','mackerel','angler','calf','gristle','barbel','mudlark','lampwick','dab']), OWN_MOUTH=new Set(['grouper','saltjaw','gar','angler','calf','gristle','barbel','mullet','bellmouth']);
+const NO_SCALES=new Set(['reedwhisker','leafjack','kelpeel','bream','mackerel','angler','calf','gristle','barbel','mudlark','lampwick','dab','conger','comber']), OWN_MOUTH=new Set(['grouper','saltjaw','gar','angler','calf','gristle','barbel','mullet','bellmouth','comber']);
 function fishRays(c,lw,pts){ c.strokeStyle='rgba(43,42,51,.32)'; c.lineWidth=clamp(lw*.4,.6,2.2); c.beginPath(); for (let i=0;i<pts.length;i+=4){ c.moveTo(pts[i],pts[i+1]); c.lineTo(pts[i+2],pts[i+3]); } c.stroke(); }
 /* `mut` draws a mutation on the fish (data/fish.js: MUTS): Glassy shows its bones through a clear body, Mossy wears moss
    and a flower along its back, and a Twin is two fish, the second a touch smaller behind the first. A Giant is just big. */
@@ -3917,6 +3977,7 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   if (shadow){ c.globalAlpha=alpha; c.fillStyle='rgba(10,26,34,.55)'; c.save(); c.rotate(tailSwing*.2); c.fill(tailPath(id,len)); c.restore(); const sh=fishPath(id,len); if (id==='gurnard') sh.addPath(gurnardWingPath(len,len*F.h)); c.fill(sh,'nonzero');
     if (id==='angler') anglerLure(c,len,h,Math.max(1,len*.02),true);   // its lure glows even as a shadow under the water
     if (id==='whiting') whitingLight(c,len,h,Math.max(1,len*.02),true); if (id==='lampwick'){ c.save(); c.rotate(tailSwing*.2); wickFlame(c,len,h,true); c.restore(); }
+    if (id==='herring') herringLights(c,len,h,true);
     c.restore(); return; }
   if (mut==='twin'){ c.save(); c.translate(-len*.2,-h*1.05); c.scale(.84,.84); drawFish(c,id,len,false,alpha,-tailSwing*.8,bare); c.restore(); }
   if (alpha<1) c.globalAlpha=alpha;
@@ -3935,6 +3996,7 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
     c.fillStyle=F.fin; c.fill(dors);
     if (det>1 && id!=='calf'){ const R=[]; for (let u=.18;u<.86;u+=.14){ const bx=lerp(da,db,u), q=(1-u)*(1-u)*da+2*u*(1-u)*dm+u*u*db, qy=(1-u)*(1-u)*dy0+2*u*(1-u)*(-h*D.top)+u*u*dy1; R.push(bx,lerp(dy0,dy1,u),lerp(bx,q,.92),lerp(lerp(dy0,dy1,u),qy,.92)); } c.save(); c.clip(dors); fishRays(c,lw,R); c.restore(); }
     c.lineWidth=lw; c.strokeStyle=INK; c.stroke(dors); }
+  if (id==='conger'){ const P=new Path2D(); P.moveTo(len*.02,h*.85); P.quadraticCurveTo(-len*.2,h*1.9,-len*.46,h*.8); P.closePath(); c.fillStyle=F.fin; c.fill(P); c.lineWidth=lw; c.stroke(P); }   // an eel's fin runs under it too
   if (det && id!=='calf'){ c.beginPath(); c.moveTo(-len*.04,h*.5); c.quadraticCurveTo(-len*.1,h*1.12,-len*.25,h*1.0); c.lineTo(-len*.24,h*.4); c.closePath(); c.fillStyle=F.fin; c.fill(); c.lineWidth=lw*.8; c.stroke(); c.lineWidth=lw; }
   const body=fishPath(id,len), glass=mut==='glassy'; if (glass){ c.globalAlpha=alpha*.42; } c.fillStyle=F.color; c.fill(body);
   c.save(); c.clip(body);
@@ -4014,6 +4076,21 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   if (id==='reeve'){ c.fillStyle='rgba(28,36,42,.3)'; c.beginPath(); c.ellipse(0,-h*.8,len*.55,h*.45,0,0,Math.PI*2); c.fill();   // a dark back, a silver flank, and old scars
     c.fillStyle='rgba(230,236,238,.35)'; c.beginPath(); c.ellipse(len*.02,h*.45,len*.46,h*.45,0,0,Math.PI*2); c.fill();
     c.strokeStyle='rgba(236,230,220,.5)'; c.lineWidth=Math.max(.8,lw*.4); c.beginPath(); c.moveTo(len*.06,-h*.5); c.lineTo(-len*.06,-h*.1); c.moveTo(-len*.14,-h*.6); c.lineTo(-len*.2,-h*.2); c.moveTo(-len*.1,-h*.55); c.lineTo(-len*.16,-h*.15); c.stroke(); }
+  // Gullrock Coast's later fish
+  if (id==='spindrift'){ c.fillStyle='rgba(40,52,62,.32)'; c.beginPath(); c.ellipse(0,-h*.82,len*.55,h*.5,0,0,Math.PI*2); c.fill();   // a sea bass's dark back, flecked with spray
+    c.fillStyle='rgba(250,252,250,.75)'; for (let i=0;i<13;i++){ const x=len*(.3-((i*5)%13)/13*.68), y=-h*(.4+(((i*7)%5)/4)*.5); c.beginPath(); c.arc(x,y,len*(i%3?.011:.017),0,Math.PI*2); c.fill(); }
+    c.fillStyle='rgba(30,36,44,.5)'; c.beginPath(); c.ellipse(len*.27,-h*.32,len*.03,h*.2,0,0,Math.PI*2); c.fill(); }   // and the dark spot on its gill cover
+  if (id==='herring'){ c.fillStyle='rgba(30,58,78,.35)'; c.beginPath(); c.ellipse(0,-h*.85,len*.55,h*.5,0,0,Math.PI*2); c.fill();   // a blue back and a silver flank
+    c.fillStyle='rgba(230,238,244,.5)'; c.beginPath(); c.ellipse(len*.02,h*.45,len*.48,h*.5,0,0,Math.PI*2); c.fill(); }
+  if (id==='conger'){ c.fillStyle='rgba(22,24,28,.32)'; c.fillRect(-len*.5,-h*1.1,len,h*.85);   // slate grey above, pale below, and a line of pores
+    c.fillStyle='rgba(226,222,212,.42)'; c.fillRect(-len*.5,h*.3,len,h*.8);
+    c.fillStyle='rgba(236,232,220,.6)'; for (let i=0;i<14;i++){ c.beginPath(); c.arc(len*(.34-i*.055),-h*.02,Math.max(.5,len*.006),0,Math.PI*2); c.fill(); } }
+  if (id==='comber'){ c.fillStyle='rgba(44,64,76,.3)'; c.beginPath(); c.ellipse(0,-h*.9,len*.55,h*.4,0,0,Math.PI*2); c.fill();   // dark-backed, and armoured in great mirror scales
+    const st=len*.085, r=h*.3; c.lineWidth=clamp(lw*.4,.6,2);
+    for (let x=len*.24,col=0;x>-len*.4;x-=st,col++) for (let row=-2;row<=2;row++){ const y=row*h*.5+(col%2?h*.25:0);
+      c.fillStyle='rgba(255,255,255,'+(.12+((col*7+row*5+20)%5)*.04).toFixed(2)+')'; c.beginPath(); c.arc(x,y,r,Math.PI-1,Math.PI+1); c.closePath(); c.fill();
+      if (det){ c.strokeStyle='rgba(40,50,58,.28)'; c.beginPath(); c.arc(x,y,r,Math.PI-1,Math.PI+1); c.stroke(); } }
+    c.fillStyle='rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(len*.04,-h*.2,len*.36,h*.12,-.05,0,Math.PI*2); c.fill(); }
   if (glass){ c.globalAlpha=alpha; c.strokeStyle='rgba(60,70,90,.55)'; c.lineWidth=Math.max(1,lw*.6); c.lineCap='round'; c.beginPath();   // the bones, showing through
     c.moveTo(len*.3,-h*.05); c.quadraticCurveTo(0,h*.02,-len*.38,0);
     for (let i=0;i<7;i++){ const x=len*(.2-i*.075); c.moveTo(x,-h*.02); c.lineTo(x-len*.05,-h*.6); c.moveTo(x,0); c.lineTo(x-len*.05,h*.55); } c.stroke();
@@ -4083,6 +4160,11 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
       c.fillStyle='#5E5852'; c.beginPath(); c.arc(0,kb,kb,0,Math.PI*2); c.fillRect(-kb*.35,kb,kb*.7,kl); c.fill(); c.fillRect(0,kb+kl*.78,kb*1.4,kb*.6); c.fillRect(0,kb+kl*.94,kb*1.1,kb*.6);
       c.strokeStyle=INK; c.lineWidth=Math.max(.7,lw*.35); c.beginPath(); c.arc(0,kb,kb,0,Math.PI*2); c.stroke(); c.strokeRect(-kb*.35,kb*2,kb*.7,kl-kb); c.restore(); } }
   if (id==='whiting') whitingLight(c,len,h,lw,false);
+  if (id==='herring') herringLights(c,len,h,false);
+  if (id==='comber'){ c.strokeStyle=INK; c.lineWidth=lw*.7; c.lineCap='round'; c.beginPath(); c.moveTo(len*.51,-h*.26); c.quadraticCurveTo(len*.44,-h*.02,len*.31,h*.04); c.stroke();   // the jaw, jutting up
+    c.fillStyle='#D6DDE0'; c.beginPath(); c.moveTo(len*.51,-h*.26); c.quadraticCurveTo(len*.5,h*.26,len*.32,h*.46); c.quadraticCurveTo(len*.43,h*.1,len*.51,-h*.26); c.fill(); c.lineWidth=lw*.55; c.stroke();
+    const D=DORSAL.comber, tt=(typeof S!=='undefined' && S.time)||0; c.strokeStyle=FISH.comber.fin; c.lineWidth=Math.max(1,lw*.5); c.beginPath();   // and the long thread off the back of its fin
+    c.moveTo(len*D.b,-h*(D.base-.05)); c.quadraticCurveTo(len*(D.b-.1),-h*(D.top-.2),len*(D.b-.28),-h*(1.15+Math.sin(tt*3)*.12)); c.stroke(); }
   if (mut==='mossy') drawMoss(c,id,len,h,lw);
   const E=EYE[id]||EYE0, ex=len*E.x, ey=h*E.y, er=Math.max(1.6,len*E.r);
   c.fillStyle=id==='angler'?'#F0E3B0':'#FFF8E8'; c.beginPath(); c.arc(ex,ey,er,0,Math.PI*2); c.fill(); c.lineWidth=lw*.6; c.strokeStyle=INK; c.stroke();
@@ -4106,6 +4188,15 @@ function wickFlame(c,len,h,shadow){ const tt=(typeof S!=='undefined' && S.time)|
   if (!shadow){ c.strokeStyle=INK; c.lineWidth=Math.max(1,len*.012); c.beginPath(); c.moveTo(fx+len*.01,0); c.lineTo(fx-len*.008,0); c.stroke(); }
   c.translate(fx,fy); c.scale(1,fl); c.fillStyle='#FFB54A'; c.beginPath(); c.moveTo(0,-r*3.2); c.quadraticCurveTo(r*1.3,-r*.8,0,r*.4); c.quadraticCurveTo(-r*1.3,-r*.8,0,-r*3.2); c.fill();
   c.fillStyle='#FFF2C4'; c.beginPath(); c.moveTo(0,-r*1.9); c.quadraticCurveTo(r*.6,-r*.5,0,r*.1); c.quadraticCurveTo(-r*.6,-r*.5,0,-r*1.9); c.fill(); c.restore(); }
+/** The Beacon Herring's lights: a row of pale-blue dots along its belly that glow, so it shows in the dark water and
+    rises to the lighthouse beam. They glow through the water even as a shadow. */
+function herringLights(c,len,h,shadow){ const tt=(typeof S!=='undefined' && S.time)||0;
+  c.save(); c.globalCompositeOperation='lighter';
+  for (let i=0;i<7;i++){ const x=len*(.28-i*.1), y=h*(.5-Math.abs(i-3)*.03), gl=.65+.35*Math.sin(tt*2.4-i*.8), R=len*.06;
+    const g=c.createRadialGradient(x,y,0,x,y,R); g.addColorStop(0,'rgba(170,226,255,'+(.55*gl).toFixed(3)+')'); g.addColorStop(1,'rgba(150,210,255,0)');
+    c.fillStyle=g; c.beginPath(); c.arc(x,y,R,0,Math.PI*2); c.fill(); }
+  c.globalCompositeOperation='source-over'; if (!shadow){ c.fillStyle='#E8FAFF'; for (let i=0;i<7;i++){ c.beginPath(); c.arc(len*(.28-i*.1),h*(.5-Math.abs(i-3)*.03),Math.max(.8,len*.014),0,Math.PI*2); c.fill(); } }
+  c.restore(); }
 /** The Will-o'-Whiting's light: a lamp on the barbel under its chin, bobbing, that you see before you see the fish. */
 function whitingLight(c,len,h,lw,shadow){ const tt=(typeof S!=='undefined' && S.time)||0, lx=len*.44+Math.sin(tt*1.7)*len*.01, ly=h*1.35, gl=.7+.3*Math.sin(tt*2.2);
   c.save(); if (!shadow){ c.strokeStyle=INK; c.lineWidth=Math.max(.8,lw*.45); c.beginPath(); c.moveTo(len*.42,h*.5); c.quadraticCurveTo(len*.4,h*1.0,lx,ly); c.stroke(); }
@@ -6276,6 +6367,7 @@ function drawCloud(x,y,s,a=1){
 }
 /** The lighthouse beam sweeping round. It burns in fog by day too, and fog turns it into a broad, soft cone. */
 function drawBeam(){
+  if (REG()==='coast') return drawCoastLamp();   // the coast's lamp sweeps the water too (game/coast-sea-art.js)
   const L=SC.lamp, fog=wxLook().fog, on=Math.max(PAL.beam,fog*.85); if (!L || on<.03) return; ctx.save(); ctx.globalAlpha=on; const a=S.time*.8, d=Math.cos(a), flash=Math.max(0,1-Math.abs(d)*3.5);
   const len=W*.42*Math.abs(d)*(1+fog*.35), dir=d>0?1:-1, up=9+fog*14, dn=7+fog*12;
   if (len>4){ const g=ctx.createLinearGradient(L.x,L.y,L.x+dir*len,L.y); g.addColorStop(0,'rgba(255,228,170,'+(.32-fog*.08).toFixed(3)+')'); g.addColorStop(1,'rgba(255,228,170,0)');
@@ -6346,7 +6438,7 @@ function drawFlower(x,y,s,kind){
   ctx.fillStyle='#F2CF63'; ctx.beginPath(); ctx.arc(x,y-s*.12,s*.16,0,Math.PI*2); ctx.fill();
 }
 function drawPads(){
-  if (REG()==='coast'){ drawKelp(); return; }
+  if (REG()==='coast'){ drawSeaBeam(); drawWash(); drawWreck(); drawKelp(); return; }
   if (REG()==='river'){ drawRiverWater(); return; }
   if (REG()==='marsh'){ drawMarshWater(); return; }
   G.padClusters.forEach((c,ci)=>{ SC.pads[ci].forEach((p,i)=>{
@@ -7197,7 +7289,7 @@ function drawGauge(){
   if (diving){ label=R.loot?(R.warn>0?'CATCHING ON THE BOTTOM · LET GO':'SNAGGED · LET GO'):R.warn>0?'DIVE INCOMING · LET GO':'DIVING · LET GO'; lc='#F5D08A'; }
   else if (R.jump){ label='TAP NOW'; lc='#F5D08A'; }
   else if (R.fade>0){ label='IT FADED · FOLLOW THE LINE'; lc='#D9DEE6'; }
-  else if (swellNear(R.y,95)){ label='SWELL COMING · EASE OFF'; lc='#F5D08A'; }
+  else if (swellNear(R.y,95)){ label=S.swell.big?'SEVENTH WAVE · EASE OFF':'SWELL COMING · EASE OFF'; lc='#F5D08A'; }
   else if (R.tug){ label='TUG · LET GO'; lc='#F5D08A'; }
   else if (R.F.beh==='tugger' && S.holding){ label='REEL BETWEEN TUGS'; lc='#CFE7B9'; }
   else if (R.surge>0){ label=R.loot?'FREE · HAUL HARD':'REEL HARD'; lc='#CFE7B9'; }
@@ -7256,7 +7348,7 @@ function layoutRegion(){
     G.lantern={x:W/2-64, y:H-150};
     sseed=77; SC.kelp=G.kelp.map(c=>{ const arr=[]; const n=c.r>W*.1?20:11;
       for (let i=0;i<n;i++){ const a=sr()*6.28, d=Math.sqrt(sr()); arr.push({ox:Math.cos(a)*d, oy:Math.sin(a)*d, len:.5+sr()*.7, ph:sr()*6.28, bulb:sr()<.5}); } return arr; });
-    SC.bank={L:[],R:[]}; SC.tails=[];
+    SC.bank={L:[],R:[]}; SC.tails=[]; layoutWreck();
   } else if (REG()==='river'){ layoutRiver();
   } else if (REG()==='marsh'){ layoutMarsh();
   } else {
@@ -7264,13 +7356,6 @@ function layoutRegion(){
     G.kelp=[]; G.stacks=[];
     G.lantern={x:W/2-90, y:H-145};
   }
-}
-function coastSpot(x,y){
-  const d=G.deep, dx=(x-d.x)/d.rx, dy=(y-d.y)/d.ry; if (dx*dx+dy*dy<1.25) return 'deep';
-  for (const k of G.kelp) if (Math.hypot(x-k.x,(y-k.y)*1.8) < k.r*1.1) return 'kelp';
-  for (const s of G.stacks) if (Math.hypot(x-s.x,(y-s.y)*2) < s.r*1.7) return 'rocks';
-  if (y < lerp(G.near,HZ+26,.8)) return 'far';
-  return 'open';
 }
 
 /* ---------- Coast backdrop ---------- */
@@ -7383,30 +7468,36 @@ function drawStacks(){ const t=S.time, c=ctx;
   c.fillStyle='#F2EFE8'; c.beginPath(); c.arc(gx+4.6*look,gy-3.2+Math.sin(t*.7)*.6,2.6,0,Math.PI*2); c.fill(); c.stroke();
   c.fillStyle='#E0A43A'; c.fillRect(look>0?gx+6.8:gx-9.8,gy-3.6,3,1.3); c.fillStyle=INK; c.beginPath(); c.arc(gx+5.4*look,gy-3.8,.6,0,Math.PI*2); c.fill(); }
 function drawSwell(){
-  const sw=S.swell; if (REG()!=='coast' || !sw || sw.y==null) return; const y=sw.y, k=sc(y), a=.25+.35*k;
+  const sw=S.swell; if (REG()!=='coast' || !sw) return;
+  drawSeventhBuilding();   // the far water darkening as a seventh wave builds (game/coast-sea-art.js)
+  if (sw.y==null) return; const y=sw.y, k=sc(y), big=sw.big, B=big?1.6:1, a=Math.min(.95,(.25+.35*k)*(big?1.35:1));
+  const crest=(dy,amp)=>{ ctx.beginPath(); for (let x=-20;x<=W+20;x+=20){ const yy=y+dy+Math.sin(x*.03+S.time*2)*amp*k; x===-20?ctx.moveTo(x,yy):ctx.lineTo(x,yy); } ctx.stroke(); };
   ctx.lineCap='round';
-  ctx.strokeStyle='rgba(10,40,55,'+(a*.5).toFixed(2)+')'; ctx.lineWidth=10*k; ctx.beginPath();
-  for (let x=-20;x<=W+20;x+=20){ const yy=y+6*k+Math.sin(x*.03+S.time*2)*3*k; x===-20?ctx.moveTo(x,yy):ctx.lineTo(x,yy); } ctx.stroke();
-  ctx.strokeStyle='rgba(235,245,248,'+a.toFixed(2)+')'; ctx.lineWidth=3.5*k; ctx.beginPath();
-  for (let x=-20;x<=W+20;x+=20){ const yy=y+Math.sin(x*.03+S.time*2)*3*k; x===-20?ctx.moveTo(x,yy):ctx.lineTo(x,yy); } ctx.stroke();
-  for (let i=0;i<6;i++){ const fx=((i*73+S.time*30)%(W+40))-20; ctx.fillStyle='rgba(245,250,250,'+(a*.8).toFixed(2)+')'; ctx.beginPath(); ctx.arc(fx,y-2*k+Math.sin(fx*.03+S.time*2)*3*k,2.2*k,0,Math.PI*2); ctx.fill(); }
+  // the trough ahead of the crest, then the crest; a seventh wave stands taller, with a second line of white behind it
+  ctx.strokeStyle='rgba(10,40,55,'+(a*.5).toFixed(2)+')'; ctx.lineWidth=10*k*B; crest(6*k*B,3*B);
+  if (big){ ctx.strokeStyle='rgba(16,52,66,'+(a*.45).toFixed(2)+')'; ctx.lineWidth=7*k; crest(-5*k,3.4); ctx.strokeStyle='rgba(235,245,248,'+(a*.55).toFixed(2)+')'; ctx.lineWidth=2.2*k; crest(-9*k,3.6); }
+  ctx.strokeStyle='rgba(235,245,248,'+a.toFixed(2)+')'; ctx.lineWidth=3.5*k*B; crest(0,3*B);
+  for (let i=0;i<(big?11:6);i++){ const fx=((i*73+S.time*30)%(W+40))-20; ctx.fillStyle='rgba(245,250,250,'+(a*.8).toFixed(2)+')'; ctx.beginPath(); ctx.arc(fx,y-2*k*B+Math.sin(fx*.03+S.time*2)*3*k*B,2.2*k*B,0,Math.PI*2); ctx.fill(); }
 }
 function updateSwell(dt){
   if (REG()!=='coast'){ S.swell=null; S.kick=0; G.player.y=G.playerBaseY; G.rodBase.y=G.rodBaseY; return; }
-  const sw=S.swell||(S.swell={t:2.5,y:null,prev:null,hit:false});
-  sw.t+=dt; const ph=sw.t%7.5, travel=4.6; sw.prev=sw.y;
-  if (ph<travel){ const u=ph/travel; sw.y=lerp(HZ+8,H-118,Math.pow(u,1.35)); if (ph<dt*1.5) sw.hit=false; } else sw.y=null;
-  if (sw.y!=null && !sw.hit && sw.y>H-175){ sw.hit=true; S.kick=1; noise(.6,{vol:.16,f:900,to:300,type:'lowpass'});
-    for (let i=0;i<14;i++) S.particles.push({x:W/2+rand(-60,60),y:H-185,vx:rand(-60,60),vy:rand(-160,-60),g:420,life:0,max:rand(.4,.8),r:rand(1.4,3),c:'rgba(235,245,248,'}); buzz(15); }
+  if (!S.swell){ CS.warned=-1; CS.wash=CS.wash.map(()=>0); }
+  const sw=S.swell||(S.swell={t:2.5,y:null,prev:null,hit:false,n:-1,big:false});
+  // the swells come every SWELL.period seconds, and every seventh is a big one (game/coast-sea.js)
+  sw.t+=dt; const n=Math.floor(sw.t/SWELL.period), newOne=n!==sw.n; sw.n=n; sw.prev=newOne?null:sw.y; sw.y=swellY(n,sw.t); sw.big=swellBig(n);
+  if (newOne) sw.hit=false;
+  if (sw.y!=null && !sw.hit && sw.y>H-175){ sw.hit=true; S.kick=sw.big?1.7:1; noise(sw.big?1:.6,{vol:sw.big?.24:.16,f:sw.big?600:900,to:sw.big?160:300,type:'lowpass'}); if (sw.big) tone(70,.6,{to:45,vol:.08,type:'sine'});
+    for (let i=0;i<(sw.big?26:14);i++) S.particles.push({x:W/2+rand(-60,60)*(sw.big?1.5:1),y:H-185,vx:rand(-60,60),vy:rand(-160,-60)*(sw.big?1.4:1),g:420,life:0,max:rand(.4,.8),r:rand(1.4,3),c:'rgba(235,245,248,'}); buzz(sw.big?[0,30,40,30]:15); }
   S.kick=Math.max(0,(S.kick||0)-dt*1.1);
   const bob=(Math.sin(S.time*1.6)*1.6+S.kick*Math.sin(S.time*8)*5)*(hasPart('keel')?.5:1);
   G.player.y=G.playerBaseY+bob; G.rodBase.y=G.rodBaseY+bob; S.bob_y=bob;
-  // a swell crossing the bobber lifts it; crossing your fish while you reel spikes tension
+  // a swell crossing the bobber lifts it; crossing your fish while you reel spikes tension; breaking on a stack, it leaves white water
   const crossed=yy=>sw.prev!=null && sw.y!=null && sw.prev<yy && sw.y>=yy;
-  if (S.bob && (S.state==='waiting'||S.state==='bite') && crossed(S.bob.y)){ S.bob.dip=-1.5; ripple(S.bob.x,S.bob.y,22); }
+  if (S.bob && (S.state==='waiting'||S.state==='bite') && crossed(S.bob.y)){ S.bob.dip=sw.big?-2.6:-1.5; ripple(S.bob.x,S.bob.y,sw.big?34:22); }
   if (S.state==='reeling' && S.reel && crossed(S.reel.y)){
-    if (S.holding){ S.reel.tension+=.3*swellSoftness(); shake(3*swellSoftness()); toast('Swell! Ease off as it passes.','warn'); } else { toast('Rode out the swell!','good'); }
-    splash(S.reel.x,S.reel.y,10); }
+    if (S.holding){ S.reel.tension+=.3*swellSoftness()*(sw.big?SWELL.big.hit:1); shake(3*swellSoftness()*(sw.big?1.8:1)); toast(sw.big?'The seventh wave! Ease off!':'Swell! Ease off as it passes.','warn'); } else { toast(sw.big?'Rode out the seventh wave!':'Rode out the swell!','good'); }
+    splash(S.reel.x,S.reel.y,sw.big?16:10); }
+  G.stacks.forEach((s,i)=>{ if (crossed(s.y)) washBreak(i,sw.big); });
 }
 function swellNear(yy,range){ const sw=S.swell; return REG()==='coast' && sw && sw.y!=null && sw.y<yy && yy-sw.y<range; }
 /** The skiff's deck, seat, rivets, rope and cleat, painted once; drawSkiffDeck lays it on the hull, riding the swell. */
@@ -7455,6 +7546,234 @@ function drawSkiffDeck(){
   const look=Math.sin(S.time*.5)>0?1:-1; ctx.fillStyle='#F2EFE8'; ctx.beginPath(); ctx.arc(gx+5*look,gy2-4,3,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#E0A43A'; ctx.fillRect(look>0?gx+7.5:gx-10.5,gy2-4.5,3,1.5);
   ctx.fillStyle=INK; ctx.beginPath(); ctx.arc(gx+6*look,gy2-4.8,.7,0,Math.PI*2); ctx.fill();
 }
+
+/* ---------- Gullrock Coast: the seventh wave, the wash, the wreck and the lighthouse beam (data/coast.js) ---------- */
+/* The swells roll in every few seconds (game/coast.js: updateSwell), and every seventh is a big one: the far water darkens
+   as it builds, it hits a line harder and washes out a wider strip, and for a few seconds after it passes your float the
+   water is churned, so a fish that's on its way comes at once, and now and then it's the Comber Tarpon. Each swell that
+   breaks on a sea stack leaves white water there for a few seconds (the wash), where fish hunt and bite sooner. The old
+   wreck lies past the stacks, a spot of its own where treasure washes out of her more often. At night and in fog the
+   lighthouse beam sweeps the water; when it crosses your float, anything that glows comes looking.
+   The seventh wave, the wash and the beam all run off the swell's own clock and S.time, nothing saved; the odds and the
+   modifiers read only the save and what a cast carries (at.churn, at.lit), so the balance simulator has its own (game/sim.js).
+   save.coastTips holds the tips already given. CS holds the moment-to-moment state. */
+const CS={wash:[], lit:false, warned:-1, tipT:-99};
+function coastTips(){ if (!isObj(save.coastTips)) save.coastTips={}; return save.coastTips; }
+/** One of the coast's tips, once each, and not on top of another of them. */
+function coastTip(k,secs){ const T=coastTips(); if (T[k] || S.tut || S.time-CS.tipT<16) return false; T[k]=1; CS.tipT=S.time; persist(); coachFor(COAST_LINES[k],secs||8); return true; }
+
+/* ---------- the seventh wave ---------- */
+/** Whether swell number n (counted from when you arrived) is a seventh wave. */
+const swellBig = n => n>=0 && n%SWELL.set===SWELL.set-1;
+/** Where swell number n's crest is at swell-clock time t: null before it rises and after it reaches the boat. */
+function swellY(n,t){ const ph=t-n*SWELL.period; if (ph<0 || ph>=SWELL.travel) return null; return lerp(HZ+8,H-118,Math.pow(ph/SWELL.travel,1.35)); }
+/** How long after it rises a swell takes to reach y (the inverse of swellY). */
+const swellReach = y => SWELL.travel*Math.pow(clamp((y-(HZ+8))/(H-118-HZ-8),0,1),1/1.35);
+/** Whether the seventh wave has the water at y churned now: it passed there, and not long ago. */
+function churnedAt(y){ const sw=S.swell; if (REG()!=='coast' || !sw) return false; const n=Math.floor(sw.t/SWELL.period), at=swellReach(y);
+  for (const k of [n,n-1]){ if (!swellBig(k)) continue; const since=sw.t-k*SWELL.period-at; if (since>=0 && since<SWELL.big.churn) return true; }
+  return false; }
+/** Seconds until the next seventh wave rises on the horizon (0 while one is rolling in). */
+function seventhIn(){ const sw=S.swell; if (!sw) return Infinity; const P=SWELL.period, n=Math.floor(sw.t/P);
+  if (swellBig(n) && sw.t-n*P<SWELL.travel) return 0;
+  for (let k=n+1;k<=n+SWELL.set;k++) if (swellBig(k)) return k*P-sw.t;
+  return Infinity; }
+/** Playtest: the next swell to rise is a seventh wave (a few seconds off, so you can watch it build). */
+function seventhNext(){ const sw=S.swell; if (!sw) return; const P=SWELL.period, n=Math.floor(sw.t/P), k=Math.ceil((n+1-(SWELL.set-1))/SWELL.set)*SWELL.set+SWELL.set-1;
+  sw.t=Math.max(sw.t,k*P-SWELL.big.warn-1.5); sw.prev=null; CS.warned=-1; }
+
+/* ---------- the wash ---------- */
+/** Where a stack's white water lies: an ellipse round its foot, spilling toward the boat. */
+function washOf(s){ return {x:s.x, y:s.y+s.r*WASH.down, rx:s.r*WASH.reach, ry:s.r*WASH.reach*.4}; }
+/** How much white water is left at stack i, 1 just broken to 0 gone. */
+const washLeft = i => clamp((CS.wash[i]||0)/WASH.last,0,1);
+/** The stack whose white water is at (x, y), if any is still there. */
+function washAt(x,y){ for (let i=0;i<(G.stacks||[]).length;i++){ if (washLeft(i)<=0) continue; const E=washOf(G.stacks[i]);
+    if (Math.pow((x-E.x)/E.rx,2)+Math.pow((y-E.y)/E.ry,2)<1) return i; }
+  return -1; }
+/** A swell breaking on a stack: the white water, a burst of spray, and a thump. */
+function washBreak(i,big){ const s=G.stacks[i], k=sc(s.y); CS.wash[i]=WASH.last*(big?1.3:1);
+  for (let q=0;q<Math.round((big?16:9)*k);q++) S.particles.push({x:s.x+rand(-1,1)*s.r,y:s.y-rand(0,s.h*.25),vx:rand(-50,50)*k,vy:-rand(60,big?190:130)*k,g:380,life:0,max:rand(.45,.9),r:rand(1.2,2.6)*k,c:'rgba(240,246,246,'});
+  if (k>.7) noise(.25,{vol:.05*k*(big?1.6:1),f:1200,to:400,type:'lowpass'}); }
+
+/* ---------- the wreck ---------- */
+/** Whether (x, y) is at the wreck: its hull, and the water close round it. */
+function atWreck(x,y){ const w=G.wreck; return !!w && Math.pow((x-w.x)/(w.r*1.35),2)+Math.pow((y-w.y)/(w.r*.55),2)<1; }
+
+/* ---------- the lighthouse beam ---------- */
+/** How strongly the lamp burns: at night, and in fog by day (as game/scenery-live.js draws it). */
+const beamOn = () => Math.max(PAL.beam,wxLook().fog*.85);
+/** Where the beam points now: its angle down from level, seen from the foot of the lighthouse, while it sweeps the
+    water (null while it faces inland). */
+function beamAngle(t){ const u=((t/BEAM.turn)%1+1)%1; return u<.5 ? lerp(BEAM.span[0],BEAM.span[1],u/.5) : null; }
+/** The foot of the lighthouse, on the horizon below the lamp: where the beam's path across the water starts. */
+const beamFoot = () => SC.lamp ? {x:SC.lamp.x, y:HZ} : null;
+/** Whether the beam is on (x, y) now. */
+function beamOnAt(x,y){ const F=beamFoot(), a=beamAngle(S.time); if (!F || a==null || beamOn()<.3 || REG()!=='coast') return false;
+  return Math.abs(Math.atan2(y-F.y,x-F.x)-a)<BEAM.width/2; }
+
+/* ---------- the spots ---------- */
+/** What the coast makes of (x, y): the white water while a stack has some, the wreck, the trench, the kelp, the stacks,
+    far water, or open water. */
+function coastSpot(x,y){
+  if (washAt(x,y)>=0) return 'wash';
+  if (atWreck(x,y)) return 'wreck';
+  const d=G.deep, dx=(x-d.x)/d.rx, dy=(y-d.y)/d.ry; if (dx*dx+dy*dy<1.25) return 'deep';
+  for (const k of G.kelp) if (Math.hypot(x-k.x,(y-k.y)*1.8) < k.r*1.1) return 'kelp';
+  for (const s of G.stacks) if (Math.hypot(x-s.x,(y-s.y)*2) < s.r*1.7) return 'rocks';
+  if (y < lerp(G.near,HZ+26,.8)) return 'far';
+  return 'open';
+}
+/** The wreck, placed as the marsh's banks are: out from the boat (WRECK.d) and across. */
+function layoutWreck(){ G.wreck={x:W*WRECK.x, y:lerp(G.near,HZ+26,WRECK.d), r:W*WRECK.r}; if (CS.wash.length!==G.stacks.length) CS.wash=G.stacks.map(()=>0); SC.wreckArt=null; }
+
+/* ---------- the coast in the modifiers (game/mods.js) ---------- */
+/** Fish hunt in the white water, and treasure washes out of the wreck. */
+function coastMods(add){ if (REG()!=='coast') return;
+  add('coast','The wash','bite',WASH.bite,{when:{region:'coast', spot:'wash'}});
+  add('coast','The wreck','treasure',WRECK.treasure,{when:{region:'coast', spot:'wreck'}}); }
+
+/* ---------- while you wait ---------- */
+/** Each frame at the coast while a float is out: the seventh wave's churn and the beam each bring a fish at once, if
+    none is on its way yet (not a treasure snag: that keeps its own time). Their marks go on the wait (churn, lit), and
+    spawnApproach hands them to the odds. */
+function coastWaiting(dt){ if (REG()!=='coast' || !S.bob || !S.wait) return;
+  const w=S.wait, b=S.bob; if (w.phase!=='empty' || w.echo || w.loot || S.tut) return;
+  if (!w.churn && churnedAt(b.y)){ w.churn=true; w.t=Math.min(w.t,SWELL.big.in); b.dip=-2.4; ripple(b.x,b.y,30); }
+  if (!w.lit && beamOnAt(b.x,b.y)){ w.lit=true; w.t=Math.min(w.t,BEAM.in); } }
+
+/* ---------- each frame ---------- */
+/** The white water fading, the seventh wave's warning as it builds, and the coast's tips. */
+function coastUpdate(dt){ if (REG()!=='coast'){ CS.lit=false; return; }
+  for (let i=0;i<CS.wash.length;i++) CS.wash[i]=Math.max(0,CS.wash[i]-dt);
+  const sw=S.swell; if (!sw) return;
+  const tin=seventhIn(), n=Math.floor(sw.t/SWELL.period);
+  if (tin>0 && tin<SWELL.big.warn && CS.warned!==n){ CS.warned=n;
+    noise(1.6,{vol:.07,f:240,to:90,type:'lowpass'}); tone(55,1.2,{to:42,vol:.05,type:'sine'});
+    if (S.state!=='reeling' && !coastTip('seventh',9)) news('A big swell is building out there','warn'); }
+  CS.lit=!!S.bob && beamOnAt(S.bob.x,S.bob.y);
+  if (S.state==='idle' && save.coastSeen){
+    if (CS.wash.some(v=>v>0) && coastTip('wash')) return;
+    if (coastTip('wreck')) return;
+    if (beamOn()>.3) coastTip('beam'); } }
+
+/* ---------- Gullrock Coast drawn: the wreck, the wash, the lighthouse beam on the water, the seventh wave building ---------- */
+/* The wreck is an old wooden fishing smack, sunk by the stern and listing, her bow up out of the water, her ribs showing
+   amidships and her mainmast snapped and leaning, with a scrap of tan sail on the yard. She's painted once into her own
+   canvas (SC.wreckArt); the water lapping round her, the sail's flutter, the cormorant drying its wings on the yard and,
+   at night, a light that moves under her are drawn each frame. Light from the upper left, as everywhere. */
+const WRK={hull:'#5C4A3B', shade:'#433428', light:'#7B6550', rib:'#3E3127', band:'#9C7A3E', sail:'#C9B48C', sailS:'#A8916A', weed:'#55602A'};
+/** The wreck's shapes, in her own space: (0, 0) is the middle of her waterline, r her half-length. */
+function wreckHull(c,r){ c.beginPath(); c.moveTo(-r*1.02,0); c.lineTo(-r*1.08,-r*.5); c.quadraticCurveTo(-r*1.02,-r*.6,-r*.9,-r*.56);
+  c.quadraticCurveTo(-r*.4,-r*.42,r*.12,-r*.2); c.lineTo(r*.2,0); c.closePath(); }
+const WRECK_RIBS=[.26,.4,.54,.68,.8];
+const wreckMastFoot = r => ({x:-r*.42, y:-r*.4});
+const wreckMastTop = r => ({x:r*.08, y:-r*1.55});
+function buildWreck(){ const w=G.wreck, r=w.r, pad=r*.4, bx=Math.floor(w.x-r*1.3), by=Math.floor(w.y-r*1.75), bw=Math.ceil(r*2.6), bh=Math.ceil(r*1.75+pad);
+  const cv=document.createElement('canvas'); cv.width=Math.round(bw*DPR); cv.height=Math.round(bh*DPR);
+  const c=cv.getContext('2d'); c.setTransform(DPR,0,0,DPR,(w.x-bx)*DPR,(w.y-by)*DPR); sseed=941;
+  const lw=Math.max(1,r*.03);
+  // the ribs amidships, curving up out of the water where her planking's gone, each with a lit edge
+  for (const u of WRECK_RIBS){ const x=r*u, top=-r*(.42-u*.22), lean=r*.05;
+    c.strokeStyle=WRK.rib; c.lineWidth=r*.05; c.lineCap='round'; c.beginPath(); c.moveTo(x-lean,r*.02); c.quadraticCurveTo(x-r*.03,top*.6,x+lean*.6,top); c.stroke();
+    c.strokeStyle='rgba(255,236,200,.18)'; c.lineWidth=r*.015; c.beginPath(); c.moveTo(x-lean-r*.015,0); c.quadraticCurveTo(x-r*.045,top*.6,x+lean*.6-r*.015,top); c.stroke();
+    c.strokeStyle=INK; c.lineWidth=lw*.8; c.beginPath(); c.moveTo(x-lean+r*.025,r*.02); c.quadraticCurveTo(x,top*.6,x+lean*.6+r*.025,top+r*.01); c.stroke(); }
+  // a stringer still joining the rib tops, half fallen
+  c.strokeStyle=WRK.shade; c.lineWidth=r*.035; c.beginPath(); c.moveTo(r*.18,-r*.2); c.quadraticCurveTo(r*.45,-r*.27,r*.66,-r*.2); c.stroke();
+  // the hull: dark planks, the lit bow on the left, the shade under her rail, a faded ochre band where her name was
+  wreckHull(c,r); c.fillStyle=WRK.hull; c.fill();
+  c.save(); wreckHull(c,r); c.clip();
+  c.fillStyle=WRK.light; c.beginPath(); c.moveTo(-r*1.1,0); c.lineTo(-r*1.1,-r*.62); c.lineTo(-r*.7,-r*.52); c.lineTo(-r*.78,0); c.closePath(); c.fill();
+  c.fillStyle=WRK.shade; c.beginPath(); c.moveTo(-r*.6,0); c.lineTo(-r*.5,-r*.36); c.lineTo(r*.25,-r*.12); c.lineTo(r*.25,0); c.closePath(); c.fill();
+  c.strokeStyle='rgba(25,18,12,.45)'; c.lineWidth=Math.max(.7,r*.012);
+  for (let i=1;i<6;i++){ const f=i/6; c.beginPath(); c.moveTo(-r*1.08,-r*.55*(1-f)); c.quadraticCurveTo(-r*.45,-r*.42*(1-f)-r*.02,r*.2,-r*.18*(1-f)); c.stroke(); }   // her planks
+  c.strokeStyle='rgba(255,236,200,.12)'; for (let i=1;i<6;i++){ const f=i/6; c.beginPath(); c.moveTo(-r*1.08,-r*.55*(1-f)-1); c.quadraticCurveTo(-r*.45,-r*.42*(1-f)-r*.02-1,r*.2,-r*.18*(1-f)-1); c.stroke(); }
+  c.fillStyle=WRK.band; c.globalAlpha=.55; c.beginPath(); c.moveTo(-r*1.06,-r*.45); c.quadraticCurveTo(-r*.5,-r*.36,r*.05,-r*.17); c.lineTo(r*.05,-r*.12); c.quadraticCurveTo(-r*.5,-r*.3,-r*1.06,-r*.38); c.closePath(); c.fill(); c.globalAlpha=1;
+  c.fillStyle='rgba(20,16,14,.5)'; c.fillRect(-r*1.2,-r*.1,r*1.5,r*.12);   // wet at the waterline
+  c.fillStyle='#D9D2C2'; for (let i=0;i<16;i++){ const x=-r*1.0+sr()*r*1.15, y=-r*.08-sr()*r*.08, b=Math.max(.8,r*.025);   // barnacles
+    c.beginPath(); c.moveTo(x-b,y+b*.6); c.lineTo(x,y-b); c.lineTo(x+b,y+b*.6); c.closePath(); c.fill(); }
+  c.fillStyle='rgba(84,98,40,.75)'; for (let i=0;i<9;i++){ const x=-r*.95+sr()*r*1.1, l=r*(.06+sr()*.1); c.beginPath(); c.moveTo(x-r*.02,-r*.1); c.quadraticCurveTo(x+r*.01,-r*.03,x,l*.4); c.lineTo(x+r*.02,-r*.1); c.closePath(); c.fill(); }   // weed hanging
+  c.restore();
+  wreckHull(c,r); c.strokeStyle=INK; c.lineWidth=lw; c.stroke();
+  // the rail along the top of her side, and the stem post at the bow
+  c.strokeStyle=WRK.light; c.lineWidth=r*.03; c.beginPath(); c.moveTo(-r*1.06,-r*.54); c.quadraticCurveTo(-r*.6,-r*.48,-r*.1,-r*.27); c.stroke();
+  c.fillStyle=WRK.shade; c.beginPath(); c.moveTo(-r*1.08,-r*.5); c.lineTo(-r*1.15,-r*.66); c.lineTo(-r*1.08,-r*.7); c.lineTo(-r*1.0,-r*.56); c.closePath(); c.fill(); c.strokeStyle=INK; c.lineWidth=lw*.8; c.stroke();
+  // the mast: snapped, leaning aft, with its yard across and stays still running to the bow
+  const F=wreckMastFoot(r), T=wreckMastTop(r);
+  c.strokeStyle='rgba(43,42,51,.6)'; c.lineWidth=Math.max(.6,r*.01); c.beginPath(); c.moveTo(T.x-r*.02,T.y+r*.1); c.quadraticCurveTo(-r*.6,-r*.9,-r*1.12,-r*.66); c.moveTo(T.x+r*.01,T.y+r*.12); c.quadraticCurveTo(r*.4,-r*.6,r*.62,r*.02); c.stroke();
+  c.strokeStyle=WRK.shade; c.lineWidth=r*.07; c.lineCap='butt'; c.beginPath(); c.moveTo(F.x,F.y); c.lineTo(T.x,T.y); c.stroke();
+  c.strokeStyle=WRK.light; c.lineWidth=r*.025; c.beginPath(); c.moveTo(F.x-r*.02,F.y); c.lineTo(T.x-r*.025,T.y+r*.01); c.stroke();
+  c.strokeStyle=INK; c.lineWidth=lw*.8; for (const sd of [-1,1]){ c.beginPath(); c.moveTo(F.x+sd*r*.035,F.y); c.lineTo(T.x+sd*r*.035,T.y); c.stroke(); }
+  c.fillStyle='#EADFCB'; c.beginPath(); c.moveTo(T.x-r*.035,T.y); c.lineTo(T.x-r*.02,T.y-r*.08); c.lineTo(T.x,T.y-r*.02); c.lineTo(T.x+r*.015,T.y-r*.1); c.lineTo(T.x+r*.035,T.y); c.closePath(); c.fill(); c.stroke();   // splintered top
+  const yA=lerp(F.y,T.y,.72), xA=lerp(F.x,T.x,.72); c.strokeStyle=WRK.shade; c.lineWidth=r*.04; c.lineCap='round'; c.beginPath(); c.moveTo(xA-r*.42,yA+r*.14); c.lineTo(xA+r*.4,yA-r*.1); c.stroke();
+  c.strokeStyle=INK; c.lineWidth=lw*.6; c.beginPath(); c.moveTo(xA-r*.42,yA+r*.14); c.lineTo(xA+r*.4,yA-r*.1); c.stroke();
+  SC.wreckArt={cv,bx,by,bw,bh,key:W+'x'+H+'@'+DPR}; }
+/** The scrap of sail left on the yard, flapping. */
+function wreckSail(c,r,t){ const F=wreckMastFoot(r), T=wreckMastTop(r), yA=lerp(F.y,T.y,.72), xA=lerp(F.x,T.x,.72), fl=Math.sin(t*2.3)*r*.05, fl2=Math.sin(t*3.1+1)*r*.04;
+  const p=new Path2D(); p.moveTo(xA-r*.32,yA+r*.12); p.lineTo(xA+r*.05,yA+r*.01); p.quadraticCurveTo(xA+r*.02+fl,yA+r*.3,xA-r*.06+fl2,yA+r*.52);
+  p.lineTo(xA-r*.12+fl2,yA+r*.44); p.lineTo(xA-r*.17+fl,yA+r*.56); p.quadraticCurveTo(xA-r*.3+fl,yA+r*.36,xA-r*.32,yA+r*.12); p.closePath();
+  c.fillStyle=WRK.sail; c.fill(p); c.save(); c.clip(p); c.fillStyle=WRK.sailS; c.fillRect(xA-r*.1,yA,r*.3,r*.6); c.restore();
+  c.strokeStyle=INK; c.lineWidth=Math.max(.8,r*.022); c.stroke(p); }
+/** A cormorant on the yard, now and then spreading its wings to dry. */
+function wreckBird(c,r,t){ const F=wreckMastFoot(r), T=wreckMastTop(r), yA=lerp(F.y,T.y,.72), x=lerp(F.x,T.x,.72)+r*.26, y=yA-r*.06-r*.02, k=r/40;
+  const open=clamp(Math.sin(t*.23)*3-1.6,0,1), flap=open*(1+Math.sin(t*5)*.08);
+  c.save(); c.translate(x,y); c.scale(k,k); c.fillStyle='#2A2C30'; c.strokeStyle=INK; c.lineWidth=1;
+  if (flap>.02) for (const sd of [-1,1]){ c.beginPath(); c.moveTo(0,-6); c.quadraticCurveTo(sd*10*flap,-14,sd*14*flap,-4-2*flap); c.quadraticCurveTo(sd*8*flap,-4,0,-3); c.closePath(); c.fill(); c.stroke(); }
+  c.beginPath(); c.ellipse(0,-5,2.8,5,0,0,Math.PI*2); c.fill(); c.stroke();
+  c.beginPath(); c.moveTo(0,-9); c.quadraticCurveTo(1.6,-13,.6,-15); c.lineWidth=2; c.strokeStyle='#2A2C30'; c.stroke();
+  c.fillStyle='#2A2C30'; c.beginPath(); c.arc(.6,-15.4,1.8,0,Math.PI*2); c.fill(); c.fillStyle='#C9A15A'; c.fillRect(1.8,-16,3.4,.9); c.fillStyle='#8FB6A0'; c.fillRect(.6,-16,.9,.9);
+  c.restore(); }
+function drawWreck(){ const w=G.wreck; if (!w) return; const c=ctx, t=S.time, r=w.r, k=sc(w.y);
+  if (!SC.wreckArt || SC.wreckArt.key!==W+'x'+H+'@'+DPR) buildWreck();
+  // her reflection, a dark smear under her
+  c.fillStyle='rgba(16,30,38,.3)'; c.beginPath(); c.ellipse(w.x-r*.35,w.y+r*.08,r*.9,r*.12,0,0,Math.PI*2); c.fill();
+  // at night, a light moves under her now and then: the lights coast folk talk about
+  const nl=PAL.dark>.2 ? clamp(Math.sin(t*.17)*2-1,0,1) : 0;
+  if (nl>0){ c.save(); c.globalCompositeOperation='lighter'; const lx=w.x+Math.sin(t*.4)*r*.7, ly=w.y+r*.18, g=c.createRadialGradient(lx,ly,0,lx,ly,r*.5);
+    g.addColorStop(0,'rgba(150,230,200,'+(.32*nl).toFixed(3)+')'); g.addColorStop(1,'rgba(150,230,200,0)'); c.fillStyle=g; c.beginPath(); c.ellipse(lx,ly,r*.5,r*.18,0,0,Math.PI*2); c.fill(); c.restore(); }
+  const A=SC.wreckArt; c.drawImage(A.cv,A.bx,A.by,A.bw,A.bh);
+  c.save(); c.translate(w.x,w.y); wreckSail(c,r,t); wreckBird(c,r,t); c.restore();
+  // water lapping at her: a breathing line of foam along the waterline, and a ring round the ribs
+  c.strokeStyle='rgba(240,246,246,'+(.35+.2*Math.sin(t*1.9)).toFixed(2)+')'; c.lineWidth=1.4*k; c.beginPath(); c.moveTo(w.x-r*1.08,w.y+1); c.quadraticCurveTo(w.x-r*.4,w.y+2.5+Math.sin(t*1.9)*1.2,w.x+r*.86,w.y+1); c.stroke();
+  for (const u of WRECK_RIBS){ const a=.25+.2*Math.sin(t*2.1+u*9); c.strokeStyle='rgba(240,246,246,'+a.toFixed(2)+')'; c.lineWidth=1*k; c.beginPath(); c.ellipse(w.x+r*u,w.y+r*.02,r*.05+Math.sin(t*2+u*7),r*.015+.6,0,0,Math.PI*2); c.stroke(); } }
+/** White water at the foot of each sea stack a swell has just broken on: a lacy patch that spreads and fades. */
+function drawWash(){ const c=ctx, t=S.time;
+  for (let i=0;i<(G.stacks||[]).length;i++){ const left=washLeft(i); if (left<=0) continue; const s=G.stacks[i], E=washOf(s), k=sc(s.y), grow=1-Math.pow(left,2)*.35, a=Math.min(1,left*1.6);
+    c.fillStyle='rgba(236,244,244,'+(.3*a).toFixed(3)+')'; c.beginPath(); c.ellipse(E.x,E.y,E.rx*grow,E.ry*grow,0,0,Math.PI*2); c.fill();
+    sseed=97+i*13; c.fillStyle='rgba(248,252,252,'+(.55*a).toFixed(3)+')';
+    for (let q=0;q<Math.round(22*k+8);q++){ const an=sr()*Math.PI*2, d=Math.sqrt(sr())*grow, bx=E.x+Math.cos(an)*E.rx*d+Math.sin(t*1.5+q)*1.2, by=E.y+Math.sin(an)*E.ry*d, br=(.8+sr()*1.8)*k*(.6+a*.4);
+      c.beginPath(); c.ellipse(bx,by,br*1.6,br*.7,0,0,Math.PI*2); c.fill(); }
+    c.strokeStyle='rgba(250,253,253,'+(.5*a).toFixed(3)+')'; c.lineWidth=1.2*k; c.setLineDash([3*k,2.4*k]); c.beginPath(); c.ellipse(E.x,E.y,E.rx*grow,E.ry*grow,0,0,Math.PI*2); c.stroke(); c.setLineDash([]); } }
+/** The lighthouse beam on the water: a long wedge of light from the foot of the lighthouse, sweeping from the far horizon
+    round toward the boat, with glints along it; and the float lit, while it's in it. */
+function drawSeaBeam(){ const F=beamFoot(), a=beamAngle(S.time), on=beamOn(); if (!F || a==null || on<.03) return;
+  const c=ctx, L=Math.hypot(W,H)*1.25, fog=wxLook().fog;
+  c.save(); c.globalCompositeOperation='lighter'; c.beginPath(); c.rect(0,HZ,W,H-HZ); c.clip();
+  for (const [wd,al] of [[1.6,.05],[1,.08],[.55,.1]]){ const h=BEAM.width*wd/2, g=c.createLinearGradient(F.x,F.y,F.x+Math.cos(a)*L*.6,F.y+Math.sin(a)*L*.6);
+    g.addColorStop(0,'rgba(255,232,180,'+(al*on*(1+fog*.6)).toFixed(3)+')'); g.addColorStop(1,'rgba(255,232,180,'+(al*on*.25).toFixed(3)+')');
+    c.fillStyle=g; c.beginPath(); c.moveTo(F.x,F.y); c.lineTo(F.x+Math.cos(a-h)*L,F.y+Math.sin(a-h)*L); c.lineTo(F.x+Math.cos(a+h)*L,F.y+Math.sin(a+h)*L); c.closePath(); c.fill(); }
+  // glints where it lies on the swell
+  c.fillStyle='rgba(255,244,214,'+(.5*on).toFixed(3)+')';
+  for (let i=0;i<14;i++){ const d=(i+.5)/14, dist=L*.55*Math.pow(d,1.3), off=Math.sin(i*2.7)*BEAM.width*.3, x=F.x+Math.cos(a+off)*dist, y=F.y+Math.sin(a+off)*dist;
+    if (y<HZ+2 || y>H) continue; const k=sc(y), fl=.5+.5*Math.sin(S.time*6+i*1.7); c.globalAlpha=fl; c.beginPath(); c.ellipse(x,y,5*k,1*k,0,0,Math.PI*2); c.fill(); }
+  c.globalAlpha=1;
+  if (CS.lit && S.bob){ const b=S.bob, k=sc(b.y), g=c.createRadialGradient(b.x,b.y,0,b.x,b.y,26*k); g.addColorStop(0,'rgba(255,240,200,'+(.4*on).toFixed(3)+')'); g.addColorStop(1,'rgba(255,240,200,0)');
+    c.fillStyle=g; c.beginPath(); c.ellipse(b.x,b.y,26*k,10*k,0,0,Math.PI*2); c.fill(); }
+  c.restore(); }
+/** The coast's lamp: it flashes as the beam swings toward you across the water, and while it faces inland its beam
+    shows as a ray over the headland. */
+function drawCoastLamp(){ const L=SC.lamp, on=beamOn(); if (!L || on<.03) return; const c=ctx, a=beamAngle(S.time), fog=wxLook().fog;
+  c.save(); c.globalAlpha=on;
+  const mid=(BEAM.span[0]+BEAM.span[1])/2, flash=a==null?0:Math.max(0,1-Math.abs(a-mid)*1.6);
+  if (a==null){ const u=((S.time/BEAM.turn)%1+1)%1, d=Math.sin((u-.5)/.5*Math.PI), len=W*.3*d*(1+fog*.35);   // facing inland: a ray off over the headland
+    if (len>4){ const g=c.createLinearGradient(L.x,L.y,L.x-len,L.y); g.addColorStop(0,'rgba(255,228,170,'+(.28-fog*.08).toFixed(3)+')'); g.addColorStop(1,'rgba(255,228,170,0)');
+      c.fillStyle=g; c.beginPath(); c.moveTo(L.x,L.y-1.5); c.lineTo(L.x-len,L.y-9-fog*14); c.lineTo(L.x-len,L.y+7+fog*12); c.lineTo(L.x,L.y+1.5); c.closePath(); c.fill(); } }
+  const r=5+flash*12+fog*9, hg=c.createRadialGradient(L.x,L.y,0,L.x,L.y,r); hg.addColorStop(0,'rgba(255,236,190,'+(.55+flash*.45).toFixed(2)+')'); hg.addColorStop(1,'rgba(255,236,190,0)');
+  c.fillStyle=hg; c.beginPath(); c.arc(L.x,L.y,r,0,Math.PI*2); c.fill(); c.restore(); }
+/** As a seventh wave builds, the far water darkens along the horizon, and a line of white shows out there. */
+function drawSeventhBuilding(){ const tin=seventhIn(); if (!(tin>0 && tin<SWELL.big.warn)) return; const u=1-tin/SWELL.big.warn, c=ctx;
+  const g=c.createLinearGradient(0,HZ,0,HZ+26); g.addColorStop(0,'rgba(8,30,42,'+(.45*u).toFixed(3)+')'); g.addColorStop(1,'rgba(8,30,42,0)'); c.fillStyle=g; c.fillRect(0,HZ,W,26);
+  c.strokeStyle='rgba(235,245,248,'+(.5*u).toFixed(3)+')'; c.lineWidth=1.4; c.beginPath(); for (let x=0;x<=W;x+=12){ const y=HZ+3+Math.sin(x*.05+S.time*2)*1.2; x?c.lineTo(x,y):c.moveTo(x,y); } c.stroke(); }
 
 /* ---------- Rootwood River: its spots, the drifting float, Ottilie's ferry, the otter and Homebody (data/river.js) ---------- */
 /* The river runs left to right across the screen. A float drifts with it, fastest in the run and slowest along the banks
@@ -11662,7 +11981,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=27, SNAP_KEY=KEY+'-snapshots';
+const BUILD=28, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -11781,7 +12100,7 @@ if (window.__PWA && 'serviceWorker' in navigator && location.protocol!=='file:')
 let last=performance.now();
 function update(dt,rdt){
   if (S.state==='idle' && save.tutorialDone && save.stats.casts>=12){ S.idleT=(S.idleT||0)+rdt; if (S.idleT>30 && S.idleT-rdt<=30) setHint('Drag back to aim. Release to cast.'); }
-  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt); weatherUpdate(rdt); moonUpdate(rdt); rfxUpdate(rdt); updateRelics(rdt); riverUpdate(dt,rdt); marshUpdate(rdt); updateWren(rdt);
+  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt); weatherUpdate(rdt); moonUpdate(rdt); rfxUpdate(rdt); updateRelics(rdt); riverUpdate(dt,rdt); marshUpdate(rdt); coastUpdate(dt); updateWren(rdt);
   { const nc=save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')); if (nc>=24) save.day=(save.day||0)+1; save.clock=nc%24; } PAL=palAt(save.clock);   // save.day: Wanderer's days
   { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2 || (S.time-(SC.bgWxT||0)>.5 && (Math.abs(wxBgKey()-(SC.bgWx||0))>(wxInfo().t<1?.1:.005)))) { SC.bgWxT=S.time; buildBg(); } }   // the hour, or the weather, has moved on
   const ct=hudClock(save.clock); if (ct!==S.clockShown || wxIcon()!==S.wxShown){ const n=(S.clockShown||'').length; S.clockShown=ct; S.wxShown=wxIcon(); setClock(ct); if (ct.length!==n) fitHud(); }
@@ -11863,7 +12182,7 @@ $('mealChip').addEventListener('click',()=>{ const m=save.meal; if (!m) return; 
 $('journalBtn').addEventListener('click',()=>{ $('journalBtn').classList.remove('pulse'); openJournal(); });
 
 /* ---------- Bonuses: the journal page that shows every bonus and where it comes from ---------- */
-const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', shack:'Shack', mount:'Trophy wall', event:'Event', weather:'Weather', tide:'Tide'};
+const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', shack:'Shack', mount:'Trophy wall', event:'Event', weather:'Weather', tide:'Tide', coast:'Coast'};
 /** How a modifier reads: +35 luck, +25%, −30%, ×2.5. Each stat keeps one unit. */
 function modValueText(stat,v,omen){
   if (omen) return '×'+trimNum(v);
@@ -12504,6 +12823,11 @@ function openTrapShop(){ const s=trapState();
    In the Saltmarsh the casts sweep the tide through its turn instead (st.tide holds it, 0 high water to .5 low), and a
    spot the tide has drowned or left dry (tide pools at high water, the flats at low) is fished as open water. A cast
    on the mud or a float the ebb strands isn't modeled: the player here aims off the banks.
+   At Gullrock Coast every seventh swell is a big one (data/coast.js: SWELL), harder on a line mid-fight; a float out
+   when one passes (as long after it as the churn lasts) gets a fish at once and the Comber Tarpon's chance, and at night
+   or in fog so does a float the lighthouse beam crosses (the beam's glow fish likelier). Both happen by chance as often
+   as the clocks line up with the wait, and a player who times casts to them (SIM_PLAYERS seventh, beam) gets more.
+   The wash only lies by a stack after a swell breaks there, so a cast to it waits for one, and is never washed out.
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
@@ -12517,15 +12841,15 @@ function openTrapShop(){ const s=trapState();
    comes back untouched. */
 const SIM_PLAYERS={
   steady:{name:'Steady player', react:()=>.2+.38*Math.pow(Math.random(),1.6), easeReact:()=>rand(.12,.32), track:5, easeAt:.8, easeFor:.45,
-          twitch:true, dives:.8, tugs:.7, jumps:.85, swells:.5},
+          twitch:true, dives:.8, tugs:.7, jumps:.85, swells:.5, seventh:.1, beam:.2},
   new:   {name:'New player', react:()=>.28+.6*Math.pow(Math.random(),1.3), easeReact:()=>rand(.25,.6), track:3, easeAt:.9, easeFor:.35,
-          twitch:false, dives:.4, tugs:.35, jumps:.5, swells:.15}
+          twitch:false, dives:.4, tugs:.35, jumps:.5, swells:.15, seventh:.03, beam:.08}
 };
 /* Where each spot sits on the cast's 0 (shore) to 1 (horizon) scale: [nearest edge, middle]. The rod's reach
    has to cover the nearest edge. Worked out from the layout in game/layout.js and game/regions.js on a
    390 by 844 phone; keep in step if spots move. */
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
-                 coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]},
+                 coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], wash:[.34,.45], deep:[.43,.53], wreck:[.72,.77], far:[.8,.9]},
                  river:{open:[0,.3], riffle:[0,.12], leaves:[.3,.38], deep:[.7,.78], roots:[.82,.9]},
                  marsh:{open:[0,.3], reeds:[0,.15], flats:[.13,.3], pans:[.28,.35], deep:[.43,.5], far:[.8,.9]}};
 /** On the river, how far a float can drift across the screen through each spot before it's off the right edge (shares of
@@ -12574,7 +12898,7 @@ function simSave(st){
 }
 /** Plays one fight (a fish or a haul) through the game's fight step, the way player P would. Returns {end, ft, why}. */
 function simFight(R,P,reg,io,fc){
-  const dt=1/60; let ft=0, end=null, easeAt=null, easeUntil=0, swellT=reg==='coast'?rand(0,7.5):Infinity;
+  const dt=1/60; let ft=0, end=null, easeAt=null, easeUntil=0, swellT=reg==='coast'?rand(0,SWELL.period):Infinity, swellN=Math.floor(rand(0,SWELL.set));
   const plan={}; io.tilt=0; io.why='';
   // a faded ghost can only be followed by its line, so the player tracks it more slowly and less surely
   io.steer=(R,dt)=>R.fam?lerp(io.tilt,R.dir,Math.min(1,dt*8)):R.fade>0?lerp(io.tilt,R.dir+Math.sin(ft*1.3)*.3,Math.min(1,dt*P.track*.4)):lerp(io.tilt,R.dir+Math.sin(ft*1.7)*.12,Math.min(1,dt*P.track));
@@ -12588,7 +12912,7 @@ function simFight(R,P,reg,io,fc){
     if (R.tension>P.easeAt && easeAt==null && ft>=easeUntil) easeAt=ft+P.easeReact();
     if (easeAt!=null && ft>=easeAt){ easeUntil=ft+P.easeFor; easeAt=null; }
     io.holding=!(ft<easeUntil || (plan.dive && (R.dive>0 || R.warn>0 && R.warn<.35)) || (plan.tug && R.tug && R.beat%1.15>.12));
-    swellT-=dt; if (swellT<=0){ swellT+=7.5; if (Math.random()>=P.swells && io.holding) R.tension+=.3*modMul('swell',fc); }
+    swellT-=dt; if (swellT<=0){ swellT+=SWELL.period; swellN++; if (Math.random()>=P.swells && io.holding) R.tension+=.3*modMul('swell',fc)*(swellBig(swellN)?SWELL.big.hit:1); }
     end=fightStep(R,dt,io);
   }
   return {end, ft, why:io.why};
@@ -12614,7 +12938,8 @@ function simulate(st,n){
       let t=1.6;                                                   // aim, drag and the cast's flight
       // the cast can tangle in the reeds or wash out in a swell
       if (spot==='reeds' && Math.random()<modBase('snag',cx)){ out.lost.snag++; out.secs+=t+.7; continue; }
-      if (reg==='coast' && !modFlag('noWashout',cx) && Math.random()<(4.6/7.5)*(68*sc(y))/(H-118-HZ-8)*(1-P.swells)){ out.lost.washout++; out.secs+=t+.7; continue; }
+      if (spot==='wash' && Math.random()<(SWELL.period-WASH.last)/SWELL.period) t+=rand(0,SWELL.period-WASH.last);   // waiting for a swell to break on the stack
+      if (reg==='coast' && spot!=='wash' && !modFlag('noWashout',cx) && Math.random()<(SWELL.travel/SWELL.period)*(68*sc(y)*(SWELL.set-1+SWELL.big.band)/SWELL.set)/(H-118-HZ-8)*(1-P.swells)){ out.lost.washout++; out.secs+=t+.7; continue; }
       // the quiet before anything shows up; a steady player twitches once to hurry it
       const tw=modMul('twitch',cx); let wait=biteWait(spot)*(spot==='deep'?1.2:1)/modMul('reedBite',cx);
       if (P.twitch) wait=Math.max(.3,wait*(.65-.2*(tw-1)));
@@ -12637,9 +12962,14 @@ function simulate(st,n){
         t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'||loot.kind==='map'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
-      const at={bow:!!st.bow, path:!!st.path}; let id=ech||rollFish(spot,lucky,at);
+      const at={bow:!!st.bow, path:!!st.path};
+      // the coast: the seventh wave's churn, and the lighthouse beam at night, each bring a fish at once
+      if (reg==='coast' && !ech){ const sevenP=(SWELL.big.churn+wait)/(SWELL.period*SWELL.set), beamP=(wait+BEAM.width/(BEAM.span[1]-BEAM.span[0])*BEAM.turn/2)/BEAM.turn;
+        if (Math.random()<sevenP+(1-sevenP)*P.seventh){ at.churn=true; wait=Math.min(wait,rand(0,wait)+SWELL.big.in); }
+        if ((isNight(save.clock) || wxNow()==='fog') && Math.random()<beamP+(1-beamP)*P.beam){ at.lit=true; wait=Math.min(wait,rand(0,wait)+BEAM.in); } }
+      let id=ech||rollFish(spot,lucky,at);
       // the Twin Spool: now and then both floats go under, and the player strikes the one with the better fish
-      if (twin && !ech && Math.random()<TWIN.both){ const id2=pickW(poolFor(spot,lucky)); out.twins++; if (FISH[id2].value>FISH[id].value) id=id2; }
+      if (twin && !ech && Math.random()<TWIN.both){ const id2=pickW(poolFor(spot,lucky,at)); out.twins++; if (FISH[id2].value>FISH[id].value) id=id2; }
       const F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
@@ -12888,7 +13218,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
     '<label for="tFix">Shack<output id="tFixO">'+shackState().fix.length+' of '+FIXUP.filter(L=>L.cost).length+' fixed</output><select id="tFix"><option value="">Fix a line for free…</option>'+FIXUP.filter(L=>L.cost).map(L=>'<option value="'+L.id+'"'+(fixDone(L.id)?' disabled':'')+'>'+L.name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Your uncle’s fix-up list, in the shack. Fill the wall puts a fish of every rarity up on the free plaques.</span></label>'+
     '<label for="tRelic">Story relics<output id="tRelicO">'+Object.keys(STORY).filter(hasFind).length+' of '+Object.keys(STORY).length+'</output><select id="tRelic"><option value="">Hand one over…</option>'+Object.keys(STORY).map(id=>'<option value="'+id+'"'+(hasFind(id)?' disabled':'')+'>'+FINDS[id].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Each is found its own way: the almanac from Ottilie, the jar on the moonpath, the bell in the deep pool’s small-hours fog, the pin in your first map’s cache.</span></label></div>'+
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
-    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="jarBtn" type="button">Fill the Moon Jar</button><button class="btn" id="wallBtn" type="button">Fill the wall</button><button class="btn" id="mapBtn2" type="button">Finish the map</button><button class="btn" id="bowBtn" type="button">'+(wxState().bow?'Clear the rainbow':'Rainbow now')+'</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
+    '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="seventhBtn" type="button">Seventh wave next</button><button class="btn" id="jarBtn" type="button">Fill the Moon Jar</button><button class="btn" id="wallBtn" type="button">Fill the wall</button><button class="btn" id="mapBtn2" type="button">Finish the map</button><button class="btn" id="bowBtn" type="button">'+(wxState().bow?'Clear the rainbow':'Rainbow now')+'</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
   bindPlaytestTabs();
   // anything the tools hand over or change makes the pace log's times less telling (game/pace.js)
   $('panel').querySelectorAll('button:not([data-pt]):not(#closeS), select, input').forEach(el=>el.addEventListener(el.tagName==='BUTTON'?'click':'change',()=>{ paceState().tools=true; persist(); }));
@@ -12911,6 +13241,8 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   $('tMut').addEventListener('change',e=>{ RARITY_CTL.mut=e.target.value||null; $('tMutO').textContent=RARITY_CTL.mut?MUTS[RARITY_CTL.mut].name:'Left to chance'; });
   $('tTide').addEventListener('change',e=>{ if (e.target.value!=='') save.tidePin=+e.target.value; else delete save.tidePin; persist(); MODC.dirty=true; MSH.dir=null; MSH.at=null; $('tTideO').textContent=tideName(); });
   $('tMoon').addEventListener('change',e=>{ const w=wxState(); if (e.target.value!=='') w.moon=+e.target.value; else delete w.moon; persist(); buildBg(); $('tMoonO').textContent=moonName(); });
+  // the coast: the next swell to rise is a seventh wave (game/coast-sea.js)
+  $('seventhBtn').addEventListener('click',()=>{ if (REG()!=='coast'){ toast('The swells only roll in at the coast','warn'); return; } closeSheet(); seventhNext(); });
   $('bowBtn').addEventListener('click',()=>{ const w=wxState(); if (w.bow) delete w.bow; else w.bow=true; persist(); buildBg(); closeSheet(); if (w.bow && isNight(save.clock)) toast('Rainbows only come by day','warn'); });
   // traps, the smoke rack and the clock all move on an hour, as if you'd been away (game/away.js)
   $('hourBtn').addEventListener('click',()=>{ const ms=3600000; trapGiftCheck(); for (const T of trapState().list) T.t-=ms; smokeTick(); for (const h of smokeState().hooks) if (h) h.t-=ms;

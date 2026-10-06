@@ -277,7 +277,7 @@ async function careerReport() {
   await p.goto('file://' + page + '?nointro'); await p.waitForTimeout(500);
   const runs = +(opt.runs || 5), cap = +(opt.hours || 30) * 60;
   const res = await p.evaluate(({ runs, cap, player }) => {
-    const hm = window.__hm, REACH = { lake: { open: 0, reeds: 0, pads: .23, deep: .51, far: .8 }, river: { open: 0, riffle: 0, leaves: .3, deep: .7, roots: .82 }, coast: { open: 0, kelp: .19, rocks: .34, deep: .43, far: .8 },
+    const hm = window.__hm, REACH = { lake: { open: 0, reeds: 0, pads: .23, deep: .51, far: .8 }, river: { open: 0, riffle: 0, leaves: .3, deep: .7, roots: .82 }, coast: { open: 0, kelp: .19, rocks: .34, wash: .34, deep: .43, wreck: .72, far: .8 },
       marsh: { open: 0, reeds: 0, flats: .13, pans: .28, deep: .43, far: .8 } };
     // a quest rod ranks just above the sold rod it matches or beats on every number; sold rods rank by price
     const rank = id => { const R = hm.RODS[id]; if (!R.quest) return R.price;

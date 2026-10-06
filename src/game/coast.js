@@ -108,30 +108,36 @@ function drawStacks(){ const t=S.time, c=ctx;
   c.fillStyle='#F2EFE8'; c.beginPath(); c.arc(gx+4.6*look,gy-3.2+Math.sin(t*.7)*.6,2.6,0,Math.PI*2); c.fill(); c.stroke();
   c.fillStyle='#E0A43A'; c.fillRect(look>0?gx+6.8:gx-9.8,gy-3.6,3,1.3); c.fillStyle=INK; c.beginPath(); c.arc(gx+5.4*look,gy-3.8,.6,0,Math.PI*2); c.fill(); }
 function drawSwell(){
-  const sw=S.swell; if (REG()!=='coast' || !sw || sw.y==null) return; const y=sw.y, k=sc(y), a=.25+.35*k;
+  const sw=S.swell; if (REG()!=='coast' || !sw) return;
+  drawSeventhBuilding();   // the far water darkening as a seventh wave builds (game/coast-sea-art.js)
+  if (sw.y==null) return; const y=sw.y, k=sc(y), big=sw.big, B=big?1.6:1, a=Math.min(.95,(.25+.35*k)*(big?1.35:1));
+  const crest=(dy,amp)=>{ ctx.beginPath(); for (let x=-20;x<=W+20;x+=20){ const yy=y+dy+Math.sin(x*.03+S.time*2)*amp*k; x===-20?ctx.moveTo(x,yy):ctx.lineTo(x,yy); } ctx.stroke(); };
   ctx.lineCap='round';
-  ctx.strokeStyle='rgba(10,40,55,'+(a*.5).toFixed(2)+')'; ctx.lineWidth=10*k; ctx.beginPath();
-  for (let x=-20;x<=W+20;x+=20){ const yy=y+6*k+Math.sin(x*.03+S.time*2)*3*k; x===-20?ctx.moveTo(x,yy):ctx.lineTo(x,yy); } ctx.stroke();
-  ctx.strokeStyle='rgba(235,245,248,'+a.toFixed(2)+')'; ctx.lineWidth=3.5*k; ctx.beginPath();
-  for (let x=-20;x<=W+20;x+=20){ const yy=y+Math.sin(x*.03+S.time*2)*3*k; x===-20?ctx.moveTo(x,yy):ctx.lineTo(x,yy); } ctx.stroke();
-  for (let i=0;i<6;i++){ const fx=((i*73+S.time*30)%(W+40))-20; ctx.fillStyle='rgba(245,250,250,'+(a*.8).toFixed(2)+')'; ctx.beginPath(); ctx.arc(fx,y-2*k+Math.sin(fx*.03+S.time*2)*3*k,2.2*k,0,Math.PI*2); ctx.fill(); }
+  // the trough ahead of the crest, then the crest; a seventh wave stands taller, with a second line of white behind it
+  ctx.strokeStyle='rgba(10,40,55,'+(a*.5).toFixed(2)+')'; ctx.lineWidth=10*k*B; crest(6*k*B,3*B);
+  if (big){ ctx.strokeStyle='rgba(16,52,66,'+(a*.45).toFixed(2)+')'; ctx.lineWidth=7*k; crest(-5*k,3.4); ctx.strokeStyle='rgba(235,245,248,'+(a*.55).toFixed(2)+')'; ctx.lineWidth=2.2*k; crest(-9*k,3.6); }
+  ctx.strokeStyle='rgba(235,245,248,'+a.toFixed(2)+')'; ctx.lineWidth=3.5*k*B; crest(0,3*B);
+  for (let i=0;i<(big?11:6);i++){ const fx=((i*73+S.time*30)%(W+40))-20; ctx.fillStyle='rgba(245,250,250,'+(a*.8).toFixed(2)+')'; ctx.beginPath(); ctx.arc(fx,y-2*k*B+Math.sin(fx*.03+S.time*2)*3*k*B,2.2*k*B,0,Math.PI*2); ctx.fill(); }
 }
 function updateSwell(dt){
   if (REG()!=='coast'){ S.swell=null; S.kick=0; G.player.y=G.playerBaseY; G.rodBase.y=G.rodBaseY; return; }
-  const sw=S.swell||(S.swell={t:2.5,y:null,prev:null,hit:false});
-  sw.t+=dt; const ph=sw.t%7.5, travel=4.6; sw.prev=sw.y;
-  if (ph<travel){ const u=ph/travel; sw.y=lerp(HZ+8,H-118,Math.pow(u,1.35)); if (ph<dt*1.5) sw.hit=false; } else sw.y=null;
-  if (sw.y!=null && !sw.hit && sw.y>H-175){ sw.hit=true; S.kick=1; noise(.6,{vol:.16,f:900,to:300,type:'lowpass'});
-    for (let i=0;i<14;i++) S.particles.push({x:W/2+rand(-60,60),y:H-185,vx:rand(-60,60),vy:rand(-160,-60),g:420,life:0,max:rand(.4,.8),r:rand(1.4,3),c:'rgba(235,245,248,'}); buzz(15); }
+  if (!S.swell){ CS.warned=-1; CS.wash=CS.wash.map(()=>0); }
+  const sw=S.swell||(S.swell={t:2.5,y:null,prev:null,hit:false,n:-1,big:false});
+  // the swells come every SWELL.period seconds, and every seventh is a big one (game/coast-sea.js)
+  sw.t+=dt; const n=Math.floor(sw.t/SWELL.period), newOne=n!==sw.n; sw.n=n; sw.prev=newOne?null:sw.y; sw.y=swellY(n,sw.t); sw.big=swellBig(n);
+  if (newOne) sw.hit=false;
+  if (sw.y!=null && !sw.hit && sw.y>H-175){ sw.hit=true; S.kick=sw.big?1.7:1; noise(sw.big?1:.6,{vol:sw.big?.24:.16,f:sw.big?600:900,to:sw.big?160:300,type:'lowpass'}); if (sw.big) tone(70,.6,{to:45,vol:.08,type:'sine'});
+    for (let i=0;i<(sw.big?26:14);i++) S.particles.push({x:W/2+rand(-60,60)*(sw.big?1.5:1),y:H-185,vx:rand(-60,60),vy:rand(-160,-60)*(sw.big?1.4:1),g:420,life:0,max:rand(.4,.8),r:rand(1.4,3),c:'rgba(235,245,248,'}); buzz(sw.big?[0,30,40,30]:15); }
   S.kick=Math.max(0,(S.kick||0)-dt*1.1);
   const bob=(Math.sin(S.time*1.6)*1.6+S.kick*Math.sin(S.time*8)*5)*(hasPart('keel')?.5:1);
   G.player.y=G.playerBaseY+bob; G.rodBase.y=G.rodBaseY+bob; S.bob_y=bob;
-  // a swell crossing the bobber lifts it; crossing your fish while you reel spikes tension
+  // a swell crossing the bobber lifts it; crossing your fish while you reel spikes tension; breaking on a stack, it leaves white water
   const crossed=yy=>sw.prev!=null && sw.y!=null && sw.prev<yy && sw.y>=yy;
-  if (S.bob && (S.state==='waiting'||S.state==='bite') && crossed(S.bob.y)){ S.bob.dip=-1.5; ripple(S.bob.x,S.bob.y,22); }
+  if (S.bob && (S.state==='waiting'||S.state==='bite') && crossed(S.bob.y)){ S.bob.dip=sw.big?-2.6:-1.5; ripple(S.bob.x,S.bob.y,sw.big?34:22); }
   if (S.state==='reeling' && S.reel && crossed(S.reel.y)){
-    if (S.holding){ S.reel.tension+=.3*swellSoftness(); shake(3*swellSoftness()); toast('Swell! Ease off as it passes.','warn'); } else { toast('Rode out the swell!','good'); }
-    splash(S.reel.x,S.reel.y,10); }
+    if (S.holding){ S.reel.tension+=.3*swellSoftness()*(sw.big?SWELL.big.hit:1); shake(3*swellSoftness()*(sw.big?1.8:1)); toast(sw.big?'The seventh wave! Ease off!':'Swell! Ease off as it passes.','warn'); } else { toast(sw.big?'Rode out the seventh wave!':'Rode out the swell!','good'); }
+    splash(S.reel.x,S.reel.y,sw.big?16:10); }
+  G.stacks.forEach((s,i)=>{ if (crossed(s.y)) washBreak(i,sw.big); });
 }
 function swellNear(yy,range){ const sw=S.swell; return REG()==='coast' && sw && sw.y!=null && sw.y<yy && yy-sw.y<range; }
 /** The skiff's deck, seat, rivets, rope and cleat, painted once; drawSkiffDeck lays it on the hull, riding the swell. */
