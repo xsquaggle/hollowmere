@@ -287,6 +287,34 @@ module.exports = [
     },
   },
   {
+    name: 'the Quarter draws and plays on any screen: a phone on its side, a tablet, a laptop window, and a phone turned round',
+    async run({ newPage, openGame, veteran, until }) {
+      const page = await newPage();
+      await openGame(page, { save: inQuarter(veteran) });
+      // on each of these, Lantern Row's last house ran far enough off the left edge that its art stopped the game: only water, no casting
+      let offLeft = 0;
+      for (const [width, height] of [[844, 390], [820, 1180], [1024, 1366], [1366, 657], [455, 667]]) {
+        await page.setViewportSize({ width, height }); await page.reload(); await page.waitForTimeout(500);
+        const R = await page.evaluate(() => new Promise(ok => { const t0 = window.__S.time, g = window.__hm.quarter.G();
+          setTimeout(() => ok({ reg: window.__hm.quarter.reg(), refl: g.refl, left: Math.min(...g.solids.map(o => o.x0)), ran: window.__S.time > t0 }), 200); }));
+        assert.equal(R.reg, 'quarter');
+        assert.ok(R.refl > 0 && R.ran, width + '×' + height + ': the street is drawn and the game keeps running: ' + JSON.stringify(R));
+        offLeft = Math.min(offLeft, R.left);
+        assert.deepEqual(page.errors, [], width + '×' + height);
+      }
+      assert.ok(offLeft < -26, 'a house reached past the left edge: ' + offLeft);
+      // turning a phone round in the Quarter, then casting on a laptop-sized window
+      await page.setViewportSize({ width: 390, height: 844 }); await page.reload(); await page.waitForTimeout(500);
+      await page.setViewportSize({ width: 844, height: 390 }); await page.waitForTimeout(400);
+      await page.setViewportSize({ width: 1366, height: 657 }); await page.waitForTimeout(400);
+      await page.mouse.move(683, 360); await page.mouse.down();
+      for (let i = 1; i <= 10; i++) { await page.mouse.move(683, 360 + 16 * i); await page.waitForTimeout(16); }
+      await page.mouse.up();
+      await until(page, () => window.__S.state === 'waiting', null, { what: 'the float on the water' });
+      assert.deepEqual(page.errors, []);
+    },
+  },
+  {
     name: 'nothing waits behind a wall or slips past: map caches, a second float, a second page, the hand bell, the round and the stopped watch',
     async run({ newPage, openGame, veteran }) {
       const page = await newPage();
