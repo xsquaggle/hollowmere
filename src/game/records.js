@@ -1,6 +1,7 @@
 /* ---------- Size, weight and records ---------- */
 // Weight follows length on each species' growth curve: grams = K·L³/100 (Fulton's condition factor), times a little variation in build.
-const BUILD_K={perch:1.25, reedwhisker:.9, lantern:1.6, leafjack:1.45, mossback:1.15, mayor:.62, sprat:.75, wrasse:1.3, kelpeel:.18, bream:1.7, grouper:1.9, saltjaw:.55, dace:1.0, char:1.05, mackerel:.95, gurnard:1.25, gar:.8, angler:3.5, shiner:1.45, calf:1.6};
+const BUILD_K={perch:1.25, reedwhisker:.9, lantern:1.6, leafjack:1.45, mossback:1.15, mayor:.62, sprat:.75, wrasse:1.3, kelpeel:.18, bream:1.7, grouper:1.9, saltjaw:.55, dace:1.0, char:1.05, mackerel:.95, gurnard:1.25, gar:.8, angler:3.5, shiner:1.45, calf:1.6,
+  mudlark:.2, lampwick:.2, dab:1.3, croaker:1.2, smelt:.7, whiting:.85, mullet:1.1, bellmouth:1.3, reeve:1.1};
 const weighFish=(id,len,build)=>Math.max(4,(BUILD_K[id]||1)*len*len*len/100*(build||1));
 const rollBuild=()=>1+(Math.random()+Math.random()+Math.random()-1.5)*.13;
 function sizePct(id,len){ const F=FISH[id]; return clamp((len-F.size[0])/(F.size[1]-F.size[0]),0,1); }

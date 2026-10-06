@@ -43,19 +43,30 @@ function drawMarshLand(x,main){
   x.fillStyle=slate; x.beginPath(); x.moveTo(hx-2,hy-11); x.lineTo(hx+8.5,hy-18); x.lineTo(hx+19,hy-11); x.closePath(); x.fill();
   x.fillStyle=stoneD; x.fillRect(hx+12,hy-19,3,6); if (main) SC.chimneys=[{x:hx+13.5,y:hy-19}];
   x.fillStyle='rgba(244,201,119,'+Math.max(.12,PAL.win).toFixed(2)+')'; x.fillRect(hx+4,hy-7.5,3.4,3.4);
-  // the old tide mill on the left: its walls still stand, the roof's gone to a few rafters, and the sluice arch is dark
-  const mx=W*.03, mw=W*.18, mh=H*.048, base=HZ;
-  x.fillStyle=stone; x.beginPath(); x.moveTo(mx,base); x.lineTo(mx,base-mh); x.lineTo(mx+mw*.18,base-mh); x.lineTo(mx+mw*.22,base-mh+3); x.lineTo(mx+mw*.34,base-mh+2);
-  x.lineTo(mx+mw*.4,base-mh-H*.02); x.lineTo(mx+mw*.5,base-mh-H*.012); x.lineTo(mx+mw*.56,base-mh-H*.016); x.lineTo(mx+mw*.62,base-mh+1); x.lineTo(mx+mw*.8,base-mh+4); x.lineTo(mx+mw,base-mh+7); x.lineTo(mx+mw,base); x.closePath(); x.fill();
-  x.save(); x.clip(); x.fillStyle=stoneD; x.fillRect(mx+mw*.62,base-mh-H*.03,mw*.4,mh+H*.03);
-  x.strokeStyle='rgba(30,26,22,.3)'; x.lineWidth=.7; for (let r=1;r<6;r++){ const yy=base-mh*r/6; x.beginPath(); x.moveTo(mx,yy); x.lineTo(mx+mw,yy); x.stroke(); for (let c=0;c<7;c++){ const xx=mx+(c+(r%2)*.5)*mw/7; x.beginPath(); x.moveTo(xx,yy); x.lineTo(xx,yy+mh/6); x.stroke(); } }
-  // ivy up the sunny corner
-  sseed=547; x.fillStyle=rvTone('trees','#3E5532',.7); for (let i=0;i<16;i++){ x.beginPath(); x.arc(mx+sr()*mw*.22,base-sr()*mh*.95,1.2+sr()*2.2,0,Math.PI*2); x.fill(); }
+  // the old tide mill on the left, on the dam that held the tide back for it: the walls still stand to the gable, the roof's
+  // gone to a few rafters, and the arch it let the water out through is dark
+  const mx=W*.035, mw=W*.15, mh=H*.04, base=HZ-H*.004, dark=rvTone('town','#1E2226',.6);
+  x.fillStyle=grassD; x.beginPath(); x.moveTo(0,HZ); x.lineTo(0,base-1.5); x.lineTo(mx+mw+W*.03,base-1); x.quadraticCurveTo(mx+mw+W*.07,base,mx+mw+W*.1,HZ); x.closePath(); x.fill();
+  x.fillStyle=stone; x.fillRect(0,base,mx+mw+W*.05,HZ-base); x.strokeStyle=stoneD; x.lineWidth=.6; x.beginPath(); for (let px=3;px<mx+mw+W*.05;px+=7){ x.moveTo(px,base); x.lineTo(px,HZ); } x.stroke();
+  const gx=mx+mw*.72, peak=base-mh-H*.022;
+  const front=()=>{ x.beginPath(); x.moveTo(mx,base); x.lineTo(mx,base-mh+2); x.lineTo(mx+mw*.08,base-mh); x.lineTo(mx+mw*.14,base-mh+4); x.lineTo(mx+mw*.22,base-mh+2); x.lineTo(mx+mw*.3,base-mh+6);
+    x.lineTo(mx+mw*.4,base-mh+3); x.lineTo(mx+mw*.5,base-mh+1); x.lineTo(gx,base-mh); x.lineTo(gx,base); x.closePath(); };
+  const gable=()=>{ x.beginPath(); x.moveTo(gx,base); x.lineTo(gx,base-mh); x.lineTo(gx+(mx+mw-gx)*.5,peak); x.lineTo(mx+mw,base-mh); x.lineTo(mx+mw,base); x.closePath(); };
+  front(); x.fillStyle=stone; x.fill(); gable(); x.fillStyle=stoneD; x.fill();
+  // coursing, and ivy up the old corner
+  x.save(); front(); x.clip(); x.strokeStyle='rgba(30,26,22,.28)'; x.lineWidth=.6;
+  for (let r=1;r<6;r++){ const yy=base-mh*r/6; x.beginPath(); x.moveTo(mx,yy); x.lineTo(gx,yy); x.stroke(); for (let c=0;c<6;c++){ const xx=mx+(c+(r%2)*.5)*(gx-mx)/6; x.beginPath(); x.moveTo(xx,yy); x.lineTo(xx,yy+mh/6); x.stroke(); } }
+  sseed=547; x.fillStyle=rvTone('trees','#3E5532',.7); for (let i=0;i<16;i++){ x.beginPath(); x.arc(mx+sr()*mw*.2,base-sr()*mh*.95,1.1+sr()*2,0,Math.PI*2); x.fill(); }
   x.restore();
-  x.fillStyle=rvTone('town','#1E2226',.6); for (const [wx,wy] of [[.18,.55],[.46,.62],[.72,.5]]){ const ww=mw*.07, ht=mh*.3, cx=mx+mw*wx, cy=base-mh*wy; x.beginPath(); x.moveTo(cx-ww,cy+ht/2); x.lineTo(cx-ww,cy-ht/4); x.arc(cx,cy-ht/4,ww,Math.PI,0); x.lineTo(cx+ww,cy+ht/2); x.closePath(); x.fill(); }
-  x.beginPath(); x.ellipse(mx+mw*.55,base,mw*.11,mh*.32,0,Math.PI,0); x.fill();
-  x.strokeStyle=wood; x.lineWidth=1.6; x.beginPath(); for (const [a,b,c2,d] of [[.3,.02,.42,-.5],[.5,.02,.62,-.42],[.7,.08,.66,-.3]]){ x.moveTo(mx+mw*a,base-mh+mh*b); x.lineTo(mx+mw*c2,base-mh+mh*d); } x.stroke();
-  x.strokeStyle=INK; x.globalAlpha=.4; x.lineWidth=1; x.strokeRect(mx,base-mh,mw,mh); x.globalAlpha=1;
+  // three arched windows, an empty one high in the gable, and the sluice arch at the waterline with the tide running out of it
+  x.fillStyle=dark; for (const [wx,wy] of [[.16,.55],[.34,.58],[.54,.55]]){ const ww=mw*.045, ht=mh*.3, cx=mx+mw*wx, cy=base-mh*wy; x.beginPath(); x.moveTo(cx-ww,cy+ht/2); x.lineTo(cx-ww,cy-ht/4); x.arc(cx,cy-ht/4,ww,Math.PI,0); x.lineTo(cx+ww,cy+ht/2); x.closePath(); x.fill(); }
+  x.beginPath(); x.arc(gx+(mx+mw-gx)*.5,base-mh-H*.004,mw*.03,0,Math.PI*2); x.fill();
+  x.beginPath(); x.moveTo(mx+mw*.28,base); x.lineTo(mx+mw*.28,base-mh*.18); x.arc(mx+mw*.36,base-mh*.18,mw*.08,Math.PI,0); x.lineTo(mx+mw*.44,base); x.closePath(); x.fill();
+  x.fillStyle='rgba(236,240,232,.55)'; x.fillRect(mx+mw*.29,HZ-1,mw*.14,1); x.fillRect(mx+mw*.31,HZ+.6,mw*.1,.8);
+  // the rafters left on the gable, and the ridge beam's broken end
+  x.strokeStyle=wood; x.lineWidth=1.5; x.beginPath(); x.moveTo(gx+(mx+mw-gx)*.5,peak+1); x.lineTo(mx+mw*.42,peak+H*.004);
+  for (const [a,h] of [[.62,.012],[.52,.009]]){ x.moveTo(mx+mw*a,base-mh+1); x.lineTo(mx+mw*(a+.05),base-mh-H*h); } x.stroke();
+  x.strokeStyle=INK; x.globalAlpha=.42; x.lineWidth=1; front(); x.stroke(); gable(); x.stroke(); x.globalAlpha=1;
   // the drowned church's tower, leaning, out where the marsh meets the sea
   const tx=W*.66, tw=Math.max(12,W*.042), th=H*.072;
   x.save(); x.translate(tx,HZ+1); x.rotate(.08);
@@ -68,6 +79,8 @@ function drawMarshLand(x,main){
   x.fillStyle=rvTone('town','#1E2226',.6); x.fillRect(-tw*.12,-th*.4,tw*.24,th*.12);
   x.strokeStyle=INK; x.globalAlpha=.5; x.lineWidth=1; x.strokeRect(-tw/2,-th,tw,th); x.globalAlpha=1;
   x.restore();
+  // the water lapping round its foot
+  x.fillStyle='rgba(236,240,232,.45)'; x.fillRect(tx-tw*.9,HZ+.4,tw*1.9,.9);
   // the haze that always lies along a marsh's horizon
   const hg=x.createLinearGradient(0,HZ-H*.035,0,HZ); hg.addColorStop(0,'rgba('+PAL.skyHzR+',0)'); hg.addColorStop(1,'rgba('+PAL.skyHzR+',.38)'); x.fillStyle=hg; x.fillRect(0,HZ-H*.035,W,H*.035);
   if (main) SC.lamp=null;
@@ -111,13 +124,24 @@ function drawSluice(){ const d=G.deep, c=ctx, t=S.time, k=sc(d.y), wd=rvTone('to
     c.fillStyle=rvTone('hillFar','#9A8C74',.5); c.beginPath(); c.moveTo(px-w/2,py-ht); c.lineTo(px+w/2,py-ht-1.6*k); c.lineTo(px+w/2,py-ht+1); c.closePath(); c.fill();
     c.strokeStyle=INK; c.globalAlpha=.6; c.lineWidth=1; c.strokeRect(px-w/2,py-ht,w,ht); c.globalAlpha=1;
     c.strokeStyle='rgba(225,236,230,'+(.25+.1*Math.sin(t*1.6+u*3)).toFixed(3)+')'; c.lineWidth=1; c.beginPath(); c.ellipse(px,py,w*1.3,w*.45,0,0,Math.PI*2); c.stroke(); }
-  // the gate's frame: two posts and a beam across, on the pool's left
-  const gx=d.x-d.rx*1.08, gy=d.y+d.ry*.15, gh=34*k*(1.1-L*.4), gw=14*k;
-  c.strokeStyle=INK; c.lineWidth=4.2*k; c.beginPath(); c.moveTo(gx-gw,gy); c.lineTo(gx-gw,gy-gh); c.lineTo(gx+gw,gy-gh+2*k); c.lineTo(gx+gw,gy); c.stroke();
-  c.strokeStyle=wd; c.lineWidth=2.6*k; c.stroke();
-  // a broken paddle still hangs in it on a chain
-  c.strokeStyle=rvTone('town','#3A3A40',.5); c.lineWidth=.8; c.beginPath(); c.moveTo(gx,gy-gh+1); c.lineTo(gx+Math.sin(t*.8)*1.2,gy-gh*.55); c.stroke();
-  c.fillStyle=wdL; c.save(); c.translate(gx+Math.sin(t*.8)*1.2,gy-gh*.55); c.rotate(Math.sin(t*.8)*.06+.12); c.fillRect(-gw*.6,0,gw*1.2,gh*.3); c.strokeStyle=INK; c.lineWidth=.9; c.strokeRect(-gw*.6,0,gw*1.2,gh*.3); c.restore(); }
+  // the gate on the pool's left: two heavy posts, a beam across with the winding wheel on it, and the gate jammed half up,
+  // so the ebb pours out under it and scours the pool
+  const gx=d.x-d.rx*1.06, gy=d.y+d.ry*.1, gh=36*k*(1.1-L*.4), gw=11*k, pw=4.6*k, T=tideNow(), ebb=!T.rising && !T.slack;
+  const board=(y0,y1)=>{ c.fillStyle=wdL; c.fillRect(gx-gw,y0,gw*2,y1-y0); c.strokeStyle=wd; c.lineWidth=.8; c.beginPath(); for (let i=1;i<3;i++){ c.moveTo(gx-gw+gw*2*i/3,y0); c.lineTo(gx-gw+gw*2*i/3,y1); } c.stroke();
+    c.fillStyle=wd; c.fillRect(gx-gw,y0+(y1-y0)*.15,gw*2,1.6*k); c.fillRect(gx-gw,y1-(y1-y0)*.15-1.6*k,gw*2,1.6*k); c.strokeStyle=INK; c.lineWidth=1; c.strokeRect(gx-gw,y0,gw*2,y1-y0); };
+  board(gy-gh*.78,gy-gh*.36);
+  // the water running out under it on the ebb
+  if (ebb){ const sp=clamp(Math.abs(T.rate)/.2,0,1); c.strokeStyle='rgba(238,242,236,'+(.5*sp).toFixed(3)+')'; c.lineWidth=1.2; c.lineCap='round';
+    for (let i=0;i<5;i++){ const f=((t*.9+i/5)%1), yy=gy-gh*.3+f*gh*.32, xx=gx-gw*.8+i*gw*.4; c.globalAlpha=1-f; c.beginPath(); c.moveTo(xx,yy); c.lineTo(xx+2*k,yy+4*k); c.stroke(); } c.globalAlpha=1;
+    c.strokeStyle='rgba(238,242,236,'+(.35*sp).toFixed(3)+')'; c.beginPath(); c.ellipse(gx+gw*.6,gy+1,gw*1.4,gw*.32,0,0,Math.PI); c.stroke(); }
+  for (const sx of [-1,1]){ const px=gx+sx*(gw+pw/2); c.fillStyle=wd; c.fillRect(px-pw/2,gy-gh,pw,gh); c.fillStyle=wdL; c.fillRect(px-pw/2,gy-gh,pw*.35,gh);
+    c.strokeStyle=INK; c.lineWidth=1; c.strokeRect(px-pw/2,gy-gh,pw,gh);
+    c.strokeStyle='rgba(225,236,230,'+(.3+.1*Math.sin(t*1.6+sx)).toFixed(3)+')'; c.beginPath(); c.ellipse(px,gy,pw*1.2,pw*.4,0,0,Math.PI*2); c.stroke(); }
+  const bw=gw+pw+2*k; c.fillStyle=wd; c.fillRect(gx-bw,gy-gh-3.4*k,bw*2,3.4*k); c.fillStyle=wdL; c.fillRect(gx-bw,gy-gh-3.4*k,bw*2,1.1*k); c.strokeStyle=INK; c.lineWidth=1; c.strokeRect(gx-bw,gy-gh-3.4*k,bw*2,3.4*k);
+  // the winding wheel, rusted where it stopped, and the rack down to the gate
+  const wy=gy-gh-3.4*k-4.4*k, wr=4.4*k; c.strokeStyle=rvTone('town','#6A4A36',.55); c.lineWidth=1.6*k; c.beginPath(); c.moveTo(gx,wy); c.lineTo(gx,gy-gh*.78); c.stroke();
+  c.strokeStyle=INK; c.lineWidth=2.4*k; c.beginPath(); c.arc(gx,wy,wr,0,Math.PI*2); c.stroke(); c.strokeStyle=rvTone('town','#7A5A42',.55); c.lineWidth=1.3*k; c.stroke();
+  c.lineWidth=.9*k; c.beginPath(); for (let i=0;i<3;i++){ const a=i*Math.PI/3+.3; c.moveTo(gx+Math.cos(a)*wr,wy+Math.sin(a)*wr); c.lineTo(gx-Math.cos(a)*wr,wy-Math.sin(a)*wr); } c.stroke(); }
 /** The tide post: a painted gauge, banded every tenth of its height, with the water's line moving up and down it. */
 function drawTidePost(){ const P=MSA.post, c=ctx, k=sc(P.y), hgt=60*k, w=5.2*k, sunk=tideNow().level*.78*hgt, top=P.y-(hgt-sunk);
   if (top>=P.y-2) return;
@@ -156,7 +180,7 @@ function buildBankMud(B){ const pad=8, w=B.rx*2+pad*2, h=B.ry*2+pad*2, cv=docume
     x.strokeStyle='rgba(38,44,30,.55)'; x.lineWidth=1.6; for (const sy of [-.25,.3]){ x.beginPath(); for (let px=-B.rx;px<=B.rx;px+=5){ const py=B.ry*sy+Math.sin(px*.09+sy*7)*B.ry*.18; if (px===-B.rx) x.moveTo(px,py); else x.lineTo(px,py); } x.stroke(); }
     x.strokeStyle=rvTone('hillNear','#86A24E',.6); x.lineWidth=1.2; for (const [px,py] of pts(Math.round(B.rx*B.ry/120))){ for (let s=-1;s<=1;s++){ x.beginPath(); x.moveTo(px+s*1.4,py); x.lineTo(px+s*2,py-2.4-sr()*1.6); x.stroke(); } }
     for (const [px,py] of pts(Math.round(B.rx*B.ry/160))){ x.fillStyle=sr()<.5?'#9C88BC':'#B6A4D2'; for (let i=0;i<4;i++){ x.beginPath(); x.arc(px+(sr()-.5)*4,py-1-sr()*2.4,.9,0,Math.PI*2); x.fill(); } }
-    x.fillStyle=rvTone('hillFar','#C2B58A',.6); for (const [px,py] of pts(Math.round(B.rx*B.ry/300))){ x.beginPath(); x.moveTo(px-2,py); x.quadraticCurveTo(px-1,py-4,px,py-4.4); x.quadraticCurveTo(px+.6,py-2,px+2,py); x.closePath(); x.fill(); }
+    x.strokeStyle=rvTone('hillFar','#A99F70',.6); x.lineWidth=1; for (const [px,py] of pts(Math.round(B.rx*B.ry/300))){ x.beginPath(); for (const [dx,hh] of [[-1.6,3.2],[-.4,4.6],[.9,3.8],[1.8,2.6]]){ x.moveTo(px+dx*.5,py); x.quadraticCurveTo(px+dx*.7,py-hh*.6,px+dx*1.2,py-hh); } x.stroke(); }
   }
   x.restore();
   return {c:cv,w,h,pad}; }
@@ -166,13 +190,13 @@ function drawBankMud(B,s){ const c=ctx, M=MSA.mud[B.id]||(MSA.mud[B.id]=buildBan
   // the mud the water's just left is darker and shines
   bankPath(c,B,s,B.x,B.y); c.strokeStyle=B.salt?'rgba(38,44,28,.35)':'rgba(44,32,22,.34)'; c.lineWidth=10*k; c.stroke();
   c.strokeStyle='rgba(236,240,230,'+(.1+.05*Math.sin(t*1.3+B.p1)).toFixed(3)+')'; c.lineWidth=3*k; c.stroke();
-  for (const P of B.pans) if (panOut(B,P,s)) drawPan(B,P);
+  for (const P of B.pans) if (panOut(B,P,s)) drawTidePan(B,P);
   c.restore();
   // the waterline, lapping at it
   const lap=1+.012*Math.sin(t*1.4+B.p2); bankPath(c,B,s*lap,B.x,B.y);
   c.strokeStyle='rgba(228,238,232,'+(.28+.1*Math.sin(t*1.4+B.p2)).toFixed(3)+')'; c.lineWidth=1.3; c.stroke(); }
 /** A tide pool: a wet rim, the sky in it, and now and then a trapped fish turning. */
-function drawPan(B,P){ const c=ctx, p=panXY(B,P), rx=P.r*B.rx, ry=rx*.42, t=S.time;
+function drawTidePan(B,P){ const c=ctx, p=panXY(B,P), rx=P.r*B.rx, ry=rx*.42, t=S.time;
   c.fillStyle='rgba(40,30,22,.45)'; c.beginPath(); c.ellipse(p.x,p.y+1,rx+2,ry+1.4,0,0,Math.PI*2); c.fill();
   c.save(); c.beginPath(); c.ellipse(p.x,p.y,rx,ry,0,0,Math.PI*2); c.clip();
   c.fillStyle=mixP('skyLow','#A5B4AE',.35); c.fillRect(p.x-rx,p.y-ry,rx*2,ry*2);

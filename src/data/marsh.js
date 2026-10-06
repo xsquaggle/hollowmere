@@ -28,7 +28,7 @@ const BANKS=[
   {id:'bar', x:.5, d:.66, rx:.17, ry:.065, lo:.28, hi:.52, pans:[[-.32,.05,.16]]},
   {id:'saltings', x:.86, d:.86, rx:.21, ry:.09, lo:.6, hi:.98, salt:true, pans:[]}
 ];
-const MARSH={croak:{from:17, to:21, x:5}, reeve:{x:2.5}, night:{mudlark:1.4}};
+const MARSH={croak:{from:17, to:21, x:5}, reeve:{x:3}, night:{mudlark:1.4}};
 const WREN_Q={
   glow:  {name:'A fish that glows', ask:'Bring me a fish that glows. A live one, in your keepnet. I need to see how it does it.',
           thanks:'It glows from the inside! Like the lights on the marsh. I KNEW it. Come on, I’ll pole you down there. I need a witness.', reward:'Wren’s punt runs down to Saltmarsh.'},

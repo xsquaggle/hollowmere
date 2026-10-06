@@ -100,7 +100,7 @@ const FISH = {
             lore:'When it opens its mouth, you hear a bell from very far down.', hint:'Something in the marsh answers a bell, when it rains.'},
   lampwick:{name:'Lampwick Eel', rarity:'epic', beh:'ghost', night:true, glow:true, secret:true, extra:true, shared:true, pull:1.45, reel:9, value:420, size:[40,95], len:62, h:.1, color:'#3E3A44', fin:'#2C2932', window:.9,
             lore:'Its tail burns like a candle wick and never goes out. Wren swears it was a candle once.', hint:'Rises where rain meets lantern light.'},
-  reeve:   {name:'Old Reeve', rarity:'legendary', beh:'darter', pull:1.8, reel:14.5, value:1100, size:[90,130], len:84, h:.24, color:'#7A888C', fin:'#55636A', window:.72,
+  reeve:   {name:'Old Reeve', rarity:'legendary', beh:'darter', pull:1.8, reel:14.5, value:1200, size:[90,130], len:84, h:.24, color:'#7A888C', fin:'#55636A', window:.72,
             lore:'The marsh-reeve kept the sea wall for forty years. Something still swims its length at every spring tide, checking for leaks.', hint:'Something big patrols the channel and the sluice pool at the spring tides.'}
 };
 const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'];
@@ -153,9 +153,9 @@ const POOLS_MARSH = {
   open: {mudlark:46, dab:24, croaker:3, mullet:3},
   reeds:{mudlark:34, dab:10, croaker:7, mullet:1.5},
   flats:{dab:40, mudlark:16, mullet:10, croaker:3},
-  pans: {mudlark:46, dab:30, croaker:1.5, mullet:2.5},
-  deep: {mudlark:34, dab:14, croaker:3, mullet:9, reeve:1},
-  far:  {dab:30, mudlark:24, mullet:11, croaker:2, reeve:.8}
+  pans: {mudlark:36, dab:30, croaker:5, mullet:5},
+  deep: {mudlark:44, dab:20, croaker:3, mullet:9, reeve:.6},
+  far:  {dab:36, mudlark:30, mullet:11, croaker:2, reeve:.5}
 };
 const RARE_BITES={
   shiner:{region:'lake', bow:true, chance:.035},

@@ -35,19 +35,22 @@ function tideLine(){ const T=tideNow(), big=T.spring?' A spring tide, the bigges
   return T.rising ? 'The tide is coming in: high water about '+at(tideUntil(false))+'.'+big : 'The tide is going out: low water about '+at(tideUntil(true))+'.'+big; }
 
 /* ---------- the banks ---------- */
-/** Where the marsh's spots lie: the sluice pool under the old tide mill (left), the mud banks and their flats, the
+/** Where the marsh's spots lie: the sluice pool by the old sluice gate (left), the mud banks and their flats, the
     channel beyond them (far), the reed beds along both edges, and the creek, which is everything else. */
 function layoutMarsh(){
   const dy=d=>lerp(G.near,HZ+26,d), D=H-HZ;
   G.deep={x:W*.25, y:dy(.5), rx:W*.15, ry:D*.05};
-  G.banks=BANKS.map(B=>{ let hs=7; for (const ch of B.id) hs=(hs*31+ch.charCodeAt(0))%100003;
-    return {id:B.id, x:W*B.x, y:dy(B.d), rx:W*B.rx, ry:D*B.ry, lo:B.lo, hi:B.hi, salt:!!B.salt, pans:B.pans.map(([u,v,r])=>({u,v,r})), p1:(hs%628)/100, p2:((hs>>3)%628)/100}; });
+  G.banks=marshBanks(dy);
   // the reed beds: the near corners, clear of the boardwalk and Wren's punt
   G.shore={L:[[0,H*.6],[W*.07,H*.66],[W*.1,H*.76],[W*.08,H*.88],[W*.06,H]], R:[[W,H*.64],[W*.93,H*.69],[W*.89,H*.8],[W*.9,H*.92],[W*.92,H]]};
   G.padClusters=[]; G.kelp=[]; G.stacks=[];
   G.lantern={x:W/2-90, y:H-145};
   MSH.splats=[];
 }
+/** The banks at this screen size (dy places them out from the boardwalk; without it, they're only their sizes). */
+function marshBanks(dy){ const D=H-HZ;
+  return BANKS.map(B=>{ let hs=7; for (const ch of B.id) hs=(hs*31+ch.charCodeAt(0))%100003;
+    return {id:B.id, x:W*B.x, y:dy?dy(B.d):0, rx:W*B.rx, ry:D*B.ry, lo:B.lo, hi:B.hi, salt:!!B.salt, pans:B.pans.map(([u,v,r])=>({u,v,r})), p1:(hs%628)/100, p2:((hs>>3)%628)/100}; }); }
 /** How much of a bank is out of the water at a level: 1 all of it, 0 none (the water closes in from the edges). */
 const bankS = (B,L) => Math.sqrt(clamp((B.hi-L)/(B.hi-B.lo),0,1));
 /** A bank's edge isn't a perfect ellipse: its reach (a share of the footprint) toward angle th. */
@@ -66,6 +69,12 @@ function bankSpot(x,y){ const B=bankOf(x,y); if (!B) return null;
   for (const P of B.pans) if (panOut(B,P,s) && inPan(B,P,x,y)) return 'pans';
   return 'mud'; }
 const marshMud = (x,y) => bankSpot(x,y)==='mud';
+/** Whether the tide leaves a spot to cast to: tide pools only while the mud round them is out, flats only while the
+    water covers enough of a bank. The simulator's player fishes the open water when it doesn't (game/sim.js). */
+function marshSpotOpen(spot){ const L=tideNow().level, bs=REG()==='marsh' && G.banks ? G.banks : marshBanks();   // the simulator plays the marsh on any screen
+  if (spot==='pans') return bs.some(B=>B.pans.some(P=>panOut(B,P,bankS(B,L))));
+  if (spot==='flats') return bs.some(B=>!B.salt && bankS(B,L)<.85);
+  return true; }
 /** The distance from (x, y) to a polyline. */
 function nearLine(pts,x,y){ let best=1e9;
   for (let i=0;i<pts.length-1;i++){ const [ax,ay]=pts[i], [bx,by]=pts[i+1], vx=bx-ax, vy=by-ay, t=clamp(((x-ax)*vx+(y-ay)*vy)/(vx*vx+vy*vy),0,1);

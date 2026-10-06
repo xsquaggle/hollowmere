@@ -6,6 +6,9 @@
    the water is lost (cast from the left, as the player learns to), though the spot it bites in stays the one
    cast to; the Twin Spool's second float shortens the wait, and when both bite the player strikes the better fish.
    The clock stands still at st.hour, except on the river, where the casts sweep that hour's minutes (st.pin keeps it).
+   In the Saltmarsh the casts sweep the tide through its turn instead (st.tide holds it, 0 high water to .5 low), and a
+   spot the tide has drowned or left dry (tide pools at high water, the flats at low) is fished as open water. A cast
+   on the mud or a float the ebb strands isn't modeled: the player here aims off the banks.
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
@@ -28,14 +31,15 @@ const SIM_PLAYERS={
    390 by 844 phone; keep in step if spots move. */
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
                  coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]},
-                 river:{open:[0,.3], riffle:[0,.12], leaves:[.3,.38], deep:[.7,.78], roots:[.82,.9]}};
+                 river:{open:[0,.3], riffle:[0,.12], leaves:[.3,.38], deep:[.7,.78], roots:[.82,.9]},
+                 marsh:{open:[0,.3], reeds:[0,.15], flats:[.13,.3], pans:[.28,.35], deep:[.43,.5], far:[.8,.9]}};
 /** On the river, how far a float can drift across the screen through each spot before it's off the right edge (shares of
     the width, from where a player casts into it): the riffle and the roots lie to the right, so their runway is short. */
 const RIVER_RUN={open:.8, leaves:.62, deep:.75, riffle:.18, roots:.4};
 /** A stand-in save for a setup. tanks, parts, fish, finds and gear can be copied from a real save ("Use my setup"). */
 function simSave(st){
   const s=fresh(), now=Date.now(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
-  s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.ferry=s.region==='river'||!!st.ferry; s.clock=st.hour==null?12:st.hour;
+  s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.marsh=s.region==='marsh'||!!st.marsh; s.ferry=s.region==='river'||s.marsh||!!st.ferry; s.clock=st.hour==null?12:st.hour;
   s.rod=st.rod||'willow'; s.rods=[s.rod]; s.parts=st.parts==='all'?Object.keys(PARTS):(st.parts||[]).slice();
   s.tune=Object.assign(fresh().tune,st.tune||save.tune);
   s.stats.catches=st.catches==null?100:st.catches;            // a player well past the first treasure
@@ -46,7 +50,7 @@ function simSave(st){
     s.tanks={fresh:{lvl:TANKS.fresh.caps.length-1,owned:true,fish:[],decor:DECOR.fresh.map(d=>d.id),tips:0,tipT:now},
              salt:{lvl:TANKS.salt.caps.length-1,owned:true,fish:[],decor:DECOR.salt.map(d=>d.id),tips:0,tipT:now}};
     for (const id of new Set([...REGION_FISH.lake,...REGION_FISH.river])) s.tanks.fresh.fish.push(F(id),F(id));
-    for (const id of REGION_FISH.coast) s.tanks.salt.fish.push(F(id),F(id)); }
+    for (const id of new Set([...REGION_FISH.coast,...REGION_FISH.marsh.filter(id=>tankOf(id)==='salt')])) s.tanks.salt.fish.push(F(id),F(id)); }
   if (st.fish) for (const id in st.fish) s.fish[id]={caught:st.fish[id].caught||0,best:0,seen:true};
   else if (st.mastery) for (const id in FISH) s.fish[id]={caught:MASTERY.catches+2,best:0,seen:true};
   // the shack: copied from a real save, or every line fixed and the wall full (game/shack.js: shackFull)
@@ -105,9 +109,12 @@ function simulate(st,n){
       tiers:{}, species:{}, records:{}, muts:{}, tierCoins:{}, mutCoins:0, mutGlimmer:0, treasure:{rolled:0,hauled:0,lost:0,coins:0,finds:0,kinds:{},crates:{}}};
     const io={t:0,holding:true,tut:null,tilt:0,reeling:false,ev:[],why:''};
     let echo=null;                                                   // Echo: the next cast at that spot bites at once
+    const tide0=Math.random();                                       // where in its turn the marsh's tide starts the run
     const dayLen=modFlag('timeStop')?0:1440/modMul('clock');
     for (let c=0;c<n;c++){
-      const spot=echo?echo.spot:spots[c%spots.length], lucky=!!st.lucky, depth=((SIM_SPOTS[reg]||{})[spot]||[0,.5])[1], y=lerp(G.near,HZ+26,depth), cx={spot,lucky};   // an Echo waiting: the player casts back to it
+      let spot=echo?echo.spot:spots[c%spots.length];   // an Echo waiting: the player casts back to it
+      if (reg==='marsh'){ save.tidePin=st.tide!=null?st.tide:(tide0+c/24)%1; if (!marshSpotOpen(spot)) spot='open'; }
+      const lucky=!!st.lucky, depth=((SIM_SPOTS[reg]||{})[spot]||[0,.5])[1], y=lerp(G.near,HZ+26,depth), cx={spot,lucky};
       let t=1.6;                                                   // aim, drag and the cast's flight
       // the cast can tangle in the reeds or wash out in a swell
       if (spot==='reeds' && Math.random()<modBase('snag',cx)){ out.lost.snag++; out.secs+=t+.7; continue; }

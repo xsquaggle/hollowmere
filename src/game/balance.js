@@ -18,6 +18,7 @@ function balanceFormHTML(){
     sel('bRegion','Water',Object.keys(REGION_NAME).map(r=>[r,REGION_NAME[r]]),f.region)+
     sel('bSpot','Spot',[...spots,['mix','Every spot']],f.spot)+
     sel('bHour','Time',BAL_TIMES.map(([h,l])=>[h,l]),f.hour)+
+    (f.region==='marsh'?sel('bTide','Tide',[['turn','Turning, as it does'],...TIDE_PINS.map(([v,l])=>[v,l+', held'])],f.tide||'turn'):'')+
     sel('bRod','Rod',ALL_RODS.map(id=>[id,RODS[id].name]),f.rod)+
     sel('bReel','Reel',TACKLE_ORDER.reel.map(id=>[id,TACKLE[id].name]),f.reel||'clicker')+
     sel('bLine','Line',TACKLE_ORDER.line.map(id=>[id,TACKLE[id].name]),f.line||'cotton')+
@@ -46,10 +47,11 @@ function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:
   if (f.finds==='mine') st.finds=findsState(); else if (f.finds!=='none') st.artifacts=[f.finds];
   if (f.runes==='mine' || !f.runes) st.enchSave=enchState(); else if (f.runes!=='none') st.ench=[f.runes];
   if (f.treasure==='no') st.treasure=false;
+  if (f.region==='marsh' && f.tide!=null && f.tide!=='turn') st.tide=+f.tide;
   return st; }
 function bindBalance(){
-  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bShack:'shack',bFinds:'finds',bRunes:'runes',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n'};
-  for (const [id,k] of Object.entries(ids)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
+  const ids={bRegion:'region',bSpot:'spot',bHour:'hour',bRod:'rod',bReel:'reel',bLine:'line',bBait:'bait',bMeal:'meal',bStars:'stars',bSets:'sets',bParts:'parts',bMastery:'mastery',bShack:'shack',bFinds:'finds',bRunes:'runes',bTreasure:'treasure',bLucky:'lucky',bPlayer:'player',bN:'n',bTide:'tide'};
+  for (const [id,k] of Object.entries(ids)) if ($(id)) $(id).addEventListener('change',e=>{ BAL.form[k]=e.target.value;
     if (k==='region') BAL.form.spot='open';
     if (k==='region' || k==='rod'){ const y=$('panel').scrollTop; openPlaytest('balance'); $('panel').scrollTop=y; }
     if (k==='n') $('bRun').textContent='Run '+Number(BAL.form.n).toLocaleString()+' casts'; });
