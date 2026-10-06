@@ -18,7 +18,8 @@
               at the rainbow's foot; moon:'full' and night:true on full-moon nights; path: how much likelier a cast onto
               the moonpath makes it; top: the share of each in-game hour, from the hour, when it can bite (the Clockfin's
               ten minutes past); wx: only in that weather; flag: only while that STATS flag is on (data/stats.js: the
-              Drowned Bell in a pocket for the Bellmouth, the Lantern Rod lit for the Lampwick Eel).
+              Drowned Bell in a pocket for the Bellmouth, the Lantern Rod lit for the Lampwick Eel); churn:true only while the
+              seventh wave has the water stirred round your float (data/coast.js: SWELL).
    DRY        soft bad-luck protection, up to Legendary only: after `from` casts in a row where a Legendary could have
               bitten and didn't, its odds creep up, reaching ×max at `to`. Landing a Legendary or rarer starts it over.
    MUTS       mutations, rolled on landing (game/landing.js: catchRoll) on anything below Mythic: chance per catch before
@@ -28,7 +29,8 @@
    POOLS      lake bite weights per spot; POOLS_COAST, POOLS_RIVER and POOLS_MARSH the same for the other waters. Night, dawn, the tide, rods,
               meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench");
               SPOT_REG  a spot's own name in one water (the coast's deep water is the Dark trench, the river's the Millpool).
-              'mud' is no spot: it's the marsh's banks while the tide is out, where a cast only goes splat (game/marsh.js). */
+              'mud' is no spot: it's the marsh's banks while the tide is out, where a cast only goes splat (game/marsh.js). The coast's wash
+              is the white water a swell leaves on a sea stack, there for a few seconds, and its wreck lies past the stacks (game/coast-sea.js). */
 const FISH = {
   perch:   {name:'Copper Perch', rarity:'common', beh:'darter', pull:0.9, reel:2.6, value:2, size:[14,26], len:34, h:.27, color:'#D08A4E', fin:'#A85E2C', window:1.4,
             lore:'Its belly often holds old coins. Nobody knows who keeps dropping them.', hint:'Common in open water.'},
@@ -52,6 +54,14 @@ const FISH = {
             lore:'So old the barnacles have barnacles.', hint:'Lurks by the sea stacks and in the trench.'},
   saltjaw: {name:'Saltjaw', rarity:'legendary', beh:'darter', night:true, pull:1.85, reel:15, value:1500, size:[140,190], len:92, h:.16, color:'#7E8FA0', fin:'#5A6A7A', window:.7,
             lore:'Coast folk say it follows the lights under the swell.', hint:'Hunts the dark trench, mostly at night.'},
+  spindrift:{name:'Spindrift Bass', rarity:'uncommon', beh:'darter', pull:1.05, reel:4.2, value:32, size:[26,48], len:42, h:.3, color:'#C3CDD1', fin:'#8D9BA4', window:1.1,
+            lore:'Hunts in the foam a swell leaves on the rocks. Comes up white, and dries silver in your hands.', hint:'Hunts in the white water a swell leaves on the sea stacks.'},
+  herring: {name:'Beacon Herring', rarity:'uncommon', beh:'darter', night:true, glow:true, pull:.9, reel:3.8, value:26, size:[18,32], len:36, h:.22, color:'#6E8DA6', fin:'#4D6A82', window:1.2,
+            lore:'Every scale throws the lighthouse beam back. Ships have steered home by a shoal of them.', hint:'Rises at night, and comes to the lighthouse beam.'},
+  conger:  {name:'Wreck Conger', rarity:'rare', beh:'sulker', pull:1.5, reel:8.5, value:150, size:[90,180], len:72, h:.12, color:'#545A60', fin:'#3E4348', window:.88,
+            lore:'Has lived in the captain’s cabin so long it thinks it’s the captain.', hint:'Lives in the old wreck past the stacks, and comes out at night.'},
+  comber:  {name:'Comber Tarpon', rarity:'epic', beh:'leaper', extra:true, pull:1.6, reel:10.5, value:600, size:[120,200], len:82, h:.27, color:'#BCC8CE', fin:'#7F9BA7', window:.8,
+            lore:'Rides in on the seventh wave and out on the eighth. Its scales are as big as coins, and sailors keep one for luck.', hint:'Comes in behind the seventh wave, the big one.'},
   mayor:   {name:'Mayor Bartholomew', rarity:'legendary', beh:'darter', pull:1.75, reel:14, value:600, size:[110,150], len:86, h:.15, color:'#7D8A63', fin:'#58663F', window:.72,
             lore:"An ancient pike still wearing the mayor's chain of office.", hint:'Something huge circles the deep pool, most often at dawn.'},
   dace:    {name:'Drizzle Dace', rarity:'uncommon', beh:'leaper', wx:'rain', pull:.95, reel:3.9, value:16, size:[14,26], len:34, h:.24, color:'#A7B8C2', fin:'#6F8794', window:1.15,
@@ -123,20 +133,22 @@ const POOLS = {
   far:  {perch:22, leafjack:30, mossback:10, reedwhisker:4, gar:2, mayor:.8},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
-const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed', riffle:'Riffle', leaves:'Leaf drift', roots:'Undercut roots',
+const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed', wash:'The wash', wreck:'The wreck', riffle:'Riffle', leaves:'Leaf drift', roots:'Undercut roots',
   flats:'Flooded flats', pans:'Tide pools', mud:'Mud'};
-const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench',
+const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench', wash:'in the wash', wreck:'by the wreck',
   riffle:'in the riffle', leaves:'under the falling leaves', roots:'among the roots', 'river:open':'in the run', 'river:deep':'in the millpool',
   flats:'on the flooded flats', pans:'in a tide pool', 'marsh:open':'in the creek', 'marsh:deep':'in the sluice pool', 'marsh:far':'in the channel'};
 const SPOT_REG = {coast:{deep:'Dark trench'}, river:{open:'The run', deep:'Millpool'}, marsh:{open:'The creek', deep:'Sluice pool', far:'The channel'}};
-const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw'],
+const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'], coast:['sprat','wrasse','spindrift','kelpeel','bream','herring','mackerel','grouper','conger','gurnard','angler','comber','saltjaw'],
   river:['brook','stone','leafjack','spatefin','barbel','grayling','clockfin','gristle'], marsh:['mudlark','dab','croaker','smelt','whiting','mullet','bellmouth','lampwick','reeve']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:9, bream:6},
   kelp: {kelpeel:46, sprat:24, bream:20, grouper:5},
   deep: {grouper:14, bream:28, sprat:34, kelpeel:10, angler:2.5, saltjaw:.9},
-  far:  {bream:34, sprat:28, grouper:10, kelpeel:10, angler:1, saltjaw:.6}
+  far:  {bream:34, sprat:28, grouper:10, kelpeel:10, angler:1, saltjaw:.6},
+  wash: {spindrift:44, wrasse:24, sprat:18, grouper:7, bream:5},
+  wreck:{wrasse:30, sprat:20, grouper:14, conger:9, kelpeel:10, bream:12}
 };
 /* Rootwood River: the current carries the float from spot to spot (game/river.js), so these are where it is when a fish comes. */
 const POOLS_RIVER = {
@@ -162,7 +174,8 @@ const RARE_BITES={
   calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2},
   clockfin:{region:'river', top:1/6, chance:1/11},
   bellmouth:{region:'marsh', spots:['open','deep','far','flats'], wx:'rain', flag:'bellmouth', chance:1/14},
-  lampwick:{region:['marsh','lake'], spots:['reeds','open'], night:true, wx:'rain', flag:'lantern', chance:1/12}
+  lampwick:{region:['marsh','lake'], spots:['reeds','open'], night:true, wx:'rain', flag:'lantern', chance:1/12},
+  comber:{region:'coast', spots:['open','far','rocks','wash','kelp','wreck'], churn:true, chance:1/16}
 };
 const DRY={from:80, to:200, max:2};
 const MUTS={

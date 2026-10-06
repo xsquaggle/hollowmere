@@ -24,24 +24,24 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/ui-flow.js` | 32 | The news ribbon (`news`), queued coach tips, the overlay stack (`ovPush`, `ovOpen`), swipe-to-close |
 | `src/game/boot.js` | 17 | `boot`: starts everything (always last in the build) |
 | `src/index.html` | 59 | Page skeleton: head, markup, where styles, scripts and fonts go |
-| `src/test-hooks.js` | 69 | Test build only: `window.__` handles for the test suite |
+| `src/test-hooks.js` | 76 | Test build only: `window.__` handles for the test suite |
 
 ## Fishing: cast, bite, reel, land
 
 | File | Lines | What's in it |
 | --- | --- | --- |
-| `src/game/casting.js` | 57 | Aiming and the cast: `updateAim`, `release`, `updateCast` |
-| `src/game/bite.js` | 107 | Waiting and the bite: `startWaiting`, `spawnApproach`, `triggerBite`, `hook` |
+| `src/game/casting.js` | 61 | Aiming and the cast: `updateAim`, `release`, `updateCast` |
+| `src/game/bite.js` | 110 | Waiting and the bite: `startWaiting`, `spawnApproach`, `triggerBite`, `hook` |
 | `src/game/reeling.js` | 181 | The fight: `startReel`, `newFight`, `fightStep`, `updateReel`, snaps and lost fish |
 | `src/game/mutations.js` | 21 | Mutations: `rollMutation`, `mutationChance`, the per-species list (`mutsFound`, `noteMutation`), card tags and tips |
 | `src/game/landing.js` | 164 | `catchRoll` (what bit), landing, the catch card, coins, the HUD (`updateHud`) |
 | `src/game/rarity-fx.js` | 81 | The Epic, Exotic and Mythic moments: hook bulge, prism tint, ink, landing trails and rays, card chords, rarity pips |
 | `src/game/catch-card.js` | 68 | The catch card scene: tape measure, the record moment |
-| `src/game/odds.js` | 59 | `poolFor`: which fish each spot offers with the rod in hand |
-| `src/game/records.js` | 29 | Size, weight, quality stars, record formatting |
+| `src/game/odds.js` | 62 | `poolFor`: which fish each spot offers with the rod in hand |
+| `src/game/records.js` | 30 | Size, weight, quality stars, record formatting |
 | `src/game/mods.js` | 100 | Every bonus goes through here: `modsFor`, `modMul`, `modAdd`, `luckPoints`, `luckCurve` |
 | `src/game/render.js` | 193 | The fishing layer and `render()`: fish shadows, bobber, rod and line, aim, gauge |
-| `src/game/fish-art.js` | 283 | `drawFish` and the body, tail and fin paths, each fish's own fins (`DORSAL`, `FINS2`), markings and details (the Bellmouth's bell, the Lampwick's flame, the Will-o'-Whiting's light) |
+| `src/game/fish-art.js` | 317 | `drawFish` and the body, tail and fin paths, each fish's own fins (`DORSAL`, `FINS2`), markings and details (the Bellmouth's bell, the Lampwick's flame, the Will-o'-Whiting's light) |
 
 ## The world: scenery, regions, weather, time
 
@@ -52,12 +52,14 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/moon.js` | 55 | Moon phases in the sky, the moonpath, the mother's breach, the rainbow's foot |
 | `src/game/weather-art.js` | 112 | Sky tint, overcast, rain, rings on the water, fog banks, rainbow |
 | `src/game/scenery.js` | 101 | Static backdrop, rebuilt on resize: sky, hills, land |
-| `src/game/scenery-live.js` | 314 | Living layers: water, clouds, gulls, the lucky spot, pads, banks, rocks, boats |
+| `src/game/scenery-live.js` | 315 | Living layers: water, clouds, gulls, the lucky spot, pads, banks, rocks, boats |
 | `src/game/dock.js` | 192 | The dock: boards, piles, tackle box, bait pail, lantern, keepnet |
 | `src/game/angler.js` | 104 | The angler seen from behind: pose, hands |
 | `src/game/folk.js` | 183 | Townsfolk on the water: Ottilie's punt, Barnaby's launch, Pell's mail boat, heron, frog |
-| `src/game/regions.js` | 47 | `REG`, `regionOpen`, region layout, spot names in each water (`spotName`), `poolsOf`, `regionOf`, `lakeDone`/`waterDone` |
-| `src/game/coast.js` | 182 | The coast backdrop: lighthouse, sea stacks, kelp, swell, skiff deck |
+| `src/game/regions.js` | 40 | `REG`, `regionOpen`, region layout, spot names in each water (`spotName`), `poolsOf`, `regionOf`, `lakeDone`/`waterDone` |
+| `src/game/coast.js` | 188 | The coast backdrop: lighthouse, sea stacks, kelp, the swell (`updateSwell`, `drawSwell`: the seventh wave's kick, breaking on the stacks), skiff deck |
+| `src/game/coast-sea.js` | 109 | Gullrock Coast's rules: the seventh wave (`swellBig`, `swellY`, `churnedAt`, `seventhIn`, `seventhNext`), the wash (`washOf`, `washAt`, `washBreak`), the wreck (`atWreck`, `layoutWreck`), the lighthouse beam (`beamOn`, `beamAngle`, `beamOnAt`), `coastSpot`, `coastMods`, `coastWaiting` (churn and beam bring a fish at once), `coastUpdate` (warning, tips) |
+| `src/game/coast-sea-art.js` | 117 | The coast's later art: the wreck of the Marigold (`buildWreck`, `drawWreck`, the sail and the cormorant), the wash, the beam on the water (`drawSeaBeam`, `drawCoastLamp`), the seventh wave building (`drawSeventhBuilding`) |
 | `src/game/river.js` | 113 | Rootwood River: its spots, the drifting float (`driftFloat`, `riverWaiting`), holding the line (`riverPress`/`riverRelease`), Ottilie's ferry (`ferryAsk`, `fixFerry`, `ferryHTML`), Homebody's days (`homeDays`, `homeMul`), the otter |
 | `src/game/river-art.js` | 226 | The river drawn: the far wood, the mill and its waterwheel, the current, the riffle, falling and floating leaves, the near banks, Wren's boathouse, the alder, the otters, the ferry's picture |
 | `src/game/marsh.js` | 142 | Saltmarsh: the tide (`tideNow`, `tideUntil`, `tideMark`, `tideLine`), the banks and spots (`layoutMarsh`, `bankS`, `bankSpot`, `marshSpot`, `marshMud`), a cast on the mud (`marshMudCast`, `mudSplat`), the stranded float (`marshWaiting`), fish swimming round the mud (`marshApproachFrom`), the tide's modifiers (`tideMods`), the tide turning (`marshUpdate`) |
@@ -135,22 +137,22 @@ Where everything lives, so you can go straight to the lines you need. Line count
 
 | File | Lines | What's in it |
 | --- | --- | --- |
-| `src/game/playtest.js` | 79 | The hidden Playtest sheet (the wrench, or a long press on the clock): forcing fish, the weather, the moon and the tide (`TIDE_PINS`) |
+| `src/game/playtest.js` | 81 | The hidden Playtest sheet (the wrench, or a long press on the clock): forcing fish, the weather, the moon and the tide (`TIDE_PINS`) |
 | `src/game/balance.js` | 95 | Playtest > Balance: run the simulator on any setup |
-| `src/game/sim.js` | 198 | The balance simulator: the 1,000-cast report, the river's drift and the marsh's tide (`SIM_SPOTS`) |
+| `src/game/sim.js` | 209 | The balance simulator: the 1,000-cast report, the river's drift, the marsh's tide, the coast's churn, beam and wash (`SIM_SPOTS`, `SIM_PLAYERS`) |
 | `src/game/pace.js` | 50 | The pace log: minutes of play and when each rod, part, fix, pocket, rune and species first came (`paceTick`, `paceKeys`), and Playtest > Pace beside the simulator's run (`paceHTML`) |
 
 ## Content tables (`src/data/`)
 
 | File | Lines | Tables |
 | --- | --- | --- |
-| `src/data/fish.js` | 174 | `FISH`, `RAR`, `BEH`, `POOLS`, `POOLS_COAST`, `REGION_FISH`, spot names |
+| `src/data/fish.js` | 187 | `FISH`, `RAR`, `BEH`, `POOLS`, `POOLS_COAST`, `REGION_FISH`, spot names |
 | `src/data/gear.js` | 59 | `RODS`, `SEA_RODS`, `BOAT` (the skiff's price), boat `PARTS`, `PAINTS` |
 | `src/data/world.js` | 9 | `REGION_NAME`, `MAP_PLACES` |
 | `src/data/weather.js` | 56 | `WX`, `WX_TABLE`, `WX_FISH`, weather lines |
 | `src/data/people.js` | 8 | Ottilie's, Barnaby's and banquet lines, the uncle's letter |
 | `src/data/aquarium.js` | 46 | `TANKS`, `DECOR`, `TANK_SETS`, tip rates |
-| `src/data/kitchen.js` | 64 | `SPICES`, `SIDES`, `RECIPES`, `MEAL_STR` |
+| `src/data/kitchen.js` | 65 | `SPICES`, `SIDES`, `RECIPES`, `MEAL_STR` |
 | `src/data/music.js` | 25 | Chords, moods, the motif, ambience levels |
 | `src/data/treasure.js` | 144 | `TREASURE`, `CRATES`, `FINDS`, `OWNERS`, `POCKETS`, `NOTES` |
 | `src/data/relics.js` | 38 | `STORY` (how each story relic is found), `MAPS`, `MOON_JAR`, `COMBOS` |
@@ -160,6 +162,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/data/orders.js` | 87 | `ORDERS`, `TOWNSFOLK`, `STANDINGS`, `UPGRADES`, `VISITS`, `PLATTER` |
 | `src/data/shack.js` | 34 | `FIXUP` (the uncle's fix-up list), `WALL` (plaques and what a mount does), `SHELF`, `MARKS`, `TRAPDOOR` |
 | `src/data/river.js` | 50 | `RIVER` (the ferry, the current, Old Gristle's hours, the otter), `WREN` (sockets, her lines and corkboard), `TWIN` |
+| `src/data/coast.js` | 31 | `SWELL` (period, the seventh wave), `WASH`, `WRECK`, `BEAM` (the lighthouse), `COAST_NIGHT` (night fish), `COAST_LINES` (tips) |
 | `src/data/marsh.js` | 45 | `TIDE` (period, spring and neap, the flood and the tide pools' bites), `BANKS` (the mud banks and their tide pools), `MARSH` (the Croaking Bass's dusk, Old Reeve's spring tides, night fish), `WREN_Q` (her quests), `WREN_MARSH` (her marsh lines) |
 | `src/data/pace.js` | 7 | `PACE_SIM`: minutes until each thing in the simulator's whole run (`npm run sim -- --career --runs 11 --pace`) |
 | `src/data/stats.js` | 60 | `STATS` (everything a bonus can change), `MASTERY` |
@@ -183,8 +186,8 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/saves.test.cjs` | 47 | Backup codes and earlier saves |
 | `tests/webapp.test.cjs` | 27 | The installable web app works offline |
 | `tests/tackle.test.cjs` | 169 | The tackle bag, bait, tackle shops |
-| `tests/treasure.test.cjs` | 187 | Treasure, crates, finds, letters |
-| `tests/enchant.test.cjs` | 308 | Glimmer and runes |
+| `tests/treasure.test.cjs` | 188 | Treasure, crates, finds, letters |
+| `tests/enchant.test.cjs` | 312 | Glimmer and runes |
 | `tests/bonuses.test.cjs` | 108 | Modifiers, luck and the simulator |
 | `tests/aquarium.test.cjs` | 66 | Tips, decor, tanks |
 | `tests/kitchen.test.cjs` | 68 | The four stations, meals, mush |
@@ -196,4 +199,5 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/shack.test.cjs` | 202 | The shack: the fix-up list, mounting and the wall bonus, the rod rack, the knock-through, the room at five phone sizes, odd saves |
 | `tests/depth.test.cjs` | 56 | The depth gate: rare and Legendary odds near the design doc, the pace log and Playtest > Pace |
 | `tests/river.test.cjs` | 185 | Rootwood River: the ferry, the drifting float, its spots, fish and hours, Homebody, the otter, Wren, the Twin Spool |
+| `tests/coast.test.cjs` | 122 | Gullrock Coast finished: the seventh wave and its churn, the Comber Tarpon, the wash, the wreck and the conger, the lighthouse beam and the herring, the four new fish |
 | `tests/marsh.test.cjs` | 216 | Saltmarsh: Wren's glow quest and the punt, the tide and the moon, the mud splat and the stranded float, the tide's bites and pools, the Lantern Rod and the Lampwick Eel, the Bellmouth |

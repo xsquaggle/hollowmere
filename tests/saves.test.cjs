@@ -23,7 +23,7 @@ module.exports = [
       await page.fill('#inCode', 'hello there'); await page.click('#ckCode'); await page.waitForTimeout(300);
       assert.match(await page.innerText('#ckOut'), /start with HM1/);
       await page.fill('#inCode', code); await page.click('#ckCode'); await page.waitForTimeout(400);
-      assert.match(await page.innerText('#ckOut'), /4,321 coins · 2\/36 species · 50 catches · Ash Caster/);
+      assert.match(await page.innerText('#ckOut'), /4,321 coins · 2\/40 species · 50 catches · Ash Caster/);
       await page.click('#doRestore'); await page.waitForTimeout(1500);
       const s = await readSave(page);
       assert.deepEqual([s.coins, s.rod], [4321, 'ash'], 'coins and rod come back');

@@ -1,10 +1,13 @@
 /* ---------- Bite odds: which fish each spot offers, and the rod in hand ---------- */
-/** Each fish's weight in this spot's pool, here and now. */
-function poolFor(spot,lucky){
+/** Each fish's weight in this spot's pool, here and now. `at` says what's going on at the float: at the coast, the
+    lighthouse beam on it (lit). */
+function poolFor(spot,lucky,at){
   const h=save.clock, night=nightNow(), reg=REG(), coastal=reg==='coast', river=reg==='river', marsh=reg==='marsh', P=poolsOf(reg), w=Object.assign({},P[spot]||P.open);
   // the water itself: who comes up at night, the Mayor's dawns, Old Gristle's six o'clock crusts, the Croaking Bass's dusk
   // and Old Reeve's spring tides
-  if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
+  if (coastal){ if (night){ for (const k in COAST_NIGHT) if (w[k] && typeof COAST_NIGHT[k]==='number') w[k]*=COAST_NIGHT[k]; if (COAST_NIGHT.herring[spot]) w.herring=COAST_NIGHT.herring[spot]; }
+    // the lighthouse beam crossing the float draws whatever glows (game/coast-sea.js)
+    if (at && at.lit) for (const k in w) if (FISH[k].glow) w[k]*=BEAM.glow; }
   else if (river){ if (night){ if (w.barbel) w.barbel*=1.6; if (w.brook) w.brook*=.7; } }
   else if (marsh){ if (night) for (const k in MARSH.night) if (w[k]) w[k]*=MARSH.night[k];
     if (w.croaker && h>=MARSH.croak.from && h<MARSH.croak.to) w.croaker*=MARSH.croak.x;
@@ -39,7 +42,7 @@ const RARE_ORDER=Object.keys(RARE_BITES).sort((a,b)=>rarRank(FISH[b].rarity)-rar
 function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
   for (const id of RARE_ORDER){ const B=RARE_BITES[id];
     if (!(Array.isArray(B.region)?B.region.includes(reg):B.region===reg) || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
-    if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top)) || (B.wx && wxNow()!==B.wx) || (B.flag && !modFlag(B.flag,{spot}))) continue;
+    if ((B.churn && !at.churn) || (B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top)) || (B.wx && wxNow()!==B.wx) || (B.flag && !modFlag(B.flag,{spot}))) continue;
     if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
   return null; }
 /** Whether the in-game clock is within `share` of an hour past the hour (the Clockfin's few minutes). */
@@ -49,7 +52,7 @@ const RARITY_CTL={fish:null, mut:null};
 /** The fish that takes this cast. A long run without a Legendary, where one could have bitten, counts toward DRY. */
 function rollFish(spot,lucky,at){ if (RARITY_CTL.fish && !SIMULATING){ const f=RARITY_CTL.fish; RARITY_CTL.fish=null; return f; }
   const hi=rareBite(spot,lucky,at); if (hi) return hi;
-  const w=poolFor(spot,lucky), id=pickW(w);
+  const w=poolFor(spot,lucky,at), id=pickW(w);
   if (rarRank(FISH[id].rarity)<rarRank('legendary') && Object.keys(w).some(k=>FISH[k].rarity==='legendary')) save.stats.dry=(save.stats.dry||0)+1;
   return id; }
 /** What the dry run multiplies the Legendaries' odds by: 1 until DRY.from casts, rising to DRY.max at DRY.to. */

@@ -29,7 +29,7 @@ function layoutRegion(){
     G.lantern={x:W/2-64, y:H-150};
     sseed=77; SC.kelp=G.kelp.map(c=>{ const arr=[]; const n=c.r>W*.1?20:11;
       for (let i=0;i<n;i++){ const a=sr()*6.28, d=Math.sqrt(sr()); arr.push({ox:Math.cos(a)*d, oy:Math.sin(a)*d, len:.5+sr()*.7, ph:sr()*6.28, bulb:sr()<.5}); } return arr; });
-    SC.bank={L:[],R:[]}; SC.tails=[];
+    SC.bank={L:[],R:[]}; SC.tails=[]; layoutWreck();
   } else if (REG()==='river'){ layoutRiver();
   } else if (REG()==='marsh'){ layoutMarsh();
   } else {
@@ -37,11 +37,4 @@ function layoutRegion(){
     G.kelp=[]; G.stacks=[];
     G.lantern={x:W/2-90, y:H-145};
   }
-}
-function coastSpot(x,y){
-  const d=G.deep, dx=(x-d.x)/d.rx, dy=(y-d.y)/d.ry; if (dx*dx+dy*dy<1.25) return 'deep';
-  for (const k of G.kelp) if (Math.hypot(x-k.x,(y-k.y)*1.8) < k.r*1.1) return 'kelp';
-  for (const s of G.stacks) if (Math.hypot(x-s.x,(y-s.y)*2) < s.r*1.7) return 'rocks';
-  if (y < lerp(G.near,HZ+26,.8)) return 'far';
-  return 'open';
 }

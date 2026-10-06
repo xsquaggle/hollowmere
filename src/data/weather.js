@@ -40,8 +40,8 @@ const WX_FISH={
          fog: {fish:'char', pools:{deep:18, far:20, open:4, pads:3}}},
   river:{rain:{fish:'spatefin', pools:{open:14, riffle:16, leaves:8, deep:6, roots:6}},
          fog: {fish:'grayling', pools:{open:8, deep:12, roots:14, leaves:4, riffle:3}}},
-  coast:{rain:{fish:'mackerel', pools:{open:16, far:14, kelp:6, rocks:4, deep:6}},
-         fog: {fish:'gurnard', pools:{rocks:10, deep:9, far:6, open:2, kelp:2}}},
+  coast:{rain:{fish:'mackerel', pools:{open:16, far:14, kelp:6, rocks:4, deep:6, wash:5, wreck:4}},
+         fog: {fish:'gurnard', pools:{rocks:10, deep:9, far:6, open:2, kelp:2, wash:6, wreck:8}}},
   marsh:{rain:{fish:'smelt', pools:{open:14, reeds:8, flats:10, pans:4, deep:6, far:10}},
          fog: {fish:'whiting', pools:{far:16, flats:12, open:8, deep:8, reeds:4, pans:3}}}
 };

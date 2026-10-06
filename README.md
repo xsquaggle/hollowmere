@@ -21,7 +21,7 @@ Its source lives in `src/` as small files, and a build pastes them together. `do
 | --- | --- |
 | `src/index.html` | The page skeleton: head, markup, and where the styles and scripts go |
 | `src/data/` | Content tables: fish, rods and boat parts, places, people's lines, aquarium, kitchen, music |
-| `src/game/` | The game itself, one file per system (casting, reeling, kitchen stations, saves…). Scene art: `angler.js`, `dock.js`, `folk.js`, `coast.js`, `river-art.js`, `wren-art.js`, `marsh-art.js` |
+| `src/game/` | The game itself, one file per system (casting, reeling, kitchen stations, saves…). Scene art: `angler.js`, `dock.js`, `folk.js`, `coast.js`, `river-art.js`, `wren-art.js`, `marsh-art.js`, `coast-sea-art.js` |
 | `src/styles/` | Styles, one file per screen |
 | `src/fonts/` | Nunito, Young Serif and Caveat, subset to WOFF, plus their licenses |
 | `src/build.json` | The order files are pasted in. Scripts share one closure, so a file can use anything listed before it |
@@ -113,7 +113,7 @@ in `layoutRegion`.
 **Pacing (the depth gate).** `npm run sim -- --career` plays whole runs from the first cast, buying rods, the boat
 and everything else as the coins come in, and lists when each thing happens and the longest waits with nothing new.
 `--builds` puts four builds on one rod and water. Rare and Legendary odds follow the design doc's table, and prices
-are set so the lake and the coast take about 9 hours (about 10 with Rootwood River and the Saltmarsh). In the game, Playtest > Pace logs a real run's minutes of
+are set so the lake and the coast take about 9 hours (about 10 with Rootwood River, the Saltmarsh and the rest of the coast). In the game, Playtest > Pace logs a real run's minutes of
 play beside the simulator's (`src/game/pace.js`, `src/data/pace.js`); after a balance change, paste
 `npm run sim -- --career --runs 11 --pace` into `src/data/pace.js`.
 

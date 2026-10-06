@@ -164,7 +164,7 @@ function drawGauge(){
   if (diving){ label=R.loot?(R.warn>0?'CATCHING ON THE BOTTOM · LET GO':'SNAGGED · LET GO'):R.warn>0?'DIVE INCOMING · LET GO':'DIVING · LET GO'; lc='#F5D08A'; }
   else if (R.jump){ label='TAP NOW'; lc='#F5D08A'; }
   else if (R.fade>0){ label='IT FADED · FOLLOW THE LINE'; lc='#D9DEE6'; }
-  else if (swellNear(R.y,95)){ label='SWELL COMING · EASE OFF'; lc='#F5D08A'; }
+  else if (swellNear(R.y,95)){ label=S.swell.big?'SEVENTH WAVE · EASE OFF':'SWELL COMING · EASE OFF'; lc='#F5D08A'; }
   else if (R.tug){ label='TUG · LET GO'; lc='#F5D08A'; }
   else if (R.F.beh==='tugger' && S.holding){ label='REEL BETWEEN TUGS'; lc='#CFE7B9'; }
   else if (R.surge>0){ label=R.loot?'FREE · HAUL HARD':'REEL HARD'; lc='#CFE7B9'; }

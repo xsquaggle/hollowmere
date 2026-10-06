@@ -9,6 +9,11 @@
    In the Saltmarsh the casts sweep the tide through its turn instead (st.tide holds it, 0 high water to .5 low), and a
    spot the tide has drowned or left dry (tide pools at high water, the flats at low) is fished as open water. A cast
    on the mud or a float the ebb strands isn't modeled: the player here aims off the banks.
+   At Gullrock Coast every seventh swell is a big one (data/coast.js: SWELL), harder on a line mid-fight; a float out
+   when one passes (as long after it as the churn lasts) gets a fish at once and the Comber Tarpon's chance, and at night
+   or in fog so does a float the lighthouse beam crosses (the beam's glow fish likelier). Both happen by chance as often
+   as the clocks line up with the wait, and a player who times casts to them (SIM_PLAYERS seventh, beam) gets more.
+   The wash only lies by a stack after a swell breaks there, so a cast to it waits for one, and is never washed out.
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
@@ -22,15 +27,15 @@
    comes back untouched. */
 const SIM_PLAYERS={
   steady:{name:'Steady player', react:()=>.2+.38*Math.pow(Math.random(),1.6), easeReact:()=>rand(.12,.32), track:5, easeAt:.8, easeFor:.45,
-          twitch:true, dives:.8, tugs:.7, jumps:.85, swells:.5},
+          twitch:true, dives:.8, tugs:.7, jumps:.85, swells:.5, seventh:.1, beam:.2},
   new:   {name:'New player', react:()=>.28+.6*Math.pow(Math.random(),1.3), easeReact:()=>rand(.25,.6), track:3, easeAt:.9, easeFor:.35,
-          twitch:false, dives:.4, tugs:.35, jumps:.5, swells:.15}
+          twitch:false, dives:.4, tugs:.35, jumps:.5, swells:.15, seventh:.03, beam:.08}
 };
 /* Where each spot sits on the cast's 0 (shore) to 1 (horizon) scale: [nearest edge, middle]. The rod's reach
    has to cover the nearest edge. Worked out from the layout in game/layout.js and game/regions.js on a
    390 by 844 phone; keep in step if spots move. */
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
-                 coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]},
+                 coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], wash:[.34,.45], deep:[.43,.53], wreck:[.72,.77], far:[.8,.9]},
                  river:{open:[0,.3], riffle:[0,.12], leaves:[.3,.38], deep:[.7,.78], roots:[.82,.9]},
                  marsh:{open:[0,.3], reeds:[0,.15], flats:[.13,.3], pans:[.28,.35], deep:[.43,.5], far:[.8,.9]}};
 /** On the river, how far a float can drift across the screen through each spot before it's off the right edge (shares of
@@ -79,7 +84,7 @@ function simSave(st){
 }
 /** Plays one fight (a fish or a haul) through the game's fight step, the way player P would. Returns {end, ft, why}. */
 function simFight(R,P,reg,io,fc){
-  const dt=1/60; let ft=0, end=null, easeAt=null, easeUntil=0, swellT=reg==='coast'?rand(0,7.5):Infinity;
+  const dt=1/60; let ft=0, end=null, easeAt=null, easeUntil=0, swellT=reg==='coast'?rand(0,SWELL.period):Infinity, swellN=Math.floor(rand(0,SWELL.set));
   const plan={}; io.tilt=0; io.why='';
   // a faded ghost can only be followed by its line, so the player tracks it more slowly and less surely
   io.steer=(R,dt)=>R.fam?lerp(io.tilt,R.dir,Math.min(1,dt*8)):R.fade>0?lerp(io.tilt,R.dir+Math.sin(ft*1.3)*.3,Math.min(1,dt*P.track*.4)):lerp(io.tilt,R.dir+Math.sin(ft*1.7)*.12,Math.min(1,dt*P.track));
@@ -93,7 +98,7 @@ function simFight(R,P,reg,io,fc){
     if (R.tension>P.easeAt && easeAt==null && ft>=easeUntil) easeAt=ft+P.easeReact();
     if (easeAt!=null && ft>=easeAt){ easeUntil=ft+P.easeFor; easeAt=null; }
     io.holding=!(ft<easeUntil || (plan.dive && (R.dive>0 || R.warn>0 && R.warn<.35)) || (plan.tug && R.tug && R.beat%1.15>.12));
-    swellT-=dt; if (swellT<=0){ swellT+=7.5; if (Math.random()>=P.swells && io.holding) R.tension+=.3*modMul('swell',fc); }
+    swellT-=dt; if (swellT<=0){ swellT+=SWELL.period; swellN++; if (Math.random()>=P.swells && io.holding) R.tension+=.3*modMul('swell',fc)*(swellBig(swellN)?SWELL.big.hit:1); }
     end=fightStep(R,dt,io);
   }
   return {end, ft, why:io.why};
@@ -119,7 +124,8 @@ function simulate(st,n){
       let t=1.6;                                                   // aim, drag and the cast's flight
       // the cast can tangle in the reeds or wash out in a swell
       if (spot==='reeds' && Math.random()<modBase('snag',cx)){ out.lost.snag++; out.secs+=t+.7; continue; }
-      if (reg==='coast' && !modFlag('noWashout',cx) && Math.random()<(4.6/7.5)*(68*sc(y))/(H-118-HZ-8)*(1-P.swells)){ out.lost.washout++; out.secs+=t+.7; continue; }
+      if (spot==='wash' && Math.random()<(SWELL.period-WASH.last)/SWELL.period) t+=rand(0,SWELL.period-WASH.last);   // waiting for a swell to break on the stack
+      if (reg==='coast' && spot!=='wash' && !modFlag('noWashout',cx) && Math.random()<(SWELL.travel/SWELL.period)*(68*sc(y)*(SWELL.set-1+SWELL.big.band)/SWELL.set)/(H-118-HZ-8)*(1-P.swells)){ out.lost.washout++; out.secs+=t+.7; continue; }
       // the quiet before anything shows up; a steady player twitches once to hurry it
       const tw=modMul('twitch',cx); let wait=biteWait(spot)*(spot==='deep'?1.2:1)/modMul('reedBite',cx);
       if (P.twitch) wait=Math.max(.3,wait*(.65-.2*(tw-1)));
@@ -142,9 +148,14 @@ function simulate(st,n){
         t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'||loot.kind==='map'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
-      const at={bow:!!st.bow, path:!!st.path}; let id=ech||rollFish(spot,lucky,at);
+      const at={bow:!!st.bow, path:!!st.path};
+      // the coast: the seventh wave's churn, and the lighthouse beam at night, each bring a fish at once
+      if (reg==='coast' && !ech){ const sevenP=(SWELL.big.churn+wait)/(SWELL.period*SWELL.set), beamP=(wait+BEAM.width/(BEAM.span[1]-BEAM.span[0])*BEAM.turn/2)/BEAM.turn;
+        if (Math.random()<sevenP+(1-sevenP)*P.seventh){ at.churn=true; wait=Math.min(wait,rand(0,wait)+SWELL.big.in); }
+        if ((isNight(save.clock) || wxNow()==='fog') && Math.random()<beamP+(1-beamP)*P.beam){ at.lit=true; wait=Math.min(wait,rand(0,wait)+BEAM.in); } }
+      let id=ech||rollFish(spot,lucky,at);
       // the Twin Spool: now and then both floats go under, and the player strikes the one with the better fish
-      if (twin && !ech && Math.random()<TWIN.both){ const id2=pickW(poolFor(spot,lucky)); out.twins++; if (FISH[id2].value>FISH[id].value) id=id2; }
+      if (twin && !ech && Math.random()<TWIN.both){ const id2=pickW(poolFor(spot,lucky,at)); out.twins++; if (FISH[id2].value>FISH[id].value) id=id2; }
       const F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js

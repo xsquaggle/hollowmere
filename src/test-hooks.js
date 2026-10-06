@@ -66,4 +66,11 @@ window.__hm={ get save(){ return save; }, FISH, RODS, ROD_ORDER, SEA_RODS, QUEST
     G:()=>({deep:G.deep, banks:(G.banks||[]).map(B=>({id:B.id, x:B.x, y:B.y, rx:B.rx, ry:B.ry, salt:!!B.salt, s:bankS(B,tideNow().level), pans:B.pans.map(P=>Object.assign(panXY(B,P),{out:panOut(B,P,bankS(B,tideNow().level))}))})), shore:G.shore, near:G.near, hz:HZ, w:W, h:H}),
     spot:(x,y)=>marshSpot(x,y), bank:(x,y)=>bankSpot(x,y), mud:(x,y)=>marshMud(x,y), travel:r=>travelTo(r), mudCast:(x,y)=>marshMudCast(x,y), wait:dt=>marshWaiting(dt||.3),
     approach:(b,d)=>marshApproachFrom(b,d), update:dt=>marshUpdate(dt), mods:()=>{ MODC.dirty=true; return modList(); },
-    glowFish:()=>glowFish(), glowReady:()=>glowReady(), lightsReady:()=>lightsReady(), giveGlow:()=>giveGlow(), giveLantern:()=>giveLantern(), news:()=>questNews() } };
+    glowFish:()=>glowFish(), glowReady:()=>glowReady(), lightsReady:()=>lightsReady(), giveGlow:()=>giveGlow(), giveLantern:()=>giveLantern(), news:()=>questNews() },
+  // Gullrock Coast finished (step 27): the seventh wave, the wash, the wreck and the lighthouse beam
+  coast:{ SWELL, WASH, WRECK, BEAM, COAST_NIGHT, CS, swell:()=>S.swell&&{t:S.swell.t, y:S.swell.y, n:S.swell.n, big:!!S.swell.big}, setSwell:t=>{ S.swell.t=t; S.swell.prev=null; },
+    big:n=>swellBig(n), y:(n,t)=>swellY(n,t), reach:y=>swellReach(y), churned:y=>churnedAt(y), seventhIn:()=>seventhIn(), seventhNext:()=>seventhNext(),
+    G:()=>({wreck:G.wreck, stacks:(G.stacks||[]).map(s=>({x:s.x,y:s.y,r:s.r,h:s.h})), deep:G.deep, kelp:G.kelp, near:G.near, hz:HZ, w:W, h:H}),
+    washOf:i=>washOf(G.stacks[i]), washAt:(x,y)=>washAt(x,y), washBreak:(i,big)=>washBreak(i,big), atWreck:(x,y)=>atWreck(x,y), spot:(x,y)=>coastSpot(x,y),
+    beamOn:()=>beamOn(), beamAngle:t=>beamAngle(t), beamFoot:()=>beamFoot(), beamOnAt:(x,y)=>beamOnAt(x,y), wait:dt=>coastWaiting(dt||.1), update:dt=>coastUpdate(dt||.1),
+    pool:(sp,l,at)=>poolFor(sp,l,at), mods:()=>{ MODC.dirty=true; return modList(); } } };
