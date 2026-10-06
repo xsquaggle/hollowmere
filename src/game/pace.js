@@ -16,6 +16,7 @@ function paceState(){ const fresh=!isObj(save.pace); if (fresh) save.pace={};
 function paceKeys(){ const k=[];
   for (const r of save.rods||[]) if (r!=='willow' && RODS[r]) k.push('rod:'+r);
   if (save.boat) k.push('boat');
+  if (save.ferry) k.push('ferry');
   for (const id of save.parts||[]) if (PARTS[id]) k.push('part:'+id);
   for (const id of (isObj(save.shack) && Array.isArray(save.shack.fix) ? save.shack.fix : [])) if (FIXUP.some(L=>L.id===id)) k.push('fix:'+id);
   const n=isObj(save.finds) ? +save.finds.pockets||0 : 0; for (let i=POCKETS.start+1;i<=Math.min(n,POCKETS.max);i++) k.push('pocket:'+i);
@@ -29,7 +30,7 @@ function paceTick(dt){ if (SIMULATING || INTRO.active || document.hidden || S.ti
   for (const k of paceKeys()) if (!p.seen[k]){ p.seen[k]=1; p.log.push([k,m]); } }
 /** What a key is called in the table. */
 function paceName(k){ const [kind,raw]=String(k).split(':'), id=String(raw).replace(/[<>&"]/g,'');   // a log read from a pasted backup code could hold anything
-  if (kind==='rod') return RODS[id]?RODS[id].name:id; if (kind==='boat') return 'The boat';
+  if (kind==='rod') return RODS[id]?RODS[id].name:id; if (kind==='boat') return 'The boat'; if (kind==='ferry') return 'Ottilie’s ferry';
   if (kind==='part') return PARTS[id]?PARTS[id].name:id; if (kind==='fix'){ const L=FIXUP.find(L=>L.id===id); return L?L.name:id; }
   if (kind==='pocket') return 'Vest pocket '+id; if (kind==='rune') return ENCH[id]?ENCH[id].name:id;
   if (kind==='fish') return FISH[id]?FISH[id].name:id; return String(k).replace(/[<>&"]/g,''); }

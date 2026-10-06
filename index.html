@@ -1159,6 +1159,37 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 /* Playtest > Pace: what this run hasn't reached yet is greyed; a time half or twice the simulator's is marked */
 .pace-tab tr.pace-todo td{color:#9A9488}
 .pace-tab td.pace-far{color:#B2493A;font-weight:800}
+/* Rootwood River: Wren's boathouse sheet (her bench, the Twin Spool, the corkboard) and Ottilie's ferry card */
+#panel .mini{font-size:12px;color:#6B665C;line-height:1.4;margin:4px 0 0}
+#panel .need{margin:0;font-size:11.5px;font-weight:800;color:#8A6A3A}
+.wren-say{font-style:italic;color:#5A4A3A;border-left:3px solid #A4553A;padding:2px 0 2px 10px}
+.wren-cut{margin-bottom:10px}
+.wren-cut .btn{justify-self:start}
+.wren-rune{grid-template-columns:64px 1fr;box-shadow:0 0 0 1.5px var(--rc) inset;background:linear-gradient(90deg,rgba(201,138,94,.1),transparent 60%)}
+.wren-rune canvas{width:64px;height:64px}
+.wren-rune p.down{color:#8A5A4A;font-size:12px}
+/* the Twin Spool's list of river fish */
+.wren-fish{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin:0 0 12px}
+.wf{display:grid;justify-items:center;gap:2px;border:1.5px dashed rgba(43,42,51,.25);border-radius:10px;padding:6px 4px;background:rgba(43,42,51,.04)}
+.wf canvas{width:84px;height:38px}
+.wf span{font-size:11.5px;font-weight:800;color:#8A857A;text-align:center;line-height:1.2}
+.wf.got{border-style:solid;border-color:rgba(78,123,76,.5);background:rgba(110,143,90,.1)}
+.wf.got span{color:#3F5E2C}
+/* the corkboard: notes pinned at an angle, blank cards for what's still to find */
+.cork{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px;padding:14px;border-radius:10px;margin:0 0 10px;
+  background:#B98A5C radial-gradient(rgba(90,58,34,.35) 1px,transparent 1.4px) 0 0/7px 7px;box-shadow:inset 0 0 0 4px #7A5636,inset 0 0 0 5.5px #2B2A33}
+.pin-note{position:relative;background:#F4ECD8;padding:16px 10px 10px;border-radius:2px;transform:rotate(var(--r));box-shadow:0 3px 6px rgba(43,42,51,.3)}
+.pin-note::before{content:'';position:absolute;top:5px;left:50%;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:#B4503F;box-shadow:0 0 0 1.2px #2B2A33,1px 2px 2px rgba(0,0,0,.3)}
+.pin-note p{margin:0;font-size:12.5px;line-height:1.4;color:#3B3530;font-style:italic}
+.pin-note.blank{background:rgba(244,236,216,.45);box-shadow:none}
+.pin-note.blank p{color:#8A7A6A;text-align:center;font-style:normal;font-weight:800}
+.pin-note.fresh{animation:pinIn .5s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes pinIn{from{transform:rotate(var(--r)) scale(.6);opacity:0}}
+/* Ottilie's ferry */
+.ferry-card{grid-template-columns:1fr;justify-items:start}
+.ferry-card canvas.ferry-art{width:100%;max-width:300px;height:110px;justify-self:center}
+.ferry-card .btn{margin-top:10px}
+@media (prefers-reduced-motion: reduce){.pin-note.fresh{animation:none}}
 </style>
 
 </head>
@@ -1235,21 +1266,24 @@ const INK='#2B2A33', PAPER='#F3EAD7', BRASS='#C9A15A', DANGER='#D9614C', GOOD='#
               fish the weather brings up (data/weather.js says where and how often; they're never in a trap).
               extra:true for fish that don't count toward finishing a water (Barnaby never waits on them); secret:true
               for a fish found by experimenting, whose journal page shows a riddle (hint) once it's been seen; beh2 for a
-              fish that changes how it fights halfway in; noTank:true for one too big for any tank.
+              fish that changes how it fights halfway in; noTank:true for one too big for any tank. shared:true for a fish
+              that lives in more than one water (it's on each one's journal page and in each one's pools).
    RAR[tier]  how a rarity looks and sounds, in order from common to godly; pips (1 to 8) so rarity never rests on color
               alone; prism and ink for the tiers whose color shifts or bleeds. luckCap is the most luck can multiply
               its odds (see game/mods.js); Godly's sits below Mythic's on purpose, so no build makes Godly routine.
    RARE_BITES fish no spot pool offers: each is checked first on every cast, at its own chance before luck, only where
               and when it can bite (game/odds.js: rollFish). region; spots (or any); bow:true at the rainbow's foot;
-              moon:'full' and night:true on full-moon nights; path: how much likelier a cast onto the moonpath makes it.
+              moon:'full' and night:true on full-moon nights; path: how much likelier a cast onto the moonpath makes it;
+              top: the share of each in-game hour, from the hour, when it can bite (the Clockfin's ten minutes past).
    DRY        soft bad-luck protection, up to Legendary only: after `from` casts in a row where a Legendary could have
               bitten and didn't, its odds creep up, reaching ×max at `to`. Landing a Legendary or rarer starts it over.
    MUTS       mutations, rolled on landing (game/landing.js: catchRoll) on anything below Mythic: chance per catch before
               bonuses (STATS.mutation), what it multiplies the value by, Glimmer it pays, and for Giant how far past the
               species' biggest it grows. MUT_ORDER is the order the journal lists them.
    ORDER      the lake journal's order, the same fish as REGION_FISH.lake.  REGION_FISH  which species live in each region, in journal order.
-   POOLS      lake bite weights per spot; POOLS_COAST the same for Gullrock Coast. Night, dawn, rods,
-              meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench"). */
+   POOLS      lake bite weights per spot; POOLS_COAST and POOLS_RIVER the same for Gullrock Coast and Rootwood River. Night, dawn, rods,
+              meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench");
+              SPOT_REG  a spot's own name in one water (the coast's deep water is the Dark trench, the river's the Millpool). */
 const FISH = {
   perch:   {name:'Copper Perch', rarity:'common', beh:'darter', pull:0.9, reel:2.6, value:2, size:[14,26], len:34, h:.27, color:'#D08A4E', fin:'#A85E2C', window:1.4,
             lore:'Its belly often holds old coins. Nobody knows who keeps dropping them.', hint:'Common in open water.'},
@@ -1257,8 +1291,8 @@ const FISH = {
             lore:"A grumpy catfish that tugs like it's ringing a doorbell.", hint:'Lurks along the reed edges.'},
   lantern: {name:'Lantern Carp', rarity:'uncommon', beh:'sleeper', night:true, pull:.7, reel:3.6, value:12, size:[25,45], len:42, h:.32, color:'#E2A64F', fin:'#B97A2F', window:1.6,
             lore:"Hollowmere's street lamps once burned its shed scales.", hint:'Only rises at night, and hates a twitchy bobber.'},
-  leafjack:{name:'Leafjack', rarity:'uncommon', beh:'leaper', pull:1.0, reel:4.2, value:15, size:[20,34], len:40, h:.36, color:'#A9B456', fin:'#7C8C33', window:1.1,
-            lore:'Disguises itself as a leaf. It fools the birds, but not you.', hint:'Seen hiding under the lily pads.'},
+  leafjack:{name:'Leafjack', rarity:'uncommon', beh:'leaper', shared:true, pull:1.0, reel:4.2, value:15, size:[20,34], len:40, h:.36, color:'#A9B456', fin:'#7C8C33', window:1.1,
+            lore:'Disguises itself as a leaf. It fools the birds, but not you.', hint:'Seen hiding under the lily pads, and under falling leaves.'},
   mossback:{name:'Mossback', rarity:'rare', beh:'sulker', pull:1.35, reel:7, value:45, size:[40,70], len:56, h:.3, color:'#6C805A', fin:'#4E6243', window:.9,
             lore:'Carries a tiny garden on its back. Some gardens have tiny fences.', hint:'Rests in the deep pool.'},
   sprat:   {name:'Silver Sprat', rarity:'common', beh:'darter', pull:.8, reel:2.2, value:6, size:[10,18], len:28, h:.22, color:'#B7C4CD', fin:'#7E8E9A', window:1.4,
@@ -1290,7 +1324,21 @@ const FISH = {
   calf:    {name:'Moonwhale Calf', rarity:'mythic', beh:'sulker', beh2:'leaper', extra:true, noTank:true, pull:2, reel:22, value:6000, size:[380,520], len:124, h:.3, color:'#5F6F8A', fin:'#45536C', window:.65,
             lore:'Too big for this lake. Where is its mother?', hint:'Something enormous breaches far out on full-moon nights. It isn’t alone.'},
   gurnard: {name:'Foghorn Gurnard', rarity:'rare', beh:'ghost', wx:'fog', pull:1.4, reel:7.5, value:160, size:[28,52], len:46, h:.28, color:'#C25A4B', fin:'#E59A5C', window:.9,
-            lore:'Grunts like a foghorn. The lighthouse keepers used to steer by it.', hint:'Grunts from the sea stacks when the fog is in.'}
+            lore:'Grunts like a foghorn. The lighthouse keepers used to steer by it.', hint:'Grunts from the sea stacks when the fog is in.'},
+  brook:   {name:'Brook Ribbon', rarity:'common', beh:'darter', pull:.9, reel:2.8, value:3, size:[16,30], len:38, h:.17, color:'#B9A27A', fin:'#8C7450', window:1.35,
+            lore:'Thin as a hair ribbon and twice as hard to hold.', hint:'Darts through the run in midstream.'},
+  stone:   {name:'Stonegrinder', rarity:'common', beh:'sulker', pull:1.05, reel:3.4, value:4, size:[22,40], len:40, h:.3, color:'#8C8A80', fin:'#66645C', window:1.25,
+            lore:'Eats pebbles and spits out smoother ones.', hint:'Grinds about on the bottom of the deep pools.'},
+  barbel:  {name:'Barkskin Barbel', rarity:'rare', beh:'tugger', pull:1.35, reel:7, value:70, size:[40,72], len:54, h:.24, color:'#7A5E42', fin:'#5A4330', window:.92,
+            lore:'Its whiskers are thin roots. At least one heron has tried to perch on it.', hint:'Hides in the roots under the far bank.'},
+  clockfin:{name:'Clockfin Trout', rarity:'epic', beh:'tugger', extra:true, pull:1.5, reel:9.5, value:260, size:[34,60], len:50, h:.26, color:'#9FA46A', fin:'#C9A15A', window:.82,
+            lore:'Its fin ticks. It runs four minutes slow.', hint:'Something in the current ticks, but only as the hour turns.'},
+  gristle: {name:'Old Gristle', rarity:'legendary', beh:'sulker', pull:1.8, reel:15, value:1000, size:[130,180], len:90, h:.17, color:'#6F6658', fin:'#4E473D', window:.72,
+            lore:'A sturgeon older than the mill. The miller fed it crusts for forty years, and it still turns up at six expecting them.', hint:'Something huge waits under the waterwheel, most of all around six in the evening.'},
+  spatefin:{name:'Spatefin', rarity:'uncommon', beh:'tugger', wx:'rain', pull:1.0, reel:4, value:22, size:[18,32], len:36, h:.26, color:'#7E8E6E', fin:'#56653F', window:1.1,
+            lore:'Comes down with the flood water, nose first, and goes back up when it’s over.', hint:'Rides the river down when it rains.'},
+  grayling:{name:'Wisp Grayling', rarity:'rare', beh:'ghost', wx:'fog', pull:1.3, reel:6.8, value:95, size:[28,50], len:46, h:.24, color:'#A3A9B2', fin:'#8C7BB0', window:.92,
+            lore:'Its tall fin is a sail of mist. In fog it rows itself upstream.', hint:'Sails up the river on foggy mornings.'}
 };
 const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'];
 const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper', ghost:'Ghost'};
@@ -1312,9 +1360,12 @@ const POOLS = {
   far:  {perch:22, leafjack:30, mossback:10, reedwhisker:4, gar:2, mayor:.8},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
-const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
-const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench'};
-const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw']};
+const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed', riffle:'Riffle', leaves:'Leaf drift', roots:'Undercut roots'};
+const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench',
+  riffle:'in the riffle', leaves:'under the falling leaves', roots:'among the roots', 'river:open':'in the run', 'river:deep':'in the millpool'};
+const SPOT_REG = {coast:{deep:'Dark trench'}, river:{open:'The run', deep:'Millpool'}};
+const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw'],
+  river:['brook','stone','leafjack','spatefin','barbel','grayling','clockfin','gristle']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:9, bream:6},
@@ -1322,9 +1373,18 @@ const POOLS_COAST = {
   deep: {grouper:14, bream:28, sprat:34, kelpeel:10, angler:2.5, saltjaw:.9},
   far:  {bream:34, sprat:28, grouper:10, kelpeel:10, angler:1, saltjaw:.6}
 };
+/* Rootwood River: the current carries the float from spot to spot (game/river.js), so these are where it is when a fish comes. */
+const POOLS_RIVER = {
+  open:  {brook:62, stone:16, leafjack:9, barbel:3},
+  riffle:{brook:72, stone:8, leafjack:6, barbel:1.5},
+  leaves:{leafjack:52, brook:30, stone:6, barbel:4},
+  deep:  {stone:46, brook:20, leafjack:6, barbel:10, gristle:1},
+  roots: {barbel:12, stone:26, brook:28, leafjack:8, gristle:.6}
+};
 const RARE_BITES={
   shiner:{region:'lake', bow:true, chance:.035},
-  calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2}
+  calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2},
+  clockfin:{region:'river', top:1/6, chance:1/11}
 };
 const DRY={from:80, to:200, max:2};
 const MUTS={
@@ -1340,6 +1400,7 @@ const MUT_ORDER=['mossy','glassy','twin','giant'];
               snag (chance the reeds catch the line); reedBoost (reed fish bite this much sooner); color; where; perk;
               sea:true for Tacklegram rods; mods, the perk as modifiers (see data/stats.js and game/mods.js);
               ench, how many enchantment sockets it has (1 to 3: data/enchant.js).
+   quest:true for a rod someone gives you rather than sells (the Twin Spool is Wren's).
    ROD_ORDER  Ottilie's shop ladder (each rod about 2.5 times the last, set by the depth gate's whole-run report).  SEA_RODS  the Tacklegram ladder.  PARTS (with their mods), PAINTS  boat upgrades and colors
               (a paint with crate: only comes in loot crates; the rest are sold on Tacklegram).
    A modifier is {stat, v, when?, omen?}: stat names an entry in STATS; when limits it to a region, spot, time
@@ -1356,6 +1417,8 @@ const RODS = {
               perk:'Approaching fish flash their rarity color.', mods:[{stat:'reveal'}]},
   brasscap:  {name:'Brasscap Pro', price:2000, ench:2,  reach:1,   line:1.4,  reel:1.25, luck:.35, value:1.25, snag:0,   reedBoost:1.3, color:'#B08D4C', where:'The horizon',
               perk:'Perfect-hook window 50% wider.', mods:[{stat:'perfect', v:1.5}]},
+  twin:      {name:'Twin Spool', price:0, quest:true, ench:2, reach:1, line:1.4, reel:1.25, luck:.35, value:1.25, snag:0, reedBoost:1.3, color:'#6E8F5A', where:'The horizon',
+              blurb:'Wren’s work: two spools on one reel, wound with something that hums.', perk:'Casts two floats. The first fish to bite is yours, and when both bite at once, you pick.', mods:[{stat:'twin'}]},
   saltline:  {name:'Saltline Rod', price:5000, ench:3, reach:1, line:1.6, reel:1.3, luck:.45, value:1.4, snag:0, reedBoost:1.3, color:'#3E6E8A', where:'Open water', sea:true,
               blurb:'Braided salt-cured line on a blue fiberglass blank.', perk:'Swells hit your line half as hard.', mods:[{stat:'swell', v:.5}]},
   gale:      {name:'Gale Rod', price:11000, ench:3, reach:1, line:1.8, reel:1.4, luck:.6, value:1.55, snag:0, reedBoost:1.3, color:'#CFC6B2', where:'Open water', sea:true,
@@ -1367,6 +1430,9 @@ const RODS = {
 };
 const ROD_ORDER=['willow','reedcutter','ash','heronwood','brasscap'];
 const SEA_RODS=['saltline','gale','deepwater'];
+/* QUEST_RODS  rods from people, not shops; ALL_RODS  every rod in the order the bag, the rack and Playtest list them. */
+const QUEST_RODS=['twin'];
+const ALL_RODS=[...ROD_ORDER,...QUEST_RODS,...SEA_RODS];
 /* BOAT  Barnaby's skiff: what it costs. */
 const BOAT={price:3000};
 const PARTS={
@@ -1387,11 +1453,11 @@ const PAINTS={blue:{name:'Harbor Blue',hull:'#3E5A6E',price:0},red:{name:'Lobste
   inkwater:{name:'Inkwater',hull:'#1C1B24',crate:'mythic',stars:true,trim:'#C4C8D4'}};
 
 /* World: region names and the map's places (x, y on the 360 by 480 chart; built:false shows "coming later"). */
-const REGION_NAME = {lake:'Stillwater Lake', coast:'Gullrock Coast'};
+const REGION_NAME = {lake:'Stillwater Lake', river:'Rootwood River', coast:'Gullrock Coast'};
 const MAP_PLACES={
   lake:  {x:100,y:368,name:'Stillwater Lake',desc:'Your uncle’s lake. Lily pads, reed edges, a deep pool, and a mayor who never left.',built:true},
   coast: {x:278,y:150,name:'Gullrock Coast',desc:'Sea stacks, kelp beds and a dark trench where the swells roll in.',built:true},
-  river: {x:150,y:300,name:'Rootwood River',desc:'Ottilie’s ferry route. Not charted yet. Coming in a later update.',built:false},
+  river: {x:150,y:300,name:'Rootwood River',desc:'Ottilie’s ferry runs up it. Falling leaves, a waterwheel, and a current that carries your float.',built:true},
   marsh: {x:212,y:236,name:'Saltmarsh',desc:'Fog, tides and something with a bell for a mouth. Coming in a later update.',built:false},
   ocean: {x:330,y:318,name:'Open Ocean',desc:'Uncharted. Barnaby says you’ll need a bigger boat.',built:false}
 };
@@ -1427,6 +1493,7 @@ const WX={
 const WX_ORDER=['clear','cloudy','rain','fog'];
 const WX_TABLE={
   lake: {clear:38, cloudy:27, rain:20, fog:15},
+  river:{clear:34, cloudy:30, rain:22, fog:14},
   coast:{clear:34, cloudy:26, rain:22, fog:18}
 };
 const WX_FOG_HOUR=[.6, 3, 1.4, .25, .25, .6];
@@ -1434,6 +1501,8 @@ const WX_SPELL={hours:4, keep:.5, ease:.75, every:12};
 const WX_FISH={
   lake: {rain:{fish:'dace', pools:{open:14, pads:10, reeds:8, far:10, deep:4}},
          fog: {fish:'char', pools:{deep:18, far:20, open:4, pads:3}}},
+  river:{rain:{fish:'spatefin', pools:{open:14, riffle:16, leaves:8, deep:6, roots:6}},
+         fog: {fish:'grayling', pools:{open:8, deep:12, roots:14, leaves:4, riffle:3}}},
   coast:{rain:{fish:'mackerel', pools:{open:16, far:14, kelp:6, rocks:4, deep:6}},
          fog: {fish:'gurnard', pools:{rocks:10, deep:9, far:6, open:2, kelp:2}}}
 };
@@ -1441,7 +1510,7 @@ const WX_SOME={rain:{cloudy:.25}, fog:{mist:1/3}};
 const DAWN_MIST={from:5, to:8, look:.4};
 const WX_LINES={
   cloudy:['Smells like rain. Your uncle could tell the hour it’d start.','Grey days are good days. The fish stop squinting.'],
-  rain:  ['Mind the drops. A raindrop and a nibble look the same from here.','Your uncle fished every storm. Said the lake talks louder in the rain.','Rain brings the dace up. Daft things jump at every drop.'],
+  rain:  ['Rain brings the river up, and the spatefins with it.','Mind the drops. A raindrop and a nibble look the same from here.','Your uncle fished every storm. Said the lake talks louder in the rain.','Rain brings the dace up. Daft things jump at every drop.'],
   fog:   ['Haven’t seen fog like this since the flood.','Hear that? A bell, under the water. Always in the fog.','Fog hides the far fish. Let them come to you.']
 };
 const MOON={cycle:8, full:4, offset:1, path:[.03,.075], breach:.35};
@@ -1520,7 +1589,8 @@ const SIDES={chips:'Chips', rice:'Rice', greens:'Garden greens', bread:'Rye brea
 const FLESH={perch:'#F4CDB0', reedwhisker:'#EFD9C2', lantern:'#F7D9A0', leafjack:'#EEDDB8', mossback:'#E9CDB2', mayor:'#F0D2B6',
   sprat:'#EBDCD0', wrasse:'#F6C4AE', kelpeel:'#E8D8C0', bream:'#F5DCB5', grouper:'#F3E3D3', saltjaw:'#ECD6CC',
   dace:'#F1E0CC', char:'#F4B9A0', mackerel:'#E8C7B4', gurnard:'#F6E6D8',
-  gar:'#F2DCC4', angler:'#F7EDE2', shiner:'#F3E2DA', calf:'#D9A79A'};
+  gar:'#F2DCC4', angler:'#F7EDE2', shiner:'#F3E2DA', calf:'#D9A79A',
+  brook:'#F3D7C2', stone:'#E9D6BE', spatefin:'#F2CDB4', barbel:'#EDDCC0', grayling:'#F4E6DE', clockfin:'#F5C7A8', gristle:'#E8D0A8'};
 const COOK_NAME={pan:'Pan-fry', grill:'Grill'};
 /* Each recipe: what it needs from the keepnet, how each station plays, and what the meal does.
    need: [{id or rar, n}]; smoked:true takes a smoked fish of any kind from the keepnet (it skips the Clean station).
@@ -1575,15 +1645,18 @@ const MOODS={
   coast_day: {bpm:100,beats:3, prog:[[43,'maj'],[41,'maj'],[48,'maj'],[43,'maj']], scale:[67,69,71,74,76,79,81], waltz:1, mel:.34, pad:.0, inst:'pluck', accordion:1, bass:1},
   coast_dusk:{bpm:72, beats:3, prog:[[40,'m'],[48,'maj'],[43,'maj'],[50,'maj']], scale:[64,67,69,71,74,76,79], waltz:1, mel:.3, pad:.024, inst:'pluck', accordion:1, bass:1},
   coast_night:{bpm:60,beats:4, prog:[[40,'m7'],[48,'maj7'],[43,'maj'],[50,'sus']], scale:[64,67,69,71,74,76,79], arp:.28, mel:.3, pad:.04, inst:'bell', bass:1},
+  river_day: {bpm:88, beats:4, prog:[[50,'maj'],[47,'m7'],[43,'maj7'],[45,'sus']], scale:[62,64,66,69,71,74,76,78], arp:.62, mel:.3, pad:.018, inst:'pluck', bass:1, whistle:1},
+  river_dusk:{bpm:70, beats:4, prog:[[47,'m7'],[43,'maj7'],[50,'maj'],[45,'sus']], scale:[59,62,64,66,69,71,74], arp:.45, mel:.28, pad:.03, inst:'pluck', bass:1, motif:1},
+  river_night:{bpm:56,beats:4, prog:[[47,'m9'],[43,'maj7'],[38,'maj7'],[45,'sus']], scale:[59,62,64,66,69,71,74], arp:.24, mel:.3, pad:.04, inst:'bell', motif:1},
   kitchen:   {bpm:96, beats:4, prog:[[41,'maj7'],[38,'m7'],[46,'maj7'],[48,'dom']], scale:[65,67,69,72,74,77], arp:.6, swing:.17, mel:.2, pad:.02, inst:'pluck', bass:1, whistle:1},
   aquarium:  {bpm:60, beats:4, prog:[[48,'maj9'],[45,'m9'],[41,'maj9'],[43,'sus']], scale:[72,74,76,79,81,84], arp:.32, mel:.2, pad:.034, inst:'bell'},
   banquet:   {bpm:126,beats:3, prog:[[48,'maj'],[41,'maj'],[43,'dom'],[48,'maj']], scale:[72,74,76,77,79,81,84], waltz:1, mel:.85, pad:0, inst:'pluck', accordion:1, bass:1},
   intro:     {bpm:60, beats:4, prog:[[50,'m9']], scale:[], silent:1}
 };
-// the Hollowmere motif, which the lake hums at dusk and at night
+// the Hollowmere motif, which the lake (and the river) hums at dusk and at night
 const MOTIF=[[76,1],[79,1],[81,1.5],[79,.5],[76,1],[74,2]];
 const AMB_LV={ lake_day:{water:.55,wind:.22}, lake_dusk:{water:.5,wind:.14}, lake_night:{water:.42,wind:.12}, coast_day:{surf:1,hiss:.3,wind:.42}, coast_dusk:{surf:.9,hiss:.24,wind:.3},
-  coast_night:{surf:.8,hiss:.18,wind:.3}, aquarium:{room:.5,water:.12}, kitchen:{room:.75}, banquet:{water:.25,wind:.1}, intro:{water:.4,wind:.3} };
+  coast_night:{surf:.8,hiss:.18,wind:.3}, river_day:{rush:.62,water:.22,wind:.2}, river_dusk:{rush:.56,water:.2,wind:.12}, river_night:{rush:.5,water:.18,wind:.1}, aquarium:{room:.5,water:.12}, kitchen:{room:.75}, banquet:{water:.25,wind:.1}, intro:{water:.4,wind:.3} };
 
 /* Treasure: everything a line pulls up that isn't a fish.
    TREASURE   how often treasure turns up and which kind (weights; a map is a piece of a treasure map, data/relics.js: MAPS);
@@ -1813,7 +1886,8 @@ const TACKLE_ORDER={reel:['clicker','brassdrag','quickwind','whisper'], line:['c
               Each rod's sockets are RODS[id].ench (1 to 3) in data/gear.js.
    GLIMMER    where Glimmer comes from. record: what beating your record for a species pays, by its rarity.
               geode: what a Glimmer geode holds, [least, most], by region. crate: Glimmer in each crate, by tier.
-   Homebody (Wren's bench, step 25) comes later. */
+   Homebody is Wren's (step 25): it joins the tray once you've met her (need:'wren'). Its value bonus grows with each
+   in-game day in a row you fish one water (home:true: game/river.js homeMul works it out; the v here is the most). */
 const ENCH={
   swift:     {name:'Swift Spool', short:'Reels 30% faster', cost:30, color:'#78C08A', eff:'You reel 30% faster.', down:'Tension rises 30% faster too.',
               mods:[{stat:'reel', v:1.3}, {stat:'drag', v:1.3}]},
@@ -1825,17 +1899,19 @@ const ENCH={
               mods:[{stat:'night', v:2}, {stat:'fog', v:2}, {stat:'bite', v:1.25, when:{night:false}}]},
   storm:     {name:'Storm Knot', short:'Rain catches +60%', cost:70, color:'#7FB2D9', eff:'In rain, fish are worth 60% more.', down:'Does nothing in other weather.',
               mods:[{stat:'value', v:1.6, when:{wx:'rain'}}]},
-  wanderer:  {name:'Wanderer', short:'Each day’s first catches ×2', cost:80, color:'#E5975A', first:3, eff:'Each day, your first 3 catches at the lake are worth double, and so are your first 3 at the coast.',
+  wanderer:  {name:'Wanderer', short:'Each day’s first catches ×2', cost:80, color:'#E5975A', first:3, eff:'Each day, your first 3 catches in each water are worth double.',
               mods:[{stat:'value', v:2, when:{wander:true}}]},
+  homebody:  {name:'Homebody', short:'+5% a day, staying put', cost:100, color:'#C98A5E', need:'wren', per:.05, eff:'Every in-game day in a row you fish the same water adds 5% to what its fish are worth, up to +50%.', down:'Travel and it starts over.',
+              mods:[{stat:'value', v:1.5, home:true}]},
   odd:       {name:'Odd Water', short:'Mutations twice as often', cost:90, color:'#6CC4A1', eff:'Mossy, Glassy, Twin and Giant catches come up twice as often.',
               mods:[{stat:'mutation', v:2}]},
   echo:      {name:'Echo', short:'Perfect hooks echo', cost:110, color:'#58C4C2', eff:'After a perfect hook, another of the same fish sometimes waits there. Cast to the same spot for an instant bite.', down:'Only perfect hooks set it off.',
               mods:[{stat:'echo', v:.35}]}
 };
-const ENCH_ORDER=['swift','magpie','deep','nightglass','storm','wanderer','odd','echo'];
+const ENCH_ORDER=['swift','magpie','deep','nightglass','storm','wanderer','odd','homebody','echo'];
 const GLIMMER={
   record:{common:2, uncommon:3, rare:5, epic:8, legendary:12, exotic:18, mythic:26, godly:40},
-  geode:{lake:[4,8], coast:[6,12]},
+  geode:{lake:[4,8], river:[5,10], coast:[6,12]},
   crate:{common:[3,5], uncommon:[6,9], rare:[10,15], epic:[18,26], legendary:[32,45], exotic:[55,75], mythic:[90,120]}
 };
 
@@ -2004,12 +2080,56 @@ const SHELF=6;
 const MARKS=[{yr:'’67', h:.86}, {yr:'’71', h:.74}, {yr:'Mar ’79', h:.62}, {yr:'’84', h:.69}, {yr:'’91', h:.56}];
 const TRAPDOOR=['Locked. Water laps underneath.','Still locked. Something down there knocks, once.','The boards are wet from below.','You put your ear to it. It sounds like a long way down.'];
 
-/* Pace: when a steady player reaches each thing, from the depth gate's whole-run report (step 24).
+/* Rootwood River and Wren (game/river.js, game/twin.js, game/wren.js).
+   RIVER.ferry    Ottilie's ferry up the river: what fixing it costs, and how many lake species you've caught before she
+                  asks (her Ferry tab appears then).
+   RIVER.current  the drifting float. speed: how far the float drifts a second in midstream, as a share of the screen's
+                  width at the near water (farther out it looks slower, as everything does). profile: [depth, speed]
+                  points from the near bank (0) to the far bank (1): fastest in the run, slow along the banks.
+                  pool: the speed in the millpool. swing: holding the line swings the float toward your bank this
+                  fast (a share of the water's depth a second), and slow: it drifts this much slower meanwhile.
+                  hold: seconds a press has to last to be a hold; a shorter one is a twitch.
+   RIVER.gristle  the hours Old Gristle comes up for its crusts, and how much likelier it is then.
+   RIVER.otter    an otter after your bait: after idle seconds on the landing with bait on the hook, it comes for the
+                  tin; tap it within tap seconds and it drops a pebble (Glimmer), otherwise it takes casts of bait.
+   WREN.sockets   Glimmer to cut a rod's second and third socket at her bench (a rod has at most 3).
+   WREN.hello     her first words; lines: what she says now and then; quest: what she asks for the Twin Spool.
+   WREN.notes     her corkboard, silly theories first: each is pinned once its `when` has happened (game/wren.js: noteOn).
+   TWIN           the Twin Spool's second float: spread (how far apart the floats land, a share of the screen's width
+                  at the near water), wait (the quiet before a bite, times this with two baits in), both (the chance a
+                  bite on one float comes with a bite on the other, when you pick which to strike). */
+const RIVER={
+  ferry:{price:1200, species:7},
+  current:{speed:.06, profile:[[0,.5],[.12,.9],[.45,1],[.75,.55],[1,.35]], pool:.22, swing:.38, slow:.45, hold:.22},
+  gristle:{from:17.5, to:19, x:3},
+  otter:{idle:40, tap:4.5, casts:1, glimmer:[2,4]}
+};
+const WREN={
+  sockets:{2:80, 3:200},
+  hello:'Oh! You’re the new keeper! I’m Wren. Enchanter. Apprentice enchanter. Well, I have a bench. Come and see!',
+  lines:['The river’s ten minutes faster going down. I timed it.','Jars are for keeping things. Mostly light. Sometimes fish. Once, a sneeze.',
+    'Bring me Glimmer and I’ll cut your rod another socket. Carefully. Mostly carefully.','Your uncle brought me the odd ones. He said I asked the right questions.',
+    'The Clockfin only bites as the hour turns. I’ve checked. Forty-one times.','Hold the line and the current swings your float in to the bank. Let go and it runs.'],
+  quest:'Bring me one of everything that lives in this river, and I’ll string you a rod with two floats. Don’t ask how. I’m still working out how.',
+  notes:[
+    {id:'count', when:'met', text:'Fish can count. The Clockfin definitely can.'},
+    {id:'leaves', when:'leafjack', text:'Leafjacks pretend to be leaves. So which leaves are pretending to be Leafjacks?'},
+    {id:'clock', when:'clockfin', text:'The Clockfin runs four minutes slow. The town hall clock stopped at 3:12. Four minutes after the flood.'},
+    {id:'mayor', when:'mayor', text:'The Mayor still wears his chain of office. Fish don’t wear jewellery. People do.'},
+    {id:'ghosts', when:'ghost', text:'Ghost fish fade the way you forget a dream. Are they leaving, or are we?'},
+    {id:'crusts', when:'gristle', text:'Old Gristle turns up at six for crusts. The mill stopped sixty years ago. Somebody still feeds it.'},
+    {id:'letters', when:'letter', text:'Pell reads the drowned letters out loud. Like he’s expecting someone to answer.'},
+    {id:'calf', when:'calf', text:'The Calf’s mother is too big for the lake. So where does she go when she dives?'}
+  ]
+};
+const TWIN={spread:.16, wait:.6, both:.18};
+
+/* Pace: when a steady player reaches each thing, from the depth gate's whole-run report (step 24; Rootwood River added in step 25).
    PACE_SIM[key]  minutes of play until it, the median of 11 runs of `npm run sim -- --career --runs 11 --pace`
-                  (paste its output here after a balance change). Keys: rod:<id>, boat, part:<id>, fix:<id>
+                  (paste its output here after a balance change). Keys: rod:<id>, boat, ferry, part:<id>, fix:<id>
                   (the fix-up list), pocket:<n> (the vest's nth pocket), rune:<id>, fish:<id> (the first one caught).
                   Playtest > Pace (game/pace.js) sets a real run beside these. */
-const PACE_SIM={'fish:perch':5, 'fish:leafjack':5, 'fish:mossback':5, 'rod:reedcutter':5, 'rod:ash':20, 'fish:lantern':21, 'rune:swift':25, 'fish:mayor':26, 'rod:heronwood':26, 'fish:gar':34, 'rune:magpie':48, 'fish:reedwhisker':62, 'rod:brasscap':69, 'fish:char':73, 'rune:deep':76, 'fix:roof':104, 'rune:nightglass':111, 'rune:storm':149, 'boat':166, 'fish:bream':172, 'fish:sprat':172, 'fish:kelpeel':172, 'fish:grouper':172, 'fish:angler':177, 'rod:saltline':186, 'rune:wanderer':196, 'fish:saltjaw':213, 'fish:gurnard':218, 'part:hold':219, 'fix:net':247, 'rune:odd':256, 'fish:wrasse':256, 'rod:gale':288, 'pocket:2':293, 'rune:echo':311, 'part:sonar':312, 'part:keel':332, 'fix:lamp':333, 'fix:stove':381, 'pocket:3':394, 'fix:cabinet':439, 'rod:deepwater':467, 'pocket:4':486, 'fix:panel':513, 'fix:knock':543, 'pocket:5':600};
+const PACE_SIM={'fish:leafjack':5, 'fish:perch':5, 'rod:reedcutter':5, 'fish:mossback':5, 'rune:swift':16, 'rod:ash':20, 'fish:lantern':21, 'fish:char':27, 'fish:gar':37, 'rod:heronwood':42, 'rune:magpie':43, 'fish:mayor':49, 'fish:reedwhisker':58, 'ferry':60, 'fish:stone':68, 'fish:brook':68, 'fish:barbel':68, 'rune:deep':80, 'rod:brasscap':88, 'fish:clockfin':94, 'fix:roof':113, 'fish:gristle':114, 'rod:twin':114, 'rune:nightglass':114, 'rune:storm':136, 'boat':136, 'fish:sprat':141, 'fish:bream':141, 'fish:kelpeel':141, 'fish:grouper':147, 'rod:saltline':154, 'fish:angler':170, 'fish:saltjaw':177, 'rune:wanderer':178, 'fish:gurnard':194, 'part:hold':194, 'rune:odd':223, 'fix:net':247, 'fish:wrasse':255, 'rod:gale':267, 'rune:homebody':270, 'pocket:2':277, 'part:sonar':292, 'part:keel':312, 'rune:echo':320, 'fix:lamp':325, 'fix:stove':378, 'pocket:3':392, 'fix:cabinet':449, 'rod:deepwater':464, 'pocket:4':503, 'fix:panel':527, 'fix:knock':559, 'pocket:5':605};
 
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
@@ -2056,6 +2176,7 @@ const STATS={
   netCap:   {name:'Keepnet space', kind:'add', start:12, good:'up', unit:'count', hint:'Fish the keepnet holds before catches sell straight away.'},
   reveal:   {name:'Rarity reveal', kind:'flag', hint:'Approaching fish flash their rarity color.'},
   sonar:    {name:'Sonar readout', kind:'flag', hint:'A readout names what’s coming before it bites.'},
+  twin:     {name:'Two floats', kind:'flag', hint:'Each cast lands two floats. The first bite is yours, and when both bite at once, you pick.'},
   noWashout:{name:'Swell-proof casts', kind:'flag', when:{region:'coast'}, hint:'Casts never wash out in a swell.'},
   autoTilt: {name:'Rod tracks the fish', kind:'flag', hint:'Your rod follows a mastered fish for you.'},
   mayorWakes:{name:'The Mayor wakes', kind:'flag', when:{region:'lake'}, hint:'Mayor Bartholomew bites at any hour, as he does at dawn.'},
@@ -2106,7 +2227,7 @@ function modSources(){
   for (const id of [rig.reel, rig.line]){ const T=TACKLE[id]; if (T) for (const x of T.mods) L.push(Object.assign({src:'gear',name:T.name},x)); }
   const bait=baitOn(); if (bait) for (const x of TACKLE[bait].mods) L.push(Object.assign({src:'gear',name:TACKLE[bait].name},x));
   // runes etched onto the rod in hand (game/enchant.js)
-  for (const id of enchFor(save.rod)) if (id) for (const x of ENCH[id].mods) L.push(Object.assign({src:'ench',name:ENCH[id].name},x));
+  for (const id of enchFor(save.rod)) if (id) for (const x of ENCH[id].mods) L.push(Object.assign({src:'ench',name:ENCH[id].name},x,x.home?{v:homeMul()}:{}));   // Homebody grows by the day (game/river.js)
   // artifacts work while they're in a vest pocket; keepsakes work from the moment you have them
   const FS=findsState();
   for (const id of FS.equip){ const D=FINDS[id]; if (D && FS.have[id]) for (const x of D.mods||[]) L.push(Object.assign({src:'artifact',name:D.name},x)); }
@@ -2171,19 +2292,21 @@ function tierMul(rar,c){ c=Object.assign({},c,{rarity:rar}); const cap=RAR[rar].
 /* ---------- Bite odds: which fish each spot offers, and the rod in hand ---------- */
 /** Each fish's weight in this spot's pool, here and now. */
 function poolFor(spot,lucky){
-  const h=save.clock, night=nightNow(), coastal=REG()==='coast', w=Object.assign({},(coastal?POOLS_COAST:POOLS)[spot]||(coastal?POOLS_COAST.open:POOLS.open));
-  // the water itself: who comes up at night, and the Mayor's dawns
+  const h=save.clock, night=nightNow(), reg=REG(), coastal=reg==='coast', river=reg==='river', P=poolsOf(reg), w=Object.assign({},P[spot]||P.open);
+  // the water itself: who comes up at night, the Mayor's dawns, Old Gristle's six o'clock crusts
   if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
+  else if (river){ if (night){ if (w.barbel) w.barbel*=1.6; if (w.brook) w.brook*=.7; } }
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
   if (w.mayor && ((h>=5 && h<8) || modFlag('mayorWakes',{spot}))) w.mayor*=3;   // the Mayor's dawns, or the Mayor's Spectacles
   if (w.gar && h>=17 && h<21) w.gar*=1.8;                                        // the Steeple Gar's evenings
+  if (w.gristle && h>=RIVER.gristle.from && h<RIVER.gristle.to) w.gristle*=RIVER.gristle.x;
   // the weather (game/weather.js): its own fish come up, the Mossback rises to the pads in rain, and fog brings the
   // night fish up by day. They crowd out the fish no rarer than themselves, never the rarer ones: those keep the share
   // they had, so a wet day never quietly makes the Mayor harder to find.
   const wx=wxNow(), dry=Object.assign({},w);
-  for (const e of wxFishFor(coastal?'coast':'lake',spot)) w[e.fish]=(w[e.fish]||0)+e.w;
-  if (wx==='rain' && !coastal && spot==='pads' && w.mossback) w.mossback*=2;
-  if (wx==='fog' && !night){ if (coastal){ if (w.kelpeel) w.kelpeel*=1.4; } else { const nl={deep:18,open:24,pads:10}[spot]||4; w.lantern=(w.lantern||0)+nl/4; } }
+  for (const e of wxFishFor(reg,spot)) w[e.fish]=(w[e.fish]||0)+e.w;
+  if (wx==='rain' && reg==='lake' && spot==='pads' && w.mossback) w.mossback*=2;
+  if (wx==='fog' && !night){ if (coastal){ if (w.kelpeel) w.kelpeel*=1.4; } else if (river){ if (w.barbel) w.barbel*=1.3; } else { const nl={deep:18,open:24,pads:10}[spot]||4; w.lantern=(w.lantern||0)+nl/4; } }
   { let top=-1, T0=0, T1=0, hi=0; for (const k in w){ if (w[k]!==dry[k]) top=Math.max(top,rarRank(FISH[k].rarity)); T1+=w[k]; T0+=dry[k]||0; }
     for (const k in dry) if (rarRank(FISH[k].rarity)>top) hi+=dry[k];
     if (top>=0 && hi>0 && T0>hi){ const x=(T1-hi)/(T0-hi); for (const k in dry) if (rarRank(FISH[k].rarity)>top) w[k]*=x; } }
@@ -2202,9 +2325,11 @@ const RARE_ORDER=Object.keys(RARE_BITES).sort((a,b)=>rarRank(FISH[b].rarity)-rar
 function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
   for (const id of RARE_ORDER){ const B=RARE_BITES[id];
     if (B.region!==reg || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
-    if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock))) continue;
+    if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top))) continue;
     if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
   return null; }
+/** Whether the in-game clock is within `share` of an hour past the hour (the Clockfin's few minutes). */
+function topOfHour(share){ const h=((save.clock%24)+24)%24; return h-Math.floor(h)<share; }
 /** Playtest: the next fish to bite, and the next mutation, picked by hand (game/playtest.js). */
 const RARITY_CTL={fish:null, mut:null};
 /** The fish that takes this cast. A long run without a Legendary, where one could have bitten, counts toward DRY. */
@@ -2259,14 +2384,14 @@ function fmtW(g){ if (imperial()){ const lb=g/453.592; if (lb<1){ const oz=g/28.
 function fmtTotal(g){ return fmtW(g); }
 const STAR_P='<path d="M10 1.6 l2.6 5.4 5.9 .8 -4.3 4.1 1.1 5.9 -5.3 -2.9 -5.3 2.9 1.1 -5.9 -4.3 -4.1 5.9 -.8 Z"/>';
 function starsHTML(n,cls){ let h='<span class="qstars'+(cls?' '+cls:'')+'" role="img" aria-label="'+n+' of 3 stars">'; for (let i=0;i<3;i++) h+='<svg viewBox="0 0 20 20" class="'+(i<n?'on':'')+'">'+STAR_P+'</svg>'; return h+'</span>'; }
-function spotLabel(reg,spot){ if (!spot) return REGION_NAME[reg]||''; const nm=reg==='coast'&&spot==='deep'?'Dark trench':SPOT_NAME[spot]||''; return nm+', '+(REGION_NAME[reg]||''); }
+function spotLabel(reg,spot){ if (!spot) return REGION_NAME[reg]||''; const nm=spotName(spot,reg)||''; return nm+', '+(REGION_NAME[reg]||''); }
 function whenLabel(t,hr,wx){ const d=t?new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric'}):'';
   const p=hr==null?'':hr>=5&&hr<7.5?'at dawn':PERIOD(hr)==='Morning'?'in the morning':PERIOD(hr)==='Day'?'in the afternoon':PERIOD(hr)==='Evening'?'in the evening':'at night';
   return [d,p,(wx==='rain'||wx==='fog')?WX[wx].on:''].filter(Boolean).join(', '); }
 const isPB=(f)=>{ const r=save.fish[f.id]; return !!(r && r.pb && r.pb.t && f.t===r.pb.t && f.size===r.pb.size); };
 /* Old saves only kept the longest length. Turn that into a record at an average build, so nobody loses their bests. */
 function migrateRecords(){ for (const id in save.fish){ const r=save.fish[id]; if (!FISH[id] || !r.caught || r.pb) continue;
-    const len=r.best||FISH[id].size[0], w=weighFish(id,len,1); r.bw=w; r.pb={size:len,w,stars:qualityOf(id,len,false),t:null,reg:REGION_FISH.coast.includes(id)?'coast':'lake'}; }
+    const len=r.best||FISH[id].size[0], w=weighFish(id,len,1); r.bw=w; r.pb={size:len,w,stars:qualityOf(id,len,false),t:null,reg:regionOf(id)}; }
   const s=save.stats; if (s.landed==null){ s.landed=Object.keys(save.fish).reduce((a,id)=>{ const r=save.fish[id]; return a+(FISH[id]&&r.caught?r.caught*weighFish(id,(FISH[id].size[0]+FISH[id].size[1])/2*.85,1):0); },0); }
   if (s.pbs==null) s.pbs=0; if (s.trophies==null) s.trophies=0; }
 
@@ -2345,7 +2470,7 @@ function audioScene(){ if (typeof INTRO!=='undefined' && INTRO.active && INTRO.q
   if (typeof K!=='undefined' && K.open) return K.mode==='banquet'?'banquet':'kitchen';
   if (typeof AQ!=='undefined' && AQ.open) return 'aquarium';
   if (typeof SH!=='undefined' && SH.open) return 'aquarium';
-  const r=REG(), tod=timeOfDay(); return r==='coast'?'coast_'+tod:'lake_'+tod; }
+  return REG()+'_'+timeOfDay(); }
 const MU={on:false,mood:null,next:0,bar:0,beat:0,timer:0,mel:null,duckT:0,duckV:1,fade:1};
 function musicStart(){ if (!AC||MU.on) return; MU.on=true; MU.next=AC.currentTime+.2; MU.timer=setInterval(musicTick,80); ambStart(); }
 function musicTick(){ if (!AC||AC.state!=='running') return; const now=AC.currentTime; if (MU.next<now-.3) MU.next=now+.05;
@@ -2387,15 +2512,15 @@ function ambBed(name,type,freq,q,lfoHz,lfoAmt){ const s=AC.createBufferSource();
   if (lfoHz){ const l=AC.createOscillator(), lg=AC.createGain(); l.frequency.value=lfoHz; lg.gain.value=lfoAmt; l.connect(lg); lg.connect(lv.gain); l.start(); }
   AMBL[name]={g,f}; }
 function ambStart(){ if (ambOn||!AC) return; ambOn=true;
-  ambBed('water','lowpass',420,.6,.13,.45); ambBed('wind','bandpass',650,.5,.05,.5); ambBed('surf','lowpass',800,.4,0,0); ambBed('hiss','highpass',2600,.3,0,0); ambBed('room','lowpass',150,.7,.3,.2);
+  ambBed('water','lowpass',420,.6,.13,.45); ambBed('wind','bandpass',650,.5,.05,.5); ambBed('surf','lowpass',800,.4,0,0); ambBed('hiss','highpass',2600,.3,0,0); ambBed('room','lowpass',150,.7,.3,.2); ambBed('rush','bandpass',1100,.45,.21,.3);
   ambBed('rain','bandpass',2600,.35,.07,.25); ambBed('drum','lowpass',340,.5,.11,.3); }   // rain on the water, and on the roof and the boards
 let ambClock=0;
 function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{}, t=AC.currentTime; ambClock+=.08;
-  const X=wxLook(), wet=X.rain, fog=X.fog*(X.mist?0:1), out=sc.startsWith('lake')||sc.startsWith('coast');   // the dawn mist stays quiet
+  const X=wxLook(), wet=X.rain, fog=X.fog*(X.mist?0:1), out=sc.startsWith('lake')||sc.startsWith('coast')||sc.startsWith('river');   // the dawn mist stays quiet
   for (const k in AMBL){ let v=L[k]||0; if ((k==='surf'||k==='hiss') && v){ const ph=(ambClock%8.5)/8.5, w=ph<.4?Math.pow(ph/.4,1.6):Math.pow(1-(ph-.4)/.6,1.2); v*=k==='surf'?.35+.65*w:w*w; }
     if (k==='rain') v=wet*(out?.55:.12); if (k==='drum') v=wet*(out?.25:.5);
     AMBL[k].g.gain.setTargetAtTime(v*.5,t,k==='surf'||k==='hiss'?.25:1.2); }
-  const r=Math.random, tod=timeOfDay(), p=(rand(-1,1)), coast=sc.startsWith('coast'), lake=sc.startsWith('lake')||sc==='intro'||sc==='banquet';
+  const r=Math.random, tod=timeOfDay(), p=(rand(-1,1)), coast=sc.startsWith('coast'), river=sc.startsWith('river'), lake=sc.startsWith('lake')||sc==='intro'||sc==='banquet';
   // the weather (game/weather.js): birds keep their heads down in rain and fog, frogs love the rain, and fog brings a
   // foghorn off the coast and a bell somewhere under the lake
   const hush=1-.67*Math.max(wet,fog);
@@ -2408,6 +2533,12 @@ function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{},
   if (lake && tod!=='day' && r()<.012) ambFrog(p);
   if (lake && tod==='night' && r()<.0025) ambOwl(p);
   if (coast && tod!=='night' && r()<.014*hush) ambGull(p);
+  // the river: birds and a woodpecker in the trees by day, the waterwheel's creak, crickets and an owl after dark
+  if (river && tod==='day' && r()<.014*hush) ambBird(p);
+  if (river && tod!=='night' && r()<.004*hush) ambWoodpecker(p*.8);
+  if (river && r()<.006) ambCreak(-.6);
+  if (river && tod!=='day' && r()<.04) ambCricket(p);
+  if (river && tod==='night' && r()<.002) ambOwl(p);
   if (coast && tod!=='day' && r()<.004) ambBuoy(p);
   if (sc==='aquarium' && r()<.45) ambBubble(p*.6);
   if (sc==='kitchen' && r()<.5) ambCrackle(p*.5);
@@ -2423,6 +2554,11 @@ function ambOwl(p){ const t=AC.currentTime+.05; ambOsc('sine',390,360,t,.42,.035
 function ambGull(p){ const t=AC.currentTime+.05, n=1+Math.floor(rand(0,3)); for (let i=0;i<n;i++){ const tt=t+i*.32, o=AC.createOscillator(), g=AC.createGain(), f=AC.createBiquadFilter(); o.type='sawtooth';
   o.frequency.setValueAtTime(900,tt); o.frequency.linearRampToValueAtTime(1350,tt+.08); o.frequency.linearRampToValueAtTime(760,tt+.28); f.type='bandpass'; f.frequency.value=1500; f.Q.value=2;
   g.gain.setValueAtTime(.0001,tt); g.gain.exponentialRampToValueAtTime(.022,tt+.03); g.gain.exponentialRampToValueAtTime(.0001,tt+.3); o.connect(f); f.connect(g); panNode(g,p).connect(AMB); o.start(tt); o.stop(tt+.32); } }
+/** A woodpecker drumming on a dead branch: a quick roll of knocks that slows at the end. */
+function ambWoodpecker(p){ const t=AC.currentTime+.05, n=10+Math.floor(rand(0,8)), f=rand(900,1300); let at=0;
+  for (let i=0;i<n;i++){ ambOsc('triangle',f,f*.6,t+at,.025,.022*(1-i/n*.5),p); at+=.045+i*.0025; } }
+/** The waterwheel turning over: a low wooden creak, then a slosh. */
+function ambCreak(p){ const t=AC.currentTime+.05; ambOsc('sawtooth',95,70,t,.35,.012,p); ambOsc('triangle',190,140,t+.05,.3,.01,p); ambPatter(p); }
 function ambBuoy(p){ const t=AC.currentTime+.05; ambOsc('sine',330,0,t,3.5,.03,p); ambOsc('sine',330*2.76,0,t,1.2,.008,p); }
 function ambPatter(p){ const t=AC.currentTime+rand(0,.08), s=AC.createBufferSource(); s.buffer=noiseBuf; const f=AC.createBiquadFilter(); f.type='bandpass'; f.frequency.value=rand(2500,6000); f.Q.value=4;   // one drop on the boards
   const g=AC.createGain(); g.gain.setValueAtTime(rand(.015,.04),t); g.gain.exponentialRampToValueAtTime(.0005,t+.03); s.connect(f); f.connect(g); panNode(g,p).connect(AMB); s.start(t,rand(0,.5),.05); }
@@ -2507,6 +2643,7 @@ const depthK = y => clamp((y-HZ)/(H-HZ),0,1);
 const sc = y => .5 + .5*depthK(y);
 function spotAt(x,y){
   if (REG()==='coast') return coastSpot(x,y);
+  if (REG()==='river') return riverSpot(x,y);
   const d=G.deep, dx=(x-d.x)/d.rx, dy=(y-d.y)/d.ry; if (dx*dx+dy*dy<1.25) return 'deep';
   for (const p of (G.padClusters||[G.pads])) if (Math.hypot(x-p.x,(y-p.y)*1.8) < p.r*1.15) return 'pads';
   if (y < lerp(G.near,HZ+26,.8)) return 'far';
@@ -2526,7 +2663,7 @@ function coach(text, step, warn){ const c=$('coach'); $('coachText').textContent
 function coachOff(){ $('coach').hidden=true; $('hint').hidden=false; }
 let coachTimer=0;
 function coachFor(text,secs){ coachLater(text,secs); }
-function setState(s){ S.state=s; document.body.dataset.state=s; updateHint(); if (s==='idle' && save.meal && save.meal.last) mealEnd(); if (s==='idle' && save.freshLast) freshEnd(); if (s==='idle') baitCheck();
+function setState(s){ S.state=s; if (s!=='waiting' && s!=='bite') S.bob2=null; document.body.dataset.state=s; updateHint(); if (s==='idle' && save.meal && save.meal.last) mealEnd(); if (s==='idle' && save.freshLast) freshEnd(); if (s==='idle') baitCheck();
   if (s==='idle' && !save.tutorialDone){ S.tut='cast'; coach('Drag down from anywhere, then let go to cast your line.','1 of 4'); } }
 
 /* ---------- Effects ---------- */
@@ -2573,6 +2710,7 @@ function release(){
   if (a && a.onNet && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openNet(); return; }
   if (a && a.onBar && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openBoatShop(); return; }
   if (a && a.onOtt && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openShop(); return; }
+  if (a && a.onWren && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); openWren(); return; }
   if (a && a.onTrap && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); tapTrap(a.onTrap); return; }
   if (a && a.onJar && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); tapJar(); return; }
   if (!a || !a.target || a.p<.12){ setState('idle'); if (S.tut) coach('Drag a little farther down before you let go.','1 of 4'); else toast('Pull back farther','warn'); return; }
@@ -2601,7 +2739,7 @@ function updateCast(dt){
       splash(x,y,6); ripple(x,y,18); sfx.snap(); buzz([0,30,30,30]); shake(2);
       toast('Snagged in the reeds!','warn'); coachFor('Reeds snag ordinary rods. Ottilie sells a Reedcutter that slices right through.',5);
       S.lost={t:0,pos:{x,y},snapped:false}; setState('lost'); return; }
-    S.bob={x,y,spot:c.spot,dip:1,jerk:0,nibble:0,plunge:0}; moonCastLanded(c,S.bob);
+    S.bob={x,y,spot:c.spot,dip:1,jerk:0,nibble:0,plunge:0}; moonCastLanded(c,S.bob); twinLand(S.bob);   // the Twin Spool's second float (game/twin.js)
     splash(x,y,8); ripple(x,y,40); ripple(x,y,24); sfx.plop(); buzz(8);
     if (c.fresh){ for (let i=0;i<8;i++) S.particles.push({x:x+rand(-14,14)*sc(y),y:y+rand(-4,4),vx:rand(-20,20),vy:rand(-40,-14),g:0,life:0,max:rand(.6,1),r:rand(1.4,2.2),c:'rgba(214,240,255,',glim:true}); }   // Fresh water
     for (const f of S.ambient){ if (Math.hypot(f.x*W-x,f.y*H-y)<90){ f.flee=1.2; f.a=Math.atan2(f.y*H-y,f.x*W-x); } }
@@ -2620,12 +2758,14 @@ function startWaiting(){
   setState('waiting');
   if (echo) return;
   if (S.bob.spot==='reeds') S.wait.t/=modMul('reedBite',{spot:'reeds'});
+  S.wait.t*=twinWait();
   if (S.tut){ S.tut='wait'; S.wait.t=.8; coach('Nice cast! Now wait. A fish will swim over to your bobber.','2 of 4'); }
 }
 /** The quiet before a fish shows up: Playtest tuning and anything that brings a bite sooner (which also speeds
     the swim over and the nibbles: spawnApproach). */
 function biteWait(spot){ const c={spot}; return rand(.75,2.1)*modMul('wait',c)*modMul('bite',c); }
 function spawnApproach(){
+  if (!S.wait.echo) twinPick();   // with two floats out, the fish heads for either one
   const w=S.wait, b=S.bob; w.lucky=inLucky(b.x,b.y); w.bow=atBowFoot(b.x,b.y);
   // the rare bites and the dry run count once a cast (as the simulator does); a fish that comes back after a spook is an ordinary one
   w.fish=S.tut?'perch':w.echo||(w.rolled?pickW(poolFor(b.spot,w.lucky)):rollFish(b.spot,w.lucky,{bow:w.bow, path:onMoonpath(b.x,b.y)})); w.rolled=true; const F=FISH[w.fish];
@@ -2637,6 +2777,7 @@ function spawnApproach(){
   w.phase='approach'; w.attract=1;
 }
 function updateWaiting(dt){
+  if (!riverWaiting(dt)) return;   // the river carries the float (game/river.js)
   const w=S.wait, b=S.bob;
   if (w.sh){ const sh=w.sh;
     if (sh.flee){ sh.x+=Math.cos(sh.ang)*170*dt; sh.y+=Math.sin(sh.ang)*85*dt; sh.alpha-=dt*1.6; if (sh.alpha<=0) w.sh=null; }
@@ -2686,7 +2827,7 @@ function triggerBite(){
   const w=S.wait, b=S.bob, F=FISH[w.fish];
   S.bite={t:0, win:F.window*modMul('hook',{fish:w.fish,spot:b.spot,lucky:w.lucky}), fish:w.fish};
   b.plunge=1; splash(b.x,b.y,9); ripple(b.x,b.y,34); sfx.bite(); buzz(30); pulse(.45);
-  toast('Tap!','big'); setState('bite');
+  toast('Tap!','big'); setState('bite'); twinBite();
   if (S.tut){ S.tut='bite'; coach('It’s biting! Tap anywhere on the screen now!','3 of 4', true); }
 }
 function updateBite(dt){
@@ -2698,6 +2839,7 @@ function updateBite(dt){
 }
 function hook(){
   if (S.bite.loot) return hookHaul();
+  if (S.bite.twin) twinStrike(S.tapX,S.tapY);
   const b=S.bite, F=FISH[b.fish], R=RAR[F.rarity];
   const perfect=b.t<=.3*modMul('perfect',{fish:b.fish,spot:S.bob.spot,lucky:!!(S.wait&&S.wait.lucky)});
   if (perfect){ save.stats.perfect++; toast('Perfect hook!','good'); } else toast('Hooked!','');
@@ -2710,7 +2852,7 @@ function hook(){
   else if (rk>=rarRank('legendary')){ S.darkT=.5; setTimeout(()=>toast(F.rarity==='exotic'?'Something strange…':'Something enormous…','gold'),350); }
   else if (rk>=rarRank('epic')) S.darkT=.3;
   else if (F.rarity==='rare') S.darkT=.18;
-  startReel(b.fish,perfect);
+  twinIn(); startReel(b.fish,perfect);
 }
 
 /* ---------- Reeling ---------- */
@@ -3077,8 +3219,8 @@ function fitHud(){ const hud=$('hud'); if (!hud) return; const g=save.glimmer||0
 window.addEventListener('resize',fitHud);
 if (document.fonts) document.fonts.ready.then(()=>{ HUD.sig=''; fitHud(); });   // the display font changes every width
 function updateHud(){
-  const all=REGION_FISH.lake.concat(save.boat?REGION_FISH.coast:[]), n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
-  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat; $('shackBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; ordersBadge(); $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
+  const all=[...new Set(['lake','river','coast'].filter(regionOpen).flatMap(r=>REGION_FISH[r]))], n=all.filter(id=>(save.fish[id]||{}).caught>0).length;
+  $('species').textContent='Journal '+n+'/'+all.length; $('mapBtn').hidden=!save.boat && !save.ferry; $('shackBtn').hidden=!save.tutorialDone; $('phoneBtn').hidden=!save.boat; ordersBadge(); $('labBtn').hidden=!!save.hideLab; updateMealChip(); const np=(save.pending||[]).length; $('phoneBadge').hidden=!np; $('phoneBadge').textContent=np;
   updateGlimChip(); fitHud(); $('muteDot').hidden=!!save.sound; $('soundBtn').setAttribute('aria-label',save.sound?'Settings':'Settings (sound is off)'); updateJournalDot(); updateBagBtn();
 }
 
@@ -3289,7 +3431,7 @@ function gearChips(id){ return (TACKLE[id].mods||[]).map(m=>{ const st=STATS[m.s
 
 /* ---------- Enchantments and Glimmer (data/enchant.js) ---------- */
 /* save.glimmer is the Glimmer you have. save.ench = {own:{id:1} for each rune you've etched, rig:{rodId:[id or null,
-   one per socket]}, kit:true once the etching kit has been shown}. An etched rune goes on any rod for free, one of
+   one per socket]}, kit:true once the etching kit has been shown, cut:{rodId:sockets Wren has added}}. An etched rune goes on any rod for free, one of
    each per rod; the modifiers of the runes on the rod in hand join the pipeline (game/mods.js, src 'ench').
    save.day counts in-game days (game/loop.js); save.wander = {day, n:{region: catches there that day}} is what
    Wanderer counts (each water, as the design doc has it, so it pays to travel). S.echo = {fish, reg, spot} is an Echo waiting at a spot for the next cast there.
@@ -3299,8 +3441,12 @@ function enchState(){ if (!isObj(save.ench)) save.ench={}; const e=save.ench;
   for (const id in e.own) if (!ENCH[id]) delete e.own[id];
   if (typeof save.glimmer!=='number' || !isFinite(save.glimmer) || save.glimmer<0) save.glimmer=0;
   return e; }
+/** A rod's sockets: its own (RODS[].ench), plus any Wren has cut at her bench (save.ench.cut[rod]), 3 at most. */
+function socketsOf(rod){ const e=enchState(), c=isObj(e.cut)?+e.cut[rod]||0:0; return Math.min(3,((RODS[rod]||RODS.willow).ench||1)+Math.max(0,Math.floor(c))); }
+/** Whether a rune is in the etching tray yet: Homebody waits until you've met Wren (data/enchant.js need). */
+const enchAvail = id => !ENCH[id].need || (ENCH[id].need==='wren' && !!(isObj(save.wren) && save.wren.met));
 /** The runes on rod `rod`, one entry per socket (null for an empty one): only runes you own, one of each. */
-function enchFor(rod){ const e=enchState(), n=(RODS[rod]||RODS.willow).ench||1; let r=e.rig[rod]; if (!Array.isArray(r)) r=e.rig[rod]=[];
+function enchFor(rod){ const e=enchState(), n=socketsOf(rod); let r=e.rig[rod]; if (!Array.isArray(r)) r=e.rig[rod]=[];
   const seen=new Set(); for (let i=0;i<r.length;i++){ const id=r[i]; if (!id || !ENCH[id] || !e.own[id] || seen.has(id)) r[i]=null; else seen.add(id); }
   if (r.length>n) r.length=n; while (r.length<n) r.push(null); return r; }
 const ownsEnch = id => !!enchState().own[id];
@@ -3309,7 +3455,7 @@ const enchOn = (id,rod) => enchFor(rod||save.rod).includes(id);
 function addGlimmer(n,o){ n=Math.round(n)||0; if (!n) return; save.glimmer=Math.max(0,(save.glimmer||0)+n); if (n>0) save.stats.glimmer=(save.stats.glimmer||0)+n; persist(); if (!SIMULATING) glimmerTally(n,o); }
 /** Etches rune `id` into socket `at` of the rod in hand: pays its Glimmer the first time, free after that. */
 function etchRune(id,at){ const e=enchState(), E=ENCH[id]; if (!E || !(at>=0 && at<enchFor(save.rod).length)) return false;
-  if (!e.own[id]){ if ((save.glimmer||0)<E.cost) return false; save.glimmer-=E.cost; e.own[id]=1; save.stats.etched=(save.stats.etched||0)+1; }
+  if (!e.own[id]){ if ((save.glimmer||0)<E.cost || !enchAvail(id)) return false; save.glimmer-=E.cost; e.own[id]=1; save.stats.etched=(save.stats.etched||0)+1; }
   return socketRune(id,at); }
 /** Puts a rune you own in socket `at` (moving it if it's in another socket on the same rod). */
 function socketRune(id,at,rod){ rod=rod||save.rod; const r=enchFor(rod); if (!ownsEnch(id) || !(at>=0 && at<r.length)) return false;
@@ -3573,7 +3719,8 @@ window.addEventListener('pagehide',persistOnLeave);
 
 /* ---------- Drawing ---------- */
 /* Most fish share one body, shaped by their h (height as a share of length). A few have their own: the Steeple Gar's
-   needle snout, the Gaslight Angler's great head, and the Moonwhale Calf's whale's body and flukes. */
+   needle snout, the Gaslight Angler's great head, the Moonwhale Calf's whale's body and flukes, and Old Gristle's
+   sturgeon's shovel snout and long upper tail. */
 function fishPath(id,len){
   const F=FISH[id], h=len*F.h, p=new Path2D();
   if (id==='gar'){ p.moveTo(len*.5,-h*.06); p.lineTo(len*.24,-h*.36); p.bezierCurveTo(len*.12,-h*1.08,-len*.25,-h*1.0,-len*.4,-h*.32);
@@ -3582,6 +3729,8 @@ function fishPath(id,len){
     p.bezierCurveTo(-len*.34,h*.3,-len*.1,h*.72,len*.2,h*.8); p.bezierCurveTo(len*.4,h*.82,len*.53,h*.42,len*.5,-h*.12); p.closePath(); return p; }
   if (id==='calf'){ p.moveTo(len*.5,h*.08); p.bezierCurveTo(len*.5,-h*.92,len*.2,-h*1.1,-len*.05,-h*.95); p.bezierCurveTo(-len*.25,-h*.78,-len*.34,-h*.3,-len*.42,-h*.12);
     p.lineTo(-len*.42,h*.12); p.bezierCurveTo(-len*.3,h*.46,-len*.1,h*1.0,len*.2,h*.96); p.bezierCurveTo(len*.42,h*.9,len*.5,h*.6,len*.5,h*.08); p.closePath(); return p; }
+  if (id==='gristle'){ p.moveTo(len*.5,h*.05); p.quadraticCurveTo(len*.44,-h*.5,len*.3,-h*.82); p.bezierCurveTo(len*.1,-h*1.12,-len*.25,-h*.8,-len*.4,-h*.28);
+    p.lineTo(-len*.4,h*.22); p.bezierCurveTo(-len*.2,h*.82,len*.1,h*1.02,len*.3,h*.72); p.quadraticCurveTo(len*.42,h*.5,len*.5,h*.05); p.closePath(); return p; }
   p.moveTo(len*.5,0);
   p.bezierCurveTo(len*.38,-h*1.08,-len*.22,-h*1.02,-len*.4,0);
   p.bezierCurveTo(-len*.22,h*1.02,len*.38,h*1.08,len*.5,0); p.closePath();
@@ -3591,20 +3740,22 @@ function tailPath(id,len){ const F=FISH[id], h=len*F.h, p=new Path2D();
   if (id==='gar'){ p.moveTo(-len*.37,0); p.quadraticCurveTo(-len*.44,-h*1.7,-len*.58,-h*.95); p.quadraticCurveTo(-len*.63,0,-len*.58,h*.95); p.quadraticCurveTo(-len*.44,h*1.7,-len*.37,0); p.closePath(); return p; }
   if (id==='calf'){ p.moveTo(-len*.38,-h*.12); p.quadraticCurveTo(-len*.47,-h*.28,-len*.63,-h*.8); p.quadraticCurveTo(-len*.6,-h*.22,-len*.53,0);
     p.quadraticCurveTo(-len*.6,h*.22,-len*.63,h*.62); p.quadraticCurveTo(-len*.47,h*.24,-len*.38,h*.12); p.closePath(); return p; }
+  if (id==='gristle'){ p.moveTo(-len*.38,-h*.3); p.quadraticCurveTo(-len*.5,-h*1.1,-len*.63,-h*1.9); p.quadraticCurveTo(-len*.56,-h*.4,-len*.5,h*.2);
+    p.quadraticCurveTo(-len*.52,h*.7,-len*.56,h*1.0); p.quadraticCurveTo(-len*.45,h*.6,-len*.38,h*.22); p.closePath(); return p; }   // a shark's tail: the top lobe far longer
   const k=id==='angler'?.62:1;
   p.moveTo(-len*.36,0); p.lineTo(-len*.6,-h*.85*k); p.quadraticCurveTo(-len*.5,0,-len*.6,h*.85*k); p.closePath(); return p; }
 /** The whole outline, body and tail, as one shape: the Moonwhale's breach far out is just this, filled. */
 function whalePath(c,len){ c.fill(tailPath('calf',len)); c.fill(fishPath('calf',len)); }
 /* Where each fish's dorsal fin sits (a and b: its front and back, as shares of length from the middle; top: its height in
    body heights; base: where it meets the back), and its eye (x, y as shares of length and height; r as a share of length). */
-const DORSAL={gar:{a:-.17,b:-.33,top:2.7,base:.78}, angler:{a:-.1,b:-.3,top:1.05,base:.6}, calf:{a:-.17,b:-.3,top:1.2,base:.86}, mayor:{a:.14,b:-.22,top:2.2,base:.8}};
+const DORSAL={grayling:{a:.16,b:-.28,top:3.4,base:.8}, gristle:{a:-.2,b:-.34,top:1.5,base:.5}, brook:{a:.06,b:-.18,top:2,base:.8}, gar:{a:-.17,b:-.33,top:2.7,base:.78}, angler:{a:-.1,b:-.3,top:1.05,base:.6}, calf:{a:-.17,b:-.3,top:1.2,base:.86}, mayor:{a:.14,b:-.22,top:2.2,base:.8}};
 const DORSAL0={a:.14,b:-.22,top:1.65,base:.8};
-const EYE={gar:{x:.21,y:-.12,r:.034}, angler:{x:.3,y:-.6,r:.036}, calf:{x:.33,y:.14,r:.018}};
+const EYE={gristle:{x:.3,y:-.42,r:.022}, gar:{x:.21,y:-.12,r:.034}, angler:{x:.3,y:-.6,r:.036}, calf:{x:.33,y:.14,r:.018}};
 const EYE0={x:.34,y:-.18,r:.045};
 /* Up close, fish get more: past 44 px a gill line, a side fin, a darker back, a mouth and a glint in the eye; past 80 px
    fin rays, a lateral line and scales (except the catfish, the eel, and the bream, leafjack and mackerel, whose patterns
    already are their scales). Small fish in the scene stay simple, so they read at a glance. */
-const NO_SCALES=new Set(['reedwhisker','leafjack','kelpeel','bream','mackerel','angler','calf']), OWN_MOUTH=new Set(['grouper','saltjaw','gar','angler','calf']);
+const NO_SCALES=new Set(['reedwhisker','leafjack','kelpeel','bream','mackerel','angler','calf','gristle','barbel']), OWN_MOUTH=new Set(['grouper','saltjaw','gar','angler','calf','gristle','barbel']);
 function fishRays(c,lw,pts){ c.strokeStyle='rgba(43,42,51,.32)'; c.lineWidth=clamp(lw*.4,.6,2.2); c.beginPath(); for (let i=0;i<pts.length;i+=4){ c.moveTo(pts[i],pts[i+1]); c.lineTo(pts[i+2],pts[i+3]); } c.stroke(); }
 /* `mut` draws a mutation on the fish (data/fish.js: MUTS): Glassy shows its bones through a clear body, Mossy wears moss
    and a flower along its back, and a Twin is two fish, the second a touch smaller behind the first. A Giant is just big. */
@@ -3631,6 +3782,21 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   c.fillStyle='rgba(255,240,210,.28)'; c.beginPath(); c.ellipse(len*.05,h*.55,len*.38,h*.5,0,0,Math.PI*2); c.fill();
   if (det){ c.fillStyle='rgba(18,26,30,.15)'; c.beginPath(); c.ellipse(0,-h*.86,len*.54,h*.52,0,0,Math.PI*2); c.fill(); }
   if (id==='perch'){ c.fillStyle='rgba(90,40,15,.35)'; for (let i=0;i<4;i++) c.fillRect(len*(.18-i*.13),-h,len*.05,h*1.4); }
+  if (id==='brook'){ c.fillStyle='rgba(225,236,214,.55)'; c.fillRect(-len*.42,-h*.12,len*.9,h*.22);   // a silver band, and the dusky marks of a young river fish along it
+    c.fillStyle='rgba(70,60,40,.3)'; for (let i=0;i<7;i++){ c.beginPath(); c.ellipse(len*(.26-i*.09),-h*.02,len*.026,h*.3,0,0,Math.PI*2); c.fill(); } }
+  if (id==='stone'){ c.fillStyle='rgba(50,48,44,.28)'; for (let i=0;i<14;i++){ const x=len*(.3-((i*37)%13)/13*.66), y=(((i*53)%11)/10-.55)*h*1.4; c.beginPath(); c.ellipse(x,y,len*.03,h*.1,i,0,Math.PI*2); c.fill(); }   // pebbly mottling
+    c.fillStyle='rgba(230,226,214,.3)'; for (let i=0;i<8;i++){ const x=len*(.26-((i*29)%9)/9*.58), y=(((i*41)%7)/6-.5)*h*1.2; c.beginPath(); c.arc(x,y,len*.012,0,Math.PI*2); c.fill(); } }
+  if (id==='barbel'){ c.strokeStyle='rgba(40,28,18,.4)'; c.lineWidth=Math.max(.8,lw*.55); c.beginPath();   // bark: long ragged furrows
+    for (let i=0;i<6;i++){ const y=(-.6+i*.24)*h; c.moveTo(len*.32,y); c.quadraticCurveTo(len*.05,y+h*.06*(i%2?1:-1),-len*.36,y*.7); } c.stroke();
+    c.fillStyle='rgba(230,200,150,.25)'; c.beginPath(); c.ellipse(len*.02,h*.6,len*.38,h*.3,0,0,Math.PI*2); c.fill(); }
+  if (id==='clockfin'){ c.fillStyle='rgba(206,120,120,.38)'; c.fillRect(-len*.4,-h*.1,len*.86,h*.2);   // a trout's pink stripe, and black spots like the minutes on a dial
+    c.fillStyle='rgba(30,30,24,.55)'; for (let i=0;i<12;i++){ const a=i/12*Math.PI*2, x=-len*.05+Math.cos(a)*len*.2, y=Math.sin(a)*h*.62; c.beginPath(); c.arc(x,y,len*(i%3?.01:.017),0,Math.PI*2); c.fill(); } }
+  if (id==='gristle'){ c.fillStyle='rgba(225,210,180,.35)'; c.beginPath(); c.ellipse(len*.02,h*.7,len*.4,h*.3,0,0,Math.PI*2); c.fill();   // the pale belly, and leathery wrinkles
+    c.strokeStyle='rgba(40,34,28,.25)'; c.lineWidth=Math.max(.7,lw*.4); c.beginPath(); for (let i=0;i<9;i++){ const x=len*(.26-i*.07); c.moveTo(x,-h*.5); c.quadraticCurveTo(x-len*.015,0,x,h*.45); } c.stroke(); }
+  if (id==='spatefin'){ c.strokeStyle='rgba(225,238,240,.42)'; c.lineWidth=Math.max(.7,lw*.4); c.beginPath(); for (let i=0;i<9;i++){ const x=len*(.32-i*.08), y=(((i*5)%4)/3-.6)*h; c.moveTo(x,y); c.lineTo(x-len*.03,y+h*.42); } c.stroke();   // rain-streaked
+    c.fillStyle='rgba(40,50,30,.3)'; for (let i=0;i<8;i++){ c.beginPath(); c.arc(len*(.24-i*.08),-h*(.4+(i%2)*.2),len*.018,0,Math.PI*2); c.fill(); } }
+  if (id==='grayling'){ c.fillStyle='rgba(40,40,60,.4)'; for (let i=0;i<9;i++){ c.beginPath(); c.arc(len*(.22-((i*3)%5)*.045),(((i*7)%5)/4-.6)*h,len*.012,0,Math.PI*2); c.fill(); }   // a few dark freckles up front
+    c.fillStyle='rgba(200,180,240,.22)'; c.fillRect(-len*.42,-h*.5,len*.9,h*.3); }
   if (id==='reedwhisker'){ c.fillStyle='rgba(40,30,20,.3)'; c.beginPath(); c.ellipse(-len*.02,-h*.55,len*.42,h*.4,0,0,Math.PI*2); c.fill();
     c.fillStyle='rgba(255,240,210,.18)'; for (let i=0;i<5;i++){ c.beginPath(); c.arc(len*(.2-i*.12),-h*.2+(i%2)*h*.25,len*.02,0,Math.PI*2); c.fill(); } }
   if (id==='lantern'){ for (let i=0;i<5;i++){ const gx=len*(.22-i*.12), gy=-h*.15+(i%2?h*.3:0); c.fillStyle='rgba(255,236,160,.35)'; c.beginPath(); c.arc(gx,gy,len*.06,0,Math.PI*2); c.fill();
@@ -3690,6 +3856,18 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   if (id==='reedwhisker'){ c.strokeStyle=INK; c.lineWidth=lw*.7; c.lineCap='round'; c.beginPath();
     c.moveTo(len*.46,h*.05); c.quadraticCurveTo(len*.6,h*.3,len*.55,h*.75); c.moveTo(len*.44,h*.12); c.quadraticCurveTo(len*.5,h*.5,len*.4,h*.85);
     c.moveTo(len*.46,-h*.05); c.quadraticCurveTo(len*.62,-h*.15,len*.66,h*.15); c.stroke(); }
+  if (id==='barbel'){ c.strokeStyle=INK; c.lineWidth=lw*.6; c.lineCap='round'; c.beginPath();   // its four barbels, and the mouth set low
+    c.moveTo(len*.44,h*.35); c.quadraticCurveTo(len*.5,h*.62,len*.46,h*.9); c.moveTo(len*.4,h*.4); c.quadraticCurveTo(len*.42,h*.7,len*.36,h*.95);
+    c.moveTo(len*.48,h*.2); c.quadraticCurveTo(len*.58,h*.32,len*.6,h*.55); c.moveTo(len*.46,h*.26); c.quadraticCurveTo(len*.53,h*.5,len*.52,h*.75); c.stroke();
+    c.beginPath(); c.moveTo(len*.48,h*.28); c.quadraticCurveTo(len*.44,h*.38,len*.4,h*.34); c.stroke(); }
+  if (id==='gristle'){ c.strokeStyle=INK; c.lineWidth=lw*.55; c.lineCap='round'; c.beginPath();   // whiskers under the snout, the mouth behind them
+    for (let i=0;i<4;i++){ const x=len*(.4-i*.018); c.moveTo(x,h*.32); c.lineTo(x-len*.008,h*.62); } c.stroke();
+    c.beginPath(); c.moveTo(len*.36,h*.62); c.quadraticCurveTo(len*.31,h*.76,len*.26,h*.62); c.stroke();
+    if (det){ const scute=(x,y,r)=>{ c.beginPath(); c.moveTo(x-r,y+r*.5); c.lineTo(x,y-r*.9); c.lineTo(x+r,y+r*.5); c.closePath(); c.fillStyle='#CFC4AE'; c.fill(); c.lineWidth=lw*.45; c.strokeStyle=INK; c.stroke(); };   // rows of bony plates
+      for (let i=0;i<9;i++){ const u=i/8, x=lerp(len*.24,-len*.34,u); scute(x,-h*(.92-u*.5)+h*.06,len*.022); }
+      for (let i=0;i<10;i++){ const x=lerp(len*.2,-len*.36,i/9); scute(x,-h*.04,len*.016); } } }
+  if (id==='clockfin' && det){ c.strokeStyle='rgba(43,42,51,.75)'; c.lineWidth=lw*.5; c.beginPath(); const gx=len*.28, gy=-h*.05;   // the hands of the clock on its gill cover, at ten past
+    c.moveTo(gx,gy); c.lineTo(gx+len*.03,gy-h*.32); c.moveTo(gx,gy); c.lineTo(gx+len*.05,gy-h*.08); c.stroke(); }
   if (id==='mossback'){ for (let i=0;i<7;i++){ const x=len*(.25-i*.08), y=-h*.92+Math.abs(i-3)*h*.06;
       c.fillStyle=i%3===0?'#E9A98B':'#8FB070'; c.beginPath(); c.arc(x,y,len*.035,0,Math.PI*2); c.fill(); c.lineWidth=lw*.6; c.stroke(); }
     c.strokeStyle=INK; c.lineWidth=lw*.6; c.beginPath(); c.moveTo(-len*.05,-h*1.05); c.lineTo(-len*.05,-h*1.35); c.moveTo(len*.02,-h*1.05); c.lineTo(len*.02,-h*1.35); c.moveTo(-len*.07,-h*1.25); c.lineTo(len*.04,-h*1.25); c.stroke(); }
@@ -4357,7 +4535,10 @@ const RUNE_GLYPH={
   storm(c){ c.moveTo(-.7,-.12); c.bezierCurveTo(-.3,-.12,-.08,-.7,.22,-.5); c.bezierCurveTo(.5,-.3,.2,.08,-.08,-.12); c.bezierCurveTo(-.3,-.3,.1,-.62,.36,-.3); c.quadraticCurveTo(.5,-.12,.72,-.12);
     for (const [x,y] of [[-.46,.18],[-.08,.12],[.3,.18],[-.28,.48],[.1,.44],[.48,.48]]){ c.moveTo(x+.07,y); c.lineTo(x-.03,y+.2); } },
   echo(c){ c.moveTo(-.12,0); c.quadraticCurveTo(-.36,-.24,-.62,0); c.quadraticCurveTo(-.36,.24,-.12,0); c.moveTo(-.62,0); c.lineTo(-.82,-.14); c.lineTo(-.82,.14); c.closePath();
-    c.moveTo(.16,-.36); c.quadraticCurveTo(.34,0,.16,.36); c.moveTo(.38,-.58); c.quadraticCurveTo(.66,0,.38,.58); }
+    c.moveTo(.16,-.36); c.quadraticCurveTo(.34,0,.16,.36); c.moveTo(.38,-.58); c.quadraticCurveTo(.66,0,.38,.58); },
+  homebody(c){ c.moveTo(-.62,-.06); c.lineTo(0,-.62); c.lineTo(.62,-.06); c.moveTo(-.46,-.2); c.lineTo(-.46,.62); c.lineTo(.46,.62); c.lineTo(.46,-.2);   // a little house,
+    c.moveTo(-.14,.62); c.lineTo(-.14,.24); c.quadraticCurveTo(0,.1,.14,.24); c.lineTo(.14,.62);   // its door,
+    c.moveTo(.3,-.36); c.lineTo(.3,-.58); c.moveTo(.3,-.7); c.quadraticCurveTo(.46,-.78,.4,-.9); }   // and a curl of smoke from the chimney
 };
 /** A rune token, centred, `s` across. o: {glow 0..1, glowR (how far the glow may reach, so it fades out inside a
     small canvas instead of being cut off square), p (how much of the glyph is drawn, for etching), empty, dim}. */
@@ -5413,7 +5594,7 @@ function clockText(h){ const hh=Math.floor(h), mm=Math.floor((h-hh)*60/10)*10, h
    Playtest and the balance simulator can pin the weather with save.wx.force. Everything here reads only the save, so
    the simulator's stand-in save has weather of its own (see game/mods.js). */
 var WXM={save:null};                        // the last answer, while nothing it depends on has changed
-const WX_REGN={lake:1, coast:2};
+const WX_REGN={lake:1, coast:2, river:3};
 /** The save's weather state, tidied on first read: a seed for the sky, a pinned kind (Playtest), tips already shown. */
 function wxState(){ let w=save.wx; if (!w || typeof w!=='object' || Array.isArray(w)) w=save.wx={};
   if (!Number.isInteger(w.seed) || w.seed<1) w.seed=1+Math.floor(Math.random()*2147483646);
@@ -5440,7 +5621,7 @@ function wxAt(reg,B,seed){ seed=seed||wxState().seed; return wxRoll(reg,wxStart(
     a rainbow, each 0 to 1). Cached until the save, the clock, the region or a pinned kind changes. */
 function wxInfo(){
   const w=wxState(), M=WXM;
-  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
+  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.ferry===save.ferry && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
   const reg=REG(), h=(((save.clock%24)+24)%24), into=h%WX_SPELL.hours; let from, to, t;
   if (w.force){ from=to=w.force; t=1; }
   else if (!save.tutorialDone){ from=to='clear'; t=1; }
@@ -5452,7 +5633,7 @@ function wxInfo(){
   // a rainbow, by day, in the hour or two after rain gives way
   if (from==='rain' && to!=='rain' && !w.force && h>=7 && h<18.5) v.bow=clamp((t-.5)/.4,0,1)*clamp((2.4-into)/.8,0,1);
   if (w.bow && !isNight(h)) v.bow=1;                                   // Playtest: a rainbow now
-  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
+  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,ferry:save.ferry,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
   return v; }
 /** The weather the fishing uses here and now: 'clear', 'cloudy', 'rain' or 'fog'. */
 const wxNow = () => wxInfo().kind;
@@ -5722,6 +5903,7 @@ function hillPath(x,amp,f1,f2,p1,p2){ x.beginPath(); x.moveTo(0,HZ);
   x.lineTo(W,HZ); x.closePath(); }
 function drawLand(x,main){
   if (REG()==='coast'){ drawCoastLand(x,main); return; }
+  if (REG()==='river'){ drawRiverLand(x,main); return; }
   hillPath(x,H*.075,.011,.027,1.2,.4); x.fillStyle=PAL.hillFar; x.fill();
   hillPath(x,H*.048,.018,.04,3.1,2.2); x.fillStyle=PAL.hillNear; x.fill();
   x.beginPath(); x.moveTo(0,HZ); for (const [px,py] of treePts(1)) x.lineTo(px,py); x.lineTo(W,HZ); x.closePath(); x.fillStyle=PAL.trees; x.fill();
@@ -5766,7 +5948,8 @@ function buildBg(){
   paintWxSky(x);   // an overcast deck and fog's wash (game/weather-art.js)
   const useSun=P.sunVis>=P.moonVis; SC.lightX=useSun?sx:mx; SC.lightRGB=useSun?P.glowR:'210,222,255'; SC.lightA=useSun?P.sunVis*(P.sunY>.7?1:.45):P.moonVis*.7*(.25+.75*moonLit());
   drawLand(x,true);
-  const ws=REG()==='coast'?[mixP('w0','#94BCCB',.3),mixP('w1','#2F8098',.38),mixP('w2','#1B6276',.38),mixP('w3','#0E3A4A',.3)]:[P.w0,P.w1,P.w2,P.w3];
+  const ws=REG()==='coast'?[mixP('w0','#94BCCB',.3),mixP('w1','#2F8098',.38),mixP('w2','#1B6276',.38),mixP('w3','#0E3A4A',.3)]
+    :REG()==='river'?[mixP('w0','#A7B98E',.4),mixP('w1','#557A55',.45),mixP('w2','#34583F',.45),mixP('w3','#1E3527',.35)]:[P.w0,P.w1,P.w2,P.w3];
   const wg=x.createLinearGradient(0,HZ,0,H); wg.addColorStop(0,ws[0]); wg.addColorStop(.1,ws[1]); wg.addColorStop(.45,ws[2]); wg.addColorStop(1,ws[3]);
   x.fillStyle=wg; x.fillRect(0,HZ,W,H-HZ);
   x.save(); x.beginPath(); x.rect(0,HZ,W,H-HZ); x.clip(); x.translate(0,HZ); x.scale(1,-.72); x.translate(0,-HZ); x.globalAlpha=.3; drawLand(x,false); x.restore();
@@ -5777,7 +5960,7 @@ function buildBg(){
 }
 function layoutScenery(){
   layoutRegion();
-  if (REG()==='coast'){ G.pads={x:-999,y:-999,r:0}; G.padClusters=[]; SC.pads=[]; return; }
+  if (REG()!=='lake'){ G.pads={x:-999,y:-999,r:0}; G.padClusters=[]; SC.pads=[]; if (REG()==='river') layoutRiverArt(); return; }
   G.padClusters=[{x:W*.26,y:HZ+(H-HZ)*.53,r:W*.13},{x:W*.8,y:HZ+(H-HZ)*.6,r:W*.1},{x:W*.46,y:HZ+(H-HZ)*.13,r:W*.07}];
   G.pads=G.padClusters[0];
   sseed=21; SC.pads=G.padClusters.map((c,ci)=>{ const n=ci===0?7:ci===1?5:4, arr=[];
@@ -5876,9 +6059,10 @@ function drawWater(){
   const sx=SC.lightX||W*.3, la=SC.lightA||0;
   if (la>.02) for (let i=0;i<14;i++){ const y=HZ+3+i*i*1.5, w=W*.05*(1-i/16)+Math.sin(S.time*1.5+i)*4;
     ctx.fillStyle='rgba('+SC.lightRGB+','+((.42-i*.025)*la).toFixed(3)+')'; ctx.fillRect(sx-w,y,w*2,1.5+i*.15); }
-  drawBoat();
+  const river=REG()==='river';   // the river draws its own current (game/river-art.js); no sails or lake swell there
+  if (!river) drawBoat();
   ctx.lineCap='round';
-  for (const v of SC.waves){
+  if (!river) for (const v of SC.waves){
     const y0=HZ+5+v.fy*(H-HZ-50), k=sc(y0), span=W*1.2;
     const x=((v.fx*span+S.time*v.dr*(6+k*10))%span)-W*.1, y=y0+Math.sin(S.time*1.1+v.ph)*1.4*k, w=(5+k*13)*v.len;
     ctx.strokeStyle='rgba(222,238,242,'+(.08+.16*k+.05*Math.sin(S.time*1.7+v.ph)).toFixed(3)+')'; ctx.lineWidth=.8+k*1.4;
@@ -5892,7 +6076,7 @@ function drawWater(){
   }
   drawMoonpath(); drawBreach(); drawBowFoot(); drawWxWater(); drawLucky();
   if (SC.jump){ const j=SC.jump, u=j.t/j.dur, k=sc(j.y), hgt=Math.sin(Math.PI*u)*26*k;
-    ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
+    ctx.save(); ctx.translate(j.x+j.dir*(u-.5)*28*k,j.y-hgt); ctx.rotate(j.dir*(-1+u*2)*.9); ctx.scale(j.dir,1); drawFish(ctx,river?'brook':'perch',22*k,false,1,Math.sin(S.time*25)); ctx.restore(); }
 }
 function drawDeep(){
   const d=G.deep; ctx.save(); ctx.translate(d.x,d.y);
@@ -5912,6 +6096,7 @@ function drawFlower(x,y,s,kind){
 }
 function drawPads(){
   if (REG()==='coast'){ drawKelp(); return; }
+  if (REG()==='river'){ drawRiverWater(); return; }
   G.padClusters.forEach((c,ci)=>{ SC.pads[ci].forEach((p,i)=>{
     const {x,y,r}=padPos(ci,i);
     ctx.save(); ctx.translate(x,y); ctx.scale(1,.42);
@@ -5966,6 +6151,7 @@ function drawRock(x,y,r){ const c=ctx;
 }
 function drawReeds(){
   if (REG()==='coast'){ drawStacks(); return; }
+  if (REG()==='river'){ drawRiverBanks(); return; }
   drawBank(SC.bank.L,-1); drawBank(SC.bank.R,1);
   drawRock(W*.075,H*.635,11); drawRock(W*.145,H*.775,8); drawRock(W*.905,H*.735,10);
   ctx.lineCap='round';
@@ -6015,7 +6201,7 @@ function nightShade(){
 const OTT = {say:'', sayT:0, next:14};
 function ottPos(){ return {x:W/2-118, y:H-150}; }
 function onOttilie(x,y){ if (REG()!=='lake') return false; const o=ottPos(); return x>o.x-34 && x<o.x+34 && y>o.y-62 && y<o.y+14; }
-function ottHasNews(){ if (!save.metOttilie) return save.stats.catches>=3; if (ownerHas('ottilie').length) return true; const n=ROD_ORDER.find(id=>!save.rods.includes(id)); return !!n && save.coins>=RODS[n].price; }
+function ottHasNews(){ if (!save.metOttilie) return save.stats.catches>=3; if (ownerHas('ottilie').length) return true; if (ferryAsk() && !save.ferry && (!save.ferrySeen || save.coins>=RIVER.ferry.price)) return true; const n=ROD_ORDER.find(id=>!save.rods.includes(id)); return !!n && save.coins>=RODS[n].price; }
 function wrapText(t,max){ const words=t.split(' '), out=[]; let line='';
   for (const w of words){ const test=line?line+' '+w:w; if (ctx.measureText(test).width>max && line){ out.push(line); line=w; } else line=test; }
   if (line) out.push(line); return out; }
@@ -6047,6 +6233,7 @@ function updateScenery(dt){
       (S.state==='loot'?news:toast)('Splat! Gull luck: '+trimNum(gullMul())+'× rarity zone','gold'); S.particles.push({x:d.tx+34,y:d.ty-46,vx:6,vy:-18,g:0,life:0,max:1.3,r:0,c:'rgba(0,0,0,',word:'PLOP!'}); } }
   if (SC.lucky){ SC.lucky.t+=dt; if (SC.lucky.t>=SC.lucky.dur) SC.lucky=null; }
   SC.birds=SC.birds.filter(f=>f.x>-120 && f.x<W+120);
+  updateRiverLeaves(dt);
   if (SC.boat){ SC.boat.x+=SC.boat.dir*SC.boat.sp*dt; if (SC.boat.x<-60||SC.boat.x>W+60) SC.boat=null; }
   else { SC.nextBoat-=dt; if (SC.nextBoat<=0){ const dir=Math.random()<.5?1:-1;
     SC.boat={x:dir>0?-40:W+40, dir, sp:rand(8,13), sail:['#EFE3CC','#E9C9A8','#D9E3E8'][Math.floor(Math.random()*3)]}; SC.nextBoat=rand(18,32); } }
@@ -6109,7 +6296,7 @@ const WOOD={a:'#7A5D43', b:'#71543C', c:'#806248', grain:'rgba(52,34,22,.34)', l
 /** The dock's shape on this screen: its far end, the two edges, and where the piles stand. */
 function dockGeo(){ const cx=W/2, top=H-128, bw=78, bb=110; return {cx, top, bw, bb, lp:cx-bw-1, rp:cx+bw+1}; }
 /** Paints the boards, piles and coiled rope into SC.dock, once per screen size. */
-function buildDock(){ if (REG()!=='lake'){ SC.dock=null; return; }
+function buildDock(){ if (REG()==='coast'){ SC.dock=null; return; }
   const D=dockGeo(), {cx,top,bw,bb}=D, h=H-top+40, c=document.createElement('canvas'); c.width=Math.round(W*DPR); c.height=Math.round(h*DPR);
   const x=c.getContext('2d'); x.setTransform(DPR,0,0,DPR,0,-(top-40)*DPR); sseed=404;
   // the deck's shadow on the water, and the side beams showing under the board ends
@@ -6188,9 +6375,10 @@ function drawDock(){
   drawPail(cx+48,top+47);
   drawBaitOnDock(cx+30,top+56);
   drawTrapProp();
-  if (!S.grey) drawHeron(D.rp,top-25);   // unless he's off guarding a trap (game/trap-scene.js)
+  const lake=REG()==='lake';   // at the river it's Ottilie's ferry landing: Grey stays home, and Wren is on her boathouse ramp
+  if (lake && !S.grey) drawHeron(D.rp,top-25);   // unless he's off guarding a trap (game/trap-scene.js)
   drawKeepnet();
-  drawOttilie();
+  if (lake) drawOttilie(); else { drawWren(); drawOtterThief(); }
   drawDockLantern(D.lp,top);   // in front of Ottilie's punt: the pile stands nearer than her boat
   drawBarnaby(); }
 /** A painted wooden tackle box, lid ajar, a lure hanging over the edge. */
@@ -6579,6 +6767,7 @@ function drawActive(){
   if (sonarOn() && (S.state==='waiting'||S.state==='bite') && S.bob){ const u=(S.time%2.4)/2.4, b=S.bob;
     ctx.strokeStyle='rgba(120,240,170,'+(.55*(1-u)).toFixed(3)+')'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(b.x,b.y,8+u*70*sc(b.y),(8+u*70*sc(b.y))*.38,0,0,Math.PI*2); ctx.stroke(); }
   if ((S.state==='waiting'||S.state==='bite') && S.bob && ((S.wait&&S.wait.phase==='snag') || (S.bite&&S.bite.loot))) drawSnagUnder();
+  drawTwinShadow();
   if ((S.state==='waiting'||S.state==='bite') && S.wait && S.wait.sh){
     const sh=S.wait.sh, F=FISH[S.wait.fish];
     ctx.save(); ctx.translate(sh.x,sh.y); ctx.rotate(sh.ang); ctx.scale(1,.55);
@@ -6608,17 +6797,21 @@ function drawActive(){
 function ghostA(R){ if (!(R.fade>0)) return 1; const e=Math.min(GHOST_FADE-R.fade,R.fade); return Math.max(.05,1-e/.3); }
 function drawBobber(){
   if (!S.bob || !(S.state==='waiting'||S.state==='bite')) return;
-  const b=S.bob, k=sc(b.y), dt=1/60;
+  if (S.bob2) drawFloat(S.bob2, S.state==='bite' && !!(S.bite&&S.bite.twin));   // the Twin Spool's other float (game/twin.js)
+  drawFloat(S.bob, S.state==='bite');
+}
+function drawFloat(b,biting){
+  const k=sc(b.y), dt=1/60;
   b.dip*=.94; b.jerk*=.88; b.nibble=Math.max(0,b.nibble-dt*4); b.rd=(b.rd||0)*.86;   // rd: a raindrop landing on it (game/weather-art.js)
-  const bobY=Math.sin(S.time*2.4)*1.5 + b.dip*4 + b.nibble*5 + b.rd*2.4 + (S.state==='bite'?7*k:0);
+  const bobY=Math.sin(S.time*2.4)*1.5 + b.dip*4 + b.nibble*5 + b.rd*2.4 + (biting?7*k:0);
   const x=b.x - b.jerk*6*k, y=b.y+bobY, r=6*k;
   ctx.fillStyle='rgba(10,26,34,.3)'; ctx.beginPath(); ctx.ellipse(b.x,b.y+2,r*1.6,r*.5,0,0,Math.PI*2); ctx.fill();
-  ctx.save(); ctx.beginPath(); ctx.rect(x-r*2,y-r*4,r*4,r*4+ (S.state==='bite'?-r*.2:r*.35)+ (b.y-y)); ctx.clip();
+  ctx.save(); ctx.beginPath(); ctx.rect(x-r*2,y-r*4,r*4,r*4+ (biting?-r*.2:r*.35)+ (b.y-y)); ctx.clip();
   ctx.fillStyle='#F6EFE2'; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
   ctx.fillStyle=mealPink()?'#F08FB8':DANGER; ctx.beginPath(); ctx.arc(x,y,r,Math.PI,0); ctx.fill();
   ctx.strokeStyle=INK; ctx.lineWidth=1.4; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(x,y-r); ctx.lineTo(x,y-r*1.9); ctx.stroke(); ctx.restore();
-  if (S.state==='bite'){ const a=.6+.4*Math.sin(S.time*30); ctx.strokeStyle='rgba(255,255,255,'+a+')'; ctx.lineWidth=2.5;
+  if (biting){ const a=.6+.4*Math.sin(S.time*30); ctx.strokeStyle='rgba(255,255,255,'+a+')'; ctx.lineWidth=2.5;
     ctx.beginPath(); ctx.ellipse(b.x,b.y,22*k+S.bite.t*30,8*k+S.bite.t*10,0,0,Math.PI*2); ctx.stroke();
     ctx.font='800 20px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=PAPER; ctx.fillText('!',b.x,b.y-22*k); }
 }
@@ -6647,10 +6840,12 @@ function drawRodAndLine(){
   const lid=rigFor(save.rod).line, LC=LINE_RGB[lid]||LINE_RGB.cotton, base=LC[0].split(',').map(Number);
   let sag=24, col='rgba('+LC[0]+','+LC[1]+')', w=lid==='silk'||lid==='wire'?1.4:1.2;
   if (S.state==='casting') sag=0;
+  if (RV.mend) sag=5;   // holding the line against the river's current (game/river.js)
   if (S.state==='reeling'){ const T=S.reel.tension; sag=(1-T)*34; if (T>.75){ const k=(T-.75)/.25; col='rgba('+Math.round(lerp(base[0],230,k))+','+Math.round(lerp(base[1],90,k))+','+Math.round(lerp(base[2],70,k))+','+lerp(LC[1],.95,k).toFixed(2)+')'; w+=k; } }
   const linePath=()=>{ ctx.beginPath(); ctx.moveTo(t.x,t.y); ctx.quadraticCurveTo((t.x+lp.x)/2,(t.y+lp.y)/2+sag,lp.x,lp.y); };
   if (lid==='glowline' && PAL.dark>.05){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.strokeStyle='rgba(150,240,130,'+(.28*PAL.dark*(.85+.15*Math.sin(S.time*2.4))).toFixed(3)+')'; ctx.lineWidth=5; linePath(); ctx.stroke(); ctx.restore(); }
   ctx.strokeStyle=col; ctx.lineWidth=w; linePath(); ctx.stroke();
+  const b2=S.bob2; if (b2 && (S.state==='waiting'||S.state==='bite')){ ctx.beginPath(); ctx.moveTo(t.x,t.y); ctx.quadraticCurveTo((t.x+b2.x)/2,(t.y+b2.y)/2+sag,b2.x,b2.y); ctx.stroke(); }
   if (S.state==='casting'){ ctx.fillStyle=DANGER; ctx.beginPath(); ctx.arc(lp.x,lp.y,4,0,Math.PI*2); ctx.fill(); }
 }
 function drawParticles(){
@@ -6760,10 +6955,20 @@ function render(){
 }
 
 /* ---------- Regions ---------- */
-const REG = () => save.region==='coast' && save.boat ? 'coast' : 'lake';
-function spotName(sp){ return REG()==='coast' && sp==='deep' ? 'Dark trench' : SPOT_NAME[sp]; }
+const REG = () => save.region==='coast' && save.boat ? 'coast' : save.region==='river' && save.ferry ? 'river' : 'lake';
+/** Whether you can get to a water: the lake always, the river once Ottilie's ferry runs, the coast once you have a boat. */
+const regionOpen = r => r==='lake' || (r==='river' && !!save.ferry) || (r==='coast' && !!save.boat);
+/** A spot's name in a water (the coast's deep water is the Dark trench, the river's the Millpool). */
+function spotName(sp,reg){ reg=reg||REG(); return (SPOT_REG[reg]||{})[sp] || SPOT_NAME[sp]; }
+/** Each water's spots and their bite weights. */
+const POOLS_BY = {lake:POOLS, coast:POOLS_COAST, river:POOLS_RIVER};
+const poolsOf = reg => POOLS_BY[reg] || POOLS;
+/** The water a fish calls home: the first one it lives in. */
+const regionOf = id => Object.keys(REGION_FISH).find(r=>REGION_FISH[r].includes(id)) || 'lake';
 /** Every lake fish caught, not counting the ones only weather brings up or the extras (Epic and rarer), so Barnaby never waits on the sky or on luck. */
-function lakeDone(){ return REGION_FISH.lake.every(id=>FISH[id].wx || FISH[id].extra || (save.fish[id]||{}).caught>0); }
+function lakeDone(){ return waterDone('lake'); }
+/** Every fish of a water caught, leaving out the weather's and the extras, as lakeDone. Wren's Twin Spool waits on the river's. */
+function waterDone(reg){ return REGION_FISH[reg].every(id=>FISH[id].wx || FISH[id].extra || (save.fish[id]||{}).caught>0); }
 function hexRGB(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]; }
 function mixP(key,hex,t){ const a=(PAL[key+'R']||'0,0,0').split(',').map(Number), b=hexRGB(hex); return 'rgb('+a.map((v,i)=>Math.round(lerp(v,b[i],t))).join(',')+')'; }
 
@@ -6778,6 +6983,7 @@ function layoutRegion(){
     sseed=77; SC.kelp=G.kelp.map(c=>{ const arr=[]; const n=c.r>W*.1?20:11;
       for (let i=0;i<n;i++){ const a=sr()*6.28, d=Math.sqrt(sr()); arr.push({ox:Math.cos(a)*d, oy:Math.sin(a)*d, len:.5+sr()*.7, ph:sr()*6.28, bulb:sr()<.5}); } return arr; });
     SC.bank={L:[],R:[]}; SC.tails=[];
+  } else if (REG()==='river'){ layoutRiver();
   } else {
     G.deep={x:W*.64, y:HZ+(H-HZ)*.3, rx:W*.19, ry:(H-HZ)*.075};
     G.kelp=[]; G.stacks=[];
@@ -6975,6 +7181,497 @@ function drawSkiffDeck(){
   ctx.fillStyle=INK; ctx.beginPath(); ctx.arc(gx+6*look,gy2-4.8,.7,0,Math.PI*2); ctx.fill();
 }
 
+/* ---------- Rootwood River: its spots, the drifting float, Ottilie's ferry, the otter and Homebody (data/river.js) ---------- */
+/* The river runs left to right across the screen. A float drifts with it, fastest in the run and slowest along the banks
+   and in the millpool, so a cast upstream carries the float through one spot into the next. Holding the line swings the
+   float toward your bank and slows it; a short tap is still a twitch. Off the right edge it's gone, and the cast is over.
+   save.ferry is true once Ottilie's ferry runs; save.home = {reg, day} is where and since which in-game day you've stayed,
+   for Homebody. RV holds the river's moment-to-moment state: the press on the line, the hour's tick, the otter. */
+const RV={down:null, mend:false, hour:null, idle:0, otter:null, swim:null, swimT:20};
+/** Where the river's spots lie: the millpool under the waterwheel (far left), the undercut roots (far right), the leaf
+    drift under the alder, and the riffle off the landing's right. Everything else is the run. */
+function layoutRiver(){
+  const dy=d=>lerp(G.near,HZ+26,d);
+  G.deep={x:W*.2, y:dy(.79), rx:W*.18, ry:(H-HZ)*.055};
+  G.leaves={x:W*.33, y:dy(.36), r:W*.15};
+  G.riffle={x:W*.78, y:dy(.13), r:W*.16};
+  G.rootsY=dy(.8); G.rootsX=W*.54;
+  G.padClusters=[]; G.kelp=[]; G.stacks=[];
+  G.lantern={x:W/2-90, y:H-145};
+}
+function riverSpot(x,y){
+  const d=G.deep, dx=(x-d.x)/d.rx, dy=(y-d.y)/d.ry; if (dx*dx+dy*dy<1.25) return 'deep';
+  if (y<G.rootsY && x>G.rootsX) return 'roots';
+  if (Math.hypot(x-G.leaves.x,(y-G.leaves.y)*1.8)<G.leaves.r) return 'leaves';
+  if (Math.hypot(x-G.riffle.x,(y-G.riffle.y)*1.8)<G.riffle.r) return 'riffle';
+  return 'open';
+}
+/** How deep across the river a point is: 0 at your bank, 1 at the far bank. */
+const riverDepth = y => clamp((G.near-y)/(G.near-HZ-26),0,1);
+/** The current's speed at a depth, as a share of its speed in midstream (RIVER.current.profile). */
+function currentAt(d){ const P=RIVER.current.profile; for (let i=1;i<P.length;i++) if (d<=P[i][0]){ const [a,va]=P[i-1], [b,vb]=P[i]; return lerp(va,vb,(d-a)/(b-a)); } return P[P.length-1][1]; }
+/** Pixels a second the river carries a float at (x, y). */
+function driftSpeed(x,y){ const C=RIVER.current, v=riverSpot(x,y)==='deep'?C.pool:currentAt(riverDepth(y)); return C.speed*W*v*sc(y); }
+
+/* ---------- the drifting float ---------- */
+/** Carries a float downstream; while the line is held, swings it in toward your bank. Returns false once it's drifted off. */
+function driftFloat(b,dt){ const C=RIVER.current, held=RV.mend && S.pointers.size>0;
+  let v=driftSpeed(b.x,b.y); if (held){ v*=C.slow; b.y=Math.min(G.near-4,b.y+C.swing*(G.near-HZ-26)*dt*sc(b.y)); }
+  b.x+=v*dt; b.spot=riverSpot(b.x,b.y);
+  b.wakeT=(b.wakeT||0)-dt; if (b.wakeT<=0){ b.wakeT=held?.35:.7; S.ripples.push({x:b.x-4*sc(b.y),y:b.y+1,r:2,max:9*sc(b.y),life:.3}); }
+  return b.x<W-14; }
+/** Each frame on the river while a float is out. A fish that's nibbling holds the float where it is. */
+function riverWaiting(dt){ if (REG()!=='river' || !S.bob || !S.wait) return true;
+  const w=S.wait; if (w.phase==='snag') return true;
+  if (S.bob2 && !driftFloat(S.bob2,dt)){ ripple(S.bob2.x,S.bob2.y,12); S.bob2=null; }
+  if (w.phase==='nibble'){ const v=driftSpeed(S.bob.x,S.bob.y)*.15; S.bob.x=Math.min(W-16,S.bob.x+v*dt); return true; }
+  if (driftFloat(S.bob,dt)) return true;
+  if (w.sh){ w.sh.flee=true; w.sh.ang+=Math.PI; }
+  if (!save.riverDrift){ save.riverDrift=true; persist(); coachFor('The current carried your float away. Cast upstream, to the left, so it drifts past the spots on its way down.',7); }
+  else toast('The current took your float','');
+  S.lost={t:0,pos:{x:S.bob.x,y:S.bob.y},snapped:false}; setState('lost'); return false; }
+/** A press on the line while waiting: on the river it's a twitch only if it's short. A long one swings the float in. */
+function riverPress(){ if (REG()!=='river') return false; RV.down=S.time; RV.mend=false; return true; }
+function riverRelease(){ if (RV.down==null) return; const was=RV.mend; RV.down=null; RV.mend=false; if (!was && S.state==='waiting') twitch(); }
+function riverUpdate(dt,rdt){
+  if (RV.down!=null && !RV.mend && S.time-RV.down>=RIVER.current.hold && S.state==='waiting'){ RV.mend=true; tone(320,.08,{vol:.03,type:'triangle'}); }
+  if (S.state!=='waiting' && S.state!=='bite'){ RV.down=null; RV.mend=false; }
+  if (!save.ferryTold && S.state==='idle') ferryTip();
+  if (REG()!=='river'){ RV.otter=null; RV.hour=null; return; }
+  // the hour turning: the river ticks, very quietly (the Clockfin's few minutes start now)
+  const hr=Math.floor(((save.clock%24)+24)%24); if (RV.hour!=null && hr!==RV.hour && !AQ.open && !K.open && !SH.open){ tone(2100,.025,{vol:.03,type:'sine'}); tone(1650,.03,{vol:.025,type:'sine',delay:.32}); } RV.hour=hr;
+  otterUpdate(rdt);
+}
+
+/* ---------- Ottilie's ferry ---------- */
+const lakeSpecies = () => REGION_FISH.lake.filter(id=>(save.fish[id]||{}).caught>0).length;
+/** Ottilie asks about her ferry once you've caught a few kinds of lake fish. */
+const ferryAsk = () => !!save.ferry || (save.metOttilie && lakeSpecies()>=RIVER.ferry.species);
+function fixFerry(){ if (save.ferry || save.coins<RIVER.ferry.price) return false;
+  addCoins(-RIVER.ferry.price); save.ferry=true; persist(); sfx.out('rare'); buzz([0,40,60,40]); toast('The ferry runs again!','gold'); return true; }
+/** The first time the ferry can be asked about, a word from the coach. */
+function ferryTip(){ if (save.ferryTold || save.ferry || S.tut || !ferryAsk()) return; save.ferryTold=true; persist();
+  setTimeout(()=>{ if (!save.ferry && !save.ferrySeen) coachFor('Ottilie wants a word about her ferry. Tap her punt.',7); },1500); }
+function ferryHTML(){ const can=save.coins>=RIVER.ferry.price;
+  let h='<div class="entry ferry-card"><canvas class="ferry-art" data-ferry="'+(save.ferry?1:0)+'" aria-hidden="true"></canvas><div>';
+  if (save.ferry) h+='<h3>The ferry runs</h3><p class="note">“Up the river and back, whenever you like. Mind Wren, she talks.”</p><button class="btn primary" id="ferryGo" type="button">'+(REG()==='river'?'Back to the lake':'Take the ferry')+'</button>';
+  else h+='<h3>Fix the ferry</h3><p class="note">“Paddle box is cracked and the wheel’s seized. Pay for the timber and the grease, and I’ll run you up Rootwood River whenever you like.”</p>'+
+    '<button class="btn primary" id="ferryFix" type="button"'+(can?'':' disabled')+'>Fix it · '+RIVER.ferry.price.toLocaleString()+' coins</button>';
+  return h+'</div></div>'; }
+function bindFerry(){ const f=$('ferryFix'); if (f) f.addEventListener('click',()=>{ if (fixFerry()){ updateHud(); openShop('ferry'); } });
+  const g=$('ferryGo'); if (g) g.addEventListener('click',()=>{ closeSheet(); setTimeout(()=>showMap(REG()==='river'?'lake':'river',!save.riverSeen),300); });
+  document.querySelectorAll('#panel canvas[data-ferry]').forEach(c=>{ const r=layoutBox(c); if (!r.width) return; const d=Math.min(window.devicePixelRatio||1,2); c.width=Math.round(r.width*d); c.height=Math.round(r.height*d);
+    const x=c.getContext('2d'); x.setTransform(d,0,0,d,0,0); drawFerryIcon(x,r.width,r.height,c.dataset.ferry==='1'); }); }
+
+/* ---------- Homebody ---------- */
+/** In-game days in a row you've fished the water you're in (Homebody counts at most 10). */
+function homeDays(){ const reg=REG(), d=save.day||0; if (!isObj(save.home) || !REGION_NAME[save.home.reg] || !(save.home.day<=d)) save.home={reg, day:d};
+  return save.home.reg===reg ? Math.min(10,d-save.home.day) : 0; }
+const homeMul = () => 1+ENCH.homebody.per*homeDays();
+/** Travelling starts Homebody's count over. */
+function homeMoved(reg){ save.home={reg, day:save.day||0}; }
+
+/* ---------- the otter ---------- */
+/* Idle on the landing with bait on the hook, and an otter comes for the tin. Tap it and it drops a pebble it was
+   carrying (a little Glimmer); leave it and it makes off with a cast's worth of bait. Now and then one swims across. */
+function otterBait(){ const id=baitOn(); return id && !isLure(id) && (gearState().left[id]||0)>0 ? id : null; }
+function otterUpdate(dt){
+  const O=RV.otter, quiet=S.state==='idle' && !S.aim && !S.place && !AQ.open && !K.open && !SH.open && !INTRO.active && !S.tut && !OV.length;
+  RV.idle=quiet && otterBait() ? RV.idle+dt : 0;
+  if (!O && RV.idle>RIVER.otter.idle){ RV.idle=0; const D=dockGeo(); RV.otter={phase:'come', x:W+30, y:D.top+44, tx:D.cx+64, t:0}; tone(880,.05,{vol:.03,type:'triangle'}); }
+  if (O){ O.t+=dt;
+    if (O.phase==='come'){ O.x=lerp(O.x,O.tx,Math.min(1,dt*2.2)); if (Math.abs(O.x-O.tx)<2){ O.phase='sniff'; O.t=0; } }
+    else if (O.phase==='sniff' && O.t>RIVER.otter.tap){ const id=otterBait(); if (id){ const g=gearState(); g.left[id]=Math.max(0,g.left[id]-RIVER.otter.casts); if (!g.left[id]) g.lastBait=id; persist(); updateBagBtn(); }
+      news('An otter made off with some of your '+(id?TACKLE[id].name.toLowerCase():'bait'),''); O.phase='dive'; O.t=0; }
+    else if ((O.phase==='dive'||O.phase==='thanks') && O.t>1.1){ splash(O.x,O.y+8,8); RV.otter=null; } }
+  // one swimming across midstream, a head and a V of ripples
+  if (!RV.swim){ RV.swimT-=dt; if (RV.swimT<=0 && S.state!=='reeling'){ RV.swimT=rand(40,90); const y=lerp(G.near,HZ+26,rand(.3,.6)); RV.swim={x:W+20, y, dir:-1}; } }
+  else { const s=RV.swim; s.x+=s.dir*W*.045*sc(s.y)*dt; if (Math.random()<dt*3) S.ripples.push({x:s.x+8*sc(s.y),y:s.y+2,r:2,max:12*sc(s.y),life:.2}); if (s.x<-30) RV.swim=null; } }
+function onOtter(x,y){ const O=RV.otter; return !!O && O.phase==='sniff' && Math.abs(x-O.x)<30 && y>O.y-30 && y<O.y+16; }
+function tapOtter(){ const O=RV.otter; if (!O) return; const n=Math.round(rand(RIVER.otter.glimmer[0],RIVER.otter.glimmer[1]+.99)-.49);
+  O.phase='thanks'; O.t=0; tone(1200,.06,{vol:.05,type:'triangle'}); tone(1500,.08,{vol:.05,type:'triangle',delay:.08});
+  addGlimmer(n,{x:O.x,y:O.y-10}); news('The otter drops a smooth pebble and scampers off','good'); }
+
+/* ---------- Rootwood River drawn: the far bank and the mill, the waterwheel, the current, leaves, the otter, the near banks ---------- */
+/* Deep greens and amber, dappled light through the trees. The far bank (trees, the mill, the bank's lip) is painted into
+   the backdrop with everything else static; the roots and the undercut, the near banks, Wren's boathouse and the alder
+   overhead are painted once into their own layers. What moves each frame: the waterwheel, the current's streaks and
+   foam, the riffle, leaves falling and floating away, light through the leaves, the alder's sway and the otters. */
+const RVA={flow:[], leaves:[], leafT:0, bank:null, near:null, alder:null, key:''};
+/** A river colour, tinted by the hour: day colours fade toward the palette's own shade at night. */
+const rvTone = (key,hex,t) => mixP(key,hex,t*(1-Math.min(.85,PAL.dark*1.6)));
+function layoutRiverArt(){ sseed=401; RVA.flow=[];
+  for (let r=0;r<18;r++){ const d=Math.pow((r+.5)/18,.9), n=3+Math.round((1-d)*4); for (let i=0;i<n;i++) RVA.flow.push({d, fx:sr(), len:.6+sr()*.9, ph:sr()*6.28, foam:sr()<.22}); }
+  RVA.leaves=[]; RVA.bank=null; RVA.near=null; RVA.alder=null; RVA.key=''; }
+const rvKey = () => W+'x'+H+'@'+DPR+'|'+Math.round(save.clock*2);
+/** The mill's wheel: where it turns, half in the water at the foot of the far bank. */
+function wheelGeo(){ return {x:W*.27, y:HZ-H*.006, r:Math.min(H*.05,W*.1)}; }
+
+/* ---------- the far bank, in the backdrop ---------- */
+function drawRiverLand(x,main){
+  // the far bank is only across the river, so its wood is close and deep green, not hazed like the lake's far hills
+  const back=rvTone('trees','#2E4A30',.8), mid=rvTone('hillNear','#3F6236',.82), lit=rvTone('hillFar','#9AA04C',.7), under=rvTone('trees','#12201A',.85), lip=rvTone('trees','#3A5230',.8), bark=rvTone('town','#5E4A36',.75);
+  sseed=611; const crowns=(top,rMin,rMax,n,col,bottom)=>{ x.fillStyle=col; x.beginPath(); x.moveTo(0,bottom);
+    for (let i=0;i<=n;i++){ const cx=i/n*W+(sr()-.5)*W/n*.6, r=H*(rMin+sr()*(rMax-rMin)); x.lineTo(cx-r,HZ-top+r*.3); x.arc(cx,HZ-top,r,Math.PI,0); }
+    x.lineTo(W,bottom); x.closePath(); x.fill(); };
+  // the far wood, then the shade under the near trees' canopy, their trunks in it, and the near canopy over the top
+  crowns(H*.13,.03,.05,9,back,HZ);
+  const ug=x.createLinearGradient(0,HZ-H*.07,0,HZ); ug.addColorStop(0,back); ug.addColorStop(1,under); x.fillStyle=ug; x.fillRect(0,HZ-H*.07,W,H*.07);
+  for (const [tx,tw,lean] of [[.47,5,.4],[.58,6,-.3],[.69,8,.2],[.81,7,-.5],[.93,9,.3],[.36,4,0]]){ const px=W*tx, top=HZ-H*.068;
+    x.fillStyle=bark; x.beginPath(); x.moveTo(px-tw*.9,HZ); x.quadraticCurveTo(px-tw*.45,HZ-3,px-tw*.4+lean*3,top); x.lineTo(px+tw*.4+lean*3,top); x.quadraticCurveTo(px+tw*.45,HZ-3,px+tw*.9,HZ); x.closePath(); x.fill();
+    x.fillStyle='rgba(0,0,0,.25)'; x.beginPath(); x.moveTo(px+tw*.1,HZ); x.lineTo(px+tw*.12+lean*3,top); x.lineTo(px+tw*.4+lean*3,top); x.quadraticCurveTo(px+tw*.45,HZ-3,px+tw*.9,HZ); x.closePath(); x.fill(); }
+  sseed=615; const near=(top,rMin,rMax,n,col)=>{ x.fillStyle=col; x.beginPath(); for (let i=0;i<=n;i++){ const cx=i/n*W+(sr()-.5)*W/n*.6, r=H*(rMin+sr()*(rMax-rMin)); x.moveTo(cx+r*1.2,HZ-top+r*.35); x.ellipse(cx,HZ-top+r*.35,r*1.2,r*.5,0,0,Math.PI*2); x.moveTo(cx+r,HZ-top); x.arc(cx,HZ-top,r,0,Math.PI*2); } x.fill(); };
+  near(H*.078,.026,.04,11,mid);
+  // light catching the near crowns from the sun's side, and their shaded undersides
+  sseed=612; x.save(); x.globalAlpha=.32*Math.max(.12,1-PAL.dark*1.6); x.fillStyle=lit; for (let i=0;i<18;i++){ const cx=sr()*W, cy=HZ-H*(.09+sr()*.06), r=H*(.006+sr()*.009); x.beginPath(); x.arc(cx,cy,r,Math.PI*1.05,Math.PI*1.95); x.fill(); } x.restore();
+  x.strokeStyle='rgba(43,42,51,.35)'; x.lineWidth=1; sseed=615; for (let i=0;i<=11;i++){ const cx=i/11*W+(sr()-.5)*W/11*.6, r=H*(.026+sr()*.014); x.beginPath(); x.arc(cx,HZ-H*.078,r,Math.PI*1.1,Math.PI*1.9); x.stroke(); }
+  // the mill: a stone ground floor, a timber storey above, a slate roof, a chimney and a lit window
+  const mx=W*.03, mw=W*.2, base=HZ, st=H*.045, up=H*.032, stone=rvTone('hillFar','#8D8678',.8), timber=rvTone('town','#5A4232',.8), plaster=rvTone('hillFar','#D6C7A2',.78), slate=rvTone('town','#3D4250',.8);
+  x.fillStyle=stone; x.fillRect(mx,base-st,mw,st);
+  x.strokeStyle='rgba(30,26,22,.35)'; x.lineWidth=.8; for (let r=0;r<4;r++){ const yy=base-st+r*st/4; x.beginPath(); x.moveTo(mx,yy); x.lineTo(mx+mw,yy); x.stroke(); for (let c=0;c<6;c++){ const xx=mx+(c+(r%2)*.5)*mw/6; x.beginPath(); x.moveTo(xx,yy); x.lineTo(xx,yy+st/4); x.stroke(); } }
+  x.fillStyle=plaster; x.fillRect(mx+2,base-st-up,mw-4,up);
+  x.strokeStyle=timber; x.lineWidth=2; x.strokeRect(mx+2,base-st-up,mw-4,up); x.beginPath(); for (const f of [.33,.66]){ x.moveTo(mx+2+(mw-4)*f,base-st-up); x.lineTo(mx+2+(mw-4)*f,base-st); } x.moveTo(mx+2,base-st-up); x.lineTo(mx+2+(mw-4)*.33,base-st); x.moveTo(mx+mw-2,base-st-up); x.lineTo(mx+2+(mw-4)*.66,base-st); x.stroke();
+  x.fillStyle=slate; x.beginPath(); x.moveTo(mx-4,base-st-up); x.lineTo(mx+mw*.5,base-st-up-H*.03); x.lineTo(mx+mw+4,base-st-up); x.closePath(); x.fill();
+  x.strokeStyle='rgba(255,255,255,.12)'; x.lineWidth=1; x.beginPath(); x.moveTo(mx+mw*.5,base-st-up-H*.03); x.lineTo(mx-4,base-st-up); x.stroke();
+  const chx=mx+mw*.72; x.fillStyle=stone; x.fillRect(chx,base-st-up-H*.032,5,H*.02); if (main) SC.chimneys=[{x:chx+2.5,y:base-st-up-H*.032}];
+  x.fillStyle='rgba(244,201,119,'+Math.max(.15,PAL.win).toFixed(2)+')'; x.fillRect(mx+mw*.12,base-st-up+up*.3,mw*.12,up*.45); x.fillRect(mx+mw*.62,base-st+st*.3,mw*.1,st*.35);
+  x.strokeStyle=INK; x.globalAlpha=.55; x.lineWidth=1; x.strokeRect(mx,base-st-up,mw,st+up); x.globalAlpha=1;
+  // the flume, a wooden trough from the mill over the wheel, and the dark behind the wheel
+  const G0=wheelGeo(); x.fillStyle='rgba(10,18,14,.35)'; x.beginPath(); x.ellipse(G0.x,G0.y,G0.r*1.05,G0.r*.75,0,Math.PI,0); x.fill();
+  x.fillStyle=timber; x.beginPath(); x.moveTo(mx+mw,base-st-up*.2); x.lineTo(G0.x-G0.r*.2,G0.y-G0.r-4); x.lineTo(G0.x-G0.r*.2,G0.y-G0.r+1); x.lineTo(mx+mw,base-st+up*.3); x.closePath(); x.fill();
+  x.strokeStyle=INK; x.globalAlpha=.6; x.lineWidth=1; x.stroke(); x.globalAlpha=1;
+  // the bank's grassy lip along the water, with stones
+  x.fillStyle=lip; x.beginPath(); x.moveTo(0,HZ); for (let px=0;px<=W;px+=10) x.lineTo(px,HZ-2.5-Math.abs(Math.sin(px*.09))*2); x.lineTo(W,HZ); x.closePath(); x.fill();
+  sseed=613; for (let i=0;i<12;i++){ const sx=sr()*W; if (Math.abs(sx-G0.x)<G0.r) continue; x.fillStyle=rvTone('hillFar','#9A9282',.7); x.beginPath(); x.ellipse(sx,HZ-.5,2+sr()*3,1.4+sr(),0,Math.PI,0); x.fill(); }
+  if (main) SC.lamp=null;
+}
+
+/* ---------- the water, each frame ---------- */
+/** The roots and the dark undercut along the far bank's foot, painted once (they hang over the water). */
+function buildRiverBank(){ const c=document.createElement('canvas'), h=Math.ceil(H*.05); c.width=Math.round(W*DPR); c.height=Math.round(h*DPR);
+  const x=c.getContext('2d'); x.setTransform(DPR,0,0,DPR,0,0); const dark=rvTone('trees','#0F1C14',.6), root=rvTone('town','#5B4632',.5);
+  x.fillStyle=dark; x.beginPath(); x.moveTo(W*.5,0); for (let px=W*.5;px<=W;px+=8) x.lineTo(px,5+Math.sin(px*.07)*2+Math.max(0,(px-W*.5)/(W*.5))*3); x.lineTo(W,0); x.closePath(); x.fill();
+  sseed=707; x.lineCap='round';
+  for (let i=0;i<26;i++){ const rx=W*(.52+sr()*.48), len=h*(.35+sr()*.6), bend=(sr()-.5)*14;
+    x.strokeStyle=INK; x.lineWidth=2.6; x.beginPath(); x.moveTo(rx,0); x.quadraticCurveTo(rx+bend,len*.5,rx+bend*.4,len); x.stroke();
+    x.strokeStyle=root; x.lineWidth=1.4; x.stroke(); }
+  // a few by the mill too, and the waterline catching the light
+  x.strokeStyle='rgba(225,238,230,.25)'; x.lineWidth=1; x.beginPath(); x.moveTo(0,1); x.lineTo(W*.5,1); x.stroke();
+  RVA.bank={c,h}; }
+function drawRiverWater(){
+  const key=rvKey(); if (RVA.key!==key){ RVA.key=key; RVA.bank=null; RVA.near=null; RVA.alder=null; }
+  const t=S.time, sun=Math.max(0,(PAL.sunVis||0)*(1-Math.max(wxLook().cloud,wxLook().fog)));
+  // light through the leaves, drifting slowly on the water
+  if (sun>.05){ ctx.save(); ctx.globalCompositeOperation='lighter';
+    for (let i=0;i<7;i++){ const px=W*((i*.163+t*.004*(1+i%3))%1), py=lerp(HZ+20,G.near,(i*.37)%1), k=sc(py), r=(18+i*4)*k, a=.07*sun*(.6+.4*Math.sin(t*.5+i));
+      const g=ctx.createRadialGradient(px,py,0,px,py,r); g.addColorStop(0,'rgba(255,214,140,'+a.toFixed(3)+')'); g.addColorStop(1,'rgba(255,214,140,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(px,py,r,r*.36,0,0,Math.PI*2); ctx.fill(); }
+    ctx.restore(); }
+  // the current: streaks and foam running left to right, fastest in the run
+  ctx.lineCap='round';
+  for (const v of RVA.flow){ const y0=lerp(G.near+20,HZ+6,v.d), k=sc(y0), sp=RIVER.current.speed*W*currentAt(v.d)*k*1.3, span=W*1.3;
+    const px=((v.fx*span+t*sp)%span)-W*.15, y=y0+Math.sin(t*1.3+v.ph)*1.2*k, w=(6+k*16)*v.len;
+    if (v.foam){ ctx.fillStyle='rgba(236,240,226,'+(.18+.18*k).toFixed(3)+')'; ctx.beginPath(); ctx.ellipse(px,y,1.6*k+.6,.8*k+.3,0,0,Math.PI*2); ctx.fill(); continue; }
+    ctx.strokeStyle='rgba(214,230,206,'+(.07+.16*k+.04*Math.sin(t*1.7+v.ph)).toFixed(3)+')'; ctx.lineWidth=.8+k*1.3;
+    ctx.beginPath(); ctx.moveTo(px-w,y); ctx.quadraticCurveTo(px,y-w*.12,px+w,y+w*.04); ctx.stroke(); }
+  // roots and the undercut at the far bank's foot
+  if (!RVA.bank) buildRiverBank(); ctx.drawImage(RVA.bank.c,0,HZ,W,RVA.bank.h);
+  drawWaterwheel();
+  drawRiffle();
+  // leaves afloat, carried off downstream
+  for (const L of RVA.leaves) if (L.on) drawLeaf(L);
+  drawOtterSwim();
+}
+function drawWaterwheel(){ const g=wheelGeo(), t=S.time, a=t*.55, c=ctx, n=10, wood=rvTone('town','#6B4E36',.55), woodL=rvTone('hillFar','#9A7550',.45);
+  c.save(); c.beginPath(); c.rect(g.x-g.r-6,g.y-g.r-8,g.r*2+12,g.r+8+g.r*.42); c.clip();   // the bottom of the wheel is under the water
+  c.lineJoin='round'; c.strokeStyle=INK; c.lineWidth=1.3;
+  for (const rr of [g.r,g.r*.62]){ c.beginPath(); c.arc(g.x,g.y,rr,0,Math.PI*2); c.strokeStyle=INK; c.lineWidth=3.2; c.stroke(); c.strokeStyle=wood; c.lineWidth=1.8; c.stroke(); }
+  for (let i=0;i<n;i++){ const q=a+i/n*Math.PI*2, cs=Math.cos(q), sn=Math.sin(q);
+    c.strokeStyle=INK; c.lineWidth=2.4; c.beginPath(); c.moveTo(g.x,g.y); c.lineTo(g.x+cs*g.r,g.y+sn*g.r); c.stroke(); c.strokeStyle=wood; c.lineWidth=1.1; c.stroke();
+    // the paddles, square to the rim
+    const px=g.x+cs*g.r, py=g.y+sn*g.r; c.save(); c.translate(px,py); c.rotate(q); c.fillStyle=woodL; c.fillRect(-1,-3.6,g.r*.3,7.2); c.strokeStyle=INK; c.lineWidth=1; c.strokeRect(-1,-3.6,g.r*.3,7.2); c.restore(); }
+  c.fillStyle=woodL; c.beginPath(); c.arc(g.x,g.y,3.4,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=1.2; c.stroke();
+  c.restore();
+  // water off the flume onto the wheel, and white water where it turns into the river
+  const fx=g.x-g.r*.2, fy=g.y-g.r-2; c.strokeStyle='rgba(214,232,226,.55)'; c.lineWidth=2.2; c.beginPath(); c.moveTo(fx,fy); c.quadraticCurveTo(fx+4,fy+g.r*.4,fx+2+Math.sin(t*9)*.6,fy+g.r*.75); c.stroke();
+  c.fillStyle='rgba(240,244,236,.4)'; for (let i=0;i<5;i++){ const ox=Math.sin(t*3+i*1.7)*g.r*.5; c.beginPath(); c.ellipse(g.x+ox,g.y+g.r*.42+Math.sin(t*5+i)*1,3+i%2*2,1.4,0,0,Math.PI*2); c.fill(); }
+  if (Math.random()<.25) S.particles.push({x:g.x+rand(-g.r*.6,g.r*.6),y:g.y+g.r*.38,vx:rand(-14,24),vy:rand(-40,-14),g:220,life:0,max:rand(.3,.55),r:rand(.8,1.6),c:'rgba(236,242,236,'}); }
+function drawRiffle(){ const R=G.riffle, t=S.time, k=sc(R.y), c=ctx;
+  // stones breaking the surface, and the broken water round them
+  sseed=733; for (let i=0;i<6;i++){ const sx=R.x+(sr()-.5)*R.r*1.6, sy=R.y+(sr()-.5)*R.r*.5, r=(3+sr()*4)*k;
+    c.strokeStyle='rgba(240,244,236,'+(.35+.2*Math.sin(t*6+i)).toFixed(3)+')'; c.lineWidth=1.2; c.beginPath(); c.ellipse(sx-r*.8,sy+r*.2,r*1.4,r*.45,0,Math.PI*.1,Math.PI*1.1); c.stroke();
+    c.fillStyle=rvTone('hillFar','#7E786A',.45); c.beginPath(); c.ellipse(sx,sy,r,r*.55,0,Math.PI,0); c.fill(); c.strokeStyle=INK; c.lineWidth=1; c.stroke();
+    c.fillStyle='rgba(255,255,255,.18)'; c.beginPath(); c.ellipse(sx-r*.3,sy-r*.25,r*.35,r*.15,0,0,Math.PI*2); c.fill(); }
+  c.strokeStyle='rgba(236,242,232,.3)'; c.lineWidth=1; for (let i=0;i<8;i++){ const px=R.x+((i*.13+t*.25)%1-.5)*R.r*2, py=R.y+((i*.37)%1-.5)*R.r*.6; c.beginPath(); c.moveTo(px-4*k,py); c.quadraticCurveTo(px,py-2*k,px+4*k,py); c.stroke(); } }
+
+/* ---------- leaves ---------- */
+const LEAF_COLS=['#C9853B','#D9A441','#A85A2E','#8E9A3E','#B9772F'];
+/** Leaves fall from the alder over the leaf drift, land, and float off on the current. */
+function updateRiverLeaves(dt){ if (REG()!=='river') return; RVA.leafT-=dt;
+  if (RVA.leafT<=0){ RVA.leafT=rand(.6,1.6)*(wxLook().rain>.3?.6:1); const tx=G.leaves.x+rand(-1,1)*G.leaves.r*.9, ty=G.leaves.y+rand(-.6,.6)*G.leaves.r*.4;
+    RVA.leaves.push({x:rand(0,W*.42), y:rand(-10,H*.08), tx, ty, vy:rand(26,40), sw:rand(0,6.28), sp:rand(1.6,2.6), rot:rand(0,6.28), col:LEAF_COLS[Math.floor(Math.random()*LEAF_COLS.length)], s:rand(.8,1.25), on:false}); }
+  for (const L of RVA.leaves){
+    if (!L.on){ L.y+=L.vy*dt; L.sw+=dt*L.sp; L.x+=Math.cos(L.sw)*28*dt+(L.tx-L.x)*dt*.35; L.rot+=Math.sin(L.sw)*dt*2.4; if (L.y>=L.ty){ L.on=true; L.y=L.ty; S.ripples.push({x:L.x,y:L.y,r:2,max:10*sc(L.y),life:0}); } }
+    else { L.x+=driftSpeed(L.x,L.y)*dt; L.rot+=dt*.3; L.y+=Math.sin(S.time*1.4+L.sw)*dt*1.5; } }
+  RVA.leaves=RVA.leaves.filter(L=>L.x<W+20); if (RVA.leaves.length>40) RVA.leaves.splice(0,RVA.leaves.length-40); }
+function drawLeaf(L){ const k=L.on?sc(L.y):1.15, c=ctx, s=5.5*k*L.s; c.save(); c.translate(L.x,L.y); c.rotate(L.rot); if (L.on) c.scale(1,.55);
+  c.beginPath(); c.moveTo(-s,0); c.quadraticCurveTo(-s*.2,-s*.7,s,0); c.quadraticCurveTo(-s*.2,s*.7,-s,0); c.fillStyle=L.col; c.fill(); c.strokeStyle='rgba(43,42,51,.7)'; c.lineWidth=.8; c.stroke();
+  c.beginPath(); c.moveTo(-s*1.25,0); c.lineTo(s*.8,0); c.strokeStyle='rgba(60,34,14,.5)'; c.lineWidth=.6; c.stroke(); c.restore(); }
+
+/* ---------- the near banks: Wren's boathouse, the alder overhead, ferns and stones on the right ---------- */
+function boathouseGeo(){ const w=Math.min(W*.3,118), x=-w*.12, y=H-150-58; return {x, y, w, h:62}; }
+function buildRiverNear(){ const c=document.createElement('canvas'); c.width=Math.round(W*DPR); c.height=Math.round(H*DPR);
+  const x=c.getContext('2d'); x.setTransform(DPR,0,0,DPR,0,0); x.lineJoin='round'; x.lineCap='round';
+  const earth=rvTone('town','#4E3E2A',.5), moss=rvTone('trees','#3E6236',.55), mossL=rvTone('hillNear','#6F8A44',.45);
+  // the left bank, under the boathouse
+  x.fillStyle=earth; x.beginPath(); x.moveTo(0,H*.66); x.quadraticCurveTo(W*.16,H*.7,W*.24,H*.8); x.quadraticCurveTo(W*.28,H*.9,W*.25,H); x.lineTo(0,H); x.closePath(); x.fill();
+  x.fillStyle=moss; x.beginPath(); x.moveTo(0,H*.66); x.quadraticCurveTo(W*.16,H*.7,W*.24,H*.8); x.lineTo(W*.2,H*.81); x.quadraticCurveTo(W*.12,H*.72,0,H*.7); x.closePath(); x.fill();
+  // the right bank: mossy stones and ferns
+  x.fillStyle=earth; x.beginPath(); x.moveTo(W,H*.72); x.quadraticCurveTo(W*.9,H*.76,W*.86,H*.86); x.quadraticCurveTo(W*.84,H*.94,W*.86,H); x.lineTo(W,H); x.closePath(); x.fill();
+  sseed=809; for (let i=0;i<7;i++){ const sx=W*(.86+sr()*.14), sy=H*(.76+sr()*.2), r=6+sr()*9; x.fillStyle=rvTone('hillFar','#7D7A6C',.45); x.beginPath(); x.ellipse(sx,sy,r,r*.62,0,0,Math.PI*2); x.fill(); x.strokeStyle=INK; x.lineWidth=1.2; x.stroke();
+    x.fillStyle=mossL; x.beginPath(); x.ellipse(sx-r*.15,sy-r*.35,r*.75,r*.28,0,0,Math.PI*2); x.fill(); }
+  const fern=(fx,fy,s,dir)=>{ x.strokeStyle=moss; x.lineWidth=1.6; for (let f=0;f<5;f++){ const a=-Math.PI/2+dir*(f-2)*.35, L=s*(1-Math.abs(f-2)*.15), ex=fx+Math.cos(a)*L, ey=fy+Math.sin(a)*L;
+      x.beginPath(); x.moveTo(fx,fy); x.quadraticCurveTo(fx+Math.cos(a)*L*.5+dir*L*.2,fy+Math.sin(a)*L*.6,ex,ey); x.stroke();
+      for (let q=1;q<6;q++){ const u=q/6, px=lerp(fx,ex,u), py=lerp(fy,ey,u)+Math.sin(u*3)*2; x.beginPath(); x.moveTo(px,py); x.lineTo(px+Math.cos(a+1.3)*L*.16*(1-u),py+Math.sin(a+1.3)*L*.16*(1-u)); x.moveTo(px,py); x.lineTo(px+Math.cos(a-1.3)*L*.16*(1-u),py+Math.sin(a-1.3)*L*.16*(1-u)); x.stroke(); } } };
+  fern(W*.93,H*.8,30,-1); fern(W*.985,H*.9,34,-1); fern(W*.04,H*.72,26,1);
+  // Wren's boathouse: a plank shed on stilts, a shingle roof, a round window full of jars, a ramp down to the water
+  const B=boathouseGeo(), bx=B.x, by=B.y, bw=B.w, bh=B.h, plank=rvTone('hillFar','#8A6A4C',.5), plankD=rvTone('town','#5A4231',.5), roof=rvTone('town','#6E3E34',.5);
+  x.strokeStyle=INK; x.lineWidth=2.4; for (const sx of [bx+bw*.25,bx+bw*.55,bx+bw*.85]){ x.beginPath(); x.moveTo(sx,by+bh); x.lineTo(sx,by+bh+30); x.stroke(); }
+  x.strokeStyle=plankD; x.lineWidth=1.4; for (const sx of [bx+bw*.25,bx+bw*.55,bx+bw*.85]){ x.beginPath(); x.moveTo(sx,by+bh); x.lineTo(sx,by+bh+30); x.stroke(); }
+  x.fillStyle=plank; x.fillRect(bx,by,bw,bh); x.strokeStyle='rgba(40,26,16,.4)'; x.lineWidth=1; for (let i=1;i<7;i++){ x.beginPath(); x.moveTo(bx+bw*i/7,by); x.lineTo(bx+bw*i/7,by+bh); x.stroke(); }
+  x.strokeStyle=INK; x.lineWidth=1.6; x.strokeRect(bx,by,bw,bh);
+  x.fillStyle=roof; x.beginPath(); x.moveTo(bx-8,by+2); x.lineTo(bx+bw*.45,by-30); x.lineTo(bx+bw+8,by+2); x.closePath(); x.fill(); x.stroke();
+  x.strokeStyle='rgba(30,14,10,.35)'; x.lineWidth=1; for (let r=1;r<4;r++){ const yy=by+2-r*8, half=(bw*.55+8)*(1-r/4.2); x.beginPath(); x.moveTo(bx+bw*.45-half,yy); x.lineTo(bx+bw*.45+half,yy); x.stroke(); }
+  // the round window, and the door onto the ramp
+  const wx=bx+bw*.42, wy=by+bh*.42; x.fillStyle=rvTone('town','#2A2622',.4); x.beginPath(); x.arc(wx,wy,bh*.22,0,Math.PI*2); x.fill(); x.strokeStyle=INK; x.lineWidth=1.6; x.stroke();
+  x.fillStyle=plankD; x.fillRect(bx+bw*.7,by+bh*.28,bw*.22,bh*.72); x.strokeStyle=INK; x.lineWidth=1.3; x.strokeRect(bx+bw*.7,by+bh*.28,bw*.22,bh*.72);
+  x.fillStyle=BRASS; x.beginPath(); x.arc(bx+bw*.74,by+bh*.66,1.4,0,Math.PI*2); x.fill();
+  // the ramp to where Wren stands
+  const r0={x:bx+bw*.8,y:by+bh}, r1=wrenPos(); x.fillStyle=plank; x.beginPath(); x.moveTo(r0.x-8,r0.y); x.lineTo(r0.x+16,r0.y); x.lineTo(r1.x+20,r1.y+4); x.lineTo(r1.x-18,r1.y+4); x.closePath(); x.fill(); x.strokeStyle=INK; x.lineWidth=1.4; x.stroke();
+  x.strokeStyle='rgba(40,26,16,.4)'; x.lineWidth=1; for (let i=1;i<6;i++){ const u=i/6; x.beginPath(); x.moveTo(lerp(r0.x-8,r1.x-18,u),lerp(r0.y,r1.y+4,u)); x.lineTo(lerp(r0.x+16,r1.x+20,u),lerp(r0.y,r1.y+4,u)); x.stroke(); }
+  x.strokeStyle=INK; x.lineWidth=2.2; x.beginPath(); x.moveTo(r1.x-16,r1.y+4); x.lineTo(r1.x-16,r1.y+22); x.moveTo(r1.x+18,r1.y+4); x.lineTo(r1.x+18,r1.y+22); x.stroke();
+  // a sign over the door
+  x.font='700 7px Nunito, sans-serif'; const sw=x.measureText('WREN · RUNES').width+10; x.fillStyle=PAPER; x.save(); x.translate(Math.max(bx+bw*.36,sw/2+4),by+bh*.12); x.rotate(-.04); x.fillRect(-sw/2,-6,sw,11); x.strokeStyle=INK; x.lineWidth=1; x.strokeRect(-sw/2,-6,sw,11);
+  x.fillStyle=INK; x.font='700 7px Nunito, sans-serif'; x.textAlign='center'; x.fillText('WREN · RUNES',0,2.4); x.restore();
+  RVA.near=c; }
+/** The alder leaning over the river from the left: its trunk at the edge and boughs across the top of the view. Painted
+    once, then swayed a little about its root. */
+function buildAlder(){ const pad=40, c=document.createElement('canvas'), w=W*.62+pad, h=H*.32+pad; c.width=Math.round(w*DPR); c.height=Math.round(h*DPR);
+  const x=c.getContext('2d'); x.setTransform(DPR,0,0,DPR,0,0); x.lineCap='round'; x.lineJoin='round';
+  const bark=rvTone('town','#4A3A2C',.55), leaf=rvTone('trees','#3D5E34',.6), leafL=rvTone('hillNear','#7A8E3E',.5), leafD=rvTone('trees','#24382A',.6);
+  const bough=(pts,wd)=>{ x.beginPath(); x.moveTo(pts[0][0],pts[0][1]); for (let i=1;i<pts.length-1;i++){ const mx=(pts[i][0]+pts[i+1][0])/2, my=(pts[i][1]+pts[i+1][1])/2; x.quadraticCurveTo(pts[i][0],pts[i][1],mx,my); } const L=pts[pts.length-1]; x.lineTo(L[0],L[1]);
+    x.strokeStyle=INK; x.lineWidth=wd+2.4; x.stroke(); x.strokeStyle=bark; x.lineWidth=wd; x.stroke(); };
+  bough([[0,h],[10,h*.6],[26,h*.3],[60,h*.12],[w*.6,h*.06],[w-pad,h*.18]],9);
+  bough([[30,h*.32],[w*.35,h*.3],[w*.55,h*.42]],4); bough([[w*.3,h*.1],[w*.45,h*.2],[w*.7,h*.28]],3);
+  sseed=913; for (let i=0;i<60;i++){ const u=sr(), px=lerp(14,w-pad,u), py=lerp(h*.5,h*.06,u)+(sr()-.3)*h*.36, r=7+sr()*11, col=sr()<.25?leafD:sr()<.6?leaf:leafL;
+    x.fillStyle=col; x.beginPath(); x.ellipse(px,py,r,r*.65,sr()*3,0,Math.PI*2); x.fill(); }
+  x.strokeStyle='rgba(43,42,51,.45)'; x.lineWidth=1; sseed=914; for (let i=0;i<22;i++){ const u=sr(), px=lerp(14,w-pad,u), py=lerp(h*.5,h*.06,u)+(sr()-.3)*h*.36, r=7+sr()*9; x.beginPath(); x.ellipse(px,py,r,r*.65,sr()*3,.3,2.4); x.stroke(); }
+  RVA.alder={c,w,h}; }
+function drawRiverBanks(){
+  if (!RVA.near) buildRiverNear(); ctx.drawImage(RVA.near,0,0,W,H);
+  // the jars in Wren's window glow, more after dark
+  const B=boathouseGeo(), wx=B.x+B.w*.42, wy=B.y+B.h*.42, gl=.35+.65*Math.min(1,PAL.dark*2.2), f=.85+.15*Math.sin(S.time*2.3);
+  ctx.save(); ctx.beginPath(); ctx.arc(wx,wy,B.h*.2,0,Math.PI*2); ctx.clip();
+  for (const [ox,oy,col] of [[-6,3,'150,230,170'],[1,2,'255,214,130'],[7,4,'170,200,255']]){ const g=ctx.createRadialGradient(wx+ox,wy+oy,0,wx+ox,wy+oy,9); g.addColorStop(0,'rgba('+col+','+(.75*gl*f).toFixed(3)+')'); g.addColorStop(1,'rgba('+col+',0)'); ctx.fillStyle=g; ctx.fillRect(wx-15,wy-15,30,30);
+    ctx.strokeStyle='rgba(43,42,51,.7)'; ctx.lineWidth=1; ctx.strokeRect(wx+ox-2.5,wy+oy-4,5,7); }
+  ctx.restore();
+  if (PAL.dark>.15){ ctx.save(); ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(wx,wy,2,wx,wy,46); g.addColorStop(0,'rgba(255,214,150,'+(.22*gl).toFixed(3)+')'); g.addColorStop(1,'rgba(255,214,150,0)'); ctx.fillStyle=g; ctx.fillRect(wx-50,wy-50,100,100); ctx.restore(); }
+  // the alder overhead, swaying, and leaves on their way down
+  if (!RVA.alder) buildAlder(); const A=RVA.alder, sw=Math.sin(S.time*.7)*.012+Math.sin(S.time*1.9)*.004;
+  ctx.save(); ctx.translate(0,A.h-20); ctx.rotate(sw); ctx.drawImage(A.c,0,-(A.h),A.w,A.h); ctx.restore();
+  for (const L of RVA.leaves) if (!L.on) drawLeaf(L);
+}
+
+/* ---------- the otters ---------- */
+function drawOtterSwim(){ const s=RV.swim; if (!s) return; const k=sc(s.y), c=ctx;
+  c.strokeStyle='rgba(225,238,230,.45)'; c.lineWidth=1.2; c.beginPath(); c.moveTo(s.x+22*k,s.y-4*k); c.lineTo(s.x+4*k,s.y+1); c.lineTo(s.x+22*k,s.y+6*k); c.stroke();
+  c.fillStyle='#4A3628'; c.beginPath(); c.ellipse(s.x,s.y,6*k,4.4*k,0,Math.PI,0); c.fill(); c.strokeStyle=INK; c.lineWidth=1; c.stroke();
+  c.fillStyle=INK; c.beginPath(); c.arc(s.x-2.4*k,s.y-2*k,.8*k,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(s.x+2.6*k,s.y-3.6*k,1.1*k,0,Math.PI*2); c.fillStyle='#4A3628'; c.fill(); c.stroke(); }
+/** The otter on the landing, after your bait: sniffing at the pail, then off with it (or thanking you with a pebble). */
+function drawOtterThief(){ const O=RV.otter; if (!O) return; const c=ctx, t=S.time, x=O.x, y=O.y, look=O.phase==='sniff'?Math.sin(t*7)*1.4:0, dive=O.phase==='dive'||O.phase==='thanks'?clamp(O.t/1.1,0,1):0;
+  c.save(); c.translate(x+dive*30,y+dive*dive*18); c.globalAlpha=1-dive*.7; c.lineJoin='round'; c.lineCap='round';
+  const fur='#5A3E2C', furL='#8A6446', bell='#C9A27E';
+  c.strokeStyle=INK; c.lineWidth=5.4; c.beginPath(); c.moveTo(10,2); c.quadraticCurveTo(22,4,26,-2); c.stroke(); c.strokeStyle=fur; c.lineWidth=3.4; c.stroke();   // the tail
+  c.fillStyle=fur; c.beginPath(); c.ellipse(2,-4,12,6.5,-.1,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=1.3; c.stroke();
+  c.fillStyle=bell; c.beginPath(); c.ellipse(-2,-1.4,7,3,-.1,0,Math.PI); c.fill();
+  c.fillStyle=fur; c.beginPath(); c.ellipse(-10+look*.3,-10,6.2,5.4,0,0,Math.PI*2); c.fill(); c.stroke();
+  c.fillStyle=bell; c.beginPath(); c.ellipse(-13.2+look*.3,-8.4,3,2.2,0,0,Math.PI*2); c.fill();
+  c.fillStyle=INK; c.beginPath(); c.arc(-15.4+look*.3,-9.4,1.1,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(-10.6+look*.3,-11.6,.9,0,Math.PI*2); c.fill();
+  c.fillStyle=furL; c.beginPath(); c.arc(-7+look*.3,-14.6,1.6,0,Math.PI*2); c.fill(); c.stroke();
+  c.strokeStyle='rgba(43,42,51,.6)'; c.lineWidth=.6; c.beginPath(); for (const s of [-1,1]){ c.moveTo(-15.4,-8.2); c.lineTo(-20,-8.6+s*1.6); } c.stroke();
+  for (const fx of [-6,6]){ c.fillStyle=fur; c.beginPath(); c.ellipse(fx,2,2.2,1.6,0,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=1; c.stroke(); }
+  if (O.phase==='thanks'){ c.fillStyle='#B9C4CC'; c.beginPath(); c.ellipse(-20,1,2.6,1.8,0,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=.8; c.stroke(); }
+  c.restore();
+  if (O.phase==='sniff'){ const a=.6+.4*Math.sin(t*5); ctx.strokeStyle='rgba(243,234,215,'+a.toFixed(2)+')'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x-6,y-6,22,0,Math.PI*2); ctx.stroke();
+    ctx.font='800 12px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=PAPER; ctx.fillText('TAP',x-6,y-32); } }
+
+/* ---------- Ottilie's ferry, on the Ferry tab ---------- */
+function drawFerryIcon(c,w,h,fixed){ const cx=w/2, cy=h*.62, s=Math.min(w/150,h/80), t=performance.now()/1000; c.save(); c.translate(cx,cy+Math.sin(t*1.4)*1.2*s); c.scale(s,s); c.lineJoin='round'; c.lineCap='round';
+  c.strokeStyle='rgba(60,110,120,.35)'; c.lineWidth=1.2; c.beginPath(); c.moveTo(-70,12); c.quadraticCurveTo(-35,9,0,12); c.quadraticCurveTo(35,15,70,12); c.stroke();
+  c.fillStyle='#6E4A33'; c.beginPath(); c.moveTo(-58,-4); c.lineTo(58,-4); c.lineTo(48,10); c.lineTo(-50,10); c.closePath(); c.fill(); c.strokeStyle=INK; c.lineWidth=1.8; c.stroke();
+  c.fillStyle='#E9DCC1'; c.fillRect(-58,-7,116,3.4); c.strokeRect(-58,-7,116,3.4);
+  c.fillStyle='#D8C8A6'; c.fillRect(-36,-30,40,23); c.strokeRect(-36,-30,40,23); c.fillStyle='#B4584A'; c.beginPath(); c.moveTo(-40,-30); c.lineTo(-16,-40); c.lineTo(8,-30); c.closePath(); c.fill(); c.stroke();
+  c.fillStyle='#8FB9C2'; c.fillRect(-30,-24,9,8); c.fillRect(-12,-24,9,8); c.strokeRect(-30,-24,9,8); c.strokeRect(-12,-24,9,8);
+  // the paddle box: cracked and askew until it's mended, turning once it is
+  c.save(); c.translate(30,-6); if (!fixed) c.rotate(.18); c.fillStyle='#A47A52'; c.beginPath(); c.arc(0,0,15,Math.PI,0); c.closePath(); c.fill(); c.stroke();
+  if (fixed){ const a=t*1.6; c.strokeStyle=INK; c.lineWidth=1.4; for (let i=0;i<6;i++){ const q=a+i*Math.PI/3; c.beginPath(); c.moveTo(0,0); c.lineTo(Math.cos(q)*12,Math.sin(q)*12); c.stroke(); } }
+  else { c.strokeStyle=INK; c.lineWidth=1.4; c.beginPath(); c.moveTo(-6,-14); c.lineTo(-2,-8); c.lineTo(-5,-3); c.lineTo(1,0); c.stroke(); c.fillStyle='#8A6448'; c.save(); c.translate(8,-9); c.rotate(-.7); c.fillRect(-2,-9,4,18); c.strokeRect(-2,-9,4,18); c.restore(); }
+  c.restore();
+  if (fixed){ c.fillStyle='rgba(225,222,230,.7)'; for (let i=0;i<3;i++){ c.beginPath(); c.arc(-24+i*3,-44-i*6-((t*8)%6),2.4+i,0,Math.PI*2); c.fill(); } c.fillStyle='#4A4C54'; c.fillRect(-27,-44,6,14); c.strokeRect(-27,-44,6,14); }
+  c.restore(); }
+
+/* ---------- The Twin Spool: two floats on one cast (data/river.js: TWIN) ---------- */
+/* S.bob2 is the second float. Everything that plays a bite (the swim over, the nibbles, the hook, treasure) works on
+   S.bob, so when a fish picks the other float the two simply swap. When both bite at once, S.bite.twin holds the
+   second fish and its shadow, and the tap picks: the float nearest the finger is the one you strike. */
+const twinOn = () => !S.tut && modFlag('twin');
+/** The cast lands: the second float splashes down beside the first, toward the middle of the water. */
+function twinLand(b){ S.bob2=null; if (!twinOn()) return;
+  const k=sc(b.y), dx=TWIN.spread*W*k*(b.x>W/2?-1:1), x=clamp(b.x+dx,18,W-18), y=clamp(b.y+rand(-6,6)*k,HZ+14,G.near);
+  S.bob2={x,y,spot:spotAt(x,y),dip:1,jerk:0,nibble:0,plunge:0}; splash(x,y,6); ripple(x,y,30); }
+/** Two baits in the water: the quiet before a bite is shorter. */
+const twinWait = () => S.bob2 ? TWIN.wait : 1;
+/** A fish heads for one float or the other. */
+function twinPick(){ if (S.bob2 && Math.random()<.5){ const a=S.bob; S.bob=S.bob2; S.bob2=a; } }
+/** The bite: now and then the other float goes under at the same moment. */
+function twinBite(){ const b2=S.bob2; if (!b2 || !S.bite || S.bite.loot || Math.random()>=TWIN.both) return;
+  const id=pickW(poolFor(b2.spot,inLucky(b2.x,b2.y))), a=rand(0,Math.PI*2);
+  S.bite.twin={fish:id, ang:a+Math.PI}; S.bite.win*=1.35; b2.plunge=1; splash(b2.x,b2.y,8); ripple(b2.x,b2.y,30);
+  setTimeout(()=>{ if (S.state==='bite' && S.bite && S.bite.twin) toast('Two bites! Tap the one you want','big'); },60); }
+/** The tap: strike whichever float is nearer the finger. The fish you leave swims off. */
+function twinStrike(x,y){ const B=S.bite, b2=S.bob2; if (!B || !B.twin || !b2) return;
+  if (Math.hypot(x-b2.x,y-b2.y) < Math.hypot(x-S.bob.x,y-S.bob.y)){ const a=S.bob; S.bob=b2; S.bob2=a; const f=B.fish; B.fish=B.twin.fish; B.twin.fish=f; if (S.wait) S.wait.fish=B.fish; }
+  if (!save.stats.twinPicks) save.stats.twinPicks=0; save.stats.twinPicks++; }
+/** Once a fish is on, the other line comes in. */
+function twinIn(){ const b2=S.bob2; if (!b2) return; ripple(b2.x,b2.y,16); S.bob2=null; }
+/** The second fish's shadow beside its float, while you choose (with a Heronwood's flash of its rarity, if you have one). */
+function drawTwinShadow(){ const B=S.bite, b2=S.bob2; if (S.state!=='bite' || !B || !B.twin || !b2) return; const F=FISH[B.twin.fish], k=sc(b2.y), a=B.twin.ang;
+  const x=b2.x-Math.cos(a)*F.len*.38*k, y=b2.y-Math.sin(a)*F.len*.2*k;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(a); ctx.scale(1,.55); drawFish(ctx,B.twin.fish,F.len*k,true,.85*fogVis(x,y),Math.sin(S.time*9)); ctx.restore();
+  if (modFlag('reveal') && F.rarity!=='common'){ ctx.strokeStyle=RAR[F.rarity].color; ctx.globalAlpha=.5+.5*Math.sin(S.time*6); ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(x,y,F.len*.55*k,F.len*.22*k,0,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1; } }
+
+/* ---------- Wren: her boathouse on Rootwood River, her bench, the Twin Spool and her corkboard (data/river.js: WREN) ---------- */
+/* save.wren = {met, twin (the Twin Spool given), seen:{noteId:1} (corkboard notes you've looked at)}. She stands on her
+   boathouse ramp where Ottilie's punt would be at the lake. Her bench cuts sockets into rods for Glimmer (save.ench.cut,
+   game/enchant.js: socketsOf) and teaches Homebody, which then joins the etching tray in the tackle bag. */
+const WR={say:'', sayT:0, next:9};
+let WREN_TAB='bench';
+function wrenState(){ if (!isObj(save.wren)) save.wren={}; const w=save.wren; if (!isObj(w.seen)) w.seen={}; return w; }
+function wrenPos(){ return {x:W/2-118, y:H-150}; }
+function onWren(x,y){ if (REG()!=='river') return false; const o=wrenPos(); return x>o.x-30 && x<o.x+30 && y>o.y-66 && y<o.y+12; }
+/** Whether a corkboard note's discovery has happened. */
+function noteOn(N){ const w=N.when, caught=id=>(save.fish[id]||{}).caught>0;
+  if (w==='met') return !!wrenState().met;
+  if (w==='ghost') return Object.keys(FISH).some(id=>FISH[id].beh==='ghost' && caught(id));
+  if (w==='letter') return findsState().notes.some(id=>NOTES[id] && NOTES[id].kind==='letter');
+  return caught(w); }
+const notesUp = () => WREN.notes.filter(noteOn);
+const riverQuestFish = () => REGION_FISH.river.filter(id=>!FISH[id].wx && !FISH[id].extra);
+const twinReady = () => !wrenState().twin && waterDone('river');
+function wrenHasNews(){ const w=wrenState(); return !w.met || twinReady() || notesUp().some(N=>!w.seen[N.id]); }
+/** Now and then she says something, while you're fishing nearby. */
+function updateWren(dt){ if (REG()!=='river'){ WR.sayT=0; return; }
+  if (WR.sayT>0){ WR.sayT-=dt; return; }
+  WR.next-=dt; if (WR.next<=0 && S.state==='idle'){ WR.next=rand(28,48); if (wrenState().met && !wrenHasNews()){ WR.say=WREN.lines[Math.floor(Math.random()*WREN.lines.length)]; WR.sayT=5; } } }
+
+/* ---------- her sheet ---------- */
+function openWren(tab){ audioInit(); const w=wrenState(), first=!w.met;
+  if (first){ w.met=true; persist(); WREN_TAB='bench'; } else if (tab) WREN_TAB=tab;
+  const g=save.glimmer||0;
+  let h='<div class="panel-head"><div><h2>Wren’s Boathouse</h2><p><span class="glim"></span><b>'+g.toLocaleString()+'</b> Glimmer · Holding: '+ROD().name+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>';
+  h+='<div class="seg" role="tablist">'+[['bench','Bench'],['twin','Twin Spool'+(twinReady()?' •':'')],['board','Corkboard'+(notesUp().some(N=>!w.seen[N.id])?' •':'')]].map(([k,l])=>'<button type="button" role="tab" data-wt="'+k+'" aria-selected="'+(WREN_TAB===k)+'" class="'+(WREN_TAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+  h+=WREN_TAB==='twin'?wrenTwinHTML():WREN_TAB==='board'?wrenBoardHTML():wrenBenchHTML(first);
+  openSheet(h); $('closeS').addEventListener('click',closeSheet);
+  document.querySelectorAll('#panel [data-wt]').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.wt===WREN_TAB) return; tone(900,.04,{vol:.04,type:'triangle'}); openWren(b.dataset.wt); $('panel').scrollTop=0; }));
+  const cut=$('wrenCut'); if (cut) cut.addEventListener('click',()=>{ if (cutSocket(save.rod)) openWren('bench'); });
+  const tw=$('wrenTwin'); if (tw) tw.addEventListener('click',()=>{ if (giveTwin()) openWren('twin'); });
+  const eq=$('wrenEquip'); if (eq) eq.addEventListener('click',()=>{ save.rod='twin'; persist(); sfx.hook(false); news('Equipped the Twin Spool','good'); openWren('twin'); });
+  paintRodArt(document.querySelectorAll('#panel canvas[data-rodart]')); paintTiles(document.querySelectorAll('#panel canvas[data-rune]')); paintFishTiles(document.querySelectorAll('#panel canvas[data-wf]'));
+  if (WREN_TAB==='board'){ for (const N of notesUp()) w.seen[N.id]=1; persist(); }
+  if (first) setTimeout(()=>{ if (!$('sheet').hidden) coachFor('Wren cut you in on Homebody. Etch it from the tray in your tackle bag, like the rest.',7); },1200); }
+function wrenBenchHTML(first){ const n=socketsOf(save.rod), cost=WREN.sockets[n+1], g=save.glimmer||0, own=ownsEnch('homebody'), E=ENCH.homebody;
+  let h='<p class="note wren-say">“'+(first?WREN.hello:n<3?'Hold still, rod. This won’t hurt. It might hurt.':WREN.lines[0])+'”</p>';
+  h+='<div class="entry wren-cut" style="grid-template-columns:1fr"><div style="display:grid;gap:6px;min-width:0"><span class="r">Cut a socket</span><h3>'+ROD().name+'</h3><canvas class="rod-art" data-rodart="'+save.rod+'" aria-hidden="true"></canvas>'+
+    '<p style="margin:0">'+(n>=3?'Three sockets. That’s all a rod can hold, or so the books say.':'This rod has '+n+' socket'+(n>1?'s':'')+'. Wren can cut socket '+(n+1)+' into it.')+'</p>'+
+    (n<3?'<button class="btn primary" id="wrenCut" type="button"'+(g>=cost?'':' disabled')+'>Cut socket '+(n+1)+' · <span class="glim"></span>'+cost+'</button>'+(g<cost?'<p class="need">'+(cost-g)+' more Glimmer</p>':''):'')+
+    '<p class="mini">She works on the rod in your hands. Pick another off the rack, or from your bag, to cut its socket.</p></div></div>';
+  h+='<div class="entry wren-rune" style="--rc:'+E.color+'"><canvas data-rune="homebody" aria-hidden="true"></canvas><div><span class="r">Wren’s own rune</span><h3>'+E.name+'</h3><p>'+E.eff+'</p><p class="down">'+E.down+'</p>'+
+    '<p class="mini">'+(own?'Etched. It’s in your tackle bag.':'Etch it in your tackle bag, for '+E.cost+' Glimmer.')+(homeDays()?' You’ve stayed '+homeDays()+' day'+(homeDays()>1?'s':'')+' at '+REGION_NAME[REG()]+'.':'')+'</p></div></div>';
+  return h; }
+function wrenTwinHTML(){ const w=wrenState(), ids=riverQuestFish(), caught=id=>(save.fish[id]||{}).caught>0, n=ids.filter(caught).length;
+  let h='<p class="note wren-say">“'+(w.twin?'Two floats, one reel, and nothing tangles. Mostly nothing.':WREN.quest)+'”</p>';
+  h+='<div class="wren-fish">'+ids.map(id=>'<div class="wf'+(caught(id)?' got':'')+'"><canvas data-wf="'+id+'"'+(caught(id)?'':' data-shadow="1"')+' aria-hidden="true"></canvas><span>'+(caught(id)?FISH[id].name:'???')+'</span></div>').join('')+'</div>';
+  if (w.twin) h+='<div class="entry" style="grid-template-columns:1fr auto"><div><h3>The Twin Spool is yours</h3><p class="mini">'+RODS.twin.perk+'</p></div>'+(save.rod==='twin'?'<span class="r" style="color:#4E7B4C">Equipped</span>':'<button class="btn" id="wrenEquip" type="button">Equip</button>')+'</div>';
+  else h+='<p class="mini" style="text-align:center">'+n+' of '+ids.length+' river fish caught'+(n<ids.length?'. Weather fish don’t count, and nor does the '+REGION_FISH.river.filter(id=>FISH[id].extra && !FISH[id].wx).map(id=>FISH[id].name).join(' or the ')+'.':'.')+'</p>'+(twinReady()?'<button class="btn primary" id="wrenTwin" type="button" style="justify-self:center">Take the Twin Spool</button>':'');
+  return h; }
+function wrenBoardHTML(){ const w=wrenState();
+  return '<p class="note wren-say">“Everything you find goes up here. Then I stare at it.”</p><div class="cork">'+WREN.notes.map((N,i)=>{ const on=noteOn(N);
+    return '<div class="pin-note'+(on?'':' blank')+(on&&!w.seen[N.id]?' fresh':'')+'" style="--r:'+((i*37%9)-4)+'deg">'+(on?'<p>'+N.text+'</p>':'<p>…</p>')+'</div>'; }).join('')+'</div>'+
+    '<p class="mini" style="text-align:center">'+notesUp().length+' of '+WREN.notes.length+' theories pinned</p>'; }
+/** Cuts the next socket into a rod, for Glimmer. */
+function cutSocket(rod){ const n=socketsOf(rod), cost=WREN.sockets[n+1]; if (n>=3 || !save.rods.includes(rod) || (save.glimmer||0)<cost) return false;
+  const e=enchState(); if (!isObj(e.cut)) e.cut={}; e.cut[rod]=(+e.cut[rod]||0)+1; addGlimmer(-cost); persist();
+  sfx.etch(); buzz([0,20,40,20]); toast('Socket '+(n+1)+' cut into your '+RODS[rod].name,'gold'); updateBagBtn(); return true; }
+function giveTwin(){ if (!twinReady()) return false; const w=wrenState(); w.twin=true; if (!save.rods.includes('twin')) save.rods.push('twin'); persist();
+  sfx.out('epic'); buzz([0,30,40,30,60,40]); toast('New rod: the Twin Spool!','gold'); return true; }
+/** Fish drawn on little canvases (a shadow for one you haven't caught). */
+function paintFishTiles(list){ const d=Math.min(window.devicePixelRatio||1,2);
+  list.forEach(cv=>{ const r=layoutBox(cv); if (!r.width) return; cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d);
+    drawFish(x,cv.dataset.wf,r.width*.78,!!cv.dataset.shadow,cv.dataset.shadow?.7:1); }); }
+
+/* ---------- Wren on her boathouse ramp (game/wren.js) ---------- */
+/* Drawn like the other folk (game/folk.js): ink outlines, 3 to 4 values a shape, light from the upper left. She's young,
+   in a rust apron over a mustard jumper, brass goggles pushed up into a mop of dark curls, and holds up one of her jars,
+   which glows. She shifts from foot to foot and peers into the jar now and then. */
+function drawWren(){
+  const o=wrenPos(), t=S.time, c=ctx, x=o.x, y=o.y, sway=Math.sin(t*1.3)*.8, peer=Math.max(0,Math.sin(t*.45))>.92?1:0;
+  c.fillStyle='rgba(20,12,8,.3)'; c.beginPath(); c.ellipse(x+1,y+10,16,3.6,0,0,Math.PI*2); c.fill();
+  c.save(); c.translate(x+sway*.3,y); c.lineJoin='round'; c.lineCap='round';
+  // boots and legs
+  c.strokeStyle=INK; c.lineWidth=4.8; c.beginPath(); c.moveTo(-4,-10); c.lineTo(-5,6); c.moveTo(4,-10); c.lineTo(5+sway*.4,6); c.stroke();
+  c.strokeStyle='#4B4A5A'; c.lineWidth=3; c.stroke();
+  c.fillStyle='#5A3A28'; for (const bx of [-6,5+sway*.4]){ c.beginPath(); c.ellipse(bx,7.4,4.4,2.6,0,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=1.1; c.stroke(); }
+  // jumper, then the apron over it with its pocket of tools
+  const body=()=>{ c.beginPath(); c.moveTo(-10,-9); c.quadraticCurveTo(-11,-22,-7,-29); c.lineTo(6,-29); c.quadraticCurveTo(10,-22,9,-9); c.closePath(); };
+  body(); c.fillStyle='#C9A13E'; c.fill();
+  c.save(); body(); c.clip(); c.fillStyle='#A9852E'; c.fillRect(2,-30,10,22); c.fillStyle='#DDB955'; c.fillRect(-10,-29,3,20); c.restore();
+  body(); c.strokeStyle=INK; c.lineWidth=1.4; c.stroke();
+  c.fillStyle='#A4553A'; c.beginPath(); c.moveTo(-7,-22); c.lineTo(6,-22); c.lineTo(8,-6); c.lineTo(-8.5,-6); c.closePath(); c.fill();
+  c.fillStyle='#874431'; c.fillRect(1.5,-22,4.5,16); c.strokeStyle=INK; c.lineWidth=1.2; c.beginPath(); c.moveTo(-7,-22); c.lineTo(6,-22); c.lineTo(8,-6); c.lineTo(-8.5,-6); c.closePath(); c.stroke();
+  c.strokeStyle='#874431'; c.lineWidth=1; c.beginPath(); c.moveTo(-6,-22); c.lineTo(-4,-29); c.moveTo(5,-22); c.lineTo(3.5,-29); c.stroke();
+  c.fillStyle='#874431'; c.fillRect(-6,-15,7,5); c.strokeStyle=INK; c.lineWidth=.8; c.strokeRect(-6,-15,7,5);
+  c.strokeStyle='#C9CCD3'; c.lineWidth=1; c.beginPath(); c.moveTo(-4.5,-15); c.lineTo(-5,-19); c.stroke(); c.strokeStyle=BRASS; c.beginPath(); c.moveTo(-1.5,-15); c.lineTo(-1,-18.5); c.stroke();
+  // the near arm, holding up the jar
+  const jx=13, jy=-31+Math.sin(t*1.1)*.6;
+  c.strokeStyle=INK; c.lineWidth=4.6; c.beginPath(); c.moveTo(5,-26); c.quadraticCurveTo(12,-22,jx-1,jy+5); c.stroke(); c.strokeStyle='#C9A13E'; c.lineWidth=2.8; c.stroke();
+  const gl=.55+.45*Math.sin(t*2.3), f=.4+.6*Math.min(1,PAL.dark*2+.3);
+  const g=c.createRadialGradient(jx,jy,0,jx,jy,16); g.addColorStop(0,'rgba(170,240,190,'+(.4*gl*f).toFixed(3)+')'); g.addColorStop(1,'rgba(170,240,190,0)'); c.fillStyle=g; c.fillRect(jx-16,jy-16,32,32);
+  c.fillStyle='rgba(200,236,214,.55)'; rrect(c,jx-4,jy-5,8,10,2); c.fill(); c.strokeStyle=INK; c.lineWidth=1.1; c.stroke();
+  c.fillStyle='rgba(200,255,214,'+(.7+.3*gl).toFixed(2)+')'; c.beginPath(); c.arc(jx+Math.sin(t*3)*1.2,jy+1+Math.cos(t*2.6)*1.4,1.4,0,Math.PI*2); c.fill();
+  c.fillStyle='#8A6448'; c.fillRect(jx-4.6,jy-7.4,9.2,2.6); c.strokeStyle=INK; c.lineWidth=.9; c.strokeRect(jx-4.6,jy-7.4,9.2,2.6);
+  c.fillStyle='#E0B08E'; c.beginPath(); c.arc(jx-1,jy+5.4,2.1,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=1; c.stroke();
+  // the far arm, on her hip
+  c.strokeStyle=INK; c.lineWidth=4.4; c.beginPath(); c.moveTo(-7,-26); c.quadraticCurveTo(-14,-19,-9,-13); c.stroke(); c.strokeStyle='#A9852E'; c.lineWidth=2.6; c.stroke();
+  // her head: dark curls, freckles, goggles pushed up; she leans in to peer at the jar now and then
+  const hx=1+peer*2, hy=-37+peer*1;
+  c.fillStyle='#3A2A26'; for (const [cx,cy,r] of [[-6,-3,3.6],[-4.6,-7.6,3.8],[0,-9,4],[4.6,-7.4,3.6],[6.6,-3.4,3],[-7.4,1.4,2.6]]){ c.beginPath(); c.arc(hx+cx,hy+cy,r,0,Math.PI*2); c.fill(); }
+  c.fillStyle='#E0B08E'; c.beginPath(); c.arc(hx,hy,6.2,0,Math.PI*2); c.fill(); c.strokeStyle=INK; c.lineWidth=1.3; c.stroke();
+  c.fillStyle='#C99A78'; c.beginPath(); c.arc(hx-2,hy+1.4,4.4,1.3,3.6); c.fill();
+  c.fillStyle='#3A2A26'; c.beginPath(); c.moveTo(hx-6.4,hy-1); c.quadraticCurveTo(hx-5,hy-7.4,hx,hy-6.8); c.quadraticCurveTo(hx+5,hy-7.2,hx+6.6,hy-2); c.quadraticCurveTo(hx+3,hy-4.2,hx,hy-3.6); c.quadraticCurveTo(hx-3,hy-3.6,hx-6.4,hy-1); c.fill();
+  c.strokeStyle='rgba(120,90,70,.6)'; c.lineWidth=.8; c.beginPath(); c.arc(hx-2,hy-6,1.6,3.4,5.8); c.arc(hx+3,hy-6.4,1.4,3.4,5.8); c.stroke();
+  // the goggles: a strap, two brass rims, lenses catching the light
+  c.strokeStyle='#5A3A28'; c.lineWidth=1.6; c.beginPath(); c.moveTo(hx-6.6,hy-4); c.quadraticCurveTo(hx,hy-6.8,hx+6.6,hy-4.6); c.stroke();
+  for (const ox of [-2.4,2.6]){ c.fillStyle='rgba(170,210,220,.8)'; c.beginPath(); c.arc(hx+ox,hy-5.6,2.2,0,Math.PI*2); c.fill(); c.strokeStyle=BRASS; c.lineWidth=1.3; c.stroke(); c.strokeStyle=INK; c.lineWidth=.6; c.beginPath(); c.arc(hx+ox,hy-5.6,2.9,0,Math.PI*2); c.stroke();
+    c.fillStyle='rgba(255,255,255,.75)'; c.beginPath(); c.arc(hx+ox-.7,hy-6.3,.6,0,Math.PI*2); c.fill(); }
+  // eye, cheek, freckles, nose and a grin
+  c.fillStyle=INK; c.beginPath(); c.ellipse(hx+3,hy,.75,peer?.4:.95,0,0,Math.PI*2); c.fill();
+  c.fillStyle='rgba(220,110,100,.45)'; c.beginPath(); c.arc(hx+3.4,hy+2.6,1.6,0,Math.PI*2); c.fill();
+  c.fillStyle='rgba(140,80,50,.6)'; for (const [fx,fy] of [[1.6,1.6],[4.6,1.4],[2.8,2.6],[5.2,2.8]]) c.fillRect(hx+fx,hy+fy,.7,.7);
+  c.beginPath(); c.moveTo(hx+6,hy-.2); c.lineTo(hx+7.2,hy+1.4); c.lineTo(hx+5.8,hy+1.8); c.fillStyle='#E0B08E'; c.fill(); c.strokeStyle=INK; c.lineWidth=.8; c.stroke();
+  c.beginPath(); c.arc(hx+3.4,hy+3.4,1.6,.2,2.2); c.stroke();
+  c.restore();
+  if (wrenHasNews() && S.state==='idle') folkBang(x+1,y-60);
+  else if (WR.sayT>0 && S.state==='idle') folkBubble(x,y-70,WR.say,Math.min(1,WR.sayT,(5-WR.sayT)*3)); }
+
 /* ---------- Barnaby ---------- */
 const BAR={state:'away',x:0,t:0,line:0,say:'',sayT:0};
 function barPos(){ return {x:BAR.x, y:H-212}; }
@@ -7054,7 +7751,7 @@ function mapSVG(){
   t+='<path d="'+ROUTE_D+'" fill="none" stroke="#B4584A" stroke-width="2" stroke-dasharray="4 5" opacity=".55"/>';
   t+='<path id="routeLive" d="'+ROUTE_D+'" fill="none" stroke="#B4584A" stroke-width="3" stroke-linecap="round"/>';
   // places
-  Object.entries(MAP_PLACES).forEach(([id,p])=>{ const open=p.built && (id==='lake' || save.boat), here=id===REG();
+  Object.entries(MAP_PLACES).forEach(([id,p])=>{ const open=p.built && regionOpen(id), here=id===REG();
     t+='<g class="pin'+(open?'':' locked')+'" data-place="'+id+'" tabindex="0" role="button" aria-label="'+p.name+'">'+
       '<circle cx="'+p.x+'" cy="'+p.y+'" r="16" fill="transparent"/>'+
       (()=>{ const L=LBL[id], w=p.name.length*(open?7:6), x0=L[2]==='end'?p.x+L[0]-w:L[2]==='middle'?p.x+L[0]-w/2:p.x+L[0];
@@ -7075,22 +7772,25 @@ function showMap(goTo,first){
     '<div class="map-card" id="mapCard"></div><button class="btn" id="mapClose" type="button">Close</button></div>';
   layer.hidden=false; noise(.5,{vol:.08,f:2400,to:900,q:.6});
   const svg=layer.querySelector('svg'), route=svg.querySelector('#routeLive'), boat=svg.querySelector('#mapBoat'), len=route.getTotalLength();
+  // the route runs lake, river, coast: each water sits at its own point along it (the river's is worked out from its pin)
+  const U={lake:0, coast:1, river:routeU(route,len,MAP_PLACES.river)}, farthest=regionOpen('coast')?1:regionOpen('river')?U.river:0;
   const place=u=>{ const p=route.getPointAtLength(len*clamp(u,0,1)); boat.setAttribute('transform','translate('+p.x.toFixed(1)+' '+(p.y+Math.sin(performance.now()/300)*1.2).toFixed(1)+')'); };
   const showRoute=u=>{ route.style.strokeDasharray=len; route.style.strokeDashoffset=String(len*(1-clamp(u,0,1))); };
-  let at=here==='coast'?1:0; place(at); showRoute(save.boat?at:0);
+  let at=U[here]||0; place(at); showRoute(farthest);
   let bobbing=true; (function bob(){ if (!bobbing||layer.hidden) return; place(at); requestAnimationFrame(bob); })();
   const card=$('mapCard');
-  const select=id=>{ const p=MAP_PLACES[id], open=p.built && (id==='lake'||save.boat), isHere=id===REG(), n=REGION_FISH[id]?REGION_FISH[id].filter(f=>(save.fish[f]||{}).caught>0).length:0;
+  const select=id=>{ const p=MAP_PLACES[id], open=p.built && regionOpen(id), isHere=id===REG(), n=REGION_FISH[id]?REGION_FISH[id].filter(f=>(save.fish[f]||{}).caught>0).length:0;
     svg.querySelectorAll('.pin').forEach(g=>g.classList.toggle('sel',g.dataset.place===id));
-    card.innerHTML='<div><span class="r">'+(isHere?'You are here':open?'Charted':'Uncharted')+'</span><h3>'+p.name+'</h3><p>'+(id==='coast'&&!save.boat?'Barnaby sells boats that can get you here.':p.desc)+'</p>'+
+    card.innerHTML='<div><span class="r">'+(isHere?'You are here':open?'Charted':'Uncharted')+'</span><h3>'+p.name+'</h3><p>'+(id==='coast'&&!save.boat?'Barnaby sells boats that can get you here.':id==='river'&&!save.ferry?'Ottilie’s ferry runs up the river, once it’s mended.':p.desc)+'</p>'+
       (REGION_FISH[id]&&open?'<p class="mini">Journal: '+n+' of '+REGION_FISH[id].length+' species</p>':'')+'</div>'+
-      (open && !isHere?'<button class="btn" id="sailBtn" type="button">Sail here</button>':'');
+      (open && !isHere?'<button class="btn" id="sailBtn" type="button">'+(id==='river'||(here==='river'&&id==='lake'&&!save.boat)?'Take the ferry':'Sail here')+'</button>':'');
     const sb=$('sailBtn'); if (sb) sb.addEventListener('click',()=>sail(id)); tone(700,.05,{vol:.05,type:'triangle'}); };
-  const sail=to=>{ if (to===REG()) return; bobbing=false; $('mapClose').hidden=true; card.innerHTML='<p class="sailing">'+(first?'The map unrolls. ':'')+'Setting sail for '+MAP_PLACES[to].name+'…</p>';
-    const t0=performance.now(), dur=REDUCED?400:2400, from=REG()==='coast'?1:0, toU=to==='coast'?1:0;
+  const sail=to=>{ if (to===REG()) return; bobbing=false; $('mapClose').hidden=true; const ferry=to==='river'||(REG()==='river'&&to==='lake'&&!save.boat);
+    card.innerHTML='<p class="sailing">'+(first?'The map unrolls. ':'')+(ferry?'All aboard Ottilie’s ferry for ':'Setting sail for ')+MAP_PLACES[to].name+'…</p>';
+    const t0=performance.now(), dur=REDUCED?400:2400*Math.max(.45,Math.abs(U[to]-at)), from=at, toU=U[to];
     noise(1.6,{vol:.1,f:700,to:250,type:'lowpass'});
     (function step(now){ const k=Math.min(1,(now-t0)/dur), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2, u=lerp(from,toU,e);
-      place(u); showRoute(Math.max(u,toU===1?u:from));
+      place(u); showRoute(Math.max(u,farthest));
       if (k<1) requestAnimationFrame(step); else setTimeout(()=>{ closeMap(); travelTo(to,first); },250); })(t0); };
   svg.querySelectorAll('.pin').forEach(g=>{ const go=()=>select(g.dataset.place); g.addEventListener('click',go); g.addEventListener('keydown',e=>{ if (e.key==='Enter'||e.key===' ') go(); }); });
   $('mapClose').addEventListener('click',closeMap);
@@ -7098,12 +7798,18 @@ function showMap(goTo,first){
   select(goTo||here);
   if (goTo && goTo!==here) setTimeout(()=>sail(goTo),first?1100:300);
 }
+/** How far along the route (0 to 1) its nearest point to a place lies. */
+function routeU(route,len,p){ let best=0, bd=1e9; for (let i=0;i<=120;i++){ const q=route.getPointAtLength(len*i/120), d=Math.hypot(q.x-p.x,q.y-p.y); if (d<bd){ bd=d; best=i/120; } } return best; }
 function closeMap(){ const layer=$('mapLayer'); if (layer.hidden) return; ovClosed('map'); layer.classList.add('closing'); setTimeout(()=>{ layer.hidden=true; layer.classList.remove('closing'); layer.innerHTML=''; },REDUCED?0:280); }
 function travelTo(to,first){
+  if (to!==REG()) homeMoved(to);   // Homebody starts counting again (game/river.js)
   save.region=to; persist();
   S.bob=null; S.wait=null; S.reel=null; S.land=null; SC.lucky=null; SC.jump=null; SC.drop=null; SC.gull=null; S.swell=null;
   layoutScenery(); buildBg(); updateHud(); setState('idle');
   toast(REGION_NAME[to],'gold');
+  if (to==='river' && !save.riverSeen){ save.riverSeen=true; persist();
+    setTimeout(()=>coachFor('Rootwood River! The current carries your float downstream, left to right. Cast upstream and let it drift through the spots. Hold the screen to swing it in toward the bank.',10),900);
+    setTimeout(()=>{ if (!S.tut && !(save.wren&&save.wren.met)) coachFor('That’s Wren on her boathouse ramp. Tap her: she enchants rods.',7); },12000); }
   if (to==='coast' && !save.coastSeen){ save.coastSeen=true; persist();
     setTimeout(()=>coachFor('Welcome to Gullrock Coast! Swells roll in from the sea. A cast that lands in a breaking swell washes out, and a swell hitting your line spikes the tension, so let go as it passes.',9),900);
     setTimeout(()=>{ if (!S.tut) coachFor('Ottilie mailed you her old waterproof phone. Tap Phone to order sea rods and boat parts from Tacklegram.',8); },11000); }
@@ -7947,7 +8653,7 @@ function aqCollect(){ accrueTips(); const tk=tanks()[AQ.tank], n=Math.floor(tk.t
 function aqCard(fi){
   const f=fi.ref, F=FISH[f.id], card=$('aqCard'), netRoom=save.net.length<netCap(), d=f.t?new Date(f.t):null, k=AQ.tank, favs=favorites(k,f.id);
   card.innerHTML='<div class="aq-card-top"><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+'</span><button class="x" id="aqX" aria-label="Close">×</button></div>'+
-    '<h3>'+F.name+(isPB(f)?' <span class="net-rec">Record</span>':'')+'</h3><p><b>'+fmtW(fishW(f))+'</b> · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+'</p><p>Caught at '+(f.spot?spotLabel(f.reg,f.spot):REGION_NAME[tankOf(f.id)==='salt'?'coast':'lake'])+(d?' · '+whenLabel(f.t,f.hr,f.wx):'')+
+    '<h3>'+F.name+(isPB(f)?' <span class="net-rec">Record</span>':'')+'</h3><p><b>'+fmtW(fishW(f))+'</b> · '+fmtLen(f.size)+' '+starsHTML(fishQ(f))+'</p><p>Caught at '+(f.spot?spotLabel(f.reg,f.spot):REGION_NAME[regionOf(f.id)])+(d?' · '+whenLabel(f.t,f.hr,f.wx):'')+
     (f.perfect?' · perfect hook':'')+(f.lucky?' · Gull luck':'')+'</p><p class="tip">Earns about '+fishTipRate(k,f).toFixed(2)+' coins a minute in tips'+(favs.length?' · loves the '+favs.map(x=>x.name).join(' and '):'')+'</p><p class="lore">'+F.lore+'</p>'+
     '<div class="row"><button class="btn" id="aqToNet"'+(netRoom?'':' disabled')+'>'+(netRoom?'Back to keepnet':'Keepnet full')+'</button><button class="btn" id="aqSell">Sell · +'+f.value+'</button></div>';
   card.hidden=false;
@@ -9820,7 +10526,7 @@ function buyFix(id){ const L=fixLine(id), s=shackState(); if (!L || !L.cost || s
 function shelfCurios(){ const FS=findsState(); return Object.keys(FINDS).filter(id=>FINDS[id].kind==='curio' && FS.have[id] && !FS.returned[id]).sort((a,b)=>(FS.have[a].t||0)-(FS.have[b].t||0)); }
 const shelfRoom = () => fixDone('cabinet')?Infinity:SHELF;
 /** Rods on the rack: every rod you own, in shop order; the one in hand leaves its pegs empty. */
-const rackRods = () => [...ROD_ORDER,...SEA_RODS].filter(id=>save.rods.includes(id));
+const rackRods = () => ALL_RODS.filter(id=>save.rods.includes(id));
 
 /** The shack button nods: a fish is in the tank, the kitchen's open, an order's come in. */
 function shackPulse(){ const b=$('shackBtn'); if (!b) return; b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); }
@@ -10073,7 +10779,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=25, SNAP_KEY=KEY+'-snapshots';
+const BUILD=26, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -10192,7 +10898,7 @@ if (window.__PWA && 'serviceWorker' in navigator && location.protocol!=='file:')
 let last=performance.now();
 function update(dt,rdt){
   if (S.state==='idle' && save.tutorialDone && save.stats.casts>=12){ S.idleT=(S.idleT||0)+rdt; if (S.idleT>30 && S.idleT-rdt<=30) setHint('Drag back to aim. Release to cast.'); }
-  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt); weatherUpdate(rdt); moonUpdate(rdt); rfxUpdate(rdt); updateRelics(rdt);
+  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt); weatherUpdate(rdt); moonUpdate(rdt); rfxUpdate(rdt); updateRelics(rdt); riverUpdate(dt,rdt); updateWren(rdt);
   { const nc=save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')); if (nc>=24) save.day=(save.day||0)+1; save.clock=nc%24; } PAL=palAt(save.clock);   // save.day: Wanderer's days
   { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2 || (S.time-(SC.bgWxT||0)>.5 && (Math.abs(wxBgKey()-(SC.bgWx||0))>(wxInfo().t<1?.1:.005)))) { SC.bgWxT=S.time; buildBg(); } }   // the hour, or the weather, has moved on
   const ct=hudClock(save.clock); if (ct!==S.clockShown || wxIcon()!==S.wxShown){ const n=(S.clockShown||'').length; S.clockShown=ct; S.wxShown=wxIcon(); setClock(ct); if (ct.length!==n) fitHud(); }
@@ -10232,9 +10938,10 @@ cv.addEventListener('pointerdown',e=>{
     case 'idle':
       if (S.place){ placeDown(x,y); break; }                                       // setting a trap: a marked spot, or the trap itself
       { const T=onTrapProp(x,y); if (T){ startPlacing(T,{x,y}); break; } }      // the trap waiting on the dock or the deck
-      S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y),onTrap:trapAt(x,y),onJar:onJar(x,y)}; setState('aiming'); break;
-    case 'waiting': twitch(); break;
-    case 'bite': hook(); break;
+      if (onOtter(x,y)){ tapOtter(); break; }                                   // the river's otter, after your bait
+      S.aim={sx:x,sy:y,x,y,p:0,th:0,target:null,spot:'open',onOtt:onOttilie(x,y),onWren:onWren(x,y),onBar:onBarnaby(x,y),onNet:onKeepnet(x,y),onTrap:trapAt(x,y),onJar:onJar(x,y)}; setState('aiming'); break;
+    case 'waiting': if (!riverPress()) twitch(); break;   // on the river a twitch waits to see if it's a hold (game/river.js)
+    case 'bite': S.tapX=x; S.tapY=y; hook(); break;
     case 'reeling': leapTap(); S.holding=true; S.pressX=x; S.pressTilt=S.tilt; break;
     case 'result': if (S.time-S.cardAt>.5) dismissCard(S.cardDefault); break;
     case 'loot': lootTap(); break;
@@ -10248,6 +10955,7 @@ cv.addEventListener('pointermove',e=>{
 function up(e){
   S.pointers.delete(e.pointerId);
   if (S.state==='aiming') release();
+  else if (S.state==='waiting' || RV.down!=null) riverRelease();
   else if (S.place) placeUp(e.clientX,e.clientY);
   if (S.state==='reeling') S.holding=S.pointers.size>0;
 }
@@ -10308,7 +11016,7 @@ function wxOnText(wx){ const L=[].concat(wx); return L.length===1?WX[L[0]].on:'i
 /** 'on' applies wherever you cast right now; 'cond' depends on where you cast or what bites; 'off-here' and
     'off-now' can't apply in this water or at this hour. Pass a rarity in `now` to settle rarity conditions too. */
 function modState(m,now){ const w=m.when; if (!w) return 'on';
-  const spots=Object.keys(now.region==='coast'?POOLS_COAST:POOLS);
+  const spots=Object.keys(poolsOf(now.region));
   if ((w.region && w.region!==now.region) || (w.spot && !spots.includes(w.spot))) return 'off-here';
   if ((w.night && !now.night) || (w.night===false && now.night)) return 'off-now';
   if (w.wx && ![].concat(w.wx).includes(now.wx)) return 'off-now';
@@ -10543,7 +11251,7 @@ function bagHTML(){ const R=ROD(), rig=rigFor(save.rod), bait=baitOn(), g=gearSt
     '<div class="rune-socks n'+runes.length+'" style="--n:'+runes.length+'">'+runes.map((id,i)=>runeSockHTML(id,i,runes.length)).join('')+'</div>'+
     (runes.length<3?'<p class="bag-hint rune-hint">'+(runes.length===1?'This rod takes one rune.':'This rod takes two runes.')+' Rods further up the ladder take more.</p>':'')+'</section>';
   // rods you own
-  const rods=[...ROD_ORDER,...SEA_RODS].filter(id=>save.rods.includes(id));
+  const rods=ALL_RODS.filter(id=>save.rods.includes(id));
   if (rods.length>1) h+='<section class="bag-card bag-rods" style="--i:2"><header><h3>Rods</h3><span>Each keeps its own reel and line</span></header><div class="rod-row">'+rods.map(id=>{ const on=id===save.rod, r=rigFor(id);
     return '<button type="button" class="rod-tile'+(on?' on':'')+'" data-rod="'+id+'"'+(on?' aria-current="true"':'')+'><canvas data-rodcv="'+id+'" aria-hidden="true"></canvas><b>'+RODS[id].name+'</b><span>'+(on?'In your hand':TACKLE[r.reel].name.replace(/ Reel$/,'')+' · '+TACKLE[r.line].name.replace(/ Line$/,''))+'</span></button>'; }).join('')+'</div></section>';
   // the vest
@@ -10651,15 +11359,15 @@ function trayHTML(kind,at){
 /** The etching kit: every rune, what it does and its catch. Etching costs Glimmer once; a rune you have goes on any rod for free. */
 function runeRows(at){ const r=enchFor(save.rod), g=save.glimmer||0, own=enchState().own;
   let h='<p class="tr-glim"><span class="bal"><span class="glim"></span><b>'+g.toLocaleString()+'</b> Glimmer</span>'+(Object.keys(own).length?'A rune you’ve etched goes on any rod for free, one of each per rod.':'Etching a rune costs Glimmer once. After that it goes on any rod for free.')+'</p>';
-  for (const id of ENCH_ORDER){ const E=ENCH[id], have=!!own[id], where=r.indexOf(id), here=where===at;
-    const other=have?[...ROD_ORDER,...SEA_RODS].filter(x=>x!==save.rod && save.rods.includes(x) && enchFor(x).includes(id)).map(x=>RODS[x].name):[];
+  for (const id of ENCH_ORDER){ if (!enchAvail(id)) continue; const E=ENCH[id], have=!!own[id], where=r.indexOf(id), here=where===at;
+    const other=have?ALL_RODS.filter(x=>x!==save.rod && save.rods.includes(x) && enchFor(x).includes(id)).map(x=>RODS[x].name):[];
     const act=here?'<button class="btn sm" type="button" data-act="runeoff">Take it out</button>'
       :have?'<button class="btn sm primary" type="button" data-act="runeon" data-id="'+id+'">'+(where>=0?'Move it here':'Set it in')+'</button>'
       :'<button class="btn sm'+(g>=E.cost?' primary':'')+' etch" type="button" data-act="etch" data-id="'+id+'"'+(g>=E.cost?'':' disabled')+'>Etch<span><span class="glim"></span>'+E.cost+'</span></button>';
     h+='<div class="tr-row rune'+(here?' on':'')+(have?'':' unetched')+'" style="--rc:'+E.color+'"><canvas data-rune="'+id+'"></canvas><div class="tr-txt"><h4>'+E.name+'</h4><p>'+E.eff+'</p>'+(E.down?'<p class="down">'+E.down+'</p>':'')+
       (where>=0 && !here?'<p class="also">In socket '+(where+1)+' of this rod</p>':'')+(other.length?'<p class="also">Also on your '+other.join(' and ')+'</p>':'')+
       (!have && g<E.cost?'<p class="need">'+(E.cost-g)+' more Glimmer to etch it</p>':'')+'</div>'+act+'</div>'; }
-  h+='<p class="tr-sub">Your uncle’s notes mention three more runes he never managed to etch.</p>';
+  if (ENCH_ORDER.some(id=>!enchAvail(id))) h+='<p class="tr-sub">Your uncle’s notes mention one more rune, in somebody else’s hand: “Ask Wren. Rootwood River.”</p>';
   return h; }
 /** Etching plays out on the rig: Glimmer streams into the socket, the rune draws itself, light runs to the tip. */
 function startEtch(id,at){ if (BAG.fx){ const F=BAG.fx; BAG.fx=null; etchDone(F); }
@@ -10673,7 +11381,7 @@ function gearRows(kind){ const g=gearState(), rig=rigFor(save.rod), on=kind==='b
   let h='';
   if (kind==='bait') h+='<div class="tr-row'+(on?'':' on')+'"><canvas data-hook="1"></canvas><div class="tr-txt"><h4>Bare hook</h4><p>No bait. Fish still bite a bare hook; bait brings them sooner, or brings different fish.</p></div>'+(on?'<button class="btn sm" type="button" data-act="unbait">Take bait off</button>':'<span class="tag ok">On the hook</span>')+'</div>';
   for (const id of have){ const T=TACKLE[id], is=id===on, fresh=g.fresh.includes(id);
-    const other=kind!=='bait' && !T.starter ? [...ROD_ORDER,...SEA_RODS].filter(r=>r!==save.rod && save.rods.includes(r) && rigFor(r)[kind]===id).map(r=>RODS[r].name) : [];
+    const other=kind!=='bait' && !T.starter ? ALL_RODS.filter(r=>r!==save.rod && save.rods.includes(r) && rigFor(r)[kind]===id).map(r=>RODS[r].name) : [];
     const stock=kind==='bait'&&!isLure(id)?'<p class="stock">'+((g.left[id]||0)?(g.left[id])+' casts left in the open tin':'')+((g.left[id]||0)&&(g.tins[id]||0)?' · ':'')+((g.tins[id]||0)?(g.tins[id])+' unopened tin'+(g.tins[id]===1?'':'s')+' of '+T.casts+' casts':'')+'</p>':'';
     h+='<div class="tr-row'+(is?' on':'')+'"><canvas data-gear="'+id+'"></canvas><div class="tr-txt"><h4>'+T.name+(fresh?' <i class="nw">New</i>':'')+'</h4><p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+(T.mods.length?chipsHTML(id):'')+stock+
       (other.length?'<p class="also">Also on your '+other.join(' and ')+'</p>':'')+'</div>'+
@@ -10736,7 +11444,8 @@ function drawPlaque(x,id,w,h){ const F=FISH[id], pw=Math.min(w*.86,330), ph=h*.9
   for (const sx of [-1,1]){ x.beginPath(); x.arc(sx*(pw/2-ph*.2),0,3.2,0,6.28); x.fillStyle=BRASS; x.fill(); x.strokeStyle=INK; x.lineWidth=1; x.stroke(); }
   const L=Math.min(pw*.68,(ph*.78)/(F.h*((DORSAL[id]||DORSAL0).top+(id==='calf'?1.1:.8)))); x.translate(0,ph*.04); x.rotate(-.07);
   x.save(); x.translate(4,5); drawFish(x,id,L,true,.55); x.restore(); drawFish(x,id,L,false,1,.15); x.restore(); }
-function journalRegions(){ return save.boat?[REG(),REG()==='lake'?'coast':'lake']:['lake']; }
+/** The waters you can reach, the one you're at first. */
+function journalRegions(){ const here=REG(); return [here,...['lake','river','coast'].filter(r=>r!==here && regionOpen(r))]; }
 function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
   let h='<div class="panel-head"><div><h2>Journal</h2><p>'+regs.map(r=>REGION_NAME[r]+' '+REGION_FISH[r].filter(id=>(save.fish[id]||{}).caught>0).length+'/'+REGION_FISH[r].length).join(' · ')+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
     '<div class="seg" role="tablist">'+[['species','Species'],['records','Records'],['finds','Finds'+(findsState().fresh.length?' •':'')],['bonuses','Bonuses']].map(([k,l])=>'<button type="button" role="tab" data-jt="'+k+'" aria-selected="'+(JTAB===k)+'" class="'+(JTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
@@ -10822,6 +11531,7 @@ function openShop(tab){
   if (first) OTT_TAB='rods';
   if (OTT_TAB==='tackle') return openTackleShop();
   if (OTT_TAB==='traps') return openTrapShop();
+  if (OTT_TAB==='ferry' && ferryAsk()) return openFerryShop();
   const cur=ROD(), nextId=ROD_ORDER.find(id=>!save.rods.includes(id));
   const greet=first?'So you’re the new keeper. That Willow barely reaches past the dock. Earn some coins and I’ll set you up with something better.'
     : nextId && save.coins>=RODS[nextId].price ? 'Now you’ve got coin. The '+RODS[nextId].name+' will take you farther out.'
@@ -10850,8 +11560,12 @@ function openShop(tab){
     addCoins(-R.price); save.rods.push(id); save.rod=id; persist(); sfx.out('uncommon'); buzz([0,30,40,30]); toast('New rod: '+R.name+'!','gold'); openShop(); }));
 }
 
+/** Ottilie's Ferry tab: mend her ferry up Rootwood River, then ride it (game/river.js). */
+function openFerryShop(){ if (!save.ferrySeen){ save.ferrySeen=true; persist(); }
+  openSheet('<div class="panel-head"><div><h2>Ottilie’s Ferry</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+ottTabs()+ferryHTML());
+  $('closeS').addEventListener('click',closeSheet); bindOttTabs(); bindFerry(); }
 /* ---------- Ottilie's tackle: reels and lines she makes herself, and bait by the tin (data/tackle.js) ---------- */
-const ottTabs = () => '<div class="seg" role="tablist">'+[['rods','Rods'],['tackle','Reels, lines & bait']].concat(trapState().gift?[['traps','Traps']]:[]).map(([k,l])=>'<button type="button" role="tab" data-ott="'+k+'" aria-selected="'+(OTT_TAB===k)+'" class="'+(OTT_TAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+const ottTabs = () => '<div class="seg" role="tablist">'+[['rods','Rods'],['tackle','Reels, lines & bait']].concat(trapState().gift?[['traps','Traps']]:[]).concat(ferryAsk()?[['ferry','Ferry'+(save.ferry?'':' •')]]:[]).map(([k,l])=>'<button type="button" role="tab" data-ott="'+k+'" aria-selected="'+(OTT_TAB===k)+'" class="'+(OTT_TAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
 function bindOttTabs(){ document.querySelectorAll('#panel [data-ott]').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.ott===OTT_TAB) return; tone(900,.04,{vol:.04,type:'triangle'}); openShop(b.dataset.ott); $('panel').scrollTop=0; })); }
 function openTackleShop(){ const g=gearState(), rig=rigFor(save.rod), bait=baitOn();
   let h='<div class="panel-head"><div><h2>Ottilie’s Tackle</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins · On your '+ROD().name+': '+TACKLE[rig.reel].name+', '+TACKLE[rig.line].name+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+ottTabs();
@@ -10900,7 +11614,10 @@ function openTrapShop(){ const s=trapState();
 /* Plays casts with any setup without drawing anything, using the game's own odds (poolFor), fights
    (fightStep), catch rolls (catchRoll) and bonuses (game/mods.js), so the report can't drift from the game.
    Reed snags, coastal washouts, twitching, swells, treasure (rolled, hauled and opened with game/treasure.js)
-   and Playtest tuning count too.
+   and Playtest tuning count too. On the river a float that waits longer than the current takes to carry it off
+   the water is lost (cast from the left, as the player learns to), though the spot it bites in stays the one
+   cast to; the Twin Spool's second float shortens the wait, and when both bite the player strikes the better fish.
+   The clock stands still at st.hour, except on the river, where the casts sweep that hour's minutes (st.pin keeps it).
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
@@ -10922,11 +11639,12 @@ const SIM_PLAYERS={
    has to cover the nearest edge. Worked out from the layout in game/layout.js and game/regions.js on a
    390 by 844 phone; keep in step if spots move. */
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
-                 coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]}};
+                 coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]},
+                 river:{open:[0,.3], riffle:[0,.12], leaves:[.3,.38], deep:[.7,.78], roots:[.82,.9]}};
 /** A stand-in save for a setup. tanks, parts, fish, finds and gear can be copied from a real save ("Use my setup"). */
 function simSave(st){
   const s=fresh(), now=Date.now(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
-  s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.clock=st.hour==null?12:st.hour;
+  s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.ferry=s.region==='river'||!!st.ferry; s.clock=st.hour==null?12:st.hour;
   s.rod=st.rod||'willow'; s.rods=[s.rod]; s.parts=st.parts==='all'?Object.keys(PARTS):(st.parts||[]).slice();
   s.tune=Object.assign(fresh().tune,st.tune||save.tune);
   s.stats.catches=st.catches==null?100:st.catches;            // a player well past the first treasure
@@ -10936,7 +11654,7 @@ function simSave(st){
     // every species twice in every tank, with every decor: enough for every tank set to complete
     s.tanks={fresh:{lvl:TANKS.fresh.caps.length-1,owned:true,fish:[],decor:DECOR.fresh.map(d=>d.id),tips:0,tipT:now},
              salt:{lvl:TANKS.salt.caps.length-1,owned:true,fish:[],decor:DECOR.salt.map(d=>d.id),tips:0,tipT:now}};
-    for (const id of REGION_FISH.lake) s.tanks.fresh.fish.push(F(id),F(id));
+    for (const id of new Set([...REGION_FISH.lake,...REGION_FISH.river])) s.tanks.fresh.fish.push(F(id),F(id));
     for (const id of REGION_FISH.coast) s.tanks.salt.fish.push(F(id),F(id)); }
   if (st.fish) for (const id in st.fish) s.fish[id]={caught:st.fish[id].caught||0,best:0,seen:true};
   else if (st.mastery) for (const id in FISH) s.fish[id]={caught:MASTERY.catches+2,best:0,seen:true};
@@ -10991,8 +11709,8 @@ function simulate(st,n){
   const keep=save, P=SIM_PLAYERS[st.player]||SIM_PLAYERS.steady, ctl=TREASURE_CTL.off;
   try {
     SIMULATING=true; save=simSave(st); MODC.dirty=true; TREASURE_CTL.off=st.treasure===false;
-    const reg=REG(), spots=st.spot==='mix'?Object.keys(reg==='coast'?POOLS_COAST:POOLS):[st.spot];
-    const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0,snag:0,washout:0,eaten:0}, perfect:0, hooked:0, coins:0, pbs:0, glimmer:0, pbGlimmer:0, echoes:0, wanders:0, secs:0, fightSecs:0,
+    const reg=REG(), spots=st.spot==='mix'?Object.keys(poolsOf(reg)):[st.spot], twin=modFlag('twin');
+    const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0,snag:0,washout:0,drift:0,eaten:0}, twins:0, perfect:0, hooked:0, coins:0, pbs:0, glimmer:0, pbGlimmer:0, echoes:0, wanders:0, secs:0, fightSecs:0,
       tiers:{}, species:{}, records:{}, muts:{}, tierCoins:{}, mutCoins:0, mutGlimmer:0, treasure:{rolled:0,hauled:0,lost:0,coins:0,finds:0,kinds:{},crates:{}}};
     const io={t:0,holding:true,tut:null,tilt:0,reeling:false,ev:[],why:''};
     let echo=null;                                                   // Echo: the next cast at that spot bites at once
@@ -11006,7 +11724,12 @@ function simulate(st,n){
       // the quiet before anything shows up; a steady player twitches once to hurry it
       const tw=modMul('twitch',cx); let wait=biteWait(spot)*(spot==='deep'?1.2:1)/modMul('reedBite',cx);
       if (P.twitch) wait=Math.max(.3,wait*(.65-.2*(tw-1)));
-      save.day=dayLen?Math.floor(out.secs/dayLen):0;                   // an in-game day is 24 minutes of play, or as artifacts make it
+      if (twin) wait*=TWIN.wait;
+      // on the river, a float cast in at the left drifts across the water: too long a wait and the current takes it
+      if (reg==='river'){ const C=RIVER.current, gone=W*.8/(C.speed*W*(spot==='deep'?C.pool:currentAt(depth))*sc(y)); if (wait>gone){ out.lost.drift++; out.secs+=t+gone+.7; continue; } }
+      save.day=dayLen?Math.floor(out.secs/dayLen):0;
+      // the river's Clockfin bites only as the hour turns, so there the casts sweep the minutes of the hour named
+      if (reg==='river' && !st.pin) save.clock=Math.floor(st.hour)+(c%12)/12+.02;                   // an in-game day is 24 minutes of play, or as artifacts make it
       // treasure instead of a fish (rolled once per cast, as the bobber lands): a haul through the fight step, and what's inside.
       // An Echo bites at once instead, unless treasure comes up first: then it keeps waiting.
       const loot=rollTreasure(cx), pend=echo; echo=loot?pend:null;
@@ -11022,7 +11745,10 @@ function simulate(st,n){
         t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'||loot.kind==='map'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
-      const at={bow:!!st.bow, path:!!st.path}, id=ech||rollFish(spot,lucky,at), F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath
+      const at={bow:!!st.bow, path:!!st.path}; let id=ech||rollFish(spot,lucky,at);
+      // the Twin Spool: now and then both floats go under, and the player strikes the one with the better fish
+      if (twin && !ech && Math.random()<TWIN.both){ const id2=rollFish(spot,lucky,at); out.twins++; if (FISH[id2].value>FISH[id].value) id=id2; }
+      const F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
       t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
@@ -11098,7 +11824,7 @@ function balMine(){ const m=save.meal, rig=rigFor(save.rod);
 function balanceFormHTML(){
   const f=BAL.form||(BAL.form=balMine());
   const sel=(id,label,opts,v)=>'<label for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(([k,l])=>'<option value="'+k+'"'+(String(k)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
-  const spots=Object.keys(f.region==='coast'?POOLS_COAST:POOLS).map(sp=>[sp,f.region==='coast'&&sp==='deep'?'Dark trench':SPOT_NAME[sp]]);
+  const spots=Object.keys(poolsOf(f.region)).map(sp=>[sp,spotName(sp,f.region)]);
   const mySets=setsDone().length, myParts=(save.parts||[]).length, myMast=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=MASTERY.catches).length;
   const myFix=shackState().fix.length, myMounts=shackState().wall.filter(Boolean).length;
   const myArts=findsState().equip.length, myRunes=enchFor(f.rod).filter(Boolean).length;
@@ -11107,7 +11833,7 @@ function balanceFormHTML(){
     sel('bRegion','Water',Object.keys(REGION_NAME).map(r=>[r,REGION_NAME[r]]),f.region)+
     sel('bSpot','Spot',[...spots,['mix','Every spot']],f.spot)+
     sel('bHour','Time',BAL_TIMES.map(([h,l])=>[h,l]),f.hour)+
-    sel('bRod','Rod',[...ROD_ORDER,...SEA_RODS].map(id=>[id,RODS[id].name]),f.rod)+
+    sel('bRod','Rod',ALL_RODS.map(id=>[id,RODS[id].name]),f.rod)+
     sel('bReel','Reel',TACKLE_ORDER.reel.map(id=>[id,TACKLE[id].name]),f.reel||'clicker')+
     sel('bLine','Line',TACKLE_ORDER.line.map(id=>[id,TACKLE[id].name]),f.line||'cotton')+
     sel('bBait','Bait',[['','Bare hook'],...TACKLE_ORDER.bait.map(id=>[id,TACKLE[id].name])],f.bait||'')+
@@ -11153,7 +11879,7 @@ function balanceResultHTML(r,prev){
   const st=r.setup, fmt=n=>Math.round(n).toLocaleString();
   const delta=(k)=>{ if (!prev) return ''; const a=prev[k], b=r[k]; if (!a) return ''; const d=Math.round((b-a)/a*100);
     return '<em class="'+(d>0?'up':d<0?'down':'')+'">'+(d===0?'same as last run':(d>0?'▲ ':'▼ ')+Math.abs(d)+'% vs last run')+'</em>'; };
-  const title=REGION_NAME[st.region]+' · '+(st.spot==='mix'?'every spot':(st.region==='coast'&&st.spot==='deep'?'the trench':SPOT_NAME[st.spot].toLowerCase()))+' · '+BAL_TIMES.find(t=>t[0]===st.hour)[1].toLowerCase()+' · '+RODS[st.rod].name+[st.reel,st.line].filter(id=>id&&!TACKLE[id].starter).map(id=>' · '+TACKLE[id].name).join('')+(st.bait?' · '+TACKLE[st.bait].name:'')+(st.meal?' · '+RECIPES[st.meal.id].name+' '+'★'.repeat(st.meal.stars):'')+(r.runes||[]).map(id=>' · '+ENCH[id].name).join('');
+  const title=REGION_NAME[st.region]+' · '+(st.spot==='mix'?'every spot':(st.region==='coast'&&st.spot==='deep'?'the trench':spotName(st.spot,st.region).toLowerCase()))+' · '+BAL_TIMES.find(t=>t[0]===st.hour)[1].toLowerCase()+' · '+RODS[st.rod].name+[st.reel,st.line].filter(id=>id&&!TACKLE[id].starter).map(id=>' · '+TACKLE[id].name).join('')+(st.bait?' · '+TACKLE[st.bait].name:'')+(st.meal?' · '+RECIPES[st.meal.id].name+' '+'★'.repeat(st.meal.stars):'')+(r.runes||[]).map(id=>' · '+ENCH[id].name).join('');
   let h='<section class="bal-res" aria-live="polite"><h3>'+r.casts.toLocaleString()+' casts: '+title+'</h3>';
   if (!r.reach.ok) h+='<p class="bal-warn">'+RODS[st.rod].name+' can’t reach this spot (it casts '+Math.round(r.reach.rod*100)+'% of the way out). These numbers assume it could.</p>';
   h+='<div class="stats bal-stats">'+
@@ -11199,6 +11925,7 @@ function paceState(){ const fresh=!isObj(save.pace); if (fresh) save.pace={};
 function paceKeys(){ const k=[];
   for (const r of save.rods||[]) if (r!=='willow' && RODS[r]) k.push('rod:'+r);
   if (save.boat) k.push('boat');
+  if (save.ferry) k.push('ferry');
   for (const id of save.parts||[]) if (PARTS[id]) k.push('part:'+id);
   for (const id of (isObj(save.shack) && Array.isArray(save.shack.fix) ? save.shack.fix : [])) if (FIXUP.some(L=>L.id===id)) k.push('fix:'+id);
   const n=isObj(save.finds) ? +save.finds.pockets||0 : 0; for (let i=POCKETS.start+1;i<=Math.min(n,POCKETS.max);i++) k.push('pocket:'+i);
@@ -11212,7 +11939,7 @@ function paceTick(dt){ if (SIMULATING || INTRO.active || document.hidden || S.ti
   for (const k of paceKeys()) if (!p.seen[k]){ p.seen[k]=1; p.log.push([k,m]); } }
 /** What a key is called in the table. */
 function paceName(k){ const [kind,raw]=String(k).split(':'), id=String(raw).replace(/[<>&"]/g,'');   // a log read from a pasted backup code could hold anything
-  if (kind==='rod') return RODS[id]?RODS[id].name:id; if (kind==='boat') return 'The boat';
+  if (kind==='rod') return RODS[id]?RODS[id].name:id; if (kind==='boat') return 'The boat'; if (kind==='ferry') return 'Ottilie’s ferry';
   if (kind==='part') return PARTS[id]?PARTS[id].name:id; if (kind==='fix'){ const L=FIXUP.find(L=>L.id===id); return L?L.name:id; }
   if (kind==='pocket') return 'Vest pocket '+id; if (kind==='rune') return ENCH[id]?ENCH[id].name:id;
   if (kind==='fish') return FISH[id]?FISH[id].name:id; return String(k).replace(/[<>&"]/g,''); }
@@ -11272,7 +11999,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
     for (const id of Object.keys(FISH)) if (!FISH[id].noTank && !up.has(id)) (byRar[FISH[id].rarity]=byRar[FISH[id].rarity]||[]).push(id);
     const pick=Object.keys(RAR).slice().reverse().flatMap(r=>byRar[r]||[]); let n=0;
     for (let i=0;i<s.wall.length;i++) if (!s.wall[i] && pick.length){ const id=pick.shift(), F=FISH[id], size=Math.round(lerp(F.size[0],F.size[1],.7)*10)/10, w=weighFish(id,size,1);
-      s.wall[i]={f:{id,size,w,stars:qualityOf(id,size,false),value:F.value,t:Date.now(),reg:REGION_FISH.coast.includes(id)?'coast':'lake',hr:save.clock,rod:save.rod},t:Date.now()}; n++; }
+      s.wall[i]={f:{id,size,w,stars:qualityOf(id,size,false),value:F.value,t:Date.now(),reg:regionOf(id),hr:save.clock,rod:save.rod},t:Date.now()}; n++; }
     persist(); SH.ver++; closeSheet(); news(n?n+' fish up on the wall':'The wall is full',''); });
   $('jarBtn').addEventListener('click',()=>{ const r=relicState(); r.jar=MOON_JAR.fill; r.armed=false; persist(); closeSheet(); news(modFlag('moonJar')?'The Moon Jar is full':'The Moon Jar is full, but it only works from a pocket',''); });
   $('mapBtn2').addEventListener('click',()=>{ while (mapCan({}) && !mapWhole()) addMapPiece({}); persist(); closeSheet(); news(mapWhole()?'Your treasure map is whole':'You already have a map from another water',''); });

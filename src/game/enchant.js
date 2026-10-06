@@ -1,6 +1,6 @@
 /* ---------- Enchantments and Glimmer (data/enchant.js) ---------- */
 /* save.glimmer is the Glimmer you have. save.ench = {own:{id:1} for each rune you've etched, rig:{rodId:[id or null,
-   one per socket]}, kit:true once the etching kit has been shown}. An etched rune goes on any rod for free, one of
+   one per socket]}, kit:true once the etching kit has been shown, cut:{rodId:sockets Wren has added}}. An etched rune goes on any rod for free, one of
    each per rod; the modifiers of the runes on the rod in hand join the pipeline (game/mods.js, src 'ench').
    save.day counts in-game days (game/loop.js); save.wander = {day, n:{region: catches there that day}} is what
    Wanderer counts (each water, as the design doc has it, so it pays to travel). S.echo = {fish, reg, spot} is an Echo waiting at a spot for the next cast there.
@@ -10,8 +10,12 @@ function enchState(){ if (!isObj(save.ench)) save.ench={}; const e=save.ench;
   for (const id in e.own) if (!ENCH[id]) delete e.own[id];
   if (typeof save.glimmer!=='number' || !isFinite(save.glimmer) || save.glimmer<0) save.glimmer=0;
   return e; }
+/** A rod's sockets: its own (RODS[].ench), plus any Wren has cut at her bench (save.ench.cut[rod]), 3 at most. */
+function socketsOf(rod){ const e=enchState(), c=isObj(e.cut)?+e.cut[rod]||0:0; return Math.min(3,((RODS[rod]||RODS.willow).ench||1)+Math.max(0,Math.floor(c))); }
+/** Whether a rune is in the etching tray yet: Homebody waits until you've met Wren (data/enchant.js need). */
+const enchAvail = id => !ENCH[id].need || (ENCH[id].need==='wren' && !!(isObj(save.wren) && save.wren.met));
 /** The runes on rod `rod`, one entry per socket (null for an empty one): only runes you own, one of each. */
-function enchFor(rod){ const e=enchState(), n=(RODS[rod]||RODS.willow).ench||1; let r=e.rig[rod]; if (!Array.isArray(r)) r=e.rig[rod]=[];
+function enchFor(rod){ const e=enchState(), n=socketsOf(rod); let r=e.rig[rod]; if (!Array.isArray(r)) r=e.rig[rod]=[];
   const seen=new Set(); for (let i=0;i<r.length;i++){ const id=r[i]; if (!id || !ENCH[id] || !e.own[id] || seen.has(id)) r[i]=null; else seen.add(id); }
   if (r.length>n) r.length=n; while (r.length<n) r.push(null); return r; }
 const ownsEnch = id => !!enchState().own[id];
@@ -20,7 +24,7 @@ const enchOn = (id,rod) => enchFor(rod||save.rod).includes(id);
 function addGlimmer(n,o){ n=Math.round(n)||0; if (!n) return; save.glimmer=Math.max(0,(save.glimmer||0)+n); if (n>0) save.stats.glimmer=(save.stats.glimmer||0)+n; persist(); if (!SIMULATING) glimmerTally(n,o); }
 /** Etches rune `id` into socket `at` of the rod in hand: pays its Glimmer the first time, free after that. */
 function etchRune(id,at){ const e=enchState(), E=ENCH[id]; if (!E || !(at>=0 && at<enchFor(save.rod).length)) return false;
-  if (!e.own[id]){ if ((save.glimmer||0)<E.cost) return false; save.glimmer-=E.cost; e.own[id]=1; save.stats.etched=(save.stats.etched||0)+1; }
+  if (!e.own[id]){ if ((save.glimmer||0)<E.cost || !enchAvail(id)) return false; save.glimmer-=E.cost; e.own[id]=1; save.stats.etched=(save.stats.etched||0)+1; }
   return socketRune(id,at); }
 /** Puts a rune you own in socket `at` (moving it if it's in another socket on the same rod). */
 function socketRune(id,at,rod){ rod=rod||save.rod; const r=enchFor(rod); if (!ownsEnch(id) || !(at>=0 && at<r.length)) return false;

@@ -7,21 +7,24 @@
               fish the weather brings up (data/weather.js says where and how often; they're never in a trap).
               extra:true for fish that don't count toward finishing a water (Barnaby never waits on them); secret:true
               for a fish found by experimenting, whose journal page shows a riddle (hint) once it's been seen; beh2 for a
-              fish that changes how it fights halfway in; noTank:true for one too big for any tank.
+              fish that changes how it fights halfway in; noTank:true for one too big for any tank. shared:true for a fish
+              that lives in more than one water (it's on each one's journal page and in each one's pools).
    RAR[tier]  how a rarity looks and sounds, in order from common to godly; pips (1 to 8) so rarity never rests on color
               alone; prism and ink for the tiers whose color shifts or bleeds. luckCap is the most luck can multiply
               its odds (see game/mods.js); Godly's sits below Mythic's on purpose, so no build makes Godly routine.
    RARE_BITES fish no spot pool offers: each is checked first on every cast, at its own chance before luck, only where
               and when it can bite (game/odds.js: rollFish). region; spots (or any); bow:true at the rainbow's foot;
-              moon:'full' and night:true on full-moon nights; path: how much likelier a cast onto the moonpath makes it.
+              moon:'full' and night:true on full-moon nights; path: how much likelier a cast onto the moonpath makes it;
+              top: the share of each in-game hour, from the hour, when it can bite (the Clockfin's ten minutes past).
    DRY        soft bad-luck protection, up to Legendary only: after `from` casts in a row where a Legendary could have
               bitten and didn't, its odds creep up, reaching ×max at `to`. Landing a Legendary or rarer starts it over.
    MUTS       mutations, rolled on landing (game/landing.js: catchRoll) on anything below Mythic: chance per catch before
               bonuses (STATS.mutation), what it multiplies the value by, Glimmer it pays, and for Giant how far past the
               species' biggest it grows. MUT_ORDER is the order the journal lists them.
    ORDER      the lake journal's order, the same fish as REGION_FISH.lake.  REGION_FISH  which species live in each region, in journal order.
-   POOLS      lake bite weights per spot; POOLS_COAST the same for Gullrock Coast. Night, dawn, rods,
-              meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench"). */
+   POOLS      lake bite weights per spot; POOLS_COAST and POOLS_RIVER the same for Gullrock Coast and Rootwood River. Night, dawn, rods,
+              meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench");
+              SPOT_REG  a spot's own name in one water (the coast's deep water is the Dark trench, the river's the Millpool). */
 const FISH = {
   perch:   {name:'Copper Perch', rarity:'common', beh:'darter', pull:0.9, reel:2.6, value:2, size:[14,26], len:34, h:.27, color:'#D08A4E', fin:'#A85E2C', window:1.4,
             lore:'Its belly often holds old coins. Nobody knows who keeps dropping them.', hint:'Common in open water.'},
@@ -29,8 +32,8 @@ const FISH = {
             lore:"A grumpy catfish that tugs like it's ringing a doorbell.", hint:'Lurks along the reed edges.'},
   lantern: {name:'Lantern Carp', rarity:'uncommon', beh:'sleeper', night:true, pull:.7, reel:3.6, value:12, size:[25,45], len:42, h:.32, color:'#E2A64F', fin:'#B97A2F', window:1.6,
             lore:"Hollowmere's street lamps once burned its shed scales.", hint:'Only rises at night, and hates a twitchy bobber.'},
-  leafjack:{name:'Leafjack', rarity:'uncommon', beh:'leaper', pull:1.0, reel:4.2, value:15, size:[20,34], len:40, h:.36, color:'#A9B456', fin:'#7C8C33', window:1.1,
-            lore:'Disguises itself as a leaf. It fools the birds, but not you.', hint:'Seen hiding under the lily pads.'},
+  leafjack:{name:'Leafjack', rarity:'uncommon', beh:'leaper', shared:true, pull:1.0, reel:4.2, value:15, size:[20,34], len:40, h:.36, color:'#A9B456', fin:'#7C8C33', window:1.1,
+            lore:'Disguises itself as a leaf. It fools the birds, but not you.', hint:'Seen hiding under the lily pads, and under falling leaves.'},
   mossback:{name:'Mossback', rarity:'rare', beh:'sulker', pull:1.35, reel:7, value:45, size:[40,70], len:56, h:.3, color:'#6C805A', fin:'#4E6243', window:.9,
             lore:'Carries a tiny garden on its back. Some gardens have tiny fences.', hint:'Rests in the deep pool.'},
   sprat:   {name:'Silver Sprat', rarity:'common', beh:'darter', pull:.8, reel:2.2, value:6, size:[10,18], len:28, h:.22, color:'#B7C4CD', fin:'#7E8E9A', window:1.4,
@@ -62,7 +65,21 @@ const FISH = {
   calf:    {name:'Moonwhale Calf', rarity:'mythic', beh:'sulker', beh2:'leaper', extra:true, noTank:true, pull:2, reel:22, value:6000, size:[380,520], len:124, h:.3, color:'#5F6F8A', fin:'#45536C', window:.65,
             lore:'Too big for this lake. Where is its mother?', hint:'Something enormous breaches far out on full-moon nights. It isn’t alone.'},
   gurnard: {name:'Foghorn Gurnard', rarity:'rare', beh:'ghost', wx:'fog', pull:1.4, reel:7.5, value:160, size:[28,52], len:46, h:.28, color:'#C25A4B', fin:'#E59A5C', window:.9,
-            lore:'Grunts like a foghorn. The lighthouse keepers used to steer by it.', hint:'Grunts from the sea stacks when the fog is in.'}
+            lore:'Grunts like a foghorn. The lighthouse keepers used to steer by it.', hint:'Grunts from the sea stacks when the fog is in.'},
+  brook:   {name:'Brook Ribbon', rarity:'common', beh:'darter', pull:.9, reel:2.8, value:3, size:[16,30], len:38, h:.17, color:'#B9A27A', fin:'#8C7450', window:1.35,
+            lore:'Thin as a hair ribbon and twice as hard to hold.', hint:'Darts through the run in midstream.'},
+  stone:   {name:'Stonegrinder', rarity:'common', beh:'sulker', pull:1.05, reel:3.4, value:4, size:[22,40], len:40, h:.3, color:'#8C8A80', fin:'#66645C', window:1.25,
+            lore:'Eats pebbles and spits out smoother ones.', hint:'Grinds about on the bottom of the deep pools.'},
+  barbel:  {name:'Barkskin Barbel', rarity:'rare', beh:'tugger', pull:1.35, reel:7, value:70, size:[40,72], len:54, h:.24, color:'#7A5E42', fin:'#5A4330', window:.92,
+            lore:'Its whiskers are thin roots. At least one heron has tried to perch on it.', hint:'Hides in the roots under the far bank.'},
+  clockfin:{name:'Clockfin Trout', rarity:'epic', beh:'tugger', extra:true, pull:1.5, reel:9.5, value:260, size:[34,60], len:50, h:.26, color:'#9FA46A', fin:'#C9A15A', window:.82,
+            lore:'Its fin ticks. It runs four minutes slow.', hint:'Something in the current ticks, but only as the hour turns.'},
+  gristle: {name:'Old Gristle', rarity:'legendary', beh:'sulker', pull:1.8, reel:15, value:1000, size:[130,180], len:90, h:.17, color:'#6F6658', fin:'#4E473D', window:.72,
+            lore:'A sturgeon older than the mill. The miller fed it crusts for forty years, and it still turns up at six expecting them.', hint:'Something huge waits under the waterwheel, most of all around six in the evening.'},
+  spatefin:{name:'Spatefin', rarity:'uncommon', beh:'tugger', wx:'rain', pull:1.0, reel:4, value:22, size:[18,32], len:36, h:.26, color:'#7E8E6E', fin:'#56653F', window:1.1,
+            lore:'Comes down with the flood water, nose first, and goes back up when it’s over.', hint:'Rides the river down when it rains.'},
+  grayling:{name:'Wisp Grayling', rarity:'rare', beh:'ghost', wx:'fog', pull:1.3, reel:6.8, value:95, size:[28,50], len:46, h:.24, color:'#A3A9B2', fin:'#8C7BB0', window:.92,
+            lore:'Its tall fin is a sail of mist. In fog it rows itself upstream.', hint:'Sails up the river on foggy mornings.'}
 };
 const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'];
 const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper', ghost:'Ghost'};
@@ -84,9 +101,12 @@ const POOLS = {
   far:  {perch:22, leafjack:30, mossback:10, reedwhisker:4, gar:2, mayor:.8},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
-const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed'};
-const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench'};
-const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw']};
+const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed', riffle:'Riffle', leaves:'Leaf drift', roots:'Undercut roots'};
+const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench',
+  riffle:'in the riffle', leaves:'under the falling leaves', roots:'among the roots', 'river:open':'in the run', 'river:deep':'in the millpool'};
+const SPOT_REG = {coast:{deep:'Dark trench'}, river:{open:'The run', deep:'Millpool'}};
+const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw'],
+  river:['brook','stone','leafjack','spatefin','barbel','grayling','clockfin','gristle']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:9, bream:6},
@@ -94,9 +114,18 @@ const POOLS_COAST = {
   deep: {grouper:14, bream:28, sprat:34, kelpeel:10, angler:2.5, saltjaw:.9},
   far:  {bream:34, sprat:28, grouper:10, kelpeel:10, angler:1, saltjaw:.6}
 };
+/* Rootwood River: the current carries the float from spot to spot (game/river.js), so these are where it is when a fish comes. */
+const POOLS_RIVER = {
+  open:  {brook:62, stone:16, leafjack:9, barbel:3},
+  riffle:{brook:72, stone:8, leafjack:6, barbel:1.5},
+  leaves:{leafjack:52, brook:30, stone:6, barbel:4},
+  deep:  {stone:46, brook:20, leafjack:6, barbel:10, gristle:1},
+  roots: {barbel:12, stone:26, brook:28, leafjack:8, gristle:.6}
+};
 const RARE_BITES={
   shiner:{region:'lake', bow:true, chance:.035},
-  calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2}
+  calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2},
+  clockfin:{region:'river', top:1/6, chance:1/11}
 };
 const DRY={from:80, to:200, max:2};
 const MUTS={

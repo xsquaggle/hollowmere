@@ -9,7 +9,7 @@ function balMine(){ const m=save.meal, rig=rigFor(save.rod);
 function balanceFormHTML(){
   const f=BAL.form||(BAL.form=balMine());
   const sel=(id,label,opts,v)=>'<label for="'+id+'"><span>'+label+'</span><select id="'+id+'">'+opts.map(([k,l])=>'<option value="'+k+'"'+(String(k)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
-  const spots=Object.keys(f.region==='coast'?POOLS_COAST:POOLS).map(sp=>[sp,f.region==='coast'&&sp==='deep'?'Dark trench':SPOT_NAME[sp]]);
+  const spots=Object.keys(poolsOf(f.region)).map(sp=>[sp,spotName(sp,f.region)]);
   const mySets=setsDone().length, myParts=(save.parts||[]).length, myMast=Object.keys(FISH).filter(id=>(save.fish[id]||{}).caught>=MASTERY.catches).length;
   const myFix=shackState().fix.length, myMounts=shackState().wall.filter(Boolean).length;
   const myArts=findsState().equip.length, myRunes=enchFor(f.rod).filter(Boolean).length;
@@ -18,7 +18,7 @@ function balanceFormHTML(){
     sel('bRegion','Water',Object.keys(REGION_NAME).map(r=>[r,REGION_NAME[r]]),f.region)+
     sel('bSpot','Spot',[...spots,['mix','Every spot']],f.spot)+
     sel('bHour','Time',BAL_TIMES.map(([h,l])=>[h,l]),f.hour)+
-    sel('bRod','Rod',[...ROD_ORDER,...SEA_RODS].map(id=>[id,RODS[id].name]),f.rod)+
+    sel('bRod','Rod',ALL_RODS.map(id=>[id,RODS[id].name]),f.rod)+
     sel('bReel','Reel',TACKLE_ORDER.reel.map(id=>[id,TACKLE[id].name]),f.reel||'clicker')+
     sel('bLine','Line',TACKLE_ORDER.line.map(id=>[id,TACKLE[id].name]),f.line||'cotton')+
     sel('bBait','Bait',[['','Bare hook'],...TACKLE_ORDER.bait.map(id=>[id,TACKLE[id].name])],f.bait||'')+
@@ -64,7 +64,7 @@ function balanceResultHTML(r,prev){
   const st=r.setup, fmt=n=>Math.round(n).toLocaleString();
   const delta=(k)=>{ if (!prev) return ''; const a=prev[k], b=r[k]; if (!a) return ''; const d=Math.round((b-a)/a*100);
     return '<em class="'+(d>0?'up':d<0?'down':'')+'">'+(d===0?'same as last run':(d>0?'▲ ':'▼ ')+Math.abs(d)+'% vs last run')+'</em>'; };
-  const title=REGION_NAME[st.region]+' · '+(st.spot==='mix'?'every spot':(st.region==='coast'&&st.spot==='deep'?'the trench':SPOT_NAME[st.spot].toLowerCase()))+' · '+BAL_TIMES.find(t=>t[0]===st.hour)[1].toLowerCase()+' · '+RODS[st.rod].name+[st.reel,st.line].filter(id=>id&&!TACKLE[id].starter).map(id=>' · '+TACKLE[id].name).join('')+(st.bait?' · '+TACKLE[st.bait].name:'')+(st.meal?' · '+RECIPES[st.meal.id].name+' '+'★'.repeat(st.meal.stars):'')+(r.runes||[]).map(id=>' · '+ENCH[id].name).join('');
+  const title=REGION_NAME[st.region]+' · '+(st.spot==='mix'?'every spot':(st.region==='coast'&&st.spot==='deep'?'the trench':spotName(st.spot,st.region).toLowerCase()))+' · '+BAL_TIMES.find(t=>t[0]===st.hour)[1].toLowerCase()+' · '+RODS[st.rod].name+[st.reel,st.line].filter(id=>id&&!TACKLE[id].starter).map(id=>' · '+TACKLE[id].name).join('')+(st.bait?' · '+TACKLE[st.bait].name:'')+(st.meal?' · '+RECIPES[st.meal.id].name+' '+'★'.repeat(st.meal.stars):'')+(r.runes||[]).map(id=>' · '+ENCH[id].name).join('');
   let h='<section class="bal-res" aria-live="polite"><h3>'+r.casts.toLocaleString()+' casts: '+title+'</h3>';
   if (!r.reach.ok) h+='<p class="bal-warn">'+RODS[st.rod].name+' can’t reach this spot (it casts '+Math.round(r.reach.rod*100)+'% of the way out). These numbers assume it could.</p>';
   h+='<div class="stats bal-stats">'+

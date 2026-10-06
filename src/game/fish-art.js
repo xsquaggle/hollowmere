@@ -1,6 +1,7 @@
 /* ---------- Drawing ---------- */
 /* Most fish share one body, shaped by their h (height as a share of length). A few have their own: the Steeple Gar's
-   needle snout, the Gaslight Angler's great head, and the Moonwhale Calf's whale's body and flukes. */
+   needle snout, the Gaslight Angler's great head, the Moonwhale Calf's whale's body and flukes, and Old Gristle's
+   sturgeon's shovel snout and long upper tail. */
 function fishPath(id,len){
   const F=FISH[id], h=len*F.h, p=new Path2D();
   if (id==='gar'){ p.moveTo(len*.5,-h*.06); p.lineTo(len*.24,-h*.36); p.bezierCurveTo(len*.12,-h*1.08,-len*.25,-h*1.0,-len*.4,-h*.32);
@@ -9,6 +10,8 @@ function fishPath(id,len){
     p.bezierCurveTo(-len*.34,h*.3,-len*.1,h*.72,len*.2,h*.8); p.bezierCurveTo(len*.4,h*.82,len*.53,h*.42,len*.5,-h*.12); p.closePath(); return p; }
   if (id==='calf'){ p.moveTo(len*.5,h*.08); p.bezierCurveTo(len*.5,-h*.92,len*.2,-h*1.1,-len*.05,-h*.95); p.bezierCurveTo(-len*.25,-h*.78,-len*.34,-h*.3,-len*.42,-h*.12);
     p.lineTo(-len*.42,h*.12); p.bezierCurveTo(-len*.3,h*.46,-len*.1,h*1.0,len*.2,h*.96); p.bezierCurveTo(len*.42,h*.9,len*.5,h*.6,len*.5,h*.08); p.closePath(); return p; }
+  if (id==='gristle'){ p.moveTo(len*.5,h*.05); p.quadraticCurveTo(len*.44,-h*.5,len*.3,-h*.82); p.bezierCurveTo(len*.1,-h*1.12,-len*.25,-h*.8,-len*.4,-h*.28);
+    p.lineTo(-len*.4,h*.22); p.bezierCurveTo(-len*.2,h*.82,len*.1,h*1.02,len*.3,h*.72); p.quadraticCurveTo(len*.42,h*.5,len*.5,h*.05); p.closePath(); return p; }
   p.moveTo(len*.5,0);
   p.bezierCurveTo(len*.38,-h*1.08,-len*.22,-h*1.02,-len*.4,0);
   p.bezierCurveTo(-len*.22,h*1.02,len*.38,h*1.08,len*.5,0); p.closePath();
@@ -18,20 +21,22 @@ function tailPath(id,len){ const F=FISH[id], h=len*F.h, p=new Path2D();
   if (id==='gar'){ p.moveTo(-len*.37,0); p.quadraticCurveTo(-len*.44,-h*1.7,-len*.58,-h*.95); p.quadraticCurveTo(-len*.63,0,-len*.58,h*.95); p.quadraticCurveTo(-len*.44,h*1.7,-len*.37,0); p.closePath(); return p; }
   if (id==='calf'){ p.moveTo(-len*.38,-h*.12); p.quadraticCurveTo(-len*.47,-h*.28,-len*.63,-h*.8); p.quadraticCurveTo(-len*.6,-h*.22,-len*.53,0);
     p.quadraticCurveTo(-len*.6,h*.22,-len*.63,h*.62); p.quadraticCurveTo(-len*.47,h*.24,-len*.38,h*.12); p.closePath(); return p; }
+  if (id==='gristle'){ p.moveTo(-len*.38,-h*.3); p.quadraticCurveTo(-len*.5,-h*1.1,-len*.63,-h*1.9); p.quadraticCurveTo(-len*.56,-h*.4,-len*.5,h*.2);
+    p.quadraticCurveTo(-len*.52,h*.7,-len*.56,h*1.0); p.quadraticCurveTo(-len*.45,h*.6,-len*.38,h*.22); p.closePath(); return p; }   // a shark's tail: the top lobe far longer
   const k=id==='angler'?.62:1;
   p.moveTo(-len*.36,0); p.lineTo(-len*.6,-h*.85*k); p.quadraticCurveTo(-len*.5,0,-len*.6,h*.85*k); p.closePath(); return p; }
 /** The whole outline, body and tail, as one shape: the Moonwhale's breach far out is just this, filled. */
 function whalePath(c,len){ c.fill(tailPath('calf',len)); c.fill(fishPath('calf',len)); }
 /* Where each fish's dorsal fin sits (a and b: its front and back, as shares of length from the middle; top: its height in
    body heights; base: where it meets the back), and its eye (x, y as shares of length and height; r as a share of length). */
-const DORSAL={gar:{a:-.17,b:-.33,top:2.7,base:.78}, angler:{a:-.1,b:-.3,top:1.05,base:.6}, calf:{a:-.17,b:-.3,top:1.2,base:.86}, mayor:{a:.14,b:-.22,top:2.2,base:.8}};
+const DORSAL={grayling:{a:.16,b:-.28,top:3.4,base:.8}, gristle:{a:-.2,b:-.34,top:1.5,base:.5}, brook:{a:.06,b:-.18,top:2,base:.8}, gar:{a:-.17,b:-.33,top:2.7,base:.78}, angler:{a:-.1,b:-.3,top:1.05,base:.6}, calf:{a:-.17,b:-.3,top:1.2,base:.86}, mayor:{a:.14,b:-.22,top:2.2,base:.8}};
 const DORSAL0={a:.14,b:-.22,top:1.65,base:.8};
-const EYE={gar:{x:.21,y:-.12,r:.034}, angler:{x:.3,y:-.6,r:.036}, calf:{x:.33,y:.14,r:.018}};
+const EYE={gristle:{x:.3,y:-.42,r:.022}, gar:{x:.21,y:-.12,r:.034}, angler:{x:.3,y:-.6,r:.036}, calf:{x:.33,y:.14,r:.018}};
 const EYE0={x:.34,y:-.18,r:.045};
 /* Up close, fish get more: past 44 px a gill line, a side fin, a darker back, a mouth and a glint in the eye; past 80 px
    fin rays, a lateral line and scales (except the catfish, the eel, and the bream, leafjack and mackerel, whose patterns
    already are their scales). Small fish in the scene stay simple, so they read at a glance. */
-const NO_SCALES=new Set(['reedwhisker','leafjack','kelpeel','bream','mackerel','angler','calf']), OWN_MOUTH=new Set(['grouper','saltjaw','gar','angler','calf']);
+const NO_SCALES=new Set(['reedwhisker','leafjack','kelpeel','bream','mackerel','angler','calf','gristle','barbel']), OWN_MOUTH=new Set(['grouper','saltjaw','gar','angler','calf','gristle','barbel']);
 function fishRays(c,lw,pts){ c.strokeStyle='rgba(43,42,51,.32)'; c.lineWidth=clamp(lw*.4,.6,2.2); c.beginPath(); for (let i=0;i<pts.length;i+=4){ c.moveTo(pts[i],pts[i+1]); c.lineTo(pts[i+2],pts[i+3]); } c.stroke(); }
 /* `mut` draws a mutation on the fish (data/fish.js: MUTS): Glassy shows its bones through a clear body, Mossy wears moss
    and a flower along its back, and a Twin is two fish, the second a touch smaller behind the first. A Giant is just big. */
@@ -58,6 +63,21 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   c.fillStyle='rgba(255,240,210,.28)'; c.beginPath(); c.ellipse(len*.05,h*.55,len*.38,h*.5,0,0,Math.PI*2); c.fill();
   if (det){ c.fillStyle='rgba(18,26,30,.15)'; c.beginPath(); c.ellipse(0,-h*.86,len*.54,h*.52,0,0,Math.PI*2); c.fill(); }
   if (id==='perch'){ c.fillStyle='rgba(90,40,15,.35)'; for (let i=0;i<4;i++) c.fillRect(len*(.18-i*.13),-h,len*.05,h*1.4); }
+  if (id==='brook'){ c.fillStyle='rgba(225,236,214,.55)'; c.fillRect(-len*.42,-h*.12,len*.9,h*.22);   // a silver band, and the dusky marks of a young river fish along it
+    c.fillStyle='rgba(70,60,40,.3)'; for (let i=0;i<7;i++){ c.beginPath(); c.ellipse(len*(.26-i*.09),-h*.02,len*.026,h*.3,0,0,Math.PI*2); c.fill(); } }
+  if (id==='stone'){ c.fillStyle='rgba(50,48,44,.28)'; for (let i=0;i<14;i++){ const x=len*(.3-((i*37)%13)/13*.66), y=(((i*53)%11)/10-.55)*h*1.4; c.beginPath(); c.ellipse(x,y,len*.03,h*.1,i,0,Math.PI*2); c.fill(); }   // pebbly mottling
+    c.fillStyle='rgba(230,226,214,.3)'; for (let i=0;i<8;i++){ const x=len*(.26-((i*29)%9)/9*.58), y=(((i*41)%7)/6-.5)*h*1.2; c.beginPath(); c.arc(x,y,len*.012,0,Math.PI*2); c.fill(); } }
+  if (id==='barbel'){ c.strokeStyle='rgba(40,28,18,.4)'; c.lineWidth=Math.max(.8,lw*.55); c.beginPath();   // bark: long ragged furrows
+    for (let i=0;i<6;i++){ const y=(-.6+i*.24)*h; c.moveTo(len*.32,y); c.quadraticCurveTo(len*.05,y+h*.06*(i%2?1:-1),-len*.36,y*.7); } c.stroke();
+    c.fillStyle='rgba(230,200,150,.25)'; c.beginPath(); c.ellipse(len*.02,h*.6,len*.38,h*.3,0,0,Math.PI*2); c.fill(); }
+  if (id==='clockfin'){ c.fillStyle='rgba(206,120,120,.38)'; c.fillRect(-len*.4,-h*.1,len*.86,h*.2);   // a trout's pink stripe, and black spots like the minutes on a dial
+    c.fillStyle='rgba(30,30,24,.55)'; for (let i=0;i<12;i++){ const a=i/12*Math.PI*2, x=-len*.05+Math.cos(a)*len*.2, y=Math.sin(a)*h*.62; c.beginPath(); c.arc(x,y,len*(i%3?.01:.017),0,Math.PI*2); c.fill(); } }
+  if (id==='gristle'){ c.fillStyle='rgba(225,210,180,.35)'; c.beginPath(); c.ellipse(len*.02,h*.7,len*.4,h*.3,0,0,Math.PI*2); c.fill();   // the pale belly, and leathery wrinkles
+    c.strokeStyle='rgba(40,34,28,.25)'; c.lineWidth=Math.max(.7,lw*.4); c.beginPath(); for (let i=0;i<9;i++){ const x=len*(.26-i*.07); c.moveTo(x,-h*.5); c.quadraticCurveTo(x-len*.015,0,x,h*.45); } c.stroke(); }
+  if (id==='spatefin'){ c.strokeStyle='rgba(225,238,240,.42)'; c.lineWidth=Math.max(.7,lw*.4); c.beginPath(); for (let i=0;i<9;i++){ const x=len*(.32-i*.08), y=(((i*5)%4)/3-.6)*h; c.moveTo(x,y); c.lineTo(x-len*.03,y+h*.42); } c.stroke();   // rain-streaked
+    c.fillStyle='rgba(40,50,30,.3)'; for (let i=0;i<8;i++){ c.beginPath(); c.arc(len*(.24-i*.08),-h*(.4+(i%2)*.2),len*.018,0,Math.PI*2); c.fill(); } }
+  if (id==='grayling'){ c.fillStyle='rgba(40,40,60,.4)'; for (let i=0;i<9;i++){ c.beginPath(); c.arc(len*(.22-((i*3)%5)*.045),(((i*7)%5)/4-.6)*h,len*.012,0,Math.PI*2); c.fill(); }   // a few dark freckles up front
+    c.fillStyle='rgba(200,180,240,.22)'; c.fillRect(-len*.42,-h*.5,len*.9,h*.3); }
   if (id==='reedwhisker'){ c.fillStyle='rgba(40,30,20,.3)'; c.beginPath(); c.ellipse(-len*.02,-h*.55,len*.42,h*.4,0,0,Math.PI*2); c.fill();
     c.fillStyle='rgba(255,240,210,.18)'; for (let i=0;i<5;i++){ c.beginPath(); c.arc(len*(.2-i*.12),-h*.2+(i%2)*h*.25,len*.02,0,Math.PI*2); c.fill(); } }
   if (id==='lantern'){ for (let i=0;i<5;i++){ const gx=len*(.22-i*.12), gy=-h*.15+(i%2?h*.3:0); c.fillStyle='rgba(255,236,160,.35)'; c.beginPath(); c.arc(gx,gy,len*.06,0,Math.PI*2); c.fill();
@@ -117,6 +137,18 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   if (id==='reedwhisker'){ c.strokeStyle=INK; c.lineWidth=lw*.7; c.lineCap='round'; c.beginPath();
     c.moveTo(len*.46,h*.05); c.quadraticCurveTo(len*.6,h*.3,len*.55,h*.75); c.moveTo(len*.44,h*.12); c.quadraticCurveTo(len*.5,h*.5,len*.4,h*.85);
     c.moveTo(len*.46,-h*.05); c.quadraticCurveTo(len*.62,-h*.15,len*.66,h*.15); c.stroke(); }
+  if (id==='barbel'){ c.strokeStyle=INK; c.lineWidth=lw*.6; c.lineCap='round'; c.beginPath();   // its four barbels, and the mouth set low
+    c.moveTo(len*.44,h*.35); c.quadraticCurveTo(len*.5,h*.62,len*.46,h*.9); c.moveTo(len*.4,h*.4); c.quadraticCurveTo(len*.42,h*.7,len*.36,h*.95);
+    c.moveTo(len*.48,h*.2); c.quadraticCurveTo(len*.58,h*.32,len*.6,h*.55); c.moveTo(len*.46,h*.26); c.quadraticCurveTo(len*.53,h*.5,len*.52,h*.75); c.stroke();
+    c.beginPath(); c.moveTo(len*.48,h*.28); c.quadraticCurveTo(len*.44,h*.38,len*.4,h*.34); c.stroke(); }
+  if (id==='gristle'){ c.strokeStyle=INK; c.lineWidth=lw*.55; c.lineCap='round'; c.beginPath();   // whiskers under the snout, the mouth behind them
+    for (let i=0;i<4;i++){ const x=len*(.4-i*.018); c.moveTo(x,h*.32); c.lineTo(x-len*.008,h*.62); } c.stroke();
+    c.beginPath(); c.moveTo(len*.36,h*.62); c.quadraticCurveTo(len*.31,h*.76,len*.26,h*.62); c.stroke();
+    if (det){ const scute=(x,y,r)=>{ c.beginPath(); c.moveTo(x-r,y+r*.5); c.lineTo(x,y-r*.9); c.lineTo(x+r,y+r*.5); c.closePath(); c.fillStyle='#CFC4AE'; c.fill(); c.lineWidth=lw*.45; c.strokeStyle=INK; c.stroke(); };   // rows of bony plates
+      for (let i=0;i<9;i++){ const u=i/8, x=lerp(len*.24,-len*.34,u); scute(x,-h*(.92-u*.5)+h*.06,len*.022); }
+      for (let i=0;i<10;i++){ const x=lerp(len*.2,-len*.36,i/9); scute(x,-h*.04,len*.016); } } }
+  if (id==='clockfin' && det){ c.strokeStyle='rgba(43,42,51,.75)'; c.lineWidth=lw*.5; c.beginPath(); const gx=len*.28, gy=-h*.05;   // the hands of the clock on its gill cover, at ten past
+    c.moveTo(gx,gy); c.lineTo(gx+len*.03,gy-h*.32); c.moveTo(gx,gy); c.lineTo(gx+len*.05,gy-h*.08); c.stroke(); }
   if (id==='mossback'){ for (let i=0;i<7;i++){ const x=len*(.25-i*.08), y=-h*.92+Math.abs(i-3)*h*.06;
       c.fillStyle=i%3===0?'#E9A98B':'#8FB070'; c.beginPath(); c.arc(x,y,len*.035,0,Math.PI*2); c.fill(); c.lineWidth=lw*.6; c.stroke(); }
     c.strokeStyle=INK; c.lineWidth=lw*.6; c.beginPath(); c.moveTo(-len*.05,-h*1.05); c.lineTo(-len*.05,-h*1.35); c.moveTo(len*.02,-h*1.05); c.lineTo(len*.02,-h*1.35); c.moveTo(-len*.07,-h*1.25); c.lineTo(len*.04,-h*1.25); c.stroke(); }

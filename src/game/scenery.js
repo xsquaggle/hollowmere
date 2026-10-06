@@ -18,6 +18,7 @@ function hillPath(x,amp,f1,f2,p1,p2){ x.beginPath(); x.moveTo(0,HZ);
   x.lineTo(W,HZ); x.closePath(); }
 function drawLand(x,main){
   if (REG()==='coast'){ drawCoastLand(x,main); return; }
+  if (REG()==='river'){ drawRiverLand(x,main); return; }
   hillPath(x,H*.075,.011,.027,1.2,.4); x.fillStyle=PAL.hillFar; x.fill();
   hillPath(x,H*.048,.018,.04,3.1,2.2); x.fillStyle=PAL.hillNear; x.fill();
   x.beginPath(); x.moveTo(0,HZ); for (const [px,py] of treePts(1)) x.lineTo(px,py); x.lineTo(W,HZ); x.closePath(); x.fillStyle=PAL.trees; x.fill();
@@ -62,7 +63,8 @@ function buildBg(){
   paintWxSky(x);   // an overcast deck and fog's wash (game/weather-art.js)
   const useSun=P.sunVis>=P.moonVis; SC.lightX=useSun?sx:mx; SC.lightRGB=useSun?P.glowR:'210,222,255'; SC.lightA=useSun?P.sunVis*(P.sunY>.7?1:.45):P.moonVis*.7*(.25+.75*moonLit());
   drawLand(x,true);
-  const ws=REG()==='coast'?[mixP('w0','#94BCCB',.3),mixP('w1','#2F8098',.38),mixP('w2','#1B6276',.38),mixP('w3','#0E3A4A',.3)]:[P.w0,P.w1,P.w2,P.w3];
+  const ws=REG()==='coast'?[mixP('w0','#94BCCB',.3),mixP('w1','#2F8098',.38),mixP('w2','#1B6276',.38),mixP('w3','#0E3A4A',.3)]
+    :REG()==='river'?[mixP('w0','#A7B98E',.4),mixP('w1','#557A55',.45),mixP('w2','#34583F',.45),mixP('w3','#1E3527',.35)]:[P.w0,P.w1,P.w2,P.w3];
   const wg=x.createLinearGradient(0,HZ,0,H); wg.addColorStop(0,ws[0]); wg.addColorStop(.1,ws[1]); wg.addColorStop(.45,ws[2]); wg.addColorStop(1,ws[3]);
   x.fillStyle=wg; x.fillRect(0,HZ,W,H-HZ);
   x.save(); x.beginPath(); x.rect(0,HZ,W,H-HZ); x.clip(); x.translate(0,HZ); x.scale(1,-.72); x.translate(0,-HZ); x.globalAlpha=.3; drawLand(x,false); x.restore();
@@ -73,7 +75,7 @@ function buildBg(){
 }
 function layoutScenery(){
   layoutRegion();
-  if (REG()==='coast'){ G.pads={x:-999,y:-999,r:0}; G.padClusters=[]; SC.pads=[]; return; }
+  if (REG()!=='lake'){ G.pads={x:-999,y:-999,r:0}; G.padClusters=[]; SC.pads=[]; if (REG()==='river') layoutRiverArt(); return; }
   G.padClusters=[{x:W*.26,y:HZ+(H-HZ)*.53,r:W*.13},{x:W*.8,y:HZ+(H-HZ)*.6,r:W*.1},{x:W*.46,y:HZ+(H-HZ)*.13,r:W*.07}];
   G.pads=G.padClusters[0];
   sseed=21; SC.pads=G.padClusters.map((c,ci)=>{ const n=ci===0?7:ci===1?5:4, arr=[];

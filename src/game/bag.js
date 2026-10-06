@@ -67,7 +67,7 @@ function bagHTML(){ const R=ROD(), rig=rigFor(save.rod), bait=baitOn(), g=gearSt
     '<div class="rune-socks n'+runes.length+'" style="--n:'+runes.length+'">'+runes.map((id,i)=>runeSockHTML(id,i,runes.length)).join('')+'</div>'+
     (runes.length<3?'<p class="bag-hint rune-hint">'+(runes.length===1?'This rod takes one rune.':'This rod takes two runes.')+' Rods further up the ladder take more.</p>':'')+'</section>';
   // rods you own
-  const rods=[...ROD_ORDER,...SEA_RODS].filter(id=>save.rods.includes(id));
+  const rods=ALL_RODS.filter(id=>save.rods.includes(id));
   if (rods.length>1) h+='<section class="bag-card bag-rods" style="--i:2"><header><h3>Rods</h3><span>Each keeps its own reel and line</span></header><div class="rod-row">'+rods.map(id=>{ const on=id===save.rod, r=rigFor(id);
     return '<button type="button" class="rod-tile'+(on?' on':'')+'" data-rod="'+id+'"'+(on?' aria-current="true"':'')+'><canvas data-rodcv="'+id+'" aria-hidden="true"></canvas><b>'+RODS[id].name+'</b><span>'+(on?'In your hand':TACKLE[r.reel].name.replace(/ Reel$/,'')+' · '+TACKLE[r.line].name.replace(/ Line$/,''))+'</span></button>'; }).join('')+'</div></section>';
   // the vest
@@ -175,15 +175,15 @@ function trayHTML(kind,at){
 /** The etching kit: every rune, what it does and its catch. Etching costs Glimmer once; a rune you have goes on any rod for free. */
 function runeRows(at){ const r=enchFor(save.rod), g=save.glimmer||0, own=enchState().own;
   let h='<p class="tr-glim"><span class="bal"><span class="glim"></span><b>'+g.toLocaleString()+'</b> Glimmer</span>'+(Object.keys(own).length?'A rune you’ve etched goes on any rod for free, one of each per rod.':'Etching a rune costs Glimmer once. After that it goes on any rod for free.')+'</p>';
-  for (const id of ENCH_ORDER){ const E=ENCH[id], have=!!own[id], where=r.indexOf(id), here=where===at;
-    const other=have?[...ROD_ORDER,...SEA_RODS].filter(x=>x!==save.rod && save.rods.includes(x) && enchFor(x).includes(id)).map(x=>RODS[x].name):[];
+  for (const id of ENCH_ORDER){ if (!enchAvail(id)) continue; const E=ENCH[id], have=!!own[id], where=r.indexOf(id), here=where===at;
+    const other=have?ALL_RODS.filter(x=>x!==save.rod && save.rods.includes(x) && enchFor(x).includes(id)).map(x=>RODS[x].name):[];
     const act=here?'<button class="btn sm" type="button" data-act="runeoff">Take it out</button>'
       :have?'<button class="btn sm primary" type="button" data-act="runeon" data-id="'+id+'">'+(where>=0?'Move it here':'Set it in')+'</button>'
       :'<button class="btn sm'+(g>=E.cost?' primary':'')+' etch" type="button" data-act="etch" data-id="'+id+'"'+(g>=E.cost?'':' disabled')+'>Etch<span><span class="glim"></span>'+E.cost+'</span></button>';
     h+='<div class="tr-row rune'+(here?' on':'')+(have?'':' unetched')+'" style="--rc:'+E.color+'"><canvas data-rune="'+id+'"></canvas><div class="tr-txt"><h4>'+E.name+'</h4><p>'+E.eff+'</p>'+(E.down?'<p class="down">'+E.down+'</p>':'')+
       (where>=0 && !here?'<p class="also">In socket '+(where+1)+' of this rod</p>':'')+(other.length?'<p class="also">Also on your '+other.join(' and ')+'</p>':'')+
       (!have && g<E.cost?'<p class="need">'+(E.cost-g)+' more Glimmer to etch it</p>':'')+'</div>'+act+'</div>'; }
-  h+='<p class="tr-sub">Your uncle’s notes mention three more runes he never managed to etch.</p>';
+  if (ENCH_ORDER.some(id=>!enchAvail(id))) h+='<p class="tr-sub">Your uncle’s notes mention one more rune, in somebody else’s hand: “Ask Wren. Rootwood River.”</p>';
   return h; }
 /** Etching plays out on the rig: Glimmer streams into the socket, the rune draws itself, light runs to the tip. */
 function startEtch(id,at){ if (BAG.fx){ const F=BAG.fx; BAG.fx=null; etchDone(F); }
@@ -197,7 +197,7 @@ function gearRows(kind){ const g=gearState(), rig=rigFor(save.rod), on=kind==='b
   let h='';
   if (kind==='bait') h+='<div class="tr-row'+(on?'':' on')+'"><canvas data-hook="1"></canvas><div class="tr-txt"><h4>Bare hook</h4><p>No bait. Fish still bite a bare hook; bait brings them sooner, or brings different fish.</p></div>'+(on?'<button class="btn sm" type="button" data-act="unbait">Take bait off</button>':'<span class="tag ok">On the hook</span>')+'</div>';
   for (const id of have){ const T=TACKLE[id], is=id===on, fresh=g.fresh.includes(id);
-    const other=kind!=='bait' && !T.starter ? [...ROD_ORDER,...SEA_RODS].filter(r=>r!==save.rod && save.rods.includes(r) && rigFor(r)[kind]===id).map(r=>RODS[r].name) : [];
+    const other=kind!=='bait' && !T.starter ? ALL_RODS.filter(r=>r!==save.rod && save.rods.includes(r) && rigFor(r)[kind]===id).map(r=>RODS[r].name) : [];
     const stock=kind==='bait'&&!isLure(id)?'<p class="stock">'+((g.left[id]||0)?(g.left[id])+' casts left in the open tin':'')+((g.left[id]||0)&&(g.tins[id]||0)?' · ':'')+((g.tins[id]||0)?(g.tins[id])+' unopened tin'+(g.tins[id]===1?'':'s')+' of '+T.casts+' casts':'')+'</p>':'';
     h+='<div class="tr-row'+(is?' on':'')+'"><canvas data-gear="'+id+'"></canvas><div class="tr-txt"><h4>'+T.name+(fresh?' <i class="nw">New</i>':'')+'</h4><p>'+T.eff+'</p>'+(T.down?'<p class="down">'+T.down+'</p>':'')+(T.mods.length?chipsHTML(id):'')+stock+
       (other.length?'<p class="also">Also on your '+other.join(' and ')+'</p>':'')+'</div>'+

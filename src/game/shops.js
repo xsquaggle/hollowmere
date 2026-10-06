@@ -43,6 +43,7 @@ function openShop(tab){
   if (first) OTT_TAB='rods';
   if (OTT_TAB==='tackle') return openTackleShop();
   if (OTT_TAB==='traps') return openTrapShop();
+  if (OTT_TAB==='ferry' && ferryAsk()) return openFerryShop();
   const cur=ROD(), nextId=ROD_ORDER.find(id=>!save.rods.includes(id));
   const greet=first?'So you’re the new keeper. That Willow barely reaches past the dock. Earn some coins and I’ll set you up with something better.'
     : nextId && save.coins>=RODS[nextId].price ? 'Now you’ve got coin. The '+RODS[nextId].name+' will take you farther out.'
@@ -71,8 +72,12 @@ function openShop(tab){
     addCoins(-R.price); save.rods.push(id); save.rod=id; persist(); sfx.out('uncommon'); buzz([0,30,40,30]); toast('New rod: '+R.name+'!','gold'); openShop(); }));
 }
 
+/** Ottilie's Ferry tab: mend her ferry up Rootwood River, then ride it (game/river.js). */
+function openFerryShop(){ if (!save.ferrySeen){ save.ferrySeen=true; persist(); }
+  openSheet('<div class="panel-head"><div><h2>Ottilie’s Ferry</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+ottTabs()+ferryHTML());
+  $('closeS').addEventListener('click',closeSheet); bindOttTabs(); bindFerry(); }
 /* ---------- Ottilie's tackle: reels and lines she makes herself, and bait by the tin (data/tackle.js) ---------- */
-const ottTabs = () => '<div class="seg" role="tablist">'+[['rods','Rods'],['tackle','Reels, lines & bait']].concat(trapState().gift?[['traps','Traps']]:[]).map(([k,l])=>'<button type="button" role="tab" data-ott="'+k+'" aria-selected="'+(OTT_TAB===k)+'" class="'+(OTT_TAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+const ottTabs = () => '<div class="seg" role="tablist">'+[['rods','Rods'],['tackle','Reels, lines & bait']].concat(trapState().gift?[['traps','Traps']]:[]).concat(ferryAsk()?[['ferry','Ferry'+(save.ferry?'':' •')]]:[]).map(([k,l])=>'<button type="button" role="tab" data-ott="'+k+'" aria-selected="'+(OTT_TAB===k)+'" class="'+(OTT_TAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
 function bindOttTabs(){ document.querySelectorAll('#panel [data-ott]').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.ott===OTT_TAB) return; tone(900,.04,{vol:.04,type:'triangle'}); openShop(b.dataset.ott); $('panel').scrollTop=0; })); }
 function openTackleShop(){ const g=gearState(), rig=rigFor(save.rod), bait=baitOn();
   let h='<div class="panel-head"><div><h2>Ottilie’s Tackle</h2><p>You have <b>'+save.coins.toLocaleString()+'</b> coins · On your '+ROD().name+': '+TACKLE[rig.reel].name+', '+TACKLE[rig.line].name+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+ottTabs();

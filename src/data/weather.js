@@ -29,6 +29,7 @@ const WX={
 const WX_ORDER=['clear','cloudy','rain','fog'];
 const WX_TABLE={
   lake: {clear:38, cloudy:27, rain:20, fog:15},
+  river:{clear:34, cloudy:30, rain:22, fog:14},
   coast:{clear:34, cloudy:26, rain:22, fog:18}
 };
 const WX_FOG_HOUR=[.6, 3, 1.4, .25, .25, .6];
@@ -36,6 +37,8 @@ const WX_SPELL={hours:4, keep:.5, ease:.75, every:12};
 const WX_FISH={
   lake: {rain:{fish:'dace', pools:{open:14, pads:10, reeds:8, far:10, deep:4}},
          fog: {fish:'char', pools:{deep:18, far:20, open:4, pads:3}}},
+  river:{rain:{fish:'spatefin', pools:{open:14, riffle:16, leaves:8, deep:6, roots:6}},
+         fog: {fish:'grayling', pools:{open:8, deep:12, roots:14, leaves:4, riffle:3}}},
   coast:{rain:{fish:'mackerel', pools:{open:16, far:14, kelp:6, rocks:4, deep:6}},
          fog: {fish:'gurnard', pools:{rocks:10, deep:9, far:6, open:2, kelp:2}}}
 };
@@ -43,7 +46,7 @@ const WX_SOME={rain:{cloudy:.25}, fog:{mist:1/3}};
 const DAWN_MIST={from:5, to:8, look:.4};
 const WX_LINES={
   cloudy:['Smells like rain. Your uncle could tell the hour it’d start.','Grey days are good days. The fish stop squinting.'],
-  rain:  ['Mind the drops. A raindrop and a nibble look the same from here.','Your uncle fished every storm. Said the lake talks louder in the rain.','Rain brings the dace up. Daft things jump at every drop.'],
+  rain:  ['Rain brings the river up, and the spatefins with it.','Mind the drops. A raindrop and a nibble look the same from here.','Your uncle fished every storm. Said the lake talks louder in the rain.','Rain brings the dace up. Daft things jump at every drop.'],
   fog:   ['Haven’t seen fog like this since the flood.','Hear that? A bell, under the water. Always in the fog.','Fog hides the far fish. Let them come to you.']
 };
 const MOON={cycle:8, full:4, offset:1, path:[.03,.075], breach:.35};

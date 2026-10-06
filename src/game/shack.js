@@ -39,7 +39,7 @@ function buyFix(id){ const L=fixLine(id), s=shackState(); if (!L || !L.cost || s
 function shelfCurios(){ const FS=findsState(); return Object.keys(FINDS).filter(id=>FINDS[id].kind==='curio' && FS.have[id] && !FS.returned[id]).sort((a,b)=>(FS.have[a].t||0)-(FS.have[b].t||0)); }
 const shelfRoom = () => fixDone('cabinet')?Infinity:SHELF;
 /** Rods on the rack: every rod you own, in shop order; the one in hand leaves its pegs empty. */
-const rackRods = () => [...ROD_ORDER,...SEA_RODS].filter(id=>save.rods.includes(id));
+const rackRods = () => ALL_RODS.filter(id=>save.rods.includes(id));
 
 /** The shack button nods: a fish is in the tank, the kitchen's open, an order's come in. */
 function shackPulse(){ const b=$('shackBtn'); if (!b) return; b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); }

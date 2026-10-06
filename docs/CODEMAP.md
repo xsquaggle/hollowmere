@@ -24,7 +24,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/ui-flow.js` | 32 | The news ribbon (`news`), queued coach tips, the overlay stack (`ovPush`, `ovOpen`), swipe-to-close |
 | `src/game/boot.js` | 17 | `boot`: starts everything (always last in the build) |
 | `src/index.html` | 57 | Page skeleton: head, markup, where styles, scripts and fonts go |
-| `src/test-hooks.js` | 56 | Test build only: `window.__` handles for the test suite |
+| `src/test-hooks.js` | 63 | Test build only: `window.__` handles for the test suite |
 
 ## Fishing: cast, bite, reel, land
 
@@ -56,8 +56,13 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/dock.js` | 183 | The dock: boards, piles, tackle box, bait pail, lantern, keepnet |
 | `src/game/angler.js` | 104 | The angler seen from behind: pose, hands |
 | `src/game/folk.js` | 183 | Townsfolk on the water: Ottilie's punt, Barnaby's launch, Pell's mail boat, heron, frog |
-| `src/game/regions.js` | 32 | Region layout, spot names, `lakeDone` |
+| `src/game/regions.js` | 43 | `REG`, `regionOpen`, region layout, spot names in each water (`spotName`), `poolsOf`, `regionOf`, `lakeDone`/`waterDone` |
 | `src/game/coast.js` | 182 | The coast backdrop: lighthouse, sea stacks, kelp, swell, skiff deck |
+| `src/game/river.js` | 110 | Rootwood River: its spots, the drifting float (`driftFloat`, `riverWaiting`), holding the line (`riverPress`/`riverRelease`), Ottilie's ferry (`ferryAsk`, `fixFerry`, `ferryHTML`), Homebody's days (`homeDays`, `homeMul`), the otter |
+| `src/game/river-art.js` | 226 | The river drawn: the far wood, the mill and its waterwheel, the current, the riffle, falling and floating leaves, the near banks, Wren's boathouse, the alder, the otters, the ferry's picture |
+| `src/game/twin.js` | 29 | The Twin Spool's second float: landing, the shorter wait, both floats biting and the tap that picks |
+| `src/game/wren.js` | 68 | Wren's sheet: her bench (sockets, Homebody), the Twin Spool quest, the corkboard, and what she says |
+| `src/game/wren-art.js` | 53 | Wren on her ramp, with her goggles and a glowing jar |
 | `src/game/barnaby.js` | 29 | Barnaby's launch and boat shop |
 | `src/game/map.js` | 103 | The map sheet and travel (`showMap`, `travelTo`) |
 | `src/game/intro.js` | 80 | The opening: letter, stars, the deep pool |
@@ -152,12 +157,13 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/data/idle.js` | 41 | `TRAPS`, `FITTINGS`, `SMOKE`, `AWAY` |
 | `src/data/orders.js` | 87 | `ORDERS`, `TOWNSFOLK`, `STANDINGS`, `UPGRADES`, `VISITS`, `PLATTER` |
 | `src/data/shack.js` | 34 | `FIXUP` (the uncle's fix-up list), `WALL` (plaques and what a mount does), `SHELF`, `MARKS`, `TRAPDOOR` |
+| `src/data/river.js` | 43 | `RIVER` (the ferry, the current, Old Gristle's hours, the otter), `WREN` (sockets, her lines and corkboard), `TWIN` |
 | `src/data/pace.js` | 6 | `PACE_SIM`: minutes until each thing in the simulator's whole run (`npm run sim -- --career --runs 11 --pace`) |
 | `src/data/stats.js` | 51 | `STATS` (everything a bonus can change), `MASTERY` |
 
 ## Styles (`src/styles/`)
 
-One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map.css`, `aquarium.css`, `settings.css`, `intro.css`, `news.css`, `kitchen.css`, `card.css`, `loot.css`, `bonuses.css`, `finds.css`, `relics.css`, `bag.css`, `enchant.css`, `idle.css`, `orders.css`, `shack.css`, `sheets.css`, `balance.css`.
+One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map.css`, `aquarium.css`, `settings.css`, `intro.css`, `news.css`, `kitchen.css`, `card.css`, `loot.css`, `bonuses.css`, `finds.css`, `relics.css`, `bag.css`, `enchant.css`, `idle.css`, `orders.css`, `shack.css`, `sheets.css`, `balance.css`, `river.css` (Wren's sheet and the ferry).
 
 ## Tools and tests
 
@@ -186,3 +192,4 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/relics.test.cjs` | 229 | Story relics, treasure maps, the Moon Jar, the almanac, combos |
 | `tests/shack.test.cjs` | 202 | The shack: the fix-up list, mounting and the wall bonus, the rod rack, the knock-through, the room at five phone sizes, odd saves |
 | `tests/depth.test.cjs` | 52 | The depth gate: rare and Legendary odds near the design doc, the pace log and Playtest > Pace |
+| `tests/river.test.cjs` | 178 | Rootwood River: the ferry, the drifting float, its spots, fish and hours, Homebody, the otter, Wren, the Twin Spool |

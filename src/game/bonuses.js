@@ -35,7 +35,7 @@ function wxOnText(wx){ const L=[].concat(wx); return L.length===1?WX[L[0]].on:'i
 /** 'on' applies wherever you cast right now; 'cond' depends on where you cast or what bites; 'off-here' and
     'off-now' can't apply in this water or at this hour. Pass a rarity in `now` to settle rarity conditions too. */
 function modState(m,now){ const w=m.when; if (!w) return 'on';
-  const spots=Object.keys(now.region==='coast'?POOLS_COAST:POOLS);
+  const spots=Object.keys(poolsOf(now.region));
   if ((w.region && w.region!==now.region) || (w.spot && !spots.includes(w.spot))) return 'off-here';
   if ((w.night && !now.night) || (w.night===false && now.night)) return 'off-now';
   if (w.wx && ![].concat(w.wx).includes(now.wx)) return 'off-now';

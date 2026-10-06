@@ -16,13 +16,13 @@ function fmtW(g){ if (imperial()){ const lb=g/453.592; if (lb<1){ const oz=g/28.
 function fmtTotal(g){ return fmtW(g); }
 const STAR_P='<path d="M10 1.6 l2.6 5.4 5.9 .8 -4.3 4.1 1.1 5.9 -5.3 -2.9 -5.3 2.9 1.1 -5.9 -4.3 -4.1 5.9 -.8 Z"/>';
 function starsHTML(n,cls){ let h='<span class="qstars'+(cls?' '+cls:'')+'" role="img" aria-label="'+n+' of 3 stars">'; for (let i=0;i<3;i++) h+='<svg viewBox="0 0 20 20" class="'+(i<n?'on':'')+'">'+STAR_P+'</svg>'; return h+'</span>'; }
-function spotLabel(reg,spot){ if (!spot) return REGION_NAME[reg]||''; const nm=reg==='coast'&&spot==='deep'?'Dark trench':SPOT_NAME[spot]||''; return nm+', '+(REGION_NAME[reg]||''); }
+function spotLabel(reg,spot){ if (!spot) return REGION_NAME[reg]||''; const nm=spotName(spot,reg)||''; return nm+', '+(REGION_NAME[reg]||''); }
 function whenLabel(t,hr,wx){ const d=t?new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric'}):'';
   const p=hr==null?'':hr>=5&&hr<7.5?'at dawn':PERIOD(hr)==='Morning'?'in the morning':PERIOD(hr)==='Day'?'in the afternoon':PERIOD(hr)==='Evening'?'in the evening':'at night';
   return [d,p,(wx==='rain'||wx==='fog')?WX[wx].on:''].filter(Boolean).join(', '); }
 const isPB=(f)=>{ const r=save.fish[f.id]; return !!(r && r.pb && r.pb.t && f.t===r.pb.t && f.size===r.pb.size); };
 /* Old saves only kept the longest length. Turn that into a record at an average build, so nobody loses their bests. */
 function migrateRecords(){ for (const id in save.fish){ const r=save.fish[id]; if (!FISH[id] || !r.caught || r.pb) continue;
-    const len=r.best||FISH[id].size[0], w=weighFish(id,len,1); r.bw=w; r.pb={size:len,w,stars:qualityOf(id,len,false),t:null,reg:REGION_FISH.coast.includes(id)?'coast':'lake'}; }
+    const len=r.best||FISH[id].size[0], w=weighFish(id,len,1); r.bw=w; r.pb={size:len,w,stars:qualityOf(id,len,false),t:null,reg:regionOf(id)}; }
   const s=save.stats; if (s.landed==null){ s.landed=Object.keys(save.fish).reduce((a,id)=>{ const r=save.fish[id]; return a+(FISH[id]&&r.caught?r.caught*weighFish(id,(FISH[id].size[0]+FISH[id].size[1])/2*.85,1):0); },0); }
   if (s.pbs==null) s.pbs=0; if (s.trophies==null) s.trophies=0; }

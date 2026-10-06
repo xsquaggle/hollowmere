@@ -3,6 +3,7 @@ function drawActive(){
   if (sonarOn() && (S.state==='waiting'||S.state==='bite') && S.bob){ const u=(S.time%2.4)/2.4, b=S.bob;
     ctx.strokeStyle='rgba(120,240,170,'+(.55*(1-u)).toFixed(3)+')'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(b.x,b.y,8+u*70*sc(b.y),(8+u*70*sc(b.y))*.38,0,0,Math.PI*2); ctx.stroke(); }
   if ((S.state==='waiting'||S.state==='bite') && S.bob && ((S.wait&&S.wait.phase==='snag') || (S.bite&&S.bite.loot))) drawSnagUnder();
+  drawTwinShadow();
   if ((S.state==='waiting'||S.state==='bite') && S.wait && S.wait.sh){
     const sh=S.wait.sh, F=FISH[S.wait.fish];
     ctx.save(); ctx.translate(sh.x,sh.y); ctx.rotate(sh.ang); ctx.scale(1,.55);
@@ -32,17 +33,21 @@ function drawActive(){
 function ghostA(R){ if (!(R.fade>0)) return 1; const e=Math.min(GHOST_FADE-R.fade,R.fade); return Math.max(.05,1-e/.3); }
 function drawBobber(){
   if (!S.bob || !(S.state==='waiting'||S.state==='bite')) return;
-  const b=S.bob, k=sc(b.y), dt=1/60;
+  if (S.bob2) drawFloat(S.bob2, S.state==='bite' && !!(S.bite&&S.bite.twin));   // the Twin Spool's other float (game/twin.js)
+  drawFloat(S.bob, S.state==='bite');
+}
+function drawFloat(b,biting){
+  const k=sc(b.y), dt=1/60;
   b.dip*=.94; b.jerk*=.88; b.nibble=Math.max(0,b.nibble-dt*4); b.rd=(b.rd||0)*.86;   // rd: a raindrop landing on it (game/weather-art.js)
-  const bobY=Math.sin(S.time*2.4)*1.5 + b.dip*4 + b.nibble*5 + b.rd*2.4 + (S.state==='bite'?7*k:0);
+  const bobY=Math.sin(S.time*2.4)*1.5 + b.dip*4 + b.nibble*5 + b.rd*2.4 + (biting?7*k:0);
   const x=b.x - b.jerk*6*k, y=b.y+bobY, r=6*k;
   ctx.fillStyle='rgba(10,26,34,.3)'; ctx.beginPath(); ctx.ellipse(b.x,b.y+2,r*1.6,r*.5,0,0,Math.PI*2); ctx.fill();
-  ctx.save(); ctx.beginPath(); ctx.rect(x-r*2,y-r*4,r*4,r*4+ (S.state==='bite'?-r*.2:r*.35)+ (b.y-y)); ctx.clip();
+  ctx.save(); ctx.beginPath(); ctx.rect(x-r*2,y-r*4,r*4,r*4+ (biting?-r*.2:r*.35)+ (b.y-y)); ctx.clip();
   ctx.fillStyle='#F6EFE2'; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
   ctx.fillStyle=mealPink()?'#F08FB8':DANGER; ctx.beginPath(); ctx.arc(x,y,r,Math.PI,0); ctx.fill();
   ctx.strokeStyle=INK; ctx.lineWidth=1.4; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(x,y-r); ctx.lineTo(x,y-r*1.9); ctx.stroke(); ctx.restore();
-  if (S.state==='bite'){ const a=.6+.4*Math.sin(S.time*30); ctx.strokeStyle='rgba(255,255,255,'+a+')'; ctx.lineWidth=2.5;
+  if (biting){ const a=.6+.4*Math.sin(S.time*30); ctx.strokeStyle='rgba(255,255,255,'+a+')'; ctx.lineWidth=2.5;
     ctx.beginPath(); ctx.ellipse(b.x,b.y,22*k+S.bite.t*30,8*k+S.bite.t*10,0,0,Math.PI*2); ctx.stroke();
     ctx.font='800 20px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=PAPER; ctx.fillText('!',b.x,b.y-22*k); }
 }
@@ -71,10 +76,12 @@ function drawRodAndLine(){
   const lid=rigFor(save.rod).line, LC=LINE_RGB[lid]||LINE_RGB.cotton, base=LC[0].split(',').map(Number);
   let sag=24, col='rgba('+LC[0]+','+LC[1]+')', w=lid==='silk'||lid==='wire'?1.4:1.2;
   if (S.state==='casting') sag=0;
+  if (RV.mend) sag=5;   // holding the line against the river's current (game/river.js)
   if (S.state==='reeling'){ const T=S.reel.tension; sag=(1-T)*34; if (T>.75){ const k=(T-.75)/.25; col='rgba('+Math.round(lerp(base[0],230,k))+','+Math.round(lerp(base[1],90,k))+','+Math.round(lerp(base[2],70,k))+','+lerp(LC[1],.95,k).toFixed(2)+')'; w+=k; } }
   const linePath=()=>{ ctx.beginPath(); ctx.moveTo(t.x,t.y); ctx.quadraticCurveTo((t.x+lp.x)/2,(t.y+lp.y)/2+sag,lp.x,lp.y); };
   if (lid==='glowline' && PAL.dark>.05){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.strokeStyle='rgba(150,240,130,'+(.28*PAL.dark*(.85+.15*Math.sin(S.time*2.4))).toFixed(3)+')'; ctx.lineWidth=5; linePath(); ctx.stroke(); ctx.restore(); }
   ctx.strokeStyle=col; ctx.lineWidth=w; linePath(); ctx.stroke();
+  const b2=S.bob2; if (b2 && (S.state==='waiting'||S.state==='bite')){ ctx.beginPath(); ctx.moveTo(t.x,t.y); ctx.quadraticCurveTo((t.x+b2.x)/2,(t.y+b2.y)/2+sag,b2.x,b2.y); ctx.stroke(); }
   if (S.state==='casting'){ ctx.fillStyle=DANGER; ctx.beginPath(); ctx.arc(lp.x,lp.y,4,0,Math.PI*2); ctx.fill(); }
 }
 function drawParticles(){

@@ -12,7 +12,8 @@ function drawPlaque(x,id,w,h){ const F=FISH[id], pw=Math.min(w*.86,330), ph=h*.9
   for (const sx of [-1,1]){ x.beginPath(); x.arc(sx*(pw/2-ph*.2),0,3.2,0,6.28); x.fillStyle=BRASS; x.fill(); x.strokeStyle=INK; x.lineWidth=1; x.stroke(); }
   const L=Math.min(pw*.68,(ph*.78)/(F.h*((DORSAL[id]||DORSAL0).top+(id==='calf'?1.1:.8)))); x.translate(0,ph*.04); x.rotate(-.07);
   x.save(); x.translate(4,5); drawFish(x,id,L,true,.55); x.restore(); drawFish(x,id,L,false,1,.15); x.restore(); }
-function journalRegions(){ return save.boat?[REG(),REG()==='lake'?'coast':'lake']:['lake']; }
+/** The waters you can reach, the one you're at first. */
+function journalRegions(){ const here=REG(); return [here,...['lake','river','coast'].filter(r=>r!==here && regionOpen(r))]; }
 function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
   let h='<div class="panel-head"><div><h2>Journal</h2><p>'+regs.map(r=>REGION_NAME[r]+' '+REGION_FISH[r].filter(id=>(save.fish[id]||{}).caught>0).length+'/'+REGION_FISH[r].length).join(' · ')+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
     '<div class="seg" role="tablist">'+[['species','Species'],['records','Records'],['finds','Finds'+(findsState().fresh.length?' •':'')],['bonuses','Bonuses']].map(([k,l])=>'<button type="button" role="tab" data-jt="'+k+'" aria-selected="'+(JTAB===k)+'" class="'+(JTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';

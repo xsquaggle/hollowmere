@@ -40,7 +40,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
     for (const id of Object.keys(FISH)) if (!FISH[id].noTank && !up.has(id)) (byRar[FISH[id].rarity]=byRar[FISH[id].rarity]||[]).push(id);
     const pick=Object.keys(RAR).slice().reverse().flatMap(r=>byRar[r]||[]); let n=0;
     for (let i=0;i<s.wall.length;i++) if (!s.wall[i] && pick.length){ const id=pick.shift(), F=FISH[id], size=Math.round(lerp(F.size[0],F.size[1],.7)*10)/10, w=weighFish(id,size,1);
-      s.wall[i]={f:{id,size,w,stars:qualityOf(id,size,false),value:F.value,t:Date.now(),reg:REGION_FISH.coast.includes(id)?'coast':'lake',hr:save.clock,rod:save.rod},t:Date.now()}; n++; }
+      s.wall[i]={f:{id,size,w,stars:qualityOf(id,size,false),value:F.value,t:Date.now(),reg:regionOf(id),hr:save.clock,rod:save.rod},t:Date.now()}; n++; }
     persist(); SH.ver++; closeSheet(); news(n?n+' fish up on the wall':'The wall is full',''); });
   $('jarBtn').addEventListener('click',()=>{ const r=relicState(); r.jar=MOON_JAR.fill; r.armed=false; persist(); closeSheet(); news(modFlag('moonJar')?'The Moon Jar is full':'The Moon Jar is full, but it only works from a pocket',''); });
   $('mapBtn2').addEventListener('click',()=>{ while (mapCan({}) && !mapWhole()) addMapPiece({}); persist(); closeSheet(); news(mapWhole()?'Your treasure map is whole':'You already have a map from another water',''); });

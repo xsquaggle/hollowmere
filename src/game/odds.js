@@ -1,19 +1,21 @@
 /* ---------- Bite odds: which fish each spot offers, and the rod in hand ---------- */
 /** Each fish's weight in this spot's pool, here and now. */
 function poolFor(spot,lucky){
-  const h=save.clock, night=nightNow(), coastal=REG()==='coast', w=Object.assign({},(coastal?POOLS_COAST:POOLS)[spot]||(coastal?POOLS_COAST.open:POOLS.open));
-  // the water itself: who comes up at night, and the Mayor's dawns
+  const h=save.clock, night=nightNow(), reg=REG(), coastal=reg==='coast', river=reg==='river', P=poolsOf(reg), w=Object.assign({},P[spot]||P.open);
+  // the water itself: who comes up at night, the Mayor's dawns, Old Gristle's six o'clock crusts
   if (coastal){ if (night){ if (w.saltjaw) w.saltjaw*=3; if (w.kelpeel) w.kelpeel*=1.4; } }
+  else if (river){ if (night){ if (w.barbel) w.barbel*=1.6; if (w.brook) w.brook*=.7; } }
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
   if (w.mayor && ((h>=5 && h<8) || modFlag('mayorWakes',{spot}))) w.mayor*=3;   // the Mayor's dawns, or the Mayor's Spectacles
   if (w.gar && h>=17 && h<21) w.gar*=1.8;                                        // the Steeple Gar's evenings
+  if (w.gristle && h>=RIVER.gristle.from && h<RIVER.gristle.to) w.gristle*=RIVER.gristle.x;
   // the weather (game/weather.js): its own fish come up, the Mossback rises to the pads in rain, and fog brings the
   // night fish up by day. They crowd out the fish no rarer than themselves, never the rarer ones: those keep the share
   // they had, so a wet day never quietly makes the Mayor harder to find.
   const wx=wxNow(), dry=Object.assign({},w);
-  for (const e of wxFishFor(coastal?'coast':'lake',spot)) w[e.fish]=(w[e.fish]||0)+e.w;
-  if (wx==='rain' && !coastal && spot==='pads' && w.mossback) w.mossback*=2;
-  if (wx==='fog' && !night){ if (coastal){ if (w.kelpeel) w.kelpeel*=1.4; } else { const nl={deep:18,open:24,pads:10}[spot]||4; w.lantern=(w.lantern||0)+nl/4; } }
+  for (const e of wxFishFor(reg,spot)) w[e.fish]=(w[e.fish]||0)+e.w;
+  if (wx==='rain' && reg==='lake' && spot==='pads' && w.mossback) w.mossback*=2;
+  if (wx==='fog' && !night){ if (coastal){ if (w.kelpeel) w.kelpeel*=1.4; } else if (river){ if (w.barbel) w.barbel*=1.3; } else { const nl={deep:18,open:24,pads:10}[spot]||4; w.lantern=(w.lantern||0)+nl/4; } }
   { let top=-1, T0=0, T1=0, hi=0; for (const k in w){ if (w[k]!==dry[k]) top=Math.max(top,rarRank(FISH[k].rarity)); T1+=w[k]; T0+=dry[k]||0; }
     for (const k in dry) if (rarRank(FISH[k].rarity)>top) hi+=dry[k];
     if (top>=0 && hi>0 && T0>hi){ const x=(T1-hi)/(T0-hi); for (const k in dry) if (rarRank(FISH[k].rarity)>top) w[k]*=x; } }
@@ -32,9 +34,11 @@ const RARE_ORDER=Object.keys(RARE_BITES).sort((a,b)=>rarRank(FISH[b].rarity)-rar
 function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
   for (const id of RARE_ORDER){ const B=RARE_BITES[id];
     if (B.region!==reg || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
-    if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock))) continue;
+    if ((B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top))) continue;
     if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
   return null; }
+/** Whether the in-game clock is within `share` of an hour past the hour (the Clockfin's few minutes). */
+function topOfHour(share){ const h=((save.clock%24)+24)%24; return h-Math.floor(h)<share; }
 /** Playtest: the next fish to bite, and the next mutation, picked by hand (game/playtest.js). */
 const RARITY_CTL={fish:null, mut:null};
 /** The fish that takes this cast. A long run without a Legendary, where one could have bitten, counts toward DRY. */

@@ -46,7 +46,7 @@ function audioScene(){ if (typeof INTRO!=='undefined' && INTRO.active && INTRO.q
   if (typeof K!=='undefined' && K.open) return K.mode==='banquet'?'banquet':'kitchen';
   if (typeof AQ!=='undefined' && AQ.open) return 'aquarium';
   if (typeof SH!=='undefined' && SH.open) return 'aquarium';
-  const r=REG(), tod=timeOfDay(); return r==='coast'?'coast_'+tod:'lake_'+tod; }
+  return REG()+'_'+timeOfDay(); }
 const MU={on:false,mood:null,next:0,bar:0,beat:0,timer:0,mel:null,duckT:0,duckV:1,fade:1};
 function musicStart(){ if (!AC||MU.on) return; MU.on=true; MU.next=AC.currentTime+.2; MU.timer=setInterval(musicTick,80); ambStart(); }
 function musicTick(){ if (!AC||AC.state!=='running') return; const now=AC.currentTime; if (MU.next<now-.3) MU.next=now+.05;
@@ -88,15 +88,15 @@ function ambBed(name,type,freq,q,lfoHz,lfoAmt){ const s=AC.createBufferSource();
   if (lfoHz){ const l=AC.createOscillator(), lg=AC.createGain(); l.frequency.value=lfoHz; lg.gain.value=lfoAmt; l.connect(lg); lg.connect(lv.gain); l.start(); }
   AMBL[name]={g,f}; }
 function ambStart(){ if (ambOn||!AC) return; ambOn=true;
-  ambBed('water','lowpass',420,.6,.13,.45); ambBed('wind','bandpass',650,.5,.05,.5); ambBed('surf','lowpass',800,.4,0,0); ambBed('hiss','highpass',2600,.3,0,0); ambBed('room','lowpass',150,.7,.3,.2);
+  ambBed('water','lowpass',420,.6,.13,.45); ambBed('wind','bandpass',650,.5,.05,.5); ambBed('surf','lowpass',800,.4,0,0); ambBed('hiss','highpass',2600,.3,0,0); ambBed('room','lowpass',150,.7,.3,.2); ambBed('rush','bandpass',1100,.45,.21,.3);
   ambBed('rain','bandpass',2600,.35,.07,.25); ambBed('drum','lowpass',340,.5,.11,.3); }   // rain on the water, and on the roof and the boards
 let ambClock=0;
 function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{}, t=AC.currentTime; ambClock+=.08;
-  const X=wxLook(), wet=X.rain, fog=X.fog*(X.mist?0:1), out=sc.startsWith('lake')||sc.startsWith('coast');   // the dawn mist stays quiet
+  const X=wxLook(), wet=X.rain, fog=X.fog*(X.mist?0:1), out=sc.startsWith('lake')||sc.startsWith('coast')||sc.startsWith('river');   // the dawn mist stays quiet
   for (const k in AMBL){ let v=L[k]||0; if ((k==='surf'||k==='hiss') && v){ const ph=(ambClock%8.5)/8.5, w=ph<.4?Math.pow(ph/.4,1.6):Math.pow(1-(ph-.4)/.6,1.2); v*=k==='surf'?.35+.65*w:w*w; }
     if (k==='rain') v=wet*(out?.55:.12); if (k==='drum') v=wet*(out?.25:.5);
     AMBL[k].g.gain.setTargetAtTime(v*.5,t,k==='surf'||k==='hiss'?.25:1.2); }
-  const r=Math.random, tod=timeOfDay(), p=(rand(-1,1)), coast=sc.startsWith('coast'), lake=sc.startsWith('lake')||sc==='intro'||sc==='banquet';
+  const r=Math.random, tod=timeOfDay(), p=(rand(-1,1)), coast=sc.startsWith('coast'), river=sc.startsWith('river'), lake=sc.startsWith('lake')||sc==='intro'||sc==='banquet';
   // the weather (game/weather.js): birds keep their heads down in rain and fog, frogs love the rain, and fog brings a
   // foghorn off the coast and a bell somewhere under the lake
   const hush=1-.67*Math.max(wet,fog);
@@ -109,6 +109,12 @@ function ambTick(){ if (!ambOn) return; const sc=audioScene(), L=AMB_LV[sc]||{},
   if (lake && tod!=='day' && r()<.012) ambFrog(p);
   if (lake && tod==='night' && r()<.0025) ambOwl(p);
   if (coast && tod!=='night' && r()<.014*hush) ambGull(p);
+  // the river: birds and a woodpecker in the trees by day, the waterwheel's creak, crickets and an owl after dark
+  if (river && tod==='day' && r()<.014*hush) ambBird(p);
+  if (river && tod!=='night' && r()<.004*hush) ambWoodpecker(p*.8);
+  if (river && r()<.006) ambCreak(-.6);
+  if (river && tod!=='day' && r()<.04) ambCricket(p);
+  if (river && tod==='night' && r()<.002) ambOwl(p);
   if (coast && tod!=='day' && r()<.004) ambBuoy(p);
   if (sc==='aquarium' && r()<.45) ambBubble(p*.6);
   if (sc==='kitchen' && r()<.5) ambCrackle(p*.5);
@@ -124,6 +130,11 @@ function ambOwl(p){ const t=AC.currentTime+.05; ambOsc('sine',390,360,t,.42,.035
 function ambGull(p){ const t=AC.currentTime+.05, n=1+Math.floor(rand(0,3)); for (let i=0;i<n;i++){ const tt=t+i*.32, o=AC.createOscillator(), g=AC.createGain(), f=AC.createBiquadFilter(); o.type='sawtooth';
   o.frequency.setValueAtTime(900,tt); o.frequency.linearRampToValueAtTime(1350,tt+.08); o.frequency.linearRampToValueAtTime(760,tt+.28); f.type='bandpass'; f.frequency.value=1500; f.Q.value=2;
   g.gain.setValueAtTime(.0001,tt); g.gain.exponentialRampToValueAtTime(.022,tt+.03); g.gain.exponentialRampToValueAtTime(.0001,tt+.3); o.connect(f); f.connect(g); panNode(g,p).connect(AMB); o.start(tt); o.stop(tt+.32); } }
+/** A woodpecker drumming on a dead branch: a quick roll of knocks that slows at the end. */
+function ambWoodpecker(p){ const t=AC.currentTime+.05, n=10+Math.floor(rand(0,8)), f=rand(900,1300); let at=0;
+  for (let i=0;i<n;i++){ ambOsc('triangle',f,f*.6,t+at,.025,.022*(1-i/n*.5),p); at+=.045+i*.0025; } }
+/** The waterwheel turning over: a low wooden creak, then a slosh. */
+function ambCreak(p){ const t=AC.currentTime+.05; ambOsc('sawtooth',95,70,t,.35,.012,p); ambOsc('triangle',190,140,t+.05,.3,.01,p); ambPatter(p); }
 function ambBuoy(p){ const t=AC.currentTime+.05; ambOsc('sine',330,0,t,3.5,.03,p); ambOsc('sine',330*2.76,0,t,1.2,.008,p); }
 function ambPatter(p){ const t=AC.currentTime+rand(0,.08), s=AC.createBufferSource(); s.buffer=noiseBuf; const f=AC.createBiquadFilter(); f.type='bandpass'; f.frequency.value=rand(2500,6000); f.Q.value=4;   // one drop on the boards
   const g=AC.createGain(); g.gain.setValueAtTime(rand(.015,.04),t); g.gain.exponentialRampToValueAtTime(.0005,t+.03); s.connect(f); f.connect(g); panNode(g,p).connect(AMB); s.start(t,rand(0,.5),.05); }

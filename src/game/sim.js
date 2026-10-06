@@ -2,7 +2,10 @@
 /* Plays casts with any setup without drawing anything, using the game's own odds (poolFor), fights
    (fightStep), catch rolls (catchRoll) and bonuses (game/mods.js), so the report can't drift from the game.
    Reed snags, coastal washouts, twitching, swells, treasure (rolled, hauled and opened with game/treasure.js)
-   and Playtest tuning count too.
+   and Playtest tuning count too. On the river a float that waits longer than the current takes to carry it off
+   the water is lost (cast from the left, as the player learns to), though the spot it bites in stays the one
+   cast to; the Twin Spool's second float shortens the wait, and when both bite the player strikes the better fish.
+   The clock stands still at st.hour, except on the river, where the casts sweep that hour's minutes (st.pin keeps it).
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
@@ -24,11 +27,12 @@ const SIM_PLAYERS={
    has to cover the nearest edge. Worked out from the layout in game/layout.js and game/regions.js on a
    390 by 844 phone; keep in step if spots move. */
 const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63], far:[.8,.9]},
-                 coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]}};
+                 coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], deep:[.43,.53], far:[.8,.9]},
+                 river:{open:[0,.3], riffle:[0,.12], leaves:[.3,.38], deep:[.7,.78], roots:[.82,.9]}};
 /** A stand-in save for a setup. tanks, parts, fish, finds and gear can be copied from a real save ("Use my setup"). */
 function simSave(st){
   const s=fresh(), now=Date.now(); s.tutorialDone=true; s.firstCast=false; s.introSeen=true;
-  s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.clock=st.hour==null?12:st.hour;
+  s.region=st.region||'lake'; s.boat=s.region==='coast'||!!st.boat; s.ferry=s.region==='river'||!!st.ferry; s.clock=st.hour==null?12:st.hour;
   s.rod=st.rod||'willow'; s.rods=[s.rod]; s.parts=st.parts==='all'?Object.keys(PARTS):(st.parts||[]).slice();
   s.tune=Object.assign(fresh().tune,st.tune||save.tune);
   s.stats.catches=st.catches==null?100:st.catches;            // a player well past the first treasure
@@ -38,7 +42,7 @@ function simSave(st){
     // every species twice in every tank, with every decor: enough for every tank set to complete
     s.tanks={fresh:{lvl:TANKS.fresh.caps.length-1,owned:true,fish:[],decor:DECOR.fresh.map(d=>d.id),tips:0,tipT:now},
              salt:{lvl:TANKS.salt.caps.length-1,owned:true,fish:[],decor:DECOR.salt.map(d=>d.id),tips:0,tipT:now}};
-    for (const id of REGION_FISH.lake) s.tanks.fresh.fish.push(F(id),F(id));
+    for (const id of new Set([...REGION_FISH.lake,...REGION_FISH.river])) s.tanks.fresh.fish.push(F(id),F(id));
     for (const id of REGION_FISH.coast) s.tanks.salt.fish.push(F(id),F(id)); }
   if (st.fish) for (const id in st.fish) s.fish[id]={caught:st.fish[id].caught||0,best:0,seen:true};
   else if (st.mastery) for (const id in FISH) s.fish[id]={caught:MASTERY.catches+2,best:0,seen:true};
@@ -93,8 +97,8 @@ function simulate(st,n){
   const keep=save, P=SIM_PLAYERS[st.player]||SIM_PLAYERS.steady, ctl=TREASURE_CTL.off;
   try {
     SIMULATING=true; save=simSave(st); MODC.dirty=true; TREASURE_CTL.off=st.treasure===false;
-    const reg=REG(), spots=st.spot==='mix'?Object.keys(reg==='coast'?POOLS_COAST:POOLS):[st.spot];
-    const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0,snag:0,washout:0,eaten:0}, perfect:0, hooked:0, coins:0, pbs:0, glimmer:0, pbGlimmer:0, echoes:0, wanders:0, secs:0, fightSecs:0,
+    const reg=REG(), spots=st.spot==='mix'?Object.keys(poolsOf(reg)):[st.spot], twin=modFlag('twin');
+    const out={setup:st, casts:n, landed:0, lost:{slow:0,jump:0,slack:0,snap:0,tired:0,snag:0,washout:0,drift:0,eaten:0}, twins:0, perfect:0, hooked:0, coins:0, pbs:0, glimmer:0, pbGlimmer:0, echoes:0, wanders:0, secs:0, fightSecs:0,
       tiers:{}, species:{}, records:{}, muts:{}, tierCoins:{}, mutCoins:0, mutGlimmer:0, treasure:{rolled:0,hauled:0,lost:0,coins:0,finds:0,kinds:{},crates:{}}};
     const io={t:0,holding:true,tut:null,tilt:0,reeling:false,ev:[],why:''};
     let echo=null;                                                   // Echo: the next cast at that spot bites at once
@@ -108,7 +112,12 @@ function simulate(st,n){
       // the quiet before anything shows up; a steady player twitches once to hurry it
       const tw=modMul('twitch',cx); let wait=biteWait(spot)*(spot==='deep'?1.2:1)/modMul('reedBite',cx);
       if (P.twitch) wait=Math.max(.3,wait*(.65-.2*(tw-1)));
-      save.day=dayLen?Math.floor(out.secs/dayLen):0;                   // an in-game day is 24 minutes of play, or as artifacts make it
+      if (twin) wait*=TWIN.wait;
+      // on the river, a float cast in at the left drifts across the water: too long a wait and the current takes it
+      if (reg==='river'){ const C=RIVER.current, gone=W*.8/(C.speed*W*(spot==='deep'?C.pool:currentAt(depth))*sc(y)); if (wait>gone){ out.lost.drift++; out.secs+=t+gone+.7; continue; } }
+      save.day=dayLen?Math.floor(out.secs/dayLen):0;
+      // the river's Clockfin bites only as the hour turns, so there the casts sweep the minutes of the hour named
+      if (reg==='river' && !st.pin) save.clock=Math.floor(st.hour)+(c%12)/12+.02;                   // an in-game day is 24 minutes of play, or as artifacts make it
       // treasure instead of a fish (rolled once per cast, as the bobber lands): a haul through the fight step, and what's inside.
       // An Echo bites at once instead, unless treasure comes up first: then it keeps waiting.
       const loot=rollTreasure(cx), pend=echo; echo=loot?pend:null;
@@ -124,7 +133,10 @@ function simulate(st,n){
         t+=loot.kind==='pouch'?1.8:loot.kind==='geode'?2.2:loot.kind==='crate'?4.5+rarRank(loot.tier)*.9+g.items.length*1.6:loot.kind==='find'||loot.kind==='map'?3.5:8;
         out.secs+=t; continue; }
       // a fish swims over and nibbles
-      const at={bow:!!st.bow, path:!!st.path}, id=ech||rollFish(spot,lucky,at), F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath
+      const at={bow:!!st.bow, path:!!st.path}; let id=ech||rollFish(spot,lucky,at);
+      // the Twin Spool: now and then both floats go under, and the player strikes the one with the better fish
+      if (twin && !ech && Math.random()<TWIN.both){ const id2=rollFish(spot,lucky,at); out.twins++; if (FISH[id2].value>FISH[id].value) id=id2; }
+      const F=FISH[id];   // st.bow: cast at the rainbow's foot; st.path: onto the moonpath
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
       t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
