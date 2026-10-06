@@ -61,6 +61,9 @@ function mapSVG(){
   t+='<rect x="3" y="3" width="354" height="474" fill="none" stroke="#2B2A33" stroke-width="1.5" opacity=".5" pointer-events="none"/>';
   return '<svg viewBox="0 0 360 480" role="img" aria-label="Map of Hollowmere and the coast">'+t+'</svg>';
 }
+/** How you get from one water to another: Wren's punt to and from the marsh, Ottilie's ferry up the river, or your own boat. */
+const wayTo = (to,here) => to==='marsh' || (here==='marsh' && (to==='river' || !save.boat)) ? 'punt' : to==='river' || (here==='river' && to==='lake' && !save.boat) ? 'ferry' : 'sail';
+const WAY={sail:['Sail here','Setting sail for '], ferry:['Take the ferry','All aboard Ottilie’s ferry for '], punt:['Ride in Wren’s punt','Into Wren’s punt, for ']};
 function showMap(goTo,first){
   audioInit(); ovOpen('map',()=>{ closeMap(); });
   const layer=$('mapLayer'), here=REG();
@@ -68,8 +71,8 @@ function showMap(goTo,first){
     '<div class="map-card" id="mapCard"></div><button class="btn" id="mapClose" type="button">Close</button></div>';
   layer.hidden=false; noise(.5,{vol:.08,f:2400,to:900,q:.6});
   const svg=layer.querySelector('svg'), route=svg.querySelector('#routeLive'), boat=svg.querySelector('#mapBoat'), len=route.getTotalLength();
-  // the route runs lake, river, coast: each water sits at its own point along it (the river's is worked out from its pin)
-  const U={lake:0, coast:1, river:routeU(route,len,MAP_PLACES.river)}, farthest=regionOpen('coast')?1:regionOpen('river')?U.river:0;
+  // the route runs lake, river, marsh, coast: each water sits at its own point along it (the river's and the marsh's are worked out from their pins)
+  const U={lake:0, coast:1, river:routeU(route,len,MAP_PLACES.river), marsh:routeU(route,len,MAP_PLACES.marsh)}, farthest=regionOpen('coast')?1:regionOpen('marsh')?U.marsh:regionOpen('river')?U.river:0;
   const place=u=>{ const p=route.getPointAtLength(len*clamp(u,0,1)); boat.setAttribute('transform','translate('+p.x.toFixed(1)+' '+(p.y+Math.sin(performance.now()/300)*1.2).toFixed(1)+')'); };
   const showRoute=u=>{ route.style.strokeDasharray=len; route.style.strokeDashoffset=String(len*(1-clamp(u,0,1))); };
   let at=U[here]||0; place(at); showRoute(farthest);
@@ -77,12 +80,12 @@ function showMap(goTo,first){
   const card=$('mapCard');
   const select=id=>{ const p=MAP_PLACES[id], open=p.built && regionOpen(id), isHere=id===REG(), n=REGION_FISH[id]?REGION_FISH[id].filter(f=>(save.fish[f]||{}).caught>0).length:0;
     svg.querySelectorAll('.pin').forEach(g=>g.classList.toggle('sel',g.dataset.place===id));
-    card.innerHTML='<div><span class="r">'+(isHere?'You are here':open?'Charted':'Uncharted')+'</span><h3>'+p.name+'</h3><p>'+(id==='coast'&&!save.boat?'Barnaby sells boats that can get you here.':id==='river'&&!save.ferry?'Ottilie’s ferry runs up the river, once it’s mended.':p.desc)+'</p>'+
+    card.innerHTML='<div><span class="r">'+(isHere?'You are here':open?'Charted':'Uncharted')+'</span><h3>'+p.name+'</h3><p>'+(id==='coast'&&!save.boat?'Barnaby sells boats that can get you here.':id==='river'&&!save.ferry?'Ottilie’s ferry runs up the river, once it’s mended.':id==='marsh'&&!save.marsh?((save.wren||{}).met?'Wren knows the way down through the reeds. She wants to see a fish that glows first.':'Somebody up Rootwood River must know the way down through the reeds.'):p.desc)+'</p>'+
       (REGION_FISH[id]&&open?'<p class="mini">Journal: '+n+' of '+REGION_FISH[id].length+' species</p>':'')+'</div>'+
-      (open && !isHere?'<button class="btn" id="sailBtn" type="button">'+(id==='river'||(here==='river'&&id==='lake'&&!save.boat)?'Take the ferry':'Sail here')+'</button>':'');
+      (open && !isHere?'<button class="btn" id="sailBtn" type="button">'+WAY[wayTo(id,here)][0]+'</button>':'');
     const sb=$('sailBtn'); if (sb) sb.addEventListener('click',()=>sail(id)); tone(700,.05,{vol:.05,type:'triangle'}); };
-  const sail=to=>{ if (to===REG()) return; bobbing=false; $('mapClose').hidden=true; const ferry=to==='river'||(REG()==='river'&&to==='lake'&&!save.boat);
-    card.innerHTML='<p class="sailing">'+(first?'The map unrolls. ':'')+(ferry?'All aboard Ottilie’s ferry for ':'Setting sail for ')+MAP_PLACES[to].name+'…</p>';
+  const sail=to=>{ if (to===REG()) return; bobbing=false; $('mapClose').hidden=true;
+    card.innerHTML='<p class="sailing">'+(first?'The map unrolls. ':'')+WAY[wayTo(to,REG())][1]+MAP_PLACES[to].name+'…</p>';
     const t0=performance.now(), dur=REDUCED?400:2400*Math.max(.45,Math.abs(U[to]-at)), from=at, toU=U[to];
     noise(1.6,{vol:.1,f:700,to:250,type:'lowpass'});
     (function step(now){ const k=Math.min(1,(now-t0)/dur), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2, u=lerp(from,toU,e);
@@ -106,6 +109,9 @@ function travelTo(to,first){
   if (to==='river' && !save.riverSeen){ save.riverSeen=true; persist();
     setTimeout(()=>coachFor('Rootwood River! The current carries your float downstream, left to right. Cast upstream and let it drift through the spots. Hold the screen to swing it in toward the bank.',10),900);
     setTimeout(()=>{ if (!S.tut && !(save.wren&&save.wren.met)) coachFor('That’s Wren on her boathouse ramp. Tap her: she enchants rods.',7); },12000); }
+  if (to==='marsh' && !save.marshSeen){ save.marshSeen=true; persist();
+    setTimeout(()=>coachFor('Saltmarsh! The tide comes in and goes out about every six hours. As it falls, mud banks come up out of the water, and a cast on the mud goes splat. Tap the clock to see when it turns.',10),900);
+    setTimeout(()=>{ if (!S.tut) coachFor('Tide pools left on the mud keep fish trapped, and they bite fast. When the tide floods the flats, the mullet come up to graze.',8); },13000); }
   if (to==='coast' && !save.coastSeen){ save.coastSeen=true; persist();
     setTimeout(()=>coachFor('Welcome to Gullrock Coast! Swells roll in from the sea. A cast that lands in a breaking swell washes out, and a swell hitting your line spikes the tension, so let go as it passes.',9),900);
     setTimeout(()=>{ if (!S.tut) coachFor('Ottilie mailed you her old waterproof phone. Tap Phone to order sea rods and boat parts from Tacklegram.',8); },11000); }

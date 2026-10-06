@@ -60,6 +60,8 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/coast.js` | 182 | The coast backdrop: lighthouse, sea stacks, kelp, swell, skiff deck |
 | `src/game/river.js` | 110 | Rootwood River: its spots, the drifting float (`driftFloat`, `riverWaiting`), holding the line (`riverPress`/`riverRelease`), Ottilie's ferry (`ferryAsk`, `fixFerry`, `ferryHTML`), Homebody's days (`homeDays`, `homeMul`), the otter |
 | `src/game/river-art.js` | 226 | The river drawn: the far wood, the mill and its waterwheel, the current, the riffle, falling and floating leaves, the near banks, Wren's boathouse, the alder, the otters, the ferry's picture |
+| `src/game/marsh.js` | 120 | Saltmarsh: the tide (`tideNow`, `tideUntil`, `tideMark`, `tideLine`), the banks and spots (`layoutMarsh`, `bankS`, `bankSpot`, `marshSpot`, `marshMud`), a cast on the mud (`marshMudCast`, `mudSplat`), the stranded float (`marshWaiting`), fish swimming round the mud (`marshApproachFrom`), the tide's modifiers (`tideMods`), the tide turning (`marshUpdate`) |
+| `src/game/marsh-art.js` | 330 | The marsh drawn: the far marsh (sea wall, tide mill, drowned tower), the flats, the tide's flow, haze, withies, the old sluice, the tide post, the mud banks and tide pools, splats, worm casts, crabs, the egret, the reed beds, the marsh lights, the Lantern Rod's lamp and light, Wren's punt |
 | `src/game/twin.js` | 29 | The Twin Spool's second float: landing, the shorter wait, both floats biting and the tap that picks |
 | `src/game/wren.js` | 68 | Wren's sheet: her bench (sockets, Homebody), the Twin Spool quest, the corkboard, and what she says |
 | `src/game/wren-art.js` | 53 | Wren on her ramp, with her goggles and a glowing jar |
@@ -158,6 +160,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/data/orders.js` | 87 | `ORDERS`, `TOWNSFOLK`, `STANDINGS`, `UPGRADES`, `VISITS`, `PLATTER` |
 | `src/data/shack.js` | 34 | `FIXUP` (the uncle's fix-up list), `WALL` (plaques and what a mount does), `SHELF`, `MARKS`, `TRAPDOOR` |
 | `src/data/river.js` | 43 | `RIVER` (the ferry, the current, Old Gristle's hours, the otter), `WREN` (sockets, her lines and corkboard), `TWIN` |
+| `src/data/marsh.js` | 45 | `TIDE` (period, spring and neap, the flood and the tide pools' bites), `BANKS` (the mud banks and their tide pools), `MARSH` (the Croaking Bass's dusk, Old Reeve's spring tides, night fish), `WREN_Q` (her quests), `WREN_MARSH` (her marsh lines) |
 | `src/data/pace.js` | 6 | `PACE_SIM`: minutes until each thing in the simulator's whole run (`npm run sim -- --career --runs 11 --pace`) |
 | `src/data/stats.js` | 51 | `STATS` (everything a bonus can change), `MASTERY` |
 

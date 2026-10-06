@@ -6,7 +6,8 @@ const twinOn = () => !S.tut && modFlag('twin');
 /** The cast lands: the second float splashes down beside the first, toward the middle of the water. */
 function twinLand(b){ S.bob2=null; if (!twinOn()) return;
   const k=sc(b.y), dx=TWIN.spread*W*k*(b.x>W/2?-1:1), x=clamp(b.x+dx,18,W-18), y=clamp(b.y+rand(-6,6)*k,HZ+14,G.near);
-  S.bob2={x,y,spot:spotAt(x,y),dip:1,jerk:0,nibble:0,plunge:0}; splash(x,y,6); ripple(x,y,30); }
+  const spot=spotAt(x,y); if (spot==='mud'){ mudSplat(x,y,.5); return; }   // the marsh: the second float lands on a bank that's out
+  S.bob2={x,y,spot,dip:1,jerk:0,nibble:0,plunge:0}; splash(x,y,6); ripple(x,y,30); }
 /** Two baits in the water: the quiet before a bite is shorter. */
 const twinWait = () => S.bob2 ? TWIN.wait : 1;
 /** A fish heads for one float or the other. */

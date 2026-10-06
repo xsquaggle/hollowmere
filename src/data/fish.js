@@ -5,6 +5,7 @@
               color and fin; window (seconds to strike after the bite); lore; hint (journal line before it is caught);
               night:true for fish that come up after dark (meals that boost night fish boost these); wx:'rain' or 'fog' for
               fish the weather brings up (data/weather.js says where and how often; they're never in a trap).
+              glow:true for a fish that glows (Wren's first quest asks for one, game/wren.js).
               extra:true for fish that don't count toward finishing a water (Barnaby never waits on them); secret:true
               for a fish found by experimenting, whose journal page shows a riddle (hint) once it's been seen; beh2 for a
               fish that changes how it fights halfway in; noTank:true for one too big for any tank. shared:true for a fish
@@ -13,24 +14,27 @@
               alone; prism and ink for the tiers whose color shifts or bleeds. luckCap is the most luck can multiply
               its odds (see game/mods.js); Godly's sits below Mythic's on purpose, so no build makes Godly routine.
    RARE_BITES fish no spot pool offers: each is checked first on every cast, at its own chance before luck, only where
-              and when it can bite (game/odds.js: rollFish). region; spots (or any); bow:true at the rainbow's foot;
-              moon:'full' and night:true on full-moon nights; path: how much likelier a cast onto the moonpath makes it;
-              top: the share of each in-game hour, from the hour, when it can bite (the Clockfin's ten minutes past).
+              and when it can bite (game/odds.js: rollFish). region (a water, or a list of them); spots (or any); bow:true
+              at the rainbow's foot; moon:'full' and night:true on full-moon nights; path: how much likelier a cast onto
+              the moonpath makes it; top: the share of each in-game hour, from the hour, when it can bite (the Clockfin's
+              ten minutes past); wx: only in that weather; flag: only while that STATS flag is on (data/stats.js: the
+              Drowned Bell in a pocket for the Bellmouth, the Lantern Rod lit for the Lampwick Eel).
    DRY        soft bad-luck protection, up to Legendary only: after `from` casts in a row where a Legendary could have
               bitten and didn't, its odds creep up, reaching ×max at `to`. Landing a Legendary or rarer starts it over.
    MUTS       mutations, rolled on landing (game/landing.js: catchRoll) on anything below Mythic: chance per catch before
               bonuses (STATS.mutation), what it multiplies the value by, Glimmer it pays, and for Giant how far past the
               species' biggest it grows. MUT_ORDER is the order the journal lists them.
    ORDER      the lake journal's order, the same fish as REGION_FISH.lake.  REGION_FISH  which species live in each region, in journal order.
-   POOLS      lake bite weights per spot; POOLS_COAST and POOLS_RIVER the same for Gullrock Coast and Rootwood River. Night, dawn, rods,
+   POOLS      lake bite weights per spot; POOLS_COAST, POOLS_RIVER and POOLS_MARSH the same for the other waters. Night, dawn, the tide, rods,
               meals and tank sets adjust them in poolFor().  SPOT_NAME  what each spot is called; SPOT_IN  the same as a place ("in the trench");
-              SPOT_REG  a spot's own name in one water (the coast's deep water is the Dark trench, the river's the Millpool). */
+              SPOT_REG  a spot's own name in one water (the coast's deep water is the Dark trench, the river's the Millpool).
+              'mud' is no spot: it's the marsh's banks while the tide is out, where a cast only goes splat (game/marsh.js). */
 const FISH = {
   perch:   {name:'Copper Perch', rarity:'common', beh:'darter', pull:0.9, reel:2.6, value:2, size:[14,26], len:34, h:.27, color:'#D08A4E', fin:'#A85E2C', window:1.4,
             lore:'Its belly often holds old coins. Nobody knows who keeps dropping them.', hint:'Common in open water.'},
   reedwhisker:{name:'Reedwhisker', rarity:'common', beh:'tugger', pull:1.0, reel:3.2, value:3, size:[22,40], len:40, h:.24, color:'#8A7558', fin:'#62513C', window:1.3,
             lore:"A grumpy catfish that tugs like it's ringing a doorbell.", hint:'Lurks along the reed edges.'},
-  lantern: {name:'Lantern Carp', rarity:'uncommon', beh:'sleeper', night:true, pull:.7, reel:3.6, value:12, size:[25,45], len:42, h:.32, color:'#E2A64F', fin:'#B97A2F', window:1.6,
+  lantern: {name:'Lantern Carp', rarity:'uncommon', beh:'sleeper', night:true, glow:true, pull:.7, reel:3.6, value:12, size:[25,45], len:42, h:.32, color:'#E2A64F', fin:'#B97A2F', window:1.6,
             lore:"Hollowmere's street lamps once burned its shed scales.", hint:'Only rises at night, and hates a twitchy bobber.'},
   leafjack:{name:'Leafjack', rarity:'uncommon', beh:'leaper', shared:true, pull:1.0, reel:4.2, value:15, size:[20,34], len:40, h:.36, color:'#A9B456', fin:'#7C8C33', window:1.1,
             lore:'Disguises itself as a leaf. It fools the birds, but not you.', hint:'Seen hiding under the lily pads, and under falling leaves.'},
@@ -58,7 +62,7 @@ const FISH = {
             lore:'Rides in under the squalls, a whole school at a time, and leaves just as fast.', hint:'Rides in under the rain squalls.'},
   gar:     {name:'Steeple Gar', rarity:'epic', beh:'leaper', extra:true, pull:1.55, reel:10, value:170, size:[90,150], len:84, h:.1, color:'#7F866A', fin:'#5B6248', window:.82,
             lore:'Rests nose-up, like the church steeple it hides behind. The steeple is underwater too.', hint:'Something long and thin hangs nose-up in the deep pool, most of all in the evening.'},
-  angler:  {name:'Gaslight Angler', rarity:'epic', beh:'sulker', night:true, extra:true, pull:1.6, reel:11, value:850, size:[45,80], len:58, h:.4, color:'#5A4E58', fin:'#3D3440', window:.8,
+  angler:  {name:'Gaslight Angler', rarity:'epic', beh:'sulker', night:true, extra:true, glow:true, pull:1.6, reel:11, value:850, size:[45,80], len:58, h:.4, color:'#5A4E58', fin:'#3D3440', window:.8,
             lore:'Its lure burns like an old gas lamp. Ships used to steer for it, which is how the trench filled up with ships.', hint:'A small light wanders in the trench after dark.'},
   shiner:  {name:'Prism Shiner', rarity:'exotic', beh:'darter', secret:true, extra:true, pull:1.15, reel:7.5, value:1200, size:[9,16], len:32, h:.25, color:'#D4E7EA', fin:'#A9CFDA', window:.62,
             lore:'It swallows the ends of rainbows. That’s why nobody ever reaches one.', hint:'Seen where the colours touch the water.'},
@@ -79,9 +83,27 @@ const FISH = {
   spatefin:{name:'Spatefin', rarity:'uncommon', beh:'tugger', wx:'rain', pull:1.0, reel:4, value:22, size:[18,32], len:36, h:.26, color:'#7E8E6E', fin:'#56653F', window:1.1,
             lore:'Comes down with the flood water, nose first, and goes back up when it’s over.', hint:'Rides the river down when it rains.'},
   grayling:{name:'Wisp Grayling', rarity:'rare', beh:'ghost', wx:'fog', pull:1.3, reel:6.8, value:95, size:[28,50], len:46, h:.24, color:'#A3A9B2', fin:'#8C7BB0', window:.92,
-            lore:'Its tall fin is a sail of mist. In fog it rows itself upstream.', hint:'Sails up the river on foggy mornings.'}
+            lore:'Its tall fin is a sail of mist. In fog it rows itself upstream.', hint:'Sails up the river on foggy mornings.'},
+  mudlark: {name:'Mudlark Eel', rarity:'common', beh:'sulker', pull:1.05, reel:3.4, value:6, size:[40,80], len:56, h:.1, color:'#6E5A44', fin:'#4E3F2E', window:1.3,
+            lore:'Collects buttons. Has strong opinions about them.', hint:'Slides about the creek and the tide pools.'},
+  dab:     {name:'Doormat Flounder', rarity:'common', beh:'sleeper', pull:.85, reel:3.2, value:5, size:[18,36], len:36, h:.46, color:'#A08868', fin:'#7C6548', window:1.5,
+            lore:'Lies so flat and so still that crabs wipe their feet on it.', hint:'Lies flat on the bottom, most of all on the flooded flats.'},
+  croaker: {name:'Croaking Bass', rarity:'uncommon', beh:'tugger', pull:1.05, reel:4.2, value:18, size:[24,44], len:42, h:.32, color:'#8E8A62', fin:'#6A6644', window:1.15,
+            lore:'Croaks back if you croak at it. Please don’t.', hint:'Croaks from the reeds at dusk.'},
+  smelt:   {name:'Cucumber Smelt', rarity:'uncommon', beh:'darter', wx:'rain', pull:.9, reel:3.6, value:20, size:[12,24], len:32, h:.18, color:'#B4C8AE', fin:'#7E9C7A', window:1.15,
+            lore:'Smells of fresh cucumber. Nobody knows why, and the smelt aren’t saying.', hint:'Runs up the creek in the rain.'},
+  whiting: {name:'Will-o’-Whiting', rarity:'uncommon', beh:'ghost', wx:'fog', glow:true, pull:1.0, reel:4.4, value:22, size:[22,40], len:40, h:.22, color:'#C7CDD0', fin:'#9DB3BC', window:1.1,
+            lore:'Leads lost fishers to good spots, or so they claim.', hint:'A light drifts over the far water when the fog is in.'},
+  mullet:  {name:'Thicklip Mullet', rarity:'rare', beh:'leaper', pull:1.3, reel:6.8, value:85, size:[30,60], len:50, h:.24, color:'#8C979C', fin:'#69757A', window:.92,
+            lore:'Grazes the flooded flats at the top of the tide, and turns its thick lips up at nearly every bait.', hint:'Grazes the flats when the tide floods them.'},
+  bellmouth:{name:'Bellmouth', rarity:'epic', beh:'ghost', extra:true, pull:1.5, reel:9.5, value:380, size:[40,70], len:52, h:.3, color:'#6F8C82', fin:'#B08D4C', window:.82,
+            lore:'When it opens its mouth, you hear a bell from very far down.', hint:'Something in the marsh answers a bell, when it rains.'},
+  lampwick:{name:'Lampwick Eel', rarity:'epic', beh:'ghost', night:true, glow:true, secret:true, extra:true, shared:true, pull:1.45, reel:9, value:420, size:[40,95], len:62, h:.1, color:'#3E3A44', fin:'#2C2932', window:.9,
+            lore:'Its tail burns like a candle wick and never goes out. Wren swears it was a candle once.', hint:'Rises where rain meets lantern light.'},
+  reeve:   {name:'Old Reeve', rarity:'legendary', beh:'darter', pull:1.8, reel:14.5, value:1100, size:[90,130], len:84, h:.24, color:'#7A888C', fin:'#55636A', window:.72,
+            lore:'The marsh-reeve kept the sea wall for forty years. Something still swims its length at every spring tide, checking for leaks.', hint:'Something big patrols the channel and the sluice pool at the spring tides.'}
 };
-const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'];
+const ORDER = ['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'];
 const BEH = {darter:'Darter', leaper:'Leaper', sulker:'Sulker', tugger:'Tugger', sleeper:'Sleeper', ghost:'Ghost'};
 const BEH_TIP = {darter:'It darts side to side, so follow it.', leaper:'Tap when it jumps clear of the water.', sulker:'When it dives, let go. Reel hard after.', tugger:'Let go on each tug, reel between tugs.', sleeper:'It barely fights. Just reel it in.', ghost:'It fades from sight. Follow the line until it surfaces.'};
 const RAR = {
@@ -101,12 +123,14 @@ const POOLS = {
   far:  {perch:22, leafjack:30, mossback:10, reedwhisker:4, gar:2, mayor:.8},
   reeds:{reedwhisker:65, perch:30, leafjack:5}
 };
-const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed', riffle:'Riffle', leaves:'Leaf drift', roots:'Undercut roots'};
+const SPOT_NAME = {open:'Open water', pads:'Lily pads', deep:'Deep pool', reeds:'Reed edge', far:'Far water', rocks:'Sea stacks', kelp:'Kelp bed', riffle:'Riffle', leaves:'Leaf drift', roots:'Undercut roots',
+  flats:'Flooded flats', pans:'Tide pools', mud:'Mud'};
 const SPOT_IN = {open:'in open water', pads:'among the lily pads', deep:'in the deep pool', reeds:'along the reed edge', far:'in far water', rocks:'by the sea stacks', kelp:'in the kelp beds', 'coast:deep':'in the trench',
-  riffle:'in the riffle', leaves:'under the falling leaves', roots:'among the roots', 'river:open':'in the run', 'river:deep':'in the millpool'};
-const SPOT_REG = {coast:{deep:'Dark trench'}, river:{open:'The run', deep:'Millpool'}};
-const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw'],
-  river:['brook','stone','leafjack','spatefin','barbel','grayling','clockfin','gristle']};
+  riffle:'in the riffle', leaves:'under the falling leaves', roots:'among the roots', 'river:open':'in the run', 'river:deep':'in the millpool',
+  flats:'on the flooded flats', pans:'in a tide pool', 'marsh:open':'in the creek', 'marsh:deep':'in the sluice pool', 'marsh:far':'in the channel'};
+const SPOT_REG = {coast:{deep:'Dark trench'}, river:{open:'The run', deep:'Millpool'}, marsh:{open:'The creek', deep:'Sluice pool', far:'The channel'}};
+const REGION_FISH = {lake:['perch','reedwhisker','lantern','leafjack','dace','mossback','char','gar','lampwick','mayor','shiner','calf'], coast:['sprat','wrasse','kelpeel','bream','mackerel','grouper','gurnard','angler','saltjaw'],
+  river:['brook','stone','leafjack','spatefin','barbel','grayling','clockfin','gristle'], marsh:['mudlark','dab','croaker','smelt','whiting','mullet','bellmouth','lampwick','reeve']};
 const POOLS_COAST = {
   open: {sprat:62, wrasse:12, bream:18, grouper:3},
   rocks:{wrasse:58, sprat:14, grouper:9, bream:6},
@@ -122,10 +146,23 @@ const POOLS_RIVER = {
   deep:  {stone:46, brook:20, leafjack:6, barbel:10, gristle:1},
   roots: {barbel:12, stone:26, brook:28, leafjack:8, gristle:.6}
 };
+/* Saltmarsh: the tide opens and drowns spots (game/marsh.js). The flooded flats are the banks under water, the tide pools
+   lie on them while the mud is out; the creek, the sluice pool and the channel are always there. The Croaking Bass is
+   about all day but comes up at dusk, and Old Reeve at the spring tides (data/marsh.js: MARSH). */
+const POOLS_MARSH = {
+  open: {mudlark:46, dab:24, croaker:3, mullet:3},
+  reeds:{mudlark:34, dab:10, croaker:7, mullet:1.5},
+  flats:{dab:40, mudlark:16, mullet:10, croaker:3},
+  pans: {mudlark:46, dab:30, croaker:1.5, mullet:2.5},
+  deep: {mudlark:34, dab:14, croaker:3, mullet:9, reeve:1},
+  far:  {dab:30, mudlark:24, mullet:11, croaker:2, reeve:.8}
+};
 const RARE_BITES={
   shiner:{region:'lake', bow:true, chance:.035},
   calf:  {region:'lake', spots:['deep'], moon:'full', night:true, chance:1/260, path:2},
-  clockfin:{region:'river', top:1/6, chance:1/11}
+  clockfin:{region:'river', top:1/6, chance:1/11},
+  bellmouth:{region:'marsh', spots:['open','deep','far','flats'], wx:'rain', flag:'bellmouth', chance:1/14},
+  lampwick:{region:['marsh','lake'], spots:['reeds','open'], night:true, wx:'rain', flag:'lantern', chance:1/12}
 };
 const DRY={from:80, to:200, max:2};
 const MUTS={

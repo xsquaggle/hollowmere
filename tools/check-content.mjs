@@ -30,12 +30,12 @@ const oneOf = (where, v, list, what) => { if (!list.includes(v)) bad(where, `${J
 const sameSet = (where, a, b, what) => { const A = [...a].sort().join(), B = [...b].sort().join(); if (A !== B) bad(where, `${what} differ: [${[...a]}] vs [${[...b]}]`); };
 const noDupes = (where, list) => { const seen = new Set(); for (const x of list) { if (seen.has(x)) bad(where, 'listed twice: ' + x); seen.add(x); } };
 
-const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, POOLS_RIVER, RARE_BITES, SPOT_NAME, SPOT_REG, REGION_FISH, REGION_NAME, MAP_PLACES,
+const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, POOLS_RIVER, POOLS_MARSH, RARE_BITES, SPOT_NAME, SPOT_REG, REGION_FISH, REGION_NAME, MAP_PLACES,
   RODS, ROD_ORDER, SEA_RODS, QUEST_RODS, PARTS, PAINTS, OTT_LINES, BAR_LINES, BANQUET_LINES, LETTER,
   TANKS, TIP_BASE, DECOR, TANK_SETS, SPICES, SPICE_ORDER, SIDES, FLESH, COOK_NAME, RECIPES, RECIPE_ORDER, MUSH, MEAL_STR, MEAL_CASTS,
   CHORD, MOODS, MOTIF, AMB_LV, STATS, TREASURE, CRATES, FINDS, OWNERS, POCKETS, NOTES, LETTER_ORDER, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER,
   TRAPS, TRAP_UNLOCK, FITTINGS, FITTING_ORDER, TRAP_GLIMMER, SMOKE, AWAY, WX, WX_ORDER, WX_TABLE, WX_FOG_HOUR, WX_SPELL, WX_FISH, WX_SOME, DAWN_MIST, WX_LINES,
-  RIVER, WREN, TWIN, SPICE_MORE, ORDERS, TOWNSFOLK, TOWNSFOLK_ORDER, STANDINGS, UPGRADES, VISITS, PLATTER, STORY, MAPS, MOON_JAR, COMBOS } = D;
+  RIVER, WREN, TWIN, TIDE, BANKS, MARSH, WREN_Q, WREN_MARSH, SPICE_MORE, ORDERS, TOWNSFOLK, TOWNSFOLK_ORDER, STANDINGS, UPGRADES, VISITS, PLATTER, STORY, MAPS, MOON_JAR, COMBOS } = D;
 for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER, TRAPS, FITTINGS, FITTING_ORDER, SMOKE, AWAY, ORDERS, TOWNSFOLK, STANDINGS, UPGRADES, VISITS, PLATTER, WX, WX_TABLE, WX_FISH, STORY, MAPS, MOON_JAR, COMBOS }))
   if (!v) { console.error('Missing table ' + n + ' in src/data/.'); process.exit(1); }
 
@@ -60,12 +60,17 @@ for (const id of FIDS) { const n = keys(REGION_FISH).filter(r => REGION_FISH[r].
   if (n < 1) bad('FISH.' + id, 'lives in no water (REGION_FISH)'); else if (n > 1 && !FISH[id].shared) bad('FISH.' + id, `lives in ${n} waters; mark it shared: true if that's meant`);
   else if (n === 1 && FISH[id].shared) bad('FISH.' + id, 'is shared: true but lives in one water'); }
 if (REGION_FISH.lake) sameSet('ORDER', ORDER, REGION_FISH.lake, 'ORDER and the lake fish');
-const POOLS_OF = { lake: POOLS, coast: POOLS_COAST, river: POOLS_RIVER };
+const POOLS_OF = { lake: POOLS, coast: POOLS_COAST, river: POOLS_RIVER, marsh: POOLS_MARSH };
 sameSet('POOLS', keys(POOLS_OF), REGIONS, 'waters with pools and REGION_NAME');
 for (const reg of keys(SPOT_REG || {})) { oneOf('SPOT_REG.' + reg, reg, REGIONS, 'region'); for (const sp of keys(SPOT_REG[reg])) if (!(POOLS_OF[reg] || {})[sp]) bad('SPOT_REG.' + reg + '.' + sp, 'is not a spot in that water'); }
-for (const id of keys(RARE_BITES)) { oneOf('RARE_BITES.' + id + '.region', RARE_BITES[id].region, REGIONS, 'region'); if (FISH[id] && !(REGION_FISH[RARE_BITES[id].region] || []).includes(id)) bad('RARE_BITES.' + id, 'bites in a water it doesn\'t live in');
+// a rare bite's region is one water or a list of them; wx is a weather kind, and flag a STATS flag (the Drowned Bell's, the Lantern Rod's)
+for (const id of keys(RARE_BITES)) { const B = RARE_BITES[id], regs = [].concat(B.region);
+  for (const r of regs) { oneOf('RARE_BITES.' + id + '.region', r, REGIONS, 'region'); if (FISH[id] && !(REGION_FISH[r] || []).includes(id)) bad('RARE_BITES.' + id, 'bites in a water it doesn\'t live in (' + r + ')'); }
+  if (B.wx !== undefined) oneOf('RARE_BITES.' + id + '.wx', B.wx, keys(WX), 'weather');
+  if (B.flag !== undefined && !(STATS[B.flag] && STATS[B.flag].kind === 'flag')) bad('RARE_BITES.' + id + '.flag', B.flag + ' is not a flag in STATS');
+  for (const sp of B.spots || []) if (!regs.some(r => (POOLS_OF[r] || {})[sp])) bad('RARE_BITES.' + id + '.spots', sp + ' is not a spot in its waters');
   if (RARE_BITES[id].top !== undefined && !(RARE_BITES[id].top > 0 && RARE_BITES[id].top < 1)) bad('RARE_BITES.' + id + '.top', 'a share of the hour, between 0 and 1'); }
-const regionOfPools = [['POOLS', POOLS, 'lake'], ['POOLS_COAST', POOLS_COAST, 'coast'], ['POOLS_RIVER', POOLS_RIVER, 'river']];
+const regionOfPools = [['POOLS', POOLS, 'lake'], ['POOLS_COAST', POOLS_COAST, 'coast'], ['POOLS_RIVER', POOLS_RIVER, 'river'], ['POOLS_MARSH', POOLS_MARSH, 'marsh']];
 for (const [name, pools, reg] of regionOfPools) for (const spot of keys(pools)) {
   const w = name + '.' + spot; oneOf(w, spot, keys(SPOT_NAME), 'spot');
   for (const [id, wt] of Object.entries(pools[spot])) { oneOf(w, id, REGION_FISH[reg] || [], reg + ' fish'); if (!(isNum(wt) && wt > 0)) bad(w + '.' + id, 'weight should be a positive number'); }
@@ -116,7 +121,9 @@ for (const k of keys(DECOR)) for (const d of DECOR[k]) { const w = `DECOR.${k}.$
   (d.beh || []).forEach(b => oneOf(w + '.beh', b, BEHS, 'behavior')); (d.ids || []).forEach(id => oneOf(w + '.ids', id, FIDS, 'fish')); (d.rar || []).forEach(r => oneOf(w + '.rar', r, RARS, 'rarity'));
   if (d.luck) { oneOf(w + '.luck.region', d.luck.region, REGIONS, 'region'); if (!(d.luck.v > 0 && d.luck.v < 1)) bad(w + '.luck.v', 'luck points, like .05 for +5 luck'); } }
 noDupes('TANK_SETS ids', TANK_SETS.map(s => s.id));
-const tankFish = { fresh: [...new Set([...(REGION_FISH.lake || []), ...(REGION_FISH.river || [])])], salt: REGION_FISH.coast || [] };
+// a fish lives in the tank of its home water (the first it's listed in): the salt tank for the coast's and the marsh's (game/aquarium.js: tankOf)
+const homeOf = id => keys(REGION_FISH).find(r => REGION_FISH[r].includes(id));
+const tankFish = { fresh: FIDS.filter(id => ['lake', 'river'].includes(homeOf(id))), salt: FIDS.filter(id => ['coast', 'marsh'].includes(homeOf(id))) };
 for (const s of TANK_SETS) { const w = 'TANK_SETS.' + s.id; need(w, s, { name: 'str', need: 'str', bonus: 'str', check: 'fn' });
   oneOf(w + '.tank', s.tank, TK, 'tank'); oneOf(w + '.region', s.region, [...REGIONS, 'any'], 'region');
   if (!(s.value > 1 || s.luck > 0)) bad(w, 'needs a value bonus above 1 or luck points above 0');
@@ -368,13 +375,37 @@ sameSet('WREN.sockets', keys(WREN.sockets), ['2', '3'], 'the sockets Wren cuts a
 if (!(WREN.sockets[2] > 0 && WREN.sockets[3] > WREN.sockets[2])) bad('WREN.sockets', 'Glimmer above 0, the third dearer than the second');
 for (const s of [WREN.hello, WREN.quest, ...(WREN.lines || [])]) if (!isStr(s)) bad('WREN', 'her words should be strings');
 noDupes('WREN.notes ids', (WREN.notes || []).map(n => n.id));
-for (const N of WREN.notes || []) { need('WREN.notes.' + N.id, N, { id: 'str', when: 'str', text: 'str' }); if (!['met', 'ghost', 'letter'].includes(N.when) && !FISH[N.when]) bad('WREN.notes.' + N.id + '.when', N.when + ' is not met, ghost, letter or a fish'); }
+for (const N of WREN.notes || []) { need('WREN.notes.' + N.id, N, { id: 'str', when: 'str', text: 'str' }); if (!['met', 'ghost', 'letter', 'marshSeen'].includes(N.when) && !FISH[N.when]) bad('WREN.notes.' + N.id + '.when', N.when + ' is not met, ghost, letter, marshSeen or a fish'); }
 if (!(TWIN.spread > 0 && TWIN.spread < .5 && TWIN.wait > 0 && TWIN.wait < 1 && TWIN.both > 0 && TWIN.both < 1)) bad('TWIN', 'spread below .5, wait and both between 0 and 1');
+
+/* ---------- Saltmarsh: the tide, the banks, Wren's quests ---------- */
+if (!(TIDE.period > 6 && TIDE.period < 24)) bad('TIDE.period', 'in-game hours from one high water to the next, between 6 and 24');
+if (!(TIDE.high >= 0 && TIDE.high < 24)) bad('TIDE.high', 'an hour of the day');
+if (!(TIDE.neap > 0 && TIDE.neap < TIDE.spring && TIDE.spring <= 1)) bad('TIDE', 'neap above 0 and below spring, spring at most 1');
+for (const k of ['flood', 'pans']) if (!(TIDE[k] > 0 && TIDE[k] < 1)) bad('TIDE.' + k, 'multiplies the wait for a bite, so between 0 and 1');
+if (!(TIDE.slack > 0 && TIDE.slack < .5 * (1 - TIDE.neap) * Math.PI * 2 / TIDE.period)) bad('TIDE.slack', 'above 0, and below the fastest a neap tide moves, or a neap tide is always slack');
+noDupes('BANKS ids', BANKS.map(B => B.id));
+for (const B of BANKS) { const w = 'BANKS.' + B.id; need(w, B, { id: 'str', rx: 'num+', ry: 'num+', pans: 'arr' });
+  if (!(B.x > 0 && B.x < 1 && B.d > 0 && B.d < 1)) bad(w, 'x and d are shares of the width and the water, inside (0, 1)');
+  if (!(B.lo >= 0 && B.lo < B.hi && B.hi <= 1)) bad(w, 'lo below hi, both tide levels from 0 to 1');
+  if (B.lo > .5 - .5 * TIDE.spring + .3 && !B.salt) bad(w + '.lo', 'a mud bank should be out at a spring low tide');
+  (B.pans || []).forEach((P, i) => { if (!(Array.isArray(P) && P.length === 3 && P[2] > 0 && Math.hypot(P[0], P[1]) + P[2] < .9)) bad(w + '.pans[' + i + ']', '[u, v, r] inside the bank, r above 0'); }); }
+if (!BANKS.some(B => !B.salt && (B.pans || []).length)) bad('BANKS', 'no tide pools on any mud bank, so the pans spot never comes up');
+{ const C = MARSH.croak || {}; if (!(C.from >= 0 && C.from < C.to && C.to <= 24 && C.x > 1)) bad('MARSH.croak', 'from before to, inside the day, x above 1'); }
+if (!(MARSH.reeve && MARSH.reeve.x > 1)) bad('MARSH.reeve.x', 'above 1');
+for (const [id, x] of Object.entries(MARSH.night || {})) { if (!(REGION_FISH.marsh || []).includes(id)) bad('MARSH.night.' + id, 'not a marsh fish'); if (!(x > 1)) bad('MARSH.night.' + id, 'above 1'); }
+sameSet('WREN_Q', keys(WREN_Q), ['glow', 'lights'], 'her quests and the ones game/wren.js knows');
+for (const k of keys(WREN_Q)) need('WREN_Q.' + k, WREN_Q[k], { name: 'str', ask: 'str', thanks: 'str', reward: 'str' });
+if (!FIDS.some(id => FISH[id].glow && !FISH[id].secret && ['lake', 'river'].includes(homeOf(id)) && !FISH[id].extra)) bad('WREN_Q.glow', 'no fish that glows lives in the lake or the river for you to show her');
+if (!(FISH.whiting && (REGION_FISH.marsh || []).includes('whiting') && FISH.whiting.glow)) bad('WREN_Q.lights', 'the marsh lights quest asks for the Will-o’-Whiting, a glowing marsh fish');
+for (const s of [...(WREN_MARSH.lines || []), WREN_MARSH.day]) if (!isStr(s)) bad('WREN_MARSH', 'her words should be strings');
+if (!(RODS.lanternrod && QUEST_RODS.includes('lanternrod'))) bad('RODS.lanternrod', 'Wren gives it: a quest rod');
 
 /* ---------- idle play: traps, the smoke rack, time away ---------- */
 // the river has none: the current carries a trap off
 for (const reg of keys(TRAPS)) oneOf('TRAPS.' + reg, reg, REGIONS, 'region');
 if (TRAPS.river) bad('TRAPS.river', 'the river has no traps (the current carries them off; game/shops.js lists lake and coast only)');
+if (TRAPS.marsh) bad('TRAPS.marsh', 'the marsh has no traps (the tide strands them; game/shops.js lists lake and coast only)');
 const low = id => FISH[id] && (FISH[id].rarity === 'common' || FISH[id].rarity === 'uncommon');
 for (const reg of keys(TRAPS)) { const T = TRAPS[reg], w = 'TRAPS.' + reg, pools = POOLS_OF[reg] || {};
   if (!(isNum(T.every) && T.every > 0)) bad(w + '.every', 'minutes per catch, above 0');

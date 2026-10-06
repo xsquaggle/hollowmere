@@ -1,6 +1,6 @@
 /* ---------- Modifiers: every bonus in the game goes through here ---------- */
 /* Each source (the rod in hand and its tackle, the meal you ate, tank sets, decor, boat parts, artifacts in your vest pockets,
-   keepsakes, the shack's fix-ups and mounts, mastery, the weather, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
+   keepsakes, the shack's fix-ups and mounts, mastery, the weather, the tide, Gull Luck, playtest tuning) is turned into a list of modifiers: {src, name, stat, v, when?, omen?, base?}. The game asks for a
    stat's total in a context (region, time, weather, spot, fish, rarity, Gull Luck) and only matching modifiers count.
    STATS (data/stats.js) says how each stat combines and where it can apply at all. Adding an enchantment or
    a relic later means adding its modifiers to a source; nothing that reads the stats has to change.
@@ -48,6 +48,8 @@ function modSources(){
     add('mastery',n,'reel',MASTERY.reel,{when:{fish:id}}); add('mastery',n,'autoTilt',undefined,{when:{fish:id}}); }
   // the weather here and now (game/weather.js)
   { const k=wxNow(), K=WX[k]; for (const x of K.mods) L.push(Object.assign({src:'weather',name:K.name},x,{when:Object.assign({wx:k},x.when)})); }
+  // the tide in the marsh (game/marsh.js)
+  tideMods(add);
   // Gull Luck: a lucky splash zone doubles the odds of every fish above common while you fish in it
   add('event','Gull Luck','luck',2,{omen:true, when:{lucky:true, rarityMin:'uncommon'}});
   // The rainbow's foot: a fish hooked where it touches the water comes up mutated twice as often (game/moon.js)

@@ -2,7 +2,7 @@
 let last=performance.now();
 function update(dt,rdt){
   if (S.state==='idle' && save.tutorialDone && save.stats.casts>=12){ S.idleT=(S.idleT||0)+rdt; if (S.idleT>30 && S.idleT-rdt<=30) setHint('Drag back to aim. Release to cast.'); }
-  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt); weatherUpdate(rdt); moonUpdate(rdt); rfxUpdate(rdt); updateRelics(rdt); riverUpdate(dt,rdt); updateWren(rdt);
+  updateAmbient(rdt); updateScenery(rdt); updateSwell(dt); updateBarnaby(rdt); updateMail(rdt); updateTraps(rdt); ordersUpdate(rdt); weatherUpdate(rdt); moonUpdate(rdt); rfxUpdate(rdt); updateRelics(rdt); riverUpdate(dt,rdt); marshUpdate(rdt); updateWren(rdt);
   { const nc=save.clock+(modFlag('timeStop')?0:rdt/60*modMul('clock')); if (nc>=24) save.day=(save.day||0)+1; save.clock=nc%24; } PAL=palAt(save.clock);   // save.day: Wanderer's days
   { let d=Math.abs(save.clock-SC.bgHour); d=Math.min(d,24-d); if (d>.2 || (S.time-(SC.bgWxT||0)>.5 && (Math.abs(wxBgKey()-(SC.bgWx||0))>(wxInfo().t<1?.1:.005)))) { SC.bgWxT=S.time; buildBg(); } }   // the hour, or the weather, has moved on
   const ct=hudClock(save.clock); if (ct!==S.clockShown || wxIcon()!==S.wxShown){ const n=(S.clockShown||'').length; S.clockShown=ct; S.wxShown=wxIcon(); setClock(ct); if (ct.length!==n) fitHud(); }

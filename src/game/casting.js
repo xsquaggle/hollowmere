@@ -42,6 +42,8 @@ function updateCast(dt){
       splash(x,y,12); ripple(x,y,30); noise(.4,{vol:.18,f:800,to:300,type:'lowpass'}); buzz(20);
       toast('Washed out by the swell!','warn'); coachFor('Cast into the calm water between swells.',4);
       S.lost={t:0,pos:{x,y},snapped:false}; setState('lost'); return; }
+    // the marsh: the tide may have moved since you aimed, and a cast onto a bank that's out goes splat (game/marsh.js)
+    if (REG()==='marsh'){ c.spot=marshSpot(x,y); if (c.spot==='mud'){ marshMudCast(x,y); return; } }
     if (c.spot==='reeds' && !S.tut && Math.random()<modBase('snag',{spot:'reeds'})){
       splash(x,y,6); ripple(x,y,18); sfx.snap(); buzz([0,30,30,30]); shake(2);
       toast('Snagged in the reeds!','warn'); coachFor('Reeds snag ordinary rods. Ottilie sells a Reedcutter that slices right through.',5);

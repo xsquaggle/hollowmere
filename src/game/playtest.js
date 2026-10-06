@@ -1,5 +1,8 @@
 /* ---------- Playtest tools (the wrench, or a long press on the clock) ---------- */
 let PTAB='tools';
+// the Tide picker's holds (game/marsh.js): where in its turn the tide stops
+const TIDE_PINS=[[0,'High water'],[.25,'Going out'],[.5,'Low water'],[.75,'Coming in']];
+function tideName(){ const T=tideNow(), p=TIDE_PINS.find(([v])=>v===save.tidePin); return p?p[1]+' (held)':T.slack?(T.level>.5?'High water':'Low water'):T.rising?'Coming in':'Going out'; }
 $('labBtn').addEventListener('click',()=>{ if (S.state!=='loot') openPlaytest(); });
 function openPlaytest(tab){ if (tab) PTAB=tab;
   const head='<div class="panel-head"><div><h2>Playtest</h2><p>Build '+BUILD+' · numbers for tuning</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
@@ -22,6 +25,8 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
       MUT_ORDER.map(k=>'<option value="'+k+'"'+(RARITY_CTL.mut===k?' selected':'')+'>'+MUTS[k].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">The next fish you land comes up with this (not a Mythic, and not in the first lesson).</span></label>'+
     '<label for="tMoon">Moon<output id="tMoonO">'+moonName()+'</output><select id="tMoon"><option value="">As the sky has it</option>'+
       Array.from({length:MOON.cycle},(_,i)=>'<option value="'+i+'"'+(wxState().moon===i?' selected':'')+'>'+moonName(i)+', pinned</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">A full moon puts the moonpath across the deep pool at night, where the Moonwhale Calf bites.</span></label>'+
+    '<label for="tTide">Tide<output id="tTideO">'+tideName()+'</output><select id="tTide"><option value="">As the moon has it</option>'+
+      TIDE_PINS.map(([v,l])=>'<option value="'+v+'"'+(save.tidePin===v?' selected':'')+'>'+l+', held</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">The Saltmarsh’s tide turns every 6 in-game hours or so. Low water bares the mud banks and fills the tide pools; the flood brings the fish in. Pin the moon full or new for a spring tide.</span></label>'+
     '<label for="tFix">Shack<output id="tFixO">'+shackState().fix.length+' of '+FIXUP.filter(L=>L.cost).length+' fixed</output><select id="tFix"><option value="">Fix a line for free…</option>'+FIXUP.filter(L=>L.cost).map(L=>'<option value="'+L.id+'"'+(fixDone(L.id)?' disabled':'')+'>'+L.name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Your uncle’s fix-up list, in the shack. Fill the wall puts a fish of every rarity up on the free plaques.</span></label>'+
     '<label for="tRelic">Story relics<output id="tRelicO">'+Object.keys(STORY).filter(hasFind).length+' of '+Object.keys(STORY).length+'</output><select id="tRelic"><option value="">Hand one over…</option>'+Object.keys(STORY).map(id=>'<option value="'+id+'"'+(hasFind(id)?' disabled':'')+'>'+FINDS[id].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Each is found its own way: the almanac from Ottilie, the jar on the moonpath, the bell in the deep pool’s small-hours fog, the pin in your first map’s cache.</span></label></div>'+
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
@@ -46,6 +51,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   $('mapBtn2').addEventListener('click',()=>{ while (mapCan({}) && !mapWhole()) addMapPiece({}); persist(); closeSheet(); news(mapWhole()?'Your treasure map is whole':'You already have a map from another water',''); });
   $('tFish').addEventListener('change',e=>{ RARITY_CTL.fish=e.target.value||null; $('tFishO').textContent=RARITY_CTL.fish?FISH[RARITY_CTL.fish].name:'As the water has it'; });
   $('tMut').addEventListener('change',e=>{ RARITY_CTL.mut=e.target.value||null; $('tMutO').textContent=RARITY_CTL.mut?MUTS[RARITY_CTL.mut].name:'Left to chance'; });
+  $('tTide').addEventListener('change',e=>{ if (e.target.value!=='') save.tidePin=+e.target.value; else delete save.tidePin; persist(); MODC.dirty=true; $('tTideO').textContent=tideName(); });
   $('tMoon').addEventListener('change',e=>{ const w=wxState(); if (e.target.value!=='') w.moon=+e.target.value; else delete w.moon; persist(); buildBg(); $('tMoonO').textContent=moonName(); });
   $('bowBtn').addEventListener('click',()=>{ const w=wxState(); if (w.bow) delete w.bow; else w.bow=true; persist(); buildBg(); closeSheet(); if (w.bow && isNight(save.clock)) toast('Rainbows only come by day','warn'); });
   // traps, the smoke rack and the clock all move on an hour, as if you'd been away (game/away.js)

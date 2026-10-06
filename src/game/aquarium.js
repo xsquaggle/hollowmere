@@ -1,5 +1,6 @@
 /* ---------- Personal aquarium ---------- */
-function tankOf(id){ return REGION_FISH.coast.includes(id)?'salt':'fresh'; }
+/** The tank a fish lives in: the salt tank for the coast's fish and the marsh's (brackish, but closer to the sea), fresh for the rest. */
+function tankOf(id){ return ['coast','marsh'].includes(regionOf(id))?'salt':'fresh'; }
 function tanks(){ save.tanks=save.tanks||{}; for (const k in TANKS){ const t=save.tanks[k]=save.tanks[k]||{lvl:0,fish:[],owned:k==='fresh'}; t.decor=t.decor||[]; if (typeof t.tips!=='number') t.tips=0; if (!t.tipT) t.tipT=Date.now(); } return save.tanks; }
 function tankCap(k){ return TANKS[k].caps[tanks()[k].lvl]; }
 function tankRoom(id){ if (FISH[id].noTank) return false; const k=tankOf(id), t=tanks()[k]; return t.owned && t.fish.length<tankCap(k); }

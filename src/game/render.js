@@ -71,6 +71,7 @@ function drawRodAndLine(){
     runes.forEach((id,i)=>{ if (!id) return; const u=.3+i*.07, x=(1-u)*(1-u)*b.x+2*u*(1-u)*mx+u*u*t.x, y=(1-u)*(1-u)*b.y+2*u*(1-u)*my+u*u*t.y, a=.5+.3*Math.sin(S.time*2+i*1.7);
       ctx.fillStyle=hexA(ENCH[id].color,(.22*a).toFixed(3)); ctx.beginPath(); ctx.arc(x,y,5.5,0,Math.PI*2); ctx.fill(); ctx.fillStyle=hexA(ENCH[id].color,(.85*a).toFixed(3)); ctx.beginPath(); ctx.arc(x,y,1.7,0,Math.PI*2); ctx.fill(); });
     ctx.restore(); }
+  drawRodLantern(t);   // the Lantern Rod's lamp (game/marsh-art.js)
   if (!lp || (S.lost && S.lost.snapped)) return;
   // the line in the color of whatever line is on the rod; it reddens as tension runs high
   const lid=rigFor(save.rod).line, LC=LINE_RGB[lid]||LINE_RGB.cotton, base=LC[0].split(',').map(Number);
@@ -123,10 +124,11 @@ function drawAim(){
   ctx.fillStyle='rgba(243,234,215,.75)';
   for (let i=1;i<14;i++){ const u=i/14, x=lerp(t.x,to.x,u), y=lerp(t.y,to.y,u)-Math.sin(Math.PI*u)*lift; ctx.beginPath(); ctx.arc(x,y,1.8,0,Math.PI*2); ctx.fill(); }
   const k=sc(to.y), pr=14*k+Math.sin(S.time*8)*2;
-  ctx.strokeStyle=a.lucky?'#F2D47E':a.spot==='deep'?'#9FC3D6':a.spot==='pads'?'#B9D79A':a.spot==='reeds'?'#D8C48A':a.spot==='rocks'?'#D9CBB8':a.spot==='kelp'?'#B8C97A':PAPER; ctx.lineWidth=2.5;
-  ctx.beginPath(); ctx.ellipse(to.x,to.y,pr,pr*.4,0,0,Math.PI*2); ctx.stroke();
-  ctx.font='800 12px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=PAPER;
-  ctx.fillText(a.lucky?'GULL LUCK · '+trimNum(gullMul())+'× RARITY':spotName(a.spot).toUpperCase()+(save.fresh>0?' · FRESH WATER':''),to.x,to.y-pr-8);
+  const mud=a.spot==='mud';   // the marsh: a bank the tide's left out (game/marsh.js)
+  ctx.strokeStyle=mud?DANGER:a.lucky?'#F2D47E':a.spot==='deep'?'#9FC3D6':a.spot==='pads'?'#B9D79A':a.spot==='reeds'?'#D8C48A':a.spot==='rocks'?'#D9CBB8':a.spot==='kelp'?'#B8C97A':a.spot==='flats'?'#D6CB98':a.spot==='pans'?'#A9D4DC':PAPER; ctx.lineWidth=2.5;
+  if (mud) ctx.setLineDash([3,4]); ctx.beginPath(); ctx.ellipse(to.x,to.y,pr,pr*.4,0,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+  ctx.font='800 12px Nunito, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillStyle=mud?'#F6C7B6':PAPER;
+  ctx.fillText(mud?((bankOf(to.x,to.y)||{}).salt?'SALTINGS · SPRING TIDES ONLY':'MUD · WAIT FOR THE TIDE'):a.lucky?'GULL LUCK · '+trimNum(gullMul())+'× RARITY':spotName(a.spot).toUpperCase()+(save.fresh>0?' · FRESH WATER':''),to.x,to.y-pr-8);
 }
 function drawGhostHand(){
   if (S.tut!=='cast' || S.state!=='idle' || INTRO.active) return;
