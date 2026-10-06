@@ -21,8 +21,8 @@
    run (0 unless named): its luck counts, the lake looking back and the ink shadow don't.
    In the Hollow the lantern's pool and the glowing shelf are lit, and so is open water from 10 to 2, where the player
    casts into the shaft of lake light. Anywhere else a fish that needs light follows the float instead of biting, and
-   the player draws it in to the lantern's pool (HOLLOW.draw) before it bites; the Eyeless Koi and the fish that glow
-   bite where they are. The eye isn't modeled (the Sleeper's Scale is worth nothing), and neither are omens or falling
+   the player draws it in to the lantern's pool (HOLLOW.draw) before it bites, and the fight starts from there; the
+   Eyeless Koi and the fish that glow bite where they are, and so does any fish under the Lantern Rod's own lamp. The eye isn't modeled (the Sleeper's Scale is worth nothing), and neither are omens or falling
    stars (they come too seldom to move an hour's coins).
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
@@ -183,10 +183,11 @@ function simulate(st,n){
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
       t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
       // the Hollow: out in the dark, a fish that needs light follows the float while the player draws it in to the far
-      // edge of the lantern's pool, and bites there
-      if (reg==='hollow' && !ech && !['lamp','spores'].includes(spot) && !at.shaft && hollowNeedsLight(id)){
+      // edge of the lantern's pool, and bites (and the fight starts) there. The Lantern Rod's lamp lights its own float.
+      let hy=y;
+      if (reg==='hollow' && !ech && !['lamp','spores'].includes(spot) && !at.shaft && !modFlag('lantern') && hollowNeedsLight(id)){
         const L=HOLLOW.spots.lamp, edge=lerp(G.near,HZ+26,L.d)-(H-HZ)*L.ry*HOLLOW.light.lamp, gap=Math.max(0,edge-y);
-        t+=HOLLOW.draw.hold+gap/(HOLLOW.draw.speed*sc((y+edge)/2)); }
+        t+=HOLLOW.draw.hold+gap/(HOLLOW.draw.speed*sc((y+edge)/2)); hy=Math.max(y,edge); }
       // on the river the float drifts from where it lands until a fish starts nibbling: the quiet and the swim over. Past
       // the spot's runway (RIVER_RUN, the share of the width from where it's cast in to the right edge) the current takes it
       if (reg==='river' && !ech){ const C=RIVER.current, gone=W*RIVER_RUN[spot]/(C.speed*W*(spot==='deep'?C.pool:currentAt(depth))*sc(y));
@@ -198,7 +199,7 @@ function simulate(st,n){
       if (r>F.window*modMul('hook',fc)){ out.lost.slow++; out.secs+=t+.7; continue; }
       const perfect=r<=.3*modMul('perfect',fc); if (perfect) out.perfect++; out.hooked++;
       // the fight, through the game's own fight step
-      const f=simFight(newFight(id,perfect,{x:W*.5,y},lucky,false,spot),P,reg,io,fc);
+      const f=simFight(newFight(id,perfect,{x:W*.5,y:hy},lucky,false,spot),P,reg,io,fc);
       t+=f.ft; out.fightSecs+=f.ft;
       if (f.end!=='land'){ out.secs+=t+.7; if (f.end==='snap') out.lost.snap++; else if (!f.end) out.lost.tired++; else if (/jump/.test(f.why)) out.lost.jump++; else out.lost.slack++; continue; }
       // the Hungry Hook can eat it before it's kept

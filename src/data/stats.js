@@ -46,7 +46,7 @@ const STATS={
   sonar:    {name:'Sonar readout', kind:'flag', hint:'A readout names what’s coming before it bites.'},
   twin:     {name:'Two floats', kind:'flag', hint:'Each cast lands two floats. The first bite is yours, and when both bite at once, you pick.'},
   lantern:  {name:'Lantern light', kind:'flag', when:{night:true}, hint:'After dark your rod’s lamp lights the water round the float, and fish show in it as they come.'},
-  mirror:   {name:'Stars in the water', kind:'flag', when:{night:true, wx:'clear'}, hint:'On a clear night, outdoors, the stars show in the water. Cast onto one, and Exotic and rarer fish bite more often.'},
+  mirror:   {name:'Stars in the water', kind:'flag', when:{night:true, wx:'clear', outdoors:true}, hint:'On a clear night, outdoors, the stars show in the water. Cast onto one, and Exotic and rarer fish bite more often.'},
   bellmouth:{name:'The bell rings', kind:'flag', when:{region:'marsh'}, hint:'In the marsh rain, the Bellmouth comes up to the bell.'},
   noWashout:{name:'Swell-proof casts', kind:'flag', when:{region:'coast'}, hint:'Casts never wash out in a swell.'},
   autoTilt: {name:'Rod tracks the fish', kind:'flag', hint:'Your rod follows a mastered fish for you.'},

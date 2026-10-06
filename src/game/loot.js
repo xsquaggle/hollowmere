@@ -107,6 +107,9 @@ function lootEnd(){ const L=S.loot; hideHaul(); closeNote(true); S.loot=null; S.
     coachFor('Artifacts only work from a vest pocket. You have one to start. Pocket and swap them in your tackle bag.',8); }
   else if (fresh && FS.treasure<=2) coachFor('Everything you find is kept on the Finds page of your journal.',6);
   if (L && L.kind==='letter') letterToPell(L.got.items[0]&&L.got.items[0].id);
+  // page 3's bottle shows only the page, so the uncle's map folded into it is told here (game/hollow.js: uncleMap)
+  const um=L && L.kind==='bottle' && L.got.items.find(it=>it.type==='map' && it.uncle), m=um && relicState().map;
+  if (m) coachFor('Your uncle’s map was folded into the page, and it makes your map whole. Cast inside its ring '+(m.reg===REG()?'out there':'in '+REGION_NAME[m.reg])+' to dig up what he buried.',9);
 }
 /** Coins already in the save (openLoot kept them) count up on the HUD. */
 function tallyCoins(){ coinTally(Math.max(300,Math.min(1200,300+Math.abs(save.coins-coinShown)*.4))); sfx.coin(6); }

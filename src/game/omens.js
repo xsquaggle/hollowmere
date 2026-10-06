@@ -74,4 +74,5 @@ function drawStar(){ const z=SC.star; if (!z) return; const c=ctx;
   for (let i=0;i<5;i++){ const ph=i*1.7, a=Math.pow(Math.max(0,Math.sin(S.time*2.2+ph)),4)*fade; if (a<.05) continue;
     const gx=z.x+Math.cos(ph*2.3)*z.r*.55, gy=z.y+Math.sin(ph*1.9)*z.r*.2, r=(2+3*a)*k;
     c.fillStyle='rgba(240,246,255,'+a.toFixed(3)+')'; c.beginPath(); c.moveTo(gx,gy-r); c.lineTo(gx+r*.25,gy); c.lineTo(gx,gy+r); c.lineTo(gx-r*.25,gy); c.closePath(); c.fill(); c.fillRect(gx-r,gy-.4,r*2,.8); }
-  c.font='800 11.5px Nunito, system-ui, sans-serif'; c.textAlign='center'; c.fillStyle='rgba(222,234,255,'+fade.toFixed(3)+')'; c.fillText(trimNum(STAR.x)+'× EXOTIC+ · '+Math.ceil(STAR.dur-z.t)+'s',z.x,z.y-z.r/2.2-8); }
+  c.font='800 11.5px Nunito, system-ui, sans-serif'; c.textAlign='center'; c.fillStyle='rgba(222,234,255,'+fade.toFixed(3)+')'; const lab=trimNum(STAR.x)+'× EXOTIC+ · '+Math.ceil(STAR.dur-z.t)+'s', lw=c.measureText(lab).width/2+8;
+  c.fillText(lab,clamp(z.x,lw,W-lw),z.y-z.r/2.2-8); }

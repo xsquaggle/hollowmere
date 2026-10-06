@@ -359,7 +359,7 @@ function drawRodLantern(tip){ if (save.rod!=='lanternrod') return; const c=ctx, 
 /** At night the Lantern Rod lights the water round the float: the fish coming in show in its light, and with the Moon
     Jar in a pocket they come tinted by their rarity. Drawn over the dark, from nightShade (dk: how dark it is, the
     night's by default; the Hollow's is full dark). */
-function lanternRodLight(dk){ if (dk==null) dk=dk; if (save.rod!=='lanternrod' || dk<.05) return;
+function lanternRodLight(dk){ if (dk==null) dk=PAL.dark; if (save.rod!=='lanternrod' || dk<.05) return;
   const c=ctx, tip=rodTip(), fl=.88+.12*Math.sin(S.time*13)*Math.sin(S.time*7.3), sw=Math.sin(S.time*2.1)*.18+(tip.a||0)*.4, lx=tip.x+Math.sin(sw)*9, ly=tip.y+Math.cos(sw)*9;
   c.save(); c.globalCompositeOperation='lighter';
   const g=c.createRadialGradient(lx,ly,0,lx,ly,26); g.addColorStop(0,'rgba(255,206,130,'+(.5*dk*fl).toFixed(3)+')'); g.addColorStop(1,'rgba(255,206,130,0)'); c.fillStyle=g; c.fillRect(lx-26,ly-26,52,52);

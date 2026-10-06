@@ -173,7 +173,7 @@ for (const r of RARS) { const c = RAR[r].luckCap; if (r === RARS[0]) { if (c !==
 // ceilings climb with rarity, except Godly's, which sits below Mythic's on purpose (see data/fish.js)
 for (let i = 2; i < RARS.length; i++) if (RARS[i] !== 'godly' && RAR[RARS[i]].luckCap < RAR[RARS[i - 1]].luckCap) bad('RAR.' + RARS[i], 'rarer tiers should have a ceiling at least as high as the tier below');
 for (const r of RARS) if (RAR[r].luckCap > 4) bad('RAR.' + r, 'a luck ceiling above ×4 lets luck run away (the design caps Mythic at ×4)');
-const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true, false], fish: FIDS, beh: BEHS, rarity: RARS, rarityMin: RARS, lucky: [true], star: [true], starlit: [true], wander: [true], wx: keys(WX) };
+const WHEN = { region: REGIONS, spot: keys(SPOT_NAME), night: [true, false], fish: FIDS, beh: BEHS, rarity: RARS, rarityMin: RARS, lucky: [true], star: [true], starlit: [true], wander: [true], wx: keys(WX), outdoors: [true, false] };
 const checkMod = (w, m) => {
   const st = STATS[m.stat]; if (!st) return bad(w, `unknown stat ${JSON.stringify(m.stat)} (see data/stats.js)`);
   if (st.kind === 'flag') { if (m.v !== undefined) bad(w, m.stat + ' is a flag and takes no v'); }

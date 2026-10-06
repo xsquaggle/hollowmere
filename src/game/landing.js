@@ -12,14 +12,15 @@ function catchRoll(id,perfect,ctx){ const F=FISH[id], mut=ctx&&ctx.tut?null:roll
   return {size,build,w,value,stars:qualityOf(id,size,perfect),mut}; }
 function startLand(){
   humStop(); const R=S.reel, F=R.F, spot=(S.bob&&S.bob.spot)||'open';
-  // the Hungry Hook takes its share before you can keep the fish
-  const eaten=!S.tut && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
+  // the Hungry Hook takes its share before you can keep the fish, but never a fish for the Ledger
+  const eaten=!S.tut && !F.noSell && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
   const wander=S.tut||eaten?0:wanderCount(REG());   // Wanderer: the day's first catches in this water
   const {size,build,w:wgt,value,mut}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky,wander:!!wander,bow:!!R.bow,tut:!!S.tut});
   S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,wx:wxNow(),rod:save.rod,value,mut,burst:false,isNew:rec(R.id).caught===0,eaten,wander,moon:!!(S.bob&&S.bob.moon)};
   if (S.land.moon) moonFishLanded();   // the Moon Jar's light is spent on the fish it lit (game/relics.js)
-  // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast
-  if (R.perfect && !S.tut && !eaten && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
+  // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast (never a Godly one:
+  // there's only ever the one)
+  if (R.perfect && !S.tut && !eaten && !F.noSell && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
   const rk=rarRank(F.rarity), big=rk>=rarRank('legendary');
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
   sfx.out(F.rarity); buzz(big?[0,40,60,40,60,120]:rk>=rarRank('epic')?[0,30,40,60]:40); shake(big?6:rk>=rarRank('epic')?4:2);

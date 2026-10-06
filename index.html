@@ -2588,7 +2588,7 @@ const OTT_CONFESS='I was on the ferry that night. Eight years old, ringing my be
                   (paste its output here after a balance change). Keys: rod:<id>, boat, ferry, marsh, quarter, hollow, part:<id>, fix:<id>
                   (the fix-up list), pocket:<n> (the vest's nth pocket), rune:<id>, fish:<id> (the first one caught).
                   Playtest > Pace (game/pace.js) sets a real run beside these. */
-const PACE_SIM={'fish:leafjack':5, 'fish:perch':5, 'fish:mossback':6, 'rod:reedcutter':10, 'rod:ash':20, 'fish:lantern':21, 'rune:swift':21, 'fish:gar':35, 'fish:reedwhisker':38, 'rod:heronwood':44, 'fish:mayor':44, 'rune:magpie':48, 'fish:char':50, 'ferry':61, 'marsh':67, 'fish:stone':76, 'rune:deep':77, 'fish:brook':77, 'fish:mudlark':84, 'fish:dab':84, 'fish:mullet':85, 'fish:barbel':90, 'fish:croaker':102, 'rod:brasscap':103, 'fix:roof':107, 'rune:nightglass':107, 'fish:clockfin':117, 'fish:gristle':117, 'boat':126, 'fish:bream':131, 'fish:sprat':131, 'fish:grouper':131, 'fish:reeve':133, 'fish:angler':138, 'fish:kelpeel':138, 'rod:twin':141, 'rune:storm':147, 'rod:saltline':158, 'fish:herring':167, 'fish:saltjaw':176, 'rune:wanderer':197, 'part:hold':198, 'quarter':210, 'fish:gudgeon':216, 'fish:roach':216, 'fish:hingejaw':216, 'fish:wrasse':219, 'fix:net':219, 'fish:sturgeon':220, 'fish:papercarp':222, 'rune:odd':233, 'rod:tidecaller':252, 'fish:spindrift':260, 'pocket:2':268, 'fish:gurnard':268, 'rune:homebody':271, 'fish:hearth':282, 'rod:gale':306, 'part:sonar':310, 'rune:echo':325, 'part:keel':332, 'fix:lamp':349, 'fix:stove':370, 'pocket:3':376, 'fish:comber':379, 'rod:deepwater':435, 'fix:cabinet':443, 'pocket:4':475, 'fix:panel':504, 'fix:knock':548, 'pocket:5':595};
+const PACE_SIM={'fish:perch':5, 'fish:leafjack':5, 'fish:mossback':5, 'rod:reedcutter':5, 'fish:reedwhisker':21, 'fish:lantern':21, 'rune:swift':24, 'rod:ash':24, 'fish:gar':43, 'rune:magpie':46, 'rod:heronwood':48, 'fish:char':51, 'fish:mayor':73, 'ferry':73, 'marsh':78, 'rune:deep':85, 'fish:stone':88, 'fish:barbel':88, 'fish:brook':88, 'fish:mudlark':100, 'fish:mullet':100, 'fish:dab':100, 'fish:croaker':103, 'fish:gristle':112, 'rod:brasscap':120, 'fix:roof':120, 'rune:nightglass':124, 'fish:clockfin':136, 'fish:reeve':156, 'rod:twin':159, 'rune:storm':170, 'boat':173, 'fish:bream':178, 'fish:sprat':178, 'fish:grouper':179, 'fish:kelpeel':180, 'fish:saltjaw':189, 'rod:saltline':203, 'fish:angler':203, 'fish:herring':208, 'part:hold':208, 'rune:wanderer':214, 'fish:spindrift':226, 'fish:comber':240, 'fix:net':244, 'quarter':251, 'rune:odd':257, 'fish:hingejaw':261, 'fish:roach':261, 'fish:sturgeon':261, 'fish:gudgeon':261, 'fish:papercarp':273, 'fish:wrasse':287, 'pocket:2':296, 'rod:tidecaller':297, 'part:sonar':306, 'rune:homebody':312, 'fish:hearth':332, 'part:keel':336, 'rod:gale':339, 'fix:lamp':362, 'rune:echo':364, 'hollow':381, 'fish:lampless':386, 'fish:echobream':386, 'fish:keyhole':386, 'fish:koi':386, 'fish:laceshad':387, 'fish:sporeloach':398, 'fix:stove':418, 'fish:mothmouth':424, 'fish:gurnard':434, 'pocket:3':435, 'fix:cabinet':483, 'fish:conger':509, 'rod:deepwater':510, 'pocket:4':530, 'fix:panel':551, 'fix:knock':577, 'pocket:5':636};
 
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
@@ -2638,7 +2638,7 @@ const STATS={
   sonar:    {name:'Sonar readout', kind:'flag', hint:'A readout names what’s coming before it bites.'},
   twin:     {name:'Two floats', kind:'flag', hint:'Each cast lands two floats. The first bite is yours, and when both bite at once, you pick.'},
   lantern:  {name:'Lantern light', kind:'flag', when:{night:true}, hint:'After dark your rod’s lamp lights the water round the float, and fish show in it as they come.'},
-  mirror:   {name:'Stars in the water', kind:'flag', when:{night:true, wx:'clear'}, hint:'On a clear night, outdoors, the stars show in the water. Cast onto one, and Exotic and rarer fish bite more often.'},
+  mirror:   {name:'Stars in the water', kind:'flag', when:{night:true, wx:'clear', outdoors:true}, hint:'On a clear night, outdoors, the stars show in the water. Cast onto one, and Exotic and rarer fish bite more often.'},
   bellmouth:{name:'The bell rings', kind:'flag', when:{region:'marsh'}, hint:'In the marsh rain, the Bellmouth comes up to the bell.'},
   noWashout:{name:'Swell-proof casts', kind:'flag', when:{region:'coast'}, hint:'Casts never wash out in a swell.'},
   autoTilt: {name:'Rod tracks the fish', kind:'flag', hint:'Your rod follows a mastered fish for you.'},
@@ -2733,9 +2733,9 @@ function modSources(){
 }
 function modList(){ if (MODC.list && MODC.at===MODC.frame && !MODC.dirty) return MODC.list;
   MODC.list=modSources(); MODC.at=MODC.frame; MODC.dirty=false; return MODC.list; }
-/** The context a stat is read in. Region, time and weather come from the game; callers add spot, fish, rarity or lucky.
-    A fish brings its rarity along. */
-function modCtx(c){ const x=Object.assign({region:REG(), night:nightNow(), wx:wxNow()}, c);
+/** The context a stat is read in. Region, time and weather come from the game (outdoors: anywhere but under the lake,
+    in the Hollow); callers add spot, fish, rarity or lucky. A fish brings its rarity along. */
+function modCtx(c){ const x=Object.assign({region:REG(), night:nightNow(), wx:wxNow()}, c); if (x.outdoors==null) x.outdoors=x.region!=='hollow';
   if (x.fish){ if (!x.rarity) x.rarity=FISH[x.fish].rarity; if (!x.beh) x.beh=FISH[x.fish].beh; } return x; }
 const rarRank=r=>Object.keys(RAR).indexOf(r);
 function modMatch(m,c){ const w=m.when; if (!w) return true;
@@ -3631,14 +3631,15 @@ function catchRoll(id,perfect,ctx){ const F=FISH[id], mut=ctx&&ctx.tut?null:roll
   return {size,build,w,value,stars:qualityOf(id,size,perfect),mut}; }
 function startLand(){
   humStop(); const R=S.reel, F=R.F, spot=(S.bob&&S.bob.spot)||'open';
-  // the Hungry Hook takes its share before you can keep the fish
-  const eaten=!S.tut && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
+  // the Hungry Hook takes its share before you can keep the fish, but never a fish for the Ledger
+  const eaten=!S.tut && !F.noSell && Math.random()<modAdd('eaten',{fish:R.id,spot:S.bob&&S.bob.spot,lucky:R.lucky});
   const wander=S.tut||eaten?0:wanderCount(REG());   // Wanderer: the day's first catches in this water
   const {size,build,w:wgt,value,mut}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky,wander:!!wander,bow:!!R.bow,tut:!!S.tut});
   S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,wx:wxNow(),rod:save.rod,value,mut,burst:false,isNew:rec(R.id).caught===0,eaten,wander,moon:!!(S.bob&&S.bob.moon)};
   if (S.land.moon) moonFishLanded();   // the Moon Jar's light is spent on the fish it lit (game/relics.js)
-  // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast
-  if (R.perfect && !S.tut && !eaten && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
+  // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast (never a Godly one:
+  // there's only ever the one)
+  if (R.perfect && !S.tut && !eaten && !F.noSell && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
   const rk=rarRank(F.rarity), big=rk>=rarRank('legendary');
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
   sfx.out(F.rarity); buzz(big?[0,40,60,40,60,120]:rk>=rarRank('epic')?[0,30,40,60]:40); shake(big?6:rk>=rarRank('epic')?4:2);
@@ -6304,6 +6305,9 @@ function lootEnd(){ const L=S.loot; hideHaul(); closeNote(true); S.loot=null; S.
     coachFor('Artifacts only work from a vest pocket. You have one to start. Pocket and swap them in your tackle bag.',8); }
   else if (fresh && FS.treasure<=2) coachFor('Everything you find is kept on the Finds page of your journal.',6);
   if (L && L.kind==='letter') letterToPell(L.got.items[0]&&L.got.items[0].id);
+  // page 3's bottle shows only the page, so the uncle's map folded into it is told here (game/hollow.js: uncleMap)
+  const um=L && L.kind==='bottle' && L.got.items.find(it=>it.type==='map' && it.uncle), m=um && relicState().map;
+  if (m) coachFor('Your uncle’s map was folded into the page, and it makes your map whole. Cast inside its ring '+(m.reg===REG()?'out there':'in '+REGION_NAME[m.reg])+' to dig up what he buried.',9);
 }
 /** Coins already in the save (openLoot kept them) count up on the HUD. */
 function tallyCoins(){ coinTally(Math.max(300,Math.min(1200,300+Math.abs(save.coins-coinShown)*.4))); sfx.coin(6); }
@@ -6656,9 +6660,11 @@ function openAlmanac(){ const now=wxNow(), h=(((save.clock%24)+24)%24), rows=alm
   const when=at=>(at>=24?'Tomorrow ':'')+clockText(at%24);
   const row=(label,k,note,at,cls)=>'<li class="'+(cls||'')+'"><span class="al-ico">'+ico(k,at)+'</span><span class="al-t">'+label+'</span><b>'+WX[k].name+'</b><span class="al-n">'+note+'</span></li>';
   let html='<div class="panel-head"><div><h2>Wet Almanac</h2><p>'+REGION_NAME[REG()]+' · in pencil, in a careful hand</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
-    '<div class="almanac"><ol class="al-rows">'+row('Now',now,almanacNote(now,h),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind,r.at),r.at)).join('')+'</ol>'+
+    // no weather reaches the Hollow (game/hollow.js), but the moon still matters down there
+    '<div class="almanac">'+(REG()==='hollow'?'<p class="note al-line">No weather reaches the Hollow, but the moon still matters down here.</p>':
+    '<ol class="al-rows">'+row('Now',now,almanacNote(now,h),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind,r.at),r.at)).join('')+'</ol>')+
     '<div class="al-moon"><span class="al-ico">'+moonSVG(m.p)+'</span><div><b>'+(h>=5&&h<20?'Tonight: ':'')+m.name+'</b><span>'+(m.toFull===0?'Full moon tonight.':'Full moon in '+m.toFull+' night'+(m.toFull===1?'':'s')+'.')+'</span></div></div>'+almanacTide()+
-    '<p class="note al-line">'+wxLine()+'</p>'+(pinned?'<p class="note">The weather is pinned in Playtest, so the almanac reads it as staying.</p>':'')+'</div>';
+    (REG()==='hollow'?'':'<p class="note al-line">'+wxLine()+'</p>')+(pinned?'<p class="note">The weather is pinned in Playtest, so the almanac reads it as staying.</p>':'')+'</div>';
   openSheet(html); $('closeS').addEventListener('click',closeSheet); noise(.35,{vol:.08,f:2400,to:1200,q:.7}); }
 
 /* ---------- ghost fish: the Drowned Bell's rings and the Tuning Fork's wake ---------- */
@@ -9483,7 +9489,7 @@ function drawRodLantern(tip){ if (save.rod!=='lanternrod') return; const c=ctx, 
 /** At night the Lantern Rod lights the water round the float: the fish coming in show in its light, and with the Moon
     Jar in a pocket they come tinted by their rarity. Drawn over the dark, from nightShade (dk: how dark it is, the
     night's by default; the Hollow's is full dark). */
-function lanternRodLight(dk){ if (dk==null) dk=dk; if (save.rod!=='lanternrod' || dk<.05) return;
+function lanternRodLight(dk){ if (dk==null) dk=PAL.dark; if (save.rod!=='lanternrod' || dk<.05) return;
   const c=ctx, tip=rodTip(), fl=.88+.12*Math.sin(S.time*13)*Math.sin(S.time*7.3), sw=Math.sin(S.time*2.1)*.18+(tip.a||0)*.4, lx=tip.x+Math.sin(sw)*9, ly=tip.y+Math.cos(sw)*9;
   c.save(); c.globalCompositeOperation='lighter';
   const g=c.createRadialGradient(lx,ly,0,lx,ly,26); g.addColorStop(0,'rgba(255,206,130,'+(.5*dk*fl).toFixed(3)+')'); g.addColorStop(1,'rgba(255,206,130,0)'); c.fillStyle=g; c.fillRect(lx-26,ly-26,52,52);
@@ -11035,9 +11041,11 @@ function godlyAfter(L){ if (L.id!=='scale' || SIMULATING) return; const h=hollow
   h.scale=1; h.lit=Math.min(absHour()+HOLLOW.eye.glow,((save.day||0)+1)*24); HS.eye=0;
   if (!save.rods.includes('mirror')) save.rods.push('mirror'); const FS=findsState(); if (!FS.notes.includes('log6')) FS.notes.push('log6');
   persist(); MODC.dirty=true; updateJournalDot();
-  setTimeout(()=>{ if (S.state!=='idle') return; setState('loot');
-    showHaul({kind:'mirror', got:{items:[{type:'rod',id:'mirror'},{type:'note',id:'log6'}], coins:0, glimmer:0}, to:{y:H*.46}});
-    tone(784,1.2,{vol:.05,type:'sine'}); tone(1175,1.4,{vol:.04,type:'sine',delay:.25}); },1100); }
+  setTimeout(mirrorRises,1100); }
+/** The Mirror coming up, once the card's closed and nothing else is on screen (a cast already under way finishes first). */
+function mirrorRises(){ if (!sceneFree()) return setTimeout(mirrorRises,900); setState('loot');
+  showHaul({kind:'mirror', got:{items:[{type:'rod',id:'mirror'},{type:'note',id:'log6'}], coins:0, glimmer:0}, to:{y:H*.46}});
+  tone(784,1.2,{vol:.05,type:'sine'}); tone(1175,1.4,{vol:.04,type:'sine',delay:.25}); }
 
 /* ---------- the Stillwater Mirror: stars in the water ---------- */
 /** Whether the stars show in the water: the Mirror in hand, a clear night, outdoors. */
@@ -11140,7 +11148,8 @@ function drawStar(){ const z=SC.star; if (!z) return; const c=ctx;
   for (let i=0;i<5;i++){ const ph=i*1.7, a=Math.pow(Math.max(0,Math.sin(S.time*2.2+ph)),4)*fade; if (a<.05) continue;
     const gx=z.x+Math.cos(ph*2.3)*z.r*.55, gy=z.y+Math.sin(ph*1.9)*z.r*.2, r=(2+3*a)*k;
     c.fillStyle='rgba(240,246,255,'+a.toFixed(3)+')'; c.beginPath(); c.moveTo(gx,gy-r); c.lineTo(gx+r*.25,gy); c.lineTo(gx,gy+r); c.lineTo(gx-r*.25,gy); c.closePath(); c.fill(); c.fillRect(gx-r,gy-.4,r*2,.8); }
-  c.font='800 11.5px Nunito, system-ui, sans-serif'; c.textAlign='center'; c.fillStyle='rgba(222,234,255,'+fade.toFixed(3)+')'; c.fillText(trimNum(STAR.x)+'× EXOTIC+ · '+Math.ceil(STAR.dur-z.t)+'s',z.x,z.y-z.r/2.2-8); }
+  c.font='800 11.5px Nunito, system-ui, sans-serif'; c.textAlign='center'; c.fillStyle='rgba(222,234,255,'+fade.toFixed(3)+')'; const lab=trimNum(STAR.x)+'× EXOTIC+ · '+Math.ceil(STAR.dur-z.t)+'s', lw=c.measureText(lab).width/2+8;
+  c.fillText(lab,clamp(z.x,lw,W-lw),z.y-z.r/2.2-8); }
 
 /* ---------- The Twin Spool: two floats on one cast (data/river.js: TWIN) ---------- */
 /* S.bob2 is the second float. Everything that plays a bite (the swim over, the nibbles, the hook, treasure) works on
@@ -11160,7 +11169,10 @@ const twinWait = () => S.bob2 ? TWIN.wait : 1;
 function twinPick(){ if (S.bob2 && Math.random()<.5){ const a=S.bob; S.bob=S.bob2; S.bob2=a; } }
 /** The bite: now and then the other float goes under at the same moment. */
 function twinBite(){ const b2=S.bob2; if (!b2 || !S.bite || S.bite.loot || Math.random()>=TWIN.both) return;
-  const id=pickW(poolFor(b2.spot,inLucky(b2.x,b2.y))), a=rand(0,Math.PI*2);
+  // in the Hollow's dark the second float only gets the fish that bite without light (game/hollow.js)
+  const pool=poolFor(b2.spot,inLucky(b2.x,b2.y)); if (!hollowLit(b2.x,b2.y)) for (const k in pool) if (hollowNeedsLight(k)) delete pool[k];
+  if (!Object.keys(pool).length) return;
+  const id=pickW(pool), a=rand(0,Math.PI*2);
   S.bite.twin={fish:id, ang:a+Math.PI}; S.bite.win*=1.35; b2.plunge=1; splash(b2.x,b2.y,8); ripple(b2.x,b2.y,30);
   setTimeout(()=>{ if (S.state==='bite' && S.bite && S.bite.twin) toast('Two bites! Tap the one you want','big'); },60); }
 /** The tap: strike whichever float is nearer the finger. The fish you leave swims off. */
@@ -14515,7 +14527,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=29, SNAP_KEY=KEY+'-snapshots';
+const BUILD=30, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -15377,8 +15389,8 @@ function openTrapShop(){ const s=trapState();
    run (0 unless named): its luck counts, the lake looking back and the ink shadow don't.
    In the Hollow the lantern's pool and the glowing shelf are lit, and so is open water from 10 to 2, where the player
    casts into the shaft of lake light. Anywhere else a fish that needs light follows the float instead of biting, and
-   the player draws it in to the lantern's pool (HOLLOW.draw) before it bites; the Eyeless Koi and the fish that glow
-   bite where they are. The eye isn't modeled (the Sleeper's Scale is worth nothing), and neither are omens or falling
+   the player draws it in to the lantern's pool (HOLLOW.draw) before it bites, and the fight starts from there; the
+   Eyeless Koi and the fish that glow bite where they are, and so does any fish under the Lantern Rod's own lamp. The eye isn't modeled (the Sleeper's Scale is worth nothing), and neither are omens or falling
    stars (they come too seldom to move an hour's coins).
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
@@ -15539,10 +15551,11 @@ function simulate(st,n){
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
       t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
       // the Hollow: out in the dark, a fish that needs light follows the float while the player draws it in to the far
-      // edge of the lantern's pool, and bites there
-      if (reg==='hollow' && !ech && !['lamp','spores'].includes(spot) && !at.shaft && hollowNeedsLight(id)){
+      // edge of the lantern's pool, and bites (and the fight starts) there. The Lantern Rod's lamp lights its own float.
+      let hy=y;
+      if (reg==='hollow' && !ech && !['lamp','spores'].includes(spot) && !at.shaft && !modFlag('lantern') && hollowNeedsLight(id)){
         const L=HOLLOW.spots.lamp, edge=lerp(G.near,HZ+26,L.d)-(H-HZ)*L.ry*HOLLOW.light.lamp, gap=Math.max(0,edge-y);
-        t+=HOLLOW.draw.hold+gap/(HOLLOW.draw.speed*sc((y+edge)/2)); }
+        t+=HOLLOW.draw.hold+gap/(HOLLOW.draw.speed*sc((y+edge)/2)); hy=Math.max(y,edge); }
       // on the river the float drifts from where it lands until a fish starts nibbling: the quiet and the swim over. Past
       // the spot's runway (RIVER_RUN, the share of the width from where it's cast in to the right edge) the current takes it
       if (reg==='river' && !ech){ const C=RIVER.current, gone=W*RIVER_RUN[spot]/(C.speed*W*(spot==='deep'?C.pool:currentAt(depth))*sc(y));
@@ -15554,7 +15567,7 @@ function simulate(st,n){
       if (r>F.window*modMul('hook',fc)){ out.lost.slow++; out.secs+=t+.7; continue; }
       const perfect=r<=.3*modMul('perfect',fc); if (perfect) out.perfect++; out.hooked++;
       // the fight, through the game's own fight step
-      const f=simFight(newFight(id,perfect,{x:W*.5,y},lucky,false,spot),P,reg,io,fc);
+      const f=simFight(newFight(id,perfect,{x:W*.5,y:hy},lucky,false,spot),P,reg,io,fc);
       t+=f.ft; out.fightSecs+=f.ft;
       if (f.end!=='land'){ out.secs+=t+.7; if (f.end==='snap') out.lost.snap++; else if (!f.end) out.lost.tired++; else if (/jump/.test(f.why)) out.lost.jump++; else out.lost.slack++; continue; }
       // the Hungry Hook can eat it before it's kept

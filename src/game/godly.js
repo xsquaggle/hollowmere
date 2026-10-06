@@ -72,9 +72,11 @@ function godlyAfter(L){ if (L.id!=='scale' || SIMULATING) return; const h=hollow
   h.scale=1; h.lit=Math.min(absHour()+HOLLOW.eye.glow,((save.day||0)+1)*24); HS.eye=0;
   if (!save.rods.includes('mirror')) save.rods.push('mirror'); const FS=findsState(); if (!FS.notes.includes('log6')) FS.notes.push('log6');
   persist(); MODC.dirty=true; updateJournalDot();
-  setTimeout(()=>{ if (S.state!=='idle') return; setState('loot');
-    showHaul({kind:'mirror', got:{items:[{type:'rod',id:'mirror'},{type:'note',id:'log6'}], coins:0, glimmer:0}, to:{y:H*.46}});
-    tone(784,1.2,{vol:.05,type:'sine'}); tone(1175,1.4,{vol:.04,type:'sine',delay:.25}); },1100); }
+  setTimeout(mirrorRises,1100); }
+/** The Mirror coming up, once the card's closed and nothing else is on screen (a cast already under way finishes first). */
+function mirrorRises(){ if (!sceneFree()) return setTimeout(mirrorRises,900); setState('loot');
+  showHaul({kind:'mirror', got:{items:[{type:'rod',id:'mirror'},{type:'note',id:'log6'}], coins:0, glimmer:0}, to:{y:H*.46}});
+  tone(784,1.2,{vol:.05,type:'sine'}); tone(1175,1.4,{vol:.04,type:'sine',delay:.25}); }
 
 /* ---------- the Stillwater Mirror: stars in the water ---------- */
 /** Whether the stars show in the water: the Mirror in hand, a clear night, outdoors. */

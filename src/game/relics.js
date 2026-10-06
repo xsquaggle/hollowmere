@@ -142,9 +142,11 @@ function openAlmanac(){ const now=wxNow(), h=(((save.clock%24)+24)%24), rows=alm
   const when=at=>(at>=24?'Tomorrow ':'')+clockText(at%24);
   const row=(label,k,note,at,cls)=>'<li class="'+(cls||'')+'"><span class="al-ico">'+ico(k,at)+'</span><span class="al-t">'+label+'</span><b>'+WX[k].name+'</b><span class="al-n">'+note+'</span></li>';
   let html='<div class="panel-head"><div><h2>Wet Almanac</h2><p>'+REGION_NAME[REG()]+' · in pencil, in a careful hand</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
-    '<div class="almanac"><ol class="al-rows">'+row('Now',now,almanacNote(now,h),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind,r.at),r.at)).join('')+'</ol>'+
+    // no weather reaches the Hollow (game/hollow.js), but the moon still matters down there
+    '<div class="almanac">'+(REG()==='hollow'?'<p class="note al-line">No weather reaches the Hollow, but the moon still matters down here.</p>':
+    '<ol class="al-rows">'+row('Now',now,almanacNote(now,h),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind,r.at),r.at)).join('')+'</ol>')+
     '<div class="al-moon"><span class="al-ico">'+moonSVG(m.p)+'</span><div><b>'+(h>=5&&h<20?'Tonight: ':'')+m.name+'</b><span>'+(m.toFull===0?'Full moon tonight.':'Full moon in '+m.toFull+' night'+(m.toFull===1?'':'s')+'.')+'</span></div></div>'+almanacTide()+
-    '<p class="note al-line">'+wxLine()+'</p>'+(pinned?'<p class="note">The weather is pinned in Playtest, so the almanac reads it as staying.</p>':'')+'</div>';
+    (REG()==='hollow'?'':'<p class="note al-line">'+wxLine()+'</p>')+(pinned?'<p class="note">The weather is pinned in Playtest, so the almanac reads it as staying.</p>':'')+'</div>';
   openSheet(html); $('closeS').addEventListener('click',closeSheet); noise(.35,{vol:.08,f:2400,to:1200,q:.7}); }
 
 /* ---------- ghost fish: the Drowned Bell's rings and the Tuning Fork's wake ---------- */

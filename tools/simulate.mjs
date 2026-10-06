@@ -378,7 +378,9 @@ async function careerReport() {
         const wallIds = Object.keys(C.fish).filter(id => !hm.FISH[id].noTank).sort((a, b) => hm.FISH[b].value - hm.FISH[a].value)
           .slice(0, hm.WALL.start + hm.FIXUP.reduce((a, L) => a + (L.plaques && C.fix.includes(L.id) ? L.plaques : 0), 0));
         const shack = { fix: C.fix.slice(), wall: wallIds.map(id => ({ f: { id, size: hm.FISH[id].size[1], value: hm.FISH[id].value, t: 0 }, t: 0 })) };
-        const out = hm.simulate({ rod: pick.rod, region: pick.reg, spot: pick.sp, hour, player, catches: 100, fish, shack, parts: C.parts }, 10);
+        // the Hollow's open water at midday: in the shaft four hours in nine, as rate() counts it
+        const atHour = pick.reg === 'hollow' && pick.sp === 'open' && hour === 12 ? (Math.random() < 4 / 9 ? 12 : 15) : hour;
+        const out = hm.simulate({ rod: pick.rod, region: pick.reg, spot: pick.sp, hour: atHour, player, catches: 100, fish, shack, parts: C.parts }, 10);
         const a0 = 9 + C.min;
         C.coins += out.coins + out.treasure.coins; C.glim += out.glimmer; C.min += out.secs * 2 / 60;
         // the uncle's logbook: pages 1 and 2 in the 3rd and 7th bottles, page 3 in the next once the Quarter's open, with

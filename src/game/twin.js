@@ -16,7 +16,10 @@ const twinWait = () => S.bob2 ? TWIN.wait : 1;
 function twinPick(){ if (S.bob2 && Math.random()<.5){ const a=S.bob; S.bob=S.bob2; S.bob2=a; } }
 /** The bite: now and then the other float goes under at the same moment. */
 function twinBite(){ const b2=S.bob2; if (!b2 || !S.bite || S.bite.loot || Math.random()>=TWIN.both) return;
-  const id=pickW(poolFor(b2.spot,inLucky(b2.x,b2.y))), a=rand(0,Math.PI*2);
+  // in the Hollow's dark the second float only gets the fish that bite without light (game/hollow.js)
+  const pool=poolFor(b2.spot,inLucky(b2.x,b2.y)); if (!hollowLit(b2.x,b2.y)) for (const k in pool) if (hollowNeedsLight(k)) delete pool[k];
+  if (!Object.keys(pool).length) return;
+  const id=pickW(pool), a=rand(0,Math.PI*2);
   S.bite.twin={fish:id, ang:a+Math.PI}; S.bite.win*=1.35; b2.plunge=1; splash(b2.x,b2.y,8); ripple(b2.x,b2.y,30);
   setTimeout(()=>{ if (S.state==='bite' && S.bite && S.bite.twin) toast('Two bites! Tap the one you want','big'); },60); }
 /** The tap: strike whichever float is nearer the finger. The fish you leave swims off. */

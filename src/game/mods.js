@@ -73,9 +73,9 @@ function modSources(){
 }
 function modList(){ if (MODC.list && MODC.at===MODC.frame && !MODC.dirty) return MODC.list;
   MODC.list=modSources(); MODC.at=MODC.frame; MODC.dirty=false; return MODC.list; }
-/** The context a stat is read in. Region, time and weather come from the game; callers add spot, fish, rarity or lucky.
-    A fish brings its rarity along. */
-function modCtx(c){ const x=Object.assign({region:REG(), night:nightNow(), wx:wxNow()}, c);
+/** The context a stat is read in. Region, time and weather come from the game (outdoors: anywhere but under the lake,
+    in the Hollow); callers add spot, fish, rarity or lucky. A fish brings its rarity along. */
+function modCtx(c){ const x=Object.assign({region:REG(), night:nightNow(), wx:wxNow()}, c); if (x.outdoors==null) x.outdoors=x.region!=='hollow';
   if (x.fish){ if (!x.rarity) x.rarity=FISH[x.fish].rarity; if (!x.beh) x.beh=FISH[x.fish].beh; } return x; }
 const rarRank=r=>Object.keys(RAR).indexOf(r);
 function modMatch(m,c){ const w=m.when; if (!w) return true;
