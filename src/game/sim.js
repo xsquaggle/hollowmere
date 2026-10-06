@@ -113,7 +113,8 @@ function simulate(st,n){
     const dayLen=modFlag('timeStop')?0:1440/modMul('clock');
     for (let c=0;c<n;c++){
       let spot=echo?echo.spot:spots[c%spots.length];   // an Echo waiting: the player casts back to it
-      if (reg==='marsh'){ save.tidePin=st.tide!=null?st.tide:(tide0+c/24)%1; if (!marshSpotOpen(spot)) spot='open'; }
+      // the tide turns through the run (the flood's bites are in the modifier list, so it's read afresh each cast)
+      if (reg==='marsh'){ save.tidePin=st.tide!=null?st.tide:(tide0+c/24)%1; MODC.dirty=true; if (!marshSpotOpen(spot)) spot='open'; }
       const lucky=!!st.lucky, depth=((SIM_SPOTS[reg]||{})[spot]||[0,.5])[1], y=lerp(G.near,HZ+26,depth), cx={spot,lucky};
       let t=1.6;                                                   // aim, drag and the cast's flight
       // the cast can tangle in the reeds or wash out in a swell

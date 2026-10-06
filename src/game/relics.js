@@ -62,7 +62,10 @@ function addMapPiece(c){ const r=relicState(); if (!mapCan(c)) return r.map;
   r.map.n++; return r.map; }
 /** Where the map's cache lies on screen. Its depth and angle are kept rather than its pixels, so it stays put
     through a resize, and casting at that depth and angle always reaches it. */
-function mapXY(m){ const ty=lerp(G.near,HZ+26,Math.min(m.depth,Math.max(MAPS.depth[0],castReach()*.95))); return {x:clamp(W/2+Math.tan(m.th)*(G.player.y-ty)*.85,W*.1,W*.9), y:ty}; }
+function mapXY(m){ const ty=lerp(G.near,HZ+26,Math.min(m.depth,Math.max(MAPS.depth[0],castReach()*.95))), p={x:clamp(W/2+Math.tan(m.th)*(G.player.y-ty)*.85,W*.1,W*.9), y:ty};
+  // the marsh: never under the saltings, which only a spring tide covers, but in the water just off their edge
+  if (REG()==='marsh') for (const B of G.banks||[]) if (B.salt && Math.hypot((p.x-B.x)/B.rx,(p.y-B.y)/B.ry)<1.3) p.y=Math.max(p.y,B.y+B.ry*1.3);
+  return p; }
 /** 'pin' on the Cartographer's Pin's mark, 'ring' inside the whole map's ring, or null. */
 function mapAt(x,y){ const m=relicState().map; if (!m || m.n<MAPS.pieces || m.reg!==REG()) return null;
   const p=mapXY(m), k=sc(p.y), d=Math.hypot(x-p.x,(y-p.y)*2.2);

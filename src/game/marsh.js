@@ -5,7 +5,7 @@
    save.marsh is true once Wren's punt runs here (game/wren.js); save.marshTips holds the tips already given; save.tidePin
    (0 to 1, Playtest) holds the tide at one point of its cycle, 0 at high water and .5 at low. The tide reads only the
    save, so the balance simulator has a tide of its own. MSH holds the moment-to-moment state. */
-const MSH={key:'', tide:null, chk:0, dir:null, at:null, splats:[]};
+const MSH={k:null, tide:null, chk:0, dir:null, at:null, splats:[]};
 function marshTips(){ if (!isObj(save.marshTips)) save.marshTips={}; return save.marshTips; }
 
 /* ---------- the tide ---------- */
@@ -17,12 +17,13 @@ function tideMoonAge(){ const w=wxState(); return w.moon!=null ? w.moon : (save.
     (rising while it's above 0); slack: barely moving; spring and neap: the moon's big and small tides. */
 /** Playtest can hold the tide at one point of its turn (save.tidePin, 0 high water to .5 low water and round again). */
 const tidePinned = () => typeof save.tidePin==='number' && save.tidePin>=0 && save.tidePin<1;
-function tideNow(){ const d=save.day||0, h=(((save.clock%24)+24)%24), pin=tidePinned()?save.tidePin:null, mp=wxState().moon, key=d+'|'+h+'|'+pin+'|'+mp;
-  if (MSH.key===key && MSH.tide) return MSH.tide;
+function tideNow(){ const d=save.day||0, h=(((save.clock%24)+24)%24), pin=tidePinned()?save.tidePin:null, mp=wxState().moon, K=MSH.k;
+  if (MSH.tide && K && K[0]===d && K[1]===h && K[2]===pin && K[3]===mp) return MSH.tide;
+  MSH.k=[d,h,pin,mp];
   const sw=TIDE.neap+(1-TIDE.neap)*Math.abs(Math.cos(tideMoonAge()/MOON.cycle*Math.PI*2));
   const ph=pin!=null ? pin : ((((d*24+h-TIDE.high)/TIDE.period)%1)+1)%1;
   const level=.5+.5*sw*Math.cos(ph*Math.PI*2), rate=-.5*sw*Math.sin(ph*Math.PI*2)*Math.PI*2/TIDE.period;
-  MSH.key=key; return MSH.tide={level, phase:ph, swing:sw, rate, rising:rate>0, slack:Math.abs(rate)<TIDE.slack, spring:sw>=TIDE.spring, neap:sw<=TIDE.neap+.05}; }
+  return MSH.tide={level, phase:ph, swing:sw, rate, rising:rate>0, slack:Math.abs(rate)<TIDE.slack, spring:sw>=TIDE.spring, neap:sw<=TIDE.neap+.05}; }
 /** In-game hours until the next high water, or with low, the next low water. */
 function tideUntil(low){ const ph=tideNow().phase; return ((((low?.5:1)-ph)%1)+1)%1*TIDE.period; }
 /** The tide's mark for the clock chip: 'in', 'out', or 'high' or 'low' while it's slack. */
@@ -55,18 +56,21 @@ function marshBanks(dy){ const D=H-HZ;
 const bankS = (B,L) => Math.sqrt(clamp((B.hi-L)/(B.hi-B.lo),0,1));
 /** A bank's edge isn't a perfect ellipse: its reach (a share of the footprint) toward angle th. */
 const bankEdge = (B,th) => .91+.06*Math.sin(2*th+B.p1)+.03*Math.sin(5*th+B.p2);
-/** A tide pool's centre on screen, and whether it's out (all of the mud round it is out of the water). */
+/** A tide pool's centre on screen, and whether it's out (all of the mud round it is out of the water, so the fish in
+    it are trapped) or wet (some of it is, and the rest is open to the tide). */
 const panXY = (B,P) => ({x:B.x+P.u*B.rx, y:B.y+P.v*B.ry});
-function panOut(B,P,s){ const ext=P.r*Math.max(1,.42*B.rx/B.ry); return Math.hypot(P.u,P.v)+ext < s*bankEdge(B,Math.atan2(P.v,P.u)); }
+const panExt = (B,P) => P.r*Math.max(1,.42*B.rx/B.ry);
+function panOut(B,P,s){ return Math.hypot(P.u,P.v)+panExt(B,P) < s*bankEdge(B,Math.atan2(P.v,P.u)); }
+function panWet(B,P,s){ return Math.hypot(P.u,P.v)-panExt(B,P) < s*bankEdge(B,Math.atan2(P.v,P.u)); }
 function inPan(B,P,x,y){ const c=panXY(B,P), rx=P.r*B.rx; return Math.pow((x-c.x)/rx,2)+Math.pow((y-c.y)/(rx*.42),2)<1; }
 /** The bank under (x, y), if any. */
 function bankOf(x,y){ for (const B of G.banks||[]){ const u=(x-B.x)/B.rx, v=(y-B.y)/B.ry, r=Math.hypot(u,v); if (r<1 && r<bankEdge(B,Math.atan2(v,u))) return B; } return null; }
 /** What a bank makes of (x, y): 'mud' where it's out of the water, 'pans' in a tide pool on it, 'flats' where the
-    tide covers it; null off the banks. */
+    tide covers it (or reaches into a pool, which is open water until the mud all round it is out); null off the banks. */
 function bankSpot(x,y){ const B=bankOf(x,y); if (!B) return null;
   const s=bankS(B,tideNow().level), u=(x-B.x)/B.rx, v=(y-B.y)/B.ry;
   if (Math.hypot(u,v)>=s*bankEdge(B,Math.atan2(v,u))) return 'flats';
-  for (const P of B.pans) if (panOut(B,P,s) && inPan(B,P,x,y)) return 'pans';
+  for (const P of B.pans) if (panWet(B,P,s) && inPan(B,P,x,y)) return panOut(B,P,s)?'pans':'flats';
   return 'mud'; }
 const marshMud = (x,y) => bankSpot(x,y)==='mud';
 /** Whether the tide leaves a spot to cast to: tide pools only while the mud round them is out, flats only while the
@@ -108,6 +112,8 @@ function marshWaiting(dt){ if (REG()!=='marsh' || !S.bob || !S.wait) return true
   MSH.chk-=dt; if (MSH.chk>0) return true; MSH.chk=.25;
   const b2=S.bob2; if (b2){ b2.spot=marshSpot(b2.x,b2.y); if (b2.spot==='mud'){ mudSplat(b2.x,b2.y,.5); S.bob2=null; } }
   const b=S.bob, sp=marshSpot(b.x,b.y); if (sp!=='mud'){ b.spot=sp; return true; }
+  // the Twin Spool: one float left on the mud and the other still in the water, so you fish on with that one
+  if (S.bob2){ mudSplat(b.x,b.y,.5); S.bob=S.bob2; S.bob2=null; spook('The tide left one float on the mud'); return true; }
   const w=S.wait; if (w.sh){ w.sh.flee=true; w.sh.ang+=Math.PI; }
   mudSplat(b.x,b.y,.6); const T=marshTips();
   if (!T.strand){ T.strand=1; persist(); coachFor('The tide went out from under your float. While it falls, the banks grow: fish a little off their edges.',7); }

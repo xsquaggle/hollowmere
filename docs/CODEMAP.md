@@ -52,7 +52,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/moon.js` | 55 | Moon phases in the sky, the moonpath, the mother's breach, the rainbow's foot |
 | `src/game/weather-art.js` | 112 | Sky tint, overcast, rain, rings on the water, fog banks, rainbow |
 | `src/game/scenery.js` | 101 | Static backdrop, rebuilt on resize: sky, hills, land |
-| `src/game/scenery-live.js` | 311 | Living layers: water, clouds, gulls, the lucky spot, pads, banks, rocks, boats |
+| `src/game/scenery-live.js` | 314 | Living layers: water, clouds, gulls, the lucky spot, pads, banks, rocks, boats |
 | `src/game/dock.js` | 192 | The dock: boards, piles, tackle box, bait pail, lantern, keepnet |
 | `src/game/angler.js` | 104 | The angler seen from behind: pose, hands |
 | `src/game/folk.js` | 183 | Townsfolk on the water: Ottilie's punt, Barnaby's launch, Pell's mail boat, heron, frog |
@@ -60,8 +60,8 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/coast.js` | 182 | The coast backdrop: lighthouse, sea stacks, kelp, swell, skiff deck |
 | `src/game/river.js` | 113 | Rootwood River: its spots, the drifting float (`driftFloat`, `riverWaiting`), holding the line (`riverPress`/`riverRelease`), Ottilie's ferry (`ferryAsk`, `fixFerry`, `ferryHTML`), Homebody's days (`homeDays`, `homeMul`), the otter |
 | `src/game/river-art.js` | 226 | The river drawn: the far wood, the mill and its waterwheel, the current, the riffle, falling and floating leaves, the near banks, Wren's boathouse, the alder, the otters, the ferry's picture |
-| `src/game/marsh.js` | 136 | Saltmarsh: the tide (`tideNow`, `tideUntil`, `tideMark`, `tideLine`), the banks and spots (`layoutMarsh`, `bankS`, `bankSpot`, `marshSpot`, `marshMud`), a cast on the mud (`marshMudCast`, `mudSplat`), the stranded float (`marshWaiting`), fish swimming round the mud (`marshApproachFrom`), the tide's modifiers (`tideMods`), the tide turning (`marshUpdate`) |
-| `src/game/marsh-art.js` | 412 | The marsh drawn: the far marsh (sea wall, tide mill, drowned tower), the flats, the tide's flow, haze, withies, the old sluice, the tide post, the mud banks and tide pools, splats, worm casts, crabs, the egret, the reed beds, the marsh lights, the Lantern Rod's lamp and light, Wren's punt |
+| `src/game/marsh.js` | 142 | Saltmarsh: the tide (`tideNow`, `tideUntil`, `tideMark`, `tideLine`), the banks and spots (`layoutMarsh`, `bankS`, `bankSpot`, `marshSpot`, `marshMud`), a cast on the mud (`marshMudCast`, `mudSplat`), the stranded float (`marshWaiting`), fish swimming round the mud (`marshApproachFrom`), the tide's modifiers (`tideMods`), the tide turning (`marshUpdate`) |
+| `src/game/marsh-art.js` | 413 | The marsh drawn: the far marsh (sea wall, tide mill, drowned tower), the flats, the tide's flow, haze, withies, the old sluice, the tide post, the mud banks and tide pools, splats, worm casts, crabs, the egret, the reed beds, the marsh lights, the Lantern Rod's lamp and light, Wren's punt |
 | `src/game/twin.js` | 30 | The Twin Spool's second float: landing, the shorter wait, both floats biting and the tap that picks |
 | `src/game/wren.js` | 107 | Wren's sheet: her bench (sockets, Homebody), her Quests tab (a fish that glows and the punt to the marsh: `giveGlow`; the marsh lights and the Lantern Rod: `giveLantern`; the Twin Spool), the corkboard, and what she says |
 | `src/game/wren-art.js` | 54 | Wren on her ramp, with her goggles and a glowing jar |
@@ -77,7 +77,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/loot.js` | 300 | The loot moment: a find lands, opens and shows what's inside |
 | `src/game/loot-art.js` | 288 | Crates, pouches, bottles, letters, every find's drawing |
 | `src/game/finds.js` | 94 | The Finds journal page, vest pockets, returning lost things |
-| `src/game/relics.js` | 161 | Story relics: how each is found (`storyLoot`, Ottilie's `storyGift`), treasure maps (`mapAt`, `addMapPiece`), the Moon Jar (`tapJar`, `nightNow`), the Wet Almanac's page, ghost rings and wake, combo chips (`combosHTML`) |
+| `src/game/relics.js` | 164 | Story relics: how each is found (`storyLoot`, Ottilie's `storyGift`), treasure maps (`mapAt`, `addMapPiece`), the Moon Jar (`tapJar`, `nightNow`), the Wet Almanac's page, ghost rings and wake, combo chips (`combosHTML`) |
 | `src/game/relic-art.js` | 133 | The four relics' drawings, treasure maps, and in the scene: the map's ring and pin, a moonlit cast, the jar on the dock, ghost rings and wake |
 | `src/game/tackle.js` | 55 | What's on the rod in hand: reels, lines, bait (`rigFor`, `baitOn`, `tickBait`) |
 | `src/game/tackle-art.js` | 180 | Every reel, line and bait drawn, and the rod rig |
@@ -137,7 +137,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | --- | --- | --- |
 | `src/game/playtest.js` | 79 | The hidden Playtest sheet (the wrench, or a long press on the clock): forcing fish, the weather, the moon and the tide (`TIDE_PINS`) |
 | `src/game/balance.js` | 95 | Playtest > Balance: run the simulator on any setup |
-| `src/game/sim.js` | 197 | The balance simulator: the 1,000-cast report, the river's drift and the marsh's tide (`SIM_SPOTS`) |
+| `src/game/sim.js` | 198 | The balance simulator: the 1,000-cast report, the river's drift and the marsh's tide (`SIM_SPOTS`) |
 | `src/game/pace.js` | 50 | The pace log: minutes of play and when each rod, part, fix, pocket, rune and species first came (`paceTick`, `paceKeys`), and Playtest > Pace beside the simulator's run (`paceHTML`) |
 
 ## Content tables (`src/data/`)
@@ -196,4 +196,4 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/shack.test.cjs` | 202 | The shack: the fix-up list, mounting and the wall bonus, the rod rack, the knock-through, the room at five phone sizes, odd saves |
 | `tests/depth.test.cjs` | 56 | The depth gate: rare and Legendary odds near the design doc, the pace log and Playtest > Pace |
 | `tests/river.test.cjs` | 183 | Rootwood River: the ferry, the drifting float, its spots, fish and hours, Homebody, the otter, Wren, the Twin Spool |
-| `tests/marsh.test.cjs` | 203 | Saltmarsh: Wren's glow quest and the punt, the tide and the moon, the mud splat and the stranded float, the tide's bites and pools, the Lantern Rod and the Lampwick Eel, the Bellmouth |
+| `tests/marsh.test.cjs` | 216 | Saltmarsh: Wren's glow quest and the punt, the tide and the moon, the mud splat and the stranded float, the tide's bites and pools, the Lantern Rod and the Lampwick Eel, the Bellmouth |

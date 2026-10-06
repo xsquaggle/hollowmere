@@ -25,7 +25,7 @@ It's a personal game for the owner and friends: free, with no ads, purchases or 
 
 Pacing follows the design doc: Legendaries about 1 cast in 80 (1 in 25 at the best spots and hours), rares 10 to 20%,
 each rod about 2.5 times the last, something new every 10 to 20 minutes early and every 30 to 45 later. With the lake,
-the river, the marsh and the coast, a steady player owns everything in about 10.5 hours (`npm run sim -- --career`).
+the river, the marsh and the coast, a steady player owns everything in about 10 hours (`npm run sim -- --career`).
 
 Every bonus is a modifier in one pipeline (`src/game/mods.js`). The Bonuses page and the balance simulator read it,
 so nothing is balanced by guesswork: `npm run sim` reports the numbers.

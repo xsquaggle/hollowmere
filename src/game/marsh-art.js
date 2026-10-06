@@ -117,11 +117,11 @@ function drawWithies(){ const c=ctx, t=S.time, wd=rvTone('town','#5E4A38',.6), L
     c.beginPath(); c.moveTo(lerp(w.x,tx,.7),lerp(w.y,ty,.7)); c.lineTo(lerp(w.x,tx,.7)+3*k,lerp(w.y,ty,.7)-2*k); c.stroke();
     c.strokeStyle='rgba(225,236,230,.3)'; c.lineWidth=.8; c.beginPath(); c.ellipse(w.x,w.y,2.4*k,.8*k,0,0,Math.PI*2); c.stroke(); } }
 /** What's left of the old sluice round the deep pool: rotten posts and the frame of its gate. */
-function drawSluice(){ const d=G.deep, c=ctx, t=S.time, k=sc(d.y), wd=rvTone('town','#4E3E30',.6), wdL=rvTone('hillFar','#7A6650',.5), L=tideNow().level;
+function drawSluice(){ const d=G.deep, c=ctx, t=S.time, k=sc(d.y), wd=rvTone('town','#4E3E30',.6), wdL=rvTone('hillFar','#7A6650',.5), cap=rvTone('hillFar','#9A8C74',.5), L=tideNow().level;
   const posts=[[-1.05,-.2,1.1],[-.95,.45,.8],[-.6,-.75,.9],[.15,-1.05,.7],[.95,-.5,.6],[1.05,.35,.85]];
   for (const [u,v,h] of posts){ const px=d.x+u*d.rx, py=d.y+v*d.ry, ht=h*26*k*(1.1-L*.4), w=3.4*k;
     c.fillStyle=wd; c.fillRect(px-w/2,py-ht,w,ht); c.fillStyle=wdL; c.fillRect(px-w/2,py-ht,w*.35,ht);
-    c.fillStyle=rvTone('hillFar','#9A8C74',.5); c.beginPath(); c.moveTo(px-w/2,py-ht); c.lineTo(px+w/2,py-ht-1.6*k); c.lineTo(px+w/2,py-ht+1); c.closePath(); c.fill();
+    c.fillStyle=cap; c.beginPath(); c.moveTo(px-w/2,py-ht); c.lineTo(px+w/2,py-ht-1.6*k); c.lineTo(px+w/2,py-ht+1); c.closePath(); c.fill();
     c.strokeStyle=INK; c.globalAlpha=.6; c.lineWidth=1; c.strokeRect(px-w/2,py-ht,w,ht); c.globalAlpha=1;
     c.strokeStyle='rgba(225,236,230,'+(.25+.1*Math.sin(t*1.6+u*3)).toFixed(3)+')'; c.lineWidth=1; c.beginPath(); c.ellipse(px,py,w*1.3,w*.45,0,0,Math.PI*2); c.stroke(); }
   // the gate on the pool's left: two heavy posts, a beam across with the winding wheel on it, and the gate jammed half up,
@@ -190,7 +190,7 @@ function drawBankMud(B,s){ const c=ctx, M=MSA.mud[B.id]||(MSA.mud[B.id]=buildBan
   // the mud the water's just left is darker and shines
   bankPath(c,B,s,B.x,B.y); c.strokeStyle=B.salt?'rgba(38,44,28,.35)':'rgba(44,32,22,.34)'; c.lineWidth=10*k; c.stroke();
   c.strokeStyle='rgba(236,240,230,'+(.1+.05*Math.sin(t*1.3+B.p1)).toFixed(3)+')'; c.lineWidth=3*k; c.stroke();
-  for (const P of B.pans) if (panOut(B,P,s)) drawTidePan(B,P);
+  for (const P of B.pans) if (panWet(B,P,s)) drawTidePan(B,P);
   c.restore();
   // the waterline, lapping at it
   const lap=1+.012*Math.sin(t*1.4+B.p2); bankPath(c,B,s*lap,B.x,B.y);
@@ -324,18 +324,19 @@ function eelTrap(x,ex,ey,a){ x.save(); x.translate(ex,ey); x.rotate(a); const L=
   x.restore(); }
 function drawMarshNear(){
   if (!MSA.near) buildMarshNear(); ctx.drawImage(MSA.near,0,0,W,H);
-  const t=S.time, c=ctx, wind=1+wxLook().rain*.6; c.lineCap='round';
-  for (const r of MSA.reeds){ const sw=(Math.sin(t*1.05+r.ph)+.4*Math.sin(t*2.3+r.ph*1.7))*r.h*.06*wind, tx=r.x+r.lean+sw, ty=r.y-r.h, col=rvTone('trees',r.col,.6);
+  const t=S.time, c=ctx, wind=1+wxLook().rain*.6, tone={}, mace=rvTone('town','#5B3D2A',.5), pc=rvTone('town','#7E6256',.55); c.lineCap='round';
+  // each colour mixed once a frame, not once a reed
+  for (const r of MSA.reeds){ const sw=(Math.sin(t*1.05+r.ph)+.4*Math.sin(t*2.3+r.ph*1.7))*r.h*.06*wind, tx=r.x+r.lean+sw, ty=r.y-r.h, col=tone[r.col]||(tone[r.col]=rvTone('trees',r.col,.6));
     if (r.kind==='blade'){ c.fillStyle=col; c.beginPath(); c.moveTo(r.x-2.2,r.y); c.quadraticCurveTo(r.x+(r.lean+sw)*.4,r.y-r.h*.6,tx,ty); c.quadraticCurveTo(r.x+(r.lean+sw)*.4+2.6,r.y-r.h*.5,r.x+2.2,r.y); c.closePath(); c.fill(); continue; }
     c.strokeStyle=col; c.lineWidth=1.8; c.beginPath(); c.moveTo(r.x,r.y); c.quadraticCurveTo(r.x+(r.lean+sw)*.4,r.y-r.h*.55,tx,ty); c.stroke();
-    if (r.kind==='mace'){ c.save(); c.translate(tx,ty+r.h*.12); c.rotate((r.lean+sw)*.012); c.fillStyle=rvTone('town','#5B3D2A',.5); c.beginPath(); c.ellipse(0,0,2.8,r.h*.11,0,0,Math.PI*2); c.fill();
+    if (r.kind==='mace'){ c.save(); c.translate(tx,ty+r.h*.12); c.rotate((r.lean+sw)*.012); c.fillStyle=mace; c.beginPath(); c.ellipse(0,0,2.8,r.h*.11,0,0,Math.PI*2); c.fill();
       c.strokeStyle=col; c.lineWidth=1.1; c.beginPath(); c.moveTo(0,-r.h*.11); c.lineTo(0,-r.h*.19); c.stroke(); c.restore(); continue; }
     // a common reed's plume: a soft purple-brown tassel nodding with the stem
-    const pc=rvTone('town','#7E6256',.55); c.strokeStyle=pc; c.lineWidth=1.1;
+    c.strokeStyle=pc; c.lineWidth=1.1;
     for (let i=0;i<7;i++){ const u=i/6, bx=lerp(tx,tx+(r.lean+sw)*.25,u)-(r.lean>0?-1:1)*0, by=ty+u*r.h*.16, dx=(r.lean>0?1:-1)*(3+u*2)+sw*.2; c.beginPath(); c.moveTo(bx,by); c.quadraticCurveTo(bx+dx*.6,by+1,bx+dx,by+3.2); c.stroke(); } }
 }
 
-/* ---------- the marsh lights, at night and in fog (drawn over the dark, from nightShade) ---------- */
+/* ---------- the marsh lights, at night and in fog (drawn over the dark and the fog, after nightShade) ---------- */
 function drawWisps(){ if (REG()!=='marsh') return; const v=Math.max(Math.min(1,PAL.dark*1.8), wxLook().fog*.9); if (v<.08) return; const t=S.time, c=ctx;
   c.save(); c.globalCompositeOperation='lighter';
   for (const w of MSA.wisps){ const on=Math.max(0,Math.sin(t*w.sp*.4+w.ph)); if (on<.05) continue;
@@ -369,7 +370,7 @@ function lanternRodLight(){ if (save.rod!=='lanternrod' || PAL.dark<.05) return;
   c.translate(b.x,b.y); c.scale(1,.45); c.translate(-b.x,-b.y); c.fillStyle=pg; c.beginPath(); c.arc(b.x,b.y,R,0,Math.PI*2); c.fill(); c.restore();
   // the fish coming in, lit as it swims into the light
   const w=S.wait, sh=w&&w.sh; if (!sh || !w.fish) return; const d=Math.hypot((sh.x-b.x),(sh.y-b.y)/.45), lit=clamp(1-d/R,0,1)*sh.alpha; if (lit<.02) return; const F=FISH[w.fish];
-  c.save(); c.globalAlpha=lit*Math.min(1,PAL.dark*2); c.translate(sh.x,sh.y); c.rotate(sh.ang); c.scale(1,.55); drawFish(c,w.fish,F.len*sc(sh.y),true,.75,Math.sin(S.time*(w.phase==='nibble'?9:6))); c.restore();
+  c.save(); c.translate(sh.x,sh.y); c.rotate(sh.ang); c.scale(1,.55); drawFish(c,w.fish,F.len*sc(sh.y),true,.75*lit*Math.min(1,PAL.dark*2),Math.sin(S.time*(w.phase==='nibble'?9:6))); c.restore();
   if (modFlag('moonJar') && F.rarity!=='common'){ comboSeen('lantern'); c.save(); c.globalCompositeOperation='lighter'; c.globalAlpha=lit*.8; const col=RAR[F.rarity].color, rg=c.createRadialGradient(sh.x,sh.y,0,sh.x,sh.y,F.len*.7*sc(sh.y));
     rg.addColorStop(0,hexA(col,.45)); rg.addColorStop(1,hexA(col,0)); c.translate(sh.x,sh.y); c.scale(1,.5); c.translate(-sh.x,-sh.y); c.fillStyle=rg; c.beginPath(); c.arc(sh.x,sh.y,F.len*.7*sc(sh.y),0,Math.PI*2); c.fill(); c.restore(); } }
 

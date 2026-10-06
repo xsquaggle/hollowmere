@@ -213,7 +213,7 @@ function nightShade(){
   if (lp && PAL.dark>.15 && S.state!=='casting'){ ctx.save(); ctx.globalCompositeOperation='lighter';
     const bg=ctx.createRadialGradient(lp.x,lp.y,0,lp.x,lp.y,14); bg.addColorStop(0,'rgba(140,255,170,'+(.55*PAL.dark).toFixed(2)+')'); bg.addColorStop(1,'rgba(140,255,170,0)');
     ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(lp.x,lp.y,14,0,Math.PI*2); ctx.fill(); ctx.restore(); }
-  lanternRodLight(); drawWisps();   // the Lantern Rod's light, and the marsh lights (game/marsh-art.js)
+  lanternRodLight();   // the Lantern Rod's light (game/marsh-art.js)
   const L=SC.lamp; if (L && PAL.beam>.3){ ctx.save(); ctx.globalCompositeOperation='lighter'; const hg=ctx.createRadialGradient(L.x,L.y,0,L.x,L.y,8); hg.addColorStop(0,'rgba(255,236,190,'+(.5*PAL.dark).toFixed(2)+')'); hg.addColorStop(1,'rgba(255,236,190,0)'); ctx.fillStyle=hg; ctx.fillRect(L.x-8,L.y-8,16,16); ctx.restore(); }
 }
 const OTT = {say:'', sayT:0, next:14};
@@ -297,7 +297,10 @@ function updateAmbient(dt){
     if (f.ta!==undefined) f.a=angLerp(f.a,f.ta,dt*1.2);
     const sp=f.sp*(f.flee>0?5:1); f.flee=Math.max(0,f.flee-dt);
     const nx=f.x+Math.cos(f.a)*sp*dt/W, ny=f.y+Math.sin(f.a)*sp*dt*.5/H;
-    if (!onWater(nx*W,ny*H)){ f.ta=f.a+Math.PI; f.a=angLerp(f.a,f.ta,dt*4); continue; }   // the marsh: it turns back from the mud
+    // the marsh: it turns back from the mud, and if a bank comes up under it, it heads off it for the water
+    if (!onWater(nx*W,ny*H)){ const B=!onWater(f.x*W,f.y*H) && bankOf(f.x*W,f.y*H);
+      if (!B){ f.ta=f.a+Math.PI; f.a=angLerp(f.a,f.ta,dt*4); continue; }
+      f.a=f.ta=Math.atan2(2*(f.y*H-B.y),f.x*W-B.x); }
     f.x=nx; f.y=ny;
     if (f.x<.05||f.x>.95) f.ta=Math.atan2(Math.sin(f.a),-Math.cos(f.a)), f.x=clamp(f.x,.05,.95);
     const yMin=(HZ+30)/H, yMax=(H-210)/H;

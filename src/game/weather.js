@@ -134,5 +134,5 @@ const TIDE_SVG={in:'<path d="M3 13.6h10" stroke="currentColor" stroke-width="1.3
 const TIDE_SAY={in:'the tide coming in', out:'the tide going out', high:'high water', low:'low water'};
 function setClock(text){ const ico=$('wxIco'), key=wxIcon(), tk=REG()==='marsh'?tideMark():'', ti=$('tideIco');
   if (ico && ico.dataset.k!==key){ ico.dataset.k=key; ico.innerHTML=wxIconSVG(key); }
-  if (ti && ti.dataset.k!==tk){ ti.dataset.k=tk; ti.hidden=!tk; ti.innerHTML=tk?'<svg viewBox="0 0 16 16" aria-hidden="true">'+TIDE_SVG[tk]+'</svg>':''; }
+  if (ti && ti.dataset.k!==tk){ const was=ti.hidden; ti.dataset.k=tk; ti.hidden=!tk; ti.innerHTML=tk?'<svg viewBox="0 0 16 16" aria-hidden="true">'+TIDE_SVG[tk]+'</svg>':''; if (was!==ti.hidden) fitHud(); }
   $('clockT').textContent=text; $('clock').setAttribute('aria-label',clockText(save.clock)+', '+WX[wxNow()].name.toLowerCase()+(tk?', '+TIDE_SAY[tk]:'')); }

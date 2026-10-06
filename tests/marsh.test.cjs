@@ -120,6 +120,19 @@ module.exports = [
       await until(page, () => window.__S.state === 'lost', null, { timeout: 3000, what: 'the float stranded on the mud' });
       await until(page, () => /tide went out from under your float/.test(document.getElementById('coachText').textContent), null, { timeout: 14000, what: 'the stranding tip, after the mud\'s' });
       assert.equal((await readSave(page)).marshTips.strand, 1);
+      // a tide pool is never mud: as the flood reaches it, it's open water until the tide covers it
+      const pools = await page.evaluate(G => { const hm = window.__hm, out = []; for (let i = 0; i <= 100; i++) { hm.save.tidePin = i / 100;
+        for (const B of G.banks) for (const P of B.pans) for (const [dx, dy] of [[0, 0], [-.5, 0], [.5, 0]]) { const sp = hm.marsh.spot(P.x + dx * B.rx * .1, P.y + dy); if (sp === 'mud') out.push([B.id, i / 100, dx]); } }
+        return out; }, G);
+      assert.deepEqual(pools, [], 'no tide pool reads as mud at any point of the tide');
+      // the Twin Spool: the ebb leaves one float on the mud, and you fish on with the other
+      await until(page, () => window.__S.state === 'idle', null, { timeout: 6000, what: 'the line back in' });
+      await page.evaluate(() => { const hm = window.__hm; hm.save.rods.push('twin'); hm.save.rod = 'twin'; hm.marsh.mods(); hm.save.tidePin = 0; });
+      await castTo(page, bar.x, bar.y);
+      await until(page, () => window.__S.state === 'waiting', null, { what: 'the floats to land on the flats' });
+      const twin = await page.evaluate(([x, y]) => { const S = window.__S, hm = window.__hm; S.wait.t = 999; S.bob2 = { x, y, spot: 'open', dip: 1, jerk: 0, nibble: 0, plunge: 0 };
+        hm.save.tidePin = .5; hm.marsh.wait(.3); return { state: S.state, x: S.bob.x, y: S.bob.y, b2: S.bob2 }; }, [G.w * .5, G.h * .62]);
+      assert.deepEqual(twin, { state: 'waiting', x: G.w * .5, y: G.h * .62, b2: null }, 'the float still in the water fishes on');
     },
   },
   {

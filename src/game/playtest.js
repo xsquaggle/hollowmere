@@ -51,7 +51,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   $('mapBtn2').addEventListener('click',()=>{ while (mapCan({}) && !mapWhole()) addMapPiece({}); persist(); closeSheet(); news(mapWhole()?'Your treasure map is whole':'You already have a map from another water',''); });
   $('tFish').addEventListener('change',e=>{ RARITY_CTL.fish=e.target.value||null; $('tFishO').textContent=RARITY_CTL.fish?FISH[RARITY_CTL.fish].name:'As the water has it'; });
   $('tMut').addEventListener('change',e=>{ RARITY_CTL.mut=e.target.value||null; $('tMutO').textContent=RARITY_CTL.mut?MUTS[RARITY_CTL.mut].name:'Left to chance'; });
-  $('tTide').addEventListener('change',e=>{ if (e.target.value!=='') save.tidePin=+e.target.value; else delete save.tidePin; persist(); MODC.dirty=true; $('tTideO').textContent=tideName(); });
+  $('tTide').addEventListener('change',e=>{ if (e.target.value!=='') save.tidePin=+e.target.value; else delete save.tidePin; persist(); MODC.dirty=true; MSH.dir=null; MSH.at=null; $('tTideO').textContent=tideName(); });
   $('tMoon').addEventListener('change',e=>{ const w=wxState(); if (e.target.value!=='') w.moon=+e.target.value; else delete w.moon; persist(); buildBg(); $('tMoonO').textContent=moonName(); });
   $('bowBtn').addEventListener('click',()=>{ const w=wxState(); if (w.bow) delete w.bow; else w.bow=true; persist(); buildBg(); closeSheet(); if (w.bow && isNight(save.clock)) toast('Rainbows only come by day','warn'); });
   // traps, the smoke rack and the clock all move on an hour, as if you'd been away (game/away.js)

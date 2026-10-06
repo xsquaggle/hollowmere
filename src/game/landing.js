@@ -147,7 +147,7 @@ const hudClock = h => HUD.lv>=2?clockText(h).replace(/ [AP]M$/,''):clockText(h);
 /** Fits the row to the numbers it will settle on (a count-up in progress ends there), then puts back what's showing. */
 function fitHud(){ const hud=$('hud'); if (!hud) return; const g=save.glimmer||0, m=save.meal;
   const chips=[...hud.querySelectorAll('.chip')], sig=[innerWidth,save.coins.toLocaleString().length,g.toLocaleString().length,clockText(save.clock).length,m?String(m.casts).length:0]
-    .concat(chips.map(c=>c.hidden?0:1),$('labBtn').hidden?0:1).join();
+    .concat(chips.map(c=>c.hidden?0:1),$('labBtn').hidden?0:1,$('tideIco')&&!$('tideIco').hidden?1:0).join();
   if (sig===HUD.sig) return; HUD.sig=sig;
   const over=()=>chips.some(c=>!c.hidden && c.scrollWidth>c.clientWidth+1);
   if (m && !$('mealChip').hidden) $('mealCasts').textContent=m.casts;
