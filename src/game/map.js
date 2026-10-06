@@ -108,7 +108,8 @@ function routeU(route,len,p){ let best=0, bd=1e9; for (let i=0;i<=120;i++){ cons
 function closeMap(){ const layer=$('mapLayer'); if (layer.hidden) return; ovClosed('map'); layer.classList.add('closing'); setTimeout(()=>{ layer.hidden=true; layer.classList.remove('closing'); layer.innerHTML=''; },REDUCED?0:280); }
 function travelTo(to,first){
   if (to!==REG()) homeMoved(to);   // Homebody starts counting again (game/river.js)
-  save.region=to; persist(); mailMoved(); QS.pages=[];
+  save.region=to; mailMoved(); QS.pages=[]; if (save.quarter && save.quarter.page){ save.quarter.page=0; MODC.dirty=true; }   // a drowned page stays in the Quarter
+  persist();
   S.bob=null; S.wait=null; S.reel=null; S.land=null; SC.lucky=null; SC.jump=null; SC.drop=null; SC.gull=null; S.swell=null;
   layoutScenery(); buildBg(); updateHud(); setState('idle');
   toast(REGION_NAME[to],'gold');

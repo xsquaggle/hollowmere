@@ -46,7 +46,7 @@ function pellUpdate(dt){ const here=REG()==='quarter';
   PL.callT-=dt;
   // at the lake he calls in at your dock when he has something for you, and waits a little while to be tapped
   if (!here){ PL.hello=false;
-    if (REG()==='lake' && PL.callT<=0 && MAIL.state==='away' && S.state==='idle' && pellHasNews()){ PL.callT=150; MAIL.state='waiting'; MAIL.t=2; MAIL.hold=28; news(PELL.wait,''); }
+    if (REG()==='lake' && PL.callT<=0 && MAIL.state==='away' && sceneFree() && pellHasNews()){ PL.callT=150; MAIL.state='waiting'; MAIL.t=2; MAIL.hold=28; news(PELL.wait,''); }
     return; }
   if (!PL.hello){ PL.hello=true; const tp=quarterState().tips; if (!tp.hello){ tp.hello=1; persist(); setTimeout(()=>{ if (REG()==='quarter') pellSay(PELL.hello,8); },2600); } }
   PL.next-=dt; if (PL.next<=0 && S.state==='idle' && !(MAIL.sayT>0)){ PL.next=rand(32,52); pellSay(pellHasNews()?PELL.call:PELL.lines[Math.floor(Math.random()*PELL.lines.length)],5.5); } }
@@ -73,9 +73,8 @@ function openPell(){ audioInit(); const q=quarterState(), first=!q.met; q.met=1;
 /** His round: each step he's asked so far, the one he's on, and a hint that there's more. */
 function pellRoundHTML(){ const q=quarterState(), FS=findsState();
   const head=(name,state)=>'<div class="quest-h"><h3>'+name+'</h3><span class="q-'+state+'">'+{done:'Done',ready:'Ready',open:'Open',later:'Later'}[state]+'</span></div>';
-  let h='', shown=0;
+  let h='';
   for (const k of PELL_STEPS){ const P=PELL_Q[k], st=pellStep(k);
-    if (st==='later'){ if (!shown++) h+='<section class="quest">'+head('???','later')+'<p class="mini">He’ll have more to ask once this is done.</p></section>'; continue; }
     h+='<section class="quest">'+head(P.name,st)+'<p class="note pell-say">“'+(st==='done'?P.thanks:k==='rowboat'&&!save.boat?PELL.noboat:P.ask)+'”</p>';
     if (k==='rowboat'){ const price=QUARTER.row.price;
       if (st==='done') h+='<p class="mini">'+P.reward+'</p>'+(REG()==='quarter'?'':'<button class="btn" id="pellRow" type="button">Row out to the Drowned Quarter</button>');
@@ -88,7 +87,7 @@ function pellRoundHTML(){ const q=quarterState(), FS=findsState();
     else if (k==='answer') h+='<p class="mini">'+(FS.letters.edith==='posted'||lettersAre('posted').length?'The Postman Sturgeon does its round of the post office, mostly in the morning.':'Post a letter first.')+'</p>';
     else if (k==='sack') h+='<div class="sack-list">'+PELL.sack.map(id=>{ const s=FS.letters[id]; return '<div class="sack-row'+(s?'':' blank')+'"><canvas data-notekind="letter" aria-hidden="true"></canvas><div><h4>'+(s?NOTES[id].to:'A letter never sent')+'</h4><p class="mini">'+(s==='posted'?'Posted':s==='delivered'?(q.clip===id?'On your line':'In the sack'):s==='waiting'?'Waiting for Pell':'Not found yet')+'</p></div></div>'; }).join('')+'</div><p class="mini">'+PELL.where.sack+'</p>';
     h+='</section>';
-    if (st!=='done') break; }
+    if (st!=='done'){ if (k!==PELL_STEPS[PELL_STEPS.length-1]) h+='<section class="quest">'+head('???','later')+'<p class="mini">He’ll have more to ask once this is done.</p></section>'; break; } }
   return h; }
 function pellRodHTML(id){ return '<div class="entry" style="grid-template-columns:1fr auto"><div><h3>The '+RODS[id].name+' is yours</h3><canvas class="rod-art" data-rodart="'+id+'" aria-hidden="true"></canvas><p class="mini">'+RODS[id].perk+'</p></div>'+
   (save.rod===id?'<span class="r" style="color:#4E7B4C">Equipped</span>':'<button class="btn" data-equip="'+id+'" type="button">Equip</button>')+'</div>'; }
@@ -142,5 +141,5 @@ function replyDue(){ const FS=findsState(); return LETTER_ORDER.find(id=>FS.lett
 function pellAfterCatch(L){ if (!L || L.id!=='sturgeon' || SIMULATING) return; const re=replyDue(); if (!re) return;
   const id=replyOf(re), FS=findsState(); FS.notes.push(id); FS.letters[id]='waiting'; persist(); updateJournalDot();
   news('The Postman Sturgeon was carrying a letter','gold');
-  const show=()=>{ if (S.state==='idle' && $('sheet').hidden && $('note').hidden){ openNote(id,{fresh:true, done:()=>letterToPell(id)}); } else setTimeout(show,900); };
+  const show=()=>{ if (sceneFree()){ openNote(id,{fresh:true, done:()=>letterToPell(id)}); } else setTimeout(show,900); };
   setTimeout(show,800); }

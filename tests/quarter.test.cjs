@@ -286,4 +286,47 @@ module.exports = [
       assert.deepEqual(page.errors, []);
     },
   },
+  {
+    name: 'nothing waits behind a wall or slips past: map caches, a second float, a second page, the hand bell, the round and the stopped watch',
+    async run({ newPage, openGame, veteran }) {
+      const page = await newPage();
+      await openGame(page, { save: inQuarter(veteran, { rods: ['willow', 'twin', 'tidecaller'], rod: 'twin', quarter: { row: true, done: {}, tips: { hello: 1, wall: 1, page: 1 } },
+        finds: finds({}, { have: { bell: { t: 1 }, watch: { t: 1 } }, equip: ['bell'] }) }) });
+      const R = await page.evaluate(() => { const hm = window.__hm, Q = hm.quarter, S = window.__S, g = Q.G(), out = { walled: [], twin: { n: 0, walls: 0, seated: 0 } };
+        out.round = [Q.pell.step('rowboat'), Q.pell.step('lantern')];   // a save with the rowboat fixed but its step not marked
+        // a treasure map's cache, at every depth and angle it can take
+        for (let d = .2; d <= .881; d += .04) for (let th = -.45; th <= .451; th += .05){ hm.relics.state().map = { reg: 'quarter', n: 3, depth: d, th, seed: 1, t: 0 };
+          const p = hm.relics.mapXY(); if (Q.hit(p.x, p.y).kind === 'wall') out.walled.push(d.toFixed(2) + '/' + th.toFixed(2)); }
+        hm.relics.state().map = null;
+        // the Twin Spool's second float, cast all over the street
+        for (let i = 0; i < 400; i++){ S.bob = { x: 20 + Math.random() * (g.w - 40), y: g.hz + 30 + Math.random() * (g.near - g.hz - 30), spot: 'open', dip: 0, nibble: 0 };
+          hm.river.twin.land(); const b2 = S.bob2; if (!b2) continue; out.twin.n++;
+          if (Q.hit(b2.x, b2.y).kind === 'wall') out.twin.walls++; if (b2.hole) out.twin.seated++; }
+        S.bob = null; S.bob2 = null;
+        // a second page tapped while one's on the hook stays in the water, and a hooked page stays in the Quarter
+        Q.pages.spawn(false); Q.pages.spawn(false); const n0 = Q.pages.list().length; Q.pages.scoop(0); Q.pages.scoop(0);
+        out.pages = [n0, Q.pages.list().length, Q.state().page];
+        // the hand bell and the Tidecaller's conch: a tap on one never rings the other
+        Q.rod('tidecaller'); const c = Q.call.pos(), b = Q.bell.pos(); let clash = 0;
+        for (let a = 0; a < 6.28; a += .3) for (const r of [0, 6, 12, 16]) if (Q.bell.on(c.x + Math.cos(a) * r, c.y + Math.sin(a) * r)) clash++;
+        out.bell = { clash, on: Q.bell.on(b.x, b.y - 2), conch: Q.call.on(c.x, c.y) };
+        // the Stopped Pocket Watch: no rain called and no tower rung into a clock that won't move
+        delete hm.save.wx.force; hm.save.clock = 12; for (let i = 0; i < 8 && hm.wx.now() !== 'clear'; i++) hm.save.clock = (hm.save.clock + 3) % 24;
+        hm.relics.pocket('watch'); Q.call.blow(); Q.bell.ring(); out.watch = { call: !!hm.save.wx.call, ring: !!Q.state().ring };
+        hm.findsState().equip = hm.findsState().equip.filter(id => id !== 'watch'); Q.mods(); Q.call.blow(); Q.bell.ring(); out.unwound = { call: !!hm.save.wx.call, ring: !!Q.state().ring };
+        Q.pell.open(); out.teaser = document.querySelector('#panel').textContent.includes('He’ll have more to ask');
+        Q.travel('lake'); out.away = Q.state().page; return out; });
+      assert.deepEqual(R.round, ['done', 'open'], 'a fixed rowboat is a done step, and the round goes on');
+      assert.deepEqual(R.walled, [], 'no map cache lies behind a wall');
+      assert.ok(R.twin.n > 100 && R.twin.walls === 0, 'the second float never sits on a wall: ' + JSON.stringify(R.twin));
+      assert.ok(R.twin.seated > 5, 'and goes in at an opening like the first: ' + JSON.stringify(R.twin));
+      assert.deepEqual(R.pages, [2, 1, 1], 'one page on the hook, the other left drifting');
+      assert.deepEqual(R.bell, { clash: 0, on: true, conch: true });
+      assert.deepEqual(R.watch, { call: false, ring: false }, 'the stopped watch holds the clock, so no rain and no tower');
+      assert.deepEqual(R.unwound, { call: true, ring: true }, 'out of the pocket, both work');
+      assert.equal(R.teaser, true, 'Pell says he’ll have more to ask');
+      assert.equal(R.away, 0, 'a page on the hook stays in the Quarter');
+      assert.deepEqual(page.errors, []);
+    },
+  },
 ];

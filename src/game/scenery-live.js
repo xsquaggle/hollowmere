@@ -243,7 +243,7 @@ function updateScenery(dt){
   const g=SC.gull;
   if (g){ g.t+=dt;
     if (g.phase==='stop' && g.t>.9){ g.phase='drop'; SC.drop={x:g.x,y:g.y+5,vy:0,k:0,tx:clamp(g.x+rand(-50,50),34,W-34),ty:rand(HZ+50,G.near-10),y0:g.y};
-      for (let i=0;i<8 && !onWater(SC.drop.tx,SC.drop.ty);i++){ SC.drop.tx=rand(34,W-34); SC.drop.ty=rand(HZ+50,G.near-10); } tone(1500,.75,{to:260,vol:.07}); }
+      for (let i=0;i<8 && !castable(SC.drop.tx,SC.drop.ty);i++){ SC.drop.tx=rand(34,W-34); SC.drop.ty=rand(HZ+50,G.near-10); } tone(1500,.75,{to:260,vol:.07}); }
     else if (g.phase==='drop' && g.t>1.7){ g.phase='leave'; }
     else if (g.phase==='leave'){ g.x+=g.dir*75*dt; g.y-=12*dt; if (g.x<-40||g.x>W+40) SC.gull=null; } }
   const d=SC.drop;
@@ -266,7 +266,7 @@ function updateScenery(dt){
   if (SC.jump){ const j=SC.jump; j.t+=dt; if (j.t>=j.dur){ splash(j.x+j.dir*14*sc(j.y),j.y,6); ripple(j.x+j.dir*14*sc(j.y),j.y,20); SC.jump=null; } }
   else { SC.nextJump-=dt; if (SC.nextJump<=0){ SC.nextJump=rand(8,15);
     const x=rand(30,W-30), y=rand(HZ+40,H-260), b=S.bob;
-    if ((!b || Math.hypot(x-b.x,y-b.y)>80) && onWater(x,y)){ SC.jump={x,y,t:0,dur:.75,dir:Math.random()<.5?1:-1}; splash(x,y,5); ripple(x,y,16); } } }
+    if ((!b || Math.hypot(x-b.x,y-b.y)>80) && castable(x,y)){ SC.jump={x,y,t:0,dur:.75,dir:Math.random()<.5?1:-1}; splash(x,y,5); ripple(x,y,16); } } }
   const f=SC.frog;
   if (REG()!=='lake' || !SC.pads[0]){}
   else if (f.hop){ f.hop.t+=dt; if (f.hop.t>=.5){ f.pad=f.hop.to; f.hop=null; const p=padPos(0,f.pad); ripple(p.x,p.y,14); splash(p.x,p.y,3); } }
@@ -294,6 +294,8 @@ function drawAmbient(dt){
 }
 /** Whether (x, y) is open water: anywhere but on a marsh bank the tide has left out. */
 const onWater = (x,y) => REG()!=='marsh' || !marshMud(x,y);
+/** Whether a cast can reach (x, y): open water, and in the Quarter not behind a wall. */
+const castable = (x,y) => onWater(x,y) && !quarterHidden(x,y);
 function updateAmbient(dt){
   for (const f of S.ambient){
     f.turn-=dt; if (f.turn<=0){ f.turn=rand(1.5,3.5); f.ta=f.a+rand(-1.2,1.2); }

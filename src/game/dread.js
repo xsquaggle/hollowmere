@@ -44,7 +44,7 @@ function boneWhistle(v){ v=v||1; tone(233,1.6,{to:220,vol:.03*v,type:'sine'}); t
 
 /* ---------- the lake looks back ---------- */
 function lakeLooksWhenFree(){ if (DR.eye || dreadState().v<100) return;
-  if (S.state==='idle' && $('sheet').hidden && $('note').hidden && $('haul').hidden) lakeLooks(); else setTimeout(lakeLooksWhenFree,1200); }
+  if (sceneFree()) lakeLooks(); else setTimeout(lakeLooksWhenFree,1200); }
 function lakeLooks(){ const d=dreadTick(); if (d.v<100) return;
   const took=Math.min(d.owed,save.coins), gone=save.net.filter(f=>isObj(f) && f.rod==='bonewhistle');
   save.net=save.net.filter(f=>!(isObj(f) && f.rod==='bonewhistle')); save.coins-=took; d.v=0; d.owed=0; d.warned=false; d.haunt=false;

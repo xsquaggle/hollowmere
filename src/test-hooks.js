@@ -81,7 +81,7 @@ window.__hm={ get save(){ return save; }, FISH, RODS, QUARTER, PELL_Q, ROD_ORDER
     aim:(x,y)=>{ const a=quarterAim({target:{x,y}}); return a&&{text:a.text, post:!!a.post, danger:!!a.danger, x:a.mark.x, y:a.mark.y}; },
     land:(x,y)=>{ const c={to:{x,y}}; quarterLand(c); return {x:c.to.x, y:c.to.y, spot:c.spot, house:c.hole?c.hole.house:null}; },
     post:house=>postLetter(G.q.holes.find(h=>h.house===house)), refl:(x,y)=>quarterRefl(x,y), from:house=>quarterFrom({x:0, hole:G.q.holes.find(h=>h.house===house)}),
-    bell:{ ringing:()=>bellRinging(), natural:()=>bellNatural(), cooling:()=>bellCooling(), ring:()=>ringBell() },
+    bell:{ ringing:()=>bellRinging(), natural:()=>bellNatural(), cooling:()=>bellCooling(), ring:()=>ringBell(), pos:()=>handBellPos(), on:(x,y)=>onHandBell(x,y) },
     pages:{ list:()=>QS.pages.map(p=>({x:p.x, y:p.y, env:!!p.env})), spawn:env=>{ QS.forceEnv=!!env; QS.pageT=0; quarterPages(.01); return QS.pages.length; }, scoop:i=>scoopPage(QS.pages[i==null?QS.pages.length-1:i]),
       at:(x,y)=>!!pageAt(x,y), drift:any=>driftLetter(any), cast:()=>pageCast(), spent:()=>pageSpent() },
     pell:{ open:()=>openPell(), met:k=>pellMet(k), step:k=>pellStep(k), news:()=>pellHasNews(), fix:()=>fixRowboat(), claim:k=>claimStep(k), clip:id=>clipLetter(id), due:()=>replyDue(),

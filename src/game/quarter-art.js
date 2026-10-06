@@ -396,8 +396,9 @@ function drawRowboat(){ const cx=W/2, b=S.bob_y||0, tipY=H-200+b, c=ctx;
     c.fillStyle='#6B4A33'; c.fillRect(-1.4,-4,2.8,4); c.restore();
     if (bellRinging() || bellCooling()<=0){ const g=.5+.5*Math.sin(S.time*2); if (!bellRinging()){ c.strokeStyle='rgba(242,212,126,'+(.25+.3*g).toFixed(2)+')'; c.lineWidth=1.2; c.beginPath(); c.arc(p.x,p.y-2,13+g*2,0,Math.PI*2); c.stroke(); } } } }
 /** Where the hand bell hangs on the rowboat (and where a tap rings it). */
-function handBellPos(){ return {x:W/2+30, y:H-150+(S.bob_y||0)}; }
-function onHandBell(x,y){ if (!bellHere() || S.state!=='idle') return false; const p=handBellPos(); return Math.hypot(x-p.x,y-(p.y-2))<20; }
+function handBellPos(){ return {x:W/2+46, y:H-150+(S.bob_y||0)}; }
+// out at the gunwale, clear of the Tidecaller's conch at the rod butt, so a tap on one never rings the other
+function onHandBell(x,y){ if (!bellHere() || S.state!=='idle') return false; const p=handBellPos(); return Math.hypot(x-p.x,y-(p.y-2))<18; }
 
 /* ---------- each frame ---------- */
 function quarterArtUpdate(dt){ const q=G.q; if (!q) return;

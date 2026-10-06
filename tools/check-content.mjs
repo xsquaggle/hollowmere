@@ -525,7 +525,7 @@ need('PLATTER', PLATTER, { name: 'str', dish: 'str', side: 'str', zone: 'arr' })
 { const { PACE_SIM, BOAT, FIXUP, POCKETS, ENCH, PARTS } = D;
   if (!(BOAT && BOAT.price > 0)) bad('BOAT', 'the skiff needs a price');
   const known = k => { const [kind, id] = k.split(':');
-    return kind === 'rod' ? !!RODS[id] : kind === 'boat' || kind === 'ferry' || kind === 'marsh' ? id === undefined : kind === 'part' ? !!PARTS[id] : kind === 'fix' ? FIXUP.some(L => L.id === id && L.cost)
+    return kind === 'rod' ? !!RODS[id] : kind === 'boat' || kind === 'ferry' || kind === 'marsh' || kind === 'quarter' ? id === undefined : kind === 'part' ? !!PARTS[id] : kind === 'fix' ? FIXUP.some(L => L.id === id && L.cost)
       : kind === 'pocket' ? +id > POCKETS.start && +id <= POCKETS.max : kind === 'rune' ? !!ENCH[id] : kind === 'fish' ? !!FISH[id] : false; };
   for (const [k, m] of Object.entries(PACE_SIM || {})) { if (!known(k)) bad('PACE_SIM.' + k, 'names nothing the pace log looks for'); if (!(isNum(m) && m >= 0)) bad('PACE_SIM.' + k, 'should be minutes'); } }
 

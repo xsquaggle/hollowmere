@@ -15,7 +15,7 @@
    balance simulator can fish here too. QS holds the moment-to-moment state. */
 const QS={pages:[], pageT:12, toll:0, ringWas:false, ringMod:false, rung:0, forceEnv:false};
 function quarterState(){ if (!isObj(save.quarter)) save.quarter={}; const q=save.quarter;
-  if (!isObj(q.done)) q.done={}; if (!isObj(q.tips)) q.tips={};
+  if (!isObj(q.done)) q.done={}; if (!isObj(q.tips)) q.tips={}; if (q.row) q.done.rowboat=1;   // a rowboat that's fixed is a step that's done
   if (q.clip!=null && !(NOTES[q.clip] && PELL.post[q.clip])) q.clip=null;
   if (q.ring!=null && !(isObj(q.ring) && q.ring.until>q.ring.from)) q.ring=null;
   if (q.page!==1 && q.page!==2) q.page=0;
@@ -143,6 +143,7 @@ function bellCooling(){ const r=save.quarter&&save.quarter.ring; return r ? Math
 const bellHere = () => REG()==='quarter' && pocketed('bell');
 function ringBell(){ const q=quarterState();
   if (bellRinging()){ toast('The tower’s already ringing',''); return; }
+  if (modFlag('timeStop')){ handBell(.5); toast('Time stands still. The tower can’t answer','warn'); return; }
   const wait=bellCooling(); if (wait>0){ handBell(.5); toast('The tower doesn’t answer. Try again in '+Math.ceil(wait)+' hour'+(Math.ceil(wait)===1?'':'s'),'warn'); return; }
   handBell(1); const a=absHour(); q.ring={from:a+.05, until:a+.05+QUARTER.bell.hours}; persist(); MODC.dirty=true;
   QS.toll=.6; comboSeen('tower'); }
@@ -169,11 +170,11 @@ function driftLetter(any){ const d=(save.quarter&&save.quarter.done)||{}, FS=fin
   if (!any && !d.tower) return null; return PELL.sack.find(id=>!FS.letters[id])||null; }
 /** Scoop a page onto the hook: it goes out on your next cast, and something in the Quarter reads them. An envelope
     is one of the letters the post office never sent: it opens, and goes to Pell. */
-function scoopPage(p){ const q=quarterState(); QS.pages=QS.pages.filter(o=>o!==p);
-  if (p.env){ const id=driftLetter(true); if (id){ const FS=findsState(); FS.letters[id]='waiting'; if (!FS.notes.includes(id)) FS.notes.push(id); persist(); updateJournalDot();
+function scoopPage(p){ const q=quarterState(), take=()=>{ QS.pages=QS.pages.filter(o=>o!==p); };
+  if (p.env){ const id=driftLetter(true); if (id){ take(); const FS=findsState(); FS.letters[id]='waiting'; if (!FS.notes.includes(id)) FS.notes.push(id); persist(); updateJournalDot();
       noise(.25,{vol:.1,f:2600,to:1400,type:'bandpass'}); buzz(12); openNote(id,{fresh:true, done:()=>letterToPell(id)}); return; } }
   if (q.page){ toast('There’s a page on the hook already',''); return; }
-  q.page=1; persist(); MODC.dirty=true; noise(.25,{vol:.1,f:2600,to:1400,type:'bandpass'}); buzz(10);
+  take(); q.page=1; persist(); MODC.dirty=true; noise(.25,{vol:.1,f:2600,to:1400,type:'bandpass'}); buzz(10);
   const tip=rodTip(); for (let i=0;i<6;i++) S.particles.push({x:p.x,y:p.y,vx:(tip.x-p.x)*1.2+rand(-30,30),vy:(tip.y-p.y)*1.2-60,g:300,life:0,max:.7,r:rand(1,1.8),c:'rgba(205,228,236,'});
   if (!q.tips.page){ q.tips.page=1; persist(); coachFor('A page from the post office, soaked through and still legible. It’s on your hook for one cast. Something in the Quarter reads them.',8); }
   else toast('A drowned page on the hook, for one cast',''); }
@@ -204,8 +205,10 @@ function quarterUpdate(dt){
   // under the lake: the tower's bell, faintly, at 3:12, once the Quarter's open
   if (!here){ QS.ringWas=false; return; }   // at the lake, the bell's heard faintly under it (game/music.js: ambTick)
   quarterPages(dt); rowboatBob(dt);
-  if (ring && !QS.ringWas && !S.tut){ const natural=bellNatural(); news(natural?'3:12. The bell tower is ringing':'The bell tower answers','gold'); QS.toll=.3;
-    const tp=quarterState().tips; if (natural && !tp.ring){ tp.ring=1; persist(); setTimeout(()=>coachFor('It’s 3:12, and the bell’s ringing. Whatever answers it lives by the tower. Fish the tower, quick: it rings for an hour.',8),1200); } }
+  if (ring && !QS.ringWas && !S.tut){ const natural=bellNatural(), tp=quarterState().tips; QS.toll=.3;
+    // the first time, the tip says it all; after that, a note
+    if (natural && !tp.ring){ tp.ring=1; persist(); setTimeout(()=>coachFor('It’s 3:12, and the bell’s ringing. Whatever answers it lives by the tower. Fish the tower, quick: it rings for an hour.',8),600); }
+    else news(natural?'3:12. The bell tower is ringing':'The bell tower answers','gold'); }
   QS.ringWas=ring; MODC.dirty=MODC.dirty||ring!==QS.ringMod; QS.ringMod=ring;
   if (ring){ QS.toll-=dt; if (QS.toll<=0){ QS.toll=3.4; towerToll(); } }
   if (QS.rung>0) QS.rung=Math.max(0,QS.rung-dt*1.4);

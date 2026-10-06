@@ -1,6 +1,8 @@
 /* ---------- News ribbon: small, queued, never covers the sky ---------- */
 const NEWS={q:[],busy:false};
 function news(text,kind){ if (NEWS.q.length && NEWS.q[NEWS.q.length-1].text===text) return; NEWS.q.push({text,kind:kind||''}); if (NEWS.q.length>4) NEWS.q.shift(); if (!NEWS.busy) newsNext(); }
+// A tip that opens while a note is up pushes the note down below it, so the two never overlap
+function newsClearCoach(){ const el=$('news'), c=$('coach'); if (el.classList.contains('show') && !c.hidden && !document.body.classList.contains('cine')) el.style.top=(c.getBoundingClientRect().bottom+8)+'px'; }
 function newsNext(){ const el=$('news'); const n=NEWS.q.shift(); if (!n){ NEWS.busy=false; return; } NEWS.busy=true;
   const c=$('coach'); el.style.top=(!c.hidden && !document.body.classList.contains('cine'))?(c.getBoundingClientRect().bottom+8)+'px':'';
   el.className='show '+n.kind; el.textContent=n.text; clearTimeout(NEWS.tm); NEWS.tm=setTimeout(()=>{ el.className='hide '+n.kind; setTimeout(newsNext,260); },2400+Math.min(1600,n.text.length*25)); }
@@ -11,6 +13,8 @@ function coachShow(text,secs){ coach(text,'Tip'); clearTimeout(coachTimer); coac
 function coachDrain(){ if (coachTimer || S.tut) return; while (COACHQ.length && performance.now()-COACHQ[0].at>90000) COACHQ.shift(); const n=COACHQ.shift(); if (n) coachShow(n.text,n.secs); }
 /* ---------- Leaving things: back gesture, Escape and swipe-down all close the top layer ---------- */
 const OV=[]; let ovSkip=0, ovPopping=false, ovQueue=[], ovQueueT=0;
+/** Nothing open over the water (a sheet, a note, a room, the map, the bag) and no cast under way: free for something to happen. */
+const sceneFree = () => S.state==='idle' && !OV.length && $('sheet').hidden && $('note').hidden && $('haul').hidden;
 /* Opening one layer as another closes (a sheet that opens the bag or the map) would push the new entry before the
    old one's history.back() lands, and that back would then eat it. So while a back is on its way, the push waits for it. */
 function ovPush(name){ try { history.pushState({hm:name},''); } catch(e){} }

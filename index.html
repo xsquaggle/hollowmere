@@ -270,7 +270,7 @@ body.cine #hud,body.cine .corner,body.cine #hint,body.cine #coach,body.cine #toa
 @media (prefers-reduced-motion: reduce){.in-title h1 span,.in-letter,.in-letter .ln,.in-go,.in-tap,.in-hand,.in-sub{animation-duration:.01s!important;animation-delay:0s!important}}
 /* News ribbon: small queued notes under the HUD */
 #news{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 60px);z-index:60;transform:translate(-50%,-8px);max-width:calc(100% - 40px);box-sizing:border-box;pointer-events:none;opacity:0;
-  background:rgba(27,34,50,.86);color:var(--paper);border:1px solid rgba(243,234,215,.22);border-radius:999px;padding:8px 14px;font:800 13px/1.25 var(--body);text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.3);transition:opacity .25s,transform .25s;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  background:rgba(27,34,50,.86);color:var(--paper);border:1px solid rgba(243,234,215,.22);border-radius:999px;padding:8px 14px;font:800 13px/1.25 var(--body);text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.3);transition:opacity .25s,transform .25s,top .25s;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 #news.show{opacity:1;transform:translate(-50%,0)}#news.hide{opacity:0;transform:translate(-50%,-6px)}
 #news.gold{color:#F2D47E;border-color:rgba(242,212,126,.4)}#news.good{color:#CFE7B9}#news.warn{color:#F5D08A}#news.bad{color:#F4A595}
 /* small fixes */
@@ -3032,7 +3032,7 @@ const S = {state:'idle', time:0, freeze:0, shake:0, pulse:0, pulseColor:'255,255
   particles:[], ripples:[], ambient:[]};
 for (let i=0;i<4;i++) S.ambient.push({x:rand(.1,.9), y:rand(.35,.75), a:rand(0,6.28), sp:rand(10,22), len:rand(18,30), turn:rand(1,3), alpha:.22, flee:0});
 
-function coach(text, step, warn){ const c=$('coach'); $('coachText').textContent=text; $('coachStep').textContent=step||'Tip'; c.classList.toggle('warn',!!warn); if (c.hidden){ c.hidden=false; } $('hint').hidden=true; }
+function coach(text, step, warn){ const c=$('coach'); $('coachText').textContent=text; $('coachStep').textContent=step||'Tip'; c.classList.toggle('warn',!!warn); if (c.hidden){ c.hidden=false; } $('hint').hidden=true; newsClearCoach(); }
 function coachOff(){ $('coach').hidden=true; $('hint').hidden=false; }
 let coachTimer=0;
 function coachFor(text,secs){ coachLater(text,secs); }
@@ -6232,6 +6232,8 @@ function addMapPiece(c){ const r=relicState(); if (!mapCan(c)) return r.map;
 function mapXY(m){ const ty=lerp(G.near,HZ+26,Math.min(m.depth,Math.max(MAPS.depth[0],castReach()*.95))), p={x:clamp(W/2+Math.tan(m.th)*(G.player.y-ty)*.85,W*.1,W*.9), y:ty};
   // the marsh: never under the saltings, which only a spring tide covers, but in the water just off their edge
   if (REG()==='marsh') for (const B of G.banks||[]) if (B.salt && Math.hypot((p.x-B.x)/B.rx,(p.y-B.y)/B.ry)<1.3) p.y=Math.max(p.y,B.y+B.ry*1.3);
+  // the Quarter: never behind a wall, where no cast can reach, but in the street at its foot
+  if (quarterHidden(p.x,p.y)){ const f=quarterFoot(p.x,p.y); p.x=f.x; p.y=f.y; }
   return p; }
 /** 'pin' on the Cartographer's Pin's mark, 'ring' inside the whole map's ring, or null. */
 function mapAt(x,y){ const m=relicState().map; if (!m || m.n<MAPS.pieces || m.reg!==REG()) return null;
@@ -7037,7 +7039,7 @@ function updateScenery(dt){
   const g=SC.gull;
   if (g){ g.t+=dt;
     if (g.phase==='stop' && g.t>.9){ g.phase='drop'; SC.drop={x:g.x,y:g.y+5,vy:0,k:0,tx:clamp(g.x+rand(-50,50),34,W-34),ty:rand(HZ+50,G.near-10),y0:g.y};
-      for (let i=0;i<8 && !onWater(SC.drop.tx,SC.drop.ty);i++){ SC.drop.tx=rand(34,W-34); SC.drop.ty=rand(HZ+50,G.near-10); } tone(1500,.75,{to:260,vol:.07}); }
+      for (let i=0;i<8 && !castable(SC.drop.tx,SC.drop.ty);i++){ SC.drop.tx=rand(34,W-34); SC.drop.ty=rand(HZ+50,G.near-10); } tone(1500,.75,{to:260,vol:.07}); }
     else if (g.phase==='drop' && g.t>1.7){ g.phase='leave'; }
     else if (g.phase==='leave'){ g.x+=g.dir*75*dt; g.y-=12*dt; if (g.x<-40||g.x>W+40) SC.gull=null; } }
   const d=SC.drop;
@@ -7060,7 +7062,7 @@ function updateScenery(dt){
   if (SC.jump){ const j=SC.jump; j.t+=dt; if (j.t>=j.dur){ splash(j.x+j.dir*14*sc(j.y),j.y,6); ripple(j.x+j.dir*14*sc(j.y),j.y,20); SC.jump=null; } }
   else { SC.nextJump-=dt; if (SC.nextJump<=0){ SC.nextJump=rand(8,15);
     const x=rand(30,W-30), y=rand(HZ+40,H-260), b=S.bob;
-    if ((!b || Math.hypot(x-b.x,y-b.y)>80) && onWater(x,y)){ SC.jump={x,y,t:0,dur:.75,dir:Math.random()<.5?1:-1}; splash(x,y,5); ripple(x,y,16); } } }
+    if ((!b || Math.hypot(x-b.x,y-b.y)>80) && castable(x,y)){ SC.jump={x,y,t:0,dur:.75,dir:Math.random()<.5?1:-1}; splash(x,y,5); ripple(x,y,16); } } }
   const f=SC.frog;
   if (REG()!=='lake' || !SC.pads[0]){}
   else if (f.hop){ f.hop.t+=dt; if (f.hop.t>=.5){ f.pad=f.hop.to; f.hop=null; const p=padPos(0,f.pad); ripple(p.x,p.y,14); splash(p.x,p.y,3); } }
@@ -7088,6 +7090,8 @@ function drawAmbient(dt){
 }
 /** Whether (x, y) is open water: anywhere but on a marsh bank the tide has left out. */
 const onWater = (x,y) => REG()!=='marsh' || !marshMud(x,y);
+/** Whether a cast can reach (x, y): open water, and in the Quarter not behind a wall. */
+const castable = (x,y) => onWater(x,y) && !quarterHidden(x,y);
 function updateAmbient(dt){
   for (const f of S.ambient){
     f.turn-=dt; if (f.turn<=0){ f.turn=rand(1.5,3.5); f.ta=f.a+rand(-1.2,1.2); }
@@ -9172,7 +9176,7 @@ function drawWrenPunt(){ const o=wrenPos(), t=S.time, bob=Math.sin(t*1.25)*1.2, 
    balance simulator can fish here too. QS holds the moment-to-moment state. */
 const QS={pages:[], pageT:12, toll:0, ringWas:false, ringMod:false, rung:0, forceEnv:false};
 function quarterState(){ if (!isObj(save.quarter)) save.quarter={}; const q=save.quarter;
-  if (!isObj(q.done)) q.done={}; if (!isObj(q.tips)) q.tips={};
+  if (!isObj(q.done)) q.done={}; if (!isObj(q.tips)) q.tips={}; if (q.row) q.done.rowboat=1;   // a rowboat that's fixed is a step that's done
   if (q.clip!=null && !(NOTES[q.clip] && PELL.post[q.clip])) q.clip=null;
   if (q.ring!=null && !(isObj(q.ring) && q.ring.until>q.ring.from)) q.ring=null;
   if (q.page!==1 && q.page!==2) q.page=0;
@@ -9300,6 +9304,7 @@ function bellCooling(){ const r=save.quarter&&save.quarter.ring; return r ? Math
 const bellHere = () => REG()==='quarter' && pocketed('bell');
 function ringBell(){ const q=quarterState();
   if (bellRinging()){ toast('The tower’s already ringing',''); return; }
+  if (modFlag('timeStop')){ handBell(.5); toast('Time stands still. The tower can’t answer','warn'); return; }
   const wait=bellCooling(); if (wait>0){ handBell(.5); toast('The tower doesn’t answer. Try again in '+Math.ceil(wait)+' hour'+(Math.ceil(wait)===1?'':'s'),'warn'); return; }
   handBell(1); const a=absHour(); q.ring={from:a+.05, until:a+.05+QUARTER.bell.hours}; persist(); MODC.dirty=true;
   QS.toll=.6; comboSeen('tower'); }
@@ -9326,11 +9331,11 @@ function driftLetter(any){ const d=(save.quarter&&save.quarter.done)||{}, FS=fin
   if (!any && !d.tower) return null; return PELL.sack.find(id=>!FS.letters[id])||null; }
 /** Scoop a page onto the hook: it goes out on your next cast, and something in the Quarter reads them. An envelope
     is one of the letters the post office never sent: it opens, and goes to Pell. */
-function scoopPage(p){ const q=quarterState(); QS.pages=QS.pages.filter(o=>o!==p);
-  if (p.env){ const id=driftLetter(true); if (id){ const FS=findsState(); FS.letters[id]='waiting'; if (!FS.notes.includes(id)) FS.notes.push(id); persist(); updateJournalDot();
+function scoopPage(p){ const q=quarterState(), take=()=>{ QS.pages=QS.pages.filter(o=>o!==p); };
+  if (p.env){ const id=driftLetter(true); if (id){ take(); const FS=findsState(); FS.letters[id]='waiting'; if (!FS.notes.includes(id)) FS.notes.push(id); persist(); updateJournalDot();
       noise(.25,{vol:.1,f:2600,to:1400,type:'bandpass'}); buzz(12); openNote(id,{fresh:true, done:()=>letterToPell(id)}); return; } }
   if (q.page){ toast('There’s a page on the hook already',''); return; }
-  q.page=1; persist(); MODC.dirty=true; noise(.25,{vol:.1,f:2600,to:1400,type:'bandpass'}); buzz(10);
+  take(); q.page=1; persist(); MODC.dirty=true; noise(.25,{vol:.1,f:2600,to:1400,type:'bandpass'}); buzz(10);
   const tip=rodTip(); for (let i=0;i<6;i++) S.particles.push({x:p.x,y:p.y,vx:(tip.x-p.x)*1.2+rand(-30,30),vy:(tip.y-p.y)*1.2-60,g:300,life:0,max:.7,r:rand(1,1.8),c:'rgba(205,228,236,'});
   if (!q.tips.page){ q.tips.page=1; persist(); coachFor('A page from the post office, soaked through and still legible. It’s on your hook for one cast. Something in the Quarter reads them.',8); }
   else toast('A drowned page on the hook, for one cast',''); }
@@ -9361,8 +9366,10 @@ function quarterUpdate(dt){
   // under the lake: the tower's bell, faintly, at 3:12, once the Quarter's open
   if (!here){ QS.ringWas=false; return; }   // at the lake, the bell's heard faintly under it (game/music.js: ambTick)
   quarterPages(dt); rowboatBob(dt);
-  if (ring && !QS.ringWas && !S.tut){ const natural=bellNatural(); news(natural?'3:12. The bell tower is ringing':'The bell tower answers','gold'); QS.toll=.3;
-    const tp=quarterState().tips; if (natural && !tp.ring){ tp.ring=1; persist(); setTimeout(()=>coachFor('It’s 3:12, and the bell’s ringing. Whatever answers it lives by the tower. Fish the tower, quick: it rings for an hour.',8),1200); } }
+  if (ring && !QS.ringWas && !S.tut){ const natural=bellNatural(), tp=quarterState().tips; QS.toll=.3;
+    // the first time, the tip says it all; after that, a note
+    if (natural && !tp.ring){ tp.ring=1; persist(); setTimeout(()=>coachFor('It’s 3:12, and the bell’s ringing. Whatever answers it lives by the tower. Fish the tower, quick: it rings for an hour.',8),600); }
+    else news(natural?'3:12. The bell tower is ringing':'The bell tower answers','gold'); }
   QS.ringWas=ring; MODC.dirty=MODC.dirty||ring!==QS.ringMod; QS.ringMod=ring;
   if (ring){ QS.toll-=dt; if (QS.toll<=0){ QS.toll=3.4; towerToll(); } }
   if (QS.rung>0) QS.rung=Math.max(0,QS.rung-dt*1.4);
@@ -9773,8 +9780,9 @@ function drawRowboat(){ const cx=W/2, b=S.bob_y||0, tipY=H-200+b, c=ctx;
     c.fillStyle='#6B4A33'; c.fillRect(-1.4,-4,2.8,4); c.restore();
     if (bellRinging() || bellCooling()<=0){ const g=.5+.5*Math.sin(S.time*2); if (!bellRinging()){ c.strokeStyle='rgba(242,212,126,'+(.25+.3*g).toFixed(2)+')'; c.lineWidth=1.2; c.beginPath(); c.arc(p.x,p.y-2,13+g*2,0,Math.PI*2); c.stroke(); } } } }
 /** Where the hand bell hangs on the rowboat (and where a tap rings it). */
-function handBellPos(){ return {x:W/2+30, y:H-150+(S.bob_y||0)}; }
-function onHandBell(x,y){ if (!bellHere() || S.state!=='idle') return false; const p=handBellPos(); return Math.hypot(x-p.x,y-(p.y-2))<20; }
+function handBellPos(){ return {x:W/2+46, y:H-150+(S.bob_y||0)}; }
+// out at the gunwale, clear of the Tidecaller's conch at the rod butt, so a tap on one never rings the other
+function onHandBell(x,y){ if (!bellHere() || S.state!=='idle') return false; const p=handBellPos(); return Math.hypot(x-p.x,y-(p.y-2))<18; }
 
 /* ---------- each frame ---------- */
 function quarterArtUpdate(dt){ const q=G.q; if (!q) return;
@@ -9834,7 +9842,7 @@ function pellUpdate(dt){ const here=REG()==='quarter';
   PL.callT-=dt;
   // at the lake he calls in at your dock when he has something for you, and waits a little while to be tapped
   if (!here){ PL.hello=false;
-    if (REG()==='lake' && PL.callT<=0 && MAIL.state==='away' && S.state==='idle' && pellHasNews()){ PL.callT=150; MAIL.state='waiting'; MAIL.t=2; MAIL.hold=28; news(PELL.wait,''); }
+    if (REG()==='lake' && PL.callT<=0 && MAIL.state==='away' && sceneFree() && pellHasNews()){ PL.callT=150; MAIL.state='waiting'; MAIL.t=2; MAIL.hold=28; news(PELL.wait,''); }
     return; }
   if (!PL.hello){ PL.hello=true; const tp=quarterState().tips; if (!tp.hello){ tp.hello=1; persist(); setTimeout(()=>{ if (REG()==='quarter') pellSay(PELL.hello,8); },2600); } }
   PL.next-=dt; if (PL.next<=0 && S.state==='idle' && !(MAIL.sayT>0)){ PL.next=rand(32,52); pellSay(pellHasNews()?PELL.call:PELL.lines[Math.floor(Math.random()*PELL.lines.length)],5.5); } }
@@ -9861,9 +9869,8 @@ function openPell(){ audioInit(); const q=quarterState(), first=!q.met; q.met=1;
 /** His round: each step he's asked so far, the one he's on, and a hint that there's more. */
 function pellRoundHTML(){ const q=quarterState(), FS=findsState();
   const head=(name,state)=>'<div class="quest-h"><h3>'+name+'</h3><span class="q-'+state+'">'+{done:'Done',ready:'Ready',open:'Open',later:'Later'}[state]+'</span></div>';
-  let h='', shown=0;
+  let h='';
   for (const k of PELL_STEPS){ const P=PELL_Q[k], st=pellStep(k);
-    if (st==='later'){ if (!shown++) h+='<section class="quest">'+head('???','later')+'<p class="mini">He’ll have more to ask once this is done.</p></section>'; continue; }
     h+='<section class="quest">'+head(P.name,st)+'<p class="note pell-say">“'+(st==='done'?P.thanks:k==='rowboat'&&!save.boat?PELL.noboat:P.ask)+'”</p>';
     if (k==='rowboat'){ const price=QUARTER.row.price;
       if (st==='done') h+='<p class="mini">'+P.reward+'</p>'+(REG()==='quarter'?'':'<button class="btn" id="pellRow" type="button">Row out to the Drowned Quarter</button>');
@@ -9876,7 +9883,7 @@ function pellRoundHTML(){ const q=quarterState(), FS=findsState();
     else if (k==='answer') h+='<p class="mini">'+(FS.letters.edith==='posted'||lettersAre('posted').length?'The Postman Sturgeon does its round of the post office, mostly in the morning.':'Post a letter first.')+'</p>';
     else if (k==='sack') h+='<div class="sack-list">'+PELL.sack.map(id=>{ const s=FS.letters[id]; return '<div class="sack-row'+(s?'':' blank')+'"><canvas data-notekind="letter" aria-hidden="true"></canvas><div><h4>'+(s?NOTES[id].to:'A letter never sent')+'</h4><p class="mini">'+(s==='posted'?'Posted':s==='delivered'?(q.clip===id?'On your line':'In the sack'):s==='waiting'?'Waiting for Pell':'Not found yet')+'</p></div></div>'; }).join('')+'</div><p class="mini">'+PELL.where.sack+'</p>';
     h+='</section>';
-    if (st!=='done') break; }
+    if (st!=='done'){ if (k!==PELL_STEPS[PELL_STEPS.length-1]) h+='<section class="quest">'+head('???','later')+'<p class="mini">He’ll have more to ask once this is done.</p></section>'; break; } }
   return h; }
 function pellRodHTML(id){ return '<div class="entry" style="grid-template-columns:1fr auto"><div><h3>The '+RODS[id].name+' is yours</h3><canvas class="rod-art" data-rodart="'+id+'" aria-hidden="true"></canvas><p class="mini">'+RODS[id].perk+'</p></div>'+
   (save.rod===id?'<span class="r" style="color:#4E7B4C">Equipped</span>':'<button class="btn" data-equip="'+id+'" type="button">Equip</button>')+'</div>'; }
@@ -9930,7 +9937,7 @@ function replyDue(){ const FS=findsState(); return LETTER_ORDER.find(id=>FS.lett
 function pellAfterCatch(L){ if (!L || L.id!=='sturgeon' || SIMULATING) return; const re=replyDue(); if (!re) return;
   const id=replyOf(re), FS=findsState(); FS.notes.push(id); FS.letters[id]='waiting'; persist(); updateJournalDot();
   news('The Postman Sturgeon was carrying a letter','gold');
-  const show=()=>{ if (S.state==='idle' && $('sheet').hidden && $('note').hidden){ openNote(id,{fresh:true, done:()=>letterToPell(id)}); } else setTimeout(show,900); };
+  const show=()=>{ if (sceneFree()){ openNote(id,{fresh:true, done:()=>letterToPell(id)}); } else setTimeout(show,900); };
   setTimeout(show,800); }
 
 /* ---------- The Bonewhistle and Dread: a cursed rod, the ink that haunts a cast, and the lake looking back (data/quarter.js: DREAD) ---------- */
@@ -9979,7 +9986,7 @@ function boneWhistle(v){ v=v||1; tone(233,1.6,{to:220,vol:.03*v,type:'sine'}); t
 
 /* ---------- the lake looks back ---------- */
 function lakeLooksWhenFree(){ if (DR.eye || dreadState().v<100) return;
-  if (S.state==='idle' && $('sheet').hidden && $('note').hidden && $('haul').hidden) lakeLooks(); else setTimeout(lakeLooksWhenFree,1200); }
+  if (sceneFree()) lakeLooks(); else setTimeout(lakeLooksWhenFree,1200); }
 function lakeLooks(){ const d=dreadTick(); if (d.v<100) return;
   const took=Math.min(d.owed,save.coins), gone=save.net.filter(f=>isObj(f) && f.rod==='bonewhistle');
   save.net=save.net.filter(f=>!(isObj(f) && f.rod==='bonewhistle')); save.coins-=took; d.v=0; d.owed=0; d.warned=false; d.haunt=false;
@@ -10108,6 +10115,7 @@ function conchPos(){ const b=G.rodBase; return {x:b.x+5+Math.sin(S.time*1.4)*1.4
 function onConch(x,y){ if (!modFlag('callRain') || S.state!=='idle') return false; const p=conchPos(); return Math.hypot(x-p.x,y-p.y)<17; }
 function blowConch(){ audioInit(); const w=wxState();
   if (w.force){ toast('Playtest has the weather pinned',''); return; }
+  if (modFlag('timeStop')){ conchNote(.35); toast('Time stands still. The rain can’t come in','warn'); return; }
   if (wxNow()==='rain'){ conchNote(.4); toast('It’s raining already',''); return; }
   const wait=callWait(); if (wait>0){ conchNote(.35); toast('The conch is quiet. Try again in '+Math.ceil(wait)+' hour'+(Math.ceil(wait)===1?'':'s'),'warn'); return; }
   const a=absHour(); w.call={reg:REG(), from:a, until:a+CALL.hours}; persist(); MODC.dirty=true;
@@ -10139,10 +10147,11 @@ function drawRodConch(){ if (!modFlag('callRain')) return; const b=G.rodBase, p=
 const twinOn = () => !S.tut && modFlag('twin');
 /** The cast lands: the second float splashes down beside the first, toward the middle of the water. */
 function twinLand(b){ S.bob2=null; if (!twinOn()) return;
-  const k=sc(b.y), dx=TWIN.spread*W*k*(b.x>W/2?-1:1), x=clamp(b.x+dx,18,W-18), y=clamp(b.y+rand(-6,6)*k,HZ+14,G.near);
+  const k=sc(b.y), dx=TWIN.spread*W*k*(b.x>W/2?-1:1); let x=clamp(b.x+dx,18,W-18), y=clamp(b.y+rand(-6,6)*k,HZ+14,G.near), hole=null;
   const spot=spotAt(x,y); if (spot==='mud'){ mudSplat(x,y,.5); return; }   // the marsh: the second float lands on a bank that's out
   if (spot==='wall') return;   // the Quarter: it hit a wall, and only the first float's in the water
-  S.bob2={x,y,spot,dip:1,jerk:0,nibble:0,plunge:0}; splash(x,y,6); ripple(x,y,30); }
+  if (REG()==='quarter'){ const hit=quarterHit(x,y); if (hit.kind==='hole'){ hole=hit.hole; ({x,y}=holeFloat(hole,x)); } }   // or it went in at an opening, like the first
+  S.bob2={x,y,spot,dip:1,jerk:0,nibble:0,plunge:0,hole}; splash(x,y,6); ripple(x,y,30); }
 /** Two baits in the water: the quiet before a bite is shorter. */
 const twinWait = () => S.bob2 ? TWIN.wait : 1;
 /** A fish heads for one float or the other. */
@@ -10467,7 +10476,8 @@ function routeU(route,len,p){ let best=0, bd=1e9; for (let i=0;i<=120;i++){ cons
 function closeMap(){ const layer=$('mapLayer'); if (layer.hidden) return; ovClosed('map'); layer.classList.add('closing'); setTimeout(()=>{ layer.hidden=true; layer.classList.remove('closing'); layer.innerHTML=''; },REDUCED?0:280); }
 function travelTo(to,first){
   if (to!==REG()) homeMoved(to);   // Homebody starts counting again (game/river.js)
-  save.region=to; persist(); mailMoved(); QS.pages=[];
+  save.region=to; mailMoved(); QS.pages=[]; if (save.quarter && save.quarter.page){ save.quarter.page=0; MODC.dirty=true; }   // a drowned page stays in the Quarter
+  persist();
   S.bob=null; S.wait=null; S.reel=null; S.land=null; SC.lucky=null; SC.jump=null; SC.drop=null; SC.gull=null; S.swell=null;
   layoutScenery(); buildBg(); updateHud(); setState('idle');
   toast(REGION_NAME[to],'gold');
@@ -13435,6 +13445,8 @@ function drawIntroShadow(){ if (!INTRO.active || INTRO.shadow<=.01 || REG()!=='l
 /* ---------- News ribbon: small, queued, never covers the sky ---------- */
 const NEWS={q:[],busy:false};
 function news(text,kind){ if (NEWS.q.length && NEWS.q[NEWS.q.length-1].text===text) return; NEWS.q.push({text,kind:kind||''}); if (NEWS.q.length>4) NEWS.q.shift(); if (!NEWS.busy) newsNext(); }
+// A tip that opens while a note is up pushes the note down below it, so the two never overlap
+function newsClearCoach(){ const el=$('news'), c=$('coach'); if (el.classList.contains('show') && !c.hidden && !document.body.classList.contains('cine')) el.style.top=(c.getBoundingClientRect().bottom+8)+'px'; }
 function newsNext(){ const el=$('news'); const n=NEWS.q.shift(); if (!n){ NEWS.busy=false; return; } NEWS.busy=true;
   const c=$('coach'); el.style.top=(!c.hidden && !document.body.classList.contains('cine'))?(c.getBoundingClientRect().bottom+8)+'px':'';
   el.className='show '+n.kind; el.textContent=n.text; clearTimeout(NEWS.tm); NEWS.tm=setTimeout(()=>{ el.className='hide '+n.kind; setTimeout(newsNext,260); },2400+Math.min(1600,n.text.length*25)); }
@@ -13445,6 +13457,8 @@ function coachShow(text,secs){ coach(text,'Tip'); clearTimeout(coachTimer); coac
 function coachDrain(){ if (coachTimer || S.tut) return; while (COACHQ.length && performance.now()-COACHQ[0].at>90000) COACHQ.shift(); const n=COACHQ.shift(); if (n) coachShow(n.text,n.secs); }
 /* ---------- Leaving things: back gesture, Escape and swipe-down all close the top layer ---------- */
 const OV=[]; let ovSkip=0, ovPopping=false, ovQueue=[], ovQueueT=0;
+/** Nothing open over the water (a sheet, a note, a room, the map, the bag) and no cast under way: free for something to happen. */
+const sceneFree = () => S.state==='idle' && !OV.length && $('sheet').hidden && $('note').hidden && $('haul').hidden;
 /* Opening one layer as another closes (a sheet that opens the bag or the map) would push the new entry before the
    old one's history.back() lands, and that back would then eat it. So while a back is on its way, the push waits for it. */
 function ovPush(name){ try { history.pushState({hm:name},''); } catch(e){} }
@@ -13466,7 +13480,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=28, SNAP_KEY=KEY+'-snapshots';
+const BUILD=29, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);

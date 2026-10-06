@@ -67,6 +67,8 @@ function addMapPiece(c){ const r=relicState(); if (!mapCan(c)) return r.map;
 function mapXY(m){ const ty=lerp(G.near,HZ+26,Math.min(m.depth,Math.max(MAPS.depth[0],castReach()*.95))), p={x:clamp(W/2+Math.tan(m.th)*(G.player.y-ty)*.85,W*.1,W*.9), y:ty};
   // the marsh: never under the saltings, which only a spring tide covers, but in the water just off their edge
   if (REG()==='marsh') for (const B of G.banks||[]) if (B.salt && Math.hypot((p.x-B.x)/B.rx,(p.y-B.y)/B.ry)<1.3) p.y=Math.max(p.y,B.y+B.ry*1.3);
+  // the Quarter: never behind a wall, where no cast can reach, but in the street at its foot
+  if (quarterHidden(p.x,p.y)){ const f=quarterFoot(p.x,p.y); p.x=f.x; p.y=f.y; }
   return p; }
 /** 'pin' on the Cartographer's Pin's mark, 'ring' inside the whole map's ring, or null. */
 function mapAt(x,y){ const m=relicState().map; if (!m || m.n<MAPS.pieces || m.reg!==REG()) return null;

@@ -268,16 +268,17 @@ for (const m of modes) {
     spot that pays best at this hour with what they own (and one stretch in four somewhere else, as players wander),
     in any water they can reach (the river once Ottilie's ferry is fixed, the coast once they have the boat, the
     Saltmarsh once Wren has seen a fish that glows: kept live, as soon as one's caught after the ferry runs, the
-    Drowned Quarter once Pell's rowboat is fixed, which needs the boat), and buys things as the coins come in. Each stretch is 10 casts through the game's own simulator, at a real
-    player's pace (half the simulator's), with the in-game clock turning a day every 24 minutes of play.
+    Drowned Quarter once Pell's rowboat is fixed, which needs the boat), and buys things as the coins come in. Each
+    stretch is 10 casts through the game's own simulator, at a real player's pace (half the simulator's), with the
+    in-game clock turning a day every 24 minutes of play.
     Wren's Lantern Rod comes with the first Will-o'-Whiting caught in the marsh, and the Twin Spool once every river
     fish is caught (but the weather's and the extras). Pell's round: Edith's letter is posted on the first stretch in
     the Quarter (600 coins), her answer comes with the next Postman Sturgeon (8 Glimmer), then Albert's letter and
     the post office's three unsent letters drift out with the Quarter's pages, one every PELL_ENV real minutes there,
-    or come up as treasure (Albert's posted, 1,200 coins; the third of the others, the Tidecaller). While his round is under way every other stretch is in the
-    Quarter, at its best spot for the hour. Each quest rod counts as a rod
+    or come up as treasure (Albert's posted, 1,200 coins; the third of the others, the Tidecaller). While his round
+    is under way every other stretch is in the Quarter, at its best spot for the hour. Each quest rod counts as a rod
     as good as the sold rod with the same numbers. The Bonewhistle never: it's cursed, and a player can leave it be.
-    as good as the sold rod with the same numbers. Shopping: rods, the ferry and the boat first; anything over half the price of the next of those goes on everything else,
+    Shopping: rods, the ferry and the boat first; anything over half the price of the next of those goes on everything else,
     cheapest first (traps, fittings, tackle, boat parts, paint, tanks, decor, the fix-up list, vest pockets). Runes are etched
     with Glimmer as it comes in, cheapest first. Counted toward income: rods, spots and the hour, treasure, mastery,
     the boat's parts, the fix-up list and the trophy wall (each plaque the most valuable species caught, at its biggest,

@@ -13,6 +13,7 @@ function conchPos(){ const b=G.rodBase; return {x:b.x+5+Math.sin(S.time*1.4)*1.4
 function onConch(x,y){ if (!modFlag('callRain') || S.state!=='idle') return false; const p=conchPos(); return Math.hypot(x-p.x,y-p.y)<17; }
 function blowConch(){ audioInit(); const w=wxState();
   if (w.force){ toast('Playtest has the weather pinned',''); return; }
+  if (modFlag('timeStop')){ conchNote(.35); toast('Time stands still. The rain can’t come in','warn'); return; }
   if (wxNow()==='rain'){ conchNote(.4); toast('It’s raining already',''); return; }
   const wait=callWait(); if (wait>0){ conchNote(.35); toast('The conch is quiet. Try again in '+Math.ceil(wait)+' hour'+(Math.ceil(wait)===1?'':'s'),'warn'); return; }
   const a=absHour(); w.call={reg:REG(), from:a, until:a+CALL.hours}; persist(); MODC.dirty=true;
