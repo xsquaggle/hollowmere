@@ -390,11 +390,14 @@ function drawRowboat(){ const cx=W/2, b=S.bob_y||0, tipY=H-200+b, c=ctx;
   const L=G.lantern; c.strokeStyle=INK; c.lineWidth=2.2; c.lineCap='round'; c.beginPath(); c.moveTo(L.x+6,H-95+b); c.lineTo(L.x+6,L.y-8+b); c.lineTo(L.x,L.y-8+b); c.lineTo(L.x,L.y-10.5+b); c.stroke();
   lanternBody(L.x,L.y+b,Math.sin(S.time*.9)*.05);
   // with the Drowned Bell in a pocket, it hangs from a hook on the bow thwart: ring it, and the tower answers
-  if (pocketed('bell')){ const p=handBellPos(), sw=Math.sin(S.time*1.2)*.08+QS.rung*Math.sin(S.time*22)*.5; c.strokeStyle=INK; c.lineWidth=1.3; c.beginPath(); c.moveTo(p.x,p.y-12); c.lineTo(p.x,p.y-8); c.stroke();
-    c.save(); c.translate(p.x,p.y-8); c.rotate(sw); c.fillStyle='#7E8C6A'; c.beginPath(); c.moveTo(-3,0); c.quadraticCurveTo(-4,5,-7,9); c.lineTo(7,9); c.quadraticCurveTo(4,5,3,0); c.closePath(); c.fill();
-    c.fillStyle='rgba(200,220,170,.35)'; c.fillRect(-5,4,3,4); c.strokeStyle=INK; c.lineWidth=1; c.beginPath(); c.moveTo(-3,0); c.quadraticCurveTo(-4,5,-7,9); c.lineTo(7,9); c.quadraticCurveTo(4,5,3,0); c.closePath(); c.stroke();
-    c.fillStyle='#6B4A33'; c.fillRect(-1.4,-4,2.8,4); c.restore();
+  if (pocketed('bell')){ const p=handBellPos(); drawHandBellAt(c,p.x,p.y,Math.sin(S.time*1.2)*.08+QS.rung*Math.sin(S.time*22)*.5);
     if (bellRinging() || bellCooling()<=0){ const g=.5+.5*Math.sin(S.time*2); if (!bellRinging()){ c.strokeStyle='rgba(242,212,126,'+(.25+.3*g).toFixed(2)+')'; c.lineWidth=1.2; c.beginPath(); c.arc(p.x,p.y-2,13+g*2,0,Math.PI*2); c.stroke(); } } } }
+/** The Drowned Bell hanging from a hook by its cord at (x, y - 12), swinging by sw: on Pell's rowboat, and on the lake
+    dock once the logbook says to ring it there (game/hollow.js). */
+function drawHandBellAt(c,x,y,sw){ c.strokeStyle=INK; c.lineWidth=1.3; c.beginPath(); c.moveTo(x,y-12); c.lineTo(x,y-8); c.stroke();
+  c.save(); c.translate(x,y-8); c.rotate(sw); c.fillStyle='#7E8C6A'; c.beginPath(); c.moveTo(-3,0); c.quadraticCurveTo(-4,5,-7,9); c.lineTo(7,9); c.quadraticCurveTo(4,5,3,0); c.closePath(); c.fill();
+  c.fillStyle='rgba(200,220,170,.35)'; c.fillRect(-5,4,3,4); c.strokeStyle=INK; c.lineWidth=1; c.beginPath(); c.moveTo(-3,0); c.quadraticCurveTo(-4,5,-7,9); c.lineTo(7,9); c.quadraticCurveTo(4,5,3,0); c.closePath(); c.stroke();
+  c.fillStyle='#6B4A33'; c.fillRect(-1.4,-4,2.8,4); c.restore(); }
 /** Where the hand bell hangs on the rowboat (and where a tap rings it). */
 function handBellPos(){ return {x:W/2+46, y:H-150+(S.bob_y||0)}; }
 // out at the gunwale, clear of the Tidecaller's conch at the rod butt, so a tap on one never rings the other

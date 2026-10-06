@@ -8,7 +8,8 @@
    good  'up' when more is better, 'down' when less is better.  tune:true stats only come from Playtest tuning.
    when  where every bonus to this stat applies, on top of its own conditions (there are no swells at the lake).
          A modifier's own when can name a region, spot, night, fish, beh (a kind of fish: leaper, sulker…), rarity,
-         rarityMin, lucky or wx (the weather here and now, data/weather.js: one kind or a list).
+         rarityMin, lucky, star (in a fallen star's zone: game/omens.js), starlit (on a star in the water, with the
+         Stillwater Mirror: game/godly.js) or wx (the weather here and now, data/weather.js: one kind or a list).
    unit  'x' to show the total as ×2.5 rather than +150%; 'chance' for a chance shown as a share of catches;
          'count' for a number of things (+4 fish).
    hint  the plain sentence the Bonuses page shows under the stat. The order here is the order on that page. */
@@ -45,6 +46,7 @@ const STATS={
   sonar:    {name:'Sonar readout', kind:'flag', hint:'A readout names what’s coming before it bites.'},
   twin:     {name:'Two floats', kind:'flag', hint:'Each cast lands two floats. The first bite is yours, and when both bite at once, you pick.'},
   lantern:  {name:'Lantern light', kind:'flag', when:{night:true}, hint:'After dark your rod’s lamp lights the water round the float, and fish show in it as they come.'},
+  mirror:   {name:'Stars in the water', kind:'flag', when:{night:true, wx:'clear'}, hint:'On a clear night, outdoors, the stars show in the water. Cast onto one, and Exotic and rarer fish bite more often.'},
   bellmouth:{name:'The bell rings', kind:'flag', when:{region:'marsh'}, hint:'In the marsh rain, the Bellmouth comes up to the bell.'},
   noWashout:{name:'Swell-proof casts', kind:'flag', when:{region:'coast'}, hint:'Casts never wash out in a swell.'},
   autoTilt: {name:'Rod tracks the fish', kind:'flag', hint:'Your rod follows a mastered fish for you.'},

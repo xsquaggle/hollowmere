@@ -10,7 +10,9 @@
                line's plaques.
    SHELF       curios on the open shelf before the cabinet.
    MARKS       high-water marks pencilled on the wall: the year, and how high (0 the floor, 1 the ceiling).
-   TRAPDOOR    what the locked trapdoor says when you tap it, in turn. */
+   TRAPDOOR    what the trapdoor says when you tap it while it's shut fast, in turn (TRAPDOOR_WAIT once logbook page 4's
+               been read). It opens while the water under it's drained, and stays open once you've climbed down
+               (game/hollow.js). */
 const FIXUP=[
   {id:'roof',  line:'Patch the roof', name:'Patch the roof', cost:400, eff:'The drip stops, and the dry wall takes two more plaques.', plaques:2,
    done:'Dry, for the first time in years.'},
@@ -26,9 +28,11 @@ const FIXUP=[
    done:'Oak, oiled, with a light over every plaque.'},
   {id:'knock', line:'Knock through to the tank room', name:'Knock through to the tank room', cost:20000, eff:'Both tanks can grow to 18 fish.', tankCap:18,
    done:'An arch where the wall was. The tanks have room to grow.'},
-  {id:'trapdoor', line:'Open the trapdoor', name:'Open the trapdoor', why:'Not yet. It needs a key, and you haven’t found the right one.'}
+  {id:'trapdoor', line:'Open the trapdoor', name:'Open the trapdoor', why:'Not yet. It won’t lift: the water holds it shut from underneath.',
+   done:'Open. A ladder goes down into the dark, under the lake.'}
 ];
 const WALL={start:3, value:1.1, record:1.2};
 const SHELF=6;
 const MARKS=[{yr:'’67', h:.86}, {yr:'’71', h:.74}, {yr:'Mar ’79', h:.62}, {yr:'’84', h:.69}, {yr:'’91', h:.56}];
-const TRAPDOOR=['Locked. Water laps underneath.','Still locked. Something down there knocks, once.','The boards are wet from below.','You put your ear to it. It sounds like a long way down.'];
+const TRAPDOOR=['Shut fast. Water laps underneath.','It won’t lift. Something down there knocks, once.','The boards are wet from below.','You put your ear to it. It sounds like a long way down.'];
+const TRAPDOOR_WAIT='It won’t lift. Not until the water under it drops.';

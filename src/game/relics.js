@@ -16,7 +16,7 @@ function relicState(){ const FS=findsState(); let r=FS.story; if (!r || typeof r
   if (!r.combos || typeof r.combos!=='object') r.combos={}; return r; }
 
 /** Night, for the fishing: after dark, or a cast the Moon Jar lit. */
-function nightNow(){ return isNight(save.clock) || (!SIMULATING && !!(S.bob && S.bob.moon)); }
+function nightNow(){ return isNight(save.clock) || REG()==='hollow' || (!SIMULATING && !!(S.bob && S.bob.moon)); }
 
 /* ---------- finding them ---------- */
 /** A story relic or a map's cache waiting where the bobber landed, instead of the usual treasure roll (or null). */

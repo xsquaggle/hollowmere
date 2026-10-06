@@ -14,6 +14,7 @@ function onConch(x,y){ if (!modFlag('callRain') || S.state!=='idle') return fals
 function blowConch(){ audioInit(); const w=wxState();
   if (w.force){ toast('Playtest has the weather pinned',''); return; }
   if (modFlag('timeStop')){ conchNote(.35); toast('Time stands still. The rain can’t come in','warn'); return; }
+  if (REG()==='hollow'){ conchNote(.3); toast('No sky down here for the rain to fall from',''); return; }
   if (wxNow()==='rain'){ conchNote(.4); toast('It’s raining already',''); return; }
   const wait=callWait(); if (wait>0){ conchNote(.35); toast('The conch is quiet. Try again in '+Math.ceil(wait)+' hour'+(Math.ceil(wait)===1?'':'s'),'warn'); return; }
   const a=absHour(); w.call={reg:REG(), from:a, until:a+CALL.hours}; persist(); MODC.dirty=true;

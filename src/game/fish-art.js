@@ -6,8 +6,10 @@
    The Drowned Quarter's: the Sooty Gudgeon's flat bottom-hugging belly, the Parlour Roach's deep back, the Hingejaw's
    square jaw jutting like a door, the Drainpipe Eel's straight-sided tube, the Lace Shad's deep belly and lace-edged
    tail, the Postman Sturgeon's (Old Gristle's body over again), the Hearthfish's flat back under its mantel, the Paper
-   Carp folded flat in straight edges, and the Choir Fish's blunt nose for its round open mouth and its lyre of a tail. */
+   Carp folded flat in straight edges, and the Choir Fish's blunt nose for its round open mouth and its lyre of a tail.
+   The Hollow's are drawn in game/hollow-fish-art.js: the Drowned Moon's disc, the Sleeper's Scale's, and their tails. */
 function fishPath(id,len){
+  if (HOLLOW_FISH.has(id)){ const hp=hollowFishPath(id,len); if (hp) return hp; }
   const F=FISH[id], h=len*F.h, p=new Path2D();
   if (id==='papercarp'){ const P=PAPER_CARP; p.moveTo(len*P[0],h*P[1]); for (let i=2;i<P.length;i+=2) p.lineTo(len*P[i],h*P[i+1]); p.closePath(); return p; }
   if (id==='gudgeon'){ p.moveTo(len*.5,h*.18); p.bezierCurveTo(len*.47,-h*.64,len*.24,-h*1.04,-len*.06,-h*.88); p.bezierCurveTo(-len*.24,-h*.74,-len*.34,-h*.32,-len*.4,-h*.2);
@@ -37,7 +39,8 @@ function fishPath(id,len){
   p.bezierCurveTo(-len*.22,h*1.02,len*.38,h*1.08,len*.5,0); p.closePath();
   return p;
 }
-function tailPath(id,len){ const F=FISH[id], h=len*F.h, p=new Path2D();
+function tailPath(id,len){ if (HOLLOW_FISH.has(id)){ const hp=hollowTailPath(id,len); if (hp) return hp; }
+  const F=FISH[id], h=len*F.h, p=new Path2D();
   if (id==='gar'){ p.moveTo(-len*.37,0); p.quadraticCurveTo(-len*.44,-h*1.7,-len*.58,-h*.95); p.quadraticCurveTo(-len*.63,0,-len*.58,h*.95); p.quadraticCurveTo(-len*.44,h*1.7,-len*.37,0); p.closePath(); return p; }
   if (id==='calf'){ p.moveTo(-len*.38,-h*.12); p.quadraticCurveTo(-len*.47,-h*.28,-len*.63,-h*.8); p.quadraticCurveTo(-len*.6,-h*.22,-len*.53,0);
     p.quadraticCurveTo(-len*.6,h*.22,-len*.63,h*.62); p.quadraticCurveTo(-len*.47,h*.24,-len*.38,h*.12); p.closePath(); return p; }
@@ -114,6 +117,7 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   if (mut==='twin'){ c.save(); c.translate(-len*.2,-h*1.05); c.scale(.84,.84); drawFish(c,id,len,false,alpha,-tailSwing*.8,bare); c.restore(); }
   if (alpha<1) c.globalAlpha=alpha;
   const lw=Math.max(1.5,len*.032), det=len>=80?2:len>=44?1:0; c.lineWidth=lw; c.lineJoin='round'; c.strokeStyle=INK;
+  if (HOLLOW_FISH.has(id)) hollowFishUnder(c,id,len,h,inked);   // the glow round the Drowned Moon and the Scale (game/hollow-fish-art.js)
   c.save(); c.translate(-len*.36,0); c.rotate(tailSwing*.25); c.translate(len*.36,0);
   // the Lace Shad's fins are sheer, netted like a lace curtain, and edged in a finer line
   const t=tailPath(id,len), lace=id==='laceshad'; if (lace) c.globalAlpha=alpha*.62; c.fillStyle=F.fin; c.fill(t); if (lace){ c.globalAlpha=alpha; laceNet(c,t,len,-len*.64,-h*1.1,-len*.36,h*1.1,det,inked); }
@@ -123,7 +127,7 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   if (inked) inkWisps(c,len,h,lw,(TAIL_TIP[id]||TAIL_TIP0).map(([x,y],i)=>[len*x,h*y,Math.sign(y),i]),.22);
   c.restore();
   if (id==='dab') dabFrill(c,len,h,lw,det,F.fin);
-  else for (const D of [DORSAL[id]||DORSAL0].concat(FINS2[id]||[])){ const da=len*D.a, db=len*D.b, dm=(da+db)/2+len*.02, dy0=-h*D.base, dy1=-h*(D.base-.05), dors=new Path2D();
+  else if (!BARE_FISH.has(id)) for (const D of [DORSAL[id]||DORSAL0].concat(FINS2[id]||[])){ const da=len*D.a, db=len*D.b, dm=(da+db)/2+len*.02, dy0=-h*D.base, dy1=-h*(D.base-.05), dors=new Path2D();
     if (D.spiny){ const n=Math.max(3,Math.round((D.a-D.b)*19)), q=u=>(1-u)*(1-u)*dy0+2*u*(1-u)*(-h*D.top)+u*u*dy1, tip=i=>{ const u=(i+.35)/n; return [lerp(da,db,u),q(u)]; };
       dors.moveTo(da,dy0); dors.lineTo(...tip(0));   // a spiny fin: the web dips between its spines
       for (let i=1;i<n;i++){ const v=i/n; dors.quadraticCurveTo(lerp(da,db,v),lerp(lerp(dy0,dy1,v),q(v),.45),...tip(i)); }
@@ -301,6 +305,7 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
   if (id==='choir'){ c.fillStyle='rgba(36,46,66,.34)'; c.beginPath(); c.ellipse(0,-h*.9,len*.56,h*.5,0,0,Math.PI*2); c.fill();
     c.fillStyle='rgba(238,243,250,.45)'; c.beginPath(); c.ellipse(len*.02,h*.4,len*.48,h*.5,0,0,Math.PI*2); c.fill(); c.fillStyle='rgba(255,255,255,.3)'; c.fillRect(-len*.42,-h*.22,len*.84,h*.1);
     c.lineWidth=Math.max(.7,lw*.4); for (let i=0;i<4;i++){ c.strokeStyle=i%2?'rgba(50,62,90,.3)':'rgba(246,250,255,.75)'; c.beginPath(); c.arc(len*.2,h*.02,len*(.04+i*.035),Math.PI*.6,Math.PI*1.4); c.stroke(); } }
+  if (HOLLOW_FISH.has(id)) hollowFishBody(c,id,len,h,lw,det,inked);   // the Hollow's patterns (game/hollow-fish-art.js)
   // Inked: ink over all of it, its markings only a ghost underneath, and a cold blue-violet sheen on the side the light comes from
   if (inked){ c.fillStyle='rgba(16,14,22,.84)'; c.fillRect(-len*.7,-h*2.4,len*1.4,h*4.8);
     c.fillStyle='rgba(104,108,206,.3)'; c.beginPath(); c.ellipse(len*.04,-h*.52,len*.42,h*.34,-.05,0,Math.PI*2); c.fill();
@@ -314,9 +319,9 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
     const ll=clamp(lw*.22,.7,1.6); c.setLineDash([ll*1.6,ll*2.4]); c.strokeStyle='rgba(30,25,20,.24)'; c.lineWidth=ll; c.beginPath(); c.moveTo(len*.22,-h*.22); c.quadraticCurveTo(-len*.05,-h*.05,-len*.38,-h*.02); c.stroke(); c.setLineDash([]); }
   c.restore(); c.globalAlpha=alpha;
   c.lineWidth=lw; c.strokeStyle=INK; c.stroke(body);
-  if (det){ if (id!=='calf'){ const gx=id==='gar'?.2:id==='angler'?.12:id==='hingejaw'?.22:.28; c.strokeStyle='rgba(43,42,51,.62)'; c.lineWidth=lw*.6; c.beginPath(); c.moveTo(len*gx,-h*.66); c.quadraticCurveTo(len*(gx-.09),-h*.02,len*(gx-.01),h*.6); c.stroke(); }
+  if (det && !BARE_FISH.has(id)){ if (id!=='calf'){ const gx=id==='gar'?.2:id==='angler'?.12:id==='hingejaw'?.22:.28; c.strokeStyle='rgba(43,42,51,.62)'; c.lineWidth=lw*.6; c.beginPath(); c.moveTo(len*gx,-h*.66); c.quadraticCurveTo(len*(gx-.09),-h*.02,len*(gx-.01),h*.6); c.stroke(); }
     if (!OWN_MOUTH.has(id)){ c.strokeStyle=INK; c.lineWidth=lw*.55; c.beginPath(); c.moveTo(len*.5,h*.04); c.quadraticCurveTo(len*.465,h*.13,len*.425,h*.11); c.stroke(); }
-    if (id==='gurnard'){ gurnardWing(c,len,h,lw,det,tailSwing,inked); } else {
+    if (id==='gurnard'){ gurnardWing(c,len,h,lw,det,tailSwing,inked); } else if (!OWN_FINS.has(id)) {
     const fl=id==='calf'?1.7:1; c.save(); c.translate(len*(id==='calf'?.22:.17),h*(id==='calf'?.5:.24)); c.rotate((id==='calf'?1.25:.45)+tailSwing*.2); const pf=new Path2D(); pf.moveTo(0,0); if (id==='papercarp'){ pf.lineTo(-len*.06,-h*.3); pf.lineTo(-len*.17,-h*.1); pf.closePath(); } else { pf.quadraticCurveTo(-len*.05*fl,-h*.34,-len*.17*fl,-h*.08*fl); pf.quadraticCurveTo(-len*.08*fl,h*.2,0,0); }
     c.globalAlpha=.9; c.fillStyle=F.fin; c.fill(pf); c.globalAlpha=1; if (det>1 && id!=='calf'){ c.save(); c.clip(pf); fishRays(c,lw,[0,0,-len*.15,-h*.16, 0,0,-len*.16,-h*.04, 0,0,-len*.12,h*.08]); c.restore(); } c.strokeStyle=INK; c.lineWidth=lw*.6; c.stroke(pf);
     if (id==='char'){ c.strokeStyle='#F7F3EA'; c.lineWidth=lw*.45; c.beginPath(); c.moveTo(-len*.012,-h*.03); c.quadraticCurveTo(-len*.05,-h*.31,-len*.15,-h*.1); c.stroke(); } c.restore(); } }
@@ -406,7 +411,10 @@ function drawFish(c,id,len,shadow,alpha=1,tailSwing=0,bare=false,mut=null){
     c.fillStyle=ik('#AEB8C8'); c.beginPath(); c.ellipse(0,0,rx,ry,0,0,Math.PI*2); c.fill(); c.lineWidth=lw*.65; c.strokeStyle=INK; c.stroke();
     c.fillStyle='#221E2A'; c.beginPath(); c.ellipse(rx*.15,0,rx*.56,ry*.64,0,0,Math.PI*2); c.fill();
     c.fillStyle=inked?'rgba(150,156,240,.45)':'rgba(255,255,255,.6)'; c.beginPath(); c.ellipse(-rx*.4,-ry*.52,rx*.22,ry*.16,-.4,0,Math.PI*2); c.fill(); c.restore(); }
+  if (HOLLOW_FISH.has(id)) hollowFishDetail(c,id,len,h,lw,det,inked,tailSwing);
   if (mut==='mossy') drawMoss(c,id,len,h,lw);
+  // the Hollow's own eyes: milky, closed, or none at all
+  if (HOLLOW_FISH.has(id) && hollowEye(c,id,len,h,lw,det,inked)){ c.restore(); return; }
   const E=EYE[id]||EYE0, ex=len*E.x, ey=h*E.y, er=Math.max(1.6,len*E.r);
   // an Inked fish's eye is pale, its pupil small; the Parlour Roach's is red
   c.fillStyle=inked?'#E2E6F4':id==='angler'?'#F0E3B0':id==='roach'?'#D04A3A':'#FFF8E8'; c.beginPath(); c.arc(ex,ey,er,0,Math.PI*2); c.fill(); c.lineWidth=lw*.6; c.strokeStyle=INK; c.stroke();

@@ -91,6 +91,7 @@ function showCard(){
   const rs=$('cRec'), pbEl=$('cPB'); rs.hidden=pbEl.hidden=!L.pbBeat; rs.hidden=!L.pbBeat||L.pbMinor; pbEl.classList.toggle('minor',!!L.pbMinor); rs.parentNode.classList.toggle('rec',!!L.pbBeat&&!L.pbMinor); rs.style.animationDelay=pbEl.style.animationDelay=REDUCED?'0s':'';
   if (L.pbBeat) pbEl.innerHTML='<span class="t">'+(L.pbMinor?'New best, just':'New personal record')+'</span><b id="cPBw">'+fmtW(L.prev.w)+'</b><em>was '+fmtW(L.prev.w)+'</em>'+(L.pbGlim?'<i class="bonus"><span class="glim" aria-hidden="true"></span>+'+L.pbGlim+'<span class="sr"> Glimmer</span></i>':'');
   card.hidden=false; S.cardAt=S.time; cardScene(L); paintTiles($('cTags').querySelectorAll('canvas[data-rune]'));   // once the card is laid out
+  $('cSell').hidden=false; if (F.noSell) ledgerCard(L);   // the Sleeper's Scale goes into the Ledger (game/godly.js)
   cardMoment(L);   // Epic and up: the card's own chord; a Mythic's name inks in (game/rarity-fx.js)
   if (L.mutGlim) setTimeout(()=>glimmerTally(L.mutGlim,{x:W/2,y:H*.5}),L.pbBeat?3400:900);
   if (L.mut && !save.stats.mutTip){ save.stats.mutTip=true; persist(); setTimeout(()=>{ if (S.state==='result') coachFor(mutTip(L.mut),8); },1200); }
@@ -105,12 +106,14 @@ function dismissCard(action){
   if (S.state!=='result') return;
   action=action||S.cardDefault||'sell';
   const L=S.land, card=$('card');
+  if (L.F.noSell) action='ledger';   // never sold or kept: into the Ledger (game/godly.js)
   if (action==='keep' && save.net.length>=netCap()) action='sell';
   if (action==='sell' && rarRank(L.F.rarity)>=rarRank('mythic') && !S.sellArmed){ S.sellArmed=true; $('cSell').textContent='Sell it? Tap again'; $('cSell').classList.add('armed'); return; }   // a Mythic is never sold by accident
   if (action==='tank' && !tankRoom(L.id)) action=save.net.length<netCap()?'keep':'sell';
   if (action==='mount' && !canMount(keptFish(L))) action=save.net.length<netCap()?'keep':'sell';
   card.classList.add('out'); setTimeout(()=>{ card.hidden=true; card.classList.remove('out'); },250);
-  if (action==='sell') addCoins(L.value);
+  if (action==='ledger') ledgerWrite(L);
+  else if (action==='sell') addCoins(L.value);
   else if (action==='tank'){ addToTank(keptFish(L)); sfx.plop(); news('Off to the aquarium','good'); }
   else if (action==='mount'){ mountFish(keptFish(L)); shSfx.mount(); buzz([0,18,120,18]); shackPulse(); news(L.F.name+' is up on the trophy wall in your shack','gold'); }
   else { save.net.push(keptFish(L)); persist();
@@ -120,6 +123,7 @@ function dismissCard(action){
   if (L.isNew){ $('journalBtn').classList.remove('pulse'); void $('journalBtn').offsetWidth; $('journalBtn').classList.add('pulse'); }
   const finishing=S.tut==='card'; if (finishing){ save.tutorialDone=true; S.tut=null; persist(); }
   S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); kitchenUnlockCheck(); relicAfterCatch(L); pellAfterCatch(L); dreadAfterCatch(L,action);   // the Moon Jar fills, Ottilie's almanac (game/relics.js); an answer on a Postman Sturgeon (game/pell.js); Dread (game/dread.js)
+  godlyAfter(L);   // the first Sleeper's Scale: the Hollow lit, and the Stillwater Mirror (game/godly.js)
   if (!save.backupHinted && !save.lastBackup && !isStandalone() && save.stats.catches>=40){ save.backupHinted=true; persist(); coachFor('Your game lives in this browser. Tap the gear, then Save, to make a backup code and keep it safe.',8); }
   if (finishing) coachFor('You’re ready. Rarer fish fight in new ways, and the deep pool hides the best ones.',6); else if (!S.tut && !coachTimer) coachOff();
 }

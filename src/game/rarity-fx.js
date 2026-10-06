@@ -1,4 +1,4 @@
-/* ---------- The rarity kit on a catch: Epic, Exotic and Mythic ---------- */
+/* ---------- The rarity kit on a catch: Epic, Exotic and Mythic (Godly adds its light: game/godly.js) ---------- */
 /* Each tier keeps what the one below it has and adds a layer, and every layer shows with the sound off (the design
    doc's "Feedback scales with rarity"). Rare and Legendary are drawn where they always were (bite.js, landing.js).
    Hook:    Epic: a freeze, and the water bulges round the bobber with violet sparks.
@@ -20,10 +20,11 @@ function hookMoment(F,perfect){ const rk=rarRank(F.rarity), b=S.bob; RFX.bulge=R
   tone(196,.5,{to:262,vol:.12,type:'triangle'}); tone(392,.6,{to:523,vol:.06,type:'sine',delay:.05});
   if (rk>=rarRank('exotic')) RFX.tint={t:0};
   if (rk>=rarRank('mythic')){ RFX.ink={t:0, hold:true}; musicDuck(0,60); ambQuiet(60); sfx.inkBell(); buzz([0,140]); }
+  if (rk>=rarRank('godly')) godlyHook();
 }
 /** Where the hooked fish is now: the fight, then the landing. */
 function rfxAt(){ if (S.reel) return {x:S.reel.x, y:S.reel.y}; if (S.land){ const p=S.state==='result'?S.land.to:landPos(); return {x:p.x, y:p.y}; } return null; }
-function rfxUpdate(dt){
+function rfxUpdate(dt){ godlyUpdate(dt);
   if (RFX.bulge){ RFX.bulge.t+=dt; if (RFX.bulge.t>1.4) RFX.bulge=null; }
   if (RFX.tint){ RFX.tint.t+=dt; if (!S.reel && !S.land) RFX.tint=null; }
   if (RFX.ink){ const I=RFX.ink; I.t+=dt; if (!S.reel && !S.land && !RFX.moon){ RFX.ink=null; musicDuck(1,0); MU.duckT=0; applyVol(); } }
@@ -60,18 +61,20 @@ function drawRfxOver(){
 }
 /** Landing, Epic and up: what trails the fish through the air, and the Mythic's moon. */
 function landMoment(L){ const rk=rarRank(L.F.rarity); if (rk<rarRank('epic')) return;
+  if (rk>=rarRank('godly')) return godlyLand(L);
   if (rk>=rarRank('mythic')){ RFX.moon={t:0}; L.to={x:W/2, y:H*.33}; if (RFX.ink) RFX.ink.hold=false; else RFX.ink={t:1.2, hold:false}; tone(147,2.4,{vol:.12,type:'sine'}); tone(220,2,{vol:.06,type:'sine',delay:.4}); } }
 function landTrail(L,p){ const r=L.F.rarity; if (rarRank(r)<rarRank('epic') || REDUCED || L.p>.92) return;
   if (r==='exotic'){ for (let i=0;i<2;i++){ const c=rgbOf(PRISM_TRAIL[Math.floor(rand(0,PRISM_TRAIL.length))]);
       S.particles.push({x:p.x+rand(-5,5),y:p.y+rand(-5,5),vx:rand(-16,16),vy:rand(-10,18),g:20,life:0,max:rand(.7,1.2),r:rand(1.6,3),c:'rgba('+c+','}); } return; }
-  const c=r==='epic'?'190,150,240':r==='legendary'?'242,212,126':'225,230,245';
+  const c=r==='epic'?'190,150,240':r==='legendary'?'242,212,126':r==='godly'?'255,241,196':'225,230,245';
   if (Math.random()<.8) S.particles.push({x:p.x+rand(-8,8),y:p.y+rand(-8,8),vx:rand(-26,26),vy:rand(-24,24),g:r==='epic'?60:-10,life:0,max:rand(.6,1.2),r:rand(1.2,2.6),c:'rgba('+c+','}); }
 /** The rays behind a fish in the air: its tier's colour, prismatic for Exotic, silver for Mythic. */
 function landRays(L,pos,len){ const r=L.F.rarity; if (r==='common') return;
   if (r==='exotic') return drawPrismRays(pos.x,pos.y,.75*pos.e,len*1.5);
-  const a=r==='uncommon'?.25:r==='rare'?.45:r==='epic'?.6:.7; drawRays(pos.x,pos.y,r==='mythic'?'#E8ECF6':RAR[r].color,a*pos.e,len*(r==='mythic'?1.1:1.3)); }
+  const a=r==='uncommon'?.25:r==='rare'?.45:r==='epic'?.6:r==='godly'?.9:.7; drawRays(pos.x,pos.y,r==='mythic'?'#E8ECF6':RAR[r].color,a*pos.e,len*(r==='mythic'?1.1:r==='godly'?1.6:1.3)); }
 /** The card: a Mythic's name inks in by pen, with the calf's theme; Epic and Exotic get a chord of their own. */
 function cardMoment(L){ const r=L.F.rarity, rk=rarRank(r), nm=$('cName'); nm.classList.remove('inked'); if (rk<rarRank('epic')) return;
+  if (rk>=rarRank('godly')) return godlyCard();
   if (rk>=rarRank('mythic')){ void nm.offsetWidth; nm.classList.add('inked'); calfTheme(); return; }
   const base=r==='exotic'?[523,659,831,988,1245]:[440,554,659,880];
   base.forEach((n,i)=>tone(n,.5+i*.05,{vol:.05,type:r==='exotic'?'sine':'triangle',delay:.45+i*.09})); }

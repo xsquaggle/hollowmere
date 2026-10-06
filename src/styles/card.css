@@ -98,3 +98,10 @@
 #cTags span.mut{background:#5E7F3E}
 #card[data-mut="glassy"] #cTags span.mut{background:#5B8CA6}#card[data-mut="twin"] #cTags span.mut{background:#B5733A}#card[data-mut="giant"] #cTags span.mut{background:#7A5A34}
 @media (prefers-reduced-motion: reduce){#cName.inked{animation:none}}
+/* Step 29: Godly. The Mythic frame's double rule in gold, and light rays falling on the card from above it, swaying */
+@property --rays{syntax:'<angle>';inherits:false;initial-value:-6deg}
+#card[data-r="godly"]{border:4px double var(--c-godly);
+  background:repeating-conic-gradient(from calc(160deg + var(--rays)) at 50% -30%,rgba(255,236,170,.32) 0 3deg,rgba(255,236,170,0) 3deg 9deg) top/100% 60% no-repeat,radial-gradient(130% 80% at 50% 0,#FFF8E2,var(--paper) 70%);
+  box-shadow:0 6px 0 #6E5822,0 0 0 6px rgba(255,241,196,.55),0 0 70px rgba(255,236,170,.6),0 18px 50px rgba(0,0,0,.6);animation:cardIn 1s cubic-bezier(.2,1.2,.4,1),raysSway 7s ease-in-out infinite alternate}
+@keyframes raysSway{to{--rays:6deg}}
+#card[data-r="godly"] .rarity{background:var(--c-godly);color:#3A2E10}

@@ -26,7 +26,8 @@
               STORY). Exotic and Mythic finds only come in crates. Drawn in game/loot-art.js and game/relic-art.js.
    OWNERS     who in town lost things (you give them back from the journal's Finds page).  POCKETS  the vest: pockets you start with, the most, and what Ottilie
               charges to sew each one after the first.
-   NOTES      what's inside message bottles (kind bottle), the uncle's logbook pages (logbook) and drowned letters
+   NOTES      what's inside message bottles (kind bottle), the uncle's logbook pages (logbook: pages 1 to 3 in bottles, 4 in a
+              treasure map's cache, 5 from Grey, and the last tied to the Stillwater Mirror: data/hollow.js) and drowned letters
               (letter, with to: the address Pell reads out, and waters: where they come up as treasure). The Drowned
               Quarter's letters are posted back through their doors (data/quarter.js: PELL.post), and each one's reply
               (reply, re: the letter it answers) comes back on a Postman Sturgeon; pell: what he says as he takes it.
@@ -142,6 +143,10 @@ const NOTES={
   three:   {kind:'bottle', region:'lake', lines:['Three in the morning, and fog','down on the deep pool.','Something under it still','rings the hour.','I didn’t cast. I wish I had.']},
   log1:    {kind:'logbook', page:1, lines:['Day 212.','The perch keep coming up with','coins in their bellies.','Old coins, every one 1966.','Who is feeding them pennies','from sixty years ago?']},
   log2:    {kind:'logbook', page:2, lines:['Day 340.','3:12 again. The town hall clock,','my watch, the mantel clock.','All stopped at 3:12 the night','the town went under.','Ottilie won’t talk about it.','She was on the ferry.']},
+  log3:    {kind:'logbook', page:3, lines:['Day 401.','Rowed out over the town at 3:12.','The tower rang under me,','and something under the tower','rang back. Deeper down.','There’s more under Hollowmere','than Hollowmere.','Buried the rest. Map enclosed.']},
+  log4:    {kind:'logbook', page:4, lines:['Day 455.','When the tower rings, the water','under the shack drops a foot.','I had the trapdoor up at 3:12.','Dry rungs. A ladder, going down.','The water came back','before I found the bottom.']},
+  log5:    {kind:'logbook', page:5, lines:['Day 500.','Ring the tower’s hand bell','yourself, from the dock, at 3:12,','and the lake holds its breath','for a minute. Then the trapdoor.','Take a lantern. Don’t go','further than the light.','— and feed the heron.']},
+  log6:    {kind:'logbook', page:6, lines:['Last page.','If you’re reading this, you went','further than the light,','and it let you back up.','It isn’t a fish. It’s dreaming','the fish, and the town,','and maybe us. Don’t wake it.','Not yet.','The mirror shows the sky','the right way up. Use it.']},
   edith:   {kind:'letter', waters:['lake'], to:'Mrs. Edith Crane, 4 Lantern Row', lines:['Edie,','the water’s up past the second','step again. The mayor says not','to worry. I worry anyway.','Save me a dance on Saturday.','— Walter']},
   albert:  {kind:'letter', waters:['lake','quarter'], to:'Master Albert Finch, the Clock Tower', lines:['Albert,','the clock has stopped at 3:12','again. Please see to it before','the bell has to ring.','Father says it mustn’t ring.','— Josephine']},
   keeper:  {kind:'letter', waters:['lake'], to:'The Keeper of the Bait Shack', lines:['To the new keeper,','we see your lantern at night.','It is good to have a light','on the water again.','Don’t fish the deep pool at dawn.','Or do. He never could stop.','— your neighbors']},

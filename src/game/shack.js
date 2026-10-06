@@ -115,7 +115,8 @@ function shDo(h){ if (!h) return;
   else if (h.k==='curio'){ shListClose(); shCurioCard(h.id); sfx.find(FINDS[h.id].rarity); }
   else if (h.k==='rack'){ shListClose(); shRackCard(); sfx.rig('reel'); }
   else if (h.k==='list'){ shCardClose(); shListOpen(); }
-  else if (h.k==='trap'){ const s=shackState(), n=(s.td||0)%TRAPDOOR.length; s.td=n+1; persist(); news(TRAPDOOR[n],''); shSfx.knock(); buzz(10); SH.fx.push({k:'lap',t:0}); }
+  else if (h.k==='trap'){ if (trapdoorOpen()){ shListClose(); shTrapCard(); shSfx.creak(); return; }   // the water's down: the ladder (game/hollow.js)
+    const s=shackState(), n=(s.td||0)%TRAPDOOR.length; s.td=n+1; persist(); news(notesRead().includes('log4')?TRAPDOOR_WAIT:TRAPDOOR[n],''); shSfx.knock(); buzz(10); SH.fx.push({k:'lap',t:0}); }
   else if (h.k==='stove'){ noise(.4,{vol:.06,f:1800,q:.6}); SH.fx.push({k:'spark',x:SH.L.stove.x+SH.L.stove.w/2,y:SH.L.stove.y+SH.L.stove.h*.55,t:0}); } }
 /** The rack's card: every rod you own, the one in hand marked; tap one to take it down and fish with it. */
 function shRackCard(){ const c=$('shCard'), rods=rackRods(); SH.sel={k:'rack'};

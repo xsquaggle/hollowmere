@@ -19,6 +19,11 @@
    chance on the cast after, and at night aims for the lit windows' reflections in the street (refl) for the
    Hearthfish. The bell tower rings with the clock (3:12 to 4:12). The Bonewhistle's Dread is held at st.dread for the
    run (0 unless named): its luck counts, the lake looking back and the ink shadow don't.
+   In the Hollow the lantern's pool and the glowing shelf are lit, and so is open water from 10 to 2, where the player
+   casts into the shaft of lake light. Anywhere else a fish that needs light follows the float instead of biting, and
+   the player draws it in to the lantern's pool (HOLLOW.draw) before it bites; the Eyeless Koi and the fish that glow
+   bite where they are. The eye isn't modeled (the Sleeper's Scale is worth nothing), and neither are omens or falling
+   stars (they come too seldom to move an hour's coins).
    Only the player is modeled (SIM_PLAYERS): a steady player reacts in about a third of a second, follows
    the fish, lets go soon after the ring turns red, twitches once to bring a fish in, and handles most
    dives, tugs, jumps and swells; a new player is slower, doesn't twitch, and handles fewer.
@@ -43,7 +48,8 @@ const SIM_SPOTS={lake:{open:[0,.3], reeds:[0,.15], pads:[.23,.3], deep:[.51,.63]
                  coast:{open:[0,.3], kelp:[.19,.26], rocks:[.34,.45], wash:[.34,.45], deep:[.43,.53], wreck:[.72,.77], far:[.8,.9]},
                  river:{open:[0,.3], riffle:[0,.12], leaves:[.3,.38], deep:[.7,.78], roots:[.82,.9]},
                  marsh:{open:[0,.3], reeds:[0,.15], flats:[.13,.3], pans:[.28,.35], deep:[.43,.5], far:[.8,.9]},
-                 quarter:{open:[0,.3], windows:[.2,.3], doors:[.3,.33], post:[.36,.36], deep:[.64,.69], far:[.82,.9]}};
+                 quarter:{open:[0,.3], windows:[.2,.3], doors:[.3,.33], post:[.36,.36], deep:[.64,.69], far:[.82,.9]},
+                 hollow:{open:[0,.3], lamp:[0,.12], deep:[.45,.5], drip:[.53,.6], spores:[.79,.84], far:[.8,.9]}};
 /** On the river, how far a float can drift across the screen through each spot before it's off the right edge (shares of
     the width, from where a player casts into it): the riffle and the roots lie to the right, so their runway is short. */
 const RIVER_RUN={open:.8, leaves:.62, deep:.75, riffle:.18, roots:.4};
@@ -85,6 +91,8 @@ function simSave(st){
   s.glimmer=0; s.day=0; s.wander=null;
   // the Drowned Quarter: Pell's rowboat fixed. The Bonewhistle's Dread, held where it's named for the run
   if (s.region==='quarter' || st.quarter) s.quarter={row:true, done:{rowboat:1}};
+  // the Hollow: climbed down to, its first-time tips given
+  if (s.region==='hollow') s.hollow={open:1, seen:1, tips:{lamp:1, follow:1, stir:1, eye:1}};
   if (st.dread>0) s.dread={v:Math.min(100,+st.dread), at:s.clock, owed:0};
   s.wx={seed:7, force:WX_ORDER.includes(st.wx)?st.wx:'clear', seen:{}};      // the weather is pinned for a run: clear unless named
   if (Number.isInteger(st.moon)) s.wx.moon=st.moon;                          // and the moon, when named (MOON.full is full)
@@ -161,6 +169,8 @@ function simulate(st,n){
         out.secs+=t; continue; }
       // a fish swims over and nibbles
       const at={bow:!!st.bow, path:!!st.path, refl:reg==='quarter' && spot==='open' && isNight(save.clock) && Math.random()<P.refl};
+      // the Hollow: at midday a cast into open water goes into the shaft of light from the roof
+      if (reg==='hollow' && spot==='open' && shaftNow()>=HOLLOW.light.lit) at.shaft=true;
       // the coast: the seventh wave's churn, and the lighthouse beam at night, each bring a fish at once
       if (reg==='coast' && !ech){ const sevenP=(SWELL.big.churn+wait)/(SWELL.period*SWELL.set), beamP=(wait+BEAM.width/(BEAM.span[1]-BEAM.span[0])*BEAM.turn/2)/BEAM.turn;
         if (Math.random()<sevenP+(1-sevenP)*P.seventh){ at.churn=true; wait=Math.min(wait,rand(0,wait)+SWELL.big.in); }
@@ -172,6 +182,11 @@ function simulate(st,n){
       const attract=P.twitch && F.beh!=='sleeper' ? Math.min(2.3+.7*(tw-1),1+.45*tw) : 1;
       const bm=modMul('bite',{spot,fish:id,lucky});                // bait: a quicker swim over and shorter nibbles, as in bite.js
       t+=wait+Math.max(.4,((ech?rand(40,60):rand(85,150))-10-F.len*.2)/((20+F.len*.35)*attract*sc(y)*(F.beh==='sleeper'?.5:1)/bm*(ech?2.2:1))*1.2);
+      // the Hollow: out in the dark, a fish that needs light follows the float while the player draws it in to the far
+      // edge of the lantern's pool, and bites there
+      if (reg==='hollow' && !ech && !['lamp','spores'].includes(spot) && !at.shaft && hollowNeedsLight(id)){
+        const L=HOLLOW.spots.lamp, edge=lerp(G.near,HZ+26,L.d)-(H-HZ)*L.ry*HOLLOW.light.lamp, gap=Math.max(0,edge-y);
+        t+=HOLLOW.draw.hold+gap/(HOLLOW.draw.speed*sc((y+edge)/2)); }
       // on the river the float drifts from where it lands until a fish starts nibbling: the quiet and the swim over. Past
       // the spot's runway (RIVER_RUN, the share of the width from where it's cast in to the right edge) the current takes it
       if (reg==='river' && !ech){ const C=RIVER.current, gone=W*RIVER_RUN[spot]/(C.speed*W*(spot==='deep'?C.pool:currentAt(depth))*sc(y));

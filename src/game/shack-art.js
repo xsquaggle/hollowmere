@@ -161,16 +161,39 @@ function shFloor(c,L){ const W=L.W, y0=L.floorY, H=L.H;
     const off=(r*61)%130; for (let x=off;x<W;x+=130){ c.fillStyle='rgba(20,12,8,.45)'; c.fillRect(x,y,1.4,16); c.fillStyle='#2A1D15'; c.beginPath(); c.arc(x+5,y+8,1,0,Math.PI*2); c.fill(); }
     c.strokeStyle='rgba(36,22,12,.3)'; c.lineWidth=.7; c.beginPath(); c.moveTo(0,y+5+sr()*5); c.bezierCurveTo(W*.3,y+4+sr()*6,W*.6,y+6+sr()*5,W,y+6+sr()*4); c.stroke(); }
   const G=c.createLinearGradient(0,y0,0,y0+24); G.addColorStop(0,'rgba(0,0,0,.35)'); G.addColorStop(1,'rgba(0,0,0,0)'); c.fillStyle=G; c.fillRect(0,y0,W,24); }
-/** The trapdoor: planks on two iron straps, a ring pull and a padlock, with dark gaps where the water shows. */
-function shTrapdoor(c,L){ const T=L.trap; c.save();
+/** The trapdoor: planks on two iron straps and a ring pull, with dark gaps where the water shows. While the water
+    under it's down, and once you've climbed down, it stands open on its hinges over a ladder into the dark. */
+function shTrapdoor(c,L){ const T=L.trap; if (trapdoorOpen()) return shTrapOpen(c,L); c.save();
   c.fillStyle='#1A1512'; rrect(c,T.x-3,T.y-3,T.w+6,T.h+6,3); c.fill();
   const n=5, pw=T.w/n; for (let i=0;i<n;i++){ c.fillStyle=SHW.board[i%3]; c.fillRect(T.x+i*pw+1,T.y,pw-2,T.h);
     c.strokeStyle='rgba(30,18,10,.35)'; c.lineWidth=.7; c.beginPath(); c.moveTo(T.x+i*pw+pw*.4,T.y+2); c.bezierCurveTo(T.x+i*pw+pw*.6,T.y+T.h*.4,T.x+i*pw+pw*.3,T.y+T.h*.7,T.x+i*pw+pw*.5,T.y+T.h-2); c.stroke(); }
   for (const f of [.24,.76]){ const y=T.y+T.h*f-2.5; c.fillStyle=SHW.iron; c.fillRect(T.x-1,y,T.w+2,5); c.fillStyle=SHW.ironL; c.fillRect(T.x-1,y,T.w+2,1.2);
     for (let i=0;i<n;i++){ c.fillStyle='#17161A'; c.beginPath(); c.arc(T.x+i*pw+pw/2,y+2.5,1.1,0,Math.PI*2); c.fill(); } }
   const rx=T.x+T.w/2, ry=T.y+T.h*.52; c.strokeStyle=SHW.iron; c.lineWidth=2.4; c.beginPath(); c.ellipse(rx,ry+3,6,4,0,0,Math.PI*2); c.stroke(); c.strokeStyle=SHW.ironL; c.lineWidth=.8; c.beginPath(); c.ellipse(rx,ry+2.5,6,4,0,Math.PI*1.1,Math.PI*1.7); c.stroke();
-  const lx=T.x+T.w-12, ly=T.y+T.h*.52; c.fillStyle='#8B8478'; rrect(c,lx-5,ly-2,10,9,2); c.fill(); shInk(c,.9); c.stroke(); c.strokeStyle='#6A655C'; c.lineWidth=1.6; c.beginPath(); c.arc(lx,ly-2,3.4,Math.PI,0); c.stroke(); c.fillStyle=INK; c.fillRect(lx-.6,ly+1.5,1.2,3);
   shInk(c,1.4); rrect(c,T.x-3,T.y-3,T.w+6,T.h+6,3); c.stroke(); c.restore(); }
+/** The trapdoor open: the hatch stood up on its hinges at the far edge, its wet underside toward you, and the hole
+    with a ladder going down into pale blue light. */
+function shTrapOpen(c,L){ const T=L.trap, n=5, x0=T.x, y0=T.y, w=T.w, h=T.h; c.save();
+  // the hole: dark, lit from far below
+  c.fillStyle='#1A1512'; rrect(c,x0-3,y0-3,w+6,h+6,3); c.fill();
+  const G=c.createLinearGradient(0,y0,0,y0+h); G.addColorStop(0,'#0B1418'); G.addColorStop(.6,'#123038'); G.addColorStop(1,'#2C6A70'); c.fillStyle=G; c.fillRect(x0,y0,w,h);
+  // the ladder's rails and rungs, going down out of sight
+  const rl=x0+w*.3, rr=x0+w*.7; c.strokeStyle='#4A3628'; c.lineWidth=2.6; c.beginPath(); c.moveTo(rl,y0); c.lineTo(rl+w*.04,y0+h); c.moveTo(rr,y0); c.lineTo(rr-w*.04,y0+h); c.stroke();
+  for (let i=0;i<4;i++){ const u=(i+.6)/4.4, y=y0+h*u, a=.45+u*.5; c.strokeStyle='rgba(110,82,58,'+a.toFixed(2)+')'; c.lineWidth=2.2; c.beginPath(); c.moveTo(rl+w*.04*u,y); c.lineTo(rr-w*.04*u,y); c.stroke(); }
+  c.strokeStyle='rgba(150,220,225,.25)'; c.lineWidth=1; c.beginPath(); c.moveTo(rl+1.5,y0+h*.5); c.lineTo(rl+w*.04+1.5,y0+h); c.moveTo(rr+1.5,y0+h*.5); c.lineTo(rr-w*.04+1.5,y0+h); c.stroke();
+  shInk(c,1.4); rrect(c,x0-3,y0-3,w+6,h+6,3); c.stroke();
+  // the hatch, up on its hinges: the underside's darker, wetter boards, the straps' bolts, the ring pull hanging
+  const lh=h*.92, ins=w*.05, top=y0-lh, pw=(w-ins*2)/n;
+  c.fillStyle='rgba(0,0,0,.35)'; c.beginPath(); c.moveTo(x0,y0); c.lineTo(x0+w,y0); c.lineTo(x0+w-ins,top+4); c.lineTo(x0+ins,top+4); c.closePath(); c.fill();
+  for (let i=0;i<n;i++){ const xa=x0+i*w/n, xb=x0+(i+1)*w/n, ta=x0+ins+i*pw, tb=x0+ins+(i+1)*pw;
+    c.fillStyle=['#4E3424','#45301F','#573A28'][i%3]; c.beginPath(); c.moveTo(xa+.6,y0); c.lineTo(xb-.6,y0); c.lineTo(tb-.6,top); c.lineTo(ta+.6,top); c.closePath(); c.fill();
+    c.fillStyle='rgba(120,190,200,.10)'; c.fillRect((xa+ta)/2+1,top+lh*.55,pw*.5,lh*.4); }
+  for (const f of [.26,.74]){ const y=top+lh*f; c.fillStyle=SHW.iron; c.fillRect(x0+ins*(1-f)-1,y-2.5,w-ins*2*(1-f)+2,5); c.fillStyle=SHW.ironL; c.fillRect(x0+ins*(1-f)-1,y-2.5,w-ins*2*(1-f)+2,1); }
+  c.strokeStyle=SHW.iron; c.lineWidth=2.2; c.beginPath(); c.ellipse(x0+w/2,top+lh*.5+6,5.5,7,0,0,Math.PI*2); c.stroke();
+  shInk(c,1.3); c.beginPath(); c.moveTo(x0,y0); c.lineTo(x0+ins,top); c.lineTo(x0+w-ins,top); c.lineTo(x0+w,y0); c.stroke();
+  // the hinges
+  for (const hx of [x0+w*.2,x0+w*.8]){ c.fillStyle=SHW.iron; c.fillRect(hx-5,y0-2,10,4); c.fillStyle=SHW.ironL; c.fillRect(hx-5,y0-2,10,1); }
+  c.restore(); }
 function shBucket(c,L){ const B=L.bucket, x=B.x, y=B.y, r=B.r; c.save();
   c.fillStyle='rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(x+3,y+r*1.5,r*1.1,4,0,0,Math.PI*2); c.fill();
   c.fillStyle='#8E949A'; c.beginPath(); c.moveTo(x-r,y); c.lineTo(x+r,y); c.lineTo(x+r*.78,y+r*1.5); c.lineTo(x-r*.78,y+r*1.5); c.closePath(); c.fill(); shInk(c,1.1); c.stroke();
@@ -336,6 +359,11 @@ function shStoveLive(c,L,t,dark){ const D=L.stove.door; if (!D) return; const f=
   c.save(); c.globalCompositeOperation='lighter'; const R=c.createRadialGradient(D.x+D.w/2,D.y+D.h,2,D.x+D.w/2,D.y+D.h,60+dark*80); R.addColorStop(0,'rgba(255,150,70,'+((.12+dark*.3)*f).toFixed(3)+')'); R.addColorStop(1,'rgba(255,150,70,0)'); c.fillStyle=R; c.fillRect(D.x-150,D.y-150,300,300); c.restore(); }
 /** Light off the water under the trapdoor, through the gaps between its planks. */
 function shTrapLive(c,L,t){ const T=L.trap, n=5, pw=T.w/n, lap=SH.fx.find(f=>f.k==='lap'), boost=lap?Math.max(0,1-lap.t/1.2):0; c.save();
+  if (trapdoorOpen()){ // open: the light from the Hollow wavers up out of the hole and onto the floor round it
+    c.globalCompositeOperation='lighter'; const cx=T.x+T.w/2, cy=T.y+T.h*.7, a=.22+.08*Math.sin(t*1.7)+.05*Math.sin(t*4.3), G=c.createRadialGradient(cx,cy,2,cx,cy,T.w*1.1);
+    G.addColorStop(0,'rgba(120,210,220,'+a.toFixed(3)+')'); G.addColorStop(1,'rgba(120,210,220,0)'); c.fillStyle=G; c.fillRect(cx-T.w*1.2,cy-T.w*1.2,T.w*2.4,T.w*2.4);
+    for (let k=0;k<4;k++){ const y=T.y+T.h*(.3+k*.18), x=T.x+T.w*(.5+.3*Math.sin(t*.9+k*1.9)); c.fillStyle='rgba(170,235,240,'+(.12+.1*Math.sin(t*2.3+k)).toFixed(3)+')'; c.fillRect(x-6,y,12,1.2); }
+    c.restore(); return; }
   for (let i=1;i<n;i++){ const x=T.x+i*pw; for (let k=0;k<3;k++){ const y=T.y+T.h*(.15+k*.3)+Math.sin(t*1.3+i*1.7+k)*2, a=(.12+.14*Math.max(0,Math.sin(t*2.2+i*1.3+k*2)))*(1+boost*2.5); c.fillStyle='rgba(140,210,215,'+Math.min(.8,a).toFixed(3)+')'; c.fillRect(x-.8,y,1.6,T.h*.12); } }
   c.restore(); }
 function shStrikeLive(c,L,S){ const p=L.list, i=FIXUP.findIndex(F=>F.id===S.id); if (i<0) return; const u=clamp(S.t/.6,0,1), h=p.h, step=(h-20)/FIXUP.length, y=16+step*(i+.5)+2, w=p.w;

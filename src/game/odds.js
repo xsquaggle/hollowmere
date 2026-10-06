@@ -13,6 +13,7 @@ function poolFor(spot,lucky,at){
     if (w.croaker && h>=MARSH.croak.from && h<MARSH.croak.to) w.croaker*=MARSH.croak.x;
     if (w.reeve && tideNow().spring) w.reeve*=MARSH.reeve.x; }
   else if (quarter) quarterPool(w,spot,night);   // the Quarter's night fish, and the Postman Sturgeon's morning round (game/quarter.js)
+  else if (reg==='hollow'){}   // always dark down there: the Hollow's pools are the same at every hour (game/hollow.js)
   else if (night){ w.lantern=spot==='deep'?18:spot==='open'?24:spot==='pads'?10:4; for (const k of ['perch','leafjack']) if (w[k]) w[k]*=.65; }
   if (w.mayor && ((h>=5 && h<8) || modFlag('mayorWakes',{spot}))) w.mayor*=3;   // the Mayor's dawns, or the Mayor's Spectacles
   if (w.gar && h>=17 && h<21) w.gar*=1.8;                                        // the Steeple Gar's evenings
@@ -28,7 +29,7 @@ function poolFor(spot,lucky,at){
     for (const k in dry) if (rarRank(FISH[k].rarity)>top) hi+=dry[k];
     if (top>=0 && hi>0 && T0>hi){ const x=(T1-hi)/(T0-hi); for (const k in dry) if (rarRank(FISH[k].rarity)>top) w[k]*=x; } }
   // your bonuses: night- and fog-fish boosts (only at night and in fog, see STATS), then luck per rarity (game/mods.js)
-  const c={spot,lucky}, nightMul=modMul('night',c), fogMul=modMul('fog',c);
+  const c={spot,lucky,star:!!(at&&at.star),starlit:!!(at&&at.starlit)}, nightMul=modMul('night',c), fogMul=modMul('fog',c);
   for (const k in w){ const F=FISH[k]; if (F.night) w[k]*=nightMul; if (F.wx==='fog') w[k]*=fogMul; w[k]*=tierMul(F.rarity,c)*modMul('lure',{spot,lucky,fish:k}); }   // a lure draws its kind of fish
   // soft bad-luck protection: a long dry run lifts the Legendaries a little (DRY)
   const dm=dryMul(); if (dm>1) for (const k in w) if (FISH[k].rarity==='legendary') w[k]*=dm;
@@ -43,8 +44,8 @@ const RARE_ORDER=Object.keys(RARE_BITES).sort((a,b)=>rarRank(FISH[b].rarity)-rar
 function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
   for (const id of RARE_ORDER){ const B=RARE_BITES[id];
     if (!(Array.isArray(B.region)?B.region.includes(reg):B.region===reg) || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
-    if ((B.at && !at[B.at]) || (B.churn && !at.churn) || (B.moon==='full' && !fullMoon()) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top)) || (B.wx && wxNow()!==B.wx) || (B.flag && !modFlag(B.flag,{spot}))) continue;
-    if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id})) return id; }
+    if ((B.at && !at[B.at]) || (B.churn && !at.churn) || (B.moon==='full' && !fullMoon()) || (B.moon==='new' && moonPhase()!==0) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top)) || (B.wx && wxNow()!==B.wx) || (B.flag && !modFlag(B.flag,{spot}))) continue;
+    if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id,star:!!at.star,starlit:!!at.starlit})) return id; }
   return null; }
 /** Whether the in-game clock is within `share` of an hour past the hour (the Clockfin's few minutes). */
 function topOfHour(share){ const h=((save.clock%24)+24)%24; return h-Math.floor(h)<share; }
@@ -52,6 +53,7 @@ function topOfHour(share){ const h=((save.clock%24)+24)%24; return h-Math.floor(
 const RARITY_CTL={fish:null, mut:null};
 /** The fish that takes this cast. A long run without a Legendary, where one could have bitten, counts toward DRY. */
 function rollFish(spot,lucky,at){ if (RARITY_CTL.fish && !SIMULATING){ const f=RARITY_CTL.fish; RARITY_CTL.fish=null; return f; }
+  if (at && at.eye && !(save.hollow||{}).scale) return 'scale';   // the first cast into the Hollow's open eye (game/hollow.js)
   const hi=rareBite(spot,lucky,at); if (hi) return hi;
   const w=poolFor(spot,lucky,at), id=pickW(w);
   if (rarRank(FISH[id].rarity)<rarRank('legendary') && Object.keys(w).some(k=>FISH[k].rarity==='legendary')) save.stats.dry=(save.stats.dry||0)+1;

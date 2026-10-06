@@ -176,6 +176,15 @@ function rigBone(c,at,W,ang,h,t){ c.save();
   const u=REDUCED?.5:((t||0)*.16)%1.5; if (u<1){ const p=at(.2+u*.78), R=h*.08; c.globalCompositeOperation='lighter';
     const g=c.createRadialGradient(p.x,p.y,0,p.x,p.y,R); g.addColorStop(0,'rgba(180,192,255,.42)'); g.addColorStop(1,'rgba(150,160,255,0)'); c.fillStyle=g; c.beginPath(); c.arc(p.x,p.y,R,0,7); c.fill(); }
   c.restore(); }
+/** The Stillwater Mirror's blank: black glass, a strip of night sky caught along its top, silver bindings at its joints,
+    and stars winking in it here and there. */
+function rigMirror(c,at,W,ang,h,t){ c.save(); c.lineCap='round';
+  c.strokeStyle='rgba(120,140,190,.45)'; c.lineWidth=Math.max(.8,h*.008); c.beginPath(); for (let i=0;i<=30;i++){ const k=.18+i/30*.78, p=at(k,W(k)*.22); if (i) c.lineTo(p.x,p.y); else c.moveTo(p.x,p.y); } c.stroke();
+  for (const k of [.4,.6,.78]){ const a=at(k,-W(k)*.5-h*.006), b=at(k,W(k)*.5+h*.006); c.strokeStyle=INK; c.lineWidth=Math.max(2.2,h*.03); c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke();
+    c.strokeStyle='#C9CED8'; c.lineWidth=Math.max(1.4,h*.02); c.stroke(); c.strokeStyle='rgba(255,255,255,.8)'; c.lineWidth=Math.max(.6,h*.006); c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(lerp(a.x,b.x,.4),lerp(a.y,b.y,.4)); c.stroke(); }
+  for (let i=0;i<7;i++){ const k=.22+((i*37)%23)/23*.7, p=at(k,W(k)*(((i*53)%7)/7-.5)*.5), tw=REDUCED?.7:Math.pow(Math.max(0,Math.sin((t||0)*1.7+i*2.3)),3), r=Math.max(.8,h*.012)*(.6+tw);
+    c.fillStyle='rgba(235,242,255,'+(.4+.6*tw).toFixed(3)+')'; c.beginPath(); c.moveTo(p.x,p.y-r*1.6); c.lineTo(p.x+r*.4,p.y); c.lineTo(p.x,p.y+r*1.6); c.lineTo(p.x-r*.4,p.y); c.closePath(); c.fill(); c.fillRect(p.x-r*1.6,p.y-.3,r*3.2,.6); }
+  c.restore(); }
 function drawRig(c,w,h,rod,rig,bait,t,fx){ const R=RODS[rod]||RODS.willow, L=rigLayout(w,h), at=L.at, ang=L.ang;
   c.save(); c.lineCap='round'; c.lineJoin='round';
   const swing=REDUCED?0:Math.sin((t||0)*1.3)*.06, tip=at(1), hook={x:L.bait.x+Math.sin(swing)*h*.3, y:L.bait.y-h*.06}, lc=LINE_COL[rig.line]||LINE_COL.cotton;
@@ -184,8 +193,8 @@ function drawRig(c,w,h,rod,rig,bait,t,fx){ const R=RODS[rod]||RODS.willow, L=rig
   for (const pass of [0,1]) for (let i=0;i<segs;i++){ const k0=.06+i/segs*.94, k1=.06+(i+1)/segs*.94, a=at(k0), b=at(k1);
     c.strokeStyle=pass?R.color:INK; c.lineWidth=wAt(i/segs)+(pass?0:2.6); c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); }
   c.strokeStyle='rgba(255,255,255,.25)'; c.lineWidth=1.2; const s0=at(.14,h*.012), s1=at(.8,h*.004); c.beginPath(); c.moveTo(s0.x,s0.y); c.lineTo(s1.x,s1.y); c.stroke();
-  // the quest rods' own: the Tidecaller's grain and green ferrule, the Bonewhistle's knuckles and holes
-  const W=k=>wAt((k-.06)/.94); if (rod==='tidecaller') rigTide(c,at,W,ang,h); if (rod==='bonewhistle') rigBone(c,at,W,ang,h,t);
+  // the quest rods' own: the Tidecaller's grain and green ferrule, the Bonewhistle's knuckles and holes, the Mirror's stars
+  const W=k=>wAt((k-.06)/.94); if (rod==='tidecaller') rigTide(c,at,W,ang,h); if (rod==='bonewhistle') rigBone(c,at,W,ang,h,t); if (rod==='mirror') rigMirror(c,at,W,ang,h,t);
   // rune sockets on the blank (game/enchant-art.js): the runes etched on a rod you own, empty seats on one you don't
   drawRigRunes(c,w,h,L,save.rods.includes(rod)?enchFor(rod):Array((R.ench||1)).fill(null),t,fx);
   // the guides stand on top of the blank; the line runs from the reel through each one to the tip, then down to the hook

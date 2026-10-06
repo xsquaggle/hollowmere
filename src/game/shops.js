@@ -41,11 +41,13 @@ function openShop(tab){
   audioInit(); if (tab) OTT_TAB=tab;
   const first=!save.metOttilie; save.metOttilie=true; persist();
   if (first) OTT_TAB='rods';
+  // once the Hollow's open, she tells you about the night the town went under, the next time you see her (game/hollow.js)
+  const conf=!first && ottConfession(); if (conf) OTT_TAB='rods';
   if (OTT_TAB==='tackle') return openTackleShop();
   if (OTT_TAB==='traps') return openTrapShop();
   if (OTT_TAB==='ferry' && ferryAsk()) return openFerryShop();
   const cur=ROD(), nextId=ROD_ORDER.find(id=>!save.rods.includes(id));
-  const greet=first?'So you’re the new keeper. That Willow barely reaches past the dock. Earn some coins and I’ll set you up with something better.'
+  const greet=conf?conf:first?'So you’re the new keeper. That Willow barely reaches past the dock. Earn some coins and I’ll set you up with something better.'
     : nextId && save.coins>=RODS[nextId].price ? 'Now you’ve got coin. The '+RODS[nextId].name+' will take you farther out.'
     : nextId ? 'Rods aren’t free, kid. Bring me coins and I’ll get you further out on that water.'
     : 'You’ve got the best rod I make. Go catch something worth bragging about.';

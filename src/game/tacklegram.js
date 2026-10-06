@@ -27,7 +27,7 @@ function mailAt(){ const q=REG()==='quarter' && G.q && G.q.mail;
   return {x:MAIL.x, y:H-240+Math.sin(S.time*1.8)*1.2, s:1, moored:false}; }
 function updateMail(dt){
   if (MAIL.sayT>0 && MAIL.state!=='stopped'){ MAIL.sayT-=dt; if (MAIL.sayT<=0) MAIL.say=''; }   // in the Quarter he talks from his boat whenever
-  if (MAIL.state==='away') return;
+  if (MAIL.state==='away' || REG()==='hollow') return;   // the mail boat can't get under the lake: it waits till you're back up
   MAIL.t-=dt; const stopX=W*.27, moored=REG()==='quarter';
   if (MAIL.state==='waiting'){ if (MAIL.t<=0){ if (moored){ MAIL.state='stopped'; MAIL.t=.6; } else { MAIL.state='coming'; MAIL.x=-90; tone(523,.18,{vol:.07,type:'triangle'}); tone(659,.22,{vol:.07,type:'triangle',delay:.2}); } } }
   else if (MAIL.state==='coming'){ if (moored){ MAIL.state='stopped'; MAIL.t=.6; return; } MAIL.x=lerp(MAIL.x,stopX,Math.min(1,dt*1.1)); if (Math.random()<dt*4) tone(rand(90,110),.06,{vol:.04,type:'square'});

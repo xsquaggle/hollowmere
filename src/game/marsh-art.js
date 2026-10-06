@@ -357,20 +357,21 @@ function drawRodLantern(tip){ if (save.rod!=='lanternrod') return; const c=ctx, 
   c.strokeStyle=INK; c.lineWidth=1; c.strokeRect(-3,-2.8,6,6.8); c.beginPath(); c.moveTo(0,-2.8); c.lineTo(0,4); c.stroke();
   c.restore(); }
 /** At night the Lantern Rod lights the water round the float: the fish coming in show in its light, and with the Moon
-    Jar in a pocket they come tinted by their rarity. Drawn over the dark, from nightShade. */
-function lanternRodLight(){ if (save.rod!=='lanternrod' || PAL.dark<.05) return;
+    Jar in a pocket they come tinted by their rarity. Drawn over the dark, from nightShade (dk: how dark it is, the
+    night's by default; the Hollow's is full dark). */
+function lanternRodLight(dk){ if (dk==null) dk=dk; if (save.rod!=='lanternrod' || dk<.05) return;
   const c=ctx, tip=rodTip(), fl=.88+.12*Math.sin(S.time*13)*Math.sin(S.time*7.3), sw=Math.sin(S.time*2.1)*.18+(tip.a||0)*.4, lx=tip.x+Math.sin(sw)*9, ly=tip.y+Math.cos(sw)*9;
   c.save(); c.globalCompositeOperation='lighter';
-  const g=c.createRadialGradient(lx,ly,0,lx,ly,26); g.addColorStop(0,'rgba(255,206,130,'+(.5*PAL.dark*fl).toFixed(3)+')'); g.addColorStop(1,'rgba(255,206,130,0)'); c.fillStyle=g; c.fillRect(lx-26,ly-26,52,52);
+  const g=c.createRadialGradient(lx,ly,0,lx,ly,26); g.addColorStop(0,'rgba(255,206,130,'+(.5*dk*fl).toFixed(3)+')'); g.addColorStop(1,'rgba(255,206,130,0)'); c.fillStyle=g; c.fillRect(lx-26,ly-26,52,52);
   c.restore();
   const on=modFlag('lantern'); if (!on || !S.bob || (S.state!=='waiting' && S.state!=='bite')) return;
   const b=S.bob, k=sc(b.y), R=78*k;
   c.save(); c.globalCompositeOperation='lighter';
-  const pg=c.createRadialGradient(b.x,b.y,0,b.x,b.y,R); pg.addColorStop(0,'rgba(255,200,120,'+(.3*PAL.dark*fl).toFixed(3)+')'); pg.addColorStop(1,'rgba(255,200,120,0)');
+  const pg=c.createRadialGradient(b.x,b.y,0,b.x,b.y,R); pg.addColorStop(0,'rgba(255,200,120,'+(.3*dk*fl).toFixed(3)+')'); pg.addColorStop(1,'rgba(255,200,120,0)');
   c.translate(b.x,b.y); c.scale(1,.45); c.translate(-b.x,-b.y); c.fillStyle=pg; c.beginPath(); c.arc(b.x,b.y,R,0,Math.PI*2); c.fill(); c.restore();
   // the fish coming in, lit as it swims into the light
   const w=S.wait, sh=w&&w.sh; if (!sh || !w.fish) return; const d=Math.hypot((sh.x-b.x),(sh.y-b.y)/.45), lit=clamp(1-d/R,0,1)*sh.alpha; if (lit<.02) return; const F=FISH[w.fish];
-  c.save(); c.translate(sh.x,sh.y); c.rotate(sh.ang); c.scale(1,.55); drawFish(c,w.fish,F.len*sc(sh.y),true,.75*lit*Math.min(1,PAL.dark*2),Math.sin(S.time*(w.phase==='nibble'?9:6))); c.restore();
+  c.save(); c.translate(sh.x,sh.y); c.rotate(sh.ang); c.scale(1,.55); drawFish(c,w.fish,F.len*sc(sh.y),true,.75*lit*Math.min(1,dk*2),Math.sin(S.time*(w.phase==='nibble'?9:6))); c.restore();
   if (modFlag('moonJar') && F.rarity!=='common'){ comboSeen('lantern'); c.save(); c.globalCompositeOperation='lighter'; c.globalAlpha=lit*.8; const col=RAR[F.rarity].color, rg=c.createRadialGradient(sh.x,sh.y,0,sh.x,sh.y,F.len*.7*sc(sh.y));
     rg.addColorStop(0,hexA(col,.45)); rg.addColorStop(1,hexA(col,0)); c.translate(sh.x,sh.y); c.scale(1,.5); c.translate(-sh.x,-sh.y); c.fillStyle=rg; c.beginPath(); c.arc(sh.x,sh.y,F.len*.7*sc(sh.y),0,Math.PI*2); c.fill(); c.restore(); } }
 

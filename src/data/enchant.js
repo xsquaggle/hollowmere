@@ -32,6 +32,6 @@ const ENCH={
 const ENCH_ORDER=['swift','magpie','deep','nightglass','storm','wanderer','odd','homebody','echo'];
 const GLIMMER={
   record:{common:2, uncommon:3, rare:5, epic:8, legendary:12, exotic:18, mythic:26, godly:40},
-  geode:{lake:[4,8], river:[5,10], marsh:[5,11], coast:[6,12], quarter:[6,13]},
+  geode:{lake:[4,8], river:[5,10], marsh:[5,11], coast:[6,12], quarter:[6,13], hollow:[7,14]},
   crate:{common:[3,5], uncommon:[6,9], rare:[10,15], epic:[18,26], legendary:[32,45], exotic:[55,75], mythic:[90,120]}
 };

@@ -23,6 +23,8 @@ function modWhenText(w){
   if (w.wx) out.push(wxOnText(w.wx));
   if (w.lucky) out.push('while you fish a lucky splash');
   if (w.bow) out.push('where the rainbow touches the water');
+  if (w.star) out.push('where a falling star came down');
+  if (w.starlit) out.push('with your float on a star in the water');
   if (w.rarity) out.push('for '+w.rarity.map(r=>RAR[r].label.toLowerCase()).join(' and ')+' fish');
   if (w.rarityMin) out.push(w.rarityMin===Object.keys(RAR)[1]?'for every fish above common':'for '+RAR[w.rarityMin].label.toLowerCase()+' fish and rarer');
   if (w.fish) out.push('with '+FISH[w.fish].name);
@@ -41,14 +43,14 @@ function modState(m,now){ const w=m.when; if (!w) return 'on';
   if (w.wx && ![].concat(w.wx).includes(now.wx)) return 'off-now';
   if (w.bow && !bowFoot()) return 'off-now';
   if (now.rarity && ((w.rarity && !w.rarity.includes(now.rarity)) || (w.rarityMin && rarRank(now.rarity)<rarRank(w.rarityMin)))) return 'off-here';
-  const open=w.spot||w.fish||w.beh||w.lucky||w.bow||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
+  const open=w.spot||w.fish||w.beh||w.lucky||w.bow||w.star||w.starlit||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
   return open ? 'cond' : 'on'; }
 const stateClass=st=>st.startsWith('off')?'off':st;
 const stateNote=st=>st==='off-here'?' · not here':st==='off-now'?' · not now':'';
 /** Rarities that some fish has, in order: the tiers the luck card shows. */
 const fishTiers = () => Object.keys(RAR).filter(r=>RAR[r].luckCap && Object.values(FISH).some(F=>F.rarity===r));
 function bonusesHTML(){
-  const now=modCtx({}), all=modList().filter(m=>m.src!=='tune' && m.src!=='base'), R=ROD();
+  const now=modCtx({}), all=modList().filter(m=>m.src!=='tune' && m.src!=='base' && !m.hide), R=ROD();
   const where='At '+REGION_NAME[now.region]+(now.night?', at night':', by day')+(now.wx==='clear'?'':', '+WX[now.wx].on);
   // gear: what you're carrying
   const sets=setsDone(), parts=(save.parts||[]).map(id=>PARTS[id]&&PARTS[id].name).filter(Boolean), meal=save.meal;

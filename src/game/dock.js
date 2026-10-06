@@ -11,7 +11,7 @@ const dockWood = () => REG()==='marsh' ? WOOD_MARSH : WOOD;
 /** The dock's shape on this screen: its far end, the two edges, and where the piles stand. */
 function dockGeo(){ const cx=W/2, top=H-128, bw=78, bb=110; return {cx, top, bw, bb, lp:cx-bw-1, rp:cx+bw+1}; }
 /** Paints the boards, piles and coiled rope into SC.dock, once per screen size. */
-function buildDock(){ if (afloat()){ SC.dock=null; return; }
+function buildDock(){ if (afloat() || REG()==='hollow'){ SC.dock=null; return; }
   const D=dockGeo(), {cx,top,bw,bb}=D, h=H-top+40, c=document.createElement('canvas'); c.width=Math.round(W*DPR); c.height=Math.round(h*DPR);
   const x=c.getContext('2d'); x.setTransform(DPR,0,0,DPR,0,-(top-40)*DPR); sseed=404;
   // the marsh's boardwalk is older: silvered boards laid crooked, lichen on them, its piles leaning
@@ -83,6 +83,7 @@ function ropeCoil(x,cx,cy,r,P){ P=P||WOOD;
 function drawDock(){
   if (REG()==='coast'){ drawSkiffDeck(); drawTrapProp(); drawMoonJarProp(); drawKeepnet(); return; }
   if (REG()==='quarter'){ drawRowboat(); drawMoonJarProp(); drawKeepnet(); return; }   // Pell's rowboat (game/quarter-art.js): no traps in the Quarter
+  if (REG()==='hollow'){ drawHollowLedge(); return; }   // a rock ledge in the cave (game/hollow-art.js)
   const D=dockGeo(), {cx,top}=D;
   // ripples round the piles first, then the cached deck over them
   ctx.strokeStyle='rgba(225,238,242,'+(.22+.1*Math.sin(S.time*2)).toFixed(3)+')'; ctx.lineWidth=1.3;
@@ -95,7 +96,9 @@ function drawDock(){
   drawBaitOnDock(cx+30,top+56);
   drawTrapProp();
   const lake=REG()==='lake';   // at the river it's Ottilie's ferry landing: Grey stays home, and Wren is on her boathouse ramp; in the marsh, in her punt
-  if (lake && !S.grey) drawHeron(D.rp,top-25);   // unless he's off guarding a trap (game/trap-scene.js)
+  // unless he's off guarding a trap (game/trap-scene.js); he brings your uncle's fifth page here (game/hollow.js)
+  if (lake && !S.grey) drawHeron(D.rp,top-25,greyHasPage());
+  if (lakeBellHere()) drawLakeBell();
   drawKeepnet();
   if (lake) drawOttilie(); else if (REG()==='marsh') drawWrenPunt(); else { drawWren(); drawOtterThief(); }
   drawDockLantern(D.lp,top);   // in front of Ottilie's punt: the pile stands nearer than her boat
@@ -148,13 +151,15 @@ function drawDockLantern(px,top){ const c=ctx, lx=px-11, ly=top-17, sw=Math.sin(
   c.strokeStyle=INK; c.lineWidth=1.8; c.lineCap='round'; c.beginPath(); c.moveTo(px-4.5,top-22); c.lineTo(lx,top-22); c.lineTo(lx,top-24.5); c.stroke();
   lanternGlow(.35+PAL.dark*1.3);
   lanternBody(lx,ly,sw); }
-/** A lantern hanging from its hook at (lx, ly-5): a ring, a cap, the lit glass and its flame. */
-function lanternBody(lx,ly,sw){ const c=ctx, fl=.86+.14*Math.sin(S.time*13)*Math.sin(S.time*7.3);
+/** A lantern hanging from its hook at (lx, ly-5): a ring, a cap, the lit glass and its flame; or, put out, dark glass
+    and a black wick (the Hollow's, game/hollow.js). */
+function lanternBody(lx,ly,sw,out){ const c=ctx, fl=.86+.14*Math.sin(S.time*13)*Math.sin(S.time*7.3);
   c.save(); c.translate(lx,ly-5); c.rotate(sw||0); c.translate(0,5);
   c.strokeStyle=INK; c.lineWidth=1.1; c.beginPath(); c.arc(0,-10.4,2.2,0,Math.PI*2); c.stroke();
   // the glass, lit from inside
-  c.fillStyle='rgba(255,'+Math.round(196+34*fl)+',130,1)'; c.beginPath(); c.moveTo(-3.6,-5.6); c.lineTo(3.6,-5.6); c.lineTo(4.2,4); c.lineTo(-4.2,4); c.closePath(); c.fill();
-  c.fillStyle='#FFF6D8'; c.beginPath(); c.ellipse(0,.4,1.3,2.6*fl,0,0,Math.PI*2); c.fill();
+  c.fillStyle=out?'#3B3D44':'rgba(255,'+Math.round(196+34*fl)+',130,1)'; c.beginPath(); c.moveTo(-3.6,-5.6); c.lineTo(3.6,-5.6); c.lineTo(4.2,4); c.lineTo(-4.2,4); c.closePath(); c.fill();
+  if (out){ c.strokeStyle='#15151A'; c.lineWidth=1; c.beginPath(); c.moveTo(0,2.6); c.lineTo(0,-.6); c.stroke(); }
+  else { c.fillStyle='#FFF6D8'; c.beginPath(); c.ellipse(0,.4,1.3,2.6*fl,0,0,Math.PI*2); c.fill(); }
   c.strokeStyle='#2B2A33'; c.lineWidth=1.1; for (const f of [-1,0,1]){ c.beginPath(); c.moveTo(f*3.6,-5.6); c.lineTo(f*4.2,4); c.stroke(); }
   c.fillStyle='#2B2A33'; c.beginPath(); c.moveTo(-5.2,-5.4); c.lineTo(0,-9.4); c.lineTo(5.2,-5.4); c.closePath(); c.fill(); c.fillRect(-5,3.6,10,2.8);
   c.fillStyle='rgba(255,255,255,.35)'; c.fillRect(-2.6,-4.6,1,7.6);

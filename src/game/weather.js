@@ -10,7 +10,7 @@
    Playtest and the balance simulator can pin the weather with save.wx.force. Everything here reads only the save, so
    the simulator's stand-in save has weather of its own (see game/mods.js). */
 var WXM={save:null};                        // the last answer, while nothing it depends on has changed
-const WX_REGN={lake:1, coast:2, river:3, marsh:4, quarter:5};
+const WX_REGN={lake:1, coast:2, river:3, marsh:4, quarter:5, hollow:6};
 /** The save's weather state, tidied on first read: a seed for the sky, a pinned kind (Playtest), tips already shown. */
 function wxState(){ let w=save.wx; if (!w || typeof w!=='object' || Array.isArray(w)) w=save.wx={};
   if (!Number.isInteger(w.seed) || w.seed<1) w.seed=1+Math.floor(Math.random()*2147483646);
@@ -38,31 +38,32 @@ function wxAt(reg,B,seed){ seed=seed||wxState().seed; return wxRoll(reg,wxStart(
     a rainbow, each 0 to 1). Cached until the save, the clock, the region or a pinned kind changes. */
 function wxInfo(){
   const w=wxState(), M=WXM;
-  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.ferry===save.ferry && M.marsh===save.marsh && M.quarter===quarterOpen() && M.call===w.call && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
+  if (M.save===save && M.clock===save.clock && M.day===save.day && M.reg===save.region && M.boat===save.boat && M.ferry===save.ferry && M.marsh===save.marsh && M.quarter===quarterOpen() && M.hollow===hollowOpen() && M.call===w.call && M.force===w.force && M.bow===w.bow && M.seed===w.seed && M.tut===save.tutorialDone) return M.v;
   const reg=REG(), h=(((save.clock%24)+24)%24), into=h%WX_SPELL.hours; let from, to, t;
-  if (w.force){ from=to=w.force; t=1; }
+  if (reg==='hollow'){ from=to='clear'; t=1; }   // no sky in the Hollow (game/hollow.js)
+  else if (w.force){ from=to=w.force; t=1; }
   else if (!save.tutorialDone){ from=to='clear'; t=1; }
   else { const B=wxSpell(); to=wxAt(reg,B,w.seed); from=B>0?wxAt(reg,B-1,w.seed):to; t=from===to?1:clamp(into/WX_SPELL.ease,0,1); }
   // rain called with the Tidecaller's conch (game/tidecaller.js) comes in over a few in-game minutes, and goes the same way
   const C=w.call; let called=false;
-  if (C && C.reg===reg && !w.force && save.tutorialDone){ const a=absHour(), nat=t<.5?from:to;
+  if (C && C.reg===reg && reg!=='hollow' && !w.force && save.tutorialDone){ const a=absHour(), nat=t<.5?from:to;
     if (a>=C.from && a<C.until){ called=true; if (nat==='rain'){ from=to='rain'; t=1; } else { from=nat; to='rain'; t=clamp((a-C.from)/.4,0,1); } }
     else if (a>=C.until && a<C.until+.5 && nat!=='rain'){ called=true; from='rain'; to=nat; t=clamp((a-C.until)/.5,0,1); } }
   const e=t*t*(3-2*t), A=WX[from].look, Z=WX[to].look, kind=t<.5?from:to;
   const v={kind, from, to, t, cloud:lerp(A.cloud,Z.cloud,e), rain:lerp(A.rain,Z.rain,e), fog:lerp(A.fog,Z.fog,e), mist:0, bow:0};
   // the dawn mist on fair mornings: thickest around six, gone by nine
-  if (kind==='clear'||kind==='cloudy'){ const m=h<DAWN_MIST.from-.5||h>DAWN_MIST.to+1.5?0:h<6?(h-(DAWN_MIST.from-.5))/1.5:1-(h-6)/(DAWN_MIST.to+1.5-6); v.mist=clamp(m,0,1); }
+  if ((kind==='clear'||kind==='cloudy') && reg!=='hollow'){ const m=h<DAWN_MIST.from-.5||h>DAWN_MIST.to+1.5?0:h<6?(h-(DAWN_MIST.from-.5))/1.5:1-(h-6)/(DAWN_MIST.to+1.5-6); v.mist=clamp(m,0,1); }
   // a rainbow, by day, in the hour or two after rain gives way
   if (from==='rain' && to!=='rain' && !w.force && !called && h>=7 && h<18.5) v.bow=clamp((t-.5)/.4,0,1)*clamp((2.4-into)/.8,0,1);
-  if (w.bow && !isNight(h)) v.bow=1;                                   // Playtest: a rainbow now
-  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,ferry:save.ferry,marsh:save.marsh,quarter:quarterOpen(),call:w.call,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
+  if (w.bow && !isNight(h) && reg!=='hollow') v.bow=1;                                   // Playtest: a rainbow now
+  Object.assign(M,{save,clock:save.clock,day:save.day,reg:save.region,boat:save.boat,ferry:save.ferry,marsh:save.marsh,quarter:quarterOpen(),hollow:hollowOpen(),call:w.call,force:w.force,bow:w.bow,seed:w.seed,tut:save.tutorialDone,v});
   return v; }
 /** The weather the fishing uses here and now: 'clear', 'cloudy', 'rain' or 'fog'. */
 const wxNow = () => wxInfo().kind;
 /** How the weather looks right now. Fog's look includes the dawn mist. */
 function wxLook(){ const v=wxInfo(); if (!v.look) v.look={cloud:v.cloud, rain:v.rain, fog:Math.max(v.fog,v.mist*DAWN_MIST.look), mist:v.mist, bow:v.bow}; return v.look; }   // one per answer, not one per call
 /** Whether the dawn mist is on the water for fishing: fog fish rise at a share of their odds. */
-const wxMist = () => { const v=wxInfo(), h=save.clock; return (v.kind==='clear'||v.kind==='cloudy') && h>=DAWN_MIST.from && h<DAWN_MIST.to; };
+const wxMist = () => { const v=wxInfo(), h=save.clock; return REG()!=='hollow' && (v.kind==='clear'||v.kind==='cloudy') && h>=DAWN_MIST.from && h<DAWN_MIST.to; };
 /* The moon waxes and wanes over MOON.cycle in-game days. A night belongs to the day it began on: the small hours are
    still last night. Playtest can pin the phase (save.wx.moon). */
 const moonNightDay = () => (save.day||0)-((((save.clock%24)+24)%24)<12?1:0);
@@ -73,7 +74,7 @@ function moonName(p){ const c=MOON.cycle, k=p==null?moonPhase():p; return MOON_N
 function moonPhase(){ const w=wxState(); if (w.moon!=null) return w.moon; const c=MOON.cycle; return (((moonNightDay()+MOON.offset)%c)+c)%c; }
 const fullMoon = () => moonPhase()===MOON.full;
 /** Whether a full moon is up and showing: the moonpath lies on the water. Cloud and fog hide it. */
-function moonpathOn(){ return fullMoon() && isNight(save.clock) && (PAL.moonVis==null?1:PAL.moonVis)*(1-Math.max(wxLook().cloud,wxLook().fog))>.25; }
+function moonpathOn(){ return REG()!=='hollow' && fullMoon() && isNight(save.clock) && (PAL.moonVis==null?1:PAL.moonVis)*(1-Math.max(wxLook().cloud,wxLook().fog))>.25; }
 /** Whether (x, y) is on the moonpath: a column of light under the moon, wider toward the dock. */
 function onMoonpath(x,y){ if (!moonpathOn()) return false; const k=clamp((y-HZ)/(H-HZ),0,1); return Math.abs(x-(SC.moonX||W*.74))<W*lerp(MOON.path[0],MOON.path[1],k); }
 /** Where the rainbow's foot touches the water, and how strongly it shows (0 to 1): on the side away from the sun. */
@@ -94,6 +95,7 @@ function wxFishFor(reg,spot){ const out=[], F=WX_FISH[reg]; if (!F) return out; 
 function wxLine(){ return wxSky()+(REG()==='marsh'?' '+tideLine():''); }
 function wxSky(){ const k=wxNow(), reg=REG(), F=WX_FISH[reg]||{}, known=id=>(save.fish[id]||{}).caught>0, nm=id=>known(id)?'the '+FISH[id].name+' is':'something new is';
   const where=' at '+REGION_NAME[reg];
+  if (reg==='hollow') return 'No sky down here. It’s dark in the Hollow day and night, but for the lantern, the glowing shelf and, around midday, the shaft of light through the roof.';
   if (bowFoot()) return 'A rainbow'+where+'. Where it comes down on the water, catches come up mutated twice as often.';
   if (isNight(save.clock) && reg==='lake' && moonpathOn()) return 'A full moon over the lake. The moonpath lies across the deep pool tonight.';
   if (k==='rain') return 'Rain'+where+'. Fish bite sooner and '+nm(F.rain.fish)+' rising, but the drops make nibbles hard to read.';
@@ -119,7 +121,7 @@ function wxTurned(was,k){
       :'Fog hides fish in the far water until they reach your bobber. Fog fish come up'+(REG()==='lake'?', and Lantern Carp rise by day.':'.'),8); }
 }
 /** The clock chip: the time, a small mark for the weather (with the sun or moon beside it), and its spoken label. */
-function wxIcon(){ const k=wxNow(), night=isNight(save.clock)||PERIOD(save.clock)==='Evening'; return k+(night?'-n':'-d')+(REG()==='marsh'?'-'+tideMark():''); }
+function wxIcon(){ const k=wxNow(), night=isNight(save.clock)||PERIOD(save.clock)==='Evening'||REG()==='hollow'; return k+(night?'-n':'-d')+(REG()==='marsh'?'-'+tideMark():''); }
 const WX_SVG={
   sun:'<circle cx="8" cy="8" r="3.3" fill="#E8C77E" stroke="#2B2A33" stroke-width=".9"/><path d="M8 1.4v1.8M8 12.8v1.8M1.4 8h1.8M12.8 8h1.8M3.3 3.3l1.3 1.3M11.4 11.4l1.3 1.3M3.3 12.7l1.3-1.3M11.4 4.6l1.3-1.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>',
   moon:'<path d="M10.6 2.2a6 6 0 1 0 3.2 9.6A5 5 0 0 1 10.6 2.2Z" fill="#E9E2CC" stroke="#2B2A33" stroke-width=".9"/>',
