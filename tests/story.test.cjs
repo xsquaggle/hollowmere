@@ -1,6 +1,6 @@
 // The story pass (step 30): Ottilie's lines by chapter and what she calls you, Wren's and Pell's later lines, what
 // each fish remembers, Pell's last step and the Row's invitation, and the end of chapter one: supper on Lantern Row,
-// played through to its card, its replay, and the scene drawn at phone, wide and landscape sizes.
+// played through to its card (and again if cut short), its replay, the opening and back/Escape, and the scene drawn at phone, wide and landscape sizes.
 const assert = require('node:assert/strict');
 
 /** Pell's round done up to the sack, and the rest of the way open: the Quarter, the Hollow, the boat. */
@@ -44,11 +44,11 @@ module.exports = [
       assert.ok(A.notes.includes('met') && !A.notes.includes('quarterSeen') && !A.notes.includes('supper'), JSON.stringify(A.notes));
       assert.equal(A.wren, 0); assert.equal(A.pell, 0);
       await openGame(page, { save: veteran({ ...roundDone, rods: ['willow', 'mirror', 'bonewhistle'], wren: { met: 1 }, story: { invite: 1, supper: 3, card: 1 }, finds: finds(PAGES) }) });
-      const B = await page.evaluate(() => { const T = window.__hm.story; return { wren: T.wrenLater(), pell: T.pellLater(), idle: [...new Set(Array.from({ length: 60 }, () => T.pellIdle()))] }; });
+      const B = await page.evaluate(() => { const T = window.__hm.story; return { wren: T.wrenLater(), pell: T.pellLater(), idle: [...new Set(Array.from({ length: 300 }, () => T.pellIdle()))] }; });
       B.notes = await up();
       for (const w of ['quarterSeen', 'bonewhistle', 'hollowSeen', 'supper']) assert.ok(B.notes.includes(w), 'Wren has pinned ' + w);
       assert.ok(B.wren.length >= 6 && B.pell.length >= 4, JSON.stringify([B.wren.length, B.pell.length]));
-      assert.ok(B.idle.some(l => /stayed up/.test(l)) && !B.idle.some(l => /these days/.test(l)), 'after supper, no more of the supper’s time');
+      assert.ok(B.pell.some(l => /stayed up/.test(l)) && !B.idle.some(l => /these days/.test(l)), 'after supper, no more of the supper’s time');
       // what a fish remembers: a common after ten catches, a legendary after two, a mythic at once
       await openGame(page, { save: veteran({ fish: { perch: { caught: 9, best: 20, seen: true }, mayor: { caught: 2, best: 90, seen: true } } }) });
       const M = await page.evaluate(() => { const T = window.__hm.story; return { at: ['perch', 'mayor', 'calf'].map(T.memoryAt), perch: T.memoryHTML('perch'), mayor: T.memoryHTML('mayor') }; });
@@ -88,7 +88,11 @@ module.exports = [
       assert.deepEqual(tip, { active: false, tip: 5 });
       await openGame(page, { save: atSupper(veteran) });
       await until(page, () => window.__hm.story.END.active, null, { what: 'the supper starting' });
-      assert.equal((await readSave(page)).story.supper, 5, 'the day it was, counted from 1');
+      assert.equal((await readSave(page)).story.supper, undefined, 'kept only once the bell stops');
+      // closed partway, it comes round again
+      await page.waitForTimeout(1500); await page.reload();
+      await until(page, () => window.__hm.story.END.active, null, { what: 'the supper starting again after a reload' });
+      assert.equal(await page.evaluate(() => window.__hm.story.END.i), 0, 'from the first line');
       const n = await page.evaluate(() => window.__hm.story.SUPPER_LINES.length);
       const seen = [];
       await page.waitForTimeout(400);
@@ -99,6 +103,7 @@ module.exports = [
       assert.equal(await page.evaluate(() => window.__hm.story.END.phase), 'out', 'tapped through every line: ' + seen.join(','));
       assert.ok(seen.includes(n - 1));
       assert.equal(await page.evaluate(() => [window.__hm.story.hushed(), window.__hm.story.natural()].join()), 'true,false', 'the bell is quiet for the rest of the hour');
+      assert.equal((await readSave(page)).story.supper, 5, 'the day it was, counted from 1');
       await until(page, () => !document.getElementById('endCard').hidden, null, { what: 'the end-of-chapter card', timeout: 12000 });
       const card = await page.textContent('#endCard');
       assert.match(card, /The end of chapter one/); assert.match(card, /Day5/); assert.match(card, /Logbook pages6 of 6/);
@@ -133,6 +138,67 @@ module.exports = [
       await openGame(page, { save: veteran() });
       await page.click('#soundBtn'); await page.waitForTimeout(400); await page.click('[data-st="app"]');
       assert.ok(await page.$('#replayIntro')); assert.equal(await page.$('#replaySupper'), null);
+      assert.deepEqual(page.errors, []);
+    },
+  },
+  {
+    name: 'the supper waits for the opening to be over; back or Escape skips to its card, then closes it; one closed before its card shows the card next time',
+    async run({ newPage, openGame, veteran, until, readSave }) {
+      const page = await newPage();
+      await openGame(page, { save: atSupper(veteran, { introSeen: true }), intro: true });
+      await page.waitForTimeout(1200);
+      assert.deepEqual(await page.evaluate(() => [!document.getElementById('intro').hidden, window.__hm.story.END.active]), [true, false], 'welcome back is up, and the supper waits for it');
+      await page.mouse.click(195, 600);
+      await until(page, () => window.__hm.story.END.active, null, { what: 'the supper, once the opening is over', timeout: 10000 });
+      assert.equal(await page.evaluate(() => document.getElementById('intro').hidden), true);
+      await page.waitForTimeout(600);
+      await page.keyboard.press('Escape');
+      await until(page, () => !document.getElementById('endCard').hidden, null, { what: 'Escape skipping to the card' });
+      assert.equal(await page.evaluate(() => window.__hm.story.END.active), true, 'still up, on the card');
+      assert.equal((await readSave(page)).story.supper, 5);
+      // the app closed on the card: next time in the Quarter, the card comes up on its own
+      const cut = await readSave(page); delete cut.story.card;
+      await openGame(page, { save: cut });
+      await until(page, () => window.__hm.story.END.active && !document.getElementById('endCard').hidden, null, { what: 'the card on its own' });
+      assert.equal(await page.evaluate(() => window.__hm.story.END.i), -1, 'no lines, only the card');
+      await page.waitForTimeout(400);
+      await page.keyboard.press('Escape');
+      await until(page, () => !window.__hm.story.END.active, null, { what: 'Escape closing the card' });
+      const S = await readSave(page);
+      assert.deepEqual([S.story.supper, S.story.card], [5, 1]);
+      await page.waitForTimeout(800);
+      assert.equal(await page.evaluate(() => window.__hm.story.END.active), false, 'once is enough');
+      assert.deepEqual(page.errors, []);
+    },
+  },
+  {
+    name: 'watching the supper again wants nothing on the line, and its card fits a phone held sideways',
+    async run({ newPage, openGame, veteran, until, readSave }) {
+      const save = veteran({ ...roundDone, story: { invite: 1, supper: 2, card: 1 }, finds: finds([...PAGES, 'invite']) });
+      let page = await newPage();
+      await openGame(page, { save });
+      await page.mouse.move(195, 560); await page.mouse.down();
+      for (let i = 1; i <= 10; i++) { await page.mouse.move(195, 560 + 16 * i); await page.waitForTimeout(16); }
+      await page.mouse.up();
+      await until(page, () => window.__S.state === 'waiting', null, { what: 'the float out' });
+      await page.click('#soundBtn'); await page.waitForTimeout(400); await page.click('[data-st="app"]');
+      await page.click('#replaySupper'); await page.waitForTimeout(600);
+      assert.equal(await page.evaluate(() => window.__hm.story.END.active), false, 'not with a float out');
+      assert.match(await page.textContent('#news'), /Reel in first/);
+      // a phone on its side: the card's button is on the screen
+      page = await newPage({ viewport: { width: 844, height: 390 } });
+      await openGame(page, { save });
+      await page.click('#soundBtn'); await page.waitForTimeout(400); await page.click('[data-st="app"]');
+      await page.click('#replaySupper');
+      await until(page, () => window.__hm.story.END.active, null, { what: 'the replay' });
+      await page.waitForTimeout(400); await page.click('#endSkip');
+      await until(page, () => !document.getElementById('endCard').hidden, null, { what: 'the card' });
+      await page.waitForTimeout(4400);
+      const R = await page.evaluate(() => { const r = e => document.querySelector(e).getBoundingClientRect(); return { h1: r('.end-card h1').top, go: r('#endGo').bottom, tally: r('.ec-tally').height, H: innerHeight }; });
+      assert.ok(R.h1 >= 0 && R.go <= R.H, JSON.stringify(R));
+      await page.click('#endGo');
+      await until(page, () => !window.__hm.story.END.active, null, { what: 'closing' });
+      assert.equal(await page.evaluate(() => window.__hm.story.EA.base), null, 'the pictures are let go');
       assert.deepEqual(page.errors, []);
     },
   },

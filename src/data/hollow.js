@@ -59,4 +59,4 @@ const HOLLOW={
 const MIRROR_STARS={n:9, r:9, d:[.25,.85]};
 const OMEN={every:[120,200], dur:180, x:5, from:40};
 const STAR={every:[90,240], dur:15, r:30, x:3};
-const OTT_CONFESS='I was on the ferry that night. Eight years old, ringing my bell for the last crossing home from the Row’s Saturday supper. At twelve minutes past three the lake closed over the town. Not a wave. It closed, like an eye. Your uncle spent forty years looking for the way under the lid. I’m glad it was you that found it. Mind you come back up, Keeper.';
+const OTT_CONFESS='I was on the ferry that night. Eight years old, ringing my bell for the last crossing home from the Row’s Saturday supper. At twelve minutes past three the lake closed over the town. Not a wave. It closed, like an eye. Your uncle spent forty years looking for the way under the lid, and only found it at the very end. I’m glad it was you that went all the way down. Mind you come back up, Keeper.';

@@ -109,7 +109,7 @@ function appHTML(){ const ios=isIOS(), and=isAndroid(), inst=isStandalone();
   return h+aboutHTML(); }
 function aboutHTML(){ return '<section class="st-card"><h3>About</h3><p>Hollowmere prototype, build '+BUILD+'. Fonts: Nunito, Young Serif and Caveat, under the SIL Open Font License.</p><div class="row"><button class="btn" id="replayIntro" type="button">Watch the opening again</button>'+(save.story && save.story.supper?'<button class="btn" id="replaySupper" type="button">Watch the supper again</button>':'')+'</div></section>'; }
 function bindApp(){ const ri=$('replayIntro'); if (ri) ri.addEventListener('click',()=>{ closeSheet(); setTimeout(()=>introStart(true),250); });
-  const rs=$('replaySupper'); if (rs) rs.addEventListener('click',()=>{ closeSheet(); setTimeout(()=>supperStart(true),250); });
+  const rs=$('replaySupper'); if (rs) rs.addEventListener('click',()=>{ if (S.state==='idle') closeSheet(); supperReplay(); });
   const di=$('doInstall'); if (di) di.addEventListener('click',async()=>{ const p=APP.prompt; if (!p) return; p.prompt(); try { const r=await p.userChoice; if (r&&r.outcome==='accepted') news('Installing Hollowmere…','gold'); } catch(e){} APP.prompt=null; openSettings('app'); });
   const cp=$('cpForApp'); if (cp) cp.addEventListener('click',async e=>{ const btn=e.currentTarget; try { const code=await makeCode(); save.lastBackup=Date.now(); persist(); copyText(code,btn); } catch(_){ news('Couldn’t make a code on this browser','bad'); } }); }
 if (window.__PWA && 'serviceWorker' in navigator && location.protocol!=='file:'){ const reg0=()=>{ navigator.serviceWorker.register('sw.js').then(reg=>{

@@ -12,7 +12,7 @@ const cfg = JSON.parse(readFileSync(join(ROOT, 'src/build.json'), 'utf8'));
 const D = vm.createContext({});
 for (const f of cfg.js.filter(f => f.startsWith('data/'))) vm.runInContext(readFileSync(join(ROOT, 'src', f), 'utf8').replace(/^const /gm, 'var '), D, { filename: 'src/' + f });
 const { LETTER, OTT_SAY, OTT_NAME, OTT_CONFESS, WX_LINES, BAR_LINES, BANQUET_LINES, VISITS, TOWNSFOLK, NOTES, LETTER_ORDER, REPLY_ORDER, FINDS, STORY, FIXUP, TRAPDOOR,
-  WREN, WREN_Q, WREN_MARSH, COAST_LINES, PELL, PELL_Q, SUPPER_LINES, SUPPER_SEATS, SUPPER_FOLK, CHAPTER_END, FISH, ORDER, REGION_FISH, REGION_NAME, RODS } = D;
+  WREN, WREN_Q, WREN_MARSH, COAST_LINES, PELL, PELL_Q, SUPPER_LINES, SUPPER_SEATS, SUPPER_FOLK, CHAPTER_END, FISH, ORDER, REGION_FISH, REGION_NAME, RODS, OWNERS } = D;
 
 const out = [];
 const put = (...l) => out.push(...l);
@@ -22,7 +22,8 @@ const say = (who, s) => put('- **' + who + ':** ' + s);
 const bullet = s => put('- ' + s);
 const ottFill = s => s.replace(/\{you\}/g, '{' + OTT_NAME.kid + ' / ' + OTT_NAME.keeper + '}');
 const rodName = id => RODS[id] ? 'the ' + RODS[id].name : id;
-const ottText = L => ottFill(typeof L === 'string' ? L : L[0] + ' *(until you have ' + rodName(L[1].replace(/^rod:/, '')) + ')*');
+const fishName = id => FISH[id] ? FISH[id].name : id;
+const ottText = L => ottFill(typeof L === 'string' ? L : L[0] + (/^caught:/.test(L[1]) ? ' *(once you\'ve caught ' + fishName(L[1].slice(7)) + ')*' : ' *(until you have ' + rodName(L[1].replace(/^rod:/, '')) + ')*'));
 /** A note as it reads in the journal: who it's to, then its lines, as a quote. */
 const note = (id, title) => { const N = NOTES[id]; put('**' + (title || id) + '**' + (N.to ? ' (to ' + N.to + ')' : ''), '');
   for (const l of N.lines) put('> ' + (l || ' '));
@@ -53,8 +54,8 @@ for (const F of FIXUP) bullet('**' + F.name + '.** ' + F.done);
 for (const s of TRAPDOOR) bullet('*(the trapdoor)* ' + s);
 h3('Message bottles');
 for (const id of notesOf(N => N.kind === 'bottle')) note(id);
-h3('Your uncle\'s logbook, pages 1 to 3');
-for (const id of ['log1', 'log2', 'log3']) note(id, 'Page ' + NOTES[id].page);
+h3('Your uncle\'s logbook, pages 1 and 2');
+for (const id of ['log1', 'log2']) note(id, 'Page ' + NOTES[id].page);
 h3('Drowned letters at the lake');
 for (const id of LETTER_ORDER.filter(id => !NOTES[id].waters.includes('quarter'))) note(id, 'Letter: ' + id);
 h3('The story relics');
@@ -62,6 +63,8 @@ for (const [id, R] of Object.entries(STORY)) { bullet('**' + FINDS[id].name + '*
   if (R.line) put('  - *Ottilie:* ' + R.line); }
 h3('Finds: what the lake gives back');
 for (const kind of ['curio', 'artifact', 'keepsake']) for (const [id, F] of Object.entries(FINDS)) if (F.kind === kind && !STORY[id]) bullet('**' + F.name + '** (' + kind + '): ' + F.lore);
+h3('Lost things given back to their owners');
+for (const [id, F] of Object.entries(FINDS)) if (F.owner && F.reward && F.reward.line) say(OWNERS[F.owner] ? OWNERS[F.owner].name : F.owner, F.reward.line + ' *(for the ' + F.name + ')*');
 
 /* ---------- the town ---------- */
 h2('2. The town at the shack');
@@ -90,15 +93,21 @@ for (const L of OTT_SAY.coast) bullet('*Ottilie:* ' + ottText(L));
 /* ---------- the Drowned Quarter ---------- */
 h2('6. The Drowned Quarter');
 say('Pell', PELL.hello); say('Pell', PELL.noboat); for (const s of PELL.lines) say('Pell', s);
-for (const k of ['reads', 'wait', 'call']) say('Pell', PELL[k]); for (const s of PELL.posted) say('Pell', s);
+for (const k of ['reads', 'call']) say('Pell', PELL[k]); for (const s of PELL.posted) say('Pell', s);
+bullet('*(the news, when he has something for you)* ' + PELL.wait);
 for (const [k, s] of Object.entries(PELL.where)) bullet('*(where ' + k + '\'s letter turns up)* ' + s);
 h3('Pell\'s round');
-for (const [k, Q] of Object.entries(PELL_Q)) { put('**' + Q.name + '**', ''); say('Pell', Q.ask); if (Q.how) bullet('*What to do:* ' + Q.how); say('Pell', Q.thanks); if (Q.after) bullet('*After:* ' + Q.after); bullet('*Reward:* ' + Q.reward); put(''); }
+const pellStep = Q => { put('**' + Q.name + '**', ''); say('Pell', Q.ask); if (Q.how) bullet('*What to do:* ' + Q.how); say('Pell', Q.thanks); if (Q.after) bullet('*After:* ' + Q.after); bullet('*Reward:* ' + Q.reward); put(''); };
+// his last step only comes once you've read the last logbook page: it's with the supper, below
+for (const [k, Q] of Object.entries(PELL_Q)) if (k !== 'supper') pellStep(Q);
+h3('Your uncle\'s logbook, page 3 (in a bottle, once the Quarter is open)');
+note('log3', 'Page 3');
 h3('The Quarter\'s letters, and their replies');
 for (const id of LETTER_ORDER.filter(id => NOTES[id].waters.includes('quarter'))) note(id, 'Letter: ' + id);
 for (const id of REPLY_ORDER) note(id, 'Reply to ' + NOTES[id].re);
 note('log4', 'Logbook, page 4');
 for (const L of OTT_SAY.quarter) bullet('*Ottilie:* ' + ottText(L));
+for (const s of WREN.later.quarter || []) say('Wren', s);
 
 /* ---------- the Hollow ---------- */
 h2('7. The Hollow');
@@ -112,6 +121,8 @@ for (const s of PELL.later.hollow || []) say('Pell', s);
 
 /* ---------- supper on Lantern Row ---------- */
 h2('8. Supper on Lantern Row');
+h3('Pell\'s last step');
+pellStep(PELL_Q.supper);
 note('invite', 'The Row\'s invitation');
 say('Pell', PELL.early);
 h3('The supper');
@@ -126,8 +137,12 @@ for (const s of PELL.later.supper || []) say('Pell', s);
 
 /* ---------- the fish ---------- */
 h2('The fish: lore, and what you remember once you know one well');
+const told = {};
 for (const reg of Object.keys(REGION_FISH)) { h3(REGION_NAME[reg] || reg);
-  for (const id of REGION_FISH[reg]) { const F = FISH[id]; bullet('**' + F.name + '** (' + F.rarity + '). ' + (F.lore || '') + (F.memory ? ' *Remembered:* ' + F.memory : '')); } }
+  for (const id of REGION_FISH[reg]) { const F = FISH[id];
+    // a fish that lives in two waters is told once, where it first turns up
+    if (told[id]) { bullet('**' + F.name + '**: also here; see ' + told[id] + '.'); continue; } told[id] = REGION_NAME[reg] || reg;
+    bullet('**' + F.name + '** (' + F.rarity + '). ' + (F.lore || '') + (F.memory ? ' *Remembered:* ' + F.memory : '')); } }
 
 const text = out.join('\n').replace(/\n{3,}/g, '\n\n') + '\n';
 const FILE = join(ROOT, 'docs/STORY.md');

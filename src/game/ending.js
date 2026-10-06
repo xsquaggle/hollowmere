@@ -5,17 +5,22 @@
    goes to the end); the camera leans toward whoever's speaking, and their face is on the line's card. After the last
    line the bell stops (for the rest of that hour: game/quarter.js, bellNatural), the windows go out one by one, and
    it's only a reflection again. Then the end-of-chapter card, and the fishing goes on.
-   save.story (game/story.js): supper is set as it starts (the in-game day it was, counted from 1), card once the card's
-   been seen, hush (the absolute hour the bell stays quiet until), tip (the day the coach last said to bring the Mirror).
-   Settings, About, has "Watch the supper again" after; a replay changes nothing. */
-const END={active:false, replay:false, i:0, t:0, lineT:0, talkT:0, flip:1, out:0, outT:0, phase:'', speaker:null, quiet:false, walter:null, dance:null,
+   save.story (game/story.js): supper is set once the bell stops (the in-game day it was, counted from 1), so a supper
+   cut short (the app closed partway) comes again; card once the card's been seen (closed before it, it's shown on its
+   own next time); hush (the absolute hour the bell stays quiet until), tip (the day the coach last said to bring the
+   Mirror). Settings, About, has "Watch the supper again" after, with nothing on the line; a replay changes nothing
+   (the clock runs on while you watch, as it does for the first one). */
+const END={active:false, closing:false, replay:false, i:0, t:0, lineT:0, talkT:0, flip:1, out:0, outT:0, phase:'', speaker:null, quiet:false, walter:null, dance:null,
   cam:{x:0,y:0,z:1}, aim:{x:0,y:0,z:1}, buf:null, raf:0, last:0, toll:0};
 /** Whether the supper is waiting for you now: the invitation in hand, in the Quarter, while the bell rings at 3:12. */
 function supperDue(){ const st=save.story; return !!(st && st.invite && !st.supper) && REG()==='quarter' && bellNatural(); }
-/** Each frame in the Quarter: the supper starts once nothing's in the way (a float that's only waiting is reeled in). */
-function endingCheck(){ if (END.active || SIMULATING || S.tut || !supperDue()) return; const st=storyState();
+/** Each frame in the Quarter: the supper starts once nothing's in the way (a float that's only waiting is reeled in,
+    but only when that's all there is). A supper that ended without its card shows the card. */
+function endingCheck(){ if (END.active || SIMULATING || S.tut) return; const st0=save.story;
+  if (st0 && st0.supper && !st0.card){ if (sceneFree()) supperStart(false,true); return; }
+  if (!supperDue()) return; const st=storyState();
   if (save.rod!=='mirror'){ if (st.tip!==(save.day||0)+1 && (S.state==='idle'||S.state==='waiting')){ st.tip=(save.day||0)+1; persist(); coachFor(SUPPER.tip,9); } return; }
-  if (S.state==='waiting') supperReelIn();
+  if (S.state==='waiting' && sceneClear()) supperReelIn();
   if (!sceneFree()) return;
   supperStart(false); }
 /** A float that's only waiting comes in first. */
@@ -23,18 +28,29 @@ function supperReelIn(){ S.bob=null; S.wait=null; S.bite=null; setState('idle');
 /** The bell is quiet for the rest of the hour once the Row's supper is over. */
 function supperHush(){ const st=storyState(), B=QUARTER.bell, h=(((save.clock%24)+24)%24); if (h>=B.from && h<B.from+B.hours){ st.hush=absHour()+(B.from+B.hours-h); persist(); } }
 
-function supperStart(replay){ eaLayout(); audioInit(); const L=$('ending'); if (S.state==='waiting') supperReelIn();
-  if (!replay){ storyState().supper=(save.day||0)+1; persist(); MODC.dirty=true; }
+/** Opens the supper: the first time (replay false), again from Settings (true), or only its card (cardOnly). */
+function supperStart(replay,cardOnly){ if (END.active) return; eaLayout(); audioInit(); const L=$('ending');
   Object.assign(END,{active:true, replay, i:-1, t:0, lineT:0, talkT:0, flip:REDUCED?1:0, out:0, outT:0, phase:REDUCED?'lines':'in', speaker:null, quiet:false, walter:null, dance:null, toll:.4});
   const f=eaFocusFor(null); END.cam={...f}; END.aim={...f};
-  document.body.classList.add('cine'); L.hidden=false; L.className='';
+  document.body.classList.add('cine'); endInert(true); L.hidden=false; L.className='';
   L.innerHTML='<canvas id="endCv" aria-hidden="true"></canvas>'+
     '<div class="end-line" id="endLine" role="status" aria-live="polite"><canvas class="end-face" id="endFace" aria-hidden="true"></canvas><div class="end-words"><b id="endWho"></b><p id="endSay"></p></div><span class="end-tap" aria-hidden="true">Tap</span></div>'+
     '<button class="end-skip" id="endSkip" type="button">Skip</button><div class="end-card" id="endCard" hidden></div>';
   endSize(); L.onpointerdown=e=>{ if (e.target.closest('button') || END.phase==='card') return; endNext(); };
+  L.onkeydown=e=>{ if ((e.key===' ' || e.key==='Enter') && !e.target.closest('button')){ e.preventDefault(); endNext(); } };
   $('endSkip').addEventListener('click',endSkip);
-  endLine(0);
+  // back, Escape or a swipe skips to the card, and from the card goes back to the water
+  ovOpen('ending',()=>{ if (END.phase==='card'){ endClose(); return true; } endSkip(); return false; });
+  L.tabIndex=-1; L.focus({preventScroll:true});
+  if (cardOnly){ END.flip=1; END.out=1; endCard(); } else endLine(0);
   END.last=performance.now(); cancelAnimationFrame(END.raf); END.raf=requestAnimationFrame(endFrame); }
+/** Watching it again (Settings, About; Playtest): only with nothing on the line, so the replay can't cost you a fish.
+    Says so and returns false otherwise. */
+function supperReplay(){ if (S.state!=='idle'){ news('Reel in first, then watch the supper again',''); return false; }
+  setTimeout(()=>supperStart(true),250); return true; }
+/** While the supper's up, nothing behind it can be reached from the keyboard either. */
+function endInert(on){ const a=document.activeElement; if (on && a && a!==document.body && a.blur) a.blur();
+  for (const el of document.querySelectorAll('#hud,.corner')) el.inert=on; }
 function endSize(){ const cv=$('endCv'); if (!cv) return; const w=Math.round(W*DPR), h=Math.round(H*DPR); cv.width=w; cv.height=h; cv.style.width=W+'px'; cv.style.height=H+'px';
   if (!END.buf) END.buf=document.createElement('canvas'); END.buf.width=w; END.buf.height=h; }
 /** Shows line i: who's speaking (their face on the card), and what happens with it. */
@@ -57,9 +73,12 @@ function endNext(){ if (END.phase==='in'){ END.flip=1; END.phase='lines'; return
   tone(1200,.03,{vol:.02,type:'triangle'}); endLine(END.i+1); }
 /** The bell stops, the windows go out, and it turns back into a reflection; then the card. */
 function endOut(){ if (END.phase==='out' || END.phase==='card') return; END.phase='out'; END.outT=0; END.speaker=null;
-  if (!END.replay) supperHush(); musicDuck(.25,7); }
-function endSkip(){ if (END.phase==='card') return; if (!END.replay) supperHush(); endCard(); }
-function endFrame(now){ if (!END.active) return; const dt=Math.min(.05,(now-END.last)/1000); END.last=now; END.t+=dt; END.lineT+=dt;
+  endDone(); musicDuck(.25,7); }
+function endSkip(){ if (END.phase==='card') return; endDone(); endCard(); }
+/** The supper's over once the bell stops: that's when it's kept (not on a replay). */
+function endDone(){ if (END.replay) return; const st=storyState(); if (st.supper) return;
+  st.supper=(save.day||0)+1; supperHush(); persist(); MODC.dirty=true; }
+function endFrame(now){ if (!END.active) return; const dt=clamp((now-END.last)/1000,0,.05); END.last=now; END.t+=dt; END.lineT+=dt;
   if (END.phase==='in' && END.t>1.1){ END.flip=Math.min(1,END.flip+dt/1.5); if (END.flip>=1) END.phase='lines'; }
   if (END.walter!=null && END.walter<1) END.walter=Math.min(1,END.walter+dt/3.6);
   if (END.dance!=null && !REDUCED) END.dance+=dt;
@@ -112,6 +131,8 @@ function endCard(){ if (END.phase==='card') return; END.phase='card'; const st=s
   $('ending').classList.add('carded'); card.hidden=false; $('endLine').hidden=true; $('endSkip').hidden=true;
   $('endGo').addEventListener('click',endClose); setTimeout(()=>{ const b=$('endGo'); if (b) b.focus({preventScroll:true}); },400);
   if (AC){ const t=AC.currentTime+.3; MOTIF.forEach(([n],i)=>iBell(mf(n),t+i*.42,{dur:2.4,vol:.045,pan:-.2+i*.08})); } }
-function endClose(){ if (!END.active) return; const L=$('ending'); L.classList.add('out'); setTimeout(()=>document.body.classList.remove('cine'),300);
-  setTimeout(()=>{ L.hidden=true; L.className=''; L.innerHTML=''; END.active=false; END.phase=''; cancelAnimationFrame(END.raf); MODC.dirty=true; updateHud();
+function endClose(){ if (!END.active || END.closing) return; END.closing=true; const L=$('ending'); L.classList.add('out'); ovClosed('ending'); setTimeout(()=>{ document.body.classList.remove('cine'); endInert(false); },300);
+  setTimeout(()=>{ L.hidden=true; L.className=''; L.innerHTML=''; L.onkeydown=null; END.active=false; END.closing=false; END.phase=''; cancelAnimationFrame(END.raf); MODC.dirty=true; updateHud();
+    // the scene's pictures are big; let them go until next time
+    if (END.buf){ END.buf.width=END.buf.height=0; END.buf=null; } eaFree();
     if (!END.replay) setTimeout(()=>{ if (S.state==='idle') news('Chapter one: the end. The fish are still biting.','gold'); },600); },700); }

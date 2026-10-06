@@ -34,7 +34,7 @@ const WREN={
   lines:['The river’s ten minutes faster going down. I timed it.','Jars are for keeping things. Mostly light. Sometimes fish. Once, a sneeze.',
     'Bring me Glimmer and I’ll cut your rod another socket. Carefully. Mostly carefully.','Your uncle brought me the odd ones. He said I asked the right questions.',
     'The Clockfin only bites as the hour turns. I’ve checked. Forty-one times.','Hold the line and the current swings your float in to the bank. Let go and it runs.'],
-  later:{quarter:['A whole street, under the lake. I’ve been rowing past it for years. Rowing OVER it.','Pell reads me the letters sometimes. He does the voices. He shouldn’t be able to do the voices.'],
+  later:{quarter:['A whole street, under the lake. I’ve crossed on that ferry a hundred times. Right OVER it.','Pell reads me the letters sometimes. He does the voices. He shouldn’t be able to do the voices.'],
     hollow:['You went DOWN? Under the shack? Without me? Take a jar next time. Take two.','Your uncle’s pages said not to go further than the light. Did you? You can tell me. I won’t pin it. I’ll pin it.'],
     supper:['Pell says you went to a supper at 3:12 in a town that drowned. I’m not jealous. I’m a little jealous.','The red string goes all the way round the board now. I may need a bigger board.']},
   quest:'Bring me one of everything that lives in this river, and I’ll string you a rod with two floats. Don’t ask how. I’m still working out how.',

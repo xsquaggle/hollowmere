@@ -137,7 +137,7 @@ function playtestStory(v){ const st=storyState(), q=quarterState(), FS=findsStat
     st.invite=1; if (!FS.notes.includes('invite')) FS.notes.push('invite');
     if (!save.rods.includes('mirror')) save.rods.push('mirror'); save.boat=true; persist(); updateHud(); updateJournalDot(); MODC.dirty=true; news('The Row’s invitation is in your notes, and the Mirror on your rack','gold'); return; }
   if (v==='go'){ delete st.hush; save.rod='mirror'; save.clock=QUARTER.bell.from+.01; PAL=palAt(save.clock); persist(); if (REG()!=='quarter') travelTo('quarter'); else { buildBg(); MODC.dirty=true; } return; }
-  if (v==='watch'){ setTimeout(()=>supperStart(true),250); return; }
+  if (v==='watch'){ supperReplay(); return; }
   // the bell stays quiet for the rest of the hour, so it doesn't start again under you
   if (v==='forget'){ delete st.supper; delete st.card; delete st.tip; delete q.done.supper; persist(); MODC.dirty=true; news('The supper hasn’t come yet',''); return; }
   if (v==='ott'){ OTT.say=ottLine(); OTT.sayT=4.5; OTT.next=rand(20,35); } }

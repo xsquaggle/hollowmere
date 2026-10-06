@@ -37,7 +37,7 @@ const { FISH, ORDER, BEH, BEH_TIP, RAR, POOLS, POOLS_COAST, POOLS_RIVER, POOLS_M
   TRAPS, TRAP_UNLOCK, FITTINGS, FITTING_ORDER, TRAP_GLIMMER, SMOKE, AWAY, WX, WX_ORDER, WX_TABLE, WX_FOG_HOUR, WX_SPELL, WX_FISH, WX_SOME, DAWN_MIST, WX_LINES,
   SUPPER, SUPPER_SEATS, SUPPER_FOLK, SUPPER_LINES, CHAPTER_END,
   RIVER, WREN, TWIN, TIDE, BANKS, MARSH, WREN_Q, WREN_MARSH, QUARTER, PELL_Q, PELL, DREAD, CALL, SPICE_MORE, ORDERS, TOWNSFOLK, TOWNSFOLK_ORDER, STANDINGS, UPGRADES, VISITS, PLATTER, STORY, MAPS, MOON_JAR, COMBOS, MASTERY } = D;
-for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER, TRAPS, FITTINGS, FITTING_ORDER, SMOKE, AWAY, ORDERS, TOWNSFOLK, STANDINGS, UPGRADES, VISITS, PLATTER, WX, WX_TABLE, WX_FISH, STORY, MAPS, MOON_JAR, COMBOS }))
+for (const [n, v] of Object.entries({ FISH, RAR, BEH, RODS, RECIPES, MOODS, TANKS, DECOR, MAP_PLACES, REGION_FISH, STATS, TREASURE, CRATES, FINDS, NOTES, TACKLE, TACKLE_ORDER, ENCH, ENCH_ORDER, GLIMMER, TRAPS, FITTINGS, FITTING_ORDER, SMOKE, AWAY, ORDERS, TOWNSFOLK, STANDINGS, UPGRADES, VISITS, PLATTER, WX, WX_TABLE, WX_FISH, STORY, MAPS, MOON_JAR, COMBOS, MASTERY, OTT_SAY, OTT_NAME, SUPPER, SUPPER_SEATS, SUPPER_FOLK, SUPPER_LINES, CHAPTER_END }))
   if (!v) { console.error('Missing table ' + n + ' in src/data/.'); process.exit(1); }
 
 /* ---------- fish ---------- */
@@ -113,13 +113,14 @@ for (const r of REGIONS) { const P = MAP_PLACES[r]; if (!P) { bad('MAP_PLACES', 
 for (const id of keys(MAP_PLACES)) { const P = MAP_PLACES[id], w = 'MAP_PLACES.' + id; need(w, P, { name: 'str', desc: 'str', built: 'bool' });
   if (!(P.x >= 0 && P.x <= 360 && P.y >= 0 && P.y <= 480)) bad(w, 'x, y should sit on the 360 by 480 chart'); }
 for (const [n, list] of Object.entries({ BAR_LINES, LETTER })) (list || []).forEach((s, i) => isStr(s) || bad(n + '[' + i + ']', 'empty line'));
-// Ottilie's lines by chapter (game/story.js: CHAPTERS), each text or [text, until]; and a few by rod and by catch
+// Ottilie's lines by chapter (game/story.js: CHAPTERS), each text or [text, when]; and a few by rod and by catch
 need('OTT_NAME', OTT_NAME || {}, { kid: 'str', keeper: 'str' });
 { const CH = ['lake', 'river', 'marsh', 'coast', 'quarter', 'hollow', 'supper'], O = OTT_SAY || {};
   sameSet('OTT_SAY', keys(O), [...CH, 'rods', 'caught'], 'her chapters (and rods and caught) and the chapters game/story.js knows');
   for (const c of CH) { if (!Array.isArray(O[c]) || !O[c].length) { bad('OTT_SAY.' + c, 'needs lines'); continue; }
     O[c].forEach((L, i) => { const w = 'OTT_SAY.' + c + '[' + i + ']';
-      if (Array.isArray(L)) { if (!(L.length === 2 && isStr(L[0]) && /^rod:/.test(L[1]) && RODS[L[1].slice(4)])) bad(w, 'should be [text, "rod:<a rod>"]'); }
+      if (Array.isArray(L)) { const ok = L.length === 2 && isStr(L[0]) && ((/^rod:/.test(L[1]) && RODS[L[1].slice(4)]) || (/^caught:/.test(L[1]) && FISH[L[1].slice(7)]));
+        if (!ok) bad(w, 'should be [text, "rod:<a rod>"] or [text, "caught:<a fish>"]'); }
       else if (!isStr(L)) bad(w, 'empty line'); }); }
   if (!O.lake.some(L => typeof L === 'string')) bad('OTT_SAY.lake', 'needs a line that never stops');
   for (const [id, s] of Object.entries(O.rods || {})) { if (!RODS[id]) bad('OTT_SAY.rods.' + id, 'not a rod'); if (!isStr(s)) bad('OTT_SAY.rods.' + id, 'empty line'); }
@@ -460,6 +461,8 @@ for (const s of [...PELL.lines, ...Object.values(PELL.later || {}).flat(), PELL.
 for (const c of keys(PELL.later)) oneOf('PELL.later.' + c, c, ['hollow', 'supper'], 'chapter he adds lines for');
 // the end of chapter one: supper on Lantern Row (data/ending.js; game/ending.js plays it)
 need('SUPPER', SUPPER, { tip: 'str' });
+// the code reads these notes by name: the last logbook page (Pell's last step waits on it) and the Row's invitation
+for (const id of ['log6', 'invite']) if (!NOTES[id]) bad('NOTES.' + id, 'game/pell.js and game/ending.js read it by this id');
 need('CHAPTER_END', CHAPTER_END, { head: 'str', lines: 'arr', go: 'str' });
 if (CHAPTER_END.lines.length !== 2 || !CHAPTER_END.lines.every(isStr)) bad('CHAPTER_END.lines', 'two lines in hand');
 { const at = new Set();

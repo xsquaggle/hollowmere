@@ -24,7 +24,7 @@ Every letter, logbook page, lore line and thing people say in the game's content
 - If a gull stops in midair, run.
 - Your uncle swore something lives where the rainbow comes down. Never caught it.
 - Full moon tonight? Mind the deep pool. Something out there is looking for its little one.
-- Mayor Bartholomew handed out toffees on the ferry when I was small. Now look at him.
+- Mayor Bartholomew handed out toffees on the ferry when I was small. Now look at him. *(once you've caught Mayor Bartholomew)*
 
 ### Ottilie, about the weather
 
@@ -160,7 +160,7 @@ Every letter, logbook page, lore line and thing people say in the game's content
 > rings the hour.
 > I didn’t cast. I wish I had.
 
-### Your uncle's logbook, pages 1 to 3
+### Your uncle's logbook, pages 1 and 2
 
 **Page 1**
 
@@ -181,17 +181,6 @@ Every letter, logbook page, lore line and thing people say in the game's content
 > Ottilie won’t talk about it.
 > She was on the ferry.
 
-**Page 3**
-
-> Day 401.
-> Rowed out over the town at 3:12.
-> The tower rang under me,
-> and something under the tower
-> rang back. Deeper down.
-> There’s more under Hollowmere
-> than Hollowmere.
-> Buried the rest. Map enclosed.
-
 ### Drowned letters at the lake
 
 **Letter: edith** (to Mrs. Edith Crane, 4 Lantern Row)
@@ -211,7 +200,7 @@ Every letter, logbook page, lore line and thing people say in the game's content
 > on the water again.
 > Don’t fish the deep pool at dawn.
 > Or do. He never could stop.
-> — your neighbors
+> — your neighbours
 
 ### The story relics
 
@@ -260,6 +249,15 @@ Every letter, logbook page, lore line and thing people say in the game's content
 - **Postmark Stamp** (keepsake): It prints HOLLOWMERE and a date that changes when you aren’t looking.
 - **Barnaby’s Sea Boots** (keepsake): Two sizes too big and somehow exactly right.
 - **Uncle’s Ladle** (keepsake): Copper, dented, the handle worn smooth where he held it. It still smells faintly of smoke and pepper.
+
+### Lost things given back to their owners
+
+- **Ottilie:** My first boat. I sailed it off this dock the summer before the flood. I cried for a week when it sank. *(for the Tin Toy Boat)*
+- **Ottilie:** My ferry bell! Fifty years I rang that for every crossing. Take this knot. My mother tied it, and it’s never once let go. *(for the Ferry Bell)*
+- **Pell:** The old post office seal. I had wondered where it went. Please, have my spare satchel. Things seem to turn up in it. *(for the Wax Seal Stamp)*
+- **Barnaby:** Well, I’ll be. My old pipe! She went over the side in a squall off the stacks. Have my spare net hoop, friend. *(for the Captain’s Pipe)*
+- **Pell:** Hollowmere Post. That one was mine. I don’t remember losing it. I don’t remember a great deal about that night. Keep the stamp. *(for the Postman’s Cap Badge)*
+- **Barnaby:** Grandfather’s glass! I’d given it up for lost. These were his too. Wear them and the swells won’t bother you. *(for the Brass Spyglass)*
 
 ## 2. The town at the shack
 
@@ -440,11 +438,11 @@ Every letter, logbook page, lore line and thing people say in the game's content
 - **Pell:** The pages float out of the post office windows. Nobody ever sent them.
 - **Pell:** I was nine when the water came. I had a satchel and a round, and I was very proud of both.
 - **Pell:** For the Quarter. I’ll keep it in the sack with the others.
-- **Pell:** Pell’s waiting at the dock with something to tell you.
 - **Pell:** Over here! I’ve something for you.
 - **Pell:** In it goes. Good shot.
 - **Pell:** Through the door. My father would have tipped his cap.
 - **Pell:** That’s gone in. Mind, it’s a long way back up.
+- *(the news, when he has something for you)* Pell’s waiting at the dock with something to tell you.
 - *(where edith's letter turns up)* It’s in his sack somewhere.
 - *(where albert's letter turns up)* It comes up out of the deep pool at the lake now and then. Or watch the post office window here: it’ll float out with the pages.
 - *(where sack's letter turns up)* They drift out of the post office window with the drowned pages. Watch the water for an envelope.
@@ -481,13 +479,18 @@ Every letter, logbook page, lore line and thing people say in the game's content
 - **Pell:** That’s the sack empty, first time since I was a boy. Here. My father’s rod. He used to call the rain down on a Monday so folk would stay in and write letters.
 - *Reward:* The Tidecaller.
 
-**Supper on the Row**
+### Your uncle's logbook, page 3 (in a bottle, once the Quarter is open)
 
-- **Pell:** This came for you. Postmarked 1966, from Lantern Row. That was the night of the Saturday supper, the whole street at one long table. I was sent to bed before the dancing.
-- *What to do:* Row out to the Quarter for 3:12, while the bell rings, with the Stillwater Mirror in your hand.
-- **Pell:** You’ve a message for me? “The letters came, every one.” Well. Of course they did. Oh, and this came for me, in the same post.
-- *After:* Pell, at the Post Office. Postmarked 1966. He puts it in his pocket, unopened.
-- *Reward:* 25 Glimmer.
+**Page 3**
+
+> Day 401.
+> Rowed out over the town at 3:12.
+> The tower rang under me,
+> and something under the tower
+> rang back. Deeper down.
+> There’s more under Hollowmere
+> than Hollowmere.
+> Buried the rest. Map enclosed.
 
 ### The Quarter's letters, and their replies
 
@@ -590,6 +593,8 @@ Every letter, logbook page, lore line and thing people say in the game's content
 - *Ottilie:* So Pell’s got you posting his letters. He’s waited a long time for somebody to ask.
 - *Ottilie:* Ivy Hale had the top room at No. 9. Best friend I ever had. She let go of a balloon at the fair once and cried all the way home.
 - *Ottilie:* Don’t ring anything down there at 3:12, {kid / Keeper}. Some bells answer.
+- **Wren:** A whole street, under the lake. I’ve crossed on that ferry a hundred times. Right OVER it.
+- **Wren:** Pell reads me the letters sometimes. He does the voices. He shouldn’t be able to do the voices.
 
 ## 7. The Hollow
 
@@ -606,7 +611,7 @@ Every letter, logbook page, lore line and thing people say in the game's content
 
 ### Ottilie, about the night the town went under
 
-> I was on the ferry that night. Eight years old, ringing my bell for the last crossing home from the Row’s Saturday supper. At twelve minutes past three the lake closed over the town. Not a wave. It closed, like an eye. Your uncle spent forty years looking for the way under the lid. I’m glad it was you that found it. Mind you come back up, Keeper.
+> I was on the ferry that night. Eight years old, ringing my bell for the last crossing home from the Row’s Saturday supper. At twelve minutes past three the lake closed over the town. Not a wave. It closed, like an eye. Your uncle spent forty years looking for the way under the lid, and only found it at the very end. I’m glad it was you that went all the way down. Mind you come back up, Keeper.
 
 **Logbook, the last page**
 
@@ -630,6 +635,16 @@ Every letter, logbook page, lore line and thing people say in the game's content
 - **Pell:** Everything in the sack’s postmarked 1966 lately. Even the circulars.
 
 ## 8. Supper on Lantern Row
+
+### Pell's last step
+
+**Supper on the Row**
+
+- **Pell:** This came for you. Postmarked 1966, from Lantern Row. That was the night of the Saturday supper, the whole street at one long table. I was sent up to bed before the dancing, for being cheeky to the Mayor.
+- *What to do:* Row out to the Quarter for 3:12, while the bell rings, with the Stillwater Mirror in your hand.
+- **Pell:** You’ve a message for me? “The letters came, every one.” Well. Of course they did. Oh, and this came for me, in the same post.
+- *After:* Pell, at the Post Office. Postmarked 1966. He puts it in his pocket, unopened.
+- *Reward:* 25 Glimmer.
 
 **The Row's invitation** (to The Keeper of the Bait Shack)
 
@@ -695,15 +710,15 @@ Every letter, logbook page, lore line and thing people say in the game's content
 ### Stillwater Lake
 
 - **Copper Perch** (common). Its belly often holds old coins. Nobody knows who keeps dropping them. *Remembered:* Every coin in its belly is a 1966 penny, and every one is warm, as if it’s only just left somebody’s pocket.
-- **Reedwhisker** (common). A grumpy catfish that tugs like it's ringing a doorbell. *Remembered:* It tugs twice and waits, then twice again, the way you’d ring a neighbour’s bell late at night, sorry to bother them.
-- **Lantern Carp** (uncommon). Hollowmere's street lamps once burned its shed scales. *Remembered:* It rises at lamp-lighting time to the minute, the hour someone used to walk Lantern Row with a long pole.
+- **Reedwhisker** (common). A grumpy catfish that tugs like it’s ringing a doorbell. *Remembered:* It tugs twice and waits, then twice again, the way you’d ring a neighbour’s bell late at night, sorry to bother them.
+- **Lantern Carp** (uncommon). Hollowmere’s street lamps once burned its shed scales. *Remembered:* It rises at lamp-lighting time to the minute, the hour someone used to walk Lantern Row with a long pole.
 - **Leafjack** (uncommon). Disguises itself as a leaf. It fools the birds, but not you. *Remembered:* The leaves it copies are plane leaves, from the trees in the old square. There are no plane trees left above the water.
-- **Drizzle Dace** (uncommon). Jumps at raindrops. It thinks they're flies, and it's been wrong every time. *Remembered:* It jumps hardest at the first drops, the way children ran out into the rain when the school bell went.
+- **Drizzle Dace** (uncommon). Jumps at raindrops. It thinks they’re flies, and it’s been wrong every time. *Remembered:* It jumps hardest at the first drops, the way children ran out into the rain when the school bell went.
 - **Mossback** (rare). Carries a tiny garden on its back. Some gardens have tiny fences. *Remembered:* The garden on its back has a row of runner beans and a little shed. Somebody grew exactly that, behind No. 2.
 - **Mist Char** (rare). Pale as the fog it swims in, and warmer in the hand than it looks. *Remembered:* It’s warm because it remembers a warm room. Hold it a while and you can smell coal smoke and toast.
 - **Steeple Gar** (epic). Rests nose-up, like the church steeple it hides behind. The steeple is underwater too. *Remembered:* At nine on a Sunday it hangs perfectly still, as if it’s waiting for the steeple bell to finish.
 - **Lampwick Eel** (epic). Its tail burns like a candle wick and never goes out. Wren swears it was a candle once. *Remembered:* Wren was right. There’s a drip of wax on its tail, stamped HOLLOWMERE CHANDLERY.
-- **Mayor Bartholomew** (legendary). An ancient pike still wearing the mayor's chain of office. *Remembered:* He still does his round of the deep pool at dawn, the way the mayor walked the high street, nodding to people who aren’t there.
+- **Mayor Bartholomew** (legendary). An ancient pike still wearing the mayor’s chain of office. *Remembered:* He still does his round of the deep pool at dawn, the way the mayor walked the high street, nodding to people who aren’t there.
 - **Prism Shiner** (exotic). It swallows the ends of rainbows. That’s why nobody ever reaches one. *Remembered:* The colours inside it run in the order of the bunting on Lantern Row: red, yellow, green, blue, and one nobody has a name for.
 - **Moonwhale Calf** (mythic). Too big for this lake. Where is its mother? *Remembered:* On full-moon nights it calls down into the deep pool, and something much further down answers, slowly, like someone talking in their sleep.
 
@@ -713,7 +728,7 @@ Every letter, logbook page, lore line and thing people say in the game's content
 - **Rock Wrasse** (common). Spends its days rearranging pebbles around the sea stacks. *Remembered:* It sets its pebbles in neat rows with a path down the middle, like a front garden.
 - **Spindrift Bass** (uncommon). Hunts in the foam a swell leaves on the rocks. Comes up white, and dries silver in your hands. *Remembered:* It comes up white because it’s been somewhere very cold and bright. It dries silver because it’s glad to be back.
 - **Kelp Ribbon** (uncommon). Ties itself into the kelp and dares you to pull. *Remembered:* The knots it ties are proper sailors’ knots, a bowline, a sheet bend. Somebody taught it.
-- **Gilt Bream** (uncommon). Sailors once paid harbor fees with its scales. *Remembered:* Each scale carries a harbour mark, worn nearly smooth. The harbour it names isn’t on any chart.
+- **Gilt Bream** (uncommon). Sailors once paid harbour fees with its scales. *Remembered:* Each scale carries a harbour mark, worn nearly smooth. The harbour it names isn’t on any chart.
 - **Beacon Herring** (uncommon). Every scale throws the lighthouse beam back. Ships have steered home by a shoal of them. *Remembered:* A shoal flashes in threes and a pause, the way the lighthouse did before they changed the lamp.
 - **Squall Mackerel** (uncommon). Rides in under the squalls, a whole school at a time, and leaves just as fast. *Remembered:* It runs for the shore before a squall, the way the fishing boats used to run for home.
 - **Barnacle Grouper** (rare). So old the barnacles have barnacles. *Remembered:* Under the barnacles there’s a brass ring through its lip, from a mooring nobody has used in sixty years.
@@ -727,7 +742,7 @@ Every letter, logbook page, lore line and thing people say in the game's content
 
 - **Brook Ribbon** (common). Thin as a hair ribbon and twice as hard to hold. *Remembered:* It always comes up tied in a bow, a little crooked, the way a child ties one.
 - **Stonegrinder** (common). Eats pebbles and spits out smoother ones. *Remembered:* The pebbles it polishes are millstone grey, and the mill’s old millstones are still wearing down, with nobody turning them.
-- **Leafjack** (uncommon). Disguises itself as a leaf. It fools the birds, but not you. *Remembered:* The leaves it copies are plane leaves, from the trees in the old square. There are no plane trees left above the water.
+- **Leafjack**: also here; see Stillwater Lake.
 - **Spatefin** (uncommon). Comes down with the flood water, nose first, and goes back up when it’s over. *Remembered:* It comes down with the flood nose first, but it goes back up tail first, as if it doesn’t want to see where it’s been.
 - **Barkskin Barbel** (rare). Its whiskers are thin roots. At least one heron has tried to perch on it. *Remembered:* Its whisker roots are alder, and the alder over Wren’s boathouse is missing a root on the river side.
 - **Wisp Grayling** (rare). Its tall fin is a sail of mist. In fog it rows itself upstream. *Remembered:* On a foggy morning, hold its sail to your ear and you can hear, very faintly, a waterwheel turning.
@@ -743,7 +758,7 @@ Every letter, logbook page, lore line and thing people say in the game's content
 - **Will-o’-Whiting** (uncommon). Leads lost fishers to good spots, or so they claim. *Remembered:* It always leads you to the old gate in the sea wall, and stops, and waits, as if the gate might still open.
 - **Thicklip Mullet** (rare). Grazes the flooded flats at the top of the tide, and turns its thick lips up at nearly every bait. *Remembered:* It turns its lips up at the bait the way a child turns up its nose at greens, and eats it the moment you look away.
 - **Bellmouth** (epic). When it opens its mouth, you hear a bell from very far down. *Remembered:* The bell you hear when it opens its mouth is the clock tower’s, two miles and sixty years away.
-- **Lampwick Eel** (epic). Its tail burns like a candle wick and never goes out. Wren swears it was a candle once. *Remembered:* Wren was right. There’s a drip of wax on its tail, stamped HOLLOWMERE CHANDLERY.
+- **Lampwick Eel**: also here; see Stillwater Lake.
 - **Old Reeve** (legendary). The marsh-reeve kept the sea wall all his life. Something still swims its length at every spring tide, checking for leaks. *Remembered:* The iron keys on its ring open the sluice, the gate, the hut, and one more lock nobody has found.
 
 ### Drowned Quarter
@@ -766,7 +781,7 @@ Every letter, logbook page, lore line and thing people say in the game's content
 - **Keyhole Eel** (uncommon). There’s a keyhole in its side. Every key in town has been tried in it. One of them turned. *Remembered:* Look through the keyhole and there’s a room on the other side: a fire lit, a table laid, a clock at 3:12.
 - **Eyeless Koi** (rare). Swims toward sound, not light. *Remembered:* It swims toward the sound of your voice, and away from everyone else’s.
 - **Looking-Glass Carp** (epic). Its scales are silvered like an old mirror. Look into one and you see the lake above, the right way up. *Remembered:* In its scales the lake above is the right way up, and the town is still on it.
-- **Mothmouth** (legendary). It has followed every light ever lowered into the Hollow. Your uncle’s, for years. Now yours. *Remembered:* It follows every light because it’s looking for the way back up. It has never once gone further than the light.
+- **Mothmouth** (legendary). It has followed every light ever lowered into the Hollow. Your uncle’s, at the very end. Now yours. *Remembered:* It follows every light because it’s looking for the way back up. It has never once gone further than the light.
 - **Inkling** (exotic). It writes on the water as it swims. The words are in your handwriting. *Remembered:* Whatever it writes is dated tomorrow.
 - **Drowned Moon** (mythic). The moon’s reflection, the night the lake closed. It never found its way back up. *Remembered:* It’s always full, as it was that night, over a street that had just started dancing.
 - **The Sleeper’s Scale** (godly). Not a fish. Something that is dreaming the fish. *Remembered:* It dreams of a town on a Saturday night with every window lit, and of someone a long way up, fishing.

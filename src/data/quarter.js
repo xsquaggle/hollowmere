@@ -51,7 +51,7 @@ const PELL_Q={
            thanks:'The clock’s stopped at 3:12. It always was. Some nights at 3:12 the bell still rings. Nobody hears it but the fish, and you, if you’re out there.', reward:'1,200 coins.', coins:1200},
   sack:   {name:'The rest of the sack', ask:'The post office kept its own letters. They float out of the windows now. Find the three that were never sent, and post them.',
            thanks:'That’s the sack empty, first time since I was a boy. Here. My father’s rod. He used to call the rain down on a Monday so folk would stay in and write letters.', reward:'The Tidecaller.', rod:'tidecaller'},
-  supper: {name:'Supper on the Row', ask:'This came for you. Postmarked 1966, from Lantern Row. That was the night of the Saturday supper, the whole street at one long table. I was sent to bed before the dancing.',
+  supper: {name:'Supper on the Row', ask:'This came for you. Postmarked 1966, from Lantern Row. That was the night of the Saturday supper, the whole street at one long table. I was sent up to bed before the dancing, for being cheeky to the Mayor.',
            how:'Row out to the Quarter for 3:12, while the bell rings, with the Stillwater Mirror in your hand.',
            thanks:'You’ve a message for me? “The letters came, every one.” Well. Of course they did. Oh, and this came for me, in the same post.',
            after:'Pell, at the Post Office. Postmarked 1966. He puts it in his pocket, unopened.', reward:'25 Glimmer.', glimmer:25}

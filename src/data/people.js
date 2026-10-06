@@ -2,12 +2,12 @@
    OTT_SAY   Ottilie's idle lines at the lake, by chapter: the furthest you've got (lake; river once her ferry runs; marsh
              once Wren's punt does; coast once you have a boat; quarter once Pell's rowboat is fixed; hollow once you've
              been down the ladder; supper once you've been to supper on Lantern Row). She says the newest chapter's lines
-             most and the earlier ones now and then (game/scenery-live.js: ottLine). A line written [text, until] stops
-             once `until` is true: rod:<id> (you own that rod). {you} is what she calls you: OTT_NAME.kid, then
+             most and the earlier ones now and then (game/story.js: ottLine). A line written [text, when] is only said while
+             `when` holds: rod:<id> until you own that rod, caught:<id> once you've caught that fish. {you} is what she calls you: OTT_NAME.kid, then
              OTT_NAME.keeper from the day she tells you what she saw the night the town went under (data/hollow.js:
              OTT_CONFESS). rods: now and then, about the rod in your hand. caught: once, just after a catch, by species,
-             else by rarity (legendary and up). Half her lines are about the weather when it has something to say
-             (data/weather.js: WX_LINES).
+             else by rarity (legendary and up). Otherwise, 2 in 5 of her lines are about the weather when it has something
+             to say (data/weather.js: WX_LINES), and then 1 in 4 about the rod in your hand.
    BAR_LINES Barnaby's lines the day his launch first ties up at your dock, in order (the last stays).
    BANQUET_LINES the Mayor's Banquet, in order: [who, line].
    LETTER    your uncle's letter in the opening, line by line, signed "— your uncle". */
@@ -16,7 +16,7 @@ const OTT_SAY={
   lake:['Fish don’t bite for folks who fidget.','Lantern Carp only come up after dark, {you}.','Reeds’ll eat your line. My Reedcutter won’t.',
     ['Want to reach the deep pool? You’ll need more rod than that.','rod:ash'],'That heron’s been stealing my bait for years.','Your uncle fished that deep pool every dawn. Never said why.',
     'If a gull stops in midair, run.','Your uncle swore something lives where the rainbow comes down. Never caught it.',
-    'Full moon tonight? Mind the deep pool. Something out there is looking for its little one.','Mayor Bartholomew handed out toffees on the ferry when I was small. Now look at him.'],
+    'Full moon tonight? Mind the deep pool. Something out there is looking for its little one.',['Mayor Bartholomew handed out toffees on the ferry when I was small. Now look at him.','caught:mayor']],
   river:['The ferry’s running again. Last one to ride her regular was your uncle.','That Wren talks faster than the river runs. Listen anyway. She’s right more than she’s wrong.',
     'The mill stopped the night of the flood. Nobody’s had the heart to start it since.'],
   marsh:['The marsh is where the lake goes when it’s tired. Don’t tell Wren I said that. She’ll pin it up.',

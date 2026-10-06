@@ -1257,18 +1257,30 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 /* the end of chapter one */
 #ending.carded{cursor:default}
 #ending.carded #endCv{animation:fadeOut 1s ease forwards}
-.end-card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px calc(env(safe-area-inset-bottom,0px) + 24px);text-align:center;color:var(--paper);
+.end-card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;justify-content:safe center;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;
+  padding:calc(env(safe-area-inset-top,0px) + 24px) 20px calc(env(safe-area-inset-bottom,0px) + 24px);box-sizing:border-box;text-align:center;color:var(--paper);
   background:radial-gradient(ellipse at 50% 38%,rgba(60,70,120,.45),rgba(6,8,18,0) 60%),linear-gradient(#070A18,#0E1430 60%,#101A2A);animation:inFade 1.2s both}
 .ec-kick{margin:0 0 14px;font:800 11px var(--body);letter-spacing:.26em;text-transform:uppercase;color:rgba(242,212,126,.85);animation:inFade 1.2s .2s both}
 .end-card h1{margin:0;font:400 clamp(44px,13.5vw,66px)/1 var(--display);color:#F7EFDD;text-shadow:0 2px 0 rgba(0,0,0,.3),0 0 34px rgba(255,214,160,.45)}
 .end-card h1 span{display:inline-block;animation:inLet 1.1s cubic-bezier(.2,.9,.25,1) both}
 .ec-orn{display:block;width:170px;height:22px;margin:10px auto 18px;color:rgba(242,212,126,.85);animation:inFade 1.2s 1.2s both}
-.ec-hand{margin:0 0 6px;max-width:320px;font:600 24px/1.2 'Caveat','Bradley Hand','Noteworthy','Segoe Print',cursive;color:rgba(247,239,221,.95);animation:inFade 1.6s both}
+.ec-hand{margin:0 0 6px;max-width:320px;text-wrap:balance;font:600 24px/1.2 'Caveat','Bradley Hand','Noteworthy','Segoe Print',cursive;color:rgba(247,239,221,.95);animation:inFade 1.6s both}
 .ec-tally{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(320px,100%);margin:22px 0 22px;animation:inFade 1.2s 3s both}
 .ec-tally div{padding:9px 8px;border-radius:10px;background:rgba(243,234,215,.07);box-shadow:inset 0 0 0 1px rgba(243,234,215,.14)}
 .ec-tally dt{font:800 10px var(--body);letter-spacing:.14em;text-transform:uppercase;color:rgba(243,234,215,.6)}
 .ec-tally dd{margin:3px 0 0;font:800 17px var(--body);color:#F7EFDD}
 .ec-go{min-width:200px;font-size:15px;padding:12px 20px;animation:inFade .8s 3.4s both}
+/* a phone on its side: smaller lettering, the two lines unwrapped, the tally in one row, so it all fits above the button */
+@media (max-height:520px){
+  .end-card{padding-top:calc(env(safe-area-inset-top,0px) + 14px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+  .ec-kick{margin-bottom:8px}
+  .end-card h1{font-size:44px}
+  .ec-orn{height:18px;margin:6px auto 10px}
+  .ec-hand{max-width:560px;font-size:21px;margin-bottom:2px}
+  .ec-tally{grid-template-columns:repeat(4,1fr);width:min(560px,100%);margin:12px 0 14px}
+  .ec-tally div{padding:6px}
+  .ec-go{padding:10px 20px}
+}
 @media (prefers-reduced-motion: reduce){#ending,.end-line.pop,.end-card,.end-card h1 span,.ec-orn,.ec-hand,.ec-tally,.ec-go,.ec-kick{animation-duration:.01s!important;animation-delay:0s!important}}
 </style>
 
@@ -1384,9 +1396,9 @@ const FISH = {
   perch:   {name:'Copper Perch', rarity:'common', beh:'darter', pull:0.9, reel:2.6, value:2, size:[14,26], len:34, h:.27, color:'#D08A4E', fin:'#A85E2C', window:1.4,
             lore:'Its belly often holds old coins. Nobody knows who keeps dropping them.', hint:'Common in open water.', memory:'Every coin in its belly is a 1966 penny, and every one is warm, as if it’s only just left somebody’s pocket.'},
   reedwhisker:{name:'Reedwhisker', rarity:'common', beh:'tugger', pull:1.0, reel:3.2, value:3, size:[22,40], len:40, h:.24, color:'#8A7558', fin:'#62513C', window:1.3,
-            lore:"A grumpy catfish that tugs like it's ringing a doorbell.", hint:'Lurks along the reed edges.', memory:'It tugs twice and waits, then twice again, the way you’d ring a neighbour’s bell late at night, sorry to bother them.'},
+            lore:'A grumpy catfish that tugs like it’s ringing a doorbell.', hint:'Lurks along the reed edges.', memory:'It tugs twice and waits, then twice again, the way you’d ring a neighbour’s bell late at night, sorry to bother them.'},
   lantern: {name:'Lantern Carp', rarity:'uncommon', beh:'sleeper', night:true, glow:true, pull:.7, reel:3.6, value:12, size:[25,45], len:42, h:.32, color:'#E2A64F', fin:'#B97A2F', window:1.6,
-            lore:"Hollowmere's street lamps once burned its shed scales.", hint:'Only rises at night, and hates a twitchy bobber.', memory:'It rises at lamp-lighting time to the minute, the hour someone used to walk Lantern Row with a long pole.'},
+            lore:'Hollowmere’s street lamps once burned its shed scales.', hint:'Only rises at night, and hates a twitchy bobber.', memory:'It rises at lamp-lighting time to the minute, the hour someone used to walk Lantern Row with a long pole.'},
   leafjack:{name:'Leafjack', rarity:'uncommon', beh:'leaper', shared:true, pull:1.0, reel:4.2, value:15, size:[20,34], len:40, h:.36, color:'#A9B456', fin:'#7C8C33', window:1.1,
             lore:'Disguises itself as a leaf. It fools the birds, but not you.', hint:'Seen hiding under the lily pads, and under falling leaves.', memory:'The leaves it copies are plane leaves, from the trees in the old square. There are no plane trees left above the water.'},
   mossback:{name:'Mossback', rarity:'rare', beh:'sulker', pull:1.35, reel:7, value:45, size:[40,70], len:56, h:.3, color:'#6C805A', fin:'#4E6243', window:.9,
@@ -1398,7 +1410,7 @@ const FISH = {
   kelpeel: {name:'Kelp Ribbon', rarity:'uncommon', beh:'sulker', night:true, pull:1.0, reel:4.4, value:28, size:[50,90], len:62, h:.12, color:'#5E7A3C', fin:'#465C2A', window:1.1,
             lore:'Ties itself into the kelp and dares you to pull.', hint:'Hides in the kelp beds.', memory:'The knots it ties are proper sailors’ knots, a bowline, a sheet bend. Somebody taught it.'},
   bream:   {name:'Gilt Bream', rarity:'uncommon', beh:'leaper', pull:1.05, reel:4, value:35, size:[24,40], len:40, h:.36, color:'#D8BE6E', fin:'#A88B3E', window:1.1,
-            lore:'Sailors once paid harbor fees with its scales.', hint:'Roams open and far water.', memory:'Each scale carries a harbour mark, worn nearly smooth. The harbour it names isn’t on any chart.'},
+            lore:'Sailors once paid harbour fees with its scales.', hint:'Roams open and far water.', memory:'Each scale carries a harbour mark, worn nearly smooth. The harbour it names isn’t on any chart.'},
   grouper: {name:'Barnacle Grouper', rarity:'rare', beh:'sulker', pull:1.45, reel:8, value:140, size:[60,110], len:66, h:.38, color:'#6E6A5C', fin:'#4F4B40', window:.9,
             lore:'So old the barnacles have barnacles.', hint:'Lurks by the sea stacks and in the trench.', memory:'Under the barnacles there’s a brass ring through its lip, from a mooring nobody has used in sixty years.'},
   saltjaw: {name:'Saltjaw', rarity:'legendary', beh:'darter', night:true, pull:1.85, reel:15, value:1500, size:[140,190], len:92, h:.16, color:'#7E8FA0', fin:'#5A6A7A', window:.7,
@@ -1412,9 +1424,9 @@ const FISH = {
   comber:  {name:'Comber Tarpon', rarity:'epic', beh:'leaper', extra:true, pull:1.6, reel:10.5, value:600, size:[120,200], len:82, h:.27, color:'#BCC8CE', fin:'#7F9BA7', window:.8,
             lore:'Rides in on the seventh wave and out on the eighth. Its scales are as big as coins, and sailors keep one for luck.', hint:'Comes in behind the seventh wave, the big one.', memory:'Count the waves it rides in on and it’s always seven. The old boatmen counted the same way, under their breath.'},
   mayor:   {name:'Mayor Bartholomew', rarity:'legendary', beh:'darter', pull:1.75, reel:14, value:600, size:[110,150], len:86, h:.15, color:'#7D8A63', fin:'#58663F', window:.72,
-            lore:"An ancient pike still wearing the mayor's chain of office.", hint:'Something huge circles the deep pool, most often at dawn.', memory:'He still does his round of the deep pool at dawn, the way the mayor walked the high street, nodding to people who aren’t there.'},
+            lore:'An ancient pike still wearing the mayor’s chain of office.', hint:'Something huge circles the deep pool, most often at dawn.', memory:'He still does his round of the deep pool at dawn, the way the mayor walked the high street, nodding to people who aren’t there.'},
   dace:    {name:'Drizzle Dace', rarity:'uncommon', beh:'leaper', wx:'rain', pull:.95, reel:3.9, value:16, size:[14,26], len:34, h:.24, color:'#A7B8C2', fin:'#6F8794', window:1.15,
-            lore:"Jumps at raindrops. It thinks they're flies, and it's been wrong every time.", hint:'Jumps at raindrops in open water.', memory:'It jumps hardest at the first drops, the way children ran out into the rain when the school bell went.'},
+            lore:'Jumps at raindrops. It thinks they’re flies, and it’s been wrong every time.', hint:'Jumps at raindrops in open water.', memory:'It jumps hardest at the first drops, the way children ran out into the rain when the school bell went.'},
   char:    {name:'Mist Char', rarity:'rare', beh:'ghost', wx:'fog', pull:1.25, reel:6.5, value:55, size:[28,56], len:50, h:.26, color:'#97A1A8', fin:'#DD7B50', window:.95,
             lore:'Pale as the fog it swims in, and warmer in the hand than it looks.', hint:'Glimpsed in the deep pool on foggy mornings.', memory:'It’s warm because it remembers a warm room. Hold it a while and you can smell coal smoke and toast.'},
   mackerel:{name:'Squall Mackerel', rarity:'uncommon', beh:'darter', wx:'rain', pull:1.05, reel:4.2, value:30, size:[26,44], len:44, h:.2, color:'#4F8A8B', fin:'#2F5C60', window:1.05,
@@ -1493,7 +1505,7 @@ const FISH = {
   glasscarp:{name:'Looking-Glass Carp', rarity:'epic', beh:'leaper', extra:true, pull:1.55, reel:10, value:600, size:[50,90], len:58, h:.34, color:'#AEB6BA', fin:'#7E888E', window:.82,
             lore:'Its scales are silvered like an old mirror. Look into one and you see the lake above, the right way up.', hint:'Something silvered rises to the light from the roof, at midday.', memory:'In its scales the lake above is the right way up, and the town is still on it.'},
   mothmouth:{name:'Mothmouth', rarity:'legendary', beh:'darter', pull:1.85, reel:15, value:2200, size:[120,170], len:90, h:.26, color:'#8C8273', fin:'#6C6253', window:.72,
-            lore:'It has followed every light ever lowered into the Hollow. Your uncle’s, for years. Now yours.', hint:'Something huge waits out in the dark for a light to follow.', memory:'It follows every light because it’s looking for the way back up. It has never once gone further than the light.'},
+            lore:'It has followed every light ever lowered into the Hollow. Your uncle’s, at the very end. Now yours.', hint:'Something huge waits out in the dark for a light to follow.', memory:'It follows every light because it’s looking for the way back up. It has never once gone further than the light.'},
   inkling: {name:'Inkling', rarity:'exotic', beh:'ghost', extra:true, secret:true, pull:1.2, reel:8, value:1200, size:[16,30], len:36, h:.26, color:'#221F2C', fin:'#16141D', window:.62,
             lore:'It writes on the water as it swims. The words are in your handwriting.', hint:'Something in the Hollow only writes for a cursed rod.', memory:'Whatever it writes is dated tomorrow.'},
   drownedmoon:{name:'Drowned Moon', rarity:'mythic', beh:'sulker', beh2:'leaper', glow:true, extra:true, noTank:true, pull:1.95, reel:21, value:8000, size:[180,260], len:96, h:.78, color:'#E2E0D4', fin:'#BAB8AC', window:.66,
@@ -1761,12 +1773,12 @@ const BOW_FOOT={depth:.4, r:.1};
    OTT_SAY   Ottilie's idle lines at the lake, by chapter: the furthest you've got (lake; river once her ferry runs; marsh
              once Wren's punt does; coast once you have a boat; quarter once Pell's rowboat is fixed; hollow once you've
              been down the ladder; supper once you've been to supper on Lantern Row). She says the newest chapter's lines
-             most and the earlier ones now and then (game/scenery-live.js: ottLine). A line written [text, until] stops
-             once `until` is true: rod:<id> (you own that rod). {you} is what she calls you: OTT_NAME.kid, then
+             most and the earlier ones now and then (game/story.js: ottLine). A line written [text, when] is only said while
+             `when` holds: rod:<id> until you own that rod, caught:<id> once you've caught that fish. {you} is what she calls you: OTT_NAME.kid, then
              OTT_NAME.keeper from the day she tells you what she saw the night the town went under (data/hollow.js:
              OTT_CONFESS). rods: now and then, about the rod in your hand. caught: once, just after a catch, by species,
-             else by rarity (legendary and up). Half her lines are about the weather when it has something to say
-             (data/weather.js: WX_LINES).
+             else by rarity (legendary and up). Otherwise, 2 in 5 of her lines are about the weather when it has something
+             to say (data/weather.js: WX_LINES), and then 1 in 4 about the rod in your hand.
    BAR_LINES Barnaby's lines the day his launch first ties up at your dock, in order (the last stays).
    BANQUET_LINES the Mayor's Banquet, in order: [who, line].
    LETTER    your uncle's letter in the opening, line by line, signed "— your uncle". */
@@ -1775,7 +1787,7 @@ const OTT_SAY={
   lake:['Fish don’t bite for folks who fidget.','Lantern Carp only come up after dark, {you}.','Reeds’ll eat your line. My Reedcutter won’t.',
     ['Want to reach the deep pool? You’ll need more rod than that.','rod:ash'],'That heron’s been stealing my bait for years.','Your uncle fished that deep pool every dawn. Never said why.',
     'If a gull stops in midair, run.','Your uncle swore something lives where the rainbow comes down. Never caught it.',
-    'Full moon tonight? Mind the deep pool. Something out there is looking for its little one.','Mayor Bartholomew handed out toffees on the ferry when I was small. Now look at him.'],
+    'Full moon tonight? Mind the deep pool. Something out there is looking for its little one.',['Mayor Bartholomew handed out toffees on the ferry when I was small. Now look at him.','caught:mayor']],
   river:['The ferry’s running again. Last one to ride her regular was your uncle.','That Wren talks faster than the river runs. Listen anyway. She’s right more than she’s wrong.',
     'The mill stopped the night of the flood. Nobody’s had the heart to start it since.'],
   marsh:['The marsh is where the lake goes when it’s tired. Don’t tell Wren I said that. She’ll pin it up.',
@@ -2101,7 +2113,7 @@ const NOTES={
   log6:    {kind:'logbook', page:6, lines:['Last page.','If you’re reading this, you went','further than the light,','and it let you back up.','It isn’t a fish. It’s dreaming','the fish, and the town,','and maybe us. Don’t wake it.','Not yet.','The mirror shows the sky','the right way up. Use it.']},
   edith:   {kind:'letter', waters:['lake'], to:'Mrs. Edith Crane, 4 Lantern Row', lines:['Edie,','the water’s up past the second','step again. The mayor says not','to worry. I worry anyway.','Save me a dance on Saturday.','— Walter']},
   albert:  {kind:'letter', waters:['lake','quarter'], to:'Master Albert Finch, the Clock Tower', lines:['Albert,','the clock has stopped at 3:12','again. Please see to it before','the bell has to ring.','Father says it mustn’t ring.','— Josephine']},
-  keeper:  {kind:'letter', waters:['lake'], to:'The Keeper of the Bait Shack', lines:['To the new keeper,','we see your lantern at night.','It is good to have a light','on the water again.','Don’t fish the deep pool at dawn.','Or do. He never could stop.','— your neighbors']},
+  keeper:  {kind:'letter', waters:['lake'], to:'The Keeper of the Bait Shack', lines:['To the new keeper,','we see your lantern at night.','It is good to have a light','on the water again.','Don’t fish the deep pool at dawn.','Or do. He never could stop.','— your neighbours']},
   bakery:  {kind:'letter', waters:['quarter'], to:'Mr. Harold Dunmore, the Bakery, 6 Lantern Row', lines:['Harold,','two loaves for Saturday,','and the seed cake, if you’ve','the heart for it.','Walter’s coming. He says.','— E. C.']},
   ivy:     {kind:'letter', waters:['quarter'], to:'Miss Ivy Hale, the top room, 9 Lantern Row', lines:['Ivy,','if the water comes up the','stairs again tonight, stay in','the top room and wait for','the bell. Don’t come down.','— Mags, at No. 11']},
   postmaster:{kind:'letter', waters:['quarter'], to:'The Postmaster, Hollowmere Post Office', lines:['Dear Postmaster,','if the town goes under,','will the letters still come?','Please say yes.','— Albert Finch (8)']},
@@ -2437,7 +2449,7 @@ const WREN={
   lines:['The river’s ten minutes faster going down. I timed it.','Jars are for keeping things. Mostly light. Sometimes fish. Once, a sneeze.',
     'Bring me Glimmer and I’ll cut your rod another socket. Carefully. Mostly carefully.','Your uncle brought me the odd ones. He said I asked the right questions.',
     'The Clockfin only bites as the hour turns. I’ve checked. Forty-one times.','Hold the line and the current swings your float in to the bank. Let go and it runs.'],
-  later:{quarter:['A whole street, under the lake. I’ve been rowing past it for years. Rowing OVER it.','Pell reads me the letters sometimes. He does the voices. He shouldn’t be able to do the voices.'],
+  later:{quarter:['A whole street, under the lake. I’ve crossed on that ferry a hundred times. Right OVER it.','Pell reads me the letters sometimes. He does the voices. He shouldn’t be able to do the voices.'],
     hollow:['You went DOWN? Under the shack? Without me? Take a jar next time. Take two.','Your uncle’s pages said not to go further than the light. Did you? You can tell me. I won’t pin it. I’ll pin it.'],
     supper:['Pell says you went to a supper at 3:12 in a town that drowned. I’m not jealous. I’m a little jealous.','The red string goes all the way round the board now. I may need a bigger board.']},
   quest:'Bring me one of everything that lives in this river, and I’ll string you a rod with two floats. Don’t ask how. I’m still working out how.',
@@ -2602,7 +2614,7 @@ const PELL_Q={
            thanks:'The clock’s stopped at 3:12. It always was. Some nights at 3:12 the bell still rings. Nobody hears it but the fish, and you, if you’re out there.', reward:'1,200 coins.', coins:1200},
   sack:   {name:'The rest of the sack', ask:'The post office kept its own letters. They float out of the windows now. Find the three that were never sent, and post them.',
            thanks:'That’s the sack empty, first time since I was a boy. Here. My father’s rod. He used to call the rain down on a Monday so folk would stay in and write letters.', reward:'The Tidecaller.', rod:'tidecaller'},
-  supper: {name:'Supper on the Row', ask:'This came for you. Postmarked 1966, from Lantern Row. That was the night of the Saturday supper, the whole street at one long table. I was sent to bed before the dancing.',
+  supper: {name:'Supper on the Row', ask:'This came for you. Postmarked 1966, from Lantern Row. That was the night of the Saturday supper, the whole street at one long table. I was sent up to bed before the dancing, for being cheeky to the Mayor.',
            how:'Row out to the Quarter for 3:12, while the bell rings, with the Stillwater Mirror in your hand.',
            thanks:'You’ve a message for me? “The letters came, every one.” Well. Of course they did. Oh, and this came for me, in the same post.',
            after:'Pell, at the Post Office. Postmarked 1966. He puts it in his pocket, unopened.', reward:'25 Glimmer.', glimmer:25}
@@ -2693,7 +2705,7 @@ const HOLLOW={
 const MIRROR_STARS={n:9, r:9, d:[.25,.85]};
 const OMEN={every:[120,200], dur:180, x:5, from:40};
 const STAR={every:[90,240], dur:15, r:30, x:3};
-const OTT_CONFESS='I was on the ferry that night. Eight years old, ringing my bell for the last crossing home from the Row’s Saturday supper. At twelve minutes past three the lake closed over the town. Not a wave. It closed, like an eye. Your uncle spent forty years looking for the way under the lid. I’m glad it was you that found it. Mind you come back up, Keeper.';
+const OTT_CONFESS='I was on the ferry that night. Eight years old, ringing my bell for the last crossing home from the Row’s Saturday supper. At twelve minutes past three the lake closed over the town. Not a wave. It closed, like an eye. Your uncle spent forty years looking for the way under the lid, and only found it at the very end. I’m glad it was you that went all the way down. Mind you come back up, Keeper.';
 
 /* The end of chapter one: supper on Lantern Row (game/ending.js plays it, game/ending-art.js draws it, and the Row's
    folk are drawn in game/row-folk.js).
@@ -14968,7 +14980,8 @@ function drawIntroShadow(){ if (!INTRO.active || INTRO.shadow<=.01 || REG()!=='l
    later, and your last catch at the lake for Ottilie to remark on (data/people.js: OTT_SAY). The ending, supper on
    Lantern Row, is in game/ending.js. ---------- */
 /* save.story = {invite (Pell has given you the Row's invitation), supper (you've been to supper on Lantern Row: the
-   in-game day it was), card (you've seen the end of chapter one), pellLetter (Pell's own letter has come)}. */
+   in-game day it was), card (you've seen the end of chapter one), hush (the absolute hour the tower bell stays quiet
+   until, after the supper), tip (the day the coach last said to bring the Mirror)}. game/ending.js says when each is set. */
 function storyState(){ if (!isObj(save.story)) save.story={}; return save.story; }
 /** The chapters, in the order Ottilie's lines grow: each is a water you've opened, and last the supper. */
 const CHAPTERS=['lake','river','marsh','coast','quarter','hollow','supper'];
@@ -14982,7 +14995,8 @@ const pickOne = L => L[Math.floor(Math.random()*L.length)];
 const ottName = () => save.hollow && save.hollow.confess ? OTT_NAME.keeper : OTT_NAME.kid;
 const ottFill = t => t.replace(/\{you\}/g, ottName());
 /** A line of hers is either text, or [text, until]: it stops once `until` is true (rod:<id>, you own that rod). */
-function ottLineOk(L){ if (typeof L==='string') return true; const [, until]=L; if (/^rod:/.test(until)) return !save.rods.includes(until.slice(4)); return true; }
+function ottLineOk(L){ if (typeof L==='string') return true; const [, when]=L; if (/^rod:/.test(when)) return !save.rods.includes(when.slice(4));
+  if (/^caught:/.test(when)) return ((save.fish[when.slice(7)]||{}).caught||0)>0; return true; }
 const ottText = L => typeof L==='string' ? L : L[0];
 /** Your last catch at the lake, for her to remark on (once, while it's fresh). */
 const OTT_LAST={id:null, rarity:null, t:-99, said:true};
@@ -15372,6 +15386,10 @@ function eaFolk(c,st){ const t=st.t, list=[];
   if (st.dance!=null){ const d=st.dance, a=d*1.1, D=EA_DANCE, at=b=>({X:D.X+Math.cos(b)*D.r, Z:D.Z+Math.sin(b)*D.r*.4});
     for (const [who,ph] of [['edith',0],['walter',Math.PI]]){ const P=at(a+ph); list.push({Z:P.Z, f:()=>eaStanding(c,who,P.X,P.Z,t,{dance:a+ph, bob:Math.abs(Math.sin(d*Math.PI*84/60/3*3)), partner:at(a+ph+Math.PI), talk:st.speaker===who?st.talk:0})}); } }
   list.sort((a,b)=>b.Z-a.Z).forEach(o=>o.f()); }
+/** Lets the painted layers and the seated folk go once the supper's over (they're tens of megabytes on a big screen);
+    eaLayout paints them again next time. */
+function eaFree(){ for (const cv of [EA.base, EA.lit, ...Object.values(EA_SPR).map(s=>s.cv)]) if (cv) cv.width=cv.height=0;
+  EA.base=EA.lit=null; EA.key=''; for (const k in EA_SPR) delete EA_SPR[k]; }
 /** Where a seated portrait's middle goes, and how big it is: 100 portrait units are 0.8 m. */
 function eaSeatAt(S){ const p=eaP(S.X,(S.kid?1.17:1.24)+S.up,S.Z); return {x:p.x, y:p.y, size:.8*p.s}; }
 /* Each one sitting is drawn into their own little canvas, and only drawn again when they blink, change their look, or
@@ -15426,17 +15444,22 @@ function eaFocusFor(who,st){ eaLayout();
    goes to the end); the camera leans toward whoever's speaking, and their face is on the line's card. After the last
    line the bell stops (for the rest of that hour: game/quarter.js, bellNatural), the windows go out one by one, and
    it's only a reflection again. Then the end-of-chapter card, and the fishing goes on.
-   save.story (game/story.js): supper is set as it starts (the in-game day it was, counted from 1), card once the card's
-   been seen, hush (the absolute hour the bell stays quiet until), tip (the day the coach last said to bring the Mirror).
-   Settings, About, has "Watch the supper again" after; a replay changes nothing. */
-const END={active:false, replay:false, i:0, t:0, lineT:0, talkT:0, flip:1, out:0, outT:0, phase:'', speaker:null, quiet:false, walter:null, dance:null,
+   save.story (game/story.js): supper is set once the bell stops (the in-game day it was, counted from 1), so a supper
+   cut short (the app closed partway) comes again; card once the card's been seen (closed before it, it's shown on its
+   own next time); hush (the absolute hour the bell stays quiet until), tip (the day the coach last said to bring the
+   Mirror). Settings, About, has "Watch the supper again" after, with nothing on the line; a replay changes nothing
+   (the clock runs on while you watch, as it does for the first one). */
+const END={active:false, closing:false, replay:false, i:0, t:0, lineT:0, talkT:0, flip:1, out:0, outT:0, phase:'', speaker:null, quiet:false, walter:null, dance:null,
   cam:{x:0,y:0,z:1}, aim:{x:0,y:0,z:1}, buf:null, raf:0, last:0, toll:0};
 /** Whether the supper is waiting for you now: the invitation in hand, in the Quarter, while the bell rings at 3:12. */
 function supperDue(){ const st=save.story; return !!(st && st.invite && !st.supper) && REG()==='quarter' && bellNatural(); }
-/** Each frame in the Quarter: the supper starts once nothing's in the way (a float that's only waiting is reeled in). */
-function endingCheck(){ if (END.active || SIMULATING || S.tut || !supperDue()) return; const st=storyState();
+/** Each frame in the Quarter: the supper starts once nothing's in the way (a float that's only waiting is reeled in,
+    but only when that's all there is). A supper that ended without its card shows the card. */
+function endingCheck(){ if (END.active || SIMULATING || S.tut) return; const st0=save.story;
+  if (st0 && st0.supper && !st0.card){ if (sceneFree()) supperStart(false,true); return; }
+  if (!supperDue()) return; const st=storyState();
   if (save.rod!=='mirror'){ if (st.tip!==(save.day||0)+1 && (S.state==='idle'||S.state==='waiting')){ st.tip=(save.day||0)+1; persist(); coachFor(SUPPER.tip,9); } return; }
-  if (S.state==='waiting') supperReelIn();
+  if (S.state==='waiting' && sceneClear()) supperReelIn();
   if (!sceneFree()) return;
   supperStart(false); }
 /** A float that's only waiting comes in first. */
@@ -15444,18 +15467,29 @@ function supperReelIn(){ S.bob=null; S.wait=null; S.bite=null; setState('idle');
 /** The bell is quiet for the rest of the hour once the Row's supper is over. */
 function supperHush(){ const st=storyState(), B=QUARTER.bell, h=(((save.clock%24)+24)%24); if (h>=B.from && h<B.from+B.hours){ st.hush=absHour()+(B.from+B.hours-h); persist(); } }
 
-function supperStart(replay){ eaLayout(); audioInit(); const L=$('ending'); if (S.state==='waiting') supperReelIn();
-  if (!replay){ storyState().supper=(save.day||0)+1; persist(); MODC.dirty=true; }
+/** Opens the supper: the first time (replay false), again from Settings (true), or only its card (cardOnly). */
+function supperStart(replay,cardOnly){ if (END.active) return; eaLayout(); audioInit(); const L=$('ending');
   Object.assign(END,{active:true, replay, i:-1, t:0, lineT:0, talkT:0, flip:REDUCED?1:0, out:0, outT:0, phase:REDUCED?'lines':'in', speaker:null, quiet:false, walter:null, dance:null, toll:.4});
   const f=eaFocusFor(null); END.cam={...f}; END.aim={...f};
-  document.body.classList.add('cine'); L.hidden=false; L.className='';
+  document.body.classList.add('cine'); endInert(true); L.hidden=false; L.className='';
   L.innerHTML='<canvas id="endCv" aria-hidden="true"></canvas>'+
     '<div class="end-line" id="endLine" role="status" aria-live="polite"><canvas class="end-face" id="endFace" aria-hidden="true"></canvas><div class="end-words"><b id="endWho"></b><p id="endSay"></p></div><span class="end-tap" aria-hidden="true">Tap</span></div>'+
     '<button class="end-skip" id="endSkip" type="button">Skip</button><div class="end-card" id="endCard" hidden></div>';
   endSize(); L.onpointerdown=e=>{ if (e.target.closest('button') || END.phase==='card') return; endNext(); };
+  L.onkeydown=e=>{ if ((e.key===' ' || e.key==='Enter') && !e.target.closest('button')){ e.preventDefault(); endNext(); } };
   $('endSkip').addEventListener('click',endSkip);
-  endLine(0);
+  // back, Escape or a swipe skips to the card, and from the card goes back to the water
+  ovOpen('ending',()=>{ if (END.phase==='card'){ endClose(); return true; } endSkip(); return false; });
+  L.tabIndex=-1; L.focus({preventScroll:true});
+  if (cardOnly){ END.flip=1; END.out=1; endCard(); } else endLine(0);
   END.last=performance.now(); cancelAnimationFrame(END.raf); END.raf=requestAnimationFrame(endFrame); }
+/** Watching it again (Settings, About; Playtest): only with nothing on the line, so the replay can't cost you a fish.
+    Says so and returns false otherwise. */
+function supperReplay(){ if (S.state!=='idle'){ news('Reel in first, then watch the supper again',''); return false; }
+  setTimeout(()=>supperStart(true),250); return true; }
+/** While the supper's up, nothing behind it can be reached from the keyboard either. */
+function endInert(on){ const a=document.activeElement; if (on && a && a!==document.body && a.blur) a.blur();
+  for (const el of document.querySelectorAll('#hud,.corner')) el.inert=on; }
 function endSize(){ const cv=$('endCv'); if (!cv) return; const w=Math.round(W*DPR), h=Math.round(H*DPR); cv.width=w; cv.height=h; cv.style.width=W+'px'; cv.style.height=H+'px';
   if (!END.buf) END.buf=document.createElement('canvas'); END.buf.width=w; END.buf.height=h; }
 /** Shows line i: who's speaking (their face on the card), and what happens with it. */
@@ -15478,9 +15512,12 @@ function endNext(){ if (END.phase==='in'){ END.flip=1; END.phase='lines'; return
   tone(1200,.03,{vol:.02,type:'triangle'}); endLine(END.i+1); }
 /** The bell stops, the windows go out, and it turns back into a reflection; then the card. */
 function endOut(){ if (END.phase==='out' || END.phase==='card') return; END.phase='out'; END.outT=0; END.speaker=null;
-  if (!END.replay) supperHush(); musicDuck(.25,7); }
-function endSkip(){ if (END.phase==='card') return; if (!END.replay) supperHush(); endCard(); }
-function endFrame(now){ if (!END.active) return; const dt=Math.min(.05,(now-END.last)/1000); END.last=now; END.t+=dt; END.lineT+=dt;
+  endDone(); musicDuck(.25,7); }
+function endSkip(){ if (END.phase==='card') return; endDone(); endCard(); }
+/** The supper's over once the bell stops: that's when it's kept (not on a replay). */
+function endDone(){ if (END.replay) return; const st=storyState(); if (st.supper) return;
+  st.supper=(save.day||0)+1; supperHush(); persist(); MODC.dirty=true; }
+function endFrame(now){ if (!END.active) return; const dt=clamp((now-END.last)/1000,0,.05); END.last=now; END.t+=dt; END.lineT+=dt;
   if (END.phase==='in' && END.t>1.1){ END.flip=Math.min(1,END.flip+dt/1.5); if (END.flip>=1) END.phase='lines'; }
   if (END.walter!=null && END.walter<1) END.walter=Math.min(1,END.walter+dt/3.6);
   if (END.dance!=null && !REDUCED) END.dance+=dt;
@@ -15533,8 +15570,10 @@ function endCard(){ if (END.phase==='card') return; END.phase='card'; const st=s
   $('ending').classList.add('carded'); card.hidden=false; $('endLine').hidden=true; $('endSkip').hidden=true;
   $('endGo').addEventListener('click',endClose); setTimeout(()=>{ const b=$('endGo'); if (b) b.focus({preventScroll:true}); },400);
   if (AC){ const t=AC.currentTime+.3; MOTIF.forEach(([n],i)=>iBell(mf(n),t+i*.42,{dur:2.4,vol:.045,pan:-.2+i*.08})); } }
-function endClose(){ if (!END.active) return; const L=$('ending'); L.classList.add('out'); setTimeout(()=>document.body.classList.remove('cine'),300);
-  setTimeout(()=>{ L.hidden=true; L.className=''; L.innerHTML=''; END.active=false; END.phase=''; cancelAnimationFrame(END.raf); MODC.dirty=true; updateHud();
+function endClose(){ if (!END.active || END.closing) return; END.closing=true; const L=$('ending'); L.classList.add('out'); ovClosed('ending'); setTimeout(()=>{ document.body.classList.remove('cine'); endInert(false); },300);
+  setTimeout(()=>{ L.hidden=true; L.className=''; L.innerHTML=''; L.onkeydown=null; END.active=false; END.closing=false; END.phase=''; cancelAnimationFrame(END.raf); MODC.dirty=true; updateHud();
+    // the scene's pictures are big; let them go until next time
+    if (END.buf){ END.buf.width=END.buf.height=0; END.buf=null; } eaFree();
     if (!END.replay) setTimeout(()=>{ if (S.state==='idle') news('Chapter one: the end. The fish are still biting.','gold'); },600); },700); }
 
 /* ---------- News ribbon: small, queued, never covers the sky ---------- */
@@ -15552,8 +15591,10 @@ function coachShow(text,secs){ coach(text,'Tip'); clearTimeout(coachTimer); coac
 function coachDrain(){ if (coachTimer || S.tut) return; while (COACHQ.length && performance.now()-COACHQ[0].at>90000) COACHQ.shift(); const n=COACHQ.shift(); if (n) coachShow(n.text,n.secs); }
 /* ---------- Leaving things: back gesture, Escape and swipe-down all close the top layer ---------- */
 const OV=[]; let ovSkip=0, ovPopping=false, ovQueue=[], ovQueueT=0;
-/** Nothing open over the water (a sheet, a note, a room, the map, the bag) and no cast under way: free for something to happen. */
-const sceneFree = () => S.state==='idle' && !OV.length && $('sheet').hidden && $('note').hidden && $('haul').hidden;
+/** Nothing open over the water (a sheet, a note, a room, the map, the bag, the opening, the supper)... */
+const sceneClear = () => !OV.length && $('sheet').hidden && $('note').hidden && $('haul').hidden && !INTRO.active && !END.active;
+/** ...and no cast under way: free for something to happen. */
+const sceneFree = () => S.state==='idle' && sceneClear();
 /* Opening one layer as another closes (a sheet that opens the bag or the map) would push the new entry before the
    old one's history.back() lands, and that back would then eat it. So while a back is on its way, the push waits for it. */
 function ovPush(name){ try { history.pushState({hm:name},''); } catch(e){} }
@@ -15685,7 +15726,7 @@ function appHTML(){ const ios=isIOS(), and=isAndroid(), inst=isStandalone();
   return h+aboutHTML(); }
 function aboutHTML(){ return '<section class="st-card"><h3>About</h3><p>Hollowmere prototype, build '+BUILD+'. Fonts: Nunito, Young Serif and Caveat, under the SIL Open Font License.</p><div class="row"><button class="btn" id="replayIntro" type="button">Watch the opening again</button>'+(save.story && save.story.supper?'<button class="btn" id="replaySupper" type="button">Watch the supper again</button>':'')+'</div></section>'; }
 function bindApp(){ const ri=$('replayIntro'); if (ri) ri.addEventListener('click',()=>{ closeSheet(); setTimeout(()=>introStart(true),250); });
-  const rs=$('replaySupper'); if (rs) rs.addEventListener('click',()=>{ closeSheet(); setTimeout(()=>supperStart(true),250); });
+  const rs=$('replaySupper'); if (rs) rs.addEventListener('click',()=>{ if (S.state==='idle') closeSheet(); supperReplay(); });
   const di=$('doInstall'); if (di) di.addEventListener('click',async()=>{ const p=APP.prompt; if (!p) return; p.prompt(); try { const r=await p.userChoice; if (r&&r.outcome==='accepted') news('Installing Hollowmere…','gold'); } catch(e){} APP.prompt=null; openSettings('app'); });
   const cp=$('cpForApp'); if (cp) cp.addEventListener('click',async e=>{ const btn=e.currentTarget; try { const code=await makeCode(); save.lastBackup=Date.now(); persist(); copyText(code,btn); } catch(_){ news('Couldn’t make a code on this browser','bad'); } }); }
 if (window.__PWA && 'serviceWorker' in navigator && location.protocol!=='file:'){ const reg0=()=>{ navigator.serviceWorker.register('sw.js').then(reg=>{
@@ -16972,7 +17013,7 @@ function playtestStory(v){ const st=storyState(), q=quarterState(), FS=findsStat
     st.invite=1; if (!FS.notes.includes('invite')) FS.notes.push('invite');
     if (!save.rods.includes('mirror')) save.rods.push('mirror'); save.boat=true; persist(); updateHud(); updateJournalDot(); MODC.dirty=true; news('The Row’s invitation is in your notes, and the Mirror on your rack','gold'); return; }
   if (v==='go'){ delete st.hush; save.rod='mirror'; save.clock=QUARTER.bell.from+.01; PAL=palAt(save.clock); persist(); if (REG()!=='quarter') travelTo('quarter'); else { buildBg(); MODC.dirty=true; } return; }
-  if (v==='watch'){ setTimeout(()=>supperStart(true),250); return; }
+  if (v==='watch'){ supperReplay(); return; }
   // the bell stays quiet for the rest of the hour, so it doesn't start again under you
   if (v==='forget'){ delete st.supper; delete st.card; delete st.tip; delete q.done.supper; persist(); MODC.dirty=true; news('The supper hasn’t come yet',''); return; }
   if (v==='ott'){ OTT.say=ottLine(); OTT.sayT=4.5; OTT.next=rand(20,35); } }

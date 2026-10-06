@@ -21,7 +21,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/loop.js` | 36 | `update` and `frame`: the main loop |
 | `src/game/input.js` | 34 | Pointer input on the lake |
 | `src/game/buttons.js` | 14 | `openSheet`, `closeSheet` |
-| `src/game/ui-flow.js` | 36 | The news ribbon (`news`, kept below an open tip), queued coach tips, the overlay stack (`ovPush`, `ovOpen`, `sceneFree`: nothing open and nothing under way), swipe-to-close |
+| `src/game/ui-flow.js` | 38 | The news ribbon (`news`, kept below an open tip), queued coach tips, the overlay stack (`ovPush`, `ovOpen`; `sceneClear`: nothing open, the opening and the supper included; `sceneFree`: that, and nothing under way), swipe-to-close |
 | `src/game/boot.js` | 17 | `boot`: starts everything (always last in the build) |
 | `src/index.html` | 60 | Page skeleton: head, markup, where styles, scripts and fonts go |
 | `src/test-hooks.js` | 110 | Test build only: `window.__` handles for the test suite |
@@ -71,7 +71,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/hollow-art.js` | 249 | The Hollow drawn: the backdrop (`buildHollowBg`), the near rock, the ledge and the lamp, the black water and its spots, the noon shaft, the eye, the dark and the light the lantern makes (`drawHollowDark`), the lake bell on its arm (`drawLakeBell`) |
 | `src/game/godly.js` | 104 | Godly fish: the hook (`godlyHook`: everything stops), the landing's light from above (`godlyLand`, `drawGodlyRays`), the card (`godlyCard`, `ledgerCard`), the Ledger instead of a sale (`ledger`, `ledgerWrite`, `ledgerHTML`), the Stillwater Mirror coming up after the first Scale (`godlyAfter`) and its stars in the water (`mirrorOn`, `mirrorStars`, `onMirrorStar`, `drawMirrorStars`) |
 | `src/game/omens.js` | 78 | Omens (`omenState`, `omenOn`, `omenStart`, `omenUpdate`, `waterHush`, `dripsHeld`, `drawOmen`) and falling stars (`starSky`, `inStar`, `starFall`, `starUpdate`, `drawStar`) |
-| `src/game/pell.js` | 164 | Pell: his round (`pellStep`, `pellMet`, `pellHasNews`, `claimStep`, `fixRowboat`), his sheet (`openPell`), clipping and posting letters (`clipLetter`, `postLetter`), answers on the Postman Sturgeon (`replyDue`, `pellAfterCatch`), what he says (`pellSay`, `pellUpdate`) |
+| `src/game/pell.js` | 164 | Pell: his round (`pellStep`, `pellCur`: the step he's on, `pellMet`, `lastPage`, `pellHasNews`, `claimStep`, `fixRowboat`), his idle lines (`pellIdle`), his sheet (`openPell`), clipping and posting letters (`clipLetter`, `postLetter`), answers on the Postman Sturgeon (`replyDue`, `pellAfterCatch`), what he says (`pellSay`, `pellUpdate`) |
 | `src/game/dread.js` | 159 | The Bonewhistle's Dread (`dreadState`, `dreadTick`, `dreadMods`, `dreadAfterCatch`), the lake looking back (`lakeLooks`, `drawDreadWater`), the Dread badge and the ink on the rod (`drawDread`, `drawBoneInk`), no fight (`limpStep`), the ink that haunts a cast (`startInk`, `inkWaiting`, `inkStrike`, `drawInk`) |
 | `src/game/tidecaller.js` | 40 | The Tidecaller's conch: calling the rain (`blowConch`, `callWait`, `save.wx.call`), and the conch drawn on its cord (`drawRodConch`) |
 | `src/game/twin.js` | 35 | The Twin Spool's second float: landing, the shorter wait, both floats biting and the tap that picks |
@@ -80,9 +80,9 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/barnaby.js` | 29 | Barnaby's launch and boat shop |
 | `src/game/map.js` | 132 | The map sheet and travel (`showMap`, `travelTo`, `wayTo`: the punt, the ferry, your boat, Pell's rowboat, or the ladder down to the Hollow) |
 | `src/game/intro.js` | 80 | The opening: letter, stars, the deep pool |
-| `src/game/story.js` | 38 | The story so far: the chapters you've reached (`chaptersReached`), what Ottilie says next (`ottLine`, by chapter, weather, rod and your last catch: `storyAfterCatch`) and what she calls you (`ottName`), the lines Wren and Pell add later (`wrenLater`, `pellLater`), `storyState` (save.story) |
-| `src/game/ending-art.js` | 415 | Supper on Lantern Row, drawn: the street in one-point perspective (`eaP`, `eaWall`, `eaFlat`, `eaFront`), painted once (`eaLayout`, `eaPaint`: the sky, the far town, the bell tower, the houses, the cobbles, the bunting, the table and what's on it, the chairs, as `EA.base`, and `EA.lit` with the windows' glow; `eaOpenStars`), and each frame (`eaDraw`: the stars, the windows going out, the bell, the smoke, the lanterns, the candles, the steam, the jelly, the folk: `eaSeated`, cached in `EA_SPR`, `eaStanding`, with Walter's walk and the dance at `EA_WALTER` and `EA_DANCE`), the camera's aim (`eaFocusFor`) |
-| `src/game/ending.js` | 117 | The end of chapter one: when the supper starts (`supperDue`, `endingCheck`), playing it line by line (`supperStart`, `endLine`, `endNext`, `endSkip`, `endFrame`, `endPaint`: the reflection turning over), the bell stopping (`supperHush`), the end-of-chapter card (`endCard`, `endClose`). Reduced motion: no turning over, and the camera cuts |
+| `src/game/story.js` | 40 | The story so far: the chapters you've reached (`chaptersReached`), what Ottilie says next (`ottLine`, by chapter, weather, rod and your last catch: `storyAfterCatch`) and what she calls you (`ottName`), the lines Wren and Pell add later (`wrenLater`, `pellLater`), `storyState` (save.story) |
+| `src/game/ending-art.js` | 419 | Supper on Lantern Row, drawn: the street in one-point perspective (`eaP`, `eaWall`, `eaFlat`, `eaFront`), painted once (`eaLayout`, `eaPaint`: the sky, the far town, the bell tower, the houses, the cobbles, the bunting, the table and what's on it, the chairs, as `EA.base`, and `EA.lit` with the windows' glow; `eaOpenStars`), and each frame (`eaDraw`: the stars, the windows going out, the bell, the smoke, the lanterns, the candles, the steam, the jelly, the folk: `eaSeated`, cached in `EA_SPR`, `eaStanding`, with Walter's walk and the dance at `EA_WALTER` and `EA_DANCE`), the camera's aim (`eaFocusFor`) |
+| `src/game/ending.js` | 138 | The end of chapter one: when the supper starts (`supperDue`, `endingCheck`), playing it line by line (`supperStart`, `endLine`, `endNext`, `endSkip`, `endFrame`, `endPaint`: the reflection turning over), the bell stopping (`supperHush`), the end-of-chapter card (`endCard`, `endClose`, which lets the pictures go: `eaFree`), watching it again (`supperReplay`), keeping the world behind out of reach (`endInert`). Reduced motion: no turning over, and the camera cuts |
 
 ## Treasure, tackle, enchantments
 
@@ -135,7 +135,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/tacklegram.js` | 124 | The phone shop: sea rods, boat parts, the mail boat (`MAIL`, `updateMail`, `drawMail`, `mailAt`: at your dock, or moored in the Quarter) |
 | `src/game/shack.js` | 179 | The shack's front room: `openShack`, the trophy wall (`mountFish`, `unmount`, `canMount`), the fix-up list (`buyFix`, `fixDone`, `shackTankCap`), the curio shelf, the rod rack, the trapdoor (shut fast until the water under it drains: game/hollow.js), the shack's modifiers (`fixUpMods`) |
 | `src/game/shack-art.js` | 376 | The front room drawn: `shLayout`, walls, window, the uncle's list, shelf or cabinet, floor, trapdoor, stove, net, rod rack; plaques and mounts with their rarity kit |
-| `src/game/journal.js` | 61 | The journal: species pages (a Godly fish's Ledger: `ledgerHTML`), records |
+| `src/game/journal.js` | 61 | The journal: species pages (a Godly fish's Ledger: `ledgerHTML`; what a fish remembers: `memoryAt`, `memoryKnown`, `memoryHTML`), records |
 | `src/game/bonuses.js` | 109 | The Bonuses journal page |
 | `src/game/saves.js` | 116 | `BUILD` number, backup codes, earlier saves, settings and sound sheets, About's "Watch the opening again" and "Watch the supper again" |
 | `src/game/save.js` | 21 | `load` and `persist` (localStorage) |
@@ -193,9 +193,9 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | File | Lines | What's in it |
 | --- | --- | --- |
 | `tools/build.mjs` | 91 | The build: `build/cast-lab.html`, `build/test.html`, and the web app at the root. `--check` fails if the committed app is stale |
-| `tools/check-content.mjs` | 631 | Checks every content table, and that this map lists every file |
+| `tools/check-content.mjs` | 634 | Checks every content table, and that this map lists every file |
 | `tools/simulate.mjs` | 439 | The balance simulator from the command line (`npm run sim`), with the depth gate's whole run (`--career`) and builds (`--builds`) |
-| `tools/story.mjs` | 137 | The story script, `docs/STORY.md` (`npm run story`): every letter, page, lore line and thing people say in the tables, in the order you meet them. `--check` fails if it's stale |
+| `tools/story.mjs` | 152 | The story script, `docs/STORY.md` (`npm run story`): every letter, page, lore line and thing people say in the tables, in the order you meet them. `--check` fails if it's stale |
 | `tests/run.cjs` | 38 | Runs the Playwright suite against `build/test.html` |
 | `tests/helpers.cjs` | 106 | Shared helpers: cast, hook, reel and tap like a player, and `page.room` to go through the shack to a room |
 | `tests/fishing.test.cjs` | 77 | The core loop and the record moment |
@@ -221,4 +221,4 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/marsh.test.cjs` | 216 | Saltmarsh: Wren's glow quest and the punt, the tide and the moon, the mud splat and the stranded float, the tide's bites and pools, the Lantern Rod and the Lampwick Eel, the Bellmouth |
 | `tests/quarter.test.cjs` | 332 | The Drowned Quarter: casting through doors and windows, Pell's rowboat and his round of letters, posting and answers, the drifting envelopes and the Tidecaller, the bell tower and the Choir Fish, the Paper Carp and the Hearthfish, the Bonewhistle, Dread and the eye, the ink shadow, the conch's rain, the map |
 | `tests/hollow.test.cjs` | 238 | The Hollow: page 3 and the uncle's map, page 4 in its cache, Grey's page 5, the Drowned Bell at 3:12 and the trapdoor, the lights and the dark, leading a fish into the light, the eye and the Sleeper's Scale, the Ledger and the Stillwater Mirror, falling stars and omens, the fish drawn and simulated |
-| `tests/story.test.cjs` | 182 | The story pass: Ottilie by chapter, Wren's and Pell's later lines, fish memories, the Row's invitation, supper on Lantern Row and its card, the replay, Playtest > The story, and the scene at four screen sizes |
+| `tests/story.test.cjs` | 248 | The story pass: Ottilie by chapter, Wren's and Pell's later lines, fish memories, the Row's invitation, supper on Lantern Row and its card, the replay, Playtest > The story, and the scene at four screen sizes |

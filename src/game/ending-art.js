@@ -367,6 +367,10 @@ function eaFolk(c,st){ const t=st.t, list=[];
   if (st.dance!=null){ const d=st.dance, a=d*1.1, D=EA_DANCE, at=b=>({X:D.X+Math.cos(b)*D.r, Z:D.Z+Math.sin(b)*D.r*.4});
     for (const [who,ph] of [['edith',0],['walter',Math.PI]]){ const P=at(a+ph); list.push({Z:P.Z, f:()=>eaStanding(c,who,P.X,P.Z,t,{dance:a+ph, bob:Math.abs(Math.sin(d*Math.PI*84/60/3*3)), partner:at(a+ph+Math.PI), talk:st.speaker===who?st.talk:0})}); } }
   list.sort((a,b)=>b.Z-a.Z).forEach(o=>o.f()); }
+/** Lets the painted layers and the seated folk go once the supper's over (they're tens of megabytes on a big screen);
+    eaLayout paints them again next time. */
+function eaFree(){ for (const cv of [EA.base, EA.lit, ...Object.values(EA_SPR).map(s=>s.cv)]) if (cv) cv.width=cv.height=0;
+  EA.base=EA.lit=null; EA.key=''; for (const k in EA_SPR) delete EA_SPR[k]; }
 /** Where a seated portrait's middle goes, and how big it is: 100 portrait units are 0.8 m. */
 function eaSeatAt(S){ const p=eaP(S.X,(S.kid?1.17:1.24)+S.up,S.Z); return {x:p.x, y:p.y, size:.8*p.s}; }
 /* Each one sitting is drawn into their own little canvas, and only drawn again when they blink, change their look, or
