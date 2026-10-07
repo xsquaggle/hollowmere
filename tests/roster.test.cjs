@@ -19,7 +19,7 @@ module.exports = [
     name: 'every fish has a last line: enough catches give its third star, the journal shows the line, and its mount leaps on the wall',
     async run({ newPage, openGame, veteran }) {
       const page = await newPage();
-      await openGame(page, { save: veteran({ ...quiet, fish: { perch: { caught: 49, best: 10, seen: true }, gar: { caught: 8, best: 10, seen: true }, roach: { caught: 2, best: 10, seen: true } } }) });
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, fish: { perch: { caught: 49, best: 10, seen: true }, gar: { caught: 8, best: 10, seen: true }, roach: { caught: 2, best: 10, seen: true } } }) });
       const R = await page.evaluate(() => { const hm = window.__hm, J = hm.roster, out = {};
         out.missing = Object.keys(hm.FISH).filter(id => !hm.FISH[id].last);
         out.at = { perch: J.lastAt('perch'), gar: J.lastAt('gar') };
@@ -44,7 +44,7 @@ module.exports = [
     name: 'a full page brings its water’s relic from someone who knows it, one sheet at a time once the scene is free',
     async run({ newPage, openGame, veteran, readSave, until }) {
       const page = await newPage();
-      await openGame(page, { save: veteran({ ...quiet, fish: { ...caught(LAKE), ...caught(RIVER) } }) });
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, fish: { ...caught(LAKE), ...caught(RIVER) } }) });
       // an older save that has already earned it gets it soon after loading
       await until(page, () => /Heron’s Feather/.test(document.getElementById('panel').textContent) && !document.getElementById('sheet').hidden, null, { timeout: 9000, what: 'Grey’s sheet' });
       let t = await sheet(page);
@@ -69,10 +69,10 @@ module.exports = [
     name: 'a quarter, a half, three quarters and all of the chapter’s species each bring a title, a hull paint and luck that stays',
     async run({ newPage, openGame, veteran, readSave, until }) {
       const page = await newPage();
-      await openGame(page, { save: veteran({ ...quiet, journal: { pages: { lake: 1, river: 1, coast: 1, marsh: 1, quarter: 1, hollow: 1 } } }) });
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, journal: { pages: { lake: 1, river: 1, coast: 1, marsh: 1, quarter: 1, hollow: 1 } } }) });
       const ids = await page.evaluate(() => window.__hm.roster.ROSTER);
       assert.equal(ids.length, 59, 'every species in the chapter, once each');
-      await openGame(page, { save: veteran({ ...quiet, fish: caught(ids.slice(0, 15)), journal: { pages: { lake: 1, river: 1, coast: 1, marsh: 1, quarter: 1, hollow: 1 } } }) });
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, fish: caught(ids.slice(0, 15)), journal: { pages: { lake: 1, river: 1, coast: 1, marsh: 1, quarter: 1, hollow: 1 } } }) });
       await until(page, () => /Promising Angler/.test(document.getElementById('panel').textContent) && !document.getElementById('sheet').hidden, null, { timeout: 9000, what: 'the first milestone' });
       assert.equal(await page.evaluate(() => !!document.querySelector('#panel canvas[data-rosette="25"]')), true, 'a rosette for it');
       await page.click('#rtGo'); await page.waitForTimeout(300);
@@ -93,7 +93,7 @@ module.exports = [
     async run({ newPage, openGame, veteran, readSave, until }) {
       const page = await newPage();
       const muts = ['mossy', 'glassy', 'twin', 'giant'];
-      await openGame(page, { save: veteran({ ...quiet, boat: true, fish: { perch: { caught: 12, best: 10, seen: true, muts }, roach: { caught: 3, best: 10, seen: true, muts: muts.slice(0, 3) },
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, boat: true, fish: { perch: { caught: 12, best: 10, seen: true, muts }, roach: { caught: 3, best: 10, seen: true, muts: muts.slice(0, 3) },
         calf: { caught: 1, best: 10, seen: true } }, journal: { pages: {}, miles: [] } }) });
       await until(page, () => /A pennant/.test(document.getElementById('panel').textContent) && !document.getElementById('sheet').hidden, null, { timeout: 9000, what: 'the pennant sheet' });
       assert.match(await sheet(page), /Copper Perch/);
@@ -113,7 +113,7 @@ module.exports = [
     async run({ newPage, openGame, veteran, readSave, until, castAndReel }) {
       const page = await newPage();
       const known = { caught: 20, best: 99, seen: true, pb: { w: 99999, size: 40 }, bw: 99999 };   // no catch is a record
-      await openGame(page, { save: veteran({ ...quiet, fish: { perch: known, reedwhisker: known, gar: { ...known } }, finds: finds(['heronfeather']) }) });
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, fish: { perch: known, reedwhisker: known, gar: { ...known } }, finds: finds(['heronfeather']) }) });
       // who he'll take
       const T = await page.evaluate(() => { const hm = window.__hm, H = hm.roster.heron, F = hm.FISH; hm.roster.HERON.steal = 1;
         const L = (id, o = {}) => ({ id, F: F[id], w: 1, stars: 1, ...o });
@@ -155,7 +155,7 @@ module.exports = [
     async run({ newPage, openGame, veteran, readSave, until }) {
       const page = await newPage();
       const have = finds(['toffeetin', 'diary', 'hallkey', 'chainlink', 'spectacles']);
-      await openGame(page, { save: veteran({ ...quiet, finds: have, heron: { out: 0, n: 3, gift: { k: 'find', id: 'tophat' } } }) });
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, finds: have, heron: { out: 0, n: 3, gift: { k: 'find', id: 'tophat' } } }) });
       await page.waitForTimeout(3500);
       assert.equal(await sheet(page), null, 'nothing yet');
       await page.click('#journalBtn'); await page.waitForTimeout(300); await page.click('[data-jt="finds"]'); await page.waitForTimeout(300);
@@ -174,18 +174,18 @@ module.exports = [
   },
   {
     name: 'the page relics at work: the Mill Weight, the Salt Circle, the Row’s Latchkey and the Lantern Glass',
-    async run({ newPage, openGame, veteran }) {
+    async run({ newPage, openGame, veteran, until }) {
       const page = await newPage();
       // the river: the current carries the float half as fast
-      await openGame(page, { save: veteran({ ...quiet, region: 'river', ferry: true, riverSeen: true, finds: finds(['millweight']) }) });
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, region: 'river', ferry: true, riverSeen: true, finds: finds(['millweight']) }) });
       const D = await page.evaluate(() => { const hm = window.__hm, R = hm.river, g = R.G(), x = g.w / 2, y = (g.hz + g.near) / 2, a = R.drift(x, y); hm.relics.pocket('millweight'); return [a, R.drift(x, y)]; });
       assert.ok(D[0] > 0 && Math.abs(D[1] - D[0] / 2) < 1e-6, 'half the drift: ' + D);
       // the Lake at night under a full moon: the Calf comes up the moonpath, but never near the Salt Circle
-      await openGame(page, { save: veteran({ ...quiet, clock: 23, wx: { seed: 5, force: 'clear', moon: 4 }, finds: finds(['saltcircle']) }) });
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, clock: 23, wx: { seed: 5, force: 'clear', moon: 4 }, finds: finds(['saltcircle']) }) });
       const M = await page.evaluate(() => { const hm = window.__hm, R = hm.rarity; R.RARE_BITES.calf.chance = 1; const a = R.rare('deep', false, { path: true }); hm.relics.pocket('saltcircle'); return [a, R.rare('deep', false, { path: true })]; });
       assert.deepEqual(M, ['calf', null]);
       // the Quarter: Dread builds half as fast, and when the lake looks back it takes nothing
-      await openGame(page, { save: veteran({ ...quiet, region: 'quarter', boat: true, quarterSeen: true, coins: 500, rods: ['willow', 'bonewhistle'], rod: 'bonewhistle', net: [{ id: 'roach', value: 40, rod: 'bonewhistle' }],
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, region: 'quarter', boat: true, quarterSeen: true, coins: 500, rods: ['willow', 'bonewhistle'], rod: 'bonewhistle', net: [{ id: 'roach', value: 40, rod: 'bonewhistle' }],
         quarter: { row: true, done: { rowboat: 1 }, bw: 1, tips: { hello: 1, wall: 1, page: 1, clip: 1, posted: 1, ring: 1 } }, wx: { seed: 7, force: 'clear' }, finds: finds(['saltcircle', 'latchkey'], ['saltcircle']), stats: { catches: 30, casts: 40, dreadSeen: true } }) });
       const S = await page.evaluate(() => { const hm = window.__hm, Q = hm.quarter, Dr = Q.dread, F = hm.FISH;
         Dr.afterCatch({ id: 'sturgeon', F: F.sturgeon, rod: 'bonewhistle', value: F.sturgeon.value }, 'sell'); const v = Dr.state().v;
@@ -200,11 +200,10 @@ module.exports = [
       assert.match(K.before.text, /DROP SHORT/); assert.match(K.after.text, /^THE LATCHKEY · /); assert.equal(K.after.danger, false);
       assert.equal(K.land.house, 'tower', 'in at the tower door');
       // the Lantern Glass: the Hollow's lamp reaches half as far again
-      const L = await page.evaluate(() => { const hm = window.__hm, a = hm.modMul('lampR'); hm.findsState().have.lampglass = { t: 1, src: 'page' }; hm.relics.pocket('lampglass'); return [a, hm.modMul('lampR')]; });
-      assert.deepEqual(L, [1, 1.5]);
+      const L = await page.evaluate(() => { const hm = window.__hm, c = { region: 'hollow' }, a = hm.modMul('lampR', c); hm.findsState().have.lampglass = { t: 1, src: 'page' }; hm.relics.pocket('lampglass'); return [a, hm.modMul('lampR', c), hm.modMul('lampR')]; });
+      assert.deepEqual(L, [1, 1.5, 1], 'only in the Hollow');
       // a moment after the lake looks away, the salt's combo is known
-      await page.waitForTimeout(3600);
-      assert.equal(await page.evaluate(() => !!window.__hm.findsState().story.combos.salt), true, 'the combo is seen');
+      await until(page, () => !!window.__hm.findsState().story.combos.salt, null, { timeout: 7000, what: 'the salt’s combo' });
       assert.deepEqual(page.errors, []);
     },
   },
@@ -212,7 +211,7 @@ module.exports = [
     name: 'on the Twin Spool the Hungry Hook eats the fish you didn’t pick, and fish are worth more for good, up to three times',
     async run({ newPage, openGame, veteran, readSave }) {
       const page = await newPage();
-      await openGame(page, { save: veteran({ ...quiet, region: 'river', ferry: true, riverSeen: true, finds: finds(['hungryhook'], ['hungryhook']) }) });
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, region: 'river', ferry: true, riverSeen: true, finds: finds(['hungryhook'], ['hungryhook']) }) });
       const R = await page.evaluate(() => { const hm = window.__hm, S = window.__S, val = () => hm.roster.mods().filter(m => m.stat === 'value' && m.name === hm.FINDS.hungryhook.name).map(m => m.v);
         const out = { start: val() };
         S.bite = { fish: 'brook', twin: { fish: 'stone', ang: 0 }, win: 1 }; S.bob = { x: 100, y: 500 }; S.bob2 = { x: 300, y: 500 };
@@ -229,7 +228,7 @@ module.exports = [
     name: 'three new meals: Marsh Chowder brings treasure up, Clockfin on Rye reads the weather and quickens the top of the hour, Bellmouth Broth keeps ghosts in sight',
     async run({ newPage, openGame, veteran }) {
       const page = await newPage();
-      await openGame(page, { save: veteran({ ...quiet, clock: 12.05 }) });
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, clock: 12.05 }) });
       const R = await page.evaluate(() => { const hm = window.__hm, out = {}, mods = () => hm.roster.mods().filter(m => m.src === 'meal').map(m => m.stat);
         hm.hud.eat('marsh', 1); out.marsh = mods(); out.treasure = hm.modMul('treasure');
         hm.hud.eat('rye', 1); out.rye = mods(); hm.save.clock = 12.05; out.top = hm.modMul('bite'); hm.save.clock = 12.5; out.later = hm.modMul('bite');
@@ -248,7 +247,7 @@ module.exports = [
     async run({ newPage, openGame, veteran }) {
       const page = await newPage();
       const ids = ['perch', 'reedwhisker', 'brook', 'stone', 'sprat', 'wrasse'];
-      await openGame(page, { save: veteran({ ...quiet, region: 'coast', boat: true, paints: ['blue', 'regalia', 'fern'], paint: 'regalia', fish: { ...caught(ids, 60), perch: { caught: 60, best: 10, seen: true, muts: ['mossy', 'glassy', 'twin', 'giant'] } },
+      await openGame(page, { rewards: true, save: veteran({ ...quiet, region: 'coast', boat: true, paints: ['blue', 'regalia', 'fern'], paint: 'regalia', fish: { ...caught(ids, 60), perch: { caught: 60, best: 10, seen: true, muts: ['mossy', 'glassy', 'twin', 'giant'] } },
         journal: { pages: { lake: 1 }, miles: [0], pennants: ['perch'], pennant: 'perch' }, finds: finds(['heronfeather']) }) });
       for (const [width, height] of [[844, 390], [820, 1180], [1366, 657], [455, 667]]) {
         await page.setViewportSize({ width, height }); await page.reload(); await page.waitForTimeout(600);
@@ -267,7 +266,7 @@ module.exports = [
     name: 'the Playtest panel can fill a page, reach the next milestone, give three stars, find a pennant and send Grey on an errand',
     async run({ newPage, openGame, veteran, readSave, until }) {
       const page = await newPage();
-      await openGame(page, { save: veteran({ ...quiet }) });
+      await openGame(page, { rewards: true, save: veteran({ ...quiet }) });
       const pick = async v => { await page.evaluate(() => window.__hm.closeSheet()); await page.waitForTimeout(300); await page.click('#labBtn'); await page.waitForTimeout(400); await page.selectOption('#tJournal', v); await page.waitForTimeout(300); };
       await pick('page');
       let s = await readSave(page); assert.ok(LAKE.every(id => s.fish[id] && s.fish[id].caught >= 1), 'every lake fish caught');

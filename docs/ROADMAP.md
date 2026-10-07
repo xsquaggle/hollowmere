@@ -27,6 +27,7 @@ each build.
 | 28 | The Drowned Quarter: old Hollowmere under the lake, reached in Pell's fixed-up rowboat; casts go in through the drowned houses' doors and windows, and a wall stops one short; Pell's round of letters, posted through their doors, with answers on the Postman Sturgeon; the bell tower that rings at 3:12; the Tidecaller, which calls the rain; and the cursed Bonewhistle, whose fish come in without a fight while Dread builds until the lake looks back; nine new fish (build 29) |
 | 29 | The Hollow: the cave under the lake, reached down the shack's trapdoor after the uncle's pages 3 to 5 and the Drowned Bell rung on the dock at 3:12; dark but for the lantern, the glowing shelf and the noon shaft, so a fish in the dark follows the float and you lead it into the light; ten new fish; the eye that opens at 3:12 and the Sleeper's Scale, the first Godly fish, which goes into the Ledger; the Stillwater Mirror; omens and falling stars (build 30) |
 | 30 | The story pass and the end of chapter one: every line read in order and tied together (`docs/STORY.md`, `npm run story`); Ottilie's lines by chapter (kid, then Keeper), Wren's and Pell's later lines, and what each fish remembers; Pell's last step and the Row's invitation; and supper on Lantern Row at 3:12 in the Stillwater Mirror, with the end-of-chapter card (build 31) |
+| 31 | The full roster: every fish's last line and third journal star (a third star mounts it mid-leap on the trophy wall); a relic for each water's full page, handed over by Grey, Wren, Ottilie, Barnaby or Pell; milestones at a quarter, half, three quarters and all of the chapter's 59 species (a title, a hull paint and luck); a pennant for every mutation of a fish, flown from the skiff; Grey's errands with the Heron's Feather and the Mayor's belongings and letter; the Hungry Hook growing on the Twin Spool; and the Mudlark, Clockfin and Bellmouth meals (build 32) |
 
 ## Next
 
@@ -34,8 +35,7 @@ each build.
 
 - **13.** Friend playtest, and the bottom-bar regroup.
 - **24.** The depth gate's friend playtest (the balance pass shipped in build 25). Playtest > Pace sets their run beside the simulator's.
-- **27–32.** Phase C: new places and the story (Rootwood River shipped in build 26, Saltmarsh in build 27, the rest of Gullrock Coast in build 28, the Drowned Quarter in build 29, the Hollow in build 30, the story pass in build 31).
-  - The full roster.
+- **27–32.** Phase C: new places and the story (Rootwood River shipped in build 26, Saltmarsh in build 27, the rest of Gullrock Coast in build 28, the Drowned Quarter in build 29, the Hollow in build 30, the story pass in build 31, the full roster in build 32).
   - The world gate.
 - **33–36.** Phase D, ending at 1.0.
   - Accessibility.

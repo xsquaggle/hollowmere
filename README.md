@@ -130,6 +130,13 @@ chapter are `OTT_SAY` in `src/data/people.js` (`src/game/story.js` picks them); 
 is `src/data/ending.js`, played by `src/game/ending.js` and drawn in `src/game/ending-art.js`, with the Row's folk in
 `src/game/row-folk.js`. Playtest > Tools > The story readies it and rows you there.
 
+**The journal's rewards.** What filling the journal brings is in `src/data/journal.js`: `PAGES` (each water's relic and
+who hands it over), `MILESTONES` (a title, a hull paint and luck at a share of the species), `PENNANT`, `MAYOR` (his
+belongings and his letter) and `HERON` (Grey's errands with the Heron's Feather). `src/game/rewards.js` works out what's
+due and gives it one sheet at a time; `heron.js` runs Grey's errands, and `journal-art.js` draws the relics, pennants
+and rosettes. A fish's last line is `last` in `src/data/fish.js`, after `MASTERY.last` catches (`src/data/stats.js`).
+Playtest > Tools > The journal fills a page, reaches the next milestone and sends Grey off.
+
 **Pacing (the depth gate).** `npm run sim -- --career` plays whole runs from the first cast, buying rods, the boat
 and everything else as the coins come in, and lists when each thing happens and the longest waits with nothing new.
 `--builds` puts four builds on one rod and water. Rare and Legendary odds follow the design doc's table, and prices
@@ -138,7 +145,7 @@ play beside the simulator's (`src/game/pace.js`, `src/data/pace.js`); after a ba
 `npm run sim -- --career --runs 11 --pace` into `src/data/pace.js`.
 
 **Adding content.** A new fish is an entry in `src/data/fish.js` plus its region list and bite weights (a weather fish takes `wx` and an entry in `WX_FISH`, `src/data/weather.js`, instead of pool weights).
-A new find is an entry in `src/data/treasure.js` plus its drawing in `src/game/loot-art.js`.
+A new find is an entry in `src/data/treasure.js` plus its drawing in `src/game/loot-art.js` (a page relic's or Grey's in `src/game/journal-art.js`).
 A new reel, line or bait is an entry in `src/data/tackle.js` plus its drawing in `src/game/tackle-art.js`.
 A new rune is an entry in `src/data/enchant.js` plus its glyph in `RUNE_GLYPH` (`src/game/enchant-art.js`).
 A new trap or fitting is an entry in `src/data/idle.js` (a fitting also needs its icon in `drawFittingIcon`, `src/game/trap-art.js`).

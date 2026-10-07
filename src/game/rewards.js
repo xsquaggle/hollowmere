@@ -52,8 +52,9 @@ function rewardsDue(){ const j=jState(), out=[];
   if (!j.mayor && mayorDone()) out.push(['mayor']);
   return out; }
 const RW={wait:false};
-/** After a catch (and on loading): if anything's earned, it's given once the scene is free. */
-function rewardsAfterCatch(){ if (SIMULATING || S.tut || !save.tutorialDone || RW.wait || !rewardsDue().length) return; RW.wait=true; setTimeout(rewardsWhenFree,900); }
+/** After a catch (and on loading): if anything's earned, it's given once the scene is free. The tests open the game
+    with ?norewards unless they're about these, so an older test's well-stocked save gets no sheet in its way. */
+function rewardsAfterCatch(){ if (SIMULATING || S.tut || !save.tutorialDone || RW.wait || /norewards/.test(location.search) || !rewardsDue().length) return; RW.wait=true; setTimeout(rewardsWhenFree,900); }
 /** One at a time: each waits for the last sheet to close, and for any tip or Ottilie's almanac to finish. */
 function rewardsWhenFree(){ const due=rewardsDue(); if (!due.length){ RW.wait=false; return; }
   if (sceneFree() && !coachTimer && !GIFT.wait){ const [k,a]=due[0]; if (k==='page') pageGift(a); else if (k==='mile') mileGift(a); else if (k==='pennant') pennantGift(a); else mayorGift(); }

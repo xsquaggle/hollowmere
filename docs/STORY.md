@@ -737,7 +737,7 @@ Every letter, logbook page, lore line and thing people say in the game's content
 - **The Mayor’s Top Hat** *(Grey brings it)*: Black silk, a little crushed from being carried in a beak. There’s a toffee tucked in the band, in case of children.
 - **Link of a Chain of Office**: One heavy gold link. The rest of the chain is still in the deep pool, around someone’s neck.
 - **Mayor’s Spectacles**: Gold wire, one lens cracked. Someone very old has been looking for these.
-**The Mayor's letter** (to The Keeper of the Bait Shack)
+**The Mayor's letter** (to the Keeper of the Bait Shack)
 
 > To the Keeper of the Bait Shack,
 > my spectacles, my chain, my hat,

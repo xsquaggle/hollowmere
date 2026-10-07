@@ -102,6 +102,12 @@ Step 16, the art pass, brought everything older up to this bar: the scene in par
   - The shelf's curios cast soft shadows; the cabinet adds glass with one streak of light and a mantel clock stopped at 3:12. The rod rack shows each rod you own in its own colors.
   - Each fix changes the room: the roof's stain and the bucket under the drip go, the net gets mended, a lamp lights the window (a moth at night), the stove glows, the knock-through glows teal past the tank room's door, which becomes an arch.
   - The doors at the bottom are arched plank doors with a brass knob, the tank room's with a teal porthole, the kitchen's with a crescent. At night the room darkens from the window and the lamp and picture lights carry it.
+- **Journal art** lives in `src/game/journal-art.js` and `src/styles/journal.css`.
+  - The page relics and Grey's finds join the finds' drawings, in the same 3–4 values and ink, lit from the upper left: a heron's flight feather, a mill weight, a ring of salt in a brass curtain ring, a saucer-sized tarpon scale, a latchkey on string and a lantern's sooted glass chimney, and the Mayor's belongings Grey brings home.
+  - A pennant is a swallowtail in its fish's own colors, a fin-colored band at the hoist and the fish's shape in cream, fluttering from the skiff's mast. A milestone is a prize rosette: pleated ribbon round a printed middle with its share, two tails, a color per milestone and gold for the whole chapter.
+  - The journal's hull paints dress the skiff with a gilt pinstripe and studs, or leaf sprigs, along the band of hull either side.
+  - A species with its third star mounts mid-leap on the trophy wall, bent and lifted over a brass wave crest with drops.
+  - Gift sheets open on a round portrait of whoever's giving (inked ring, brass halo), or on the rosette or pennant. The Species page's cover is brass rings filling round each water's fish, and a species' three stars sit under its picture.
 - **Fish up close:** past 44 px a fish gets a gill line, a side fin, a darker back, a mouth and a glint in its eye; past 80 px, fin rays, a lateral line and scales. Catfish, eels, and fish whose pattern already reads as scales don't get extra scales. The Foghorn Gurnard's wing-like fan shows at every size, its shadow included, because it's the gurnard's silhouette.
 
 ## Rarity kit
