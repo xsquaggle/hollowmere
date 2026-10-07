@@ -281,7 +281,8 @@ module.exports = [
     async run({ newPage, openGame, veteran, readSave, until }) {
       const page = await newPage();
       await openGame(page, { rewards: true, save: veteran({ ...quiet }) });
-      const pick = async v => { await page.evaluate(() => window.__hm.closeSheet()); await page.waitForTimeout(300); await page.click('#labBtn'); await page.waitForTimeout(400); await page.selectOption('#tJournal', v); await page.waitForTimeout(300); };
+      // Closes the gift sheet the last pick earned and opens the tools in one go: a gift waiting its turn can't open in between.
+      const pick = async v => { await page.evaluate(() => { window.__hm.closeSheet(); document.getElementById('labBtn').click(); }); await page.waitForTimeout(400); await page.selectOption('#tJournal', v); await page.waitForTimeout(300); };
       await pick('page');
       let s = await readSave(page); assert.ok(LAKE.every(id => s.fish[id] && s.fish[id].caught >= 1), 'every lake fish caught');
       assert.deepEqual(await page.evaluate(() => window.__hm.roster.due()[0]), ['page', 'lake']);
