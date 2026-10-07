@@ -121,7 +121,7 @@ module.exports = [
       await page.click('#journalBtn'); await page.waitForTimeout(300); await page.click('[data-jt="finds"]'); await page.waitForTimeout(300);
       await page.click('.fd-tile[data-sel="ferrybell"]'); await page.waitForTimeout(300);
       await page.click('[data-give="ferrybell"]'); await page.waitForTimeout(500);
-      assert.match(await page.textContent('#panel'), /Forty years/);
+      assert.match(await page.textContent('#panel'), /Fifty years/);
       const s = await readSave(page);
       assert.equal(s.coins, 300); assert.ok(s.finds.returned.ferrybell && s.finds.have.knot, 'returned, and the Ferryman’s Knot is ours');
       assert.ok(Math.abs(await page.evaluate(() => window.__hm.modMul('line')) - 1.1) < 1e-9, 'the knot strengthens the line');

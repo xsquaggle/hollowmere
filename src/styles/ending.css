@@ -1,0 +1,46 @@
+/* The end of chapter one: supper on Lantern Row (game/ending.js), its line card, and the end-of-chapter card */
+#ending{position:fixed;inset:0;z-index:52;overflow:hidden;background:#0C2129;touch-action:none;cursor:pointer;animation:endIn .9s ease both}
+#ending.out{animation:fadeOut .7s ease forwards}
+@keyframes endIn{from{opacity:0}}
+#endCv{position:absolute;inset:0;display:block}
+.end-line{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);width:min(380px,calc(100% - 24px));box-sizing:border-box;
+  display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;padding:12px 14px 12px 12px;border-radius:14px;color:var(--ink);
+  background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0) 40%),var(--paper);box-shadow:0 14px 34px rgba(0,0,0,.5),0 0 0 1.5px rgba(201,161,90,.55),inset 0 0 26px rgba(160,120,60,.12)}
+.end-line.pop{animation:endLine .38s cubic-bezier(.2,1.2,.4,1) both}
+@keyframes endLine{from{opacity:0;transform:translate(-50%,10px) scale(.98)}}
+.end-face{width:64px;height:64px;border-radius:50%;box-shadow:0 0 0 2px var(--ink),0 0 0 4px rgba(201,161,90,.8)}
+.end-words b{display:block;font:400 15px/1.15 var(--display);color:#6A3E2A;margin-bottom:3px}
+.end-words p{margin:0;font:700 16px/1.4 var(--body)}
+.end-line.narr{grid-template-columns:1fr;background:rgba(10,14,30,.72);color:rgba(243,234,215,.95);box-shadow:0 14px 34px rgba(0,0,0,.45),0 0 0 1px rgba(243,234,215,.22);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.end-line.narr .end-face,.end-line.narr b{display:none}
+.end-line.narr p{font:600 italic 16px/1.45 var(--body);text-align:center}
+.end-tap{position:absolute;right:12px;bottom:6px;font:800 9.5px var(--body);letter-spacing:.18em;text-transform:uppercase;opacity:.4;animation:inPulse 2.4s 1.5s ease-in-out infinite both}
+.end-skip{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;background:rgba(6,8,18,.4);color:rgba(243,234,215,.85);border:1px solid rgba(243,234,215,.3);border-radius:999px;padding:7px 14px;font:800 12px var(--body);letter-spacing:.06em;cursor:pointer}
+/* the end of chapter one */
+#ending.carded{cursor:default}
+#ending.carded #endCv{animation:fadeOut 1s ease forwards}
+.end-card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;justify-content:safe center;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;
+  padding:calc(env(safe-area-inset-top,0px) + 24px) 20px calc(env(safe-area-inset-bottom,0px) + 24px);box-sizing:border-box;text-align:center;color:var(--paper);
+  background:radial-gradient(ellipse at 50% 38%,rgba(60,70,120,.45),rgba(6,8,18,0) 60%),linear-gradient(#070A18,#0E1430 60%,#101A2A);animation:inFade 1.2s both}
+.ec-kick{margin:0 0 14px;font:800 11px var(--body);letter-spacing:.26em;text-transform:uppercase;color:rgba(242,212,126,.85);animation:inFade 1.2s .2s both}
+.end-card h1{margin:0;font:400 clamp(44px,13.5vw,66px)/1 var(--display);color:#F7EFDD;text-shadow:0 2px 0 rgba(0,0,0,.3),0 0 34px rgba(255,214,160,.45)}
+.end-card h1 span{display:inline-block;animation:inLet 1.1s cubic-bezier(.2,.9,.25,1) both}
+.ec-orn{display:block;width:170px;height:22px;margin:10px auto 18px;color:rgba(242,212,126,.85);animation:inFade 1.2s 1.2s both}
+.ec-hand{margin:0 0 6px;max-width:320px;text-wrap:balance;font:600 24px/1.2 'Caveat','Bradley Hand','Noteworthy','Segoe Print',cursive;color:rgba(247,239,221,.95);animation:inFade 1.6s both}
+.ec-tally{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(320px,100%);margin:22px 0 22px;animation:inFade 1.2s 3s both}
+.ec-tally div{padding:9px 8px;border-radius:10px;background:rgba(243,234,215,.07);box-shadow:inset 0 0 0 1px rgba(243,234,215,.14)}
+.ec-tally dt{font:800 10px var(--body);letter-spacing:.14em;text-transform:uppercase;color:rgba(243,234,215,.6)}
+.ec-tally dd{margin:3px 0 0;font:800 17px var(--body);color:#F7EFDD}
+.ec-go{min-width:200px;font-size:15px;padding:12px 20px;animation:inFade .8s 3.4s both}
+/* a phone on its side: smaller lettering, the two lines unwrapped, the tally in one row, so it all fits above the button */
+@media (max-height:520px){
+  .end-card{padding-top:calc(env(safe-area-inset-top,0px) + 14px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+  .ec-kick{margin-bottom:8px}
+  .end-card h1{font-size:44px}
+  .ec-orn{height:18px;margin:6px auto 10px}
+  .ec-hand{max-width:560px;font-size:21px;margin-bottom:2px}
+  .ec-tally{grid-template-columns:repeat(4,1fr);width:min(560px,100%);margin:12px 0 14px}
+  .ec-tally div{padding:6px}
+  .ec-go{padding:10px 20px}
+}
+@media (prefers-reduced-motion: reduce){#ending,.end-line.pop,.end-card,.end-card h1 span,.ec-orn,.ec-hand,.ec-tally,.ec-go,.ec-kick{animation-duration:.01s!important;animation-delay:0s!important}}

@@ -13,8 +13,10 @@ function coachShow(text,secs){ coach(text,'Tip'); clearTimeout(coachTimer); coac
 function coachDrain(){ if (coachTimer || S.tut) return; while (COACHQ.length && performance.now()-COACHQ[0].at>90000) COACHQ.shift(); const n=COACHQ.shift(); if (n) coachShow(n.text,n.secs); }
 /* ---------- Leaving things: back gesture, Escape and swipe-down all close the top layer ---------- */
 const OV=[]; let ovSkip=0, ovPopping=false, ovQueue=[], ovQueueT=0;
-/** Nothing open over the water (a sheet, a note, a room, the map, the bag) and no cast under way: free for something to happen. */
-const sceneFree = () => S.state==='idle' && !OV.length && $('sheet').hidden && $('note').hidden && $('haul').hidden;
+/** Nothing open over the water (a sheet, a note, a room, the map, the bag, the opening, the supper)... */
+const sceneClear = () => !OV.length && $('sheet').hidden && $('note').hidden && $('haul').hidden && !INTRO.active && !END.active;
+/** ...and no cast under way: free for something to happen. */
+const sceneFree = () => S.state==='idle' && sceneClear();
 /* Opening one layer as another closes (a sheet that opens the bag or the map) would push the new entry before the
    old one's history.back() lands, and that back would then eat it. So while a back is on its way, the push waits for it. */
 function ovPush(name){ try { history.pushState({hm:name},''); } catch(e){} }

@@ -1,5 +1,5 @@
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=30, SNAP_KEY=KEY+'-snapshots';
+const BUILD=31, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -107,8 +107,9 @@ function appHTML(){ const ios=isIOS(), and=isAndroid(), inst=isStandalone();
       (APP.prompt?'<div class="row"><button class="btn primary" id="doInstall" type="button">Install Hollowmere</button></div>':'<ol class="st-steps"><li>Open Chrome’s menu '+GLYPH.dots+' at the top right.</li><li>Choose <b>Install app</b> (or <b>Add to Home screen</b>).</li><li>Open Hollowmere from your home screen.</li></ol>')+'</section>';
   else h+='<section class="st-card"><h3>Best on a phone</h3><p>On an iPhone, open Hollowmere in Safari and use Share, then Add to Home Screen. On a Pixel, open it in Chrome and choose Install app from the menu.'+(APP.prompt?' On this computer you can install it too.':'')+'</p>'+(APP.prompt?'<div class="row"><button class="btn primary" id="doInstall" type="button">Install Hollowmere</button></div>':'')+'</section>';
   return h+aboutHTML(); }
-function aboutHTML(){ return '<section class="st-card"><h3>About</h3><p>Hollowmere prototype, build '+BUILD+'. Fonts: Nunito, Young Serif and Caveat, under the SIL Open Font License.</p><div class="row"><button class="btn" id="replayIntro" type="button">Watch the opening again</button></div></section>'; }
+function aboutHTML(){ return '<section class="st-card"><h3>About</h3><p>Hollowmere prototype, build '+BUILD+'. Fonts: Nunito, Young Serif and Caveat, under the SIL Open Font License.</p><div class="row"><button class="btn" id="replayIntro" type="button">Watch the opening again</button>'+(save.story && save.story.supper?'<button class="btn" id="replaySupper" type="button">Watch the supper again</button>':'')+'</div></section>'; }
 function bindApp(){ const ri=$('replayIntro'); if (ri) ri.addEventListener('click',()=>{ closeSheet(); setTimeout(()=>introStart(true),250); });
+  const rs=$('replaySupper'); if (rs) rs.addEventListener('click',()=>{ if (S.state==='idle') closeSheet(); supperReplay(); });
   const di=$('doInstall'); if (di) di.addEventListener('click',async()=>{ const p=APP.prompt; if (!p) return; p.prompt(); try { const r=await p.userChoice; if (r&&r.outcome==='accepted') news('Installing Hollowmere…','gold'); } catch(e){} APP.prompt=null; openSettings('app'); });
   const cp=$('cpForApp'); if (cp) cp.addEventListener('click',async e=>{ const btn=e.currentTarget; try { const code=await makeCode(); save.lastBackup=Date.now(); persist(); copyText(code,btn); } catch(_){ news('Couldn’t make a code on this browser','bad'); } }); }
 if (window.__PWA && 'serviceWorker' in navigator && location.protocol!=='file:'){ const reg0=()=>{ navigator.serviceWorker.register('sw.js').then(reg=>{

@@ -21,7 +21,8 @@
     "styles/sheets.css",
     "styles/balance.css",
     "styles/river.css",
-    "styles/quarter.css"
+    "styles/quarter.css",
+    "styles/ending.css"
   ],
   "js": [
     "game/core.js",
@@ -45,6 +46,7 @@
     "data/coast.js",
     "data/quarter.js",
     "data/hollow.js",
+    "data/ending.js",
     "data/pace.js",
     "data/stats.js",
     "game/mods.js",
@@ -118,6 +120,7 @@
     "game/orders.js",
     "game/kitchen-art.js",
     "game/portrait-art.js",
+    "game/row-folk.js",
     "game/kitchen-stations.js",
     "game/kitchen-results.js",
     "game/order-kitchen.js",
@@ -125,6 +128,9 @@
     "game/shack-art.js",
     "game/shack.js",
     "game/intro.js",
+    "game/story.js",
+    "game/ending-art.js",
+    "game/ending.js",
     "game/ui-flow.js",
     "game/saves.js",
     "game/loop.js",

@@ -79,6 +79,9 @@
 .nt-paper[data-kind="bottle"]{background:radial-gradient(140% 90% at 80% 100%,rgba(140,110,60,.18),transparent 60%),repeating-linear-gradient(transparent 0 27px,rgba(90,110,140,.1) 27px 28px),#F1E6CC;transform:translateX(-50%) rotate(1.2deg)}
 .nt-paper[data-kind="logbook"]{background:linear-gradient(90deg,transparent 26px,rgba(190,70,60,.35) 26px 27.5px,transparent 27.5px),repeating-linear-gradient(transparent 0 27px,rgba(90,110,140,.16) 27px 28px),#F6EEDC;padding-left:36px}
 .nt-paper[data-kind="letter"]{background:linear-gradient(180deg,rgba(80,50,20,.06),transparent 30%),repeating-linear-gradient(transparent 0 27px,rgba(90,110,140,.12) 27px 28px),#EFE6D2}
+/* Lantern Row's invitation: a printed card, a gilt double rule inside its edge, no ruled lines */
+.nt-paper[data-kind="invite"]{background:radial-gradient(120% 80% at 50% 0%,rgba(255,250,235,.7),transparent 70%),#F6EEDA;transform:translateX(-50%) rotate(.8deg);
+  box-shadow:0 22px 50px rgba(0,0,0,.55),0 2px 0 rgba(0,0,0,.18),inset 0 0 0 7px #F6EEDA,inset 0 0 0 8.5px rgba(201,161,90,.9),inset 0 0 0 11px #F6EEDA,inset 0 0 0 12px rgba(201,161,90,.55),inset 0 0 40px rgba(160,120,60,.12)}
 .nt-paper .ln{display:block;white-space:nowrap;clip-path:inset(0 100% 0 0);-webkit-clip-path:inset(0 100% 0 0);animation:ink var(--d,1s) var(--s,0s) linear forwards}
 .nt-paper .ln.first{font-size:1.12em}.nt-paper .ln.sig{text-align:right;margin-top:2px}
 .nt-paper.done .ln{animation:none;clip-path:none;-webkit-clip-path:none}

@@ -31,4 +31,4 @@ function up(e){
 cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up);
 document.addEventListener('gesturestart',e=>e.preventDefault());
 document.addEventListener('visibilitychange',()=>{ last=performance.now(); if (document.hidden){ S.holding=false; S.pointers.clear(); if (AC && AC.state==='running') AC.suspend().catch(()=>{}); } else if (AC && AC.state==='suspended' && MU.on) AC.resume().catch(()=>{}); });
-window.addEventListener('resize',()=>{ resize(); if (INTRO.active){ introLayout(); if (INTRO.full && INTRO.phase==='gate') setIntroOffset(H); } });
+window.addEventListener('resize',()=>{ resize(); if (INTRO.active){ introLayout(); if (INTRO.full && INTRO.phase==='gate') setIntroOffset(H); } if (END.active){ eaLayout(); endSize(); } });

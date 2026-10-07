@@ -135,7 +135,9 @@ function quarterLanded(b){ if (REG()!=='quarter' || !b.hole) return; postLetter(
 
 /* ---------- the bell tower ---------- */
 /** Whether the tower's bell is ringing: every night from 3:12 for an in-game hour, or when the Drowned Bell has rung it. */
-function bellNatural(){ const h=(((save.clock%24)+24)%24), B=QUARTER.bell; return h>=B.from && h<B.from+B.hours; }
+function bellNatural(){ const h=(((save.clock%24)+24)%24), B=QUARTER.bell; return h>=B.from && h<B.from+B.hours && !bellHushed(); }
+/** After the Row's supper the bell stops for the rest of that hour (game/ending.js: supperHush). */
+const bellHushed = () => !!(save.story && save.story.hush>absHour());
 function bellRinging(){ if (bellNatural()) return true; const r=save.quarter&&save.quarter.ring, a=absHour(); return !!r && a>=r.from && a<r.until; }
 /** In-game hours until the Drowned Bell can ring the tower again (0: now). */
 function bellCooling(){ const r=save.quarter&&save.quarter.ring; return r ? Math.max(0,r.from+QUARTER.bell.cool-absHour()) : 0; }
@@ -205,12 +207,14 @@ function quarterUpdate(dt){
   // under the lake: the tower's bell, faintly, at 3:12, once the Quarter's open
   if (!here){ QS.ringWas=false; return; }   // at the lake, the bell's heard faintly under it (game/music.js: ambTick)
   quarterPages(dt); rowboatBob(dt);
+  // supper on Lantern Row, once you've the invitation and it's 3:12 (game/ending.js)
+  endingCheck();
   if (ring && !QS.ringWas && !S.tut){ const natural=bellNatural(), tp=quarterState().tips; QS.toll=.3;
     // the first time, the tip says it all; after that, a note
     if (natural && !tp.ring){ tp.ring=1; persist(); setTimeout(()=>coachFor('It’s 3:12, and the bell’s ringing. Whatever answers it lives by the tower. Fish the tower, quick: it rings for an hour.',8),600); }
     else news(natural?'3:12. The bell tower is ringing':'The bell tower answers','gold'); }
   QS.ringWas=ring; MODC.dirty=MODC.dirty||ring!==QS.ringMod; QS.ringMod=ring;
-  if (ring){ QS.toll-=dt; if (QS.toll<=0){ QS.toll=3.4; towerToll(); } }
+  if (ring && !END.active){ QS.toll-=dt; if (QS.toll<=0){ QS.toll=3.4; towerToll(); } }
   if (QS.rung>0) QS.rung=Math.max(0,QS.rung-dt*1.4);
   quarterArtUpdate(dt); }
 /** One stroke of the tower bell: heard, seen (the bell swings) and felt on the water round the tower. */

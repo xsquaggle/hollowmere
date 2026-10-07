@@ -63,5 +63,7 @@ const STATS={
   limp:     {name:'No fight', kind:'flag', hint:'A hooked fish comes straight in.'},
   cursed:   {name:'Cursed', kind:'flag', hint:'Catches can come up Inked, worth five times as much. Every catch builds Dread.'}
 };
-/* Mastery: catch this many of a species and it reels in faster, with your rod following it. */
-const MASTERY={catches:10, reel:1.65};
+/* Mastery: catch this many of a species and it reels in faster, with your rod following it.
+   memory: how many of a species you catch before its journal page shows what it remembers (FISH[id].memory), by rarity:
+   the mastery count up to Rare, fewer for the fish too rare to master. */
+const MASTERY={catches:10, reel:1.65, memory:{common:10, uncommon:10, rare:10, epic:3, legendary:2, exotic:1, mythic:1, godly:1}};

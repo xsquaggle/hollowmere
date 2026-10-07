@@ -28,7 +28,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
     '<label for="tTide">Tide<output id="tTideO">'+tideName()+'</output><select id="tTide"><option value="">As the moon has it</option>'+
       TIDE_PINS.map(([v,l])=>'<option value="'+v+'"'+(save.tidePin===v?' selected':'')+'>'+l+', held</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">The Saltmarsh’s tide turns every 6 in-game hours or so. Low water bares the mud banks and fills the tide pools; the flood brings the fish in. Pin the moon full or new for a spring tide.</span></label>'+
     '<label for="tFix">Shack<output id="tFixO">'+shackState().fix.length+' of '+FIXUP.filter(L=>L.cost).length+' fixed</output><select id="tFix"><option value="">Fix a line for free…</option>'+FIXUP.filter(L=>L.cost).map(L=>'<option value="'+L.id+'"'+(fixDone(L.id)?' disabled':'')+'>'+L.name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Your uncle’s fix-up list, in the shack. Fill the wall puts a fish of every rarity up on the free plaques.</span></label>'+
-    '<label for="tRelic">Story relics<output id="tRelicO">'+Object.keys(STORY).filter(hasFind).length+' of '+Object.keys(STORY).length+'</output><select id="tRelic"><option value="">Hand one over…</option>'+Object.keys(STORY).map(id=>'<option value="'+id+'"'+(hasFind(id)?' disabled':'')+'>'+FINDS[id].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Each is found its own way: the almanac from Ottilie, the jar on the moonpath, the bell in the deep pool’s small-hours fog, the pin in your first map’s cache.</span></label>'+playtestQuarterHTML()+playtestHollowHTML()+'</div>'+
+    '<label for="tRelic">Story relics<output id="tRelicO">'+Object.keys(STORY).filter(hasFind).length+' of '+Object.keys(STORY).length+'</output><select id="tRelic"><option value="">Hand one over…</option>'+Object.keys(STORY).map(id=>'<option value="'+id+'"'+(hasFind(id)?' disabled':'')+'>'+FINDS[id].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Each is found its own way: the almanac from Ottilie, the jar on the moonpath, the bell in the deep pool’s small-hours fog, the pin in your first map’s cache.</span></label>'+playtestQuarterHTML()+playtestHollowHTML()+playtestStoryHTML()+'</div>'+
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
     '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="seventhBtn" type="button">Seventh wave next</button><button class="btn" id="jarBtn" type="button">Fill the Moon Jar</button><button class="btn" id="wallBtn" type="button">Fill the wall</button><button class="btn" id="mapBtn2" type="button">Finish the map</button><button class="btn" id="bowBtn" type="button">'+(wxState().bow?'Clear the rainbow':'Rainbow now')+'</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
   bindPlaytestTabs();
@@ -55,6 +55,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   $('tMoon').addEventListener('change',e=>{ const w=wxState(); if (e.target.value!=='') w.moon=+e.target.value; else delete w.moon; persist(); buildBg(); $('tMoonO').textContent=moonName(); });
   $('tQuarter').addEventListener('change',e=>{ const v=e.target.value; if (v) playtestQuarter(v); });
   $('tHollow').addEventListener('change',e=>{ const v=e.target.value; if (v) playtestHollow(v); });
+  $('tStory').addEventListener('change',e=>{ const v=e.target.value; if (v) playtestStory(v); });
   // the coast: the next swell to rise is a seventh wave (game/coast-sea.js)
   $('seventhBtn').addEventListener('click',()=>{ if (REG()!=='coast'){ toast('The swells only roll in at the coast','warn'); return; } closeSheet(); seventhNext(); });
   $('bowBtn').addEventListener('click',()=>{ const w=wxState(); if (w.bow) delete w.bow; else w.bow=true; persist(); buildBg(); closeSheet(); if (w.bow && isNight(save.clock)) toast('Rainbows only come by day','warn'); });
@@ -82,15 +83,15 @@ const lootName=l=>l.kind==='crate'?CRATES[l.tier].name:{pouch:'Coin pouch',geode
 function bindPlaytestTabs(){ $('closeS').addEventListener('click',closeSheet);
   document.querySelectorAll('#panel [data-pt]').forEach(b=>b.addEventListener('click',()=>{ tone(900,.04,{vol:.04,type:'triangle'}); openPlaytest(b.dataset.pt); $('panel').scrollTop=0; })); }
 /* ---------- the Drowned Quarter's tools (game/quarter.js, game/pell.js, game/dread.js, game/tidecaller.js) ---------- */
-function playtestQuarterHTML(){ const q=quarterState(), d=dreadState(), cur=PELL_STEPS.find(k=>pellStep(k)!=='done');
+function playtestQuarterHTML(){ const q=quarterState(), d=dreadState(), cur=pellCur();
   const o=(v,l,off)=>'<option value="'+v+'"'+(off?' disabled':'')+'>'+l+'</option>';
-  return '<label for="tQuarter">Drowned Quarter<output>'+(quarterOpen()?(cur?'Pell: '+PELL_Q[cur].name:'Pell’s round done'):'Not open')+' · Dread '+Math.round(d.v)+'</output><select id="tQuarter"><option value="">Do something…</option>'+
-    o('open','Fix Pell’s rowboat for free',quarterOpen())+o('step','Meet Pell’s current ask',!cur||cur==='rowboat')+o('ring','Ring the bell tower now',!quarterOpen())+o('page','Send a drowned page',!quarterOpen())+o('env','Send an unsent letter',!quarterOpen())+
+  return '<label for="tQuarter">Drowned Quarter<output>'+(quarterOpen()?(cur?'Pell: '+PELL_Q[cur].name:PELL_STEPS.every(k=>pellStep(k)==='done')?'Pell’s round done':'Pell: waiting on the last page'):'Not open')+' · Dread '+Math.round(d.v)+'</output><select id="tQuarter"><option value="">Do something…</option>'+
+    o('open','Fix Pell’s rowboat for free',quarterOpen())+o('step','Meet Pell’s current ask',!cur||cur==='rowboat'||cur==='supper')+o('ring','Ring the bell tower now',!quarterOpen())+o('page','Send a drowned page',!quarterOpen())+o('env','Send an unsent letter',!quarterOpen())+
     o('bone','Hand over the Bonewhistle',save.rods.includes('bonewhistle'))+o('d50','Dread to 50')+o('d95','Dread to 95')+o('d0','Dread to 0')+o('ink','Haunt the next cast')+o('call','Let the conch call again')+
     '</select><span class="note" style="grid-column:1/-1;margin:0">Pell’s round, the bell (it rings by itself at 3:12 in the morning), the pages, and the Bonewhistle’s Dread. At 100 Dread the lake looks back.</span></label>'; }
 function playtestQuarter(v){ const q=quarterState(), FS=findsState(); closeSheet();
   if (v==='open'){ q.row=true; q.done.rowboat=1; if (FS.letters.edith!=='posted') FS.letters.edith='delivered'; if (!FS.notes.includes('edith')) FS.notes.push('edith'); persist(); updateHud(); news('The Drowned Quarter is open','gold'); return; }
-  if (v==='step'){ const k=PELL_STEPS.find(k=>pellStep(k)!=='done');
+  if (v==='step'){ const k=pellCur(); if (k==='supper'){ news('Pell’s last ask is the supper: see The story',''); return; }
     if (k==='lantern') FS.letters.edith='posted';
     else if (k==='answer'){ const r=REPLY_ORDER.find(id=>!FS.notes.includes(id)); if (r){ FS.notes.push(r); FS.letters[r]='delivered'; } }
     else if (k==='tower') FS.letters.albert='posted';
@@ -122,3 +123,21 @@ function playtestHollow(v){ const h=hollowState(), FS=findsState(); closeSheet()
   if (v==='omen'){ omenStart(); return; }
   if (v==='star'){ if (!starSky()){ toast('Stars only fall on a clear night, outdoors','warn'); return; } SC.star=null; starFall(); return; }
   if (v==='mirror'){ if (!save.rods.includes('mirror')) save.rods.push('mirror'); persist(); MODC.dirty=true; news('The Stillwater Mirror is on your rack','good'); } }
+
+/* ---------- the story's tools (game/story.js, game/ending.js) ---------- */
+function playtestStoryHTML(){ const st=save.story||{}, got=chaptersReached(), ready=!!st.invite && save.rods.includes('mirror');
+  const o=(v,l,off)=>'<option value="'+v+'"'+(off?' disabled':'')+'>'+l+'</option>';
+  return '<label for="tStory">The story<output>'+(st.supper?'Supper on day '+st.supper:st.invite?'Invited to supper':'Chapter '+got.length+' of '+CHAPTERS.length)+' · Ottilie says '+ottName()+'</output><select id="tStory"><option value="">Do something…</option>'+
+    o('ready','Ready the supper: Pell’s round, the last page, the invitation, the Mirror',ready || !!st.supper)+o('go','Row to the Quarter at 3:12 with the Mirror (it starts)',!st.invite || !!st.supper)+
+    o('watch','Watch the supper now (changes nothing)')+o('forget','Forget the supper, as if it hadn’t come yet',!st.supper && !st.card)+o('ott','Make Ottilie say something now',REG()!=='lake')+
+    '</select><span class="note" style="grid-column:1/-1;margin:0">The end of chapter one: once Pell’s round is done and you’ve read your uncle’s last page, Pell brings the Row’s invitation. Be in the Quarter while the bell rings at 3:12 with the Stillwater Mirror in your hand.</span></label>'; }
+function playtestStory(v){ const st=storyState(), q=quarterState(), FS=findsState(); closeSheet();
+  if (v==='ready'){ q.row=true; for (const k of PELL_STEPS) if (k!=='supper') q.done[k]=1;
+    for (const id of ['log1','log2','log3','log4','log5','log6']) if (!FS.notes.includes(id)) FS.notes.push(id);
+    st.invite=1; if (!FS.notes.includes('invite')) FS.notes.push('invite');
+    if (!save.rods.includes('mirror')) save.rods.push('mirror'); save.boat=true; persist(); updateHud(); updateJournalDot(); MODC.dirty=true; news('The Row’s invitation is in your notes, and the Mirror on your rack','gold'); return; }
+  if (v==='go'){ delete st.hush; save.rod='mirror'; save.clock=QUARTER.bell.from+.01; PAL=palAt(save.clock); persist(); if (REG()!=='quarter') travelTo('quarter'); else { buildBg(); MODC.dirty=true; } return; }
+  if (v==='watch'){ supperReplay(); return; }
+  // the bell stays quiet for the rest of the hour, so it doesn't start again under you
+  if (v==='forget'){ delete st.supper; delete st.card; delete st.tip; delete q.done.supper; persist(); MODC.dirty=true; news('The supper hasn’t come yet',''); return; }
+  if (v==='ott'){ OTT.say=ottLine(); OTT.sayT=4.5; OTT.next=rand(20,35); } }

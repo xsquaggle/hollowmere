@@ -2,12 +2,15 @@
 /* The same people as on the water (game/folk.js), drawn larger: 3 to 4 values a shape, ink outlines, light from the
    upper left. drawPortrait(c, who, x, y, size, o) draws one centered at (x, y), size tall, in a 100-unit box.
    o = {t: time, for the blink and the little motions; mood: 'wait' | 'happy' | 'meh' | 'talk'; talk: 0..1, how open
-   the mouth is while talking; hop: 0..1, a happy bounce}. Each blinks on its own clock. */
+   the mouth is while talking; hop: 0..1, a happy bounce; blink: true or false, to say rather than go by the clock}.
+   Each blinks on its own clock. */
 const PORTRAIT={ottilie:{blink:0}, barnaby:{blink:1.3}, pell:{blink:2.1}, bram:{blink:.7}, tam:{blink:1.8}, grey:{blink:2.7}};
+/** Who's drawn by what (Lantern Row's folk, for the supper, join these in game/row-folk.js). */
+const PT_DRAW={ottilie:ptOttilie, barnaby:ptBarnaby, pell:ptPell, bram:ptBram, tam:ptTam, grey:ptGrey};
 function drawPortrait(c,who,x,y,size,o){ o=o||{}; const k=size/100, t=o.t||0, P=PORTRAIT[who]; if (!P) return;
   c.save(); c.translate(x,y-(o.hop||0)*6*k); c.scale(k,k); c.lineJoin='round'; c.lineCap='round'; c.lineWidth=2; c.strokeStyle=INK;
-  const blink=((t+P.blink)%4.3)<.13 || (o.mood==='talk' && ((t*1.7+P.blink)%2.9)<.1);
-  ({ottilie:ptOttilie,barnaby:ptBarnaby,pell:ptPell,bram:ptBram,tam:ptTam,grey:ptGrey})[who](c,t,o.mood||'wait',blink,o.talk||0);
+  const blink=o.blink!=null?o.blink:((t+P.blink)%4.3)<.13 || (o.mood==='talk' && ((t*1.7+P.blink)%2.9)<.1);
+  PT_DRAW[who](c,t,o.mood||'wait',blink,o.talk||0,o);
   c.restore(); }
 /** What's behind them: the lake through the window, at this hour, so a portrait always looks like someone come to call. */
 function ptBackdrop(c,w,h,t){ const P=palAt(save.clock), hz=h*.7;
