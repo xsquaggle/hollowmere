@@ -17733,7 +17733,7 @@ function playtestJournal(v){ const j=jState(), FS=findsState(), here=REGION_FISH
     if (!FS.equip.includes('heronfeather')){ if (FS.equip.length>=FS.pockets) FS.equip.pop(); FS.equip.push('heronfeather'); } MODC.dirty=true; updateJournalDot(); news('The Heron’s Feather is in a pocket','good'); }
   if (v==='grey'){ const h=heronState(); h.out=1; h.gift=null; news('Grey’s off on an errand. He’s back after your next cast',''); }
   if (v==='mayor'){ for (const id of MAYOR.items) if (!FS.have[id]){ FS.have[id]={t:Date.now(), hr:save.clock, reg:'lake', src:FINDS[id].from==='grey'?'grey':'story'}; FS.fresh.push(id); } updateJournalDot(); }
-  if (v==='forget'){ save.journal={}; RW.wait=false; MODC.dirty=true; news('The journal’s rewards are ungiven, and come again',''); }
+  if (v==='forget'){ save.journal={}; jState(); RW.wait=false; MODC.dirty=true; news('The journal’s rewards are ungiven, and come again',''); }
   persist(); MODC.dirty=true; rewardsAfterCatch(); }
 
 /* ---------- Boot ---------- */
