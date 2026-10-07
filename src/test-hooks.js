@@ -108,6 +108,8 @@ window.__hm={ get save(){ return save; }, POOLS_BY, FISH, RODS, QUARTER, PELL_Q,
     wrenLater:()=>wrenLater(), pellLater:()=>pellLater(), pellIdle:()=>pellIdle(), notesUp:()=>notesUp().map(n=>n.id), memoryAt:id=>memoryAt(id), memoryHTML:id=>memoryHTML(id),
     due:()=>supperDue(), check:()=>endingCheck(), start:r=>supperStart(!!r), next:()=>endNext(), skip:()=>endSkip(), close:()=>endClose(), hushed:()=>bellHushed(), natural:()=>bellNatural(),
     focus:who=>eaFocusFor(who), draw:(c,st)=>{ eaLayout(); eaDraw(c,st); }, frame:()=>({phase:END.phase, i:END.i, flip:END.flip, out:END.out, speaker:END.speaker, walter:END.walter, dance:END.dance, cam:{...END.cam}}) },
+  // the world gate (step 32): the scene with nobody talking and no gull's luck on the water (for tools/shots.mjs), and Barnaby and his boat shop
+  gate:{ bar:()=>BAR.state, boatShop:()=>openBoatShop(), quiet(){ OTT.sayT=0; OTT.next=1e9; WR.sayT=0; WR.next=1e9; MAIL.sayT=0; MAIL.say=''; PL.next=1e9; BAR.sayT=0; SC.lucky=null; SC.gull=null; SC.drop=null; for (const f of SC.birds) f.dropAt=null; } },
   // the full roster (step 31): the journal's rewards, Grey's errands, the Hungry Hook and the three meals
   roster:{ PAGES, MILESTONES, PENNANT, MAYOR, HERON, HUNGRY, ROSTER, RW, MASTERY, state:()=>jState(), due:()=>rewardsDue(), after:()=>rewardsAfterCatch(), stars:id=>jStars(id), lastAt:id=>lastAt(id), lastKnown:id=>lastKnown(id),
     title:()=>journalTitle(), share:()=>journalShare(), pageDone:r=>pageDone(r), pennantDone:id=>pennantDone(id), pennantOn:()=>pennantOn(), fly:id=>flyPennant(id), mayorDone:()=>mayorDone(), leaps:id=>shLeaps(id),

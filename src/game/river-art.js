@@ -12,6 +12,17 @@ function layoutRiverArt(){ sseed=401; RVA.flow=[];
 const rvKey = () => W+'x'+H+'@'+DPR+'|'+Math.round(save.clock*2);
 /** The mill's wheel: where it turns, half in the water at the foot of the far bank. */
 function wheelGeo(){ return {x:W*.27, y:HZ-H*.006, r:Math.min(H*.05,W*.1)}; }
+/** The mill on the far bank: where it stands, and its two lit windows (one up in the timber storey, one in the stone). */
+function millGeo(){ const mx=W*.03, mw=W*.2, base=HZ, st=H*.045, up=H*.032;
+  return {mx, mw, base, st, up, wins:[{x:mx+mw*.12, y:base-st-up+up*.3, w:mw*.12, h:up*.45}, {x:mx+mw*.62, y:base-st+st*.3, w:mw*.1, h:st*.35}]}; }
+/** The mill's lamplight carrying through the dark and the fog, where its walls don't: a glow round each window, and the
+    windows themselves over the fog (drawn under the alder, which is nearer). a is how strong, 0 to 1. */
+function millGlow(a){ const M=millGeo(); ctx.save(); ctx.globalCompositeOperation='lighter';
+  for (const w of M.wins){ const cx=w.x+w.w/2, cy=w.y+w.h/2, r=H*.03, g=ctx.createRadialGradient(cx,cy,1,cx,cy,r);
+    g.addColorStop(0,'rgba(255,206,130,'+(.34*a).toFixed(3)+')'); g.addColorStop(1,'rgba(255,206,130,0)'); ctx.fillStyle=g; ctx.fillRect(cx-r,cy-r,r*2,r*2); }
+  ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=Math.min(1,a*.85); ctx.fillStyle='rgb(244,201,119)';
+  for (const w of M.wins) ctx.fillRect(w.x,w.y,w.w,w.h);
+  ctx.restore(); }
 
 /* ---------- the far bank, in the backdrop ---------- */
 function drawRiverLand(x,main){
@@ -32,7 +43,7 @@ function drawRiverLand(x,main){
   sseed=612; x.save(); x.globalAlpha=.32*Math.max(.12,1-PAL.dark*1.6); x.fillStyle=lit; for (let i=0;i<18;i++){ const cx=sr()*W, cy=HZ-H*(.09+sr()*.06), r=H*(.006+sr()*.009); x.beginPath(); x.arc(cx,cy,r,Math.PI*1.05,Math.PI*1.95); x.fill(); } x.restore();
   x.strokeStyle='rgba(43,42,51,.35)'; x.lineWidth=1; sseed=615; for (let i=0;i<=11;i++){ const cx=i/11*W+(sr()-.5)*W/11*.6, r=H*(.026+sr()*.014); x.beginPath(); x.arc(cx,HZ-H*.078,r,Math.PI*1.1,Math.PI*1.9); x.stroke(); }
   // the mill: a stone ground floor, a timber storey above, a slate roof, a chimney and a lit window
-  const mx=W*.03, mw=W*.2, base=HZ, st=H*.045, up=H*.032, stone=rvTone('hillFar','#8D8678',.8), timber=rvTone('town','#5A4232',.8), plaster=rvTone('hillFar','#D6C7A2',.78), slate=rvTone('town','#3D4250',.8);
+  const {mx, mw, base, st, up, wins}=millGeo(), stone=rvTone('hillFar','#8D8678',.8), timber=rvTone('town','#5A4232',.8), plaster=rvTone('hillFar','#D6C7A2',.78), slate=rvTone('town','#3D4250',.8);
   x.fillStyle=stone; x.fillRect(mx,base-st,mw,st);
   x.strokeStyle='rgba(30,26,22,.35)'; x.lineWidth=.8; for (let r=0;r<4;r++){ const yy=base-st+r*st/4; x.beginPath(); x.moveTo(mx,yy); x.lineTo(mx+mw,yy); x.stroke(); for (let c=0;c<6;c++){ const xx=mx+(c+(r%2)*.5)*mw/6; x.beginPath(); x.moveTo(xx,yy); x.lineTo(xx,yy+st/4); x.stroke(); } }
   x.fillStyle=plaster; x.fillRect(mx+2,base-st-up,mw-4,up);
@@ -40,7 +51,7 @@ function drawRiverLand(x,main){
   x.fillStyle=slate; x.beginPath(); x.moveTo(mx-4,base-st-up); x.lineTo(mx+mw*.5,base-st-up-H*.03); x.lineTo(mx+mw+4,base-st-up); x.closePath(); x.fill();
   x.strokeStyle='rgba(255,255,255,.12)'; x.lineWidth=1; x.beginPath(); x.moveTo(mx+mw*.5,base-st-up-H*.03); x.lineTo(mx-4,base-st-up); x.stroke();
   const chx=mx+mw*.72; x.fillStyle=stone; x.fillRect(chx,base-st-up-H*.032,5,H*.02); if (main) SC.chimneys=[{x:chx+2.5,y:base-st-up-H*.032}];
-  x.fillStyle='rgba(244,201,119,'+Math.max(.15,PAL.win).toFixed(2)+')'; x.fillRect(mx+mw*.12,base-st-up+up*.3,mw*.12,up*.45); x.fillRect(mx+mw*.62,base-st+st*.3,mw*.1,st*.35);
+  x.fillStyle='rgba(244,201,119,'+Math.max(.15,PAL.win).toFixed(2)+')'; for (const w of wins) x.fillRect(w.x,w.y,w.w,w.h);
   x.strokeStyle=INK; x.globalAlpha=.55; x.lineWidth=1; x.strokeRect(mx,base-st-up,mw,st+up); x.globalAlpha=1;
   // the flume, a wooden trough from the mill over the wheel, and the dark behind the wheel
   const G0=wheelGeo(); x.fillStyle='rgba(10,18,14,.35)'; x.beginPath(); x.ellipse(G0.x,G0.y,G0.r*1.05,G0.r*.75,0,Math.PI,0); x.fill();
@@ -181,6 +192,8 @@ function drawRiverBanks(){
     ctx.strokeStyle='rgba(43,42,51,.7)'; ctx.lineWidth=1; ctx.strokeRect(wx+ox-2.5,wy+oy-4,5,7); }
   ctx.restore();
   if (PAL.dark>.15){ ctx.save(); ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(wx,wy,2,wx,wy,46); g.addColorStop(0,'rgba(255,214,150,'+(.22*gl).toFixed(3)+')'); g.addColorStop(1,'rgba(255,214,150,0)'); ctx.fillStyle=g; ctx.fillRect(wx-50,wy-50,100,100); ctx.restore(); }
+  // the mill's lamplight through the fog and the dark, so the far bank still reads as the river's on a foggy night
+  const ml=PAL.win*Math.max(wxLook().fog*Math.min(1,.35+PAL.dark*1.5),PAL.dark*.6); if (ml>.05) millGlow(ml);
   // the alder overhead, swaying, and leaves on their way down
   if (!RVA.alder) buildAlder(); const A=RVA.alder, sw=Math.sin(S.time*.7)*.012+Math.sin(S.time*1.9)*.004;
   ctx.save(); ctx.translate(0,A.h-20); ctx.rotate(sw); ctx.drawImage(A.c,0,-(A.h),A.w,A.h); ctx.restore();

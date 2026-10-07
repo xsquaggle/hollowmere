@@ -28,15 +28,16 @@ each build.
 | 29 | The Hollow: the cave under the lake, reached down the shack's trapdoor after the uncle's pages 3 to 5 and the Drowned Bell rung on the dock at 3:12; dark but for the lantern, the glowing shelf and the noon shaft, so a fish in the dark follows the float and you lead it into the light; ten new fish; the eye that opens at 3:12 and the Sleeper's Scale, the first Godly fish, which goes into the Ledger; the Stillwater Mirror; omens and falling stars (build 30) |
 | 30 | The story pass and the end of chapter one: every line read in order and tied together (`docs/STORY.md`, `npm run story`); Ottilie's lines by chapter (kid, then Keeper), Wren's and Pell's later lines, and what each fish remembers; Pell's last step and the Row's invitation; and supper on Lantern Row at 3:12 in the Stillwater Mirror, with the end-of-chapter card (build 31) |
 | 31 | The full roster: every fish's last line and third journal star (a third star mounts it mid-leap on the trophy wall); a relic for each water's full page, handed over by Grey, Wren, Ottilie, Barnaby or Pell; milestones at a quarter, half, three quarters and all of the chapter's 59 species (a title, a hull paint and luck); a pennant for every mutation of a fish, flown from the skiff; Grey's errands with the Heron's Feather and the Mayor's belongings and letter; the Hungry Hook growing on the Twin Spool; and the Mudlark, Clockfin and Bellmouth meals (build 32) |
+| 32 | The world gate, all but the friends: a test plays the whole chapter in order on one save, from the first lake fish to supper on Lantern Row; every water drawn in each light and weather at five screen sizes; every Hollow fish caught with the sound off and no vibration; screenshots of every water, which a reader who'd never seen the game named all 56 of, and a "Name the water" quiz for friends; the river mill's windows lit at night and through fog; the simulator and Playtest > Pace run to the supper, and Pace copies a friend's run as text; the play tests run in three shards (build 33) |
 
 ## Next
 
-13 and 24's friend playtest wait for friends to be available; the rest go in order.
+The friend playtests (13, 24 and 32) wait for friends to be available; the rest go in order.
 
 - **13.** Friend playtest, and the bottom-bar regroup.
 - **24.** The depth gate's friend playtest (the balance pass shipped in build 25). Playtest > Pace sets their run beside the simulator's.
-- **27–32.** Phase C: new places and the story (Rootwood River shipped in build 26, Saltmarsh in build 27, the rest of Gullrock Coast in build 28, the Drowned Quarter in build 29, the Hollow in build 30, the story pass in build 31, the full roster in build 32).
-  - The world gate.
+- **32.** The world gate's friend playtest (everything else shipped in build 33): friends play the whole chapter, name each water from a screenshot (`npm run shots -- --quiz 12`), and explain the mystery so far in their own words; Playtest > Pace's Copy button sends their run back.
+- **Art pass.** One pass over the art with Higgsfield (an AI art tool), now the base game is done.
 - **33–36.** Phase D, ending at 1.0.
   - Accessibility.
   - Performance.

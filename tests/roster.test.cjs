@@ -121,10 +121,9 @@ module.exports = [
           record: H.takes(L('perch', { w: 100000 })), unknown: H.takes(L('dace')), wander: H.takes(L('perch', { wander: 1 })), moon: H.takes(L('perch', { moon: true })) }; });
       assert.deepEqual(T, { common: true, epic: false, isNew: false, mut: false, three: false, record: false, unknown: false, wander: false, moon: false });
       // a real catch: he swoops off his pile and takes it
-      await page.evaluate(() => { window.__hm.rarity.ctl.fish = 'perch'; });
       let took = 0;
-      // (a three-star catch he leaves alone, so this can take a few casts)
-      for (let i = 0; i < 8 && !took; i++){ await castAndReel(page); await page.waitForTimeout(600); took = await page.evaluate(() => window.__hm.save.stats.greyTook || 0);
+      // (a three-star catch he leaves alone, so this can take a few casts; the pick holds for one bite, so it's made each cast)
+      for (let i = 0; i < 8 && !took; i++){ await page.evaluate(() => { window.__hm.rarity.ctl.fish = 'perch'; }); await castAndReel(page); await page.waitForTimeout(600); took = await page.evaluate(() => window.__hm.save.stats.greyTook || 0);
         if (!took && await page.evaluate(() => window.__S.state === 'result')) { await page.waitForTimeout(400); await page.click('#cSell'); await page.waitForTimeout(800); } }
       assert.equal(took, 1, 'Grey took one');
       const A = await page.evaluate(() => ({ h: window.__hm.roster.heron.state(), net: window.__hm.save.net.filter(f => f.id === 'perch').length, state: window.__S.state, away: window.__hm.roster.heron.away() }));

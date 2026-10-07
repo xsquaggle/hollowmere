@@ -6,9 +6,16 @@ on:
   pull_request:
 
 jobs:
-  test:
+  # the play tests take about 20 minutes one after another, so they run as three shards side by side
+  # (every third test each: tests/run.cjs --shard)
+  play:
+    name: play tests (${{ matrix.shard }} of 3)
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -19,9 +26,17 @@ jobs:
       - name: The committed web app matches src/
         run: npm run verify
       - name: Content check, build, play tests
-        run: npm test
+        run: npm test -- --shard ${{ matrix.shard }}/3
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: failed-test-screenshots
+          name: failed-test-screenshots-${{ matrix.shard }}
           path: tests/out/
+  # one check that passes only when every shard did
+  test:
+    needs: play
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every shard passed
+        run: test "${{ needs.play.result }}" = success

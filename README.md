@@ -25,7 +25,7 @@ Its source lives in `src/` as small files, and a build pastes them together. `do
 | `src/styles/` | Styles, one file per screen |
 | `src/fonts/` | Nunito, Young Serif and Caveat, subset to WOFF, plus their licenses |
 | `src/build.json` | The order files are pasted in. Scripts share one closure, so a file can use anything listed before it |
-| `tools/` | `build.mjs` (the build), `check-content.mjs` (the content checker), `simulate.mjs` (the balance simulator) and `story.mjs` (the story script) |
+| `tools/` | `build.mjs` (the build), `check-content.mjs` (the content checker), `simulate.mjs` (the balance simulator), `story.mjs` (the story script) and `shots.mjs` (the world gate's screenshots) |
 | `tests/` | Play tests that drive the game in a phone-sized browser |
 | `index.html`, `sw.js`, `manifest.webmanifest`, `icons/`, `splash/`, `fonts/` | The built web app GitHub Pages serves. Don't edit these by hand |
 
@@ -36,10 +36,11 @@ npm install                       # once: Playwright for the tests
 npx playwright install chromium   # once: the test browser
 npm run check    # check the content tables
 npm run build    # build the web app and build/cast-lab.html
-npm test         # check, build, then play every test (about 10 minutes)
+npm test         # check, build, then play every test (about 20 minutes; GitHub runs it in three shards side by side)
 npm run verify   # confirm the committed web app matches src/
 npm run sim      # the 1,000-cast balance report (also in the game: Playtest > Balance)
 npm run story    # write docs/STORY.md: every line of the story, in order
+npm run shots    # every water in each light and weather, into build/shots/ (after npm run build)
 npm run sim -- --rod brasscap --spot deep --hour 6.5 --meal pie:3 --sets all
 ```
 
@@ -143,6 +144,13 @@ and everything else as the coins come in, and lists when each thing happens and 
 are set so the lake and the coast take about 9 hours (about 10.5 with Rootwood River, the Saltmarsh, the rest of the coast, the Drowned Quarter and the Hollow). In the game, Playtest > Pace logs a real run's minutes of
 play beside the simulator's (`src/game/pace.js`, `src/data/pace.js`); after a balance change, paste
 `npm run sim -- --career --runs 11 --pace` into `src/data/pace.js`.
+
+**The world gate.** Chapter one is whole: `tests/gate.test.cjs` plays it in order on one save, from the first lake
+fish to supper on Lantern Row, checking each step opens from the one before and the game points to the next. The
+career simulator runs to the supper too (a median of about 8 hours). `npm run shots` renders every water in each light
+and weather with nothing over the scene, plus sheets side by side; `npm run shots -- --quiz 12` makes a numbered "Name
+the water" sheet and its key for friends. Playtest > Pace adds the uncle's pages, Pell's round, the bell, the Hollow and
+the supper, lists the longest waits, and copies the whole run as text to send back.
 
 **Adding content.** A new fish is an entry in `src/data/fish.js` plus its region list and bite weights (a weather fish takes `wx` and an entry in `WX_FISH`, `src/data/weather.js`, instead of pool weights).
 A new find is an entry in `src/data/treasure.js` plus its drawing in `src/game/loot-art.js` (a page relic's or Grey's in `src/game/journal-art.js`).

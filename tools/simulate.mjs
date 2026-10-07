@@ -18,7 +18,8 @@
 //   node tools/simulate.mjs --region quarter --rod bonewhistle --dread 50   the Drowned Quarter with the Bonewhistle, its Dread held at 50
 //   node tools/simulate.mjs --rod brasscap --spot deep --shack   with every fix-up line done and the trophy wall full (data/shack.js)
 //   node tools/simulate.mjs --builds                  four builds on one rod and water, by day and at night (the M2 gate: builds play differently)
-//   node tools/simulate.mjs --career                  a whole run from the first cast: when each rod, the boat and everything else gets bought (--runs 5)
+//   node tools/simulate.mjs --career                  a whole run from the first cast: when each rod, the boat and everything else gets bought,
+//                                                     and the story's steps to the end of chapter one (--runs 5)
 //   node tools/simulate.mjs --career --runs 11 --pace  the same, as data/pace.js's table of medians for Playtest > Pace
 //   node tools/simulate.mjs --json                   machine-readable output
 import { existsSync } from 'node:fs';
@@ -315,8 +316,10 @@ async function careerReport() {
     const fogAt = (a, b, seed) => { for (let h = a; h < b; h += .25) if (h % 24 < 5 && hm.wx.at('lake', Math.floor(h / 4), seed) === 'fog') return h; return null; };
     function career() {
       const C = { coins: 0, glim: 0, min: 0, rods: ['willow'], boat: false, ferry: false, marsh: false, quarter: false, pell: null, fish: {}, fix: [], parts: [], runes: [], have: {}, events: [],
-        bottles: 0, logs: 0, rang: false, bell: false, hollow: false, bought: null, done: null, seed: 1 + Math.floor(Math.random() * 2147483646) };
-      const ev = (key, label, kind) => C.events.push({ key, label, kind, min: C.min });
+        bottles: 0, logs: 0, rang: false, bell: false, hollow: false, bought: null, done: null, scale: null, invite: null, supper: null, pellDone: null, seed: 1 + Math.floor(Math.random() * 2147483646) };
+      const ev = (key, label, kind, min) => C.events.push({ key, label, kind, min: min ?? C.min });
+      // minutes of play until the clock next reads 3:12 (it's 9 in the morning at the first cast, and an hour goes by each minute)
+      const at312 = m => m + (((BELL - 9 - m) % 24) + 24) % 24;
       const items = [], add = (key, label, price, kind, needs) => items.push({ key, label, price, kind, needs: needs || (() => true) });
       const lakeDone = () => hm.REGION_FISH.lake.every(id => hm.FISH[id].wx || hm.FISH[id].extra || C.fish[id]);
       hm.ROD_ORDER.slice(1).forEach((id, i) => add('rod:' + id, hm.RODS[id].name, hm.RODS[id].price, 'rod', () => C.rods.includes(hm.ROD_ORDER[i])));
@@ -345,8 +348,8 @@ async function careerReport() {
         if (it.key.startsWith('fix:')) C.fix.push(it.key.slice(4)); if (it.key.startsWith('part:')) C.parts.push(it.key.slice(5)); };
       const hollowDone = () => C.hollow && hm.REGION_FISH.hollow.every(id => hm.FISH[id].extra || C.fish[id]);
       let n = 0;
-      // on until everything's bought, and every fish the Hollow counts is caught (the eye can open)
-      while (C.min < cap && (items.length || !hollowDone())) {
+      // on until everything's bought, and the chapter's over (supper on Lantern Row)
+      while (C.min < cap && (items.length || C.supper == null)) {
         if (!items.length && C.bought == null) C.bought = C.min;
         if (C.done == null && hollowDone()) C.done = C.min;
         // shop: the next rod or the boat when it can be had, then the rest from what's left above it
@@ -389,10 +392,10 @@ async function careerReport() {
         // page 5 says so, and finds it by chance before that when fishing there), and the bell rung at the next 3:12
         const a1 = 9 + C.min, bottles = out.treasure.kinds.bottle || 0;
         if (pick.reg === 'quarter' && past(a0, a1, BELL)) C.rang = true;
-        if (C.logs < 2 && bottles) { C.bottles += bottles; while (C.logs < 2 && C.bottles >= [3, 7][C.logs]) { C.logs++; ev('log' + C.logs, 'Logbook page ' + C.logs, 'quest'); } }
-        else if (C.logs === 2 && C.quarter && bottles) { C.logs = 3; ev('log3', 'Logbook page 3', 'quest'); }
-        else if (C.logs === 3) { C.min += 4; C.logs = 4; ev('log4', 'Logbook page 4, in the uncle’s cache', 'quest'); }
-        if (C.logs === 4 && C.rang) { C.min += 1; C.logs = 5; ev('log5', 'Logbook page 5, from Grey', 'quest'); }
+        if (C.logs < 2 && bottles) { C.bottles += bottles; while (C.logs < 2 && C.bottles >= [3, 7][C.logs]) { C.logs++; ev('log:' + C.logs, 'Logbook page ' + C.logs, 'quest'); } }
+        else if (C.logs === 2 && C.quarter && bottles) { C.logs = 3; ev('log:3', 'Logbook page 3', 'quest'); }
+        else if (C.logs === 3) { C.min += 4; C.logs = 4; ev('log:4', 'Logbook page 4, in the uncle’s cache', 'quest'); }
+        if (C.logs === 4 && C.rang) { C.min += 1; C.logs = 5; ev('log:5', 'Logbook page 5, from Grey', 'quest'); }
         if (!C.bell && (C.logs >= 5 || pick.reg === 'lake' && pick.sp === 'deep')) { const h = fogAt(a0, a1, C.seed); if (h != null) { C.bell = h; ev('bell', 'The Drowned Bell', 'quest'); } }
         if (C.logs >= 5 && C.bell && !C.hollow && past(Math.max(a0, C.bell), 9 + C.min, BELL)) { C.hollow = true; ev('hollow', 'The way down to the Hollow', 'rod'); }
         for (const id in out.species) { if (!C.fish[id]) ev('fish:' + id, hm.FISH[id].name, 'fish'); C.fish[id] = (C.fish[id] || 0) + out.species[id]; }
@@ -407,10 +410,17 @@ async function careerReport() {
           if (P.step === 'lantern' && here) { C.coins += Q.lantern.coins; P.step = 'answer'; P.env = 0; ev('pell:lantern', 'Edith’s letter posted', 'quest'); }
           else if (P.step === 'answer') { P.letters += letters; if (out.species.sturgeon) { C.glim += Q.answer.glimmer; P.step = 'tower'; P.env = 0; ev('pell:answer', 'An answer, on a Postman Sturgeon', 'quest'); } }
           else if (P.step === 'tower') { P.letters += letters; if (Math.floor(P.env) + P.letters > 0) { P.letters = 0; C.coins += Q.tower.coins; P.step = 'sack'; P.env = 0; ev('pell:tower', 'Albert’s letter posted in the tower', 'quest'); } }
-          else if (P.step === 'sack') { if (here) P.letters += letters; if (Math.floor(P.env) + P.letters >= 3) { P.step = 'done'; C.rods.push('tidecaller'); ev('rod:tidecaller', hm.RODS.tidecaller.name, 'rod'); } } }
+          else if (P.step === 'sack') { if (here) P.letters += letters; if (Math.floor(P.env) + P.letters >= 3) { P.step = 'done'; C.pellDone = C.min; C.rods.push('tidecaller'); ev('rod:tidecaller', hm.RODS.tidecaller.name, 'rod'); } } }
+        // the end of chapter one (the world gate, step 32). With every fish the Hollow counts caught, the player goes down
+        // for the next 3:12 and puts the lantern out: the eye opens, and the Sleeper's Scale brings up the Stillwater
+        // Mirror and the uncle's last page. Pell has the Row's invitation once his round's done and that page read (a few
+        // minutes to find him), and at the next 3:12 in the Quarter, with the Mirror in hand, it's supper on Lantern Row
+        if (C.scale == null && hollowDone()) { C.scale = at312(C.min) + 2; ev('fish:scale', hm.FISH.scale.name, 'fish', C.scale); ev('rod:mirror', hm.RODS.mirror.name, 'rod', C.scale); }
+        if (C.scale != null && C.invite == null && C.pellDone != null) { C.invite = Math.max(C.scale, C.pellDone) + 3; ev('invite', 'The Row’s invitation, from Pell', 'quest', C.invite);
+          C.supper = at312(C.invite) + 4; ev('supper', 'Supper on Lantern Row: the end of chapter one', 'quest', C.supper); }
       }
       if (C.done == null && hollowDone()) C.done = C.min;
-      return { events: C.events, end: C.bought ?? C.min, done: C.done, left: items.map(it => it.label) };
+      return { events: C.events, end: C.bought ?? C.min, done: C.done, supper: C.supper, left: items.map(it => it.label) };
     }
     const all = []; for (let i = 0; i < runs; i++) all.push(career());
     return all;
@@ -423,7 +433,7 @@ async function careerReport() {
   const hm = m => (m = Math.round(m)) < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0');
   const rows = Object.entries(by).map(([key, x]) => ({ ...x, key, m: med(x.t), lo: Math.min(...x.t), hi: Math.max(...x.t), runs: x.t.length })).sort((a, b) => a.m - b.m);
   // --pace: the medians the pace log (game/pace.js) compares a real run with, as data/pace.js's table
-  if (opt.pace) { const keep = rows.filter(r => /^(rod|boat|ferry|marsh|quarter|hollow|part|fix|pocket|rune|fish)/.test(r.key) && r.runs * 2 > runs);
+  if (opt.pace) { const keep = rows.filter(r => /^(rod|boat|ferry|marsh|quarter|hollow|part|fix|pocket|rune|fish|log|bell|pell|invite|supper)/.test(r.key) && r.runs * 2 > runs);
     console.log('const PACE_SIM={' + keep.map(r => `'${r.key}':${Math.round(r.m)}`).join(', ') + '};'); return; }
   console.log(`\n${runs} runs from the first cast, ${opt.player || 'steady'} player at a real pace. Median time each thing happens (fastest to slowest run):\n`);
   console.log('| When | What | Kind | Range |\n| ---: | --- | --- | --- |');
@@ -432,6 +442,8 @@ async function careerReport() {
   console.log(`\nEverything bought: ${left.length ? left.length + ' of ' + runs + ' runs still had ' + left[0].left.join(', ') + ' to buy at ' + hm(cap) : 'median ' + hm(med(ends)) + ' (' + hm(Math.min(...ends)) + ' to ' + hm(Math.max(...ends)) + ')'}.`);
   const done = res.map(r => r.done).filter(m => m != null);
   console.log(`Every fish the Hollow counts caught: ${done.length ? 'median ' + hm(med(done)) + ' (' + hm(Math.min(...done)) + ' to ' + hm(Math.max(...done)) + ')' + (done.length < runs ? `, in ${done.length} of ${runs} runs` : '') : 'in no run by ' + hm(cap)}.`);
+  const sup = res.map(r => r.supper).filter(m => m != null);
+  console.log(`The end of chapter one (supper on Lantern Row): ${sup.length ? 'median ' + hm(med(sup)) + ' (' + hm(Math.min(...sup)) + ' to ' + hm(Math.max(...sup)) + ')' + (sup.length < runs ? `, in ${sup.length} of ${runs} runs` : '') : 'in no run by ' + hm(cap)}.`);
   // pacing (design doc: something new every 10 to 20 minutes early, 30 to 45 late): the longest waits with nothing new
   const gaps = []; for (let i = 1; i < rows.length; i++) gaps.push({ from: rows[i - 1], to: rows[i], g: rows[i].m - rows[i - 1].m });
   console.log('\nLongest waits with nothing new (a purchase, a rune or a first catch):\n');

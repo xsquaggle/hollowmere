@@ -8,7 +8,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   const head='<div class="panel-head"><div><h2>Playtest</h2><p>Build '+BUILD+' · numbers for tuning</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
     '<div class="seg" role="tablist">'+[['tools','Tools'],['balance','Balance'],['pace','Pace']].map(([k,l])=>'<button type="button" role="tab" data-pt="'+k+'" aria-selected="'+(PTAB===k)+'" class="'+(PTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
   if (PTAB==='balance'){ openSheet(head+balanceFormHTML()); bindPlaytestTabs(); bindBalance(); return; }
-  if (PTAB==='pace'){ openSheet(head+paceHTML()); bindPlaytestTabs(); return; }
+  if (PTAB==='pace'){ openSheet(head+paceHTML()); bindPlaytestTabs(); $('paceCopy').addEventListener('click',e=>copyText(paceText(),e.currentTarget)); return; }
   const s=save.stats, fishCasts=s.casts-(s.hauls||0), rate=fishCasts>0?Math.round(s.catches/fishCasts*100):0, t=save.tune;   // treasure casts aren't missed fish
   const sl=(id,label,v,hint)=>'<label for="'+id+'">'+label+'<output id="'+id+'O">'+v.toFixed(2)+'×</output><input type="range" id="'+id+'" min="0.5" max="1.6" step="0.05" value="'+v+'"><span class="note" style="grid-column:1/-1;margin:0">'+hint+'</span></label>';
   openSheet(head+

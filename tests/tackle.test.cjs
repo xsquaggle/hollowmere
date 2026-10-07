@@ -94,8 +94,10 @@ module.exports = [
     async run({ newPage, openGame, veteran, readSave, castAndReel, until }) {
       const page = await newPage();
       await openGame(page, { save: veteran({ gear: { bait: 'worms', left: { worms: 2 }, tins: { worms: 1 } } }) });
-      await castAndReel(page); await until(page, () => window.__S.state === 'result', null, { timeout: 8000, what: 'the catch card' });
-      await page.waitForTimeout(700); await page.click('#cSell');
+      // a cast uses one whether the fish is landed or slips the hook
+      const r = await castAndReel(page);
+      if (r.end === 'landing' || r.end === 'result') { await until(page, () => window.__S.state === 'result', null, { timeout: 8000, what: 'the catch card' });
+        await page.waitForTimeout(700); await page.click('#cSell'); }
       await until(page, () => window.__S.state === 'idle', null, { timeout: 8000, what: 'the dock to be quiet again' });
       let s = await readSave(page); assert.equal(s.gear.left.worms, 1, 'a cast uses one');
       const g = () => page.evaluate(() => { window.__hm.gear.state(); return { on: window.__hm.gear.on(), ...JSON.parse(JSON.stringify(window.__hm.save.gear)) }; });

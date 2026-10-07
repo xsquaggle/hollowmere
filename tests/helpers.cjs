@@ -70,18 +70,31 @@ async function castAndReel(page, { follow = true } = {}) {
   for (let i = 0; i < 220; i++) { if (await state(page) === 'bite') break; await page.waitForTimeout(80); }
   const coachAtBite = await text(page, '#coachText');
   await page.waitForTimeout(250);
+  const r = await fight(page, { follow });
+  await page.waitForTimeout(300);
+  return { ...r, coachAtBite, toast: await text(page, '#toast') };
+}
+/** Hooks the fish at the bite and plays the fight the way the screen says to: the ring follows the fish (unless
+    follow is false), a tap while it's in the air, and the finger off while it dives or tugs and when the ring turns red.
+    Ends when the fish is landed or gone: { end: the state it ended in, maxTension }. */
+async function fight(page, { follow = true } = {}) {
   await page.mouse.move(195, 700); await page.mouse.down();
-  let x = 195, maxTension = 0, end = '';
-  for (let i = 0; i < 700; i++) {
-    const s = await page.evaluate(() => ({ st: window.__S.state, d: window.__S.reel && window.__S.reel.dir, t: window.__S.tilt, T: window.__S.reel && window.__S.reel.tension }));
-    if (s.st !== 'reeling') { end = s.st; break; }
+  let x = 195, maxTension = 0, end = '', down = true;
+  const press = async on => { if (on && !down) { await page.mouse.move(x, 700); await page.mouse.down(); } if (!on && down) await page.mouse.up(); down = on; };
+  for (let i = 0; i < 1200; i++) {
+    const s = await page.evaluate(() => { const S = window.__S, R = S.reel; return { st: S.state, d: R && R.dir, t: S.tilt, T: R && R.tension,
+      jump: !!(R && R.jump && !R.jump.tapped), dive: !!(R && (R.dive > 0 || R.warn > 0)), tug: !!(R && R.tug) }; });
+    if (s.st !== 'reeling' && s.st !== 'bite') { end = s.st; break; }
+    if (s.st !== 'reeling') { await page.waitForTimeout(40); continue; }
     maxTension = Math.max(maxTension, s.T);
-    if (follow) { x += (s.d - s.t) * 25; x = Math.max(10, Math.min(380, x)); await page.mouse.move(x, 700); }
-    if (s.T > 0.85) { await page.mouse.up(); await page.waitForTimeout(500); await page.mouse.down(); }
-    await page.waitForTimeout(50);
+    if (s.jump) { await press(false); await press(true); }
+    else if (s.dive || s.tug || s.T > 0.8) await press(false);
+    else if (s.T < 0.55) await press(true);
+    if (down && follow) { x = Math.max(10, Math.min(380, x + (s.d - s.t) * 25)); await page.mouse.move(x, 700); }
+    await page.waitForTimeout(40);
   }
-  await page.mouse.up(); await page.waitForTimeout(300);
-  return { end, maxTension, coachAtBite, toast: await text(page, '#toast') };
+  await press(false);
+  return { end, maxTension };
 }
 /** Casts until a fish is landed (a few tries, since a fish can still slip the hook), then waits for the catch card. */
 async function landFish(page, tries = 5) {
@@ -105,4 +118,4 @@ function serveSite() {
   return new Promise(ok => server.listen(0, '127.0.0.1', () => ok({ url: 'http://127.0.0.1:' + server.address().port + '/', close: () => new Promise(c => server.close(c)) })));
 }
 
-module.exports = { ROOT, KEY, PAGE, ARTIFACT, veteran, harness, watch, openGame, readSave, state, text, visible, until, castAndReel, landFish, serveSite };
+module.exports = { ROOT, KEY, PAGE, ARTIFACT, veteran, harness, watch, openGame, readSave, state, text, visible, until, castAndReel, fight, landFish, serveSite };
