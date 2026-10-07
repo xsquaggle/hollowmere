@@ -118,8 +118,8 @@ module.exports = [
       const T = await page.evaluate(() => { const hm = window.__hm, H = hm.roster.heron, F = hm.FISH; hm.roster.HERON.steal = 1;
         const L = (id, o = {}) => ({ id, F: F[id], w: 1, stars: 1, ...o });
         return { common: H.takes(L('perch')), epic: H.takes(L('gar')), isNew: H.takes(L('perch', { isNew: true })), mut: H.takes(L('perch', { mut: 'mossy' })), three: H.takes(L('perch', { stars: 3 })),
-          record: H.takes(L('perch', { w: 100000 })), unknown: H.takes(L('dace')) }; });
-      assert.deepEqual(T, { common: true, epic: false, isNew: false, mut: false, three: false, record: false, unknown: false });
+          record: H.takes(L('perch', { w: 100000 })), unknown: H.takes(L('dace')), wander: H.takes(L('perch', { wander: 1 })), moon: H.takes(L('perch', { moon: true })) }; });
+      assert.deepEqual(T, { common: true, epic: false, isNew: false, mut: false, three: false, record: false, unknown: false, wander: false, moon: false });
       // a real catch: he swoops off his pile and takes it
       await page.evaluate(() => { window.__hm.rarity.ctl.fish = 'perch'; });
       let took = 0;
@@ -129,6 +129,10 @@ module.exports = [
       assert.equal(took, 1, 'Grey took one');
       const A = await page.evaluate(() => ({ h: window.__hm.roster.heron.state(), net: window.__hm.save.net.filter(f => f.id === 'perch').length, state: window.__S.state, away: window.__hm.roster.heron.away() }));
       assert.ok(A.h.out >= 6 && A.h.out <= 10, 'off for 6 to 10 casts: ' + A.h.out); assert.equal(A.h.took, 'perch'); assert.equal(A.state, 'idle'); assert.equal(A.away, true);
+      // the uncle's page 5 waits for him to be home: an empty pile has nothing to tap
+      const P = await page.evaluate(() => { const hm = window.__hm, FS = hm.findsState(), q = hm.save.quarter = hm.save.quarter || {}; q.tips = { ...(q.tips || {}), ring: 1 }; FS.notes.push('log4');
+        const out = { away: hm.hollow.grey(), due: hm.hollow.due().log5 }; FS.notes.splice(FS.notes.indexOf('log4'), 1); delete q.tips.ring; return out; });
+      assert.deepEqual(P, { away: false, due: true });
       // he's back after his casts: the toffee tin first, in his beak on the pile, and a tap takes it
       const B = await page.evaluate(() => { const H = window.__hm.roster.heron, h = H.state(); h.out = 1; H.cast(); return { gift: h.gift, pile: H.gift() }; });
       assert.deepEqual(B.gift, { k: 'find', id: 'toffeetin' });
@@ -194,6 +198,11 @@ module.exports = [
       assert.equal(S.v, 3, 'a rare catch adds 3 instead of 6');
       assert.deepEqual([S.after, S.owed, S.coins, S.net], [0, 0, 500, 1], 'Dread empties, and nothing is taken');
       assert.equal(S.held, 1);
+      // and striking the ink costs half the Dread it would
+      const I = await page.evaluate(() => { const hm = window.__hm, S = window.__S, D = hm.quarter.dread; const d = D.state(); d.v = 0; d.haunt = true; hm.closeSheet();
+        S.bob = { x: 195, y: 420, spot: 'open', dip: 0, nibble: 0 }; hm.setState('waiting'); S.wait = { phase: 'empty', t: 9 }; D.startInk(); D.inkWait(.1);
+        const hit = D.strike(); const v = D.state().v; S.bob = null; S.wait = null; hm.setState('idle'); return { hit, v }; });
+      assert.deepEqual(I, { hit: true, v: 3 }, 'the ink adds 3 instead of 6');
       // a cast at a wall goes in at the nearest door with the Latchkey in a pocket
       const K = await page.evaluate(() => { const hm = window.__hm, Q = hm.quarter, g = Q.G(), T = g.solids.find(o => o.kind === 'tower'), wall = { x: g.tower.x, y: (T.y0 + T.base) / 2 };
         const before = Q.aim(wall.x, wall.y); hm.relics.pocket('latchkey'); return { before, after: Q.aim(wall.x, wall.y), land: Q.land(wall.x, wall.y) }; });
@@ -239,6 +248,11 @@ module.exports = [
       assert.deepEqual(R.rye.sort(), ['bite', 'forecast']); assert.ok(R.top < 1 && R.later === 1, 'bites come sooner only at the top of the hour: ' + R.top + ' / ' + R.later);
       assert.deepEqual(R.broth, ['ghostSolid']);
       assert.deepEqual(R.learn, ['mudlark', 'clockfin', 'bellmouth']);
+      // the Bonuses page says when the rye's quicker bites apply, and marks them not now at half past
+      await page.evaluate(() => { const hm = window.__hm; hm.hud.eat('rye', 1); hm.save.clock = 12.5; });
+      await page.click('#journalBtn'); await page.waitForTimeout(400); await page.click('[data-jt="bonuses"]'); await page.waitForTimeout(400);
+      const B = await page.$$eval('.bn-src li', els => els.filter(e => /Clockfin on Rye/.test(e.textContent)).map(e => ({ off: e.classList.contains('off'), text: e.textContent })));
+      assert.ok(B.some(b => b.off && /in the first 10 minutes of each hour/.test(b.text)), 'the top of the hour, and not now: ' + JSON.stringify(B));
       assert.deepEqual(page.errors, []);
     },
   },

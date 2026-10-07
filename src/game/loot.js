@@ -100,7 +100,7 @@ function lootPop(){ const L=S.loot, R=RAR[L.tier], ti=L.ti, top=L.y-(L.hv||0)-cr
   if (L.tier==='mythic'){ L.hole=0; lootSparks(L.x,top,40,'225,230,245',{v0:80,v1:380,g:10,m0:1,m1:2}); }
 }
 function lootReveal(){ const L=S.loot; if (L.phase==='reveal') return; L.phase='reveal'; showHaul(L); }
-function lootEnd(){ const L=S.loot; hideHaul(); closeNote(true); S.loot=null; S.darkT=0; S.zoomT=1; MU.duckT=0; if (coinShown!==save.coins) coinTally(500); updateHud(); setState('idle');
+function lootEnd(){ const L=S.loot; hideHaul(); closeNote(true); S.loot=null; S.darkT=0; S.zoomT=1; MU.duckT=0; if (coinShown!==save.coins) coinTally(500); updateHud(); setState('idle'); rewardsAfterCatch();   // a find can finish the Mayor's set (game/rewards.js)
   const FS=findsState(), fresh=L && L.got.items.some(it=>it.type==='find'||it.type==='note');
   if (fresh){ $('journalBtn').classList.remove('pulse'); void $('journalBtn').offsetWidth; $('journalBtn').classList.add('pulse'); }
   if (L && L.got.items.some(it=>it.type==='find' && FINDS[it.id].kind==='artifact') && !save.finds.pocketTip){ save.finds.pocketTip=true; persist();

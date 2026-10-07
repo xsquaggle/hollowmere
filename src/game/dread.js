@@ -146,7 +146,7 @@ function inkWaiting(dt){ const w=S.wait, I=w.ink, b=S.bob; I.t+=dt;
     if (I.a<=0){ w.ink=null; w.phase='empty'; w.t=rand(.8,1.6); const d=dreadState(); d.haunt=false; persist(); toast('The ink sank away',''); } } }
 /** A twitch while the ink's at the float strikes it: Dread rises, and the cast is over. */
 function inkStrike(){ const w=S.wait, I=w&&w.ink, b=S.bob; if (!I || I.phase==='sink' || !b) return false;
-  const d=dreadTick(); d.v=Math.min(100,d.v+DREAD.haunt); d.haunt=false; persist(); MODC.dirty=true; DR.pulse=1;
+  const d=dreadTick(); d.v=Math.min(100,d.v+DREAD.haunt*modMul('dread')); d.haunt=false; persist(); MODC.dirty=true; DR.pulse=1;
   for (let i=0;i<18;i++) S.particles.push({x:I.x,y:I.y,vx:rand(-90,90),vy:rand(-120,-20),g:240,life:0,max:rand(.5,1),r:rand(1.4,3),c:'rgba(18,14,34,'});
   ripple(I.x,I.y,34); dreadSting(d.v); buzz([0,60,40,90]); shake(4);
   toast('You struck the ink. It took a little of you with it','bad');

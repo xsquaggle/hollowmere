@@ -3,8 +3,8 @@
 .jr-cover{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center;margin:2px 0 12px;padding:12px;border:1.5px solid rgba(43,42,51,.18);border-radius:12px;background:linear-gradient(#F7EFDD,#EDE1C6)}
 .jr-all{--p:0%;width:84px;height:84px;border-radius:50%;display:grid;place-content:center;text-align:center;
   background:radial-gradient(closest-side,#FBF6EA 76%,transparent 77% 100%),conic-gradient(var(--brass) var(--p),rgba(43,42,51,.12) 0)}
-.jr-all b{font:400 22px/1 var(--display)}.jr-all span{font:800 9px/1.1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:#7A7468}
-.jr-rings{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:8px 6px}
+.jr-all b{font:400 22px/1.2 var(--display)}.jr-all span{margin-top:1px;font:800 9px/1.1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:#7A7468}
+.jr-rings{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px 6px}
 .jr-ring{--p:0%;display:grid;justify-items:center;gap:3px;min-width:0}
 .jr-ring i{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:800 11px/1 var(--body);font-style:normal;color:#4B4842;
   background:radial-gradient(closest-side,#FBF6EA 72%,transparent 73% 100%),conic-gradient(#6E9F5B var(--p),rgba(43,42,51,.12) 0)}

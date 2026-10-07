@@ -70,7 +70,7 @@ function giftSheet(o){
   const p=$('panel'); paintTiles(p.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-pennant],canvas[data-rosette]')); paintFaces(p.querySelectorAll('canvas[data-who]'));
   p.querySelectorAll('[data-gpocket]').forEach(b=>b.addEventListener('click',()=>{ if (pocketIt(b.dataset.gpocket)) b.outerHTML='<span class="tag ok">In a pocket</span>'; }));
   p.querySelectorAll('[data-read]').forEach(b=>b.addEventListener('click',()=>openNote(b.dataset.read,{})));
-  p.querySelectorAll('[data-fly]').forEach(b=>b.addEventListener('click',()=>{ flyPennant(b.dataset.fly); sfx.hook(false); b.outerHTML='<span class="tag ok">Flying from your mast</span>'; })); }
+  p.querySelectorAll('[data-fly]').forEach(b=>b.addEventListener('click',()=>{ flyPennant(b.dataset.fly); sfx.hook(false); b.outerHTML='<span class="tag ok">On your mast</span>'; })); }
 /** A find on a gift sheet: what it is and does, and a pocket for it if it's an artifact. */
 function giftFindHTML(id){ const D=FINDS[id], art=D.kind==='artifact', eq=findsState().equip.includes(id);
   return '<div class="fd-row rf" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+findKind(D)+' · <b>New</b></span><h4>'+D.name+'</h4><p>'+(D.eff||D.lore)+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+combosHTML(id)+'</div>'+
@@ -96,7 +96,7 @@ function pennantGift(id){ const j=jState(); if (j.pennants.includes(id)) return;
   sfx.out('epic'); buzz([0,20,30,20]); const F=FISH[id], on=j.pennant===id;
   giftSheet({name:'A pennant', sub:'Every mutation of the '+F.name, art:'<canvas class="rt-face" data-pennant="'+id+'"></canvas>',
     line:'Mossy, Glassy, Twin and Giant: you’ve found them all. Its pennant is yours, in its own colors.',
-    rows:'<div class="fd-row rf" data-r="'+F.rarity+'"><canvas data-pennant="'+id+'"></canvas><div><span class="k">Pennant · <b>New</b></span><h4>'+F.name+'</h4><p>'+(save.boat?'It flies from your skiff’s mast. Change it on Tacklegram’s Boat tab.':'For your boat’s mast, once you have one.')+'</p></div>'+(save.boat?(on?'<span class="tag ok">Flying from your mast</span>':'<button class="btn sm" type="button" data-fly="'+id+'">Fly it</button>'):'')+'</div>', go:'Lovely'}); }
+    rows:'<div class="fd-row rf" data-r="'+F.rarity+'"><canvas data-pennant="'+id+'"></canvas><div><span class="k">Pennant · <b>New</b></span><h4>'+F.name+'</h4><p>'+(save.boat?'It flies from your skiff’s mast. Change it on Tacklegram’s Boat tab.':'For your boat’s mast, once you have one.')+'</p></div>'+(save.boat?(on?'<span class="tag ok">On your mast</span>':'<button class="btn sm" type="button" data-fly="'+id+'">Fly it</button>'):'')+'</div>', go:'Lovely'}); }
 /** The Mayor's belongings all home: Pell brings his letter, and his paint. */
 function mayorGift(){ const j=jState(), FS=findsState(); if (j.mayor) return; j.mayor=Date.now(); if (!FS.notes.includes(MAYOR.note)) FS.notes.push(MAYOR.note); grantPaint(MAYOR.paint); persist(); updateJournalDot();
   sfx.out('legendary'); buzz([0,30,40,30]);

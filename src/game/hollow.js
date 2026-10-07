@@ -31,7 +31,7 @@ const log4Due = () => { const n=notesRead(); return n.includes('log3') && !n.inc
 const log5Due = () => { const n=notesRead(); return n.includes('log4') && !n.includes('log5') && !!(save.quarter && save.quarter.tips && save.quarter.tips.ring); };
 /** Grey stands on the lake dock's right pile, holding page 5 when it's his to give. */
 const greyPos = () => { const D=dockGeo(); return {x:D.rp, y:D.top-25}; };
-const greyHasPage = () => REG()==='lake' && !S.grey && !S.tut && log5Due();
+const greyHasPage = () => REG()==='lake' && !S.grey && !S.tut && !heronAway() && log5Due();   // (off on an errand, he brings it when he's back: game/heron.js)
 function onGrey(x,y){ if ((!greyHasPage() && !greyGift()) || S.state!=='idle') return false; const p=greyPos(); return x>p.x-18 && x<p.x+20 && y>p.y-50 && y<p.y+4; }
 /** Grey hands over the page in his beak. */
 function takeGreyPage(){ if (!greyHasPage()) return; const FS=findsState(); if (!FS.notes.includes('log5')) FS.notes.push('log5'); persist(); updateJournalDot();

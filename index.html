@@ -1161,8 +1161,8 @@ body:not([data-state="idle"]) .corner.center{transform:translateY(12px) scale(va
 .jr-cover{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center;margin:2px 0 12px;padding:12px;border:1.5px solid rgba(43,42,51,.18);border-radius:12px;background:linear-gradient(#F7EFDD,#EDE1C6)}
 .jr-all{--p:0%;width:84px;height:84px;border-radius:50%;display:grid;place-content:center;text-align:center;
   background:radial-gradient(closest-side,#FBF6EA 76%,transparent 77% 100%),conic-gradient(var(--brass) var(--p),rgba(43,42,51,.12) 0)}
-.jr-all b{font:400 22px/1 var(--display)}.jr-all span{font:800 9px/1.1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:#7A7468}
-.jr-rings{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:8px 6px}
+.jr-all b{font:400 22px/1.2 var(--display)}.jr-all span{margin-top:1px;font:800 9px/1.1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:#7A7468}
+.jr-rings{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px 6px}
 .jr-ring{--p:0%;display:grid;justify-items:center;gap:3px;min-width:0}
 .jr-ring i{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:800 11px/1 var(--body);font-style:normal;color:#4B4842;
   background:radial-gradient(closest-side,#FBF6EA 72%,transparent 73% 100%),conic-gradient(#6E9F5B var(--p),rgba(43,42,51,.12) 0)}
@@ -6827,7 +6827,7 @@ function lootPop(){ const L=S.loot, R=RAR[L.tier], ti=L.ti, top=L.y-(L.hv||0)-cr
   if (L.tier==='mythic'){ L.hole=0; lootSparks(L.x,top,40,'225,230,245',{v0:80,v1:380,g:10,m0:1,m1:2}); }
 }
 function lootReveal(){ const L=S.loot; if (L.phase==='reveal') return; L.phase='reveal'; showHaul(L); }
-function lootEnd(){ const L=S.loot; hideHaul(); closeNote(true); S.loot=null; S.darkT=0; S.zoomT=1; MU.duckT=0; if (coinShown!==save.coins) coinTally(500); updateHud(); setState('idle');
+function lootEnd(){ const L=S.loot; hideHaul(); closeNote(true); S.loot=null; S.darkT=0; S.zoomT=1; MU.duckT=0; if (coinShown!==save.coins) coinTally(500); updateHud(); setState('idle'); rewardsAfterCatch();   // a find can finish the Mayor's set (game/rewards.js)
   const FS=findsState(), fresh=L && L.got.items.some(it=>it.type==='find'||it.type==='note');
   if (fresh){ $('journalBtn').classList.remove('pulse'); void $('journalBtn').offsetWidth; $('journalBtn').classList.add('pulse'); }
   if (L && L.got.items.some(it=>it.type==='find' && FINDS[it.id].kind==='artifact') && !save.finds.pocketTip){ save.finds.pocketTip=true; persist();
@@ -11047,7 +11047,7 @@ function inkWaiting(dt){ const w=S.wait, I=w.ink, b=S.bob; I.t+=dt;
     if (I.a<=0){ w.ink=null; w.phase='empty'; w.t=rand(.8,1.6); const d=dreadState(); d.haunt=false; persist(); toast('The ink sank away',''); } } }
 /** A twitch while the ink's at the float strikes it: Dread rises, and the cast is over. */
 function inkStrike(){ const w=S.wait, I=w&&w.ink, b=S.bob; if (!I || I.phase==='sink' || !b) return false;
-  const d=dreadTick(); d.v=Math.min(100,d.v+DREAD.haunt); d.haunt=false; persist(); MODC.dirty=true; DR.pulse=1;
+  const d=dreadTick(); d.v=Math.min(100,d.v+DREAD.haunt*modMul('dread')); d.haunt=false; persist(); MODC.dirty=true; DR.pulse=1;
   for (let i=0;i<18;i++) S.particles.push({x:I.x,y:I.y,vx:rand(-90,90),vy:rand(-120,-20),g:240,life:0,max:rand(.5,1),r:rand(1.4,3),c:'rgba(18,14,34,'});
   ripple(I.x,I.y,34); dreadSting(d.v); buzz([0,60,40,90]); shake(4);
   toast('You struck the ink. It took a little of you with it','bad');
@@ -11141,7 +11141,7 @@ const log4Due = () => { const n=notesRead(); return n.includes('log3') && !n.inc
 const log5Due = () => { const n=notesRead(); return n.includes('log4') && !n.includes('log5') && !!(save.quarter && save.quarter.tips && save.quarter.tips.ring); };
 /** Grey stands on the lake dock's right pile, holding page 5 when it's his to give. */
 const greyPos = () => { const D=dockGeo(); return {x:D.rp, y:D.top-25}; };
-const greyHasPage = () => REG()==='lake' && !S.grey && !S.tut && log5Due();
+const greyHasPage = () => REG()==='lake' && !S.grey && !S.tut && !heronAway() && log5Due();   // (off on an errand, he brings it when he's back: game/heron.js)
 function onGrey(x,y){ if ((!greyHasPage() && !greyGift()) || S.state!=='idle') return false; const p=greyPos(); return x>p.x-18 && x<p.x+20 && y>p.y-50 && y<p.y+4; }
 /** Grey hands over the page in his beak. */
 function takeGreyPage(){ if (!greyHasPage()) return; const FS=findsState(); if (!FS.notes.includes('log5')) FS.notes.push('log5'); persist(); updateJournalDot();
@@ -11781,8 +11781,8 @@ function drawTwinShadow(){ const B=S.bite, b2=S.bob2; if (S.state!=='bite' || !B
 
 /* ---------- Grey's errands: the Heron's Feather (data/journal.js: HERON) ---------- */
 /* With the Heron's Feather, now and then at the lake Grey swoops off his pile and takes a common catch out of the air
-   as it comes in (never a new species, a record, a mutation or a three-star fish), and flies off with it: no coins, no
-   journal credit. A few casts later (anywhere) he's back on the pile with something in his beak, and a tap takes it.
+   as it comes in (never a new species, a record, a mutation, a three-star fish, or a catch that spends a Wanderer
+   bonus or the Moon Jar's light), and flies off with it: no coins, no journal credit. A few casts later (anywhere) he's back on the pile with something in his beak, and a tap takes it.
    His first errand brings the Mayor's toffee tin; after that his own finds (the Mayor's belongings: FINDS with
    from:'grey') come first while any are left, then a piece of your treasure map while you carry the Cartographer's Pin
    (their combo), a loose find, or a purse of coins.
@@ -11795,14 +11795,14 @@ function heronState(){ let h=save.heron; if (!h || typeof h!=='object' || Array.
 /** Off on an errand, or in the air: not on his pile. */
 const heronAway = () => !!S.heronFly || !!(save.heron && save.heron.out>0);
 /** What he's holding on the pile at the lake, to be tapped for (the logbook page comes first: game/hollow.js). */
-function greyGift(){ if (REG()!=='lake' || S.grey || S.tut || heronAway()) return null; return (save.heron && save.heron.gift) || null; }
+function greyGift(){ if (REG()!=='lake' || S.grey || S.tut || heronAway()) return null; return heronState().gift || null; }
 const greyPile = () => { const D=dockGeo(); return {x:D.rp, y:D.top-25}; };
 
 /* ---------- the theft ---------- */
 /** Whether Grey takes this catch (decided as it leaves the water: game/landing.js). */
 function heronTakes(L){ if (!L || L.eaten || S.tut || SIMULATING || REG()!=='lake' || !modFlag('heron') || heronAway() || S.grey || greyHasPage() || greyGift()) return false;
   const F=L.F, r=save.fish[L.id]||{};
-  if (F.rarity!=='common' || F.noSell || L.isNew || L.mut || L.stars>=3 || !r.pb || L.w>(r.bw||0)) return false;
+  if (F.rarity!=='common' || F.noSell || L.isNew || L.mut || L.wander || L.moon || L.stars>=3 || !r.pb || L.w>(r.bw||0)) return false;
   return Math.random()<HERON.steal; }
 /** He leaves the pile as the fish comes up, and meets it in the air: his beak is on it just as it's his (HERON_AT). */
 const HERON_AT=.45;
@@ -11947,7 +11947,7 @@ function giftSheet(o){
   const p=$('panel'); paintTiles(p.querySelectorAll('canvas[data-find],canvas[data-paint],canvas[data-notekind],canvas[data-pennant],canvas[data-rosette]')); paintFaces(p.querySelectorAll('canvas[data-who]'));
   p.querySelectorAll('[data-gpocket]').forEach(b=>b.addEventListener('click',()=>{ if (pocketIt(b.dataset.gpocket)) b.outerHTML='<span class="tag ok">In a pocket</span>'; }));
   p.querySelectorAll('[data-read]').forEach(b=>b.addEventListener('click',()=>openNote(b.dataset.read,{})));
-  p.querySelectorAll('[data-fly]').forEach(b=>b.addEventListener('click',()=>{ flyPennant(b.dataset.fly); sfx.hook(false); b.outerHTML='<span class="tag ok">Flying from your mast</span>'; })); }
+  p.querySelectorAll('[data-fly]').forEach(b=>b.addEventListener('click',()=>{ flyPennant(b.dataset.fly); sfx.hook(false); b.outerHTML='<span class="tag ok">On your mast</span>'; })); }
 /** A find on a gift sheet: what it is and does, and a pocket for it if it's an artifact. */
 function giftFindHTML(id){ const D=FINDS[id], art=D.kind==='artifact', eq=findsState().equip.includes(id);
   return '<div class="fd-row rf" data-r="'+D.rarity+'"><canvas data-find="'+id+'"></canvas><div><span class="k" style="color:'+rarInk(D.rarity)+'">'+RAR[D.rarity].label+' '+findKind(D)+' · <b>New</b></span><h4>'+D.name+'</h4><p>'+(D.eff||D.lore)+'</p>'+(D.down?'<p class="down">'+D.down+'</p>':'')+combosHTML(id)+'</div>'+
@@ -11973,7 +11973,7 @@ function pennantGift(id){ const j=jState(); if (j.pennants.includes(id)) return;
   sfx.out('epic'); buzz([0,20,30,20]); const F=FISH[id], on=j.pennant===id;
   giftSheet({name:'A pennant', sub:'Every mutation of the '+F.name, art:'<canvas class="rt-face" data-pennant="'+id+'"></canvas>',
     line:'Mossy, Glassy, Twin and Giant: you’ve found them all. Its pennant is yours, in its own colors.',
-    rows:'<div class="fd-row rf" data-r="'+F.rarity+'"><canvas data-pennant="'+id+'"></canvas><div><span class="k">Pennant · <b>New</b></span><h4>'+F.name+'</h4><p>'+(save.boat?'It flies from your skiff’s mast. Change it on Tacklegram’s Boat tab.':'For your boat’s mast, once you have one.')+'</p></div>'+(save.boat?(on?'<span class="tag ok">Flying from your mast</span>':'<button class="btn sm" type="button" data-fly="'+id+'">Fly it</button>'):'')+'</div>', go:'Lovely'}); }
+    rows:'<div class="fd-row rf" data-r="'+F.rarity+'"><canvas data-pennant="'+id+'"></canvas><div><span class="k">Pennant · <b>New</b></span><h4>'+F.name+'</h4><p>'+(save.boat?'It flies from your skiff’s mast. Change it on Tacklegram’s Boat tab.':'For your boat’s mast, once you have one.')+'</p></div>'+(save.boat?(on?'<span class="tag ok">On your mast</span>':'<button class="btn sm" type="button" data-fly="'+id+'">Fly it</button>'):'')+'</div>', go:'Lovely'}); }
 /** The Mayor's belongings all home: Pell brings his letter, and his paint. */
 function mayorGift(){ const j=jState(), FS=findsState(); if (j.mayor) return; j.mayor=Date.now(); if (!FS.notes.includes(MAYOR.note)) FS.notes.push(MAYOR.note); grantPaint(MAYOR.paint); persist(); updateJournalDot();
   sfx.out('legendary'); buzz([0,30,40,30]);
@@ -16514,6 +16514,7 @@ function modWhenText(w){
   if (w.fish) out.push('with '+FISH[w.fish].name);
   if (w.beh) out.push('for '+BEH[w.beh].toLowerCase()+'s');
   if (w.wander) out.push('on the day’s first '+ENCH.wanderer.first+' catches in each water');
+  if (w.top) out.push('in the first '+Math.round(RARE_BITES.clockfin.top*60)+' minutes of each hour');
   return out.join(', ');
 }
 /** A weather condition in words: "in the rain", "in rain and fog". */
@@ -16526,6 +16527,7 @@ function modState(m,now){ const w=m.when; if (!w) return 'on';
   if ((w.night && !now.night) || (w.night===false && now.night)) return 'off-now';
   if (w.wx && ![].concat(w.wx).includes(now.wx)) return 'off-now';
   if (w.bow && !bowFoot()) return 'off-now';
+  if (w.top && !topOfHour(RARE_BITES.clockfin.top)) return 'off-now';
   if (now.rarity && ((w.rarity && !w.rarity.includes(now.rarity)) || (w.rarityMin && rarRank(now.rarity)<rarRank(w.rarityMin)))) return 'off-here';
   const open=w.spot||w.fish||w.beh||w.lucky||w.bow||w.star||w.starlit||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
   return open ? 'cond' : 'on'; }
@@ -17224,6 +17226,7 @@ function simSave(st){
     for (const id of new Set([...REGION_FISH.lake,...REGION_FISH.river])) s.tanks.fresh.fish.push(F(id),F(id));
     for (const id of new Set([...REGION_FISH.coast,...REGION_FISH.marsh.filter(id=>tankOf(id)==='salt')])) s.tanks.salt.fish.push(F(id),F(id)); }
   if (st.fish) for (const id in st.fish) s.fish[id]={caught:st.fish[id].caught||0,best:0,seen:true};
+  if (st.journal) s.journal={miles:(st.journal.miles||[]).slice()};   // the journal's milestones and the luck they lend (game/rewards.js)
   else if (st.mastery) for (const id in FISH) s.fish[id]={caught:MASTERY.catches+2,best:0,seen:true};
   // the shack: copied from a real save, or every line fixed and the wall full (game/shack.js: shackFull)
   if (st.shack==='all') s.shack=shackFull(); else if (st.shack) s.shack=JSON.parse(JSON.stringify(st.shack));
@@ -17456,7 +17459,7 @@ function balanceFormHTML(){
 function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:f.rod, reel:f.reel, line:f.line, bait:f.bait||null, meal:f.meal?{id:f.meal,stars:+f.stars}:null,
     parts:f.parts==='all'?'all':f.parts==='mine'?(save.parts||[]).slice():[], lucky:f.lucky==='yes', player:f.player};
   if (f.sets==='mine') st.tanks=tanks(); else st.sets=f.sets;
-  if (f.mastery==='mine') st.fish=save.fish; else st.mastery=f.mastery==='all';
+  if (f.mastery==='mine'){ st.fish=save.fish; st.journal=jState(); } else st.mastery=f.mastery==='all';   // your fish, and the luck your journal's milestones lend
   if (f.shack==='all') st.shack='all'; else if (f.shack!=='none') st.shack=shackState();
   if (f.finds==='mine') st.finds=findsState(); else if (f.finds!=='none') st.artifacts=[f.finds];
   if (f.runes==='mine' || !f.runes) st.enchSave=enchState(); else if (f.runes!=='none') st.ench=[f.runes];

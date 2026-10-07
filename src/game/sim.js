@@ -69,6 +69,7 @@ function simSave(st){
     for (const id of new Set([...REGION_FISH.lake,...REGION_FISH.river])) s.tanks.fresh.fish.push(F(id),F(id));
     for (const id of new Set([...REGION_FISH.coast,...REGION_FISH.marsh.filter(id=>tankOf(id)==='salt')])) s.tanks.salt.fish.push(F(id),F(id)); }
   if (st.fish) for (const id in st.fish) s.fish[id]={caught:st.fish[id].caught||0,best:0,seen:true};
+  if (st.journal) s.journal={miles:(st.journal.miles||[]).slice()};   // the journal's milestones and the luck they lend (game/rewards.js)
   else if (st.mastery) for (const id in FISH) s.fish[id]={caught:MASTERY.catches+2,best:0,seen:true};
   // the shack: copied from a real save, or every line fixed and the wall full (game/shack.js: shackFull)
   if (st.shack==='all') s.shack=shackFull(); else if (st.shack) s.shack=JSON.parse(JSON.stringify(st.shack));

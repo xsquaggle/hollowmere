@@ -1,7 +1,7 @@
 /* ---------- Grey's errands: the Heron's Feather (data/journal.js: HERON) ---------- */
 /* With the Heron's Feather, now and then at the lake Grey swoops off his pile and takes a common catch out of the air
-   as it comes in (never a new species, a record, a mutation or a three-star fish), and flies off with it: no coins, no
-   journal credit. A few casts later (anywhere) he's back on the pile with something in his beak, and a tap takes it.
+   as it comes in (never a new species, a record, a mutation, a three-star fish, or a catch that spends a Wanderer
+   bonus or the Moon Jar's light), and flies off with it: no coins, no journal credit. A few casts later (anywhere) he's back on the pile with something in his beak, and a tap takes it.
    His first errand brings the Mayor's toffee tin; after that his own finds (the Mayor's belongings: FINDS with
    from:'grey') come first while any are left, then a piece of your treasure map while you carry the Cartographer's Pin
    (their combo), a loose find, or a purse of coins.
@@ -14,14 +14,14 @@ function heronState(){ let h=save.heron; if (!h || typeof h!=='object' || Array.
 /** Off on an errand, or in the air: not on his pile. */
 const heronAway = () => !!S.heronFly || !!(save.heron && save.heron.out>0);
 /** What he's holding on the pile at the lake, to be tapped for (the logbook page comes first: game/hollow.js). */
-function greyGift(){ if (REG()!=='lake' || S.grey || S.tut || heronAway()) return null; return (save.heron && save.heron.gift) || null; }
+function greyGift(){ if (REG()!=='lake' || S.grey || S.tut || heronAway()) return null; return heronState().gift || null; }
 const greyPile = () => { const D=dockGeo(); return {x:D.rp, y:D.top-25}; };
 
 /* ---------- the theft ---------- */
 /** Whether Grey takes this catch (decided as it leaves the water: game/landing.js). */
 function heronTakes(L){ if (!L || L.eaten || S.tut || SIMULATING || REG()!=='lake' || !modFlag('heron') || heronAway() || S.grey || greyHasPage() || greyGift()) return false;
   const F=L.F, r=save.fish[L.id]||{};
-  if (F.rarity!=='common' || F.noSell || L.isNew || L.mut || L.stars>=3 || !r.pb || L.w>(r.bw||0)) return false;
+  if (F.rarity!=='common' || F.noSell || L.isNew || L.mut || L.wander || L.moon || L.stars>=3 || !r.pb || L.w>(r.bw||0)) return false;
   return Math.random()<HERON.steal; }
 /** He leaves the pile as the fish comes up, and meets it in the air: his beak is on it just as it's his (HERON_AT). */
 const HERON_AT=.45;

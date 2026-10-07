@@ -139,7 +139,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/shack.js` | 179 | The shack's front room: `openShack`, the trophy wall (`mountFish`, `unmount`, `canMount`), the fix-up list (`buyFix`, `fixDone`, `shackTankCap`), the curio shelf, the rod rack, the trapdoor (shut fast until the water under it drains: game/hollow.js), the shack's modifiers (`fixUpMods`) |
 | `src/game/shack-art.js` | 387 | The front room drawn: `shLayout`, walls, window, the uncle's list, shelf or cabinet, floor, trapdoor, stove, net, rod rack; plaques and mounts with their rarity kit, a third-star mount mid-leap (`shLeaps`, `shLeapWave`) |
 | `src/game/journal.js` | 76 | The journal: species pages (the cover's rings: `journalCoverHTML`; a species' three stars: `jStarsHTML`; a Godly fish's Ledger: `ledgerHTML`; what a fish remembers: `memoryAt`, `memoryKnown`, `memoryHTML`; its mutations: `mutLineHTML`), records |
-| `src/game/bonuses.js` | 109 | The Bonuses journal page |
+| `src/game/bonuses.js` | 111 | The Bonuses journal page |
 | `src/game/saves.js` | 116 | `BUILD` number, backup codes, earlier saves, settings and sound sheets, About's "Watch the opening again" and "Watch the supper again" |
 | `src/game/save.js` | 21 | `load` and `persist` (localStorage) |
 
@@ -156,7 +156,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | --- | --- | --- |
 | `src/game/playtest.js` | 168 | The hidden Playtest sheet (the wrench, or a long press on the clock): forcing fish, the weather, the moon and the tide (`TIDE_PINS`), and the Quarter's, the Hollow's, the story's and the journal's menus (`playtestQuarter`, `playtestHollow`, `playtestStory`, `playtestJournal`) |
 | `src/game/balance.js` | 100 | Playtest > Balance: run the simulator on any setup (Dread for the Bonewhistle) |
-| `src/game/sim.js` | 237 | The balance simulator: the 1,000-cast report, the river's drift, the marsh's tide, the coast's churn, beam and wash, the Quarter's pages and reflections, the Hollow's lights and a fish led in from the dark (`SIM_SPOTS`, `SIM_PLAYERS`) |
+| `src/game/sim.js` | 238 | The balance simulator: the 1,000-cast report, the river's drift, the marsh's tide, the coast's churn, beam and wash, the Quarter's pages and reflections, the Hollow's lights and a fish led in from the dark (`SIM_SPOTS`, `SIM_PLAYERS`) |
 | `src/game/pace.js` | 54 | The pace log: minutes of play and when each rod, part, fix, pocket, rune and species first came, and the way down to the Hollow (`paceTick`, `paceKeys`), and Playtest > Pace beside the simulator's run (`paceHTML`) |
 
 ## Content tables (`src/data/`)
@@ -225,5 +225,5 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/marsh.test.cjs` | 216 | Saltmarsh: Wren's glow quest and the punt, the tide and the moon, the mud splat and the stranded float, the tide's bites and pools, the Lantern Rod and the Lampwick Eel, the Bellmouth |
 | `tests/quarter.test.cjs` | 362 | The Drowned Quarter: casting through doors and windows, Pell's rowboat and his round of letters, posting and answers, the drifting envelopes and the Tidecaller, the bell tower and the Choir Fish, the Paper Carp and the Hearthfish, the Bonewhistle, Dread and the eye, the ink shadow, the conch's rain, the map |
 | `tests/hollow.test.cjs` | 238 | The Hollow: page 3 and the uncle's map, page 4 in its cache, Grey's page 5, the Drowned Bell at 3:12 and the trapdoor, the lights and the dark, leading a fish into the light, the eye and the Sleeper's Scale, the Ledger and the Stillwater Mirror, falling stars and omens, the fish drawn and simulated |
-| `tests/roster.test.cjs` | 282 | The full roster: last lines and the third star (and the leaping mount), page relics from Grey, Wren, Ottilie, Barnaby and Pell, milestones and their paints and luck, pennants, Grey's errands with the Heron's Feather, the Mayor's belongings and letter, the page relics at work, the Hungry Hook's growth, the three new meals, the journal at four screen sizes, and Playtest > The journal |
+| `tests/roster.test.cjs` | 296 | The full roster: last lines and the third star (and the leaping mount), page relics from Grey, Wren, Ottilie, Barnaby and Pell, milestones and their paints and luck, pennants, Grey's errands with the Heron's Feather, the Mayor's belongings and letter, the page relics at work, the Hungry Hook's growth, the three new meals, the journal at four screen sizes, and Playtest > The journal |
 | `tests/story.test.cjs` | 248 | The story pass: Ottilie by chapter, Wren's and Pell's later lines, fish memories, the Row's invitation, supper on Lantern Row and its card, the replay, Playtest > The story, and the scene at four screen sizes |
