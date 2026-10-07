@@ -1,6 +1,8 @@
 /* ---------- Map and travel ---------- */
 const LBL={lake:[0,24,'middle'],coast:[0,-16,'middle'],river:[-12,4,'end'],marsh:[-10,-10,'end'],quarter:[0,-32,'middle'],hollow:[12,4,'start'],ocean:[-2,22,'middle']};
 const ROUTE_D='M112 352 C134 336 142 318 150 300 C160 278 186 258 212 238 C236 220 248 196 262 172 C266 164 270 158 274 154';
+/** The boat's flag on the map: your pennant in its fish's colors, or the plain red one. */
+function mapPennant(){ const id=pennantOn(), F=id&&FISH[id]; return F?'<path d="M0 -15 l7 1 l-2 1.4 l2 1.4 l-7 .6 Z" fill="'+F.color+'" stroke="#2B2A33" stroke-width=".6"/><path d="M0 -15 l1.6 .25 v3.1 l-1.6 .15 Z" fill="'+F.fin+'"/>':'<path d="M0 -15 l5 1.5 l-5 1.5" fill="#B4584A"/>'; }
 function mapSVG(){
   const tree=(x,y,s=1)=>'<g transform="translate('+x+' '+y+') scale('+s+')"><path d="M0 -9 L5 0 L-5 0 Z" fill="#7E9A63" stroke="#2B2A33" stroke-width=".8"/><path d="M0 0 V3" stroke="#2B2A33" stroke-width="1"/></g>';
   const mtn=(x,y,s=1)=>'<g transform="translate('+x+' '+y+') scale('+s+')"><path d="M-14 0 L0 -18 L14 0 Z" fill="#E4D6B6" stroke="#2B2A33" stroke-width="1"/><path d="M0 -18 L5 0" stroke="#2B2A33" stroke-width=".8" opacity=".5"/><path d="M-4 -12 L0 -18 L4 -12 L1 -13 L-1 -11 Z" fill="#FBF6EA"/></g>';
@@ -62,7 +64,7 @@ function mapSVG(){
       (open?'<circle cx="'+p.x+'" cy="'+p.y+'" r="'+(here?9:7)+'" fill="'+(here?'#C9A15A':'#F7EDD5')+'" stroke="#2B2A33" stroke-width="2"/>'
            :'<circle cx="'+p.x+'" cy="'+p.y+'" r="7" fill="#E8DCC0" stroke="#2B2A33" stroke-width="1.2" stroke-dasharray="2 2"/><text x="'+p.x+'" y="'+(p.y+3.5)+'" text-anchor="middle" font-family="Nunito, sans-serif" font-size="9" font-weight="800" fill="#6B665C">?</text>')+
       '<text x="'+(p.x+LBL[id][0])+'" y="'+(p.y+LBL[id][1])+'" text-anchor="'+LBL[id][2]+'" font-family="Young Serif, Georgia, serif" font-size="'+(open?13:10.5)+'" fill="#2B2A33" opacity="'+(open?1:.5)+'">'+p.name+'</text></g>'; });
-  t+='<g id="mapBoat"><ellipse cx="0" cy="5" rx="11" ry="2.5" fill="#2B2A33" opacity=".15"/><path d="M-10 0 L10 0 L7 5 L-7 5 Z" fill="'+(PAINTS[save.paint]||PAINTS.blue).hull+'" stroke="#2B2A33" stroke-width="1"/><path d="M0 0 L0 -15 L9 -2 Z" fill="#F7EDD5" stroke="#2B2A33" stroke-width="1"/><path d="M0 -15 l5 1.5 l-5 1.5" fill="#B4584A"/></g>';
+  t+='<g id="mapBoat"><ellipse cx="0" cy="5" rx="11" ry="2.5" fill="#2B2A33" opacity=".15"/><path d="M-10 0 L10 0 L7 5 L-7 5 Z" fill="'+(PAINTS[save.paint]||PAINTS.blue).hull+'" stroke="#2B2A33" stroke-width="1"/><path d="M0 0 L0 -15 L9 -2 Z" fill="#F7EDD5" stroke="#2B2A33" stroke-width="1"/>'+mapPennant()+'</g>';
   t+='<rect x="0" y="0" width="360" height="480" fill="url(#mv)" pointer-events="none"/>';
   t+='<rect x="3" y="3" width="354" height="474" fill="none" stroke="#2B2A33" stroke-width="1.5" opacity=".5" pointer-events="none"/>';
   return '<svg viewBox="0 0 360 480" role="img" aria-label="Map of Hollowmere and the coast">'+t+'</svg>';

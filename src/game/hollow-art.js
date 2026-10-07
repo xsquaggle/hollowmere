@@ -172,7 +172,7 @@ function drawHollowWater(){ const h=G.hollow, t=S.time, c=ctx; if (!h) return;
   for (let i=0;i<8;i++){ const y=S0.y-S0.ry*.2+i*S0.ry*.42, w=S0.rx*(1.1-i*.08)*(.8+.2*Math.sin(t*1.2+i)), a=(.14-i*.012)*pu; if (a<=0) continue;
     c.fillStyle='rgba(120,230,200,'+a.toFixed(3)+')'; c.fillRect(S0.x-w+Math.sin(t*.8+i*1.7)*4,y,w*2,1.4+i*.2); }
   // the lantern's pool: warm light lying on the water by the ledge
-  if (!HS.lampOut){ const P=h.lamp, fl=.88+.12*Math.sin(t*13)*Math.sin(t*7.3);
+  if (!HS.lampOut){ const L0=h.lamp, rr=lampReach(), P={x:L0.x, y:L0.y, rx:L0.rx*rr, ry:L0.ry*rr}, fl=.88+.12*Math.sin(t*13)*Math.sin(t*7.3);   // the Lantern Glass reaches further (game/hollow.js)
     const g=c.createRadialGradient(P.x,P.y,4,P.x,P.y,P.rx); g.addColorStop(0,'rgba(255,196,120,'+(.2*fl).toFixed(3)+')'); g.addColorStop(1,'rgba(255,196,120,0)');
     c.save(); c.translate(P.x,P.y); c.scale(1,P.ry/P.rx); c.translate(-P.x,-P.y); c.fillStyle=g; c.beginPath(); c.arc(P.x,P.y,P.rx,0,Math.PI*2); c.fill(); c.restore();
     for (let i=0;i<9;i++){ const y=P.y-P.ry*.7+i*P.ry*.18, w=P.rx*(.25+.35*Math.sin((i+.5)/9*Math.PI))*(.8+.2*Math.sin(t*1.6+i*2)); c.fillStyle='rgba(255,214,150,'+(.1*fl).toFixed(3)+')'; c.fillRect(P.x-w+Math.sin(t*1.1+i)*5,y,w*2,1.3); } }

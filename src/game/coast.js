@@ -170,6 +170,7 @@ function drawSkiffDeck(){
   ctx.beginPath(); ctx.moveTo(cx,tipY+4); ctx.quadraticCurveTo(cx-90,H-150+b,cx-150,H); ctx.moveTo(cx,tipY+4); ctx.quadraticCurveTo(cx+90,H-150+b,cx+150,H); ctx.stroke();
   const PT=PAINTS[save.paint]||PAINTS.blue;
   ctx.fillStyle=hullColor(); ctx.beginPath(); ctx.moveTo(cx,tipY); ctx.quadraticCurveTo(cx-86,H-150+b,cx-140,H+4); ctx.lineTo(cx+140,H+4); ctx.quadraticCurveTo(cx+86,H-150+b,cx,tipY); ctx.closePath(); ctx.fill();
+  if (PT.leaf || PT.gilt) hullDressDeck(ctx,PT,cx,tipY,b);   // the journal's paints (data/gear.js)
   if (PT.stars){ ctx.save(); ctx.clip(); for (let i=0;i<14;i++){ const sx=cx+((i*53)%260)-130, sy=H-130+b+((i*37)%120), tw=.4+.6*Math.abs(Math.sin(S.time*1.3+i)); ctx.fillStyle='rgba(225,230,245,'+tw.toFixed(2)+')'; ctx.beginPath(); ctx.arc(sx,sy,1.3,0,7); ctx.fill(); } ctx.restore(); }
   ctx.fillStyle=PT.trim||'#EDE6D6'; ctx.beginPath(); ctx.moveTo(cx,tipY+6); ctx.quadraticCurveTo(cx-80,H-150+b,cx-130,H+4); ctx.lineTo(cx-122,H+4); ctx.quadraticCurveTo(cx-74,H-148+b,cx,tipY+14); ctx.quadraticCurveTo(cx+74,H-148+b,cx+122,H+4); ctx.lineTo(cx+130,H+4); ctx.quadraticCurveTo(cx+80,H-150+b,cx,tipY+6); ctx.closePath(); ctx.fill();
   if (!SC.skiffArt || SC.skiffArt.key!==W+'x'+H+'@'+DPR) buildSkiffDeck();
@@ -178,6 +179,9 @@ function drawSkiffDeck(){
   // the lantern on its pole
   const L=G.lantern; ctx.strokeStyle=INK; ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(L.x+6,H-95+b); ctx.lineTo(L.x+6,L.y-8+b); ctx.lineTo(L.x,L.y-8+b); ctx.lineTo(L.x,L.y-10.5+b); ctx.stroke();
   lanternBody(L.x,L.y+b,Math.sin(S.time*.9)*.05);
+  // your pennant, on a staff above the lantern pole (game/rewards.js)
+  const pid=pennantOn(); if (pid){ const px=L.x+6, py=L.y-8+b; ctx.strokeStyle=INK; ctx.lineWidth=2.2; ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,py-30); ctx.stroke();
+    ctx.fillStyle=BRASS; ctx.beginPath(); ctx.arc(px,py-31,2.2,0,Math.PI*2); ctx.fill(); ctx.save(); ctx.translate(px,py-28); drawPennant(ctx,pid,34,S.time); ctx.restore(); }
   if (hasPart('sonar')){ const dx=cx+44, dy=H-128+b; ctx.strokeStyle=INK; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(dx,dy+12); ctx.lineTo(dx,dy); ctx.stroke();
     ctx.save(); ctx.translate(dx,dy); ctx.rotate(Math.sin(S.time*1.5)*.6); ctx.fillStyle='#D9D2C2'; ctx.beginPath(); ctx.ellipse(0,-3,7,3.5,0,Math.PI,0); ctx.fill(); ctx.strokeStyle=INK; ctx.lineWidth=1.2; ctx.stroke(); ctx.restore();
     ctx.fillStyle='rgba(120,240,170,'+(.5+.5*Math.sin(S.time*5)).toFixed(2)+')'; ctx.beginPath(); ctx.arc(dx,dy-4,1.6,0,Math.PI*2); ctx.fill(); }

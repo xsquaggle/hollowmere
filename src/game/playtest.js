@@ -28,7 +28,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
     '<label for="tTide">Tide<output id="tTideO">'+tideName()+'</output><select id="tTide"><option value="">As the moon has it</option>'+
       TIDE_PINS.map(([v,l])=>'<option value="'+v+'"'+(save.tidePin===v?' selected':'')+'>'+l+', held</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">The Saltmarsh’s tide turns every 6 in-game hours or so. Low water bares the mud banks and fills the tide pools; the flood brings the fish in. Pin the moon full or new for a spring tide.</span></label>'+
     '<label for="tFix">Shack<output id="tFixO">'+shackState().fix.length+' of '+FIXUP.filter(L=>L.cost).length+' fixed</output><select id="tFix"><option value="">Fix a line for free…</option>'+FIXUP.filter(L=>L.cost).map(L=>'<option value="'+L.id+'"'+(fixDone(L.id)?' disabled':'')+'>'+L.name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Your uncle’s fix-up list, in the shack. Fill the wall puts a fish of every rarity up on the free plaques.</span></label>'+
-    '<label for="tRelic">Story relics<output id="tRelicO">'+Object.keys(STORY).filter(hasFind).length+' of '+Object.keys(STORY).length+'</output><select id="tRelic"><option value="">Hand one over…</option>'+Object.keys(STORY).map(id=>'<option value="'+id+'"'+(hasFind(id)?' disabled':'')+'>'+FINDS[id].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Each is found its own way: the almanac from Ottilie, the jar on the moonpath, the bell in the deep pool’s small-hours fog, the pin in your first map’s cache.</span></label>'+playtestQuarterHTML()+playtestHollowHTML()+playtestStoryHTML()+'</div>'+
+    '<label for="tRelic">Story relics<output id="tRelicO">'+Object.keys(STORY).filter(hasFind).length+' of '+Object.keys(STORY).length+'</output><select id="tRelic"><option value="">Hand one over…</option>'+Object.keys(STORY).map(id=>'<option value="'+id+'"'+(hasFind(id)?' disabled':'')+'>'+FINDS[id].name+'</option>').join('')+'</select><span class="note" style="grid-column:1/-1;margin:0">Each is found its own way: the almanac from Ottilie, the jar on the moonpath, the bell in the deep pool’s small-hours fog, the pin in your first map’s cache.</span></label>'+playtestQuarterHTML()+playtestHollowHTML()+playtestStoryHTML()+playtestJournalHTML()+'</div>'+
     '<p class="note">Gate A: friends play from the opening with no help. Watch for where they hesitate. The Balance tab plays 1,000 casts with any setup.</p>'+
     '<div class="row"><button class="btn" id="coinBtn" type="button">+1,000 coins</button><button class="btn" id="barBtn" type="button">Summon Barnaby</button><button class="btn" id="gullBtn" type="button">Send a gull</button><button class="btn" id="stockBtn" type="button">Stock keepnet</button><button class="btn" id="hourBtn" type="button">Pass an hour</button><button class="btn" id="seventhBtn" type="button">Seventh wave next</button><button class="btn" id="jarBtn" type="button">Fill the Moon Jar</button><button class="btn" id="wallBtn" type="button">Fill the wall</button><button class="btn" id="mapBtn2" type="button">Finish the map</button><button class="btn" id="bowBtn" type="button">'+(wxState().bow?'Clear the rainbow':'Rainbow now')+'</button><button class="btn" id="findsBtn" type="button">Find everything</button><button class="btn" id="gearBtn" type="button">All tackle</button><button class="btn" id="introBtn" type="button">Replay opening</button><button class="btn" id="hideLab" type="button">Hide this wrench</button><button class="btn" id="replayTut" type="button">Replay tutorial</button><button class="btn" id="resetT" type="button">Reset tuning</button><button class="btn" id="resetAll" type="button">Erase progress</button></div>');
   bindPlaytestTabs();
@@ -56,6 +56,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   $('tQuarter').addEventListener('change',e=>{ const v=e.target.value; if (v) playtestQuarter(v); });
   $('tHollow').addEventListener('change',e=>{ const v=e.target.value; if (v) playtestHollow(v); });
   $('tStory').addEventListener('change',e=>{ const v=e.target.value; if (v) playtestStory(v); });
+  $('tJournal').addEventListener('change',e=>{ const v=e.target.value; if (v) playtestJournal(v); });
   // the coast: the next swell to rise is a seventh wave (game/coast-sea.js)
   $('seventhBtn').addEventListener('click',()=>{ if (REG()!=='coast'){ toast('The swells only roll in at the coast','warn'); return; } closeSheet(); seventhNext(); });
   $('bowBtn').addEventListener('click',()=>{ const w=wxState(); if (w.bow) delete w.bow; else w.bow=true; persist(); buildBg(); closeSheet(); if (w.bow && isNight(save.clock)) toast('Rainbows only come by day','warn'); });
@@ -141,3 +142,27 @@ function playtestStory(v){ const st=storyState(), q=quarterState(), FS=findsStat
   // the bell stays quiet for the rest of the hour, so it doesn't start again under you
   if (v==='forget'){ delete st.supper; delete st.card; delete st.tip; delete q.done.supper; persist(); MODC.dirty=true; news('The supper hasn’t come yet',''); return; }
   if (v==='ott'){ OTT.say=ottLine(); OTT.sayT=4.5; OTT.next=rand(20,35); } }
+
+/* ---------- the journal's tools (game/rewards.js, game/heron.js) ---------- */
+function playtestJournalHTML(){ const j=jState(), n=ROSTER.filter(caughtAny).length, h=save.heron||{};
+  const o=(v,l,off)=>'<option value="'+v+'"'+(off?' disabled':'')+'>'+l+'</option>';
+  return '<label for="tJournal">The journal<output>'+n+' of '+ROSTER.length+' species · '+Object.keys(j.pages).length+' pages · '+j.pennants.length+' pennants'+(h.out>0?' · Grey back in '+h.out:'')+'</output><select id="tJournal"><option value="">Do something…</option>'+
+    o('page','Catch every fish on this water’s page once',pageDone(REG()))+o('next','Catch species up to the next milestone',!MILESTONES.some((M,i)=>!j.miles.includes(i)))+
+    o('stars','Three stars for every fish caught here')+o('muts','Find every mutation of a fish caught here (a pennant)')+
+    o('feather','Hand over the Heron’s Feather',hasFind('heronfeather'))+o('grey','Grey back from an errand on your next cast')+o('mayor','Bring the Mayor’s belongings home',mayorDone())+
+    o('forget','Forget the journal’s rewards (keeps your catches)',!Object.keys(j.pages).length && !j.miles.length && !j.pennants.length && !j.mayor)+
+    '</select><span class="note" style="grid-column:1/-1;margin:0">A full page brings its water’s relic; a quarter, half, three quarters and all of the chapter’s species bring a title, a hull paint and luck; every mutation of a fish brings its pennant. With the Heron’s Feather in a pocket, Grey now and then takes a common catch at the lake and comes back with something better.</span></label>'; }
+function playtestJournal(v){ const j=jState(), FS=findsState(), here=REGION_FISH[REG()]; closeSheet();
+  const catchIt=id=>{ const r=rec(id); r.seen=true; r.caught=Math.max(1,r.caught||0); };
+  if (v==='page'){ here.forEach(catchIt); }
+  if (v==='next'){ const n=ROSTER.filter(caughtAny).length, M=MILESTONES.find((M,i)=>!j.miles.includes(i)); let k=Math.max(0,Math.ceil(M.at*ROSTER.length-n));
+    for (const id of ROSTER) if (k>0 && !caughtAny(id)){ catchIt(id); k--; } }
+  if (v==='stars'){ for (const id of here) if (caughtAny(id)) rec(id).caught=Math.max(rec(id).caught,lastAt(id)); SH.ver++; }
+  if (v==='muts'){ const id=here.find(id=>caughtAny(id) && rarRank(FISH[id].rarity)<rarRank('mythic') && !pennantDone(id)); if (!id){ toast('Catch a fish here first','warn'); return; }
+    for (const k of PENNANT.muts) noteMutation(id,k); }
+  if (v==='feather'){ FS.have.heronfeather={t:Date.now(), hr:save.clock, reg:'lake', src:'page'}; FS.fresh.push('heronfeather');
+    if (!FS.equip.includes('heronfeather')){ if (FS.equip.length>=FS.pockets) FS.equip.pop(); FS.equip.push('heronfeather'); } MODC.dirty=true; updateJournalDot(); news('The Heron’s Feather is in a pocket','good'); }
+  if (v==='grey'){ const h=heronState(); h.out=1; h.gift=null; news('Grey’s off on an errand. He’s back after your next cast',''); }
+  if (v==='mayor'){ for (const id of MAYOR.items) if (!FS.have[id]){ FS.have[id]={t:Date.now(), hr:save.clock, reg:'lake', src:FINDS[id].from==='grey'?'grey':'story'}; FS.fresh.push(id); } updateJournalDot(); }
+  if (v==='forget'){ save.journal={}; jState(); RW.wait=false; MODC.dirty=true; news('The journal’s rewards are ungiven, and come again',''); }
+  persist(); MODC.dirty=true; rewardsAfterCatch(); }

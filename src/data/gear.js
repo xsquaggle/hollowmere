@@ -7,7 +7,8 @@
    Pell's, the Bonewhistle comes up out of the bell tower, and the Stillwater Mirror up out of the Hollow's eye after the
    Sleeper's Scale: game/godly.js). cursed:true for cursed gear (data/quarter.js: DREAD).
    ROD_ORDER  Ottilie's shop ladder (each rod about 2.5 times the last, set by the depth gate's whole-run report).  SEA_RODS  the Tacklegram ladder.  PARTS (with their mods), PAINTS  boat upgrades and colors
-              (a paint with crate: only comes in loot crates; the rest are sold on Tacklegram).
+              (a paint with crate: only comes in loot crates; with journal: only from the journal's rewards,
+              data/journal.js; the rest are sold on Tacklegram).
    A modifier is {stat, v, when?, omen?}: stat names an entry in STATS; when limits it to a region, spot, time
    (night:true, or night:false for daytime), fish, rarity (a list) or rarityMin (that rarity and rarer); omen:true multiplies luck after the
    ceilings, like Gull Luck. */
@@ -69,4 +70,10 @@ const PAINTS={blue:{name:'Harbor Blue',hull:'#3E5A6E',price:0},red:{name:'Lobste
   violet:{name:'Violet Dusk',hull:'#5B4A7A',crate:'epic',trim:'#C9B6E8'},
   gilded:{name:'Gilded',hull:'#A8823A',crate:'legendary',trim:'#F2D47E'},
   aurora:{name:'Aurora',hull:'#3E7A8A',crate:'exotic',shift:true,trim:'#E8F6F2'},
-  inkwater:{name:'Inkwater',hull:'#1C1B24',crate:'mythic',stars:true,trim:'#C4C8D4'}};
+  inkwater:{name:'Inkwater',hull:'#1C1B24',crate:'mythic',stars:true,trim:'#C4C8D4'},
+  // only from the journal (data/journal.js): journal says how. leaf lays pressed leaves along the hull, gilt a gold scroll
+  fern:{name:'Pressed Fern',hull:'#55704A',journal:'A quarter of the species in your journal',trim:'#D8E4B4',leaf:true},
+  margin:{name:'Ink and Margin',hull:'#262B3E',journal:'Half the species in your journal',trim:'#EFE5CC'},
+  kingfisher:{name:'Kingfisher',hull:'#1C7FA8',journal:'Three quarters of the species in your journal',trim:'#E8833A'},
+  illuminated:{name:'Illuminated',hull:'#2C3F8E',journal:'Every species in your journal',trim:'#F2D47E',gilt:true},
+  regalia:{name:'Mayor’s Regalia',hull:'#6E1F2E',journal:'All the Mayor’s belongings, home again',trim:'#E2B13C',gilt:true}};

@@ -23,7 +23,10 @@
               mods (modifiers, as on rods: see data/stats.js). A curio with an owner can be returned for a reward:
               {coins, keepsake, line}. from:'return' keepsakes only come as rewards for returned curios, from:'town' ones from the
               town (data/orders.js), and from:'story' artifacts are the story relics, each found its own way (data/relics.js:
-              STORY). Exotic and Mythic finds only come in crates. Drawn in game/loot-art.js and game/relic-art.js.
+              STORY). from:'page' relics come from finishing a water's page in the journal, and from:'grey' curios only
+              from Grey's errands (data/journal.js: PAGES, MAYOR). Exotic and Mythic finds only come in crates. A mod
+              with grows:true is the Hungry Hook's value, which grows on the Twin Spool (data/relics.js: HUNGRY).
+              Drawn in game/loot-art.js and game/relic-art.js (the journal's relics: game/journal-art.js).
    OWNERS     who in town lost things (you give them back from the journal's Finds page).  POCKETS  the vest: pockets you start with, the most, and what Ottilie
               charges to sew each one after the first.
    NOTES      what's inside message bottles (kind bottle), the uncle's logbook pages (logbook: pages 1 to 3 in bottles, 4 in a
@@ -32,7 +35,8 @@
               Quarter's letters are posted back through their doors (data/quarter.js: PELL.post), and each one's reply
               (reply, re: the letter it answers) comes back on a Postman Sturgeon; pell: what he says as he takes it.
               The invite (kind invite) is Lantern Row's invitation to supper, which Pell brings you once you've read
-              your uncle's last page (data/quarter.js: PELL_Q.supper).
+              your uncle's last page (data/quarter.js: PELL_Q.supper). The Mayor's letter (kind mayor) comes with Pell
+              once all the Mayor's belongings are home (data/journal.js: MAYOR).
               Lines are written the way they're inked. LETTER_ORDER: the order letters turn up in; REPLY_ORDER: their answers. */
 const TREASURE={
   rate:1/12, firstRate:1/4, from:8,
@@ -95,7 +99,7 @@ const FINDS={
   hourglass:{name:'Cracked Hourglass', kind:'artifact', rarity:'rare', region:'any', lore:'The sand runs uphill when nobody is looking.',
             eff:'Time passes three times as fast.', down:'Tank tips build up half as fast.', mods:[{stat:'clock', v:3}, {stat:'tips', v:.5}]},
   hungryhook:{name:'Hungry Hook', kind:'artifact', rarity:'epic', region:'any', lore:'It was hungry when your uncle found it. It still is.',
-            eff:'Fish are worth twice as much.', down:'1 catch in 5 gets eaten: no coins, no journal credit.', mods:[{stat:'value', v:2}, {stat:'eaten', v:.2}]},
+            eff:'Fish are worth twice as much.', down:'1 catch in 5 gets eaten: no coins, no journal credit.', mods:[{stat:'value', v:2, grows:true}, {stat:'eaten', v:.2}]},
   wishbone:{name:'Gull’s Wishbone', kind:'artifact', rarity:'epic', region:'any', lore:'Somebody won this wish a long time ago. They never said what for.',
             eff:'Gull Luck triples rarer bites instead of doubling them.', mods:[{stat:'luck', omen:true, v:1.5, when:{lucky:true, rarityMin:'uncommon'}}]},
   spectacles:{name:'Mayor’s Spectacles', kind:'artifact', rarity:'legendary', region:'lake', lore:'Gold wire, one lens cracked. Someone very old has been looking for these.',
@@ -113,6 +117,25 @@ const FINDS={
             eff:'Ghost fish ring like a bell while they fade, so you can follow them. In the marsh rain, something comes up to it.', mods:[{stat:'ghostRings'}, {stat:'bellmouth'}]},
   pin:     {name:'Cartographer’s Pin', kind:'artifact', rarity:'epic', region:'any', from:'story', lore:'A brass map pin with a compass rose for a head. Whoever drew the treasure maps marked every cache with it.',
             eff:'Treasure maps mark the exact spot, and every 5th treasure is a map piece.', mods:[{stat:'mapPin'}]},
+  // the journal's page relics: finishing a water's page in the journal brings its relic, handed over by someone who
+  // knows that water (data/journal.js: PAGES). Never loose or in crates.
+  heronfeather:{name:'Heron’s Feather', kind:'keepsake', rarity:'epic', region:'lake', from:'page', lore:'A long grey flight feather with a bend in it, where it was folded into a pocket for a while. Grey gave it to you, which means he expects something.',
+            eff:'Now and then at the lake, Grey takes a common catch off you, and comes back later with something better.', down:'You lose the catch he takes.', mods:[{stat:'heron'}]},
+  millweight:{name:'Mill Weight', kind:'artifact', rarity:'rare', region:'river', from:'page', lore:'A brass ball off the mill wheel’s governor, stamped HOLLOWMERE MILL. It still wants to keep things steady.',
+            eff:'On the river, the current carries your float half as fast.', mods:[{stat:'drift', v:.5}]},
+  saltcircle:{name:'Salt Circle', kind:'artifact', rarity:'epic', region:'marsh', from:'page', lore:'Grey sea salt set hard in an old brass curtain ring. Old Reeve laid a fresh one round his door at every spring tide, and the marsh never once came over the step.',
+            eff:'Dread builds half as fast.', down:'Mythic fish won’t come near you.', mods:[{stat:'dread', v:.5}, {stat:'noMythic'}, {stat:'saltHolds'}]},
+  tarponscale:{name:'Comber’s Scale', kind:'artifact', rarity:'epic', region:'coast', from:'page', lore:'A tarpon scale the size of a saucer, silver going to blue at the rim. Hold it to your ear and there’s a wave in it, coming in.',
+            eff:'At the coast, the water stays churned twice as long behind the seventh wave.', mods:[{stat:'churn', v:2}]},
+  latchkey:{name:'The Row’s Latchkey', kind:'artifact', rarity:'epic', region:'quarter', from:'page', lore:'A latchkey on a loop of string, worn thin. Every front door on Lantern Row took the same key, and nobody ever locked them anyway.',
+            eff:'In the Drowned Quarter, a cast that would hit a wall goes in at its nearest door or window instead.', mods:[{stat:'latchkey'}]},
+  lampglass:{name:'Lantern Glass', kind:'artifact', rarity:'legendary', region:'hollow', from:'page', lore:'The glass chimney off your uncle’s lantern, sooted at the top. Light through it goes further than it has any right to.',
+            eff:'In the Hollow, the lantern’s light reaches half as far again.', mods:[{stat:'lampR', v:1.5}]},
+  // the Mayor's belongings: Grey brings these back from his errands, and only Grey (data/journal.js: MAYOR)
+  toffeetin:{name:'Toffee Tin', kind:'curio', rarity:'uncommon', region:'lake', from:'grey', lore:'HOLLOWMERE HARBOUR TOFFEE. Inside, two toffees stuck together for sixty years. The Mayor handed them out on the ferry, one to every child.'},
+  diary:   {name:'The Mayor’s Diary', kind:'curio', rarity:'rare', region:'lake', from:'grey', lore:'Saturday’s page is a speech, crossed out and begun again eleven times. Every version ends with a toast to whoever keeps a light on the water.'},
+  hallkey: {name:'Town Hall Key', kind:'curio', rarity:'epic', region:'lake', from:'grey', lore:'Iron, as long as your hand, with a tassel gone from red to brown. It winds the clock in the tower as well as it opens the door.'},
+  tophat:  {name:'The Mayor’s Top Hat', kind:'curio', rarity:'legendary', region:'lake', from:'grey', lore:'Black silk, a little crushed from being carried in a beak. There’s a toffee tucked in the band, in case of children.'},
   // keepsakes: they work from the shelf
   thermos: {name:'Uncle’s Thermos', kind:'keepsake', rarity:'rare', region:'any', lore:'Still half full of something hot. You don’t remember filling it.',
             eff:'Meals last half again as many casts.', mods:[{stat:'mealCasts', v:1.5}]},
@@ -165,6 +188,7 @@ const NOTES={
             pell:'For Tam. Tam’s eight. And this is postmarked 1966.'},
   r_postmaster:{kind:'reply', re:'postmaster', to:'The Keeper of the Bait Shack', lines:['Dear Keeper,','yes. The letters still come.','They only take a while.','Keep your lantern lit.','— The Postmaster'],
             pell:'For the Keeper again. From the Postmaster. That was my father.'},
+  mayor:   {kind:'mayor', to:'the Keeper of the Bait Shack', lines:['To the Keeper of the Bait Shack,','my spectacles, my chain, my hat,','the hall key, my diary (unread,','I trust) and my toffees:','all home again. That heron','is a credit to the town.','Supper is on Saturday.','I shall make a speech.','— Bartholomew, Mayor']},
   invite:  {kind:'invite', to:'The Keeper of the Bait Shack', lines:['Dear Keeper,','Lantern Row is having its supper,','the whole street at one table,','and there’s a place laid for you.','Come at 3:12, when the bell rings.','Bring the mirror, or you won’t','see us.','— E. Crane, for the Row']}
 };
 const LETTER_ORDER=['edith','albert','keeper','bakery','ivy','postmaster'];

@@ -28,7 +28,7 @@ const riverDepth = y => clamp((G.near-y)/(G.near-HZ-26),0,1);
 /** The current's speed at a depth, as a share of its speed in midstream (RIVER.current.profile). */
 function currentAt(d){ const P=RIVER.current.profile; for (let i=1;i<P.length;i++) if (d<=P[i][0]){ const [a,va]=P[i-1], [b,vb]=P[i]; return lerp(va,vb,(d-a)/(b-a)); } return P[P.length-1][1]; }
 /** Pixels a second the river carries a float at (x, y). */
-function driftSpeed(x,y){ const C=RIVER.current, v=riverSpot(x,y)==='deep'?C.pool:currentAt(riverDepth(y)); return C.speed*W*v*sc(y); }
+function driftSpeed(x,y){ const C=RIVER.current, v=riverSpot(x,y)==='deep'?C.pool:currentAt(riverDepth(y)); return C.speed*W*v*sc(y)*modMul('drift'); }   // the Mill Weight slows it (data/treasure.js)
 
 /* ---------- the drifting float ---------- */
 /** Carries a float downstream; while the line is held, swings it in toward your bank. Returns false once it's drifted off. */

@@ -6,9 +6,9 @@ const twinOn = () => !S.tut && modFlag('twin');
 /** The cast lands: the second float splashes down beside the first, toward the middle of the water. */
 function twinLand(b){ S.bob2=null; if (!twinOn()) return;
   const k=sc(b.y), dx=TWIN.spread*W*k*(b.x>W/2?-1:1); let x=clamp(b.x+dx,18,W-18), y=clamp(b.y+rand(-6,6)*k,HZ+14,G.near), hole=null;
-  const spot=spotAt(x,y); if (spot==='mud'){ mudSplat(x,y,.5); return; }   // the marsh: the second float lands on a bank that's out
-  if (spot==='wall') return;   // the Quarter: it hit a wall, and only the first float's in the water
-  if (REG()==='quarter'){ const hit=quarterHit(x,y); if (hit.kind==='hole'){ hole=hit.hole; ({x,y}=holeFloat(hole,x)); } }   // or it went in at an opening, like the first
+  let spot=spotAt(x,y); if (spot==='mud'){ mudSplat(x,y,.5); return; }   // the marsh: the second float lands on a bank that's out
+  if (REG()==='quarter'){ const hit=quarterHitKeyed(x,y); if (hit.kind==='wall') return;   // the Quarter: it hit a wall, and only the first float's in the water
+    spot=hit.spot; if (hit.kind==='hole'){ hole=hit.hole; ({x,y}=holeFloat(hole,x)); } }   // or it went in at an opening (or the Row's Latchkey let it in), like the first
   S.bob2={x,y,spot,dip:1,jerk:0,nibble:0,plunge:0,hole}; splash(x,y,6); ripple(x,y,30); }
 /** Two baits in the water: the quiet before a bite is shorter. */
 const twinWait = () => S.bob2 ? TWIN.wait : 1;
@@ -25,7 +25,17 @@ function twinBite(){ const b2=S.bob2; if (!b2 || !S.bite || S.bite.loot || Math.
 /** The tap: strike whichever float is nearer the finger. The fish you leave swims off. */
 function twinStrike(x,y){ const B=S.bite, b2=S.bob2; if (!B || !B.twin || !b2) return;
   if (Math.hypot(x-b2.x,y-b2.y) < Math.hypot(x-S.bob.x,y-S.bob.y)){ const a=S.bob; S.bob=b2; S.bob2=a; const f=B.fish; B.fish=B.twin.fish; B.twin.fish=f; if (S.wait) S.wait.fish=B.fish; }
-  if (!save.stats.twinPicks) save.stats.twinPicks=0; save.stats.twinPicks++; }
+  if (!save.stats.twinPicks) save.stats.twinPicks=0; save.stats.twinPicks++; hookFeeds(); }
+/* ---------- the Hungry Hook on the Twin Spool (data/relics.js: HUNGRY, COMBOS.twinspool) ---------- */
+/** What the Hungry Hook makes fish worth: its own ×2, and a little more for every fish it's eaten on the Twin Spool. */
+const hookValue = () => Math.min(HUNGRY.max, 2+(+findsState().hook||0)*HUNGRY.step);
+/** You picked one of two: with the hook in a pocket, it eats the other, and grows (for good, up to HUNGRY.max). */
+function hookFeeds(){ const B=S.bite, b2=S.bob2; if (!B || !B.twin || !b2 || !pocketed('hungryhook')) return; const FS=findsState(), F=FISH[B.twin.fish];
+  FS.hook=Math.min(Math.round((HUNGRY.max-2)/HUNGRY.step),(+FS.hook||0)+1); save.stats.hookFed=(save.stats.hookFed||0)+1; persist(); MODC.dirty=true; comboSeen('twinspool');
+  sfx.chomp(); buzz([0,20,20,40]); ripple(b2.x,b2.y,22);
+  for (let i=0;i<12;i++) S.particles.push({x:b2.x,y:b2.y,vx:rand(-110,110),vy:rand(-140,20),g:420,life:0,max:rand(.4,.7),r:rand(1.2,2.6),c:i%3?'rgba('+rgbOf(F.color)+',':'rgba(243,234,215,'});
+  S.particles.push({x:b2.x,y:b2.y-26,vx:0,vy:-30,g:0,life:0,max:1.2,r:0,c:'rgba(0,0,0,',word:'CHOMP!'});
+  news('The Hungry Hook ate the '+F.name+' you left. Fish are worth ×'+trimNum(hookValue())+' now','gold'); }
 /** Once a fish is on, the other line comes in. */
 function twinIn(){ const b2=S.bob2; if (!b2) return; ripple(b2.x,b2.y,16); S.bob2=null; }
 /** The second fish's shadow beside its float, while you choose (with a Heronwood's flash of its rarity, if you have one). */

@@ -35,7 +35,7 @@ const ORDERS={
   smoked:{from:2, chance:.3}, delicacy:{from:2, chance:.3}, grey:{from:1, chance:.12}
 };
 const TOWNSFOLK={
-  ottilie:{name:'Ottilie', title:'the ferry', likes:['gumbo','stew','chowder','steak','kedgeree'], twists:['more:pepper','done:well','none:lemon'], side:'bread', tip:1,
+  ottilie:{name:'Ottilie', title:'the ferry', likes:['gumbo','stew','chowder','steak','kedgeree','marsh'], twists:['more:pepper','done:well','none:lemon'], side:'bread', tip:1,
     say:{'more:pepper':'Pepper. More than you think.', 'done:well':'Well done. I’ve eaten enough raw things on that ferry.', 'none:lemon':'No lemon. Lemon is for people who don’t trust their fish.',
       delicacy:'Something your uncle would have been proud of.', any:['Your uncle made this every Thursday.','Hot, and not too much fuss.']},
     served:['I’ll take it home for the heron.','It’ll do. Don’t tell anyone I said that.','Not bad at all. You’ve got his hands.','Now that’s a supper. Same time tomorrow?']},

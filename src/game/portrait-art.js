@@ -4,14 +4,20 @@
    o = {t: time, for the blink and the little motions; mood: 'wait' | 'happy' | 'meh' | 'talk'; talk: 0..1, how open
    the mouth is while talking; hop: 0..1, a happy bounce; blink: true or false, to say rather than go by the clock}.
    Each blinks on its own clock. */
-const PORTRAIT={ottilie:{blink:0}, barnaby:{blink:1.3}, pell:{blink:2.1}, bram:{blink:.7}, tam:{blink:1.8}, grey:{blink:2.7}};
+const PORTRAIT={ottilie:{blink:0}, barnaby:{blink:1.3}, pell:{blink:2.1}, bram:{blink:.7}, tam:{blink:1.8}, grey:{blink:2.7}, wren:{blink:3.3}};
 /** Who's drawn by what (Lantern Row's folk, for the supper, join these in game/row-folk.js). */
-const PT_DRAW={ottilie:ptOttilie, barnaby:ptBarnaby, pell:ptPell, bram:ptBram, tam:ptTam, grey:ptGrey};
+const PT_DRAW={ottilie:ptOttilie, barnaby:ptBarnaby, pell:ptPell, bram:ptBram, tam:ptTam, grey:ptGrey, wren:ptWren};
 function drawPortrait(c,who,x,y,size,o){ o=o||{}; const k=size/100, t=o.t||0, P=PORTRAIT[who]; if (!P) return;
   c.save(); c.translate(x,y-(o.hop||0)*6*k); c.scale(k,k); c.lineJoin='round'; c.lineCap='round'; c.lineWidth=2; c.strokeStyle=INK;
   const blink=o.blink!=null?o.blink:((t+P.blink)%4.3)<.13 || (o.mood==='talk' && ((t*1.7+P.blink)%2.9)<.1);
   PT_DRAW[who](c,t,o.mood||'wait',blink,o.talk||0,o);
   c.restore(); }
+/** Portraits in round frames on a sheet (canvas[data-who]: someone giving you something), each over the lake at this
+    hour, smiling. */
+function paintFaces(list){ const d=Math.min(window.devicePixelRatio||1,2);
+  for (const cv of list){ const w=cv.offsetWidth, h=cv.offsetHeight; if (!w || !PORTRAIT[cv.dataset.who]) continue; cv.width=Math.round(w*d); cv.height=Math.round(h*d);
+    const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.save(); x.beginPath(); x.arc(w/2,h/2,Math.min(w,h)/2,0,Math.PI*2); x.clip();
+    ptBackdrop(x,w,h,1.2); drawPortrait(x,cv.dataset.who,w/2,h/2+h*.08,h*1.02,{t:1.2, mood:'happy'}); x.restore(); } }
 /** What's behind them: the lake through the window, at this hour, so a portrait always looks like someone come to call. */
 function ptBackdrop(c,w,h,t){ const P=palAt(save.clock), hz=h*.7;
   const g=c.createLinearGradient(0,0,0,hz); g.addColorStop(0,'rgb('+P.skyTopR+')'); g.addColorStop(.7,'rgb('+P.skyLowR+')'); g.addColorStop(1,'rgb('+P.skyHzR+')'); c.fillStyle=g; c.fillRect(0,0,w,hz);
@@ -221,4 +227,35 @@ function ptGrey(c,t,mood,blink,talk){
   else { c.fillStyle='#F2D45C'; c.beginPath(); c.arc(6.4,-18.4,3,0,6.28); c.fill(); c.lineWidth=1.4; c.strokeStyle=INK; c.stroke();
     c.fillStyle=INK; c.beginPath(); c.arc(7,-18.4,1.4,0,6.28); c.fill(); c.fillStyle='#FFF'; c.beginPath(); c.arc(6.4,-19.2,.6,0,6.28); c.fill(); }
   c.restore();
+}
+/* ---- Wren: a mop of dark curls with brass goggles pushed up into them, freckles, a mustard jumper under her rust apron ---- */
+function ptWren(c,t,mood,blink,talk){
+  ptBody(c,40,22,'#C9A13E','#A9852E','#DDB955');
+  // the apron's bib and straps over the jumper, a pencil in its pocket
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-16,30); c.lineTo(16,30); c.lineTo(18,52); c.lineTo(-18,52); c.closePath(); },'#A4553A','#874431','#BE6A4C',{sx:12,sy:44,sr:8,sr2:12,lx:-12,ly:36,lr:3,lr2:8,lw:1.8});
+  for (const sx of [-1,1]){ c.strokeStyle=INK; c.lineWidth=5; c.beginPath(); c.moveTo(sx*15,31); c.lineTo(sx*21,24); c.stroke(); c.strokeStyle='#874431'; c.lineWidth=3; c.stroke(); }
+  ptShade(c,()=>{ rrect(c,-8,38,16,10,2); },'#874431','#6E3626',null,{sx:6,sy:46,sr:5,sr2:4,lw:1.4});
+  c.save(); c.translate(4,38); c.rotate(.15); c.fillStyle='#E2B13C'; c.fillRect(-1.2,-9,2.4,10); c.lineWidth=1; c.strokeStyle=INK; c.strokeRect(-1.2,-9,2.4,10); c.fillStyle='#E7A0A0'; c.fillRect(-1.2,-11,2.4,2); c.restore();
+  c.strokeStyle='rgba(120,90,30,.4)'; c.lineWidth=1; for (const y of [26,30]){ c.beginPath(); c.moveTo(-34,y+8); c.quadraticCurveTo(-28,y+2,-20,y); c.moveTo(34,y+8); c.quadraticCurveTo(28,y+2,20,y); c.stroke(); }   // the knit at the shoulders
+  ptNeck(c,6,8,'#E0B08E','#C99A78');
+  // the roll neck
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-11,16); c.quadraticCurveTo(0,22,11,16); c.lineTo(12,23); c.quadraticCurveTo(0,29,-12,23); c.closePath(); },'#C9A13E','#A9852E','#DDB955',{sx:8,sy:24,sr:6,sr2:5,lx:-8,ly:18,lr:3,lr2:2,lw:1.6});
+  // curls behind the head
+  const curl=(x,y,r)=>ptShade(c,()=>{ c.beginPath(); c.arc(x,y,r,0,6.28); },'#3A2A26','#2A1E1B','#55403A',{sx:x+r*.5,sy:y+r*.5,sr:r*.7,sr2:r*.7,lx:x-r*.4,ly:y-r*.45,lr:r*.3,lr2:r*.25,lw:1.4});
+  for (const [x,y,r] of [[-21,-2,7],[21,-3,7],[-20,8,5.6],[20,8,5.4]]) curl(x,y,r);
+  ptEar(c,18,-3,'#E0B08E','#C99A78'); ptEar(c,-18,-3,'#E0B08E','#C99A78');
+  ptHead(c,0,-5,17.5,19.5,'#E0B08E','#C99A78','#EBC4A6');
+  ptEyes(c,0,-4,7.4,mood,blink,2.5);
+  ptBrows(c,0,-11,7.4,mood,'#3A2A26',2.2);
+  c.fillStyle='rgba(170,100,60,.55)'; for (const [x,y] of [[-10,2],[-8,4],[-12,4.2],[-6.6,2.4],[10,2],[8,4],[12,4.2],[6.6,2.4]]){ c.beginPath(); c.arc(x,y,.85,0,6.28); c.fill(); }   // freckles
+  c.strokeStyle='#B98666'; c.lineWidth=1.6; c.beginPath(); c.moveTo(0,-1); c.quadraticCurveTo(-1.6,3.4,1.2,3.8); c.stroke();
+  ptCheeks(c,0,4,11,.26);
+  ptMouth(c,0,10,mood,talk,5);
+  // the fringe of curls, then the goggles pushed up into them
+  for (const [x,y,r] of [[-14,-17,6.4],[-6,-21,6.8],[3,-22,6.8],[11,-19,6.4],[17,-12,5],[-17,-10,5]]) curl(x,y,r);
+  ptShade(c,()=>{ c.beginPath(); c.moveTo(-19,-17); c.quadraticCurveTo(0,-22,19,-17); c.lineTo(19,-14); c.quadraticCurveTo(0,-19,-19,-14); c.closePath(); },'#5A3A28','#3E2A1E',null,{sx:12,sy:-14,sr:8,sr2:3,lw:1.4});
+  for (const sx of [-1,1]){ const gx=sx*7.6, gy=-18.6;
+    ptShade(c,()=>{ c.beginPath(); c.arc(gx,gy,6,0,6.28); },BRASS,'#A8843E','#E8CC8A',{sx:gx+2,sy:gy+2,sr:4,sr2:4,lx:gx-2,ly:gy-2,lr:1.6,lr2:1.6,lw:1.6});
+    c.fillStyle='rgba(170,220,200,.75)'; c.beginPath(); c.arc(gx,gy,3.8,0,6.28); c.fill(); c.lineWidth=1.1; c.strokeStyle=INK; c.stroke();
+    c.fillStyle='rgba(255,255,255,.85)'; c.beginPath(); c.arc(gx-1.3,gy-1.3,1.1,0,6.28); c.fill(); }
 }

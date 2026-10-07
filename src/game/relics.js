@@ -49,8 +49,7 @@ function storyGift(id){ const FS=findsState(), D=FINDS[id], St=STORY[id], who='o
   openSheet(h); $('closeS').addEventListener('click',closeSheet); $('rtGo').addEventListener('click',closeSheet);
   const pk=$('sgPocket'); if (pk) pk.addEventListener('click',()=>{ if (pocketIt(id)) pk.outerHTML='<span class="tag ok">In a pocket</span>'; });
   paintTiles(document.querySelectorAll('#panel canvas[data-find]'));
-  document.querySelectorAll('#panel canvas[data-who]').forEach(cv=>{ const r=cv.getBoundingClientRect(), d=Math.min(window.devicePixelRatio||1,2); cv.width=r.width*d; cv.height=r.height*d;
-    const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); drawPortrait(x,cv.dataset.who,Math.min(r.width,r.height)); });
+  paintFaces(document.querySelectorAll('#panel canvas[data-who]'));
   if (!save.finds.pocketTip){ save.finds.pocketTip=true; persist(); coachLater('Relics are artifacts: they work from a vest pocket. Pocket and swap them in your tackle bag.',8); } }
 
 /* ---------- treasure maps ---------- */
@@ -141,7 +140,9 @@ function openAlmanac(){ const now=wxNow(), h=(((save.clock%24)+24)%24), rows=alm
   const ico=(k,at)=>wxIconSVG(k+((isNight(at%24)||PERIOD(at%24)==='Evening')?'-n':'-d'));
   const when=at=>(at>=24?'Tomorrow ':'')+clockText(at%24);
   const row=(label,k,note,at,cls)=>'<li class="'+(cls||'')+'"><span class="al-ico">'+ico(k,at)+'</span><span class="al-t">'+label+'</span><b>'+WX[k].name+'</b><span class="al-n">'+note+'</span></li>';
-  let html='<div class="panel-head"><div><h2>Wet Almanac</h2><p>'+REGION_NAME[REG()]+' · in pencil, in a careful hand</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
+  // the forecast comes from the Almanac in a pocket, or for a while from a plate of Clockfin on Rye (data/kitchen.js)
+  const alm=modsFor('forecast').some(m=>m.src!=='meal');
+  let html='<div class="panel-head"><div><h2>'+(alm?'Wet Almanac':'The hours ahead')+'</h2><p>'+REGION_NAME[REG()]+(alm?' · in pencil, in a careful hand':' · the Clockfin on Rye, while it lasts')+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
     // no weather reaches the Hollow (game/hollow.js), but the moon still matters down there
     '<div class="almanac">'+(REG()==='hollow'?'<p class="note al-line">No weather reaches the Hollow, but the moon still matters down here.</p>':
     '<ol class="al-rows">'+row('Now',now,almanacNote(now,h),h,'now')+rows.map(r=>row('From '+when(r.at),r.kind,almanacNote(r.kind,r.at),r.at)).join('')+'</ol>')+

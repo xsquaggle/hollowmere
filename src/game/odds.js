@@ -33,6 +33,7 @@ function poolFor(spot,lucky,at){
   for (const k in w){ const F=FISH[k]; if (F.night) w[k]*=nightMul; if (F.wx==='fog') w[k]*=fogMul; w[k]*=tierMul(F.rarity,c)*modMul('lure',{spot,lucky,fish:k}); }   // a lure draws its kind of fish
   // soft bad-luck protection: a long dry run lifts the Legendaries a little (DRY)
   const dm=dryMul(); if (dm>1) for (const k in w) if (FISH[k].rarity==='legendary') w[k]*=dm;
+  if (modFlag('noMythic',c)) for (const k in w) if (FISH[k].rarity==='mythic') delete w[k];   // the Salt Circle keeps them away
   return w;
 }
 /* ---------- Which fish bites: the rarest first, then the spot's own fish ---------- */
@@ -45,6 +46,7 @@ function rareBite(spot,lucky,at){ const reg=REG(); at=at||{};
   for (const id of RARE_ORDER){ const B=RARE_BITES[id];
     if (!(Array.isArray(B.region)?B.region.includes(reg):B.region===reg) || (B.spots && !B.spots.includes(spot)) || (B.bow && !at.bow)) continue;
     if ((B.at && !at[B.at]) || (B.churn && !at.churn) || (B.moon==='full' && !fullMoon()) || (B.moon==='new' && moonPhase()!==0) || (B.night && !isNight(save.clock)) || (B.top && !topOfHour(B.top)) || (B.wx && wxNow()!==B.wx) || (B.flag && !modFlag(B.flag,{spot}))) continue;
+    if (FISH[id].rarity==='mythic' && modFlag('noMythic',{spot})) continue;   // the Salt Circle keeps them away
     if (Math.random()<B.chance*(B.path && at.path?B.path:1)*tierMul(FISH[id].rarity,{spot,lucky,fish:id,star:!!at.star,starlit:!!at.starlit})) return id; }
   return null; }
 /** Whether the in-game clock is within `share` of an hour past the hour (the Clockfin's few minutes). */

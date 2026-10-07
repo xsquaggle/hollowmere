@@ -12,7 +12,8 @@ const cfg = JSON.parse(readFileSync(join(ROOT, 'src/build.json'), 'utf8'));
 const D = vm.createContext({});
 for (const f of cfg.js.filter(f => f.startsWith('data/'))) vm.runInContext(readFileSync(join(ROOT, 'src', f), 'utf8').replace(/^const /gm, 'var '), D, { filename: 'src/' + f });
 const { LETTER, OTT_SAY, OTT_NAME, OTT_CONFESS, WX_LINES, BAR_LINES, BANQUET_LINES, VISITS, TOWNSFOLK, NOTES, LETTER_ORDER, REPLY_ORDER, FINDS, STORY, FIXUP, TRAPDOOR,
-  WREN, WREN_Q, WREN_MARSH, COAST_LINES, PELL, PELL_Q, SUPPER_LINES, SUPPER_SEATS, SUPPER_FOLK, CHAPTER_END, FISH, ORDER, REGION_FISH, REGION_NAME, RODS, OWNERS } = D;
+  WREN, WREN_Q, WREN_MARSH, COAST_LINES, PELL, PELL_Q, SUPPER_LINES, SUPPER_SEATS, SUPPER_FOLK, CHAPTER_END, FISH, ORDER, REGION_FISH, REGION_NAME, RODS, OWNERS,
+  PAGES, MILESTONES, MAYOR } = D;
 
 const out = [];
 const put = (...l) => out.push(...l);
@@ -62,7 +63,7 @@ h3('The story relics');
 for (const [id, R] of Object.entries(STORY)) { bullet('**' + FINDS[id].name + '** (' + R.found + '). *Hint:* ' + R.hint + ' *Lore:* ' + FINDS[id].lore);
   if (R.line) put('  - *Ottilie:* ' + R.line); }
 h3('Finds: what the lake gives back');
-for (const kind of ['curio', 'artifact', 'keepsake']) for (const [id, F] of Object.entries(FINDS)) if (F.kind === kind && !STORY[id]) bullet('**' + F.name + '** (' + kind + '): ' + F.lore);
+for (const kind of ['curio', 'artifact', 'keepsake']) for (const [id, F] of Object.entries(FINDS)) if (F.kind === kind && !STORY[id] && F.from !== 'page' && F.from !== 'grey') bullet('**' + F.name + '** (' + kind + '): ' + F.lore);
 h3('Lost things given back to their owners');
 for (const [id, F] of Object.entries(FINDS)) if (F.owner && F.reward && F.reward.line) say(OWNERS[F.owner] ? OWNERS[F.owner].name : F.owner, F.reward.line + ' *(for the ' + F.name + ')*');
 
@@ -135,14 +136,27 @@ for (const L of OTT_SAY.supper) bullet('*Ottilie:* ' + ottText(L));
 for (const s of WREN.later.supper || []) say('Wren', s);
 for (const s of PELL.later.supper || []) say('Pell', s);
 
+/* ---------- the journal's rewards ---------- */
+h2('9. The journal\'s rewards');
+h3('A water\'s page, full');
+for (const [reg, P] of Object.entries(PAGES)) { const R = FINDS[P.relic];
+  if (P.act) bullet('*(' + REGION_NAME[reg] + ')* ' + P.act); else say(P.name + ' (' + REGION_NAME[reg] + ')', ottFill(P.line));
+  bullet('**' + R.name + '** (' + R.kind + '): ' + R.lore); }
+h3('Milestones');
+for (const M of MILESTONES) bullet(Math.round(M.at * 100) + '% of the species: **' + M.title + '**');
+h3('Grey\'s errands: the Mayor\'s belongings');
+for (const id of MAYOR.items) bullet('**' + FINDS[id].name + '**' + (FINDS[id].from === 'grey' ? ' *(Grey brings it)*' : '') + ': ' + FINDS[id].lore);
+note(MAYOR.note, 'The Mayor\'s letter');
+say('Pell', MAYOR.pell);
+
 /* ---------- the fish ---------- */
-h2('The fish: lore, and what you remember once you know one well');
+h2('The fish: lore, what you remember once you know one well, and its last line');
 const told = {};
 for (const reg of Object.keys(REGION_FISH)) { h3(REGION_NAME[reg] || reg);
   for (const id of REGION_FISH[reg]) { const F = FISH[id];
     // a fish that lives in two waters is told once, where it first turns up
     if (told[id]) { bullet('**' + F.name + '**: also here; see ' + told[id] + '.'); continue; } told[id] = REGION_NAME[reg] || reg;
-    bullet('**' + F.name + '** (' + F.rarity + '). ' + (F.lore || '') + (F.memory ? ' *Remembered:* ' + F.memory : '')); } }
+    bullet('**' + F.name + '** (' + F.rarity + '). ' + (F.lore || '') + (F.memory ? ' *Remembered:* ' + F.memory : '') + (F.last ? ' *Last:* ' + F.last : '')); } }
 
 const text = out.join('\n').replace(/\n{3,}/g, '\n\n') + '\n';
 const FILE = join(ROOT, 'docs/STORY.md');

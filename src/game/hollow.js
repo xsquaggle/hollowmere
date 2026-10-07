@@ -31,8 +31,8 @@ const log4Due = () => { const n=notesRead(); return n.includes('log3') && !n.inc
 const log5Due = () => { const n=notesRead(); return n.includes('log4') && !n.includes('log5') && !!(save.quarter && save.quarter.tips && save.quarter.tips.ring); };
 /** Grey stands on the lake dock's right pile, holding page 5 when it's his to give. */
 const greyPos = () => { const D=dockGeo(); return {x:D.rp, y:D.top-25}; };
-const greyHasPage = () => REG()==='lake' && !S.grey && !S.tut && log5Due();
-function onGrey(x,y){ if (!greyHasPage() || S.state!=='idle') return false; const p=greyPos(); return x>p.x-18 && x<p.x+20 && y>p.y-50 && y<p.y+4; }
+const greyHasPage = () => REG()==='lake' && !S.grey && !S.tut && !heronAway() && log5Due();   // (off on an errand, he brings it when he's back: game/heron.js)
+function onGrey(x,y){ if ((!greyHasPage() && !greyGift()) || S.state!=='idle') return false; const p=greyPos(); return x>p.x-18 && x<p.x+20 && y>p.y-50 && y<p.y+4; }
 /** Grey hands over the page in his beak. */
 function takeGreyPage(){ if (!greyHasPage()) return; const FS=findsState(); if (!FS.notes.includes('log5')) FS.notes.push('log5'); persist(); updateJournalDot();
   noise(.25,{vol:.1,f:2600,to:1400,type:'bandpass'}); tone(520,.08,{to:380,vol:.06,type:'triangle'}); buzz(10);
@@ -97,8 +97,10 @@ function shaftNow(){ const h=(((save.clock%24)+24)%24), S0=HOLLOW.light.shaft; i
 /** Whether the Hollow's lit right through, after the Sleeper's Scale. */
 const hollowLitUp = () => !!(save.hollow && save.hollow.lit>absHour());
 /** Every light on the water here and now, as ellipses with a brightness a (0 to 1) and a kind k. */
+/** How far the lantern's pool reaches, as a share of its own: the Lantern Glass lends it half as far again. */
+const lampReach = () => modMul('lampR');
 function hollowLights(){ const h=G.hollow, LI=HOLLOW.light, L=[]; if (!h) return L;
-  if (!HS.lampOut) L.push({x:h.lamp.x, y:h.lamp.y, rx:h.lamp.rx*LI.lamp, ry:h.lamp.ry*LI.lamp, a:1, k:'lamp'});
+  if (!HS.lampOut){ const r=LI.lamp*lampReach(); L.push({x:h.lamp.x, y:h.lamp.y, rx:h.lamp.rx*r, ry:h.lamp.ry*r, a:1, k:'lamp'}); }
   L.push(Object.assign({a:LI.fungus, k:'spores'},h.spores));
   const s=shaftNow(); if (s>0) L.push(Object.assign({a:s, k:'shaft'},h.shaft));
   if (modFlag('lantern') && S.bob){ const r=LI.rod*sc(S.bob.y); L.push({x:S.bob.x, y:S.bob.y, rx:r, ry:r*.42, a:1, k:'rod'}); }

@@ -18,7 +18,8 @@ function startReel(id,perfect){
 function newFight(id,perfect,from,lucky,tut,spot){
   const F=FISH[id], c={fish:id,spot,lucky};
   // bonuses lock in when the fish is hooked
-  const mod={tm:modMul('tension')*modMul('drag',c)/modMul('line',c), tug:modMul('tug',c), reel:modMul('reel',c)};
+  // solid: a ghost that stays in sight (Bellmouth Broth, data/kitchen.js)
+  const mod={tm:modMul('tension')*modMul('drag',c)/modMul('line',c), tug:modMul('tug',c), reel:modMul('reel',c), solid:F.beh==='ghost' && modFlag('ghostSolid',c)};
   return fightOf(F,perfect,from,{id,lucky,tut,mod,fam:modFlag('autoTilt',c),limp:!tut && modFlag('limp',c)});   // the Bonewhistle: no fight (game/dread.js)
 }
 /** A haul: treasure on the line (game/treasure.js). It comes up like a dead weight that catches on the bottom. */
@@ -55,7 +56,8 @@ function fightStep(R,dt,io){
   else if (beh==='ghost'){                                             // darts like a darter, and fades: while it's gone it
     if (R.fade>0){ R.fade-=dt; if (R.fade<=0){ R.nextFade=rand(2.6,3.8); R.dirT=rand(1.4,2.2); ev.push('surface'); } }   // slides somewhere new, unseen
     else { R.nextFade-=dt; R.dirT-=dt;
-      if (R.nextFade<=0){ R.fade=GHOST_FADE; R.tgt=(R.dir>0?-1:1)*rand(.35,.85)*(Math.random()<.75?1:-1); ev.push('fade'); }
+      if (R.nextFade<=0 && R.mod.solid){ R.nextFade=rand(2.6,3.8); R.tgt=(R.dir>0?-1:1)*rand(.35,.85)*(Math.random()<.75?1:-1); ev.push('turn'); }   // it slips off as if to fade, and doesn't
+      else if (R.nextFade<=0){ R.fade=GHOST_FADE; R.tgt=(R.dir>0?-1:1)*rand(.35,.85)*(Math.random()<.75?1:-1); ev.push('fade'); }
       else if (R.dirT<=0){ R.tgt=(R.tgt>0?-1:1)*rand(.45,.85); R.dirT=rand(1.4,2.2); ev.push('turn'); } } }
   else { R.dirT-=dt; if (R.dirT<=0){ R.tgt=rand(-.8,.8); R.dirT=rand(1.4,2.2); } }
   R.dir=lerp(R.dir,R.tgt,Math.min(1,dt*(quick?3:1.7)));

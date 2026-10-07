@@ -18,9 +18,10 @@ function startLand(){
   const {size,build,w:wgt,value,mut}=catchRoll(R.id,R.perfect,{spot:S.bob&&S.bob.spot,lucky:R.lucky,wander:!!wander,bow:!!R.bow,tut:!!S.tut});
   S.land={lucky:R.lucky,id:R.id,F,p:0,from:{x:R.x,y:R.y},to:{x:W/2,y:H*.36},perfect:R.perfect,size,w:wgt,build,stars:qualityOf(R.id,size,R.perfect),t:Date.now(),reg:REG(),spot,hr:save.clock,wx:wxNow(),rod:save.rod,value,mut,burst:false,isNew:rec(R.id).caught===0,eaten,wander,moon:!!(S.bob&&S.bob.moon)};
   if (S.land.moon) moonFishLanded();   // the Moon Jar's light is spent on the fish it lit (game/relics.js)
+  S.land.grey=heronTakes(S.land);   // with the Heron's Feather, Grey may take it out of the air (game/heron.js)
   // Echo: after a perfect hook, another of the same fish may wait at this spot for your next cast (never a Godly one:
   // there's only ever the one)
-  if (R.perfect && !S.tut && !eaten && !F.noSell && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
+  if (R.perfect && !S.tut && !eaten && !S.land.grey && !F.noSell && echoRoll(R.id,spot)){ S.echo={fish:R.id,reg:REG(),spot}; S.land.echo=true; }
   const rk=rarRank(F.rarity), big=rk>=rarRank('legendary');
   splash(R.x,R.y,RAR[F.rarity].splash); ripple(R.x,R.y,50); ripple(R.x,R.y,30);
   sfx.out(F.rarity); buzz(big?[0,40,60,40,60,120]:rk>=rarRank('epic')?[0,30,40,60]:40); shake(big?6:rk>=rarRank('epic')?4:2);
@@ -32,6 +33,7 @@ function updateLand(dt){
   const L=S.land, r=L.F.rarity, rk=rarRank(r), slowmo=rk>=rarRank('rare'), slow=slowmo && !REDUCED && L.p>.3 && L.p<.7 ? .38 : 1;
   L.p=Math.min(1,L.p+dt/RAR[r].land*slow*(slowmo?1.6:1));
   if (L.eaten && L.p>.55) return hookEats();
+  if (L.grey){ if (!S.heronFly && L.p>.1) heronLaunch(); if (L.p>HERON_AT) return heronSnatch(); }
   if (L.p>.5 && !L.burst){ L.burst=true; if (rk>=rarRank('legendary')) confetti(L.to.x,L.to.y,70); else if (rk>=rarRank('epic')) confetti(L.to.x,L.to.y,40); else if (r==='rare') confetti(L.to.x,L.to.y,24); pulse(r==='common'?.1:.3); }
   if (Math.random()<.5 && L.p<.8){ const p=landPos(); splash(p.x,p.y,1); }
   landTrail(L,landPos());
@@ -76,6 +78,7 @@ function showCard(){
   const ord=!L.needFor && orderShort(L.id); L.orderFor=ord&&ord.n>0?ord.T:null; if (L.orderFor && !L.isNew) tags.push('For '+TOWNSFOLK[L.orderFor.who].name+'’s supper order');
   if (r.caught>=MASTERY.catches && r.caught-(L.mut==='twin'?2:1)<MASTERY.catches) tags.push('Mastered: reels get easier'); else if (r.caught<MASTERY.catches) tags.push('Mastery '+r.caught+'/'+MASTERY.catches);
   const mAt=memoryAt(L.id); if (F.memory && mAt>1 && r.caught>=mAt && r.caught-(L.mut==='twin'?2:1)<mAt) tags.push('A new line in the journal');
+  const lAt=lastAt(L.id); if (F.last && r.caught>=lAt && r.caught-(L.mut==='twin'?2:1)<lAt) tags.push('Third star: its last line is in the journal');
   $('cTags').innerHTML=tags.map(t=>'<span></span>').join(''); [...$('cTags').children].forEach((s,i)=>s.textContent=tags[i]); if (L.mut) $('cTags').children[0].className='mut';
   // runes that did something for this catch
   const runes=[]; if (L.wander) runes.push(runeTag('wanderer','Wanderer ×2 · '+L.wander+' of '+ENCH.wanderer.first)); if (L.echo) runes.push(runeTag('echo','Echo: another waits here'));
@@ -128,6 +131,7 @@ function dismissCard(action){
   const finishing=S.tut==='card'; if (finishing){ save.tutorialDone=true; S.tut=null; persist(); }
   S.land=null; S.darkT=0; S.zoomT=1; updateHud(); setState('idle'); kitchenUnlockCheck(); relicAfterCatch(L); pellAfterCatch(L); dreadAfterCatch(L,action);   // the Moon Jar fills, Ottilie's almanac (game/relics.js); an answer on a Postman Sturgeon (game/pell.js); Dread (game/dread.js)
   godlyAfter(L);   // the first Sleeper's Scale: the Hollow lit, and the Stillwater Mirror (game/godly.js)
+  rewardsAfterCatch();   // a full page, a milestone, a pennant (game/rewards.js)
   if (!save.backupHinted && !save.lastBackup && !isStandalone() && save.stats.catches>=40){ save.backupHinted=true; persist(); coachFor('Your game lives in this browser. Tap the gear, then Save, to make a backup code and keep it safe.',8); }
   if (finishing) coachFor('You’re ready. Rarer fish fight in new ways, and the deep pool hides the best ones.',6); else if (!S.tut && !coachTimer) coachOff();
 }

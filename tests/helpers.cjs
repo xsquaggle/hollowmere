@@ -37,9 +37,11 @@ function watch(page) {
   return page;
 }
 
-/** Opens the game. `save` seeds localStorage first; `intro: true` keeps the opening cinematic. */
-async function openGame(page, { save = null, intro = false, url = PAGE } = {}) {
-  await page.goto(url + (intro ? '' : '?nointro'));
+/** Opens the game. `save` seeds localStorage first; `intro: true` keeps the opening cinematic, and `rewards: true` the
+    journal's gift sheets (game/rewards.js), which would otherwise pop up over a test whose save has earned one. */
+async function openGame(page, { save = null, intro = false, rewards = false, url = PAGE } = {}) {
+  const q = [intro ? '' : 'nointro', rewards ? '' : 'norewards'].filter(Boolean).join('&');
+  await page.goto(url + (q ? '?' + q : ''));
   if (save) { await page.evaluate(([k, s]) => localStorage.setItem(k, JSON.stringify(s)), [KEY, save]); await page.reload(); }
   await page.waitForTimeout(700);
 }

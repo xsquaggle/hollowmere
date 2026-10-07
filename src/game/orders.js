@@ -23,7 +23,7 @@ function validTicket(T){ if (!isObj(T) || !TOWNSFOLK[T.who] || !Number.isInteger
   const P=TOWNSFOLK[T.who], own=Object.values(P.say).flat();
   if (T.who==='grey' || T.kind==='grey'){ T.kind='grey'; T.tw=[]; }
   else if (T.kind==='delicacy'){ if (!SIDES[T.side]) T.side='bread'; T.tw=[]; }
-  else { T.kind='dish'; if (!RECIPES[T.rid] || T.rid==='pie') return false;
+  else { T.kind='dish'; if (!RECIPES[T.rid] || rareDish(T.rid)) return false;
     if (!(T.smoked && RECIPES[T.rid].need[0].id && RECIPES[T.rid].need[0].n===1)) delete T.smoked; }
   // what's written on the ticket is always one of their own lines (it goes into the page as it is)
   if (!own.includes(T.say)) T.say=sayFor(P,T.kind==='delicacy'?['delicacy']:T.tw);
@@ -62,11 +62,13 @@ function makeTicket(who,st,batch,del){ const P=TOWNSFOLK[who], s=ordersState(), 
   const smoked=st>=ORDERS.smoked.from && !!R.need[0].id && R.need[0].n===1 && smokedNear(R.need[0].id) && Math.random()<ORDERS.smoked.chance;
   const tw=pickTwists(P,R,st);
   return {id, who, kind:'dish', rid, tw, smoked:smoked||undefined, say:sayFor(P,tw)}; }
-/** A recipe you know for this customer: their favorites three times as likely, and not one already on tonight's board. */
+/** A recipe you know for this customer: their favorites three times as likely, and not one already on tonight's board.
+    Never one that wants an Epic fish or rarer (the Clockfin, the Bellmouth, the Mayor): nobody orders those for supper. */
 function pickRecipeFor(P,batch){ const w={};
-  for (const id of RECIPE_ORDER){ if (id==='pie' || !knownRecipe(id)) continue; const R=RECIPES[id]; if (Object.keys(R.spice).some(k=>!spicesOn().includes(k))) continue;
+  for (const id of RECIPE_ORDER){ if (!knownRecipe(id) || rareDish(id)) continue; const R=RECIPES[id]; if (Object.keys(R.spice).some(k=>!spicesOn().includes(k))) continue;
     w[id]=(P.likes.includes(id)?3:1)*(batch.some(T=>T.rid===id)?.2:1); }
   return Object.keys(w).length ? pickW(w) : null; }
+function rareDish(id){ return RECIPES[id].need.some(n=>n.id && rarRank(FISH[n.id].rarity)>=rarRank('epic')); }
 /** The recipe's spice with these twists (as ticketSpice does for a ticket). */
 function spiceWith(R,tw){ const sp=Object.assign({},R.spice);
   for (const x of tw){ const [k,v]=x.split(':'); if (!SPICES[v]) continue; if (k==='more') sp[v]=(sp[v]||0)+1; else if (k==='less') sp[v]=Math.max(1,(sp[v]||0)-1); else if (k==='none') delete sp[v]; }

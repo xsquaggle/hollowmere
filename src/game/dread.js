@@ -28,7 +28,7 @@ function dreadMods(add){ if (!holdingBone()) return; const v=save.dread?clamp(+s
 /** After a catch's card: a Bonewhistle catch builds Dread (more if it's Inked, which also haunts the next cast), and
     what it sold for is owed. */
 function dreadAfterCatch(L,action){ if (!L || L.rod!=='bonewhistle' || SIMULATING) return; const d=dreadTick(), first=!d.v && !save.stats.dreadSeen;
-  d.v=Math.min(100,d.v+(DREAD.gain[L.F.rarity]||DREAD.gain.common)+(L.mut==='inked'?DREAD.inked:0));
+  d.v=Math.min(100,d.v+((DREAD.gain[L.F.rarity]||DREAD.gain.common)+(L.mut==='inked'?DREAD.inked:0))*modMul('dread'));   // the Salt Circle halves it (data/treasure.js)
   if (action==='sell') d.owed+=L.value;
   if (L.mut==='inked') d.haunt=true;
   save.stats.dreadSeen=true; persist(); MODC.dirty=true; DR.pulse=1; dreadSting(d.v);
@@ -46,6 +46,7 @@ function boneWhistle(v){ v=v||1; tone(233,1.6,{to:220,vol:.03*v,type:'sine'}); t
 function lakeLooksWhenFree(){ if (DR.eye || dreadState().v<100) return;
   if (sceneFree()) lakeLooks(); else setTimeout(lakeLooksWhenFree,1200); }
 function lakeLooks(){ const d=dreadTick(); if (d.v<100) return;
+  if (modFlag('saltHolds')) return saltHolds(d);   // the Salt Circle in a pocket: it sees the salt, and takes nothing
   const took=Math.min(d.owed,save.coins), gone=save.net.filter(f=>isObj(f) && f.rod==='bonewhistle');
   save.net=save.net.filter(f=>!(isObj(f) && f.rod==='bonewhistle')); save.coins-=took; d.v=0; d.owed=0; d.warned=false; d.haunt=false;
   save.stats.lookedBack=(save.stats.lookedBack||0)+1; persist(); MODC.dirty=true;
@@ -55,6 +56,13 @@ function lakeLooks(){ const d=dreadTick(); if (d.v<100) return;
   setTimeout(()=>{ coinTally(900); updateHud(); },2200);
   setTimeout(()=>{ const bits=[]; if (took) bits.push(took.toLocaleString()+' coin'+(took===1?'':'s')); if (gone.length) bits.push(gone.length===1?'the fish the Bonewhistle caught':'the '+gone.length+' fish the Bonewhistle caught');
     coachFor('The lake looked back. '+(bits.length?'It took '+bits.join(' and ')+'. ':'It found nothing of its own to take. ')+'Dread is empty, for now.',10); news('The lake looked back','bad'); },4400); }
+/** The lake looks back at someone carrying the Salt Circle: the eye opens, sees the salt, and closes on nothing.
+    Dread empties, and nothing it's owed is taken (COMBOS.salt). */
+function saltHolds(d){ d.v=0; d.owed=0; d.warned=false; d.haunt=false; save.stats.lookedBack=(save.stats.lookedBack||0)+1; save.stats.saltHeld=(save.stats.saltHeld||0)+1; persist(); MODC.dirty=true;
+  DR.eye={t:0, took:0, n:0, x:W/2, y:lerp(HZ+30,G.near,.42), coins:0, salt:true};
+  musicDuck(0,7); tone(55,4,{to:49,vol:.07,type:'sine'}); noise(3,{vol:.04,f:260,to:120,type:'lowpass'}); buzz([0,200,120]);
+  setTimeout(()=>{ if (!DR.eye) return; tone(1320,.5,{to:1180,vol:.05,type:'triangle'}); tone(1980,.4,{vol:.02,type:'sine',delay:.05}); for (let i=0;i<14;i++){ const a=i/14*Math.PI*2; S.particles.push({x:W/2+Math.cos(a)*40,y:DR.eye.y+Math.sin(a)*14,vx:Math.cos(a)*60,vy:Math.sin(a)*24-20,g:60,life:0,max:rand(.8,1.3),r:rand(1.4,2.4),c:'rgba(244,240,230,'}); } },2300);
+  setTimeout(()=>{ comboSeen('salt'); coachFor('The lake looked back, and saw the salt. It took nothing. Dread is empty, for now.',9); news('The salt held','gold'); },4400); }
 function updateEye(dt){ const E=DR.eye; if (!E) return; E.t+=dt;
   // the coins it's owed fly from your purse down into it
   if (E.took>0 && E.t>1.5 && E.t<2.6 && Math.random()<dt*28){ const x=rand(24,70), y=DR.hudB-24, t=rand(1,1.25), g=160, ex=E.x+rand(-30,30), ey=E.y+rand(-6,6);
@@ -138,7 +146,7 @@ function inkWaiting(dt){ const w=S.wait, I=w.ink, b=S.bob; I.t+=dt;
     if (I.a<=0){ w.ink=null; w.phase='empty'; w.t=rand(.8,1.6); const d=dreadState(); d.haunt=false; persist(); toast('The ink sank away',''); } } }
 /** A twitch while the ink's at the float strikes it: Dread rises, and the cast is over. */
 function inkStrike(){ const w=S.wait, I=w&&w.ink, b=S.bob; if (!I || I.phase==='sink' || !b) return false;
-  const d=dreadTick(); d.v=Math.min(100,d.v+DREAD.haunt); d.haunt=false; persist(); MODC.dirty=true; DR.pulse=1;
+  const d=dreadTick(); d.v=Math.min(100,d.v+DREAD.haunt*modMul('dread')); d.haunt=false; persist(); MODC.dirty=true; DR.pulse=1;
   for (let i=0;i<18;i++) S.particles.push({x:I.x,y:I.y,vx:rand(-90,90),vy:rand(-120,-20),g:240,life:0,max:rand(.5,1),r:rand(1.4,3),c:'rgba(18,14,34,'});
   ripple(I.x,I.y,34); dreadSting(d.v); buzz([0,60,40,90]); shake(4);
   toast('You struck the ink. It took a little of you with it','bad');

@@ -272,17 +272,3 @@ function drawCrate(c,tier,w,o){ o=o||{}; const L=crateLook(tier), h=w*.62, lh=L.
   c.fillStyle='rgba(255,255,255,.12)'; c.fillRect(-ow/2+ink,-h-lh+ink,ow-ink*2,lh*.25);
   c.restore(); c.restore(); }
 
-/* ---------- townsfolk, for giving things back ---------- */
-function drawPortrait(c,who,s){ c.save(); c.scale(s/100,s/100);
-  c.fillStyle={ottilie:'#C3D9D7', barnaby:'#BFD3E6', pell:'#E9D9C0'}[who]||'#DDD'; c.beginPath(); c.arc(0,0,48,0,7); c.fill(); c.save(); c.beginPath(); c.arc(0,0,48,0,7); c.clip(); laInk(c);
-  if (who==='ottilie'){ c.beginPath(); c.moveTo(-34,60); c.quadraticCurveTo(-30,18,0,16); c.quadraticCurveTo(30,18,34,60); laFill(c,'#3F5B4A'); c.fillStyle='#B4503F'; c.fillRect(-26,20,52,8);
-    c.beginPath(); c.arc(0,-6,20,0,7); laFill(c,'#D7A98A'); c.fillStyle='#C9C3BA'; c.beginPath(); c.arc(-4,-24,15,0,7); c.fill(); c.beginPath(); c.arc(-18,-12,9,0,7); c.fill();
-    c.fillStyle=INK; c.beginPath(); c.arc(8,-6,2.2,0,7); c.fill(); c.strokeStyle='#4A3428'; c.lineWidth=4; c.beginPath(); c.moveTo(14,4); c.lineTo(30,2); c.stroke(); c.fillStyle='#4A3428'; c.fillRect(28,-4,7,7); }
-  else if (who==='barnaby'){ c.beginPath(); c.moveTo(-36,60); c.quadraticCurveTo(-32,18,0,16); c.quadraticCurveTo(32,18,36,60); laFill(c,'#E2B13C');
-    c.beginPath(); c.arc(0,-4,20,0,7); laFill(c,'#D7A98A'); c.fillStyle='#F3F0EA'; c.beginPath(); c.moveTo(-20,-2); c.quadraticCurveTo(0,40,20,-2); c.closePath(); c.fill(); c.stroke();
-    c.fillStyle='#D9614C'; c.beginPath(); c.arc(6,-8,4,0,7); c.fill(); c.fillStyle=INK; c.beginPath(); c.arc(-6,-10,2,0,7); c.fill(); c.beginPath(); c.arc(8,-10,2,0,7); c.fill();
-    c.fillStyle='#24324A'; c.fillRect(-22,-34,44,12); c.strokeRect(-22,-34,44,12); c.fillStyle='#F3F0EA'; c.fillRect(-18,-40,36,7); c.fillStyle='#24324A'; c.fillRect(-28,-24,56,5); }
-  else { c.beginPath(); c.moveTo(-34,60); c.quadraticCurveTo(-30,18,0,16); c.quadraticCurveTo(30,18,34,60); laFill(c,'#3B5C8A');
-    c.beginPath(); c.arc(0,-4,19,0,7); laFill(c,'#D7A98A'); c.fillStyle='#4A3428'; c.fillRect(-12,-2,24,4); laInk(c,2); c.beginPath(); c.arc(-7,-8,4.5,0,7); c.arc(7,-8,4.5,0,7); c.stroke();
-    c.fillStyle='#2D4870'; c.fillRect(-22,-30,44,10); c.fillRect(-14,-38,28,9); c.fillStyle=LA.brass; c.fillRect(-4,-30,8,5); }
-  c.restore(); c.restore(); }

@@ -19,7 +19,7 @@ function modSources(){
   for (const m of R.mods||[]) L.push(Object.assign({src:'rod',name:R.name},m));
   // the meal you ate: each boost scales with its stars
   if (mealActive()){ const m=save.meal, Rc=RECIPES[m.id], s=mealStr(m);
-    for (const b of Rc.boost) add('meal',Rc.name,b.k,b.k==='luck'?b.v*s:Math.max(.2,1+b.v*s),{stars:m.stars}); }
+    for (const b of Rc.boost) add('meal',Rc.name,b.k,b.k==='luck'?b.v*s:Math.max(.2,1+b.v*s),b.when?{stars:m.stars, when:b.when}:{stars:m.stars}); }
   // completed tank sets, and decor that lends luck while its fish is in the tank
   for (const st of setsDone()){
     const when={}; if (st.region!=='any') when.region=st.region; if (st.night) when.night=true; if (st.wx) when.wx=st.wx;
@@ -38,10 +38,12 @@ function modSources(){
   for (const id of enchFor(save.rod)) if (id) for (const x of ENCH[id].mods) L.push(Object.assign({src:'ench',name:ENCH[id].name},x,x.home?{v:homeMul()}:{}));   // Homebody grows by the day (game/river.js)
   // artifacts work while they're in a vest pocket; keepsakes work from the moment you have them
   const FS=findsState();
-  for (const id of FS.equip){ const D=FINDS[id]; if (D && FS.have[id]) for (const x of D.mods||[]) L.push(Object.assign({src:'artifact',name:D.name},x)); }
+  for (const id of FS.equip){ const D=FINDS[id]; if (D && FS.have[id]) for (const x of D.mods||[]) L.push(Object.assign({src:'artifact',name:D.name},x,x.grows?{v:hookValue()}:{})); }   // the Hungry Hook grows on the Twin Spool (game/twin.js)
   for (const id in FS.have){ const D=FINDS[id]; if (D && D.kind==='keepsake') for (const x of D.mods||[]) L.push(Object.assign({src:'keepsake',name:D.name},x)); }
   // the shack: each line of the fix-up list done, and each fish on the trophy wall (game/shack.js)
   fixUpMods(add,L);
+  // the journal: each milestone's luck, for good (game/rewards.js)
+  journalMods(add);
   add('base','Keepnet','netCap',STATS.netCap.start);
   // mastery: enough of a species and your rod knows it
   for (const id in FISH) if ((save.fish[id]||{}).caught>=MASTERY.catches){ const n='Mastered '+FISH[id].name;
@@ -74,8 +76,9 @@ function modSources(){
 function modList(){ if (MODC.list && MODC.at===MODC.frame && !MODC.dirty) return MODC.list;
   MODC.list=modSources(); MODC.at=MODC.frame; MODC.dirty=false; return MODC.list; }
 /** The context a stat is read in. Region, time and weather come from the game (outdoors: anywhere but under the lake,
-    in the Hollow); callers add spot, fish, rarity or lucky. A fish brings its rarity along. */
-function modCtx(c){ const x=Object.assign({region:REG(), night:nightNow(), wx:wxNow()}, c); if (x.outdoors==null) x.outdoors=x.region!=='hollow';
+    in the Hollow; top: the first minutes of the hour, the Clockfin's); callers add spot, fish, rarity or lucky. A fish
+    brings its rarity along. */
+function modCtx(c){ const x=Object.assign({region:REG(), night:nightNow(), wx:wxNow(), top:topOfHour(RARE_BITES.clockfin.top)}, c); if (x.outdoors==null) x.outdoors=x.region!=='hollow';
   if (x.fish){ if (!x.rarity) x.rarity=FISH[x.fish].rarity; if (!x.beh) x.beh=FISH[x.fish].beh; } return x; }
 const rarRank=r=>Object.keys(RAR).indexOf(r);
 function modMatch(m,c){ const w=m.when; if (!w) return true;

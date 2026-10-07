@@ -100,7 +100,7 @@ function lootPop(){ const L=S.loot, R=RAR[L.tier], ti=L.ti, top=L.y-(L.hv||0)-cr
   if (L.tier==='mythic'){ L.hole=0; lootSparks(L.x,top,40,'225,230,245',{v0:80,v1:380,g:10,m0:1,m1:2}); }
 }
 function lootReveal(){ const L=S.loot; if (L.phase==='reveal') return; L.phase='reveal'; showHaul(L); }
-function lootEnd(){ const L=S.loot; hideHaul(); closeNote(true); S.loot=null; S.darkT=0; S.zoomT=1; MU.duckT=0; if (coinShown!==save.coins) coinTally(500); updateHud(); setState('idle');
+function lootEnd(){ const L=S.loot; hideHaul(); closeNote(true); S.loot=null; S.darkT=0; S.zoomT=1; MU.duckT=0; if (coinShown!==save.coins) coinTally(500); updateHud(); setState('idle'); rewardsAfterCatch();   // a find can finish the Mayor's set (game/rewards.js)
   const FS=findsState(), fresh=L && L.got.items.some(it=>it.type==='find'||it.type==='note');
   if (fresh){ $('journalBtn').classList.remove('pulse'); void $('journalBtn').offsetWidth; $('journalBtn').classList.add('pulse'); }
   if (L && L.got.items.some(it=>it.type==='find' && FINDS[it.id].kind==='artifact') && !save.finds.pocketTip){ save.finds.pocketTip=true; persist();
@@ -215,12 +215,13 @@ function haulItemHTML(it,i){ const st=' style="--i:'+i+'"';
 function haulTitle(L){ const g=L.got;
   if (L.kind==='crate') return g.cache?'A buried cache':CRATES[L.tier].name;
   if (L.kind==='map') return g.items[0]&&g.items[0].n>=MAPS.pieces?'The map is whole':'A piece of a map';
+  if (L.kind==='grey') return 'Grey brought you something';   // back from an errand (game/heron.js)
   const it=g.items[0]; if (it && it.type==='find') return 'You found something';
   if (L.kind==='mirror') return 'Up from where the eye was';   // after the Sleeper's Scale (game/godly.js)
   if (it && it.type==='rod') return 'Something came up out of the tower';
   return 'Treasure'; }
 function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
-  const tier=L.kind==='crate'?L.tier:first&&first.type==='find'?FINDS[first.id].rarity:L.kind==='map'?'uncommon':L.kind==='rod'?'epic':L.kind==='mirror'?'godly':'common';
+  const tier=L.kind==='crate'?L.tier:first&&first.type==='find'?FINDS[first.id].rarity:L.kind==='map'||(first&&first.type==='map')?'uncommon':L.kind==='rod'?'epic':L.kind==='mirror'?'godly':'common';
   el.dataset.r=tier; el.dataset.kind=L.kind; el.classList.remove('out');
   let h='<div class="hl-top"><span class="rarity">'+RAR[tier].label+'</span>'+pipsHTML(tier)+'</div><h2>'+haulTitle(L)+'</h2>';
   const base=g.base==null?g.coins:g.base;
@@ -249,7 +250,7 @@ function showHaul(L){ const g=L.got, el=$('haul'), first=g.items[0];
   const cardTop=window.innerHeight-(parseFloat(getComputedStyle(el).bottom)||18)-el.offsetHeight, room=cardTop-14-(L.kind==='crate'?crateW(L.ti)*1.02+L.hv:90)-64;
   L.lift=Math.min(L.to.y,cardTop-14); if (L.kind==='crate' && room<0) L.fit=Math.max(.5,1+room/(crateW(L.ti)*1.02));
 }
-const itemRarity=it=>it.type==='rod'?(it.id==='mirror'?'godly':'epic'):it.type==='map'?'uncommon':it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate:it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
+const itemRarity=it=>it.type==='rod'?(it.id==='mirror'?'godly':'epic'):it.type==='map'?'uncommon':it.type==='find'?FINDS[it.id].rarity:it.type==='gear'?TACKLE[it.id].crate||'common':it.type==='paint'?PAINTS[it.id].crate||'legendary':it.type==='decor'?DECOR[it.tank].find(d=>d.id===it.id).crate:it.type==='spare'?it.rarity:'common';
 function hideHaul(){ const el=$('haul'); if (el.hidden) return; ovClosed('haul'); el.classList.add('out'); setTimeout(()=>{ el.hidden=true; el.classList.remove('out'); el.innerHTML=''; },REDUCED?0:250); }
 /** Paints tiles in two passes, every size read before any canvas is resized, so the page lays out once. */
 /** Tiles are sized by their layout box, not their box on screen, so a sheet mid-zoom or a badge popping in doesn't
@@ -269,25 +270,28 @@ function paintTile(cv,r,d){ r=r||{width:cv.offsetWidth,height:cv.offsetHeight}; 
   else if (cv.dataset.trap) drawTrapIcon(x,cv.dataset.trap,s);
   else if (cv.dataset.fitting) drawFittingIcon(x,cv.dataset.fitting,s);
   else if (cv.dataset.runeempty) drawRune(x,null,s*.8,{empty:true});
-  else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter'||cv.dataset.notekind==='reply'||cv.dataset.notekind==='invite') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
+  else if (cv.dataset.pennant) drawPennantTile(x,cv.dataset.pennant,s,S.time);
+  else if (cv.dataset.rosette) drawRosette(x,+cv.dataset.rosette,s);
+  else if (cv.dataset.notekind) { if (cv.dataset.notekind==='letter'||cv.dataset.notekind==='reply'||cv.dataset.notekind==='invite'||cv.dataset.notekind==='mayor') drawEnvelope(x,s*.95); else if (cv.dataset.notekind==='logbook') drawLogbook(x,s); else drawBottle(x,s,0); } }
 function drawHullSwatch(c,id,s){ const P=PAINTS[id]; c.save(); c.scale(s/100,s/100); laInk(c);
   c.fillStyle='rgba(60,110,130,.25)'; laEll(c,0,24,44,7); c.fill();
   c.beginPath(); c.moveTo(-44,-4); c.lineTo(44,-8); c.quadraticCurveTo(50,-6,44,6); c.quadraticCurveTo(0,26,-38,16); c.closePath(); c.fillStyle=P.shift?prismAt(S.time,0,52):P.hull; c.fill(); c.stroke();
   c.strokeStyle=P.trim||'#EDE6D6'; c.lineWidth=4; c.beginPath(); c.moveTo(-40,2); c.lineTo(44,-1); c.stroke();
   if (P.stars){ c.fillStyle='#E6E9F2'; for (const [x,y] of [[-20,10],[4,12],[24,6],[-6,6]]){ c.beginPath(); c.arc(x,y,1.4,0,7); c.fill(); } }
+  if (P.leaf || P.gilt){ c.save(); c.beginPath(); c.moveTo(-44,-4); c.lineTo(44,-8); c.quadraticCurveTo(50,-6,44,6); c.quadraticCurveTo(0,26,-38,16); c.closePath(); c.clip(); hullDress(c,P,0,8,.55); c.restore(); laInk(c); }
   laInk(c); c.fillStyle='#F7EDD5'; c.beginPath(); c.moveTo(0,-8); c.lineTo(0,-44); c.lineTo(26,-12); c.closePath(); c.fill(); c.stroke(); c.restore(); }
 function drawLogbook(c,s){ c.save(); c.scale(s/100,s/100); c.rotate(-.1); laInk(c); rrect(c,-30,-38,60,76,4); laFill(c,'#6B4630'); rrect(c,-24,-34,50,68,3); laFill(c,'#F4EBD8');
   c.strokeStyle='rgba(90,110,140,.4)'; c.lineWidth=1.4; for (let y=-24;y<30;y+=7){ c.beginPath(); c.moveTo(-18,y); c.lineTo(20,y); c.stroke(); }
   c.font='600 13px Caveat, cursive'; c.fillStyle='#B4433A'; c.textAlign='center'; c.fillText('3:12',2,6); c.strokeStyle='#B4433A'; c.lineWidth=1.6; laEll(c,2,2,14,8); c.stroke(); c.restore(); }
 
 /* ---------- notes: bottles, logbook pages and letters, inked in by hand ---------- */
-const noteKind=N=>N.kind==='letter'?'A drowned letter':N.kind==='reply'?'An answer, from the Quarter':N.kind==='invite'?'An invitation, from Lantern Row':N.kind==='logbook'?'Your uncle’s logbook':'A note in a bottle';
-function noteTitle(id){ const N=NOTES[id]; if (N.kind==='letter'||N.kind==='reply'||N.kind==='invite') return 'For '+N.to; if (N.kind==='logbook') return 'Logbook, page '+N.page; return '“'+N.lines[0].replace(/[,:.]$/,'')+'…”'; }
+const noteKind=N=>N.kind==='letter'?'A drowned letter':N.kind==='reply'?'An answer, from the Quarter':N.kind==='invite'?'An invitation, from Lantern Row':N.kind==='mayor'?'A letter from the Town Hall':N.kind==='logbook'?'Your uncle’s logbook':'A note in a bottle';
+function noteTitle(id){ const N=NOTES[id]; if (N.kind==='letter'||N.kind==='reply'||N.kind==='invite'||N.kind==='mayor') return 'For '+N.to; if (N.kind==='logbook') return 'Logbook, page '+N.page; return '“'+N.lines[0].replace(/[,:.]$/,'')+'…”'; }
 let NOTE_DONE=null;
 function openNote(id,o){ if (!id || !NOTES[id]) { if (o&&o.done) o.done(); return; } o=o||{}; const N=NOTES[id], el=$('note'); NOTE_DONE=o.done||null;
   let t=.5, lines=''; N.lines.forEach((ln,i)=>{ const d=Math.max(.45,ln.length*.045); lines+='<span class="ln'+(i===0?' first':'')+(i===N.lines.length-1&&/^—/.test(ln)?' sig':'')+'" style="--s:'+t.toFixed(2)+'s;--d:'+d.toFixed(2)+'s">'+ln+'</span>'; t+=d+.12; });
-  const env=N.kind==='letter'||N.kind==='reply'||N.kind==='invite', head=env?'<div class="nt-env"><span class="nt-to">To '+N.to+'</span><span class="nt-mark">'+(N.kind!=='letter'?'LANTERN ROW<br>MAR 1966':'HOLLOWMERE<br>MAR 1966')+'</span></div>':N.kind==='logbook'?'<div class="nt-log">Your uncle’s logbook · page '+N.page+'</div>':'';
-  const foot=env&&o.fresh&&N.kind!=='invite'?'Give it to Pell':o.fresh?'Keep it':'Close';
+  const env=N.kind==='letter'||N.kind==='reply'||N.kind==='invite'||N.kind==='mayor', head=env?'<div class="nt-env"><span class="nt-to">To '+N.to+'</span><span class="nt-mark">'+(N.kind==='mayor'?'TOWN HALL<br>MAR 1966':N.kind!=='letter'?'LANTERN ROW<br>MAR 1966':'HOLLOWMERE<br>MAR 1966')+'</span></div>':N.kind==='logbook'?'<div class="nt-log">Your uncle’s logbook · page '+N.page+'</div>':'';
+  const foot=env&&o.fresh&&N.kind!=='invite'&&N.kind!=='mayor'?'Give it to Pell':o.fresh?'Keep it':'Close';
   el.innerHTML='<div class="nt-paper" data-kind="'+(N.kind==='invite'?'invite':env?'letter':N.kind)+'" role="dialog" aria-label="'+noteKind(N)+'">'+head+lines+'<button class="btn primary nt-go" id="ntGo" type="button" style="animation-delay:'+(REDUCED?0:t).toFixed(2)+'s">'+foot+'</button></div>';
   el.hidden=false; el.classList.remove('out'); ovOpen('note',()=>{ closeNote(); });
   const paper=el.querySelector('.nt-paper'); paper.addEventListener('click',e=>{ if (e.target.id!=='ntGo'){ paper.classList.add('done'); penStop(); } });

@@ -15,10 +15,12 @@ function drawPlaque(x,id,w,h){ const F=FISH[id], pw=Math.min(w*.86,330), ph=h*.9
 /** The waters you can reach, the one you're at first. */
 function journalRegions(){ const here=REG(); return [here,...WATERS.filter(r=>r!==here && regionOpen(r))]; }
 function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
-  let h='<div class="panel-head"><div><h2>Journal</h2><p>'+regs.map(r=>REGION_NAME[r]+' '+REGION_FISH[r].filter(id=>(save.fish[id]||{}).caught>0).length+'/'+REGION_FISH[r].length).join(' · ')+'</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
+  const title=journalTitle(), got=ROSTER.filter(caughtAny).length;
+  let h='<div class="panel-head"><div><h2>Journal</h2><p>'+(title?'<b class="jr-title">'+title+'</b> · ':'')+got+' of '+ROSTER.length+' species</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
     '<div class="seg" role="tablist">'+[['species','Species'],['records','Records'],['finds','Finds'+(findsState().fresh.length?' •':'')],['bonuses','Bonuses']].map(([k,l])=>'<button type="button" role="tab" data-jt="'+k+'" aria-selected="'+(JTAB===k)+'" class="'+(JTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
   h+=JTAB==='records'?recordsHTML(regs):JTAB==='bonuses'?bonusesHTML():JTAB==='finds'?findsHTML():speciesHTML(regs);
   openSheet(h); $('closeS').addEventListener('click',closeSheet); if (JTAB==='finds') bindFinds();
+  if (JTAB==='species') paintTiles(document.querySelectorAll('#panel .jr-ring canvas[data-find]'));
   document.querySelectorAll('#panel [data-jt]').forEach(b=>b.addEventListener('click',()=>{ tone(900,.04,{vol:.04,type:'triangle'}); openJournal(b.dataset.jt); $('panel').scrollTop=0; }));
   document.querySelectorAll('#panel [data-units]').forEach(b=>b.addEventListener('click',()=>{ save.units=b.dataset.units; persist(); openJournal('records'); }));
   document.querySelectorAll('#panel canvas[data-f]').forEach(c=>{ const r=c.getBoundingClientRect(), d=Math.min(window.devicePixelRatio||1,2);
@@ -27,10 +29,22 @@ function openJournal(tab){ if (tab) JTAB=tab; const regs=journalRegions();
     if (c.dataset.sil){ x.fillStyle='rgba(43,42,51,.75)'; x.fill(tailPath(id,L)); x.fill(fishPath(id,L)); }
     else if (big) drawPlaque(x,id,r.width,r.height); else drawFish(x,id,L,false); });
 }
-function speciesHTML(regs){ let h='<div class="entries">';
+/** The top of the Species page: how much of the chapter you have, each water's page as a ring (its relic in the
+    middle once it's full), and how far to the next milestone (game/rewards.js). */
+function journalCoverHTML(regs){ const j=jState(), n=ROSTER.filter(caughtAny).length, pct=Math.floor(n/ROSTER.length*100), next=MILESTONES.find((M,i)=>!j.miles.includes(i) && n<M.at*ROSTER.length);
+  let h='<div class="jr-cover"><div class="jr-all" style="--p:'+pct+'%" role="img" aria-label="'+pct+'% of the chapter’s species"><b>'+pct+'%</b><span>of the chapter</span></div><div class="jr-rings">';
+  for (const rg of regs){ const ids=REGION_FISH[rg], got=ids.filter(caughtAny).length, gift=j.pages[rg] && PAGES[rg];
+    h+='<div class="jr-ring'+(got===ids.length?' done':'')+'" style="--p:'+Math.round(got/ids.length*100)+'%" role="img" aria-label="'+REGION_NAME[rg]+': '+got+' of '+ids.length+'"><i>'+(gift?'<canvas data-find="'+gift.relic+'"></canvas>':got+'/'+ids.length)+'</i><span>'+REGION_SHORT[rg]+'</span></div>'; }
+  h+='</div>';
+  if (next){ const k=Math.ceil(next.at*ROSTER.length-n); h+='<p class="jr-next">'+k+' more species to <b>'+next.title+'</b></p>'; }
+  else if (journalTitle()) h+='<p class="jr-next">Every species in the chapter. <b>'+journalTitle()+'</b></p>';
+  return h+'</div>'; }
+/** A species' three journal stars, under its picture: caught, what it remembers, its last line. */
+function jStarsHTML(id){ const n=jStars(id); return '<span class="jstars" role="img" aria-label="'+n+' of 3 journal stars" title="Caught · its memory · its last line">'+[1,2,3].map(i=>'<i class="'+(i<=n?'on':'')+'"></i>').join('')+'</span>'; }
+function speciesHTML(regs){ let h=journalCoverHTML(regs)+'<div class="entries">';
   regs.forEach(rg=>{ h+='<h3 class="j-reg">'+REGION_NAME[rg]+'</h3>'; REGION_FISH[rg].forEach(id=>{ const F=FISH[id], r=save.fish[id]||{caught:0,best:0,seen:false};
     if (r.caught>0){ const m=Math.min(MASTERY.catches,r.caught), pb=r.pb;
-      h+='<div class="entry"><canvas data-f="'+id+'"></canvas><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+(F.beh2?' then '+BEH[F.beh2]:'')+'</span>'+rarPipsHTML(F.rarity)+'<h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p>'+memoryHTML(id)+mutLineHTML(id)+ledgerHTML(id)+'<div class="mast"><i style="width:'+Math.round(m/MASTERY.catches*100)+'%"></i></div><p>'+(r.caught>=MASTERY.catches?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/'+MASTERY.catches)+'</p></div></div>'; }
+      h+='<div class="entry"><div class="ent-pic"><canvas data-f="'+id+'"></canvas>'+jStarsHTML(id)+'</div><div><span class="r" style="color:'+RAR[F.rarity].color+'">'+RAR[F.rarity].label+' · '+BEH[F.beh]+(F.beh2?' then '+BEH[F.beh2]:'')+'</span>'+rarPipsHTML(F.rarity)+'<h3>'+F.name+'</h3><p>Caught '+r.caught+(pb?' · Record <b>'+fmtW(pb.w)+'</b> · '+fmtLen(pb.size)+' '+starsHTML(pb.stars):'')+'</p><p>'+F.lore+'</p>'+memoryHTML(id)+mutLineHTML(id)+ledgerHTML(id)+'<div class="mast"><i style="width:'+Math.round(m/MASTERY.catches*100)+'%"></i></div><p>'+(r.caught>=MASTERY.catches?'Mastered: shorter reels, auto-tilt':'Mastery '+m+'/'+MASTERY.catches)+'</p></div></div>'; }
     else h+='<div class="entry"><canvas data-f="'+id+'" data-sil="1"></canvas><div><span class="r" style="color:#7A7468">'+(r.seen?'Seen, not caught':F.secret?'A secret':'Undiscovered')+'</span><h3>???</h3><p'+(F.secret&&!r.seen?' class="riddle"':'')+'>'+(r.seen||F.secret?F.hint:'Keep fishing to find this one.')+'</p></div></div>';
   }); });
   return h+'</div>'; }
@@ -38,12 +52,13 @@ function speciesHTML(regs){ let h='<div class="entries">';
 const memoryAt = id => MASTERY.memory[FISH[id].rarity]||MASTERY.catches;
 const memoryKnown = id => ((save.fish[id]||{}).caught||0)>=memoryAt(id);
 /** What a fish remembers of the old town, under its lore once you know it well enough; until then, how many more. */
-function memoryHTML(id){ const F=FISH[id]; if (!F.memory) return ''; if (memoryKnown(id)) return '<p class="memory">'+F.memory+'</p>';
-  const n=memoryAt(id)-((save.fish[id]||{}).caught||0); return '<p class="memory-to">Catch '+n+' more to learn what it remembers.</p>'; }
+function memoryHTML(id){ const F=FISH[id]; if (!F.memory) return ''; const c=(save.fish[id]||{}).caught||0;
+  if (!memoryKnown(id)) return '<p class="memory-to">Catch '+(memoryAt(id)-c)+' more to learn what it remembers.</p>';
+  return '<p class="memory">'+F.memory+'</p>'+(!F.last?'':lastKnown(id)?'<p class="memory last">'+F.last+'</p>':'<p class="memory-to">Catch '+(lastAt(id)-c)+' more for its last line.</p>'); }
 /** The mutations found for a species, as a line under its lore: the ones still to find show as dashes. Fish too rare to
     mutate (Mythic and up) get none. */
 function mutLineHTML(id){ if (rarRank(FISH[id].rarity)>=rarRank('mythic')) return ''; const got=mutsFound(id);
-  return '<p class="muts">Mutations: '+MUT_ORDER.map(k=>got.includes(k)?'<b>'+MUTS[k].name+'</b>':'<i aria-label="not found yet">—</i>').join(' · ')+'</p>'; }
+  return '<p class="muts">Mutations: '+MUT_ORDER.map(k=>got.includes(k)?'<b>'+MUTS[k].name+'</b>':'<i aria-label="not found yet">—</i>').join(' · ')+(pennantDone(id)?' <span class="pen-tag">Its pennant is yours</span>':'')+'</p>'; }
 function recordsHTML(regs){ const s=save.stats, all=regs.flatMap(rg=>REGION_FISH[rg]).filter(id=>(save.fish[id]||{}).pb);
   const best=list=>list.reduce((b,id)=>!b||save.fish[id].pb.w>save.fish[b].pb.w?id:b,null);
   let h='<div class="seg units" aria-label="Units"><button type="button" data-units="imperial" class="'+(imperial()?'on':'')+'">lb · in</button><button type="button" data-units="metric" class="'+(!imperial()?'on':'')+'">kg · cm</button></div>';

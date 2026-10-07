@@ -22,7 +22,8 @@ function swellY(n,t){ const ph=t-n*SWELL.period; if (ph<0 || ph>=SWELL.travel) r
 const swellReach = y => SWELL.travel*Math.pow(clamp((y-(HZ+8))/(H-118-HZ-8),0,1),1/1.35);
 /** Whether the seventh wave has the water at y churned now: it passed there, and not long ago. */
 function churnedAt(y){ const sw=S.swell; if (REG()!=='coast' || !sw) return false; const n=Math.floor(sw.t/SWELL.period), at=swellReach(y);
-  for (const k of [n,n-1]){ if (!swellBig(k)) continue; const since=sw.t-k*SWELL.period-at; if (since>=0 && since<SWELL.big.churn) return true; }
+  const last=SWELL.big.churn*modMul('churn'), back=Math.ceil(last/SWELL.period);   // the Comber's Scale keeps it churned longer, past the next swell or two
+  for (let k=n;k>=n-back;k--){ if (!swellBig(k)) continue; const since=sw.t-k*SWELL.period-at; if (since>=0 && since<last) return true; }
   return false; }
 /** Seconds until the next seventh wave rises on the horizon (0 while one is rolling in). */
 function seventhIn(){ const sw=S.swell; if (!sw) return Infinity; const P=SWELL.period, n=Math.floor(sw.t/P);

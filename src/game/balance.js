@@ -46,7 +46,7 @@ function balanceFormHTML(){
 function balSetup(f){ const st={region:f.region, spot:f.spot, hour:+f.hour, rod:f.rod, reel:f.reel, line:f.line, bait:f.bait||null, meal:f.meal?{id:f.meal,stars:+f.stars}:null,
     parts:f.parts==='all'?'all':f.parts==='mine'?(save.parts||[]).slice():[], lucky:f.lucky==='yes', player:f.player};
   if (f.sets==='mine') st.tanks=tanks(); else st.sets=f.sets;
-  if (f.mastery==='mine') st.fish=save.fish; else st.mastery=f.mastery==='all';
+  if (f.mastery==='mine'){ st.fish=save.fish; st.journal=jState(); } else st.mastery=f.mastery==='all';   // your fish, and the luck your journal's milestones lend
   if (f.shack==='all') st.shack='all'; else if (f.shack!=='none') st.shack=shackState();
   if (f.finds==='mine') st.finds=findsState(); else if (f.finds!=='none') st.artifacts=[f.finds];
   if (f.runes==='mine' || !f.runes) st.enchSave=enchState(); else if (f.runes!=='none') st.ench=[f.runes];

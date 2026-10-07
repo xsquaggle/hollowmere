@@ -97,7 +97,7 @@ function drawDock(){
   drawTrapProp();
   const lake=REG()==='lake';   // at the river it's Ottilie's ferry landing: Grey stays home, and Wren is on her boathouse ramp; in the marsh, in her punt
   // unless he's off guarding a trap (game/trap-scene.js); he brings your uncle's fifth page here (game/hollow.js)
-  if (lake && !S.grey) drawHeron(D.rp,top-25,greyHasPage());
+  if (lake && !S.grey && !heronAway()) drawHeron(D.rp,top-25,greyHasPage()||greyGift());   // or back from an errand, with something (game/heron.js)
   if (lakeBellHere()) drawLakeBell();
   drawKeepnet();
   if (lake) drawOttilie(); else if (REG()==='marsh') drawWrenPunt(); else { drawWren(); drawOtterThief(); }

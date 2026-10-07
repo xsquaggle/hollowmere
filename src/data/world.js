@@ -1,6 +1,7 @@
 /* World: region names and the map's places (x, y on the 360 by 480 chart; built:false shows "coming later"). The Hollow
    only shows on the chart once you've climbed down to it (game/hollow.js). */
 const REGION_NAME = {lake:'Stillwater Lake', river:'Rootwood River', coast:'Gullrock Coast', marsh:'Saltmarsh', quarter:'Drowned Quarter', hollow:'The Hollow'};
+const REGION_SHORT = {lake:'Lake', river:'River', coast:'Coast', marsh:'Marsh', quarter:'Quarter', hollow:'Hollow'};   // the journal's page rings
 const MAP_PLACES={
   lake:  {x:100,y:368,name:'Stillwater Lake',desc:'Your uncle’s lake. Lily pads, reed edges, a deep pool, and a mayor who never left.',built:true},
   coast: {x:278,y:150,name:'Gullrock Coast',desc:'Sea stacks, kelp beds, a dark trench and the wreck of the Marigold, where the swells roll in.',built:true},

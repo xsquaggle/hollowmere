@@ -9,7 +9,8 @@
    when  where every bonus to this stat applies, on top of its own conditions (there are no swells at the lake).
          A modifier's own when can name a region, spot, night, fish, beh (a kind of fish: leaper, sulker…), rarity,
          rarityMin, lucky, star (in a fallen star's zone: game/omens.js), starlit (on a star in the water, with the
-         Stillwater Mirror: game/godly.js) or wx (the weather here and now, data/weather.js: one kind or a list).
+         Stillwater Mirror: game/godly.js), top (the first ten minutes of an in-game hour, the Clockfin's) or wx (the
+         weather here and now, data/weather.js: one kind or a list).
    unit  'x' to show the total as ×2.5 rather than +150%; 'chance' for a chance shown as a share of catches;
          'count' for a number of things (+4 fish).
    hint  the plain sentence the Bonuses page shows under the stat. The order here is the order on that page. */
@@ -37,6 +38,10 @@ const STATS={
   clock:    {name:'Time of day', kind:'mul', good:'up', unit:'x', hint:'How fast the in-game clock runs while you fish.'},
   tips:     {name:'Tank tips', kind:'mul', good:'up', hint:'How fast the aquarium’s tip jar fills.'},
   mealCasts:{name:'Meal length', kind:'mul', good:'up', hint:'How many casts a meal’s boosts last.'},
+  dread:    {name:'Dread build-up', kind:'mul', good:'down', hint:'How fast the Bonewhistle’s catches build Dread.'},
+  drift:    {name:'River current', kind:'mul', good:'down', when:{region:'river'}, hint:'How fast the current carries your float downstream.'},
+  churn:    {name:'Churned water', kind:'mul', good:'up', when:{region:'coast'}, hint:'How long the water stays stirred behind the seventh wave.'},
+  lampR:    {name:'Lantern’s reach', kind:'mul', good:'up', when:{region:'hollow'}, hint:'How far the lantern’s pool of light reaches across the Hollow’s water.'},
   tension:  {name:'Tension build-up', kind:'mul', good:'down', tune:true, hint:'Playtest tuning for how fast tension rises.'},
   wait:     {name:'Bite wait tuning', kind:'mul', good:'down', tune:true, hint:'Playtest tuning for the quiet before a fish shows up.'},
   reach:    {name:'Reach', kind:'base', good:'up', hint:'How far out you can cast.'},
@@ -61,9 +66,18 @@ const STATS={
   page:     {name:'A drowned page', kind:'flag', when:{region:'quarter'}, hint:'A drowned page on the hook, for one cast. Something in the Quarter reads them.'},
   callRain: {name:'Call the rain', kind:'flag', hint:'Blow the Tidecaller’s conch, and rain comes where you are.'},
   limp:     {name:'No fight', kind:'flag', hint:'A hooked fish comes straight in.'},
-  cursed:   {name:'Cursed', kind:'flag', hint:'Catches can come up Inked, worth five times as much. Every catch builds Dread.'}
+  cursed:   {name:'Cursed', kind:'flag', hint:'Catches can come up Inked, worth five times as much. Every catch builds Dread.'},
+  noMythic: {name:'No Mythic fish', kind:'flag', hint:'Mythic fish won’t come near you.'},
+  saltHolds:{name:'The salt holds', kind:'flag', hint:'When the lake looks back, it takes nothing, and Dread empties.'},
+  ghostSolid:{name:'Ghosts stay in sight', kind:'flag', hint:'Ghost fish don’t fade while they fight.'},
+  heron:    {name:'Grey’s errands', kind:'flag', when:{region:'lake'}, hint:'Now and then Grey takes a common catch off you, and comes back later with something better.'},
+  latchkey: {name:'The Row’s latchkey', kind:'flag', when:{region:'quarter'}, hint:'A cast that would hit a wall goes in at the nearest door or window instead.'}
 };
 /* Mastery: catch this many of a species and it reels in faster, with your rod following it.
    memory: how many of a species you catch before its journal page shows what it remembers (FISH[id].memory), by rarity:
-   the mastery count up to Rare, fewer for the fish too rare to master. */
-const MASTERY={catches:10, reel:1.65, memory:{common:10, uncommon:10, rare:10, epic:3, legendary:2, exotic:1, mythic:1, godly:1}};
+   the mastery count up to Rare, fewer for the fish too rare to master.
+   last: how many before its third star, with its last line (FISH[id].last) and a leaping pose on the trophy wall. The
+   journal's three stars are the first catch, the memory and the last line (the design doc's 1, 10 and 50, kept for
+   commons and scaled down for the rarer fish, so every star can be earned). */
+const MASTERY={catches:10, reel:1.65, memory:{common:10, uncommon:10, rare:10, epic:3, legendary:2, exotic:1, mythic:1, godly:1},
+  last:{common:50, uncommon:30, rare:20, epic:8, legendary:4, exotic:3, mythic:2, godly:1}};

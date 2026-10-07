@@ -11,7 +11,7 @@ const SPICES={
 };
 /* SPICE_ORDER: the jars on the counter; SPICE_MORE: the two the bigger spice rack adds. */
 const SPICE_ORDER=['salt','pepper','dill','lemon','paprika'], SPICE_MORE=['garlic','fennel'];
-const SIDES={chips:'Chips', rice:'Rice', greens:'Garden greens', bread:'Rye bread', potatoes:'Roast potatoes', corn:'Grilled corn'};
+const SIDES={chips:'Chips', rice:'Rice', greens:'Garden greens', bread:'Rye bread', potatoes:'Roast potatoes', corn:'Grilled corn', clams:'Saltmarsh clams'};
 const FLESH={perch:'#F4CDB0', reedwhisker:'#EFD9C2', lantern:'#F7D9A0', leafjack:'#EEDDB8', mossback:'#E9CDB2', mayor:'#F0D2B6',
   sprat:'#EBDCD0', wrasse:'#F6C4AE', kelpeel:'#E8D8C0', bream:'#F5DCB5', grouper:'#F3E3D3', saltjaw:'#ECD6CC',
   dace:'#F1E0CC', char:'#F4B9A0', mackerel:'#E8C7B4', gurnard:'#F6E6D8',
@@ -26,7 +26,8 @@ const COOK_NAME={pan:'Pan-fry', grill:'Grill'};
    need: [{id or rar, n}]; smoked:true takes a smoked fish of any kind from the keepnet (it skips the Clean station).
    learn: the fish that teaches it when you catch one; rep: the Town reputation standing that teaches it instead
    (data/orders.js: STANDINGS).
-   boost: list of {k,v}: k is a stat in data/stats.js. A meal's modifier is 1+v*strength (luck: v*strength points). */
+   boost: list of {k,v,when?}: k is a stat in data/stats.js. A meal's modifier is 1+v*strength (luck: v*strength points;
+   a flag is simply on while the meal lasts). when limits it, as on any modifier (data/stats.js). */
 const RECIPES={
   chowder:{name:'Odds and Ends Chowder', need:[{rar:'common',n:3}], learn:null, cook:'pan', form:'fillet', dish:'bowl', side:'bread',
     spice:{salt:2,pepper:1,dill:1}, zone:[.56,.8], speed:1, boost:[{k:'value',v:.15}], eff:'Fish are worth 15% more',
@@ -58,10 +59,20 @@ const RECIPES={
   pepperpot:{name:'Harbor Pepperpot', need:[{rar:'uncommon',n:2}], learn:null, rep:4, cook:'pan', form:'fillet', dish:'bowl', side:'bread',
     spice:{pepper:2,garlic:2,fennel:1,paprika:1}, zone:[.6,.8], speed:1.1, boost:[{k:'treasure',v:.25}], eff:'Treasure turns up 25% more often',
     blurb:'Edie Crane’s, from Lantern Row: pepper, garlic and a whisper of fennel. It warms you right down to the boots.'},
+  marsh:{name:'Marsh Chowder', need:[{id:'mudlark',n:2}], learn:'mudlark', cook:'pan', form:'fillet', dish:'bowl', side:'clams',
+    spice:{salt:1,pepper:2,dill:1}, zone:[.58,.8], speed:1.05, boost:[{k:'treasure',v:1}], eff:'Treasure turns up twice as often',
+    blurb:'Eel and Saltmarsh clams in a peppery broth. The buttons, you’ll be glad to hear, are not included.'},
+  rye:{name:'Clockfin on Rye', need:[{id:'clockfin',n:1}], learn:'clockfin', cook:'grill', form:'fillet', dish:'plate', side:'bread',
+    spice:{salt:1,dill:1,lemon:2}, zone:[.6,.76], speed:1.15, boost:[{k:'forecast',v:0},{k:'bite',v:-.3,when:{top:true}}],
+    eff:'Read the weather three turns ahead, and fish bite 30% sooner in the first ten minutes of every hour',
+    blurb:'Grilled and laid on buttered rye. Serve it on the hour: it will be four minutes late anyway.'},
+  broth:{name:'Bellmouth Broth', need:[{id:'bellmouth',n:1}], learn:'bellmouth', cook:'pan', form:'fillet', dish:'bowl', side:'bread',
+    spice:{salt:2,lemon:1,dill:1}, zone:[.6,.78], speed:1.1, boost:[{k:'ghostSolid',v:0}], eff:'Ghost fish stay in sight while they fight',
+    blurb:'A clear broth with a long, low ring to it. Drink it slowly, or your teeth hum.'},
   pie:{name:'Mayor’s Banquet Pie', need:[{id:'mayor',n:1}], learn:'mayor', cook:'pan', form:'fillet', dish:'pie', side:'greens',
     spice:{salt:2,pepper:1,dill:2,lemon:1}, zone:[.62,.76], speed:1.2, boost:[{k:'luck',v:.4}], eff:'+40 luck', banquet:true,
     blurb:'A stargazy pie fit for a mayor. The whole town will want a slice.'}
 };
-const RECIPE_ORDER=['chowder','fry','gumbo','skewers','wraps','stew','bream','steak','kedgeree','pepperpot','pie'];
+const RECIPE_ORDER=['chowder','fry','gumbo','skewers','wraps','stew','bream','steak','marsh','rye','broth','kedgeree','pepperpot','pie'];
 const MUSH={name:'Mystery Mush', eff:'Your bobber turns pink. Fish find it hilarious.', casts:10};
 const MEAL_STR=[1,1.25,1.5], MEAL_CASTS=[20,30,40];

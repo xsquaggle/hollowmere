@@ -17,7 +17,7 @@ function applyAway(ms){ if (!(ms>0)) return null; ms=Math.min(ms,AWAY.cap*360000
   AWAYS.info=info; return info; }
 /** Grey wades out to the fullest lake trap, and a gull settles on the fullest pot at the coast. */
 function awaitTraps(){ const best=reg=>trapsIn(reg).filter(T=>T.spot && T.fish.length>=Math.ceil(trapCap(T)*.3)).sort((a,b)=>b.fish.length/trapCap(b)-a.fish.length/trapCap(a))[0]||null;
-  const L=best('lake'); S.grey=L?{T:L, phase:'wade', t:0}:null; S.gullPot=best('coast'); }
+  const L=best('lake'); S.grey=L && !heronAway()?{T:L, phase:'wade', t:0}:null; S.gullPot=best('coast'); }   // Grey stays away while he's off on an errand (game/heron.js)
 /** The welcome back's line about what's waiting (the tip jar has its own). */
 function awayLine(info){ if (!info || info.mins<AWAY.welcome) return ''; const bits=[], set=trapState().list.filter(T=>T.spot).length;
   const full=info.full===1?(set===1?', and it’s full':', and one is full'):info.full>1?(info.full===set?(set===2?', and both are full':', and all '+set+' are full'):', and '+info.full+' are full'):'';

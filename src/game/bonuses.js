@@ -1,5 +1,5 @@
 /* ---------- Bonuses: the journal page that shows every bonus and where it comes from ---------- */
-const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', shack:'Shack', mount:'Trophy wall', event:'Event', weather:'Weather', tide:'Tide', coast:'Coast', quarter:'Drowned Quarter', dread:'Curse'};
+const SRC_LABEL={rod:'Rod', gear:'Tackle', ench:'Rune', meal:'Meal', set:'Tank set', decor:'Decor', part:'Boat part', artifact:'Artifact', keepsake:'Keepsake', mastery:'Mastery', shack:'Shack', mount:'Trophy wall', event:'Event', weather:'Weather', tide:'Tide', coast:'Coast', quarter:'Drowned Quarter', dread:'Curse', journal:'Journal'};
 /** How a modifier reads: +35 luck, +25%, −30%, ×2.5. Each stat keeps one unit. */
 function modValueText(stat,v,omen){
   if (omen) return '×'+trimNum(v);
@@ -30,6 +30,7 @@ function modWhenText(w){
   if (w.fish) out.push('with '+FISH[w.fish].name);
   if (w.beh) out.push('for '+BEH[w.beh].toLowerCase()+'s');
   if (w.wander) out.push('on the day’s first '+ENCH.wanderer.first+' catches in each water');
+  if (w.top) out.push('in the first '+Math.round(RARE_BITES.clockfin.top*60)+' minutes of each hour');
   return out.join(', ');
 }
 /** A weather condition in words: "in the rain", "in rain and fog". */
@@ -42,6 +43,7 @@ function modState(m,now){ const w=m.when; if (!w) return 'on';
   if ((w.night && !now.night) || (w.night===false && now.night)) return 'off-now';
   if (w.wx && ![].concat(w.wx).includes(now.wx)) return 'off-now';
   if (w.bow && !bowFoot()) return 'off-now';
+  if (w.top && !topOfHour(RARE_BITES.clockfin.top)) return 'off-now';
   if (now.rarity && ((w.rarity && !w.rarity.includes(now.rarity)) || (w.rarityMin && rarRank(now.rarity)<rarRank(w.rarityMin)))) return 'off-here';
   const open=w.spot||w.fish||w.beh||w.lucky||w.bow||w.star||w.starlit||w.wander||((w.rarity||w.rarityMin)&&!now.rarity);
   return open ? 'cond' : 'on'; }
