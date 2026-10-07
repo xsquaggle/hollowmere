@@ -197,7 +197,7 @@ function render(){
   drawSky(); drawWater(); drawDeep(); drawIntroShadow(); drawPads(); drawAmbient(); drawRipples(); drawRfxWater(); drawRelicWater(); drawDreadWater(); drawGhostFx(); drawTraps(); drawSwell(); drawWxVeil(); drawActive(); drawBobber();   /* the fog under the fish you are playing, so its jumps and prompts read */
   drawReeds(); drawMail(); drawDock(); drawPlayer(); drawRodAndLine(); drawAnglerHands(); nightShade(); drawWisps(); drawRain(); drawOmen();
   if (S.dark>.01){ ctx.fillStyle='rgba(8,10,22,'+S.dark.toFixed(3)+')'; ctx.fillRect(-20,-20,W+40,H+40); }
-  drawTrapMarkers(); drawRfxOver(); drawGodlyRays(); drawParticles(); drawLanding(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
+  drawTrapMarkers(); drawRfxOver(); drawGodlyRays(); drawParticles(); drawLanding(); drawHeronFly(); drawLoot(); drawAim(); drawGhostHand(); drawLootOverlay();
   ctx.restore();
   drawOverlays();
 }

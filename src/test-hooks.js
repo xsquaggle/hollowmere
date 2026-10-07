@@ -107,4 +107,11 @@ window.__hm={ get save(){ return save; }, POOLS_BY, FISH, RODS, QUARTER, PELL_Q,
   story:{ END, EA, SUPPER_LINES, SUPPER_SEATS, OTT_SAY, OTT_NAME, OTT_LAST, WREN, PELL, state:()=>storyState(), chapters:()=>chaptersReached(), ottLine:()=>ottLine(), ottName:()=>ottName(), afterCatch:L=>storyAfterCatch(L),
     wrenLater:()=>wrenLater(), pellLater:()=>pellLater(), pellIdle:()=>pellIdle(), notesUp:()=>notesUp().map(n=>n.id), memoryAt:id=>memoryAt(id), memoryHTML:id=>memoryHTML(id),
     due:()=>supperDue(), check:()=>endingCheck(), start:r=>supperStart(!!r), next:()=>endNext(), skip:()=>endSkip(), close:()=>endClose(), hushed:()=>bellHushed(), natural:()=>bellNatural(),
-    focus:who=>eaFocusFor(who), draw:(c,st)=>{ eaLayout(); eaDraw(c,st); }, frame:()=>({phase:END.phase, i:END.i, flip:END.flip, out:END.out, speaker:END.speaker, walter:END.walter, dance:END.dance, cam:{...END.cam}}) } };
+    focus:who=>eaFocusFor(who), draw:(c,st)=>{ eaLayout(); eaDraw(c,st); }, frame:()=>({phase:END.phase, i:END.i, flip:END.flip, out:END.out, speaker:END.speaker, walter:END.walter, dance:END.dance, cam:{...END.cam}}) },
+  // the full roster (step 31): the journal's rewards, Grey's errands, the Hungry Hook and the three meals
+  roster:{ PAGES, MILESTONES, PENNANT, MAYOR, HERON, HUNGRY, ROSTER, RW, MASTERY, state:()=>jState(), due:()=>rewardsDue(), after:()=>rewardsAfterCatch(), stars:id=>jStars(id), lastAt:id=>lastAt(id), lastKnown:id=>lastKnown(id),
+    title:()=>journalTitle(), share:()=>journalShare(), pageDone:r=>pageDone(r), pennantDone:id=>pennantDone(id), pennantOn:()=>pennantOn(), fly:id=>flyPennant(id), mayorDone:()=>mayorDone(), leaps:id=>shLeaps(id),
+    open:t=>openJournal(t), mods:()=>{ MODC.dirty=true; return modList(); }, give:(k,a)=>({page:pageGift, mile:mileGift, pennant:pennantGift, mayor:mayorGift})[k](a),
+    heron:{ state:()=>heronState(), away:()=>heronAway(), gift:()=>greyGift(), takes:L=>heronTakes(L), cast:()=>heronCast(), brings:()=>heronBrings(), take:()=>takeGreyGift(), pile:()=>greyPile(), update:dt=>heronUpdate(dt),
+      fly:()=>S.heronFly&&{phase:S.heronFly.phase, x:S.heronFly.x, y:S.heronFly.y} },
+    hook:{ value:()=>hookValue() } } };

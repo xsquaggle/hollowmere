@@ -14,7 +14,8 @@
    MOON_JAR    fill: night catches to fill it; fullMoon: what one catch on a full-moon night counts as.
    COMBOS[id]  two things that change each other. a: the relic or artifact (a FINDS id). with: the partner's name.
                eff: what they do together, shown once you've seen it happen. live: the partner is in the game now;
-               otherwise the combo shows as "???" until the step that adds its partner. */
+               otherwise the combo shows as "???" until the step that adds its partner.
+   HUNGRY      how the Hungry Hook grows on the Twin Spool (game/twin.js: hookFeeds). */
 const STORY={
   almanac:{how:'ottilie', fish:['dace','char'], found:'A gift from Ottilie',
            hint:'Ottilie’s mother kept one. She might part with it for someone who fishes in every weather.',
@@ -30,9 +31,12 @@ const MAPS={pieces:3, ring:.13, chance:.35, pinR:.045, every:5, depth:[.2,.88], 
 const MOON_JAR={fill:8, fullMoon:2};
 const COMBOS={
   wake:     {a:'tuningfork', with:'Ghost fish', live:true, eff:'A faded ghost fish leaves a glowing wake on the water.'},
-  twinspool:{a:'hungryhook', with:'Twin Spool', eff:'It eats the fish you didn’t pick, and grows hungrier for it.'},
+  twinspool:{a:'hungryhook', with:'Twin Spool', live:true, eff:'When two fish bite at once, it eats the one you didn’t pick, and grows: what fish are worth climbs toward three times.'},
   lantern:  {a:'moonjar', with:'Lantern Rod', live:true, eff:'In the Lantern Rod’s light, fish coming to the float are tinted by their rarity.'},
   tide:     {a:'almanac', with:'Tidecaller', live:true, eff:'The Tidecaller calls rain twice as often.'},
   tower:    {a:'bell', with:'The bell tower', live:true, eff:'Ring it in the Drowned Quarter, and the tower answers.'},
-  lodestone:{a:'pin', with:'Lodestone Rod', eff:'Map caches pull toward your line.'}
+  grey:     {a:'pin', with:'Heron’s Feather', live:true, eff:'Grey brings back pieces of your treasure map.'},
+  salt:     {a:'saltcircle', with:'Bonewhistle', live:true, eff:'When the lake looks back, it sees the salt, takes nothing, and Dread empties.'}
 };
+/* The Hungry Hook on the Twin Spool: each fish it eats adds step to what fish are worth, up to max (from its own ×2). */
+const HUNGRY={step:.05, max:3};

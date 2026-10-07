@@ -705,83 +705,129 @@ Every letter, logbook page, lore line and thing people say in the game's content
 - **Pell:** The Row had its supper. I keep thinking I should have stayed up.
 - **Pell:** My father always said the post goes where it goes. I think he meant it.
 
-## The fish: lore, and what you remember once you know one well
+## 9. The journal's rewards
+
+### A water's page, full
+
+- *(Stillwater Lake)* Grey stalks along the dock, drops a long grey feather at your feet, and looks hard at your keepnet.
+- **Heron’s Feather** (keepsake): A long grey flight feather with a bend in it, where it was folded into a pocket for a while. Grey gave it to you, which means he expects something.
+- **Wren (Rootwood River):** Every fish in the river, written down! I’ve pinned your page up. Here, this came out of the mill race. It’s off the old wheel’s governor. Hang it under your float and the current can’t hurry you.
+- **Mill Weight** (artifact): A brass ball off the mill wheel’s governor, stamped HOLLOWMERE MILL. It still wants to keep things steady.
+- **Ottilie (Saltmarsh):** Old Reeve’s. He laid one round his door every spring tide, and the marsh never once came over the step. You’ve the whole marsh in your book now. It ought to keep you, too.
+- **Salt Circle** (artifact): Grey sea salt set hard in an old brass curtain ring. Old Reeve laid a fresh one round his door at every spring tide, and the marsh never once came over the step.
+- **Barnaby (Gullrock Coast):** Every fish on the coast, eh? Then you’ve earned this more than I have. Found it on the stacks when I was a lad, after a big sea. Been in my pocket ever since.
+- **Comber’s Scale** (artifact): A tarpon scale the size of a saucer, silver going to blue at the rim. Hold it to your ear and there’s a wave in it, coming in.
+- **Pell (Drowned Quarter):** Every fish in the Quarter. Mum would have liked you. This was her spare key. Every door on the Row took it, so she kept it for the post. They’ll let you in.
+- **The Row’s Latchkey** (artifact): A latchkey on a loop of string, worn thin. Every front door on Lantern Row took the same key, and nobody ever locked them anyway.
+- **Ottilie (The Hollow):** He left this on my step, the last morning. The glass off his lantern. Said whoever finished his book should have it. That’s you, {kid / Keeper}.
+- **Lantern Glass** (artifact): The glass chimney off your uncle’s lantern, sooted at the top. Light through it goes further than it has any right to.
+
+### Milestones
+
+- 25% of the species: **Promising Angler**
+- 50% of the species: **Seasoned Angler**
+- 75% of the species: **Naturalist**
+- 100% of the species: **Hollowmere’s Naturalist**
+
+### Grey's errands: the Mayor's belongings
+
+- **Toffee Tin** *(Grey brings it)*: HOLLOWMERE HARBOUR TOFFEE. Inside, two toffees stuck together for sixty years. The Mayor handed them out on the ferry, one to every child.
+- **The Mayor’s Diary** *(Grey brings it)*: Saturday’s page is a speech, crossed out and begun again eleven times. Every version ends with a toast to whoever keeps a light on the water.
+- **Town Hall Key** *(Grey brings it)*: Iron, as long as your hand, with a tassel gone from red to brown. It winds the clock in the tower as well as it opens the door.
+- **The Mayor’s Top Hat** *(Grey brings it)*: Black silk, a little crushed from being carried in a beak. There’s a toffee tucked in the band, in case of children.
+- **Link of a Chain of Office**: One heavy gold link. The rest of the chain is still in the deep pool, around someone’s neck.
+- **Mayor’s Spectacles**: Gold wire, one lens cracked. Someone very old has been looking for these.
+**The Mayor's letter** (to The Keeper of the Bait Shack)
+
+> To the Keeper of the Bait Shack,
+> my spectacles, my chain, my hat,
+> the hall key, my diary (unread,
+> I trust) and my toffees:
+> all home again. That heron
+> is a credit to the town.
+> Supper is on Saturday.
+> I shall make a speech.
+> — Bartholomew, Mayor
+
+- **Pell:** Something for the Keeper, from the Town Hall. Postmarked 1966. He always did write a lovely letter, the Mayor.
+
+## The fish: lore, what you remember once you know one well, and its last line
 
 ### Stillwater Lake
 
-- **Copper Perch** (common). Its belly often holds old coins. Nobody knows who keeps dropping them. *Remembered:* Every coin in its belly is a 1966 penny, and every one is warm, as if it’s only just left somebody’s pocket.
-- **Reedwhisker** (common). A grumpy catfish that tugs like it’s ringing a doorbell. *Remembered:* It tugs twice and waits, then twice again, the way you’d ring a neighbour’s bell late at night, sorry to bother them.
-- **Lantern Carp** (uncommon). Hollowmere’s street lamps once burned its shed scales. *Remembered:* It rises at lamp-lighting time to the minute, the hour someone used to walk Lantern Row with a long pole.
-- **Leafjack** (uncommon). Disguises itself as a leaf. It fools the birds, but not you. *Remembered:* The leaves it copies are plane leaves, from the trees in the old square. There are no plane trees left above the water.
-- **Drizzle Dace** (uncommon). Jumps at raindrops. It thinks they’re flies, and it’s been wrong every time. *Remembered:* It jumps hardest at the first drops, the way children ran out into the rain when the school bell went.
-- **Mossback** (rare). Carries a tiny garden on its back. Some gardens have tiny fences. *Remembered:* The garden on its back has a row of runner beans and a little shed. Somebody grew exactly that, behind No. 2.
-- **Mist Char** (rare). Pale as the fog it swims in, and warmer in the hand than it looks. *Remembered:* It’s warm because it remembers a warm room. Hold it a while and you can smell coal smoke and toast.
-- **Steeple Gar** (epic). Rests nose-up, like the church steeple it hides behind. The steeple is underwater too. *Remembered:* At nine on a Sunday it hangs perfectly still, as if it’s waiting for the steeple bell to finish.
-- **Lampwick Eel** (epic). Its tail burns like a candle wick and never goes out. Wren swears it was a candle once. *Remembered:* Wren was right. There’s a drip of wax on its tail, stamped HOLLOWMERE CHANDLERY.
-- **Mayor Bartholomew** (legendary). An ancient pike still wearing the mayor’s chain of office. *Remembered:* He still does his round of the deep pool at dawn, the way the mayor walked the high street, nodding to people who aren’t there.
-- **Prism Shiner** (exotic). It swallows the ends of rainbows. That’s why nobody ever reaches one. *Remembered:* The colours inside it run in the order of the bunting on Lantern Row: red, yellow, green, blue, and one nobody has a name for.
-- **Moonwhale Calf** (mythic). Too big for this lake. Where is its mother? *Remembered:* On full-moon nights it calls down into the deep pool, and something much further down answers, slowly, like someone talking in their sleep.
+- **Copper Perch** (common). Its belly often holds old coins. Nobody knows who keeps dropping them. *Remembered:* Every coin in its belly is a 1966 penny, and every one is warm, as if it’s only just left somebody’s pocket. *Last:* Count a season’s pennies and they come to one and six, the price of one of Harold’s seed cakes. Somebody on the Row is still paying for supper.
+- **Reedwhisker** (common). A grumpy catfish that tugs like it’s ringing a doorbell. *Remembered:* It tugs twice and waits, then twice again, the way you’d ring a neighbour’s bell late at night, sorry to bother them. *Last:* It’s ringing No. 4’s bell for Walter, who always forgot his key. Edith always came down and let him in.
+- **Lantern Carp** (uncommon). Hollowmere’s street lamps once burned its shed scales. *Remembered:* It rises at lamp-lighting time to the minute, the hour someone used to walk Lantern Row with a long pole. *Last:* On the Saturday of the supper the lamplighter came round early, so the dancing could go on late. The carp still rise early on Saturdays.
+- **Leafjack** (uncommon). Disguises itself as a leaf. It fools the birds, but not you. *Remembered:* The leaves it copies are plane leaves, from the trees in the old square. There are no plane trees left above the water. *Last:* Under its leaf it carries a single plane seed, like a button it means to sew back on. It’s looking for somewhere above the water to plant it.
+- **Drizzle Dace** (uncommon). Jumps at raindrops. It thinks they’re flies, and it’s been wrong every time. *Remembered:* It jumps hardest at the first drops, the way children ran out into the rain when the school bell went. *Last:* It has never caught a raindrop, and it never will, and it has never once been sorry it tried.
+- **Mossback** (rare). Carries a tiny garden on its back. Some gardens have tiny fences. *Remembered:* The garden on its back has a row of runner beans and a little shed. Somebody grew exactly that, behind No. 2. *Last:* The runner beans on its back are staked and tied, and every spring they flower. Whoever lived at No. 2 is still keeping the garden, from wherever they are.
+- **Mist Char** (rare). Pale as the fog it swims in, and warmer in the hand than it looks. *Remembered:* It’s warm because it remembers a warm room. Hold it a while and you can smell coal smoke and toast. *Last:* The warm room is the bakery’s back kitchen, where Harold let the children thaw out on wet mornings, with toast on a long fork.
+- **Steeple Gar** (epic). Rests nose-up, like the church steeple it hides behind. The steeple is underwater too. *Remembered:* At nine on a Sunday it hangs perfectly still, as if it’s waiting for the steeple bell to finish. *Last:* The weathervane on the drowned steeple was never a cockerel. It’s a fish, nose up, and it looks exactly like this one.
+- **Lampwick Eel** (epic). Its tail burns like a candle wick and never goes out. Wren swears it was a candle once. *Remembered:* Wren was right. There’s a drip of wax on its tail, stamped HOLLOWMERE CHANDLERY. *Last:* Its flame always leans toward the Drowned Quarter, wherever you stand, like a candle in the draught from a door left open.
+- **Mayor Bartholomew** (legendary). An ancient pike still wearing the mayor’s chain of office. *Remembered:* He still does his round of the deep pool at dawn, the way the mayor walked the high street, nodding to people who aren’t there. *Last:* At dawn he mouths something at the surface, over and over, like a man going over a speech. It’s a toast, to the Keeper.
+- **Prism Shiner** (exotic). It swallows the ends of rainbows. That’s why nobody ever reaches one. *Remembered:* The colours inside it run in the order of the bunting on Lantern Row: red, yellow, green, blue, and one nobody has a name for. *Last:* Ivy Hale had a name for the last colour. She whispered it to Ottilie on the ferry, the night of the supper, and Ottilie has kept it ever since.
+- **Moonwhale Calf** (mythic). Too big for this lake. Where is its mother? *Remembered:* On full-moon nights it calls down into the deep pool, and something much further down answers, slowly, like someone talking in their sleep. *Last:* Its mother breaches far out and never comes nearer. She keeps clear of the deep pool, the way you’d tiptoe past someone asleep.
 
 ### Gullrock Coast
 
-- **Silver Sprat** (common). Schools so tight they look like one big fish. Sometimes they are. *Remembered:* A shoal can hold a shape for a moment: a boat, a house, once a face. Then it forgets.
-- **Rock Wrasse** (common). Spends its days rearranging pebbles around the sea stacks. *Remembered:* It sets its pebbles in neat rows with a path down the middle, like a front garden.
-- **Spindrift Bass** (uncommon). Hunts in the foam a swell leaves on the rocks. Comes up white, and dries silver in your hands. *Remembered:* It comes up white because it’s been somewhere very cold and bright. It dries silver because it’s glad to be back.
-- **Kelp Ribbon** (uncommon). Ties itself into the kelp and dares you to pull. *Remembered:* The knots it ties are proper sailors’ knots, a bowline, a sheet bend. Somebody taught it.
-- **Gilt Bream** (uncommon). Sailors once paid harbour fees with its scales. *Remembered:* Each scale carries a harbour mark, worn nearly smooth. The harbour it names isn’t on any chart.
-- **Beacon Herring** (uncommon). Every scale throws the lighthouse beam back. Ships have steered home by a shoal of them. *Remembered:* A shoal flashes in threes and a pause, the way the lighthouse did before they changed the lamp.
-- **Squall Mackerel** (uncommon). Rides in under the squalls, a whole school at a time, and leaves just as fast. *Remembered:* It runs for the shore before a squall, the way the fishing boats used to run for home.
-- **Barnacle Grouper** (rare). So old the barnacles have barnacles. *Remembered:* Under the barnacles there’s a brass ring through its lip, from a mooring nobody has used in sixty years.
-- **Wreck Conger** (rare). Has lived in the captain’s cabin so long it thinks it’s the captain. *Remembered:* It turns to face north at every change of the watch, as if someone might still call it up on deck.
-- **Foghorn Gurnard** (rare). Grunts like a foghorn. The lighthouse keepers used to steer by it. *Remembered:* It grunts in the old foghorn’s pattern, two long and one short. The foghorn was taken down in 1971.
-- **Gaslight Angler** (epic). Its lure burns like an old gas lamp. Ships used to steer for it, which is how the trench filled up with ships. *Remembered:* Its lamp dims and brightens like a gas lamp turned down for the night and up again at dawn.
-- **Comber Tarpon** (epic). Rides in on the seventh wave and out on the eighth. Its scales are as big as coins, and sailors keep one for luck. *Remembered:* Count the waves it rides in on and it’s always seven. The old boatmen counted the same way, under their breath.
-- **Saltjaw** (legendary). Coast folk say it follows the lights under the swell. *Remembered:* It follows the lights under the swell because it’s looking for one light in particular. It hasn’t found it yet.
+- **Silver Sprat** (common). Schools so tight they look like one big fish. Sometimes they are. *Remembered:* A shoal can hold a shape for a moment: a boat, a house, once a face. Then it forgets. *Last:* Hold a jarful up at dusk and the face comes back long enough to wink. Barnaby swears it’s his grandfather. Barnaby swears a lot of things.
+- **Rock Wrasse** (common). Spends its days rearranging pebbles around the sea stacks. *Remembered:* It sets its pebbles in neat rows with a path down the middle, like a front garden. *Last:* The garden it lays out has a gate, and at the gate, in white pebbles, a number: 2. The back garden is on the Mossback.
+- **Spindrift Bass** (uncommon). Hunts in the foam a swell leaves on the rocks. Comes up white, and dries silver in your hands. *Remembered:* It comes up white because it’s been somewhere very cold and bright. It dries silver because it’s glad to be back. *Last:* It goes white with fright, every time, and silver with relief. It has never got used to being caught, and it forgives you anyway.
+- **Kelp Ribbon** (uncommon). Ties itself into the kelp and dares you to pull. *Remembered:* The knots it ties are proper sailors’ knots, a bowline, a sheet bend. Somebody taught it. *Last:* The last knot it ties, when it thinks nobody’s looking, is the Ferryman’s Knot: Ottilie’s mother’s, the one that never comes loose.
+- **Gilt Bream** (uncommon). Sailors once paid harbour fees with its scales. *Remembered:* Each scale carries a harbour mark, worn nearly smooth. The harbour it names isn’t on any chart. *Last:* The harbour on its scales is Hollowmere’s own, at the foot of Lantern Row, where the ferry tied up. It’s on no chart because it’s under the lake.
+- **Beacon Herring** (uncommon). Every scale throws the lighthouse beam back. Ships have steered home by a shoal of them. *Remembered:* A shoal flashes in threes and a pause, the way the lighthouse did before they changed the lamp. *Last:* Three flashes and a pause was how the old lamp said Hollowmere to passing ships. The herring still say it, in case anyone’s passing.
+- **Squall Mackerel** (uncommon). Rides in under the squalls, a whole school at a time, and leaves just as fast. *Remembered:* It runs for the shore before a squall, the way the fishing boats used to run for home. *Last:* It runs for a harbour that isn’t there any more, and turns back at the last moment, every time, as if it’s only just remembered.
+- **Barnacle Grouper** (rare). So old the barnacles have barnacles. *Remembered:* Under the barnacles there’s a brass ring through its lip, from a mooring nobody has used in sixty years. *Last:* Whatever was moored to that ring, the grouper never let go of it. It’s still holding on, in case it comes back.
+- **Wreck Conger** (rare). Has lived in the captain’s cabin so long it thinks it’s the captain. *Remembered:* It turns to face north at every change of the watch, as if someone might still call it up on deck. *Last:* North of the wreck lies Hollowmere. It has kept watch for the town’s lights for sixty years, and since you came it has something to report.
+- **Foghorn Gurnard** (rare). Grunts like a foghorn. The lighthouse keepers used to steer by it. *Remembered:* It grunts in the old foghorn’s pattern, two long and one short. The foghorn was taken down in 1971. *Last:* Since you came it adds a fourth note, a short one, at the end. In the keepers’ old code book that means: all’s well.
+- **Gaslight Angler** (epic). Its lure burns like an old gas lamp. Ships used to steer for it, which is how the trench filled up with ships. *Remembered:* Its lamp dims and brightens like a gas lamp turned down for the night and up again at dawn. *Last:* Turn your own lamp down at night and it turns its own down too, politely, the way neighbours did on the Row at bedtime.
+- **Comber Tarpon** (epic). Rides in on the seventh wave and out on the eighth. Its scales are as big as coins, and sailors keep one for luck. *Remembered:* Count the waves it rides in on and it’s always seven. The old boatmen counted the same way, under their breath. *Last:* On the eighth wave it goes out a scale or two lighter. Those wash up on the stacks, and Barnaby has kept one in his pocket since he was a boy.
+- **Saltjaw** (legendary). Coast folk say it follows the lights under the swell. *Remembered:* It follows the lights under the swell because it’s looking for one light in particular. It hasn’t found it yet. *Last:* The light it’s looking for is the lighthouse’s old lamp, the one they changed. Nobody has had the heart to tell it.
 
 ### Rootwood River
 
-- **Brook Ribbon** (common). Thin as a hair ribbon and twice as hard to hold. *Remembered:* It always comes up tied in a bow, a little crooked, the way a child ties one.
-- **Stonegrinder** (common). Eats pebbles and spits out smoother ones. *Remembered:* The pebbles it polishes are millstone grey, and the mill’s old millstones are still wearing down, with nobody turning them.
+- **Brook Ribbon** (common). Thin as a hair ribbon and twice as hard to hold. *Remembered:* It always comes up tied in a bow, a little crooked, the way a child ties one. *Last:* It’s the bow off Hattie’s red mitten. The lake has the mitten too. It’s holding out for the cookie.
+- **Stonegrinder** (common). Eats pebbles and spits out smoother ones. *Remembered:* The pebbles it polishes are millstone grey, and the mill’s old millstones are still wearing down, with nobody turning them. *Last:* It’s grinding flour, very slowly, a pebble at a time. In sixty years it has nearly made enough for one loaf.
 - **Leafjack**: also here; see Stillwater Lake.
-- **Spatefin** (uncommon). Comes down with the flood water, nose first, and goes back up when it’s over. *Remembered:* It comes down with the flood nose first, but it goes back up tail first, as if it doesn’t want to see where it’s been.
-- **Barkskin Barbel** (rare). Its whiskers are thin roots. At least one heron has tried to perch on it. *Remembered:* Its whisker roots are alder, and the alder over Wren’s boathouse is missing a root on the river side.
-- **Wisp Grayling** (rare). Its tall fin is a sail of mist. In fog it rows itself upstream. *Remembered:* On a foggy morning, hold its sail to your ear and you can hear, very faintly, a waterwheel turning.
-- **Clockfin Trout** (epic). Its fin ticks. It runs four minutes slow. *Remembered:* At twelve minutes past each hour its ticking stops for a moment. Then it remembers, and carries on.
-- **Old Gristle** (legendary). A sturgeon older than the mill. The miller fed it crusts for thirty years, and it still turns up at six expecting them. *Remembered:* It turns up at six for crusts and swims off hungry, and never seems to mind. It’s the turning up that matters.
+- **Spatefin** (uncommon). Comes down with the flood water, nose first, and goes back up when it’s over. *Remembered:* It comes down with the flood nose first, but it goes back up tail first, as if it doesn’t want to see where it’s been. *Last:* Each spate it brings something down from the hills and leaves it at the mill race, like a cat with a mouse: a twig, a sock, once a teaspoon.
+- **Barkskin Barbel** (rare). Its whiskers are thin roots. At least one heron has tried to perch on it. *Remembered:* Its whisker roots are alder, and the alder over Wren’s boathouse is missing a root on the river side. *Last:* Wren knows about the root. She says the alder only lent it, and wants it back when the barbel’s finished growing.
+- **Wisp Grayling** (rare). Its tall fin is a sail of mist. In fog it rows itself upstream. *Remembered:* On a foggy morning, hold its sail to your ear and you can hear, very faintly, a waterwheel turning. *Last:* The wheel you hear is the mill’s, on the last morning it turned. The grayling kept the sound, in case the miller ever wants it back.
+- **Clockfin Trout** (epic). Its fin ticks. It runs four minutes slow. *Remembered:* At twelve minutes past each hour its ticking stops for a moment. Then it remembers, and carries on. *Last:* Running four minutes slow, it will never quite reach twelve past three. That’s the whole idea.
+- **Old Gristle** (legendary). A sturgeon older than the mill. The miller fed it crusts for thirty years, and it still turns up at six expecting them. *Remembered:* It turns up at six for crusts and swims off hungry, and never seems to mind. It’s the turning up that matters. *Last:* Bring a crust at six and it takes it from your fingers as gently as an old dog, then waits a moment, as if for the miller to say good lad.
 
 ### Saltmarsh
 
-- **Mudlark Eel** (common). Collects buttons. Has strong opinions about them. *Remembered:* Lay out the buttons it collects and they’re all off one coat, a child’s coat, navy blue.
-- **Doormat Flounder** (common). Lies so flat and so still that crabs wipe their feet on it. *Remembered:* There’s a word woven into its back, half worn away: WELC.
-- **Croaking Bass** (uncommon). Croaks back if you croak at it. Please don’t. *Remembered:* Croak back at it three times and it croaks the first bar of the Sunday hymn, a little flat.
-- **Cucumber Smelt** (uncommon). Smells of fresh cucumber. Nobody knows why, and the smelt aren’t saying. *Remembered:* It smells of cucumber sandwiches, actually, with the crusts cut off. Somebody’s picnic, a long time ago.
-- **Will-o’-Whiting** (uncommon). Leads lost fishers to good spots, or so they claim. *Remembered:* It always leads you to the old gate in the sea wall, and stops, and waits, as if the gate might still open.
-- **Thicklip Mullet** (rare). Grazes the flooded flats at the top of the tide, and turns its thick lips up at nearly every bait. *Remembered:* It turns its lips up at the bait the way a child turns up its nose at greens, and eats it the moment you look away.
-- **Bellmouth** (epic). When it opens its mouth, you hear a bell from very far down. *Remembered:* The bell you hear when it opens its mouth is the clock tower’s, two miles and sixty years away.
+- **Mudlark Eel** (common). Collects buttons. Has strong opinions about them. *Remembered:* Lay out the buttons it collects and they’re all off one coat, a child’s coat, navy blue. *Last:* The coat was Pell’s post-office coat, a size too big. He lost a button a day that summer, and his mother sewed one back every night.
+- **Doormat Flounder** (common). Lies so flat and so still that crabs wipe their feet on it. *Remembered:* There’s a word woven into its back, half worn away: WELC. *Last:* The rest of the word is under the mud by the sea wall gate: WELCOME. The marsh-reeve’s mat said it, and he meant it.
+- **Croaking Bass** (uncommon). Croaks back if you croak at it. Please don’t. *Remembered:* Croak back at it three times and it croaks the first bar of the Sunday hymn, a little flat. *Last:* It goes flat in exactly the place Albert Finch went flat, every Sunday, in the front row of the choir. Josephine always nudged him.
+- **Cucumber Smelt** (uncommon). Smells of fresh cucumber. Nobody knows why, and the smelt aren’t saying. *Remembered:* It smells of cucumber sandwiches, actually, with the crusts cut off. Somebody’s picnic, a long time ago. *Last:* The picnic was on the sea wall, the Saturday afternoon before the supper. Somebody left half a sandwich for the gulls, and the smelt got there first.
+- **Will-o’-Whiting** (uncommon). Leads lost fishers to good spots, or so they claim. *Remembered:* It always leads you to the old gate in the sea wall, and stops, and waits, as if the gate might still open. *Last:* Follow it in the fog with a lantern lit and, once, you’ll hear the latch lift on the far side of the gate.
+- **Thicklip Mullet** (rare). Grazes the flooded flats at the top of the tide, and turns its thick lips up at nearly every bait. *Remembered:* It turns its lips up at the bait the way a child turns up its nose at greens, and eats it the moment you look away. *Last:* Hattie did exactly that with her greens, every Saturday, and her father always looked away on purpose.
+- **Bellmouth** (epic). When it opens its mouth, you hear a bell from very far down. *Remembered:* The bell you hear when it opens its mouth is the clock tower’s, two miles and sixty years away. *Last:* It only ever opens its mouth to answer a bell. Albert Finch told everyone never to ring back, and the Bellmouth never listened either.
 - **Lampwick Eel**: also here; see Stillwater Lake.
-- **Old Reeve** (legendary). The marsh-reeve kept the sea wall all his life. Something still swims its length at every spring tide, checking for leaks. *Remembered:* The iron keys on its ring open the sluice, the gate, the hut, and one more lock nobody has found.
+- **Old Reeve** (legendary). The marsh-reeve kept the sea wall all his life. Something still swims its length at every spring tide, checking for leaks. *Remembered:* The iron keys on its ring open the sluice, the gate, the hut, and one more lock nobody has found. *Last:* On spring tides the last key turns a little on its ring, all by itself, toward Hollowmere. The lock it fits is under the lake.
 
 ### Drowned Quarter
 
-- **Sooty Gudgeon** (common). Lives in the drowned chimneys. It goes in grey and comes out black, and it never minds which. *Remembered:* The chimneys it swims up still smell of that night’s fires: coal, toast, somebody’s pipe.
-- **Parlour Roach** (common). Keeps to the front rooms, and to the best chair in them. It has a red eye for anyone who sits there. *Remembered:* The best chair it guards is still warm. Somebody sits in it just before you look.
-- **Hingejaw** (uncommon). It lives in doorframes and slams shut when startled. *Remembered:* It slams shut at a knock, but knock twice, slowly, and it opens, the way a door opens for someone you know.
-- **Drainpipe Eel** (uncommon). Comes down the drainpipes in the rain, all the way from gutters it remembers. *Remembered:* It knows every gutter in town by name, and it sulks when it comes to one that isn’t there any more.
-- **Lace Shad** (rare). Its fins are as fine as the curtains it hides in. When the fog is in, it drifts out through the windows. *Remembered:* The lace in its fins has a pattern of fish and bells and lamps. Somebody on Lantern Row made curtains like that.
-- **Postman Sturgeon** (rare). Always carries a letter. The letters are addressed to people who still live in town. *Remembered:* It does the round in the order Pell did it as a boy, and it waits at No. 4 a little longer than anywhere else.
-- **Hearthfish** (epic). Warm to the touch, like a hearthstone. It only rises where a window is lit, and only in the reflection. *Remembered:* It’s warmest at a quarter past three in the morning, as if somewhere a fire has just been made up for a long night.
-- **Paper Carp** (epic). Folded, somehow, from a letter: a word or two still shows along its side. It never eats the pages. It reads them. *Remembered:* Unfold it, very carefully, and the letter it’s folded from is a list: Bread. String. Two candles.
-- **Choir Fish** (legendary). Sings in harmony with something below it. *Remembered:* It sings the alto part. The rest of the choir is somewhere below it, still singing.
+- **Sooty Gudgeon** (common). Lives in the drowned chimneys. It goes in grey and comes out black, and it never minds which. *Remembered:* The chimneys it swims up still smell of that night’s fires: coal, toast, somebody’s pipe. *Last:* It goes up the bakery chimney most, where Harold banked the ovens on Saturday nights for Sunday’s bread.
+- **Parlour Roach** (common). Keeps to the front rooms, and to the best chair in them. It has a red eye for anyone who sits there. *Remembered:* The best chair it guards is still warm. Somebody sits in it just before you look. *Last:* The chair is Edith’s, at No. 4. She only ever sat down once Walter was home, and it has been warm for sixty years.
+- **Hingejaw** (uncommon). It lives in doorframes and slams shut when startled. *Remembered:* It slams shut at a knock, but knock twice, slowly, and it opens, the way a door opens for someone you know. *Last:* Two slow knocks was Pell’s knock, on his round. The doors of Lantern Row still open for the post.
+- **Drainpipe Eel** (uncommon). Comes down the drainpipes in the rain, all the way from gutters it remembers. *Remembered:* It knows every gutter in town by name, and it sulks when it comes to one that isn’t there any more. *Last:* It sulks longest at the bakery’s gutter, which dripped on the Saturday queue. Everybody grumbled, and nobody ever moved.
+- **Lace Shad** (rare). Its fins are as fine as the curtains it hides in. When the fog is in, it drifts out through the windows. *Remembered:* The lace in its fins has a pattern of fish and bells and lamps. Somebody on Lantern Row made curtains like that. *Last:* Edith Crane made those curtains, one long winter, for every house on the Row. The shad has been keeping the pattern for her.
+- **Postman Sturgeon** (rare). Always carries a letter. The letters are addressed to people who still live in town. *Remembered:* It does the round in the order Pell did it as a boy, and it waits at No. 4 a little longer than anywhere else. *Last:* It learned the round from Pell, and it learned the waiting at No. 4 from him too. He stood at her window every morning for a year.
+- **Hearthfish** (epic). Warm to the touch, like a hearthstone. It only rises where a window is lit, and only in the reflection. *Remembered:* It’s warmest at a quarter past three in the morning, as if somewhere a fire has just been made up for a long night. *Last:* The fire is the one in No. 4’s grate, made up by Edith so Walter would come home to something warm. It was the last fire lit on the Row.
+- **Paper Carp** (epic). Folded, somehow, from a letter: a word or two still shows along its side. It never eats the pages. It reads them. *Remembered:* Unfold it, very carefully, and the letter it’s folded from is a list: Bread. String. Two candles. *Last:* It’s the shopping list for the Row’s supper. The bread was Harold’s, the candles were for the table, and the string was for Ivy’s balloon, so she wouldn’t let go of this one.
+- **Choir Fish** (legendary). Sings in harmony with something below it. *Remembered:* It sings the alto part. The rest of the choir is somewhere below it, still singing. *Last:* They’re holding the last verse for the tenor. Walter Crane sang tenor, and he was always late.
 
 ### The Hollow
 
-- **Lampless Perch** (common). Its stripes have faded from so long without light. It keeps them anyway, out of habit. *Remembered:* It swims slow circles round the lantern’s pool, like someone warming their hands at a fire they can’t quite reach.
-- **Spore Loach** (common). It grazes the glowing spores off the rocks and glows for an hour after, like a child who’s eaten a lantern. *Remembered:* It glows brightest close to you, like a child holding up something it’s found.
-- **Echo Bream** (uncommon). Every drip in the Hollow rings twice: once on the water, once in the Echo Bream. It keeps the sound in its rings. *Remembered:* Hold it to your ear and under the drips there are voices, a long way off, saying goodnight.
-- **Keyhole Eel** (uncommon). There’s a keyhole in its side. Every key in town has been tried in it. One of them turned. *Remembered:* Look through the keyhole and there’s a room on the other side: a fire lit, a table laid, a clock at 3:12.
-- **Eyeless Koi** (rare). Swims toward sound, not light. *Remembered:* It swims toward the sound of your voice, and away from everyone else’s.
-- **Looking-Glass Carp** (epic). Its scales are silvered like an old mirror. Look into one and you see the lake above, the right way up. *Remembered:* In its scales the lake above is the right way up, and the town is still on it.
-- **Mothmouth** (legendary). It has followed every light ever lowered into the Hollow. Your uncle’s, at the very end. Now yours. *Remembered:* It follows every light because it’s looking for the way back up. It has never once gone further than the light.
-- **Inkling** (exotic). It writes on the water as it swims. The words are in your handwriting. *Remembered:* Whatever it writes is dated tomorrow.
-- **Drowned Moon** (mythic). The moon’s reflection, the night the lake closed. It never found its way back up. *Remembered:* It’s always full, as it was that night, over a street that had just started dancing.
-- **The Sleeper’s Scale** (godly). Not a fish. Something that is dreaming the fish. *Remembered:* It dreams of a town on a Saturday night with every window lit, and of someone a long way up, fishing.
+- **Lampless Perch** (common). Its stripes have faded from so long without light. It keeps them anyway, out of habit. *Remembered:* It swims slow circles round the lantern’s pool, like someone warming their hands at a fire they can’t quite reach. *Last:* Your uncle’s lantern was the first light it had seen in sixty years. It still circles the place on the ledge where he set it down.
+- **Spore Loach** (common). It grazes the glowing spores off the rocks and glows for an hour after, like a child who’s eaten a lantern. *Remembered:* It glows brightest close to you, like a child holding up something it’s found. *Last:* What it’s holding up is you: the first light in a long while that came all the way down, and stayed.
+- **Echo Bream** (uncommon). Every drip in the Hollow rings twice: once on the water, once in the Echo Bream. It keeps the sound in its rings. *Remembered:* Hold it to your ear and under the drips there are voices, a long way off, saying goodnight. *Last:* One of the goodnights is for Pell, sent up early for being cheeky. Somebody’s still telling him he can come down for the dancing.
+- **Keyhole Eel** (uncommon). There’s a keyhole in its side. Every key in town has been tried in it. One of them turned. *Remembered:* Look through the keyhole and there’s a room on the other side: a fire lit, a table laid, a clock at 3:12. *Last:* The key that turned was the Rusty Key, the one that fits no lock in town. On the other side someone has pulled a chair up to the fire, and left room for one more.
+- **Eyeless Koi** (rare). Swims toward sound, not light. *Remembered:* It swims toward the sound of your voice, and away from everyone else’s. *Last:* It knew your uncle’s voice first. That’s how it knows yours: you talk to the fish the way he did.
+- **Looking-Glass Carp** (epic). Its scales are silvered like an old mirror. Look into one and you see the lake above, the right way up. *Remembered:* In its scales the lake above is the right way up, and the town is still on it. *Last:* In the scale nearest its heart the Row is at supper, and someone has laid a place that looks a good deal like yours.
+- **Mothmouth** (legendary). It has followed every light ever lowered into the Hollow. Your uncle’s, at the very end. Now yours. *Remembered:* It follows every light because it’s looking for the way back up. It has never once gone further than the light. *Last:* It followed your uncle’s light as far as the light went. After that, he didn’t seem to need one.
+- **Inkling** (exotic). It writes on the water as it swims. The words are in your handwriting. *Remembered:* Whatever it writes is dated tomorrow. *Last:* What it writes is your next journal entry. It’s always right about the fish, and always wrong about the weather.
+- **Drowned Moon** (mythic). The moon’s reflection, the night the lake closed. It never found its way back up. *Remembered:* It’s always full, as it was that night, over a street that had just started dancing. *Last:* It’s waiting for the lake to open its eye again, so it can go back up and finish the night.
+- **The Sleeper’s Scale** (godly). Not a fish. Something that is dreaming the fish. *Remembered:* It dreams of a town on a Saturday night with every window lit, and of someone a long way up, fishing. *Last:* Lately the one fishing far up has a face, and it’s yours. The more you fish, the clearer it dreams you.

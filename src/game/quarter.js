@@ -101,6 +101,12 @@ function quarterHit(x,y){ const q=G.q; if (!q) return {kind:'water', spot:'open'
   if (y<lerp(G.near,HZ+26,QUARTER.rows.far)) return {kind:'water', spot:'far'};
   return {kind:'water', spot:'open'}; }
 function quarterSpot(x,y){ return quarterHit(x,y).spot; }
+/** What a cast meets, with the Row's Latchkey in a pocket: a building's wall lets it in at that building's nearest door
+    or window that can be seen (a lamp post or a boat has none, so a cast still drops short of those). key:true says so. */
+function quarterHitKeyed(x,y){ const hit=quarterHit(x,y); if (hit.kind!=='wall' || !(hit.solid.holes||[]).length || !modFlag('latchkey',{region:'quarter'})) return hit;
+  let best=null, bd=Infinity;
+  for (const H0 of hit.solid.holes){ const cx=(H0.x0+H0.x1)/2, cy=(H0.y0+H0.y1)/2, d=Math.hypot(x-cx,y-cy); if (d<bd && quarterHit(cx,cy).hole===H0){ bd=d; best=H0; } }
+  return best?{kind:'hole', hole:best, solid:hit.solid, spot:best.spot, house:best.house, key:true}:hit; }
 /** Whether (x, y) on the water is hidden behind a wall (and not in an opening). */
 function quarterHidden(x,y){ return REG()==='quarter' && quarterHit(x,y).kind==='wall'; }
 /** Where a cast that hits a wall ends up: in the water at the wall's foot (and in front of whatever's in front of that). */
@@ -112,16 +118,17 @@ function holeFloat(H0,x){ return {x:clamp(x,H0.x0+5*H0.s,H0.x1-5*H0.s), y:H0.bas
 /** A fish hooked inside a room comes out under the sill: the fight starts in the street in front of it. */
 function quarterFrom(b){ if (REG()!=='quarter' || !b || !b.hole) return null; return {x:b.x, y:b.hole.base+10*b.hole.s}; }
 /** The aim's marker and label in the Quarter: an opening by name, a letter's door, or a wall the cast will drop short of. */
-function quarterAim(a){ const t=a.target, hit=quarterHit(t.x,t.y), q=quarterState();
+function quarterAim(a){ const t=a.target, hit=quarterHitKeyed(t.x,t.y), q=quarterState();
   if (hit.kind==='wall'){ const f=quarterFoot(t.x,t.y); return {mark:f, text:hit.solid.kind==='lamp'?'A LAMP POST · IT’LL DROP SHORT':hit.solid.kind==='mail'?'PELL’S BOAT · IT’LL DROP SHORT':'A WALL · IT’LL DROP SHORT', col:'#F6C7B6', danger:true}; }
   if (hit.kind==='hole'){ const H0=hit.hole, f=holeFloat(H0,t.x), post=q.clip && H0.house && PELL.post[q.clip]===H0.house;
     const name=H0.house==='tower'?'THE BELL TOWER DOOR':H0.house==='post'?'THE POST OFFICE':H0.house==='no9'?'NO. 9 · THE TOP ROOM':H0.house==='no4'?(H0.kind==='door'?'NO. 4 · THE FRONT DOOR':'NO. 4 · THE FRONT ROOM'):H0.house==='no6'?(H0.kind==='shop'?'THE BAKERY':'THE BAKERY DOOR'):spotName(H0.spot).toUpperCase();
-    return {mark:f, text:post?'POST IT · '+name:name, col:post?'#F2D47E':PAPER, post}; }
+    return {mark:f, text:post?'POST IT · '+name:hit.key?'THE LATCHKEY · '+name:name, col:post||hit.key?'#F2D47E':PAPER, post}; }
   return null; }
 
 /* ---------- casting through the street ---------- */
 /** As the cast comes down: a wall stops it short (Tok!), an opening takes it in. Called from updateCast. */
-function quarterLand(c){ const t=c.to, hit=quarterHit(t.x,t.y);
+function quarterLand(c){ const t=c.to, hit=quarterHitKeyed(t.x,t.y);
+  if (hit.key){ tone(1500,.04,{to:1100,vol:.07,type:'triangle'}); tone(900,.05,{vol:.05,type:'square',delay:.06}); }   // the latch lifts
   if (hit.kind==='wall'){ const f=quarterFoot(t.x,t.y), B=hit.solid, iron=B.kind==='lamp'||B.kind==='box', wood=B.kind==='mail';
     tone(iron?1180:wood?260:520,.07,{to:iron?900:wood?180:380,vol:.12,type:iron?'triangle':'square'}); noise(.05,{vol:.12,f:iron?3600:1800,to:900,type:'bandpass'}); buzz(14);
     for (let i=0;i<6;i++) S.particles.push({x:t.x,y:t.y,vx:rand(-60,60),vy:rand(-90,-30),g:420,life:0,max:rand(.25,.45),r:rand(1,2),c:'rgba(214,204,186,'});

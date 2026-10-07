@@ -86,8 +86,15 @@ function renderApp(tab){
     body+='<h4 class="app-sub">Hull paint</h4><div class="swatches">';
     Object.entries(PAINTS).forEach(([id,P])=>{ const owned=(save.paints||['blue']).includes(id), on=(save.paint||'blue')===id;
       if (P.crate && !owned){ body+='<button class="swatch crate" disabled><i style="background:'+P.hull+'"></i><span>'+P.name+'</span><small>In '+cratesOf(P.crate)+'</small></button>'; return; }
+      if (P.journal && !owned){ body+='<button class="swatch crate" disabled title="'+P.journal+'"><i style="background:'+P.hull+'"></i><span>'+P.name+'</span><small>From your journal</small></button>'; return; }   // the journal's rewards (game/rewards.js)
       body+='<button class="swatch'+(on?' on':'')+(P.shift?' shift':'')+'" '+(owned?'data-paint="'+id+'"':isPending('paint',id)?'disabled':'data-order="paint:'+id+'"'+(save.coins>=P.price?'':' disabled'))+'><i style="background:'+P.hull+(P.trim?';box-shadow:inset 0 -4px 0 '+P.trim:'')+'"></i><span>'+P.name+'</span><small>'+(on?'On your boat':owned?'Apply':isPending('paint',id)?'On its way':P.price.toLocaleString()+' coins')+'</small></button>'; });
     body+='</div>';
+    // pennants: one for every fish you've found every mutation of (game/rewards.js)
+    const j=jState(), on=pennantOn();
+    body+='<h4 class="app-sub">Pennant</h4>';
+    if (!j.pennants.length) body+='<p class="app-note">Find every mutation of a fish, Mossy, Glassy, Twin and Giant, and its pennant is yours to fly from the mast.</p>';
+    else body+='<div class="swatches pennants"><button class="swatch'+(on?'':' on')+'" data-fly=""><i class="none"></i><span>None</span><small>'+(on?'Take it down':'A bare mast')+'</small></button>'+
+      j.pennants.map(id=>'<button class="swatch'+(on===id?' on':'')+'" data-fly="'+id+'"><canvas data-pennant="'+id+'"></canvas><span>'+FISH[id].name+'</span><small>'+(on===id?'On your mast':'Fly it')+'</small></button>').join('')+'</div>';
   }
   const L=$('phoneScreen'); if (!L) return;
   L.innerHTML='<div class="app-in">'+
@@ -96,7 +103,8 @@ function renderApp(tab){
     (pend.length?'<p class="app-ship">Pell’s mail boat is bringing: '+pend.map(itemName).join(', ')+'</p>':'')+
     '<div class="app-body">'+body+'</div></div>';
   L.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>renderApp(b.dataset.tab)));
-  paintTiles(L.querySelectorAll('canvas[data-gear]')); paintRodArt(L.querySelectorAll('canvas[data-rodart]'));
+  paintTiles(L.querySelectorAll('canvas[data-gear],canvas[data-pennant]')); paintRodArt(L.querySelectorAll('canvas[data-rodart]'));
+  L.querySelectorAll('[data-fly]').forEach(b=>b.addEventListener('click',()=>{ flyPennant(b.dataset.fly||null); sfx.hook(false); renderApp('boat'); }));
   L.querySelectorAll('[data-eq]').forEach(b=>b.addEventListener('click',()=>{ save.rod=b.dataset.eq; persist(); sfx.hook(false); news('Equipped '+RODS[save.rod].name,'good'); renderApp('rods'); }));
   L.querySelectorAll('[data-paint]').forEach(b=>b.addEventListener('click',()=>{ save.paint=b.dataset.paint; persist(); sfx.hook(false); renderApp('boat'); }));
   L.querySelectorAll('[data-order]').forEach(b=>b.addEventListener('click',()=>{ const [kind,id]=b.dataset.order.split(':');

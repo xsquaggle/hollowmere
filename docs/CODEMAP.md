@@ -75,6 +75,8 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/dread.js` | 159 | The Bonewhistle's Dread (`dreadState`, `dreadTick`, `dreadMods`, `dreadAfterCatch`), the lake looking back (`lakeLooks`, `drawDreadWater`), the Dread badge and the ink on the rod (`drawDread`, `drawBoneInk`), no fight (`limpStep`), the ink that haunts a cast (`startInk`, `inkWaiting`, `inkStrike`, `drawInk`) |
 | `src/game/tidecaller.js` | 40 | The Tidecaller's conch: calling the rain (`blowConch`, `callWait`, `save.wx.call`), and the conch drawn on its cord (`drawRodConch`) |
 | `src/game/twin.js` | 35 | The Twin Spool's second float: landing, the shorter wait, both floats biting and the tap that picks |
+| `src/game/heron.js` | 93 | Grey's errands with the Heron's Feather: whether he takes a catch (`heronTakes`), the snatch (`heronSnatch`), his casts away and what he brings back (`heronCast`, `heronBrings`), the tap on his pile (`takeGreyGift`), and his flight (`heronUpdate`, `drawHeronFly`, `drawBeakGift`) |
+| `src/game/rewards.js` | 104 | The journal's rewards: the roster (`ROSTER`), `jState`, the three stars (`jStars`, `lastAt`, `lastKnown`), pennants (`pennantDone`, `pennantOn`, `flyPennant`), the milestones' luck (`journalMods`), what's due (`rewardsDue`) and the gift sheets that give it (`rewardsAfterCatch`, `giftSheet`, `pageGift`, `mileGift`, `pennantGift`, `mayorGift`) |
 | `src/game/wren.js` | 111 | Wren's sheet: her bench (sockets, Homebody), her Quests tab (a fish that glows and the punt to the marsh: `giveGlow`; the marsh lights and the Lantern Rod: `giveLantern`; the Twin Spool), the corkboard, and what she says |
 | `src/game/wren-art.js` | 54 | Wren on her ramp, with her goggles and a glowing jar |
 | `src/game/barnaby.js` | 29 | Barnaby's launch and boat shop |
@@ -94,6 +96,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/finds.js` | 97 | The Finds journal page, vest pockets, returning lost things |
 | `src/game/relics.js` | 170 | Story relics: how each is found (`storyLoot`, Ottilie's `storyGift`), treasure maps (`mapAt`, `addMapPiece`), the Moon Jar (`tapJar`, `nightNow`), the Wet Almanac's page, ghost rings and wake, combo chips (`combosHTML`) |
 | `src/game/relic-art.js` | 133 | The four relics' drawings, treasure maps, and in the scene: the map's ring and pin, a moonlit cast, the jar on the dock, ghost rings and wake |
+| `src/game/journal-art.js` | 150 | The page relics' and Grey's finds' drawings (their `FIND_ART` entries), pennants (`drawPennant`, `drawPennantTile`), the journal hull paints' dressing (`hullDress`) and the milestone rosette (`drawRosette`) |
 | `src/game/tackle.js` | 55 | What's on the rod in hand: reels, lines, bait (`rigFor`, `baitOn`, `tickBait`) |
 | `src/game/tackle-art.js` | 231 | Every reel, line and bait drawn, and the rod rig (the Tidecaller's grain and conch, the Bonewhistle's knuckles, the Stillwater Mirror's night-sky glass) |
 | `src/game/bag.js` | 247 | The tackle bag overlay: rig, rods, vest pockets, keepsakes |
@@ -181,12 +184,13 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/data/quarter.js` | 82 | `QUARTER` (the rowboat's price, where the street's buildings stand, the bell, the Sturgeon's mornings, the pages), `PELL_Q` (his round), `PELL` (his lines, where each letter is posted), `DREAD`, `CALL` (the Tidecaller's rain) |
 | `src/data/hollow.js` | 62 | `HOLLOW` (the lake draining, the cave's spots, the lantern's light, drawing a fish, the eye), `MIRROR_STARS`, `OMEN`, `STAR` (falling stars), `OTT_CONFESS` |
 | `src/data/ending.js` | 47 | The end of chapter one: `SUPPER` (when it comes), `SUPPER_SEATS` (who sits where at the long table), `SUPPER_FOLK`, `SUPPER_LINES` (the scene, line by line), `CHAPTER_END` (the card after it) |
+| `src/data/journal.js` | 37 | The journal's rewards: `PAGES` (each water's relic and who hands it over), `MILESTONES`, `PENNANT`, `MAYOR` (his belongings, his letter and his paint), `HERON` (Grey's errands) |
 | `src/data/pace.js` | 8 | `PACE_SIM`: minutes until each thing in the simulator's whole run (`npm run sim -- --career --runs 11 --pace`) |
 | `src/data/stats.js` | 69 | `STATS` (everything a bonus can change), `MASTERY` |
 
 ## Styles (`src/styles/`)
 
-One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map.css`, `aquarium.css`, `settings.css`, `intro.css`, `news.css`, `kitchen.css`, `card.css`, `loot.css`, `bonuses.css`, `finds.css`, `relics.css`, `bag.css`, `enchant.css`, `idle.css`, `orders.css`, `shack.css`, `sheets.css`, `balance.css`, `river.css` (Wren's sheet, her quests and the ferry), `quarter.css` (Pell's sheet and the Bonewhistle's haul card), `ending.css` (the supper on Lantern Row and the end-of-chapter card).
+One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map.css`, `aquarium.css`, `settings.css`, `intro.css`, `news.css`, `kitchen.css`, `card.css`, `loot.css`, `bonuses.css`, `finds.css`, `relics.css`, `bag.css`, `enchant.css`, `idle.css`, `orders.css`, `shack.css`, `sheets.css`, `journal.css` (the journal's cover rings and stars, the gift sheets, pennant swatches), `balance.css`, `river.css` (Wren's sheet, her quests and the ferry), `quarter.css` (Pell's sheet and the Bonewhistle's haul card), `ending.css` (the supper on Lantern Row and the end-of-chapter card).
 
 ## Tools and tests
 

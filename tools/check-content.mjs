@@ -54,9 +54,12 @@ for (const id of FIDS) {
   if (F.window > 3) bad(w, 'window over 3 s makes the strike trivial');
   // what it remembers, in the journal once you've caught enough of it (MASTERY.memory)
   if (!isStr(F.memory)) bad(w + '.memory', 'every fish remembers something (a line in its journal page)');
+  // and its last line, with the third star (MASTERY.last)
+  if (!isStr(F.last)) bad(w + '.last', 'every fish has a last line for its third journal star');
 }
 need('MASTERY', MASTERY || {}, { catches: 'num+', reel: 'num+', memory: 'obj' });
 for (const r of RARS) if (!(Number.isInteger((MASTERY.memory || {})[r]) && MASTERY.memory[r] >= 1)) bad('MASTERY.memory.' + r, 'how many catches before a fish of this rarity says what it remembers (a whole number, 1 or more)');
+for (const r of RARS) if (!(Number.isInteger((MASTERY.last || {})[r]) && MASTERY.last[r] >= (MASTERY.memory || {})[r])) bad('MASTERY.last.' + r, 'how many catches before the third star and last line (a whole number, no fewer than its memory takes)');
 sameSet('BEH_TIP', keys(BEH_TIP), BEHS, 'behaviors with tips and behaviors');
 for (const r of RARS) need('RAR.' + r, RAR[r], { label: 'str', color: 'hex', hitstop: 'num0', land: 'num+', splash: 'num+', notes: 'arr' });
 RARS.forEach((r, i) => { if (RAR[r].pips !== i + 1) bad('RAR.' + r, `pips should count the tier (${i + 1})`); });
@@ -105,6 +108,7 @@ for (const id of SEA_RODS) if (RODS[id] && !RODS[id].sea) bad('RODS.' + id, 'is 
 for (const id of keys(PARTS)) { need('PARTS.' + id, PARTS[id], { name: 'str', price: 'num+', blurb: 'str', plus: 'arr' }); (PARTS[id].plus || []).forEach((p, i) => isStr(p) || bad('PARTS.' + id + '.plus[' + i + ']', 'empty')); }
 for (const id of keys(PAINTS)) { const P = PAINTS[id], w = 'PAINTS.' + id;
   if (P.crate) { need(w, P, { name: 'str', hull: 'hex' }); oneOf(w + '.crate', P.crate, RARS, 'rarity'); if (P.price !== undefined) bad(w, 'crate paints are never sold, so no price'); if (P.trim && !isHex(P.trim)) bad(w + '.trim', 'not a color'); }
+  else if (P.journal !== undefined) { need(w, P, { name: 'str', hull: 'hex', journal: 'str' }); if (P.price !== undefined) bad(w, 'the journal’s paints are never sold, so no price'); if (P.trim && !isHex(P.trim)) bad(w + '.trim', 'not a color'); }
   else need(w, P, { name: 'str', hull: 'hex', price: 'num0' }); }
 if (keys(PAINTS).filter(id => PAINTS[id].price === 0).length !== 1) bad('PAINTS', 'exactly one paint should be free (the starting hull)');
 
@@ -156,7 +160,7 @@ for (const s of TANK_SETS) { const w = 'TANK_SETS.' + s.id; need(w, s, { name: '
 
 /* ---------- kitchen ---------- */
 const FORMS = ['fillet', 'skewer', 'wrap', 'steak', 'whole'], DISHES = ['bowl', 'plate', 'pie'];                         // drawn in game/kitchen-art.js
-const BOOSTS = keys(STATS).filter(k => STATS[k].kind === 'mul' || STATS[k].kind === 'luck');                       // meal boosts are modifiers on these stats
+const BOOSTS = keys(STATS).filter(k => STATS[k].kind === 'mul' || STATS[k].kind === 'luck' || STATS[k].kind === 'flag');   // meal boosts are modifiers on these stats (a flag is on while the meal lasts)
 sameSet('SPICE_ORDER', [...SPICE_ORDER, ...(SPICE_MORE || [])], keys(SPICES), 'SPICE_ORDER and SPICE_MORE, and SPICES'); noDupes('SPICE_ORDER', [...SPICE_ORDER, ...(SPICE_MORE || [])]);
 for (const k of keys(SPICES)) need('SPICES.' + k, SPICES[k], { name: 'str', short: 'str', col: 'hex', glass: 'hex', lid: 'hex' });
 for (const id of FIDS) if (!FISH[id].noSell && !isHex(FLESH[id])) bad('FLESH', 'no cooked color for ' + id);   // a fish that's never kept is never cooked
@@ -170,7 +174,7 @@ for (const id of keys(RECIPES)) { const R = RECIPES[id], w = 'RECIPES.' + id;
   for (const n of R.need || []) { if (n.id) oneOf(w + '.need', n.id, FIDS, 'fish'); else if (n.rar) oneOf(w + '.need', n.rar, RARS, 'rarity'); else if (!n.smoked) bad(w + '.need', 'each need names an id, a rar, or smoked:true'); if (!(Number.isInteger(n.n) && n.n > 0)) bad(w + '.need', 'n should be a whole number'); }
   for (const [sp, c] of Object.entries(R.spice || {})) { oneOf(w + '.spice', sp, keys(SPICES), 'spice'); if (!(Number.isInteger(c) && c > 0 && c <= 4)) bad(w + '.spice.' + sp, 'pinches should be 1 to 4'); }
   if (!(R.zone && R.zone[0] > 0 && R.zone[0] < R.zone[1] && R.zone[1] < 1)) bad(w, 'zone should be [start, end] inside 0..1');
-  for (const b of R.boost || []) { oneOf(w + '.boost', b.k, BOOSTS, 'meal boost'); if (!isNum(b.v) || b.v === 0) bad(w + '.boost.' + b.k, 'v should be a nonzero number'); }
+  for (const b of R.boost || []) { oneOf(w + '.boost', b.k, BOOSTS, 'meal boost'); if (STATS[b.k] && STATS[b.k].kind === 'flag' ? b.v !== 0 : !isNum(b.v) || b.v === 0) bad(w + '.boost.' + b.k, STATS[b.k] && STATS[b.k].kind === 'flag' ? 'a flag is on or off: v:0' : 'v should be a nonzero number'); }
   if (R.learn && R.need.some(n => n.id) && !R.need.some(n => n.id === R.learn)) bad(w, 'is learned from a fish it does not use'); }
 need('MUSH', MUSH, { name: 'str', eff: 'str', casts: 'num+' });
 if (!(MEAL_STR.length === 3 && MEAL_CASTS.length === 3)) bad('MEAL_STR/MEAL_CASTS', 'one entry per star (3)');
@@ -202,7 +206,8 @@ const checkMod = (w, m) => {
     if (k === 'rarity' && !Array.isArray(v)) bad(w + '.when.rarity', 'a list of rarities; use rarityMin for "this rarity and rarer"');
     for (const x of Array.isArray(v) ? v : [v]) oneOf(w + '.when.' + k, x, WHEN[k], k); }
   if (m.home !== undefined && m.home !== true) bad(w + '.home', 'true or left out: its v grows with the days you stay (Homebody)');
-  for (const k of keys(m)) if (!['stat', 'v', 'when', 'omen', 'home'].includes(k)) bad(w, 'unknown modifier field ' + k);
+  if (m.grows !== undefined && (m.grows !== true || m.stat !== 'value')) bad(w + '.grows', 'true or left out, on a value modifier: it grows as the Hungry Hook eats (data/relics.js: HUNGRY)');
+  for (const k of keys(m)) if (!['stat', 'v', 'when', 'omen', 'home', 'grows'].includes(k)) bad(w, 'unknown modifier field ' + k);
 };
 for (const [k, st] of Object.entries(STATS)) { const w = 'STATS.' + k; need(w, st, { name: 'str', hint: 'str' }); oneOf(w + '.kind', st.kind, KINDS, 'stat kind');
   if (st.unit !== undefined) oneOf(w + '.unit', st.unit, ['x', 'chance', 'count'], 'unit'); if (st.when) checkMod(w + '.when', { stat: k, v: st.kind === 'flag' ? undefined : 1, when: st.when });
@@ -268,7 +273,11 @@ for (const id of keys(FINDS)) { const F = FINDS[id], w = 'FINDS.' + id;
   need(w, F, { name: 'str', lore: 'str' }); oneOf(w + '.kind', F.kind, FKINDS, 'find kind'); oneOf(w + '.rarity', F.rarity, CT, 'crate tier'); oneOf(w + '.region', F.region, [...REGIONS, 'any'], 'region');
   if (F.kind === 'curio') { if (F.mods || F.eff) bad(w, 'curios do nothing: no mods or eff'); }
   else { need(w, F, { eff: 'str', mods: 'arr' }); if (!(F.mods || []).length) bad(w, 'an artifact or keepsake needs at least one modifier'); (F.mods || []).forEach((m, i) => checkMod(`${w}.mods[${i}]`, m)); if (F.down !== undefined && !isStr(F.down)) bad(w + '.down', 'empty'); }
-  if (F.from !== undefined) { oneOf(w + '.from', F.from, ['return', 'town', 'story'], 'source'); if (F.from === 'story' ? F.kind !== 'artifact' : F.kind !== 'keepsake') bad(w, F.from === 'story' ? 'story relics are artifacts' : 'only keepsakes come as rewards');
+  // where a find comes from when it isn't treasure: given back by its owner, the town, the story, a full journal page, or Grey
+  if (F.from !== undefined) { oneOf(w + '.from', F.from, ['return', 'town', 'story', 'page', 'grey'], 'source');
+    if (F.from === 'page') { if (F.kind === 'curio') bad(w, 'a page relic does something: an artifact or keepsake'); }
+    else if (F.from === 'grey') { if (F.kind !== 'curio') bad(w, 'Grey brings back curios'); }
+    else if (F.from === 'story' ? F.kind !== 'artifact' : F.kind !== 'keepsake') bad(w, F.from === 'story' ? 'story relics are artifacts' : 'only keepsakes come as rewards');
     if (F.from === 'story' && !STORY[id]) bad(w, 'a story relic needs its entry in STORY (data/relics.js)'); }
   if (F.owner !== undefined) { oneOf(w + '.owner', F.owner, keys(OWNERS), 'owner'); if (F.kind !== 'curio') bad(w, 'only curios can belong to someone'); const R = F.reward || {};
     if (!isStr(R.line)) bad(w + '.reward', 'a returned find needs the owner’s line'); if (!(R.coins > 0)) bad(w + '.reward', 'coins should be above 0');
@@ -300,10 +309,10 @@ for (const k of keys(OWNERS)) need('OWNERS.' + k, OWNERS[k], { name: 'str' });
 need('POCKETS', POCKETS, { start: 'num+', max: 'num+', costs: 'arr' });
 if (POCKETS.costs.length !== POCKETS.max - POCKETS.start) bad('POCKETS.costs', 'one price per pocket after the first');
 for (let i = 1; i < POCKETS.costs.length; i++) if (!(POCKETS.costs[i] > POCKETS.costs[i - 1])) bad('POCKETS.costs', 'each pocket should cost more than the last');
-for (const id of keys(NOTES)) { const N = NOTES[id], w = 'NOTES.' + id; oneOf(w + '.kind', N.kind, ['bottle', 'logbook', 'letter', 'reply', 'invite'], 'note kind');
+for (const id of keys(NOTES)) { const N = NOTES[id], w = 'NOTES.' + id; oneOf(w + '.kind', N.kind, ['bottle', 'logbook', 'letter', 'reply', 'invite', 'mayor'], 'note kind');
   if (!Array.isArray(N.lines) || !N.lines.length) bad(w, 'needs lines'); (N.lines || []).forEach((l, i) => { if (!isStr(l)) bad(w + '.lines[' + i + ']', 'empty'); else if (l.length > 34) bad(w + '.lines[' + i + ']', `${l.length} characters won’t fit on the paper (34 at most)`); });
   if (N.region !== undefined) oneOf(w + '.region', N.region, REGIONS, 'region');
-  if ((N.kind === 'letter' || N.kind === 'reply' || N.kind === 'invite') && !isStr(N.to)) bad(w, 'a letter needs an address (to)');
+  if ((N.kind === 'letter' || N.kind === 'reply' || N.kind === 'invite' || N.kind === 'mayor') && !isStr(N.to)) bad(w, 'a letter needs an address (to)');
   if (N.kind === 'letter') { if (!(N.waters || []).length) bad(w + '.waters', 'where it comes up'); (N.waters || []).forEach(r => { oneOf(w + '.waters', r, REGIONS, 'region'); if (!(L.waters || {})[r]) bad(w + '.waters', 'letters never come up in ' + r + ' (TREASURE.letter.waters)'); }); }
   // a reply answers a letter posted in the Quarter, and its id is r_ and that letter's
   if (N.kind === 'reply') { if (id !== 'r_' + N.re) bad(w, 'a reply is named r_ and the letter it answers'); if (!(NOTES[N.re] && NOTES[N.re].kind === 'letter' && PELL.post[N.re])) bad(w + '.re', 'answers a letter that is posted in the Quarter (PELL.post)'); if (!isStr(N.pell)) bad(w + '.pell', 'what Pell says as he takes it'); } if (N.kind === 'logbook' && !(Number.isInteger(N.page) && N.page > 0)) bad(w, 'a logbook page needs its page number'); }
@@ -609,6 +618,37 @@ need('PLATTER', PLATTER, { name: 'str', dish: 'str', side: 'str', zone: 'arr' })
     return kind === 'rod' ? !!RODS[id] : kind === 'boat' || kind === 'ferry' || kind === 'marsh' || kind === 'quarter' || kind === 'hollow' ? id === undefined : kind === 'part' ? !!PARTS[id] : kind === 'fix' ? FIXUP.some(L => L.id === id && L.cost)
       : kind === 'pocket' ? +id > POCKETS.start && +id <= POCKETS.max : kind === 'rune' ? !!ENCH[id] : kind === 'fish' ? !!FISH[id] : false; };
   for (const [k, m] of Object.entries(PACE_SIM || {})) { if (!known(k)) bad('PACE_SIM.' + k, 'names nothing the pace log looks for'); if (!(isNum(m) && m >= 0)) bad('PACE_SIM.' + k, 'should be minutes'); } }
+
+/* ---------- the journal's rewards (data/journal.js) ---------- */
+{ const { PAGES, MILESTONES, PENNANT, MAYOR, HERON, HUNGRY, MUT_ORDER } = D;
+  if (!PAGES || !MILESTONES || !PENNANT || !MAYOR || !HERON) bad('data/journal.js', 'PAGES, MILESTONES, PENNANT, MAYOR and HERON are all needed');
+  else {
+    sameSet('PAGES', keys(PAGES), REGIONS, 'waters with a page relic and waters');
+    for (const reg of keys(PAGES)) { const P = PAGES[reg], w = 'PAGES.' + reg; need(w, P, { relic: 'str', who: 'str', name: 'str' });
+      if (!isStr(P.line) === !isStr(P.act)) bad(w, 'either a line they say or an act they do, not both');
+      const R = FINDS[P.relic]; if (!R || R.from !== 'page') bad(w + '.relic', P.relic + ' should be a find with from:"page"'); else if (R.region !== reg) bad(w + '.relic', 'a page relic belongs to its own water (region ' + R.region + ')'); }
+    for (const id of keys(FINDS).filter(id => FINDS[id].from === 'page')) if (keys(PAGES).filter(r => PAGES[r].relic === id).length !== 1) bad('FINDS.' + id, 'a page relic should be given by exactly one page (PAGES)');
+    let prev = 0; MILESTONES.forEach((M, i) => { const w = 'MILESTONES[' + i + ']'; need(w, M, { at: 'num+', title: 'str', paint: 'str', luck: 'num+' });
+      if (!(M.at > prev && M.at <= 1)) bad(w + '.at', 'shares climb, up to 1'); prev = M.at;
+      if (!PAINTS[M.paint] || !isStr(PAINTS[M.paint].journal)) bad(w + '.paint', M.paint + ' should be a journal paint (PAINTS with journal)');
+      if (M.luck > .1) bad(w + '.luck', 'a small bonus: .1 at most'); });
+    if (prev !== 1) bad('MILESTONES', 'the last milestone is the whole chapter (at:1)');
+    if (!Array.isArray(PENNANT.muts) || !PENNANT.muts.length) bad('PENNANT.muts', 'the mutations a pennant takes');
+    else PENNANT.muts.forEach(k => oneOf('PENNANT.muts', k, MUT_ORDER || [], 'mutation'));
+    need('MAYOR', MAYOR, { items: 'arr', note: 'str', paint: 'str', pell: 'str' });
+    (MAYOR.items || []).forEach(id => { if (!FINDS[id]) bad('MAYOR.items', 'unknown find ' + id); }); noDupes('MAYOR.items', MAYOR.items || []);
+    for (const id of keys(FINDS).filter(id => FINDS[id].from === 'grey')) if (!(MAYOR.items || []).includes(id)) bad('FINDS.' + id, 'Grey’s finds are the Mayor’s belongings (MAYOR.items)');
+    if (!NOTES[MAYOR.note] || NOTES[MAYOR.note].kind !== 'mayor') bad('MAYOR.note', 'names a note with kind:"mayor"');
+    if (!PAINTS[MAYOR.paint] || !isStr(PAINTS[MAYOR.paint].journal)) bad('MAYOR.paint', 'should be a journal paint');
+    for (const id of keys(PAINTS).filter(id => PAINTS[id].journal)) if (MAYOR.paint !== id && !MILESTONES.some(M => M.paint === id)) bad('PAINTS.' + id, 'a journal paint nothing gives');
+    need('HERON', HERON, { steal: '01', away: 'arr', first: 'str', bring: 'obj', purse: 'arr' });
+    if (!(HERON.steal > 0 && HERON.steal < .5)) bad('HERON.steal', 'a chance in (0, .5)');
+    if (!(Number.isInteger(HERON.away[0]) && HERON.away[0] >= 1 && HERON.away[0] <= HERON.away[1])) bad('HERON.away', '[fewest, most] casts away, whole numbers');
+    if (!FINDS[HERON.first] || FINDS[HERON.first].from !== 'grey') bad('HERON.first', 'one of Grey’s finds');
+    for (const [k, v] of Object.entries(HERON.bring || {})) { oneOf('HERON.bring', k, ['grey', 'map', 'find', 'coins'], 'thing he brings'); if (!(v > 0)) bad('HERON.bring.' + k, 'weight above 0'); }
+    if (!(HERON.bring || {}).coins) bad('HERON.bring', 'coins: there is always something to bring');
+    if (!(HERON.purse[0] > 0 && HERON.purse[0] <= HERON.purse[1])) bad('HERON.purse', '[least, most] fish worth of coins');
+    if (!(HUNGRY && HUNGRY.step > 0 && HUNGRY.max > 2)) bad('HUNGRY', 'a step above 0 and a cap above the hook’s own ×2'); } }
 
 /* ---------- the code map lists every file (docs/CODEMAP.md) ---------- */
 const MAP_FILE = join(ROOT, 'docs/CODEMAP.md');

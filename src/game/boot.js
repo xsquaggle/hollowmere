@@ -10,6 +10,7 @@ function boot(data){
   resize(); coinShown=save.coins; $('coins').textContent=hudNum(save.coins); updateHud(); accrueTips(); setState('idle'); kitchenUnlockCheck(true);
   requestAnimationFrame(t=>{ last=t; requestAnimationFrame(frame); });
   snapshot('Start of a session'); protectStorage(); introStart(); sheetSwipe();
+  setTimeout(rewardsAfterCatch,3000);   // a journal reward an older save earned before there were any (game/rewards.js)
   if (AWAYS.info && AWAYS.info.fresh && !INTRO.active) setTimeout(freshTip,1500);
 }
 window.claude?.hot?.snapshot?.(()=>({save}));

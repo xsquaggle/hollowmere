@@ -193,11 +193,11 @@ module.exports = [
         R.pocket('tuningfork'); R.signs({ ...ghost, fade: 0 }, .1); out.solid = R.ghost();
         R.signs(ghost, .1); R.signs({ ...ghost, x: 220 }, .1); out.fork = R.ghost(); out.known = R.known('wake'); out.after = R.combos('tuningfork');
         R.pocket('bell'); R.signs({ ...ghost, x: 240 }, .1); out.bell = R.ghost();
-        R.seen('lodestone'); out.notLive = R.known('lodestone');
+        hm.COMBOS.grey.live = false; R.seen('grey'); out.notLive = R.known('grey'); hm.COMBOS.grey.live = true;   // as if its partner weren't in the game yet
         return out; });
       assert.match(r.before, /cb q/); assert.doesNotMatch(r.before, /Ghost fish/);
       assert.match(r.almanac, /\?\?\?/, 'a combo not seen yet shows as ???');
-      assert.match(r.pin, /\?\?\?/, 'and so does one whose partner isn’t in the game yet');
+      assert.match(r.pin, /\?\?\?/, 'and so does the pin’s, until Grey brings back a piece of the map');
       assert.equal(r.none, '', 'finds without combos show no chips');
       assert.deepEqual(r.unpocketed, { rings: 0, wake: 0 }, 'nothing without the fork in a pocket');
       assert.deepEqual(r.solid, { rings: 0, wake: 0 }, 'nor while the ghost is in sight');

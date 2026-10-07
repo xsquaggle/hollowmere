@@ -74,7 +74,7 @@ function openPell(){ audioInit(); const q=quarterState(), first=!q.met; q.met=1;
   h+='<div class="rt-card"><canvas class="rt-face" data-who="pell"></canvas><p class="rt-line">“'+line+'”</p></div>';
   h+=pellRoundHTML()+pellSackHTML();
   openSheet(h); $('closeS').addEventListener('click',closeSheet);
-  document.querySelectorAll('#panel canvas[data-who]').forEach(cv=>{ const r=cv.getBoundingClientRect(), d=Math.min(window.devicePixelRatio||1,2); cv.width=r.width*d; cv.height=r.height*d; const x=cv.getContext('2d'); x.setTransform(d,0,0,d,r.width/2*d,r.height/2*d); drawPortrait(x,'pell',Math.min(r.width,r.height)); });
+  paintFaces(document.querySelectorAll('#panel canvas[data-who]'));
   paintTiles(document.querySelectorAll('#panel canvas[data-notekind]')); paintRodArt(document.querySelectorAll('#panel canvas[data-rodart]'));
   const fix=$('pellFix'); if (fix) fix.addEventListener('click',()=>{ if (fixRowboat()) openPell(); });
   const row=$('pellRow'); if (row) row.addEventListener('click',()=>{ closeSheet(); setTimeout(()=>showMap('quarter',!save.quarterSeen),300); });

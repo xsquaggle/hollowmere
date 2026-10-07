@@ -26,12 +26,12 @@ function release(){
   if (a && a.onConch && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); blowConch(); return; }
   if (a && a.onPage && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); scoopPage(a.onPage); return; }
   // the way down to the Hollow and the Hollow itself (game/hollow.js): Grey's page, the bell on the lake dock, the lantern
-  if (a && a.onGrey && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); takeGreyPage(); return; }
+  if (a && a.onGrey && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); if (greyHasPage()) takeGreyPage(); else takeGreyGift(); return; }   // or what he brought back from an errand (game/heron.js)
   if (a && a.onLakeBell && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); ringLakeBell(); return; }
   if (a && a.onLamp && Math.hypot(a.x-a.sx,a.y-a.sy)<14){ setState('idle'); toggleLamp(); return; }
   if (!a || !a.target || a.p<.12){ setState('idle'); if (S.tut) coach('Drag a little farther down before you let go.','1 of 4'); else toast('Pull back farther','warn'); return; }
   S.cast={t:0, dur:.4+.42*a.p, from:{x:G.rodBase.x+18,y:G.rodBase.y-88}, to:a.target, p:a.p, th:a.th, spot:a.spot};
-  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal(); tickBait(); pageCast(); S.cast.fresh=freshCast(); S.cast.moon=relicState().armed;   // the Moon Jar's moonlight goes with it (game/relics.js)
+  save.stats.casts++; sfx.cast(a.p); buzz(10); tickMeal(); tickBait(); pageCast(); heronCast(); S.cast.fresh=freshCast(); S.cast.moon=relicState().armed;   // the Moon Jar's moonlight goes with it (game/relics.js)
   if (save.firstCast){ save.firstCast=false; persist(); }
   setState('casting');
 }

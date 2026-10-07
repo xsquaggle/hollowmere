@@ -269,10 +269,21 @@ function shBoard(c,p,m){ const x=0, y=0, w=p.w, h=p.h-4; sseed=313;
     c.strokeStyle=SHW.chalk; c.lineWidth=1.6; const cx=x+w/2, cy=y+h*.42, s=Math.min(w,h)*.12; c.beginPath(); c.moveTo(cx-s,cy); c.lineTo(cx+s,cy); c.moveTo(cx,cy-s); c.lineTo(cx,cy+s); c.stroke(); }
   // the hanger
   c.fillStyle=SHW.brassD; c.beginPath(); c.arc(x+w/2,y+3,2,0,Math.PI*2); c.fill(); }
-/** A mount: the fish turned a little nose-up with its tail curled, as if it had just jumped. */
-function shMountFish(c,p,m){ const f=m.f, F=FISH[f.id], h=p.h-4, len=Math.min(p.w*.72,(h*.6)/Math.max(.22,F.h*1.15));
-  c.save(); c.translate(p.w/2+len*.02,h*.42); c.rotate(-.13); drawFish(c,f.id,len,false,1,.55,false,f.mut||null); c.restore(); return len; }
-function shPlaqueArt(i){ const L=SH.L, p=L.plaques[i], m=shackState().wall[i], key=[p.w|0,p.h|0,SH.dpr,m?m.f.id+':'+m.f.size+':'+(m.f.mut||''):'-'].join('|'), A=SH.art['pl'+i];
+/** A mount: the fish turned a little nose-up with its tail curled, as if it had just jumped. A species with all three
+    journal stars (game/rewards.js) is mounted mid-leap instead, clearing a carved brass wave. */
+function shMountFish(c,p,m){ const f=m.f, F=FISH[f.id], h=p.h-4, leap=shLeaps(f.id), len=Math.min(p.w*(leap?.66:.72),(h*(leap?.52:.6))/Math.max(.22,F.h*1.15));
+  if (leap) shLeapWave(c,p.w/2-len*.26,h*.66,Math.min(len*.24,h*.2));
+  c.save(); c.translate(p.w/2+len*.02,h*(leap?.4:.42)); c.rotate(leap?-.36:-.13); drawFish(c,f.id,len,false,1,leap?1:.55,false,f.mut||null); c.restore(); return len; }
+const shLeaps = id => jStars(id)>=3;
+/** The carved wave a leaping mount clears: a brass crest with a curl and two drops. */
+function shLeapWave(c,x,y,s){ c.save(); c.translate(x,y);
+  c.beginPath(); c.moveTo(-s*1.3,s*.35); c.quadraticCurveTo(-s*.9,-s*.15,-s*.3,-s*.45); c.quadraticCurveTo(s*.25,-s*.7,s*.5,-s*.25);
+  c.quadraticCurveTo(s*.1,-s*.35,0,-s*.1); c.quadraticCurveTo(s*.4,s*.05,s*1.2,s*.35); c.closePath();
+  const g=c.createLinearGradient(0,-s*.7,0,s*.35); g.addColorStop(0,SHW.brassL); g.addColorStop(1,SHW.brassD); c.fillStyle=g; c.fill(); shInk(c,1.1); c.stroke();
+  c.strokeStyle='rgba(255,240,200,.6)'; c.lineWidth=.9; c.beginPath(); c.moveTo(-s*.85,s*.05); c.quadraticCurveTo(-s*.5,-s*.3,-s*.15,-s*.4); c.stroke();
+  c.fillStyle=SHW.brass; for (const [dx,dy,r] of [[s*.75,-s*.55,s*.09],[s*1,-s*.3,s*.065]]){ c.beginPath(); c.arc(dx,dy,Math.max(1.2,r),0,Math.PI*2); c.fill(); shInk(c,.8); c.stroke(); }
+  c.restore(); }
+function shPlaqueArt(i){ const L=SH.L, p=L.plaques[i], m=shackState().wall[i], key=[p.w|0,p.h|0,SH.dpr,m?m.f.id+':'+m.f.size+':'+(m.f.mut||'')+(shLeaps(m.f.id)?':leap':''):'-'].join('|'), A=SH.art['pl'+i];
   if (A && A.key===key) return A;
   const [bcv,bc]=shCanvas('plb'+i,p.w+6,p.h+6); shBoard(bc,p,m);
   let fcv=null, len=0; if (m){ const r=shCanvas('plf'+i,p.w,p.h); fcv=r[0]; len=shMountFish(r[1],p,m); }

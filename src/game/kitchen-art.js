@@ -164,6 +164,18 @@ function drawSide(c,kind,s,cooked){
     c.beginPath(); c.ellipse(4,0,26,11,0,0,6.28); c.fillStyle='#F2CF4F'; c.fill(); c.stroke();
     c.save(); c.clip(); for (let i=-6;i<=7;i++) for (let j=-2;j<=2;j++){ c.fillStyle=(i+j)%4===0?'#B47A32':'#F7DD6A'; c.beginPath(); c.arc(4+i*3.6,j*4.2,1.6,0,6.28); c.fill(); }
     c.strokeStyle='rgba(60,35,15,.6)'; c.lineWidth=3; for (let i=-1;i<=1;i++){ c.beginPath(); c.moveTo(i*14-4,-12); c.lineTo(i*14+4,12); c.stroke(); } c.restore(); c.restore(); }
+  else if (kind==='clams'){
+    // a sprig of samphire under the shells, then five clams, some open on their pale meat
+    c.strokeStyle='#5E8F4E'; c.lineWidth=3; c.lineCap='round';
+    for (const [x,y,a] of [[-20,10,-.5],[-14,14,-.2],[16,12,.4]]){ c.beginPath(); c.moveTo(x,y); c.lineTo(x+Math.sin(a)*16,y-Math.cos(a)*16); c.stroke();
+      c.beginPath(); c.moveTo(x+Math.sin(a)*8,y-Math.cos(a)*8); c.lineTo(x+Math.sin(a+.7)*14,y-Math.cos(a+.7)*14); c.stroke(); }
+    c.lineWidth=1.3; c.strokeStyle=INK;
+    for (const [x,y,r,open] of [[-12,-4,.3,1],[8,-10,-.4,0],[14,6,.7,1],[-4,12,-.2,0],[-22,-14,.1,0]]){ c.save(); c.translate(x,y); c.rotate(r);
+      if (open){ c.beginPath(); c.ellipse(0,-5,10,7,0,Math.PI,0); c.closePath(); c.fillStyle='#CFC3A8'; c.fill(); c.stroke(); }
+      c.beginPath(); c.moveTo(-10,0); c.quadraticCurveTo(-9,9,0,10); c.quadraticCurveTo(9,9,10,0); c.closePath(); c.fillStyle='#B8AE96'; c.fill(); c.stroke();
+      if (open){ c.beginPath(); c.ellipse(0,1,6.5,3.6,0,0,6.28); c.fillStyle='#F2D2B0'; c.fill(); c.fillStyle='rgba(255,255,255,.55)'; c.beginPath(); c.ellipse(-2,0,2.4,1.1,0,0,6.28); c.fill(); }
+      c.strokeStyle='rgba(43,42,51,.35)'; c.lineWidth=.9; for (let i=-2;i<=2;i++){ c.beginPath(); c.moveTo(i*2.6,9.5-Math.abs(i)*.6); c.lineTo(i*4.4,1.5); c.stroke(); }
+      c.lineWidth=1.3; c.strokeStyle=INK; c.restore(); } }
   c.restore();
 }
 function drawLemon(c,s){ c.save(); c.scale(s,s); c.rotate(-.3); c.beginPath(); c.arc(0,0,16,Math.PI,0); c.closePath(); c.fillStyle='#E8C23A'; c.fill(); c.lineWidth=1.3; c.strokeStyle=INK; c.stroke();

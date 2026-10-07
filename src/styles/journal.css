@@ -1,0 +1,30 @@
+/* Journal rewards (game/rewards.js, game/journal.js): the Species page's cover rings, a species' three stars, the
+   gift sheets with a face or a rosette at the top, the Mayor's belongings and the pennants on Tacklegram's Boat tab */
+.jr-cover{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center;margin:2px 0 12px;padding:12px;border:1.5px solid rgba(43,42,51,.18);border-radius:12px;background:linear-gradient(#F7EFDD,#EDE1C6)}
+.jr-all{--p:0%;width:84px;height:84px;border-radius:50%;display:grid;place-content:center;text-align:center;
+  background:radial-gradient(closest-side,#FBF6EA 76%,transparent 77% 100%),conic-gradient(var(--brass) var(--p),rgba(43,42,51,.12) 0)}
+.jr-all b{font:400 22px/1 var(--display)}.jr-all span{font:800 9px/1.1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:#7A7468}
+.jr-rings{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:8px 6px}
+.jr-ring{--p:0%;display:grid;justify-items:center;gap:3px;min-width:0}
+.jr-ring i{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:800 11px/1 var(--body);font-style:normal;color:#4B4842;
+  background:radial-gradient(closest-side,#FBF6EA 72%,transparent 73% 100%),conic-gradient(#6E9F5B var(--p),rgba(43,42,51,.12) 0)}
+.jr-ring.done i{background:radial-gradient(closest-side,#FBF6EA 72%,transparent 73% 100%),conic-gradient(var(--brass) 100%,transparent 0);box-shadow:0 0 0 1.5px rgba(138,106,68,.5)}
+.jr-ring canvas{width:30px;height:30px}
+.jr-ring span{font:800 10px/1 var(--body);letter-spacing:.05em;text-transform:uppercase;color:#7A7468;white-space:nowrap}
+.jr-next{grid-column:1/-1;margin:0;font-size:12.5px;color:#6B665C}.jr-next b{color:var(--ink)}
+.jr-title{color:#6E5236}
+/* a species' stars: caught, what it remembers, its last line */
+.ent-pic{display:grid;justify-items:center;gap:6px}
+.jstars{display:flex;gap:3px}
+.jstars i{width:15px;height:15px;background:rgba(43,42,51,.18);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.jstars i.on{background:var(--brass)}
+.entry p.memory.last{border-left-color:rgba(132,86,190,.55);color:#3E3550}
+.pen-tag{font-weight:800;color:#6E5236;white-space:nowrap}
+/* a gift sheet's top: who's giving it (a round portrait), or a rosette or pennant */
+.rt-face[data-who]{border-radius:50%;box-shadow:0 0 0 2px var(--ink),0 0 0 5px rgba(201,161,90,.45)}
+.rt-line.act{font-style:normal;font-size:14px;color:#4B4842}
+.fd-mayor{background:linear-gradient(#F3E6E2,#EAD8D2);border-color:#8A4A54}
+/* pennants on the Boat tab */
+.swatches.pennants canvas{grid-row:1/3;width:28px;height:28px}
+.swatch i.none{background:repeating-linear-gradient(45deg,rgba(43,42,51,.18) 0 3px,transparent 3px 6px)}
+@media (max-width:360px){.jr-cover{grid-template-columns:1fr;justify-items:center}.jr-rings{width:100%}}
