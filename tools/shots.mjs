@@ -66,7 +66,7 @@ async function sheet(name, items, cols, title) {
 for (const reg of WATERS) { const mine = shots.filter(s => s.reg === reg); if (mine.length) await sheet(`sheet-${reg}.jpg`, mine.map(s => ({ data: s.data, cap: hourName(s.hour) + ', ' + s.wx })), reg === 'hollow' ? mine.length : WXS.length, NAME[reg]); }
 for (const hour of HOURS) for (const wx of WXS) { const row = shots.filter(s => s.hour === hour && (s.wx === wx || s.wx === 'cave')); if (row.length > 1) await sheet(`side-${String(hour).replace('.', '_')}-${wx}.jpg`, row.map(s => ({ data: s.data, cap: NAME[s.reg] })), row.length, hourName(hour) + ', ' + wx); }
 // --quiz n: shots picked across the waters, lights and weathers, shuffled and numbered, and the key on its own sheet
-if (opt.quiz) { const n = +opt.quiz || 12, pool = shots.slice().sort(() => Math.random() - .5), pick = [];
+if (opt.quiz) { const n = opt.quiz === true ? 12 : +opt.quiz || 12, pool = shots.slice().sort(() => Math.random() - .5), pick = [];
   // a round of one shot per water at a time, so each comes up about as often (the Hollow looks the same at every hour
   // and in any weather, so it's in once)
   for (let round = 0; pick.length < n && round < pool.length; round++) for (const reg of WATERS) {

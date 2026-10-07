@@ -157,7 +157,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/playtest.js` | 168 | The hidden Playtest sheet (the wrench, or a long press on the clock): forcing fish, the weather, the moon and the tide (`TIDE_PINS`), and the Quarter's, the Hollow's, the story's and the journal's menus (`playtestQuarter`, `playtestHollow`, `playtestStory`, `playtestJournal`) |
 | `src/game/balance.js` | 100 | Playtest > Balance: run the simulator on any setup (Dread for the Bonewhistle) |
 | `src/game/sim.js` | 238 | The balance simulator: the 1,000-cast report, the river's drift, the marsh's tide, the coast's churn, beam and wash, the Quarter's pages and reflections, the Hollow's lights and a fish led in from the dark (`SIM_SPOTS`, `SIM_PLAYERS`) |
-| `src/game/pace.js` | 86 | The pace log: minutes of play and when each rod, part, fix, pocket, rune and species first came, the uncle's pages, Pell's round, the Drowned Bell, the way down to the Hollow and the supper (`paceTick`, `paceKeys`), and Playtest > Pace beside the simulator's run, with the longest waits and a plain-text copy to send back (`paceHTML`, `paceText`) |
+| `src/game/pace.js` | 89 | The pace log: minutes of play and when each rod, part, fix, pocket, rune and species first came, the uncle's pages, Pell's round, the Drowned Bell, the way down to the Hollow and the supper (`paceTick`, `paceKeys`), and Playtest > Pace beside the simulator's run, with the longest waits and a plain-text copy to send back (`paceHTML`, `paceText`) |
 
 ## Content tables (`src/data/`)
 
@@ -199,9 +199,9 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tools/build.mjs` | 91 | The build: `build/cast-lab.html`, `build/test.html`, and the web app at the root. `--check` fails if the committed app is stale |
 | `tools/check-content.mjs` | 677 | Checks every content table, and that this map lists every file |
 | `tools/simulate.mjs` | 451 | The balance simulator from the command line (`npm run sim`), with the whole run to the end of chapter one (`--career`) and builds (`--builds`) |
-| `tools/shots.mjs` | 79 | The world gate's screenshots: every water in each light and weather with nothing over the scene, sheets side by side, and a numbered "Name the water" quiz with its key (`--quiz 12`) |
+| `tools/shots.mjs` | 80 | The world gate's screenshots: every water in each light and weather with nothing over the scene, sheets side by side, and a numbered "Name the water" quiz with its key (`--quiz 12`) |
 | `tools/story.mjs` | 166 | The story script, `docs/STORY.md` (`npm run story`): every letter, page, lore line and thing people say in the tables, in the order you meet them. `--check` fails if it's stale |
-| `tests/run.cjs` | 43 | Runs the Playwright suite against `build/test.html`, all of it or a shard (`--shard 2/3`, as CI runs it) |
+| `tests/run.cjs` | 44 | Runs the Playwright suite against `build/test.html`, all of it or a shard (`--shard 2/3`, as CI runs it) |
 | `tests/helpers.cjs` | 121 | Shared helpers: cast, hook and play the fight like a player (`fight`: follow the fish, tap a jump, ease off a dive, a tug or a red ring), and `page.room` to go through the shack to a room |
 | `tests/fishing.test.cjs` | 77 | The core loop and the record moment |
 | `tests/opening.test.cjs` | 23 | The opening |
@@ -220,7 +220,7 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/weather.test.cjs` | 137 | Weather and its fish |
 | `tests/relics.test.cjs` | 237 | Story relics, treasure maps, the Moon Jar, the almanac, combos |
 | `tests/shack.test.cjs` | 202 | The shack: the fix-up list, mounting and the wall bonus, the rod rack, the knock-through, the room at five phone sizes, odd saves |
-| `tests/depth.test.cjs` | 56 | The depth gate: rare and Legendary odds near the design doc, the pace log and Playtest > Pace |
+| `tests/depth.test.cjs` | 59 | The depth gate: rare and Legendary odds near the design doc, the pace log (and an older log meeting the story's steps) and Playtest > Pace |
 | `tests/river.test.cjs` | 185 | Rootwood River: the ferry, the drifting float, its spots, fish and hours, Homebody, the otter, Wren, the Twin Spool |
 | `tests/coast.test.cjs` | 122 | Gullrock Coast finished: the seventh wave and its churn, the Comber Tarpon, the wash, the wreck and the conger, the lighthouse beam and the herring, the four new fish |
 | `tests/marsh.test.cjs` | 216 | Saltmarsh: Wren's glow quest and the punt, the tide and the moon, the mud splat and the stranded float, the tide's bites and pools, the Lantern Rod and the Lampwick Eel, the Bellmouth |

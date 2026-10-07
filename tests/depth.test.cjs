@@ -33,11 +33,14 @@ module.exports = [
         // a new game: everything counts from the first minute
         delete s.pace; s.stats.casts = 0; s.coins = 0; s.rods = ['willow']; s.fish = {};
         P.touch(); P.tick(5.5); s.rods.push('reedcutter'); P.tick(5.5); const q = P.state(); out.fresh = [!!q.late, q.log.map(e => e[0]), q.log[0][1]];
+        // a log begun before build 33 looked for the story's steps: a page already read isn't news
+        window.__hm.findsState().notes.push('log1'); delete q.v; P.tick(5.5); out.old = [q.log.map(e => e[0]), q.v];
         return out; });
       assert.deepEqual(r.late, [true, 0, true], 'started on a save under way');
       assert.deepEqual(r.logged, ['fish:perch', 'rod:heronwood']);
       assert.equal(r.secs, 12); assert.equal(r.idle, 12, 'idle time doesn\'t count');
       assert.deepEqual(r.fresh.slice(0, 2), [false, ['rod:reedcutter']]); assert.equal(r.fresh[2], .2, 'logged at 11 seconds of play');
+      assert.deepEqual(r.old, [['rod:reedcutter'], 2], 'a page read before the log looked for pages isn’t logged at the minute it opened');
       await page.evaluate(() => { window.__hm.save.pace.log.push(['rod:ash', 400]); });
       await page.click('#labBtn'); await page.waitForTimeout(300);
       await page.click('[data-pt="pace"]'); await page.waitForTimeout(300);

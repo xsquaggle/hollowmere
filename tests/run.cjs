@@ -10,9 +10,10 @@ const H = require('./helpers.cjs');
 
 (async () => {
   if (!fs.existsSync(path.join(H.ROOT, 'build/test.html'))) { console.error('build/test.html is missing. Run `npm run build` first.'); process.exit(1); }
-  const args = process.argv.slice(2), at = args.indexOf('--shard');
-  const [shard, shards] = at >= 0 ? args.splice(at, 2)[1].split('/').map(Number) : [1, 1];
-  if (!(shards >= 1 && shard >= 1 && shard <= shards)) { console.error('--shard wants k/n, like 2/3'); process.exit(1); }
+  const args = process.argv.slice(2), at = args.findIndex(a => a.startsWith('--shard'));
+  const spec = at < 0 ? '1/1' : args[at].includes('=') ? args.splice(at, 1)[0].split('=')[1] : args.splice(at, 2)[1];
+  const [shard, shards] = String(spec).split('/').map(Number);
+  if (!(Number.isInteger(shard) && Number.isInteger(shards) && shard >= 1 && shard <= shards)) { console.error('--shard wants k/n, like 2/3'); process.exit(1); }
   const filters = args;
   const files = fs.readdirSync(__dirname).filter(f => f.endsWith('.test.cjs')).sort();
   const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });

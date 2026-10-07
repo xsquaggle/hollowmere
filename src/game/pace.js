@@ -8,13 +8,16 @@
    simulator's whole run (data/pace.js), so a friend's phone shows where the game ran slow or fast for them, where they
    waited longest for anything new, and copies it all as text to send back.
    save.pace = {secs, log:[[key, minute]], seen:{key:1}, late:true when the log began on a save already under way,
-   tools:true once Playtest's tools have handed anything over}. The opening doesn't count: the simulator starts at the first cast. */
-const PACE={touch:-1e9, t:0}, PACE_IDLE=90;
+   tools:true once Playtest's tools have handed anything over, v: PACE_V, the keys it looks for}. The opening doesn't count: the simulator starts at the first cast. */
+const PACE={touch:-1e9, t:0}, PACE_IDLE=90, PACE_V=2;
 ['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{ PACE.touch=S.time; },true));
 function paceState(){ const fresh=!isObj(save.pace); if (fresh) save.pace={};
   const p=save.pace; if (!(p.secs>=0)) p.secs=0; if (!Array.isArray(p.log)) p.log=[]; if (!isObj(p.seen)) p.seen={};
   // a save that was already playing before the log began: what it holds now isn't news, and the minutes start here
   if (fresh && (save.stats.casts>0 || save.coins>0)){ p.late=true; for (const k of paceKeys()) p.seen[k]=1; }
+  // a log begun before the story's steps were looked for (v2, build 33): the pages, bell and letters it already holds aren't news either
+  if (!fresh && p.v!==PACE_V) for (const k of paceKeys()) if (/^(log:|pell:|bell$|invite$|supper$)/.test(k)) p.seen[k]=1;
+  p.v=PACE_V;
   return p; }
 /** Everything the log looks for, as keys (the same keys as data/pace.js). */
 function paceKeys(){ const k=[];

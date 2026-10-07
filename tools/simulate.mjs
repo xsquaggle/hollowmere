@@ -318,7 +318,7 @@ async function careerReport() {
       const C = { coins: 0, glim: 0, min: 0, rods: ['willow'], boat: false, ferry: false, marsh: false, quarter: false, pell: null, fish: {}, fix: [], parts: [], runes: [], have: {}, events: [],
         bottles: 0, logs: 0, rang: false, bell: false, hollow: false, bought: null, done: null, scale: null, invite: null, supper: null, pellDone: null, seed: 1 + Math.floor(Math.random() * 2147483646) };
       const ev = (key, label, kind, min) => C.events.push({ key, label, kind, min: min ?? C.min });
-      // minutes of play until the clock next reads 3:12 (it's 9 in the morning at the first cast, and an hour goes by each minute)
+      // minutes of play until the clock next reads 3:12 (the simulator's clock reads 9 in the morning at the first cast, as above, and an hour goes by each minute)
       const at312 = m => m + (((BELL - 9 - m) % 24) + 24) % 24;
       const items = [], add = (key, label, price, kind, needs) => items.push({ key, label, price, kind, needs: needs || (() => true) });
       const lakeDone = () => hm.REGION_FISH.lake.every(id => hm.FISH[id].wx || hm.FISH[id].extra || C.fish[id]);

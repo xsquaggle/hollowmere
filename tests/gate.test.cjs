@@ -197,7 +197,7 @@ module.exports = [
     async run({ newPage, openGame, veteran, until, fight }) {
       const page = await newPage();
       // a phone that can't vibrate (an iPhone's browser can't), with the game's sound off
-      await page.addInitScript(() => { window.__buzzes = 0; Object.defineProperty(navigator, 'vibrate', { value: undefined, configurable: true }); });
+      await page.addInitScript(() => { Object.defineProperty(navigator, 'vibrate', { value: undefined, configurable: true }); });
       await openGame(page, { save: veteran({ ...allOpen, region: 'hollow', sound: false, clock: 20, wx: { seed: 7, force: 'clear' }, rods: ['willow', 'deepwater'], rod: 'deepwater' }) });
       const ids = await page.evaluate(() => window.__hm.REGION_FISH.hollow.filter(id => id !== 'scale'));
       assert.ok(ids.length >= 9, 'the Hollow’s fish: ' + ids.join());
