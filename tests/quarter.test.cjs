@@ -145,7 +145,7 @@ module.exports = [
       const R = await page.evaluate(() => { const Q = window.__hm.quarter, m = Q.mods(); window.__hm.treasure(true); return { ringing: Q.bell.ringing(), flag: m.some(x => x.stat === 'ringing'), story: Q.story('tower'), other: Q.story('no4') }; });
       assert.deepEqual(R, { ringing: true, flag: true, story: { kind: 'rod', id: 'bonewhistle' }, other: null });
       const ring = await rolls(page, 'deep', {}, 2000), row = await rolls(page, 'open', {}, 1000);
-      assert.ok(ring.choir > 300 && ring.choir < 700, 'about one cast in four at the tower while it rings: ' + ring.choir);
+      assert.ok(ring.choir > 230 && ring.choir < 450, 'about one cast in six at the tower while it rings (about 333 in 2000): ' + ring.choir);
       assert.equal(row.choir || 0, 0, 'only at the tower');
       // the rod itself, as loot of its own kind
       const L = await page.evaluate(() => { const got = window.__hm.openLoot({ kind: 'rod', id: 'bonewhistle' }, { spot: 'deep' }), s = JSON.parse(localStorage.getItem('hollowmere-castlab-v1'));
@@ -157,8 +157,10 @@ module.exports = [
       // by day the tower's quiet, and the Choir Fish with it, until the Drowned Bell rings it from the rowboat
       const D = await page.evaluate(() => { const hm = window.__hm, Q = hm.quarter; hm.save.clock = 12; const out = { day: Q.bell.ringing(), flag: Q.mods().some(x => x.stat === 'ringing') };
         hm.findsState().have.bell = { t: Date.now() }; hm.relics.pocket('bell'); Q.bell.ring(); hm.save.clock += .1; out.rung = Q.bell.ringing(); out.cool = Q.bell.cooling(); out.flagNow = Q.mods().some(x => x.stat === 'ringing');
-        const ring = hm.save.quarter.ring; Q.bell.ring(); out.again = hm.save.quarter.ring === ring; hm.save.clock = 13.2; out.after = Q.bell.ringing(); out.coolLater = Q.bell.cooling(); return out; });
-      assert.deepEqual([D.day, D.flag, D.rung, D.flagNow, D.again, D.after], [false, false, true, true, true, false]);
+        const ring = hm.save.quarter.ring; Q.bell.ring(); out.again = hm.save.quarter.ring === ring; hm.save.clock = 13.2; out.after = Q.bell.ringing(); out.flagAfter = Q.mods().some(x => x.stat === 'ringing'); out.coolLater = Q.bell.cooling(); return out; });
+      // (reading the modifiers again also refreshes them: they're worked out once a frame, and the rolls below can come
+      // before the next frame, when the list from 12.1 with the bell ringing would still be the one in use)
+      assert.deepEqual([D.day, D.flag, D.rung, D.flagNow, D.again, D.after, D.flagAfter], [false, false, true, true, true, false, false]);
       assert.ok(D.cool > 5.9 && D.coolLater > 4.7 && D.coolLater < 4.9, 'six in-game hours before it can ring it again: ' + D.cool + ', ' + D.coolLater);
       assert.equal((await rolls(page, 'deep', {}, 600)).choir || 0, 0, 'the Choir Fish is quiet again');
       assert.deepEqual(page.errors, []);
