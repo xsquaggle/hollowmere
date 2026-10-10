@@ -24,7 +24,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/ui-flow.js` | 38 | The news ribbon (`news`, kept below an open tip), queued coach tips, the overlay stack (`ovPush`, `ovOpen`; `sceneClear`: nothing open, the opening and the supper included; `sceneFree`: that, and nothing under way), swipe-to-close |
 | `src/game/boot.js` | 18 | `boot`: starts everything (always last in the build) |
 | `src/index.html` | 60 | Page skeleton: head, markup, where styles, scripts and fonts go |
-| `src/test-hooks.js` | 117 | Test build only: `window.__` handles for the test suite |
+| `src/test-hooks.js` | 119 | Test build only: `window.__` handles for the test suite (`gate.quiet` hushes the scene for `tools/shots.mjs`) |
 
 ## Fishing: cast, bite, reel, land
 
@@ -62,7 +62,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/coast-sea.js` | 110 | Gullrock Coast's rules: the seventh wave (`swellBig`, `swellY`, `churnedAt`, `seventhIn`, `seventhNext`), the wash (`washOf`, `washAt`, `washBreak`), the wreck (`atWreck`, `layoutWreck`), the lighthouse beam (`beamOn`, `beamAngle`, `beamOnAt`), `coastSpot`, `coastMods`, `coastWaiting` (churn and beam bring a fish at once), `coastUpdate` (warning, tips) |
 | `src/game/coast-sea-art.js` | 117 | The coast's later art: the wreck of the Marigold (`buildWreck`, `drawWreck`, the sail and the cormorant), the wash, the beam on the water (`drawSeaBeam`, `drawCoastLamp`), the seventh wave building (`drawSeventhBuilding`) |
 | `src/game/river.js` | 113 | Rootwood River: its spots, the drifting float (`driftFloat`, `riverWaiting`), holding the line (`riverPress`/`riverRelease`), Ottilie's ferry (`ferryAsk`, `fixFerry`, `ferryHTML`), Homebody's days (`homeDays`, `homeMul`), the otter |
-| `src/game/river-art.js` | 226 | The river drawn: the far wood, the mill and its waterwheel, the current, the riffle, falling and floating leaves, the near banks, Wren's boathouse, the alder, the otters, the ferry's picture |
+| `src/game/river-art.js` | 239 | The river drawn: the far wood, the mill and its waterwheel, its lamplit windows at night and through fog (`millGlow`), the current, the riffle, falling and floating leaves, the near banks, Wren's boathouse, the alder, the otters, the ferry's picture |
 | `src/game/marsh.js` | 142 | Saltmarsh: the tide (`tideNow`, `tideUntil`, `tideMark`, `tideLine`), the banks and spots (`layoutMarsh`, `bankS`, `bankSpot`, `marshSpot`, `marshMud`), a cast on the mud (`marshMudCast`, `mudSplat`), the stranded float (`marshWaiting`), fish swimming round the mud (`marshApproachFrom`), the tide's modifiers (`tideMods`), the tide turning (`marshUpdate`) |
 | `src/game/marsh-art.js` | 414 | The marsh drawn: the far marsh (sea wall, tide mill, drowned tower), the flats, the tide's flow, haze, withies, the old sluice, the tide post, the mud banks and tide pools, splats, worm casts, crabs, the egret, the reed beds, the marsh lights, the Lantern Rod's lamp and light, Wren's punt |
 | `src/game/quarter.js` | 233 | The Drowned Quarter: the street's solids and their openings (`layoutQuarter`, `inSolid`, `quarterHit`, `quarterHitKeyed` with the Row's Latchkey, `quarterSpot`), a cast that hits a wall or goes in at a door (`quarterLand`, `quarterFoot`, `holeFloat`, `quarterFrom`, `quarterAim`), the bell tower (`bellRinging`, `ringBell`, `towerToll`), the drowned pages (`quarterPages`, `scoopPage`, `driftLetter`), the lit reflections (`quarterRefl`), its modifiers and pools (`quarterMods`, `quarterPool`), `afloat` |
@@ -157,7 +157,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/game/playtest.js` | 168 | The hidden Playtest sheet (the wrench, or a long press on the clock): forcing fish, the weather, the moon and the tide (`TIDE_PINS`), and the Quarter's, the Hollow's, the story's and the journal's menus (`playtestQuarter`, `playtestHollow`, `playtestStory`, `playtestJournal`) |
 | `src/game/balance.js` | 100 | Playtest > Balance: run the simulator on any setup (Dread for the Bonewhistle) |
 | `src/game/sim.js` | 238 | The balance simulator: the 1,000-cast report, the river's drift, the marsh's tide, the coast's churn, beam and wash, the Quarter's pages and reflections, the Hollow's lights and a fish led in from the dark (`SIM_SPOTS`, `SIM_PLAYERS`) |
-| `src/game/pace.js` | 54 | The pace log: minutes of play and when each rod, part, fix, pocket, rune and species first came, and the way down to the Hollow (`paceTick`, `paceKeys`), and Playtest > Pace beside the simulator's run (`paceHTML`) |
+| `src/game/pace.js` | 89 | The pace log: minutes of play and when each rod, part, fix, pocket, rune and species first came, the uncle's pages, Pell's round, the Drowned Bell, the way down to the Hollow and the supper (`paceTick`, `paceKeys`), and Playtest > Pace beside the simulator's run, with the longest waits and a plain-text copy to send back (`paceHTML`, `paceText`) |
 
 ## Content tables (`src/data/`)
 
@@ -185,7 +185,7 @@ Where everything lives, so you can go straight to the lines you need. Line count
 | `src/data/hollow.js` | 62 | `HOLLOW` (the lake draining, the cave's spots, the lantern's light, drawing a fish, the eye), `MIRROR_STARS`, `OMEN`, `STAR` (falling stars), `OTT_CONFESS` |
 | `src/data/ending.js` | 47 | The end of chapter one: `SUPPER` (when it comes), `SUPPER_SEATS` (who sits where at the long table), `SUPPER_FOLK`, `SUPPER_LINES` (the scene, line by line), `CHAPTER_END` (the card after it) |
 | `src/data/journal.js` | 37 | The journal's rewards: `PAGES` (each water's relic and who hands it over), `MILESTONES`, `PENNANT`, `MAYOR` (his belongings, his letter and his paint), `HERON` (Grey's errands) |
-| `src/data/pace.js` | 8 | `PACE_SIM`: minutes until each thing in the simulator's whole run (`npm run sim -- --career --runs 11 --pace`) |
+| `src/data/pace.js` | 11 | `PACE_SIM`: minutes until each thing in the simulator's whole run (`npm run sim -- --career --runs 11 --pace`) |
 | `src/data/stats.js` | 83 | `STATS` (everything a bonus can change), `MASTERY` (when a fish's memory and last line come) |
 
 ## Styles (`src/styles/`)
@@ -197,17 +197,18 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | File | Lines | What's in it |
 | --- | --- | --- |
 | `tools/build.mjs` | 91 | The build: `build/cast-lab.html`, `build/test.html`, and the web app at the root. `--check` fails if the committed app is stale |
-| `tools/check-content.mjs` | 674 | Checks every content table, and that this map lists every file |
-| `tools/simulate.mjs` | 439 | The balance simulator from the command line (`npm run sim`), with the depth gate's whole run (`--career`) and builds (`--builds`) |
+| `tools/check-content.mjs` | 677 | Checks every content table, and that this map lists every file |
+| `tools/simulate.mjs` | 451 | The balance simulator from the command line (`npm run sim`), with the whole run to the end of chapter one (`--career`) and builds (`--builds`) |
+| `tools/shots.mjs` | 80 | The world gate's screenshots: every water in each light and weather with nothing over the scene, sheets side by side, and a numbered "Name the water" quiz with its key (`--quiz 12`) |
 | `tools/story.mjs` | 166 | The story script, `docs/STORY.md` (`npm run story`): every letter, page, lore line and thing people say in the tables, in the order you meet them. `--check` fails if it's stale |
-| `tests/run.cjs` | 38 | Runs the Playwright suite against `build/test.html` |
-| `tests/helpers.cjs` | 108 | Shared helpers: cast, hook, reel and tap like a player, and `page.room` to go through the shack to a room |
+| `tests/run.cjs` | 44 | Runs the Playwright suite against `build/test.html`, all of it or a shard (`--shard 2/3`, as CI runs it) |
+| `tests/helpers.cjs` | 121 | Shared helpers: cast, hook and play the fight like a player (`fight`: follow the fish, tap a jump, ease off a dive, a tug or a red ring), and `page.room` to go through the shack to a room |
 | `tests/fishing.test.cjs` | 77 | The core loop and the record moment |
 | `tests/opening.test.cjs` | 23 | The opening |
 | `tests/ui.test.cjs` | 59 | Back gesture, closing things, music, Playtest tools |
 | `tests/saves.test.cjs` | 48 | Backup codes and earlier saves |
 | `tests/webapp.test.cjs` | 27 | The installable web app works offline |
-| `tests/tackle.test.cjs` | 169 | The tackle bag, bait, tackle shops |
+| `tests/tackle.test.cjs` | 171 | The tackle bag, bait, tackle shops |
 | `tests/treasure.test.cjs` | 188 | Treasure, crates, finds, letters |
 | `tests/enchant.test.cjs` | 312 | Glimmer and runes |
 | `tests/bonuses.test.cjs` | 108 | Modifiers, luck and the simulator |
@@ -219,7 +220,7 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/weather.test.cjs` | 137 | Weather and its fish |
 | `tests/relics.test.cjs` | 237 | Story relics, treasure maps, the Moon Jar, the almanac, combos |
 | `tests/shack.test.cjs` | 202 | The shack: the fix-up list, mounting and the wall bonus, the rod rack, the knock-through, the room at five phone sizes, odd saves |
-| `tests/depth.test.cjs` | 56 | The depth gate: rare and Legendary odds near the design doc, the pace log and Playtest > Pace |
+| `tests/depth.test.cjs` | 59 | The depth gate: rare and Legendary odds near the design doc, the pace log (and an older log meeting the story's steps) and Playtest > Pace |
 | `tests/river.test.cjs` | 185 | Rootwood River: the ferry, the drifting float, its spots, fish and hours, Homebody, the otter, Wren, the Twin Spool |
 | `tests/coast.test.cjs` | 122 | Gullrock Coast finished: the seventh wave and its churn, the Comber Tarpon, the wash, the wreck and the conger, the lighthouse beam and the herring, the four new fish |
 | `tests/marsh.test.cjs` | 216 | Saltmarsh: Wren's glow quest and the punt, the tide and the moon, the mud splat and the stranded float, the tide's bites and pools, the Lantern Rod and the Lampwick Eel, the Bellmouth |
@@ -227,3 +228,4 @@ One file per screen, pasted in `build.json` order: `base.css`, `phone.css`, `map
 | `tests/hollow.test.cjs` | 238 | The Hollow: page 3 and the uncle's map, page 4 in its cache, Grey's page 5, the Drowned Bell at 3:12 and the trapdoor, the lights and the dark, leading a fish into the light, the eye and the Sleeper's Scale, the Ledger and the Stillwater Mirror, falling stars and omens, the fish drawn and simulated |
 | `tests/roster.test.cjs` | 296 | The full roster: last lines and the third star (and the leaping mount), page relics from Grey, Wren, Ottilie, Barnaby and Pell, milestones and their paints and luck, pennants, Grey's errands with the Heron's Feather, the Mayor's belongings and letter, the page relics at work, the Hungry Hook's growth, the three new meals, the journal at four screen sizes, and Playtest > The journal |
 | `tests/story.test.cjs` | 248 | The story pass: Ottilie by chapter, Wren's and Pell's later lines, fish memories, the Row's invitation, supper on Lantern Row and its card, the replay, Playtest > The story, and the scene at four screen sizes |
+| `tests/gate.test.cjs` | 220 | The world gate: the whole chapter in order on one save, from the first lake fish to supper on Lantern Row; every water in each light and weather at five screen sizes; every Hollow fish caught with the sound off and no vibration |

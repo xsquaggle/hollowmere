@@ -616,7 +616,10 @@ need('PLATTER', PLATTER, { name: 'str', dish: 'str', side: 'str', zone: 'arr' })
   if (!(BOAT && BOAT.price > 0)) bad('BOAT', 'the skiff needs a price');
   const known = k => { const [kind, id] = k.split(':');
     return kind === 'rod' ? !!RODS[id] : kind === 'boat' || kind === 'ferry' || kind === 'marsh' || kind === 'quarter' || kind === 'hollow' ? id === undefined : kind === 'part' ? !!PARTS[id] : kind === 'fix' ? FIXUP.some(L => L.id === id && L.cost)
-      : kind === 'pocket' ? +id > POCKETS.start && +id <= POCKETS.max : kind === 'rune' ? !!ENCH[id] : kind === 'fish' ? !!FISH[id] : false; };
+      : kind === 'pocket' ? +id > POCKETS.start && +id <= POCKETS.max : kind === 'rune' ? !!ENCH[id] : kind === 'fish' ? !!FISH[id]
+      // the story's steps (step 32): the uncle's logbook pages 1 to 5, the Drowned Bell, Pell's round, the invitation and the supper
+      : kind === 'log' ? ['1', '2', '3', '4', '5'].includes(id) : kind === 'pell' ? ['lantern', 'answer', 'tower'].includes(id)
+      : kind === 'bell' || kind === 'invite' || kind === 'supper' ? id === undefined : false; };
   for (const [k, m] of Object.entries(PACE_SIM || {})) { if (!known(k)) bad('PACE_SIM.' + k, 'names nothing the pace log looks for'); if (!(isNum(m) && m >= 0)) bad('PACE_SIM.' + k, 'should be minutes'); } }
 
 /* ---------- the journal's rewards (data/journal.js) ---------- */

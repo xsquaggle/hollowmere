@@ -2932,12 +2932,15 @@ const HERON={steal:.1, away:[6,10], first:'toffeetin', bring:{grey:50, map:20, f
 
 /* Pace: when a steady player reaches each thing, from the depth gate's whole-run report (step 24; Rootwood River
    added in step 25, the Saltmarsh in step 26, Gullrock Coast's later fish and spots in step 27, the Drowned Quarter
-   and Pell's round in step 28, the way down to the Hollow in step 29).
+   and Pell's round in step 28, the way down to the Hollow in step 29, and the story's steps to the end of chapter one
+   in step 32).
    PACE_SIM[key]  minutes of play until it, the median of 11 runs of `npm run sim -- --career --runs 11 --pace`
                   (paste its output here after a balance change). Keys: rod:<id>, boat, ferry, marsh, quarter, hollow, part:<id>, fix:<id>
-                  (the fix-up list), pocket:<n> (the vest's nth pocket), rune:<id>, fish:<id> (the first one caught).
+                  (the fix-up list), pocket:<n> (the vest's nth pocket), rune:<id>, fish:<id> (the first one caught),
+                  log:<n> (the uncle's logbook, pages 1 to 5), bell (the Drowned Bell), pell:<step> (a step of Pell's round
+                  done: lantern, answer, tower), invite (the Row's invitation), supper (the end of chapter one).
                   Playtest > Pace (game/pace.js) sets a real run beside these. */
-const PACE_SIM={'fish:perch':5, 'fish:leafjack':5, 'fish:mossback':5, 'rod:reedcutter':5, 'fish:reedwhisker':21, 'fish:lantern':21, 'rune:swift':24, 'rod:ash':24, 'fish:gar':43, 'rune:magpie':46, 'rod:heronwood':48, 'fish:char':51, 'fish:mayor':73, 'ferry':73, 'marsh':78, 'rune:deep':85, 'fish:stone':88, 'fish:barbel':88, 'fish:brook':88, 'fish:mudlark':100, 'fish:mullet':100, 'fish:dab':100, 'fish:croaker':103, 'fish:gristle':112, 'rod:brasscap':120, 'fix:roof':120, 'rune:nightglass':124, 'fish:clockfin':136, 'fish:reeve':156, 'rod:twin':159, 'rune:storm':170, 'boat':173, 'fish:bream':178, 'fish:sprat':178, 'fish:grouper':179, 'fish:kelpeel':180, 'fish:saltjaw':189, 'rod:saltline':203, 'fish:angler':203, 'fish:herring':208, 'part:hold':208, 'rune:wanderer':214, 'fish:spindrift':226, 'fish:comber':240, 'fix:net':244, 'quarter':251, 'rune:odd':257, 'fish:hingejaw':261, 'fish:roach':261, 'fish:sturgeon':261, 'fish:gudgeon':261, 'fish:papercarp':273, 'fish:wrasse':287, 'pocket:2':296, 'rod:tidecaller':297, 'part:sonar':306, 'rune:homebody':312, 'fish:hearth':332, 'part:keel':336, 'rod:gale':339, 'fix:lamp':362, 'rune:echo':364, 'hollow':381, 'fish:lampless':386, 'fish:echobream':386, 'fish:keyhole':386, 'fish:koi':386, 'fish:laceshad':387, 'fish:sporeloach':398, 'fix:stove':418, 'fish:mothmouth':424, 'fish:gurnard':434, 'pocket:3':435, 'fix:cabinet':483, 'fish:conger':509, 'rod:deepwater':510, 'pocket:4':530, 'fix:panel':551, 'fix:knock':577, 'pocket:5':636};
+const PACE_SIM={'fish:leafjack':5, 'fish:perch':5, 'fish:mossback':6, 'rod:reedcutter':6, 'fish:lantern':21, 'rune:swift':24, 'rod:ash':25, 'fish:gar':34, 'fish:reedwhisker':36, 'rod:heronwood':43, 'rune:magpie':50, 'fish:mayor':50, 'fish:char':50, 'ferry':64, 'fish:brook':70, 'fish:stone':70, 'fish:barbel':70, 'marsh':70, 'rod:brasscap':76, 'fish:dab':82, 'fish:mullet':82, 'fish:mudlark':82, 'fish:gristle':88, 'rod:twin':88, 'rune:deep':92, 'fish:clockfin':95, 'log:1':96, 'fish:reeve':105, 'fish:croaker':105, 'boat':108, 'fish:sprat':113, 'fish:bream':113, 'fish:grouper':113, 'fix:roof':118, 'rune:nightglass':120, 'fish:grayling':123, 'fish:kelpeel':129, 'fish:angler':136, 'fish:herring':137, 'fish:saltjaw':141, 'rune:storm':147, 'rod:saltline':156, 'part:hold':163, 'rune:wanderer':189, 'fish:wrasse':209, 'quarter':209, 'fish:roach':214, 'fish:gudgeon':214, 'pell:lantern':214, 'fish:gurnard':218, 'fish:papercarp':221, 'fish:hingejaw':221, 'fish:sturgeon':225, 'fix:net':226, 'pell:answer':227, 'log:2':229, 'rune:odd':230, 'fish:hearth':235, 'pell:tower':237, 'rod:tidecaller':248, 'pocket:2':258, 'part:sonar':287, 'part:keel':293, 'rune:homebody':293, 'fish:comber':297, 'log:3':301, 'log:4':310, 'fix:lamp':312, 'log:5':316, 'rod:gale':320, 'bell':336, 'rune:echo':345, 'hollow':355, 'fish:sporeloach':365, 'fish:lampless':365, 'fish:echobream':365, 'fish:keyhole':365, 'fish:glasscarp':371, 'fish:koi':375, 'fix:stove':383, 'pocket:3':400, 'fish:mothmouth':413, 'fish:scale':428, 'rod:mirror':428, 'invite':431, 'fix:cabinet':441, 'supper':454, 'rod:deepwater':463, 'pocket:4':497, 'fix:panel':523, 'fix:knock':546, 'pocket:5':604};
 
 /* Stats: everything a bonus can change, how bonuses to it combine, and how the Bonuses page words it.
    kind  mul   multipliers multiply: ×1.2 and ×1.1 make ×1.32
@@ -9314,6 +9317,17 @@ function layoutRiverArt(){ sseed=401; RVA.flow=[];
 const rvKey = () => W+'x'+H+'@'+DPR+'|'+Math.round(save.clock*2);
 /** The mill's wheel: where it turns, half in the water at the foot of the far bank. */
 function wheelGeo(){ return {x:W*.27, y:HZ-H*.006, r:Math.min(H*.05,W*.1)}; }
+/** The mill on the far bank: where it stands, and its two lit windows (one up in the timber storey, one in the stone). */
+function millGeo(){ const mx=W*.03, mw=W*.2, base=HZ, st=H*.045, up=H*.032;
+  return {mx, mw, base, st, up, wins:[{x:mx+mw*.12, y:base-st-up+up*.3, w:mw*.12, h:up*.45}, {x:mx+mw*.62, y:base-st+st*.3, w:mw*.1, h:st*.35}]}; }
+/** The mill's lamplight carrying through the dark and the fog, where its walls don't: a glow round each window, and the
+    windows themselves over the fog (drawn under the alder, which is nearer). a is how strong, 0 to 1. */
+function millGlow(a){ const M=millGeo(); ctx.save(); ctx.globalCompositeOperation='lighter';
+  for (const w of M.wins){ const cx=w.x+w.w/2, cy=w.y+w.h/2, r=H*.03, g=ctx.createRadialGradient(cx,cy,1,cx,cy,r);
+    g.addColorStop(0,'rgba(255,206,130,'+(.34*a).toFixed(3)+')'); g.addColorStop(1,'rgba(255,206,130,0)'); ctx.fillStyle=g; ctx.fillRect(cx-r,cy-r,r*2,r*2); }
+  ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=Math.min(1,a*.85); ctx.fillStyle='rgb(244,201,119)';
+  for (const w of M.wins) ctx.fillRect(w.x,w.y,w.w,w.h);
+  ctx.restore(); }
 
 /* ---------- the far bank, in the backdrop ---------- */
 function drawRiverLand(x,main){
@@ -9334,7 +9348,7 @@ function drawRiverLand(x,main){
   sseed=612; x.save(); x.globalAlpha=.32*Math.max(.12,1-PAL.dark*1.6); x.fillStyle=lit; for (let i=0;i<18;i++){ const cx=sr()*W, cy=HZ-H*(.09+sr()*.06), r=H*(.006+sr()*.009); x.beginPath(); x.arc(cx,cy,r,Math.PI*1.05,Math.PI*1.95); x.fill(); } x.restore();
   x.strokeStyle='rgba(43,42,51,.35)'; x.lineWidth=1; sseed=615; for (let i=0;i<=11;i++){ const cx=i/11*W+(sr()-.5)*W/11*.6, r=H*(.026+sr()*.014); x.beginPath(); x.arc(cx,HZ-H*.078,r,Math.PI*1.1,Math.PI*1.9); x.stroke(); }
   // the mill: a stone ground floor, a timber storey above, a slate roof, a chimney and a lit window
-  const mx=W*.03, mw=W*.2, base=HZ, st=H*.045, up=H*.032, stone=rvTone('hillFar','#8D8678',.8), timber=rvTone('town','#5A4232',.8), plaster=rvTone('hillFar','#D6C7A2',.78), slate=rvTone('town','#3D4250',.8);
+  const {mx, mw, base, st, up, wins}=millGeo(), stone=rvTone('hillFar','#8D8678',.8), timber=rvTone('town','#5A4232',.8), plaster=rvTone('hillFar','#D6C7A2',.78), slate=rvTone('town','#3D4250',.8);
   x.fillStyle=stone; x.fillRect(mx,base-st,mw,st);
   x.strokeStyle='rgba(30,26,22,.35)'; x.lineWidth=.8; for (let r=0;r<4;r++){ const yy=base-st+r*st/4; x.beginPath(); x.moveTo(mx,yy); x.lineTo(mx+mw,yy); x.stroke(); for (let c=0;c<6;c++){ const xx=mx+(c+(r%2)*.5)*mw/6; x.beginPath(); x.moveTo(xx,yy); x.lineTo(xx,yy+st/4); x.stroke(); } }
   x.fillStyle=plaster; x.fillRect(mx+2,base-st-up,mw-4,up);
@@ -9342,7 +9356,7 @@ function drawRiverLand(x,main){
   x.fillStyle=slate; x.beginPath(); x.moveTo(mx-4,base-st-up); x.lineTo(mx+mw*.5,base-st-up-H*.03); x.lineTo(mx+mw+4,base-st-up); x.closePath(); x.fill();
   x.strokeStyle='rgba(255,255,255,.12)'; x.lineWidth=1; x.beginPath(); x.moveTo(mx+mw*.5,base-st-up-H*.03); x.lineTo(mx-4,base-st-up); x.stroke();
   const chx=mx+mw*.72; x.fillStyle=stone; x.fillRect(chx,base-st-up-H*.032,5,H*.02); if (main) SC.chimneys=[{x:chx+2.5,y:base-st-up-H*.032}];
-  x.fillStyle='rgba(244,201,119,'+Math.max(.15,PAL.win).toFixed(2)+')'; x.fillRect(mx+mw*.12,base-st-up+up*.3,mw*.12,up*.45); x.fillRect(mx+mw*.62,base-st+st*.3,mw*.1,st*.35);
+  x.fillStyle='rgba(244,201,119,'+Math.max(.15,PAL.win).toFixed(2)+')'; for (const w of wins) x.fillRect(w.x,w.y,w.w,w.h);
   x.strokeStyle=INK; x.globalAlpha=.55; x.lineWidth=1; x.strokeRect(mx,base-st-up,mw,st+up); x.globalAlpha=1;
   // the flume, a wooden trough from the mill over the wheel, and the dark behind the wheel
   const G0=wheelGeo(); x.fillStyle='rgba(10,18,14,.35)'; x.beginPath(); x.ellipse(G0.x,G0.y,G0.r*1.05,G0.r*.75,0,Math.PI,0); x.fill();
@@ -9483,6 +9497,8 @@ function drawRiverBanks(){
     ctx.strokeStyle='rgba(43,42,51,.7)'; ctx.lineWidth=1; ctx.strokeRect(wx+ox-2.5,wy+oy-4,5,7); }
   ctx.restore();
   if (PAL.dark>.15){ ctx.save(); ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(wx,wy,2,wx,wy,46); g.addColorStop(0,'rgba(255,214,150,'+(.22*gl).toFixed(3)+')'); g.addColorStop(1,'rgba(255,214,150,0)'); ctx.fillStyle=g; ctx.fillRect(wx-50,wy-50,100,100); ctx.restore(); }
+  // the mill's lamplight through the fog and the dark, so the far bank still reads as the river's on a foggy night
+  const ml=PAL.win*Math.max(wxLook().fog*Math.min(1,.35+PAL.dark*1.5),PAL.dark*.6); if (ml>.05) millGlow(ml);
   // the alder overhead, swaying, and leaves on their way down
   if (!RVA.alder) buildAlder(); const A=RVA.alder, sw=Math.sin(S.time*.7)*.012+Math.sin(S.time*1.9)*.004;
   ctx.save(); ctx.translate(0,A.h-20); ctx.rotate(sw); ctx.drawImage(A.c,0,-(A.h),A.w,A.h); ctx.restore();
@@ -16279,7 +16295,7 @@ function sheetSwipe(){ const p=$('panel'); let y0=null, dy=0, id=null;
 function recipeNeeding(fid){ if (!save.kitchenOpen) return null; return RECIPE_ORDER.find(id=>{ const R=RECIPES[id], n=R.need[0]; return id!=='chowder' && n.id===fid && knownRecipe(id) && haveFor(R)<n.n; })||null; }
 
 /* ---------- Saves: backup codes, earlier saves, protection, installing ---------- */
-const BUILD=32, SNAP_KEY=KEY+'-snapshots';
+const BUILD=33, SNAP_KEY=KEY+'-snapshots';
 var APP={prompt:null,persisted:null,stale:false,snapT:600,inFrame:(()=>{ try { return window.self!==window.top; } catch(e){ return true; } })()};
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -17512,20 +17528,26 @@ function balanceResultHTML(r,prev){
   return h;
 }
 
-/* ---------- The pace log: how long a run takes to reach each thing (the depth gate, step 24) ----------
+/* ---------- The pace log: how long a run takes to reach each thing (the depth gate, step 24; the story's steps to the
+   end of chapter one since the world gate, step 32) ----------
    Counts minutes of play: the page showing and someone touching it in the last PACE_IDLE seconds, in a room too.
    Every few seconds it notes anything new the save holds (a rod, the boat, the ferry, the punt to the marsh, Pell's
    rowboat to the Drowned Quarter, the way down to the Hollow, a boat
-   part, a line of the fix-up list, a vest pocket, a rune or a species caught) with the minute it came. Playtest > Pace sets the log beside the
-   simulator's whole run (data/pace.js), so a friend's phone shows where the game ran slow or fast for them.
+   part, a line of the fix-up list, a vest pocket, a rune, a species caught, a page of the uncle's logbook, the Drowned
+   Bell, a step of Pell's round, the Row's invitation and the supper) with the minute it came. Playtest > Pace sets the log beside the
+   simulator's whole run (data/pace.js), so a friend's phone shows where the game ran slow or fast for them, where they
+   waited longest for anything new, and copies it all as text to send back.
    save.pace = {secs, log:[[key, minute]], seen:{key:1}, late:true when the log began on a save already under way,
-   tools:true once Playtest's tools have handed anything over}. The opening doesn't count: the simulator starts at the first cast. */
-const PACE={touch:-1e9, t:0}, PACE_IDLE=90;
+   tools:true once Playtest's tools have handed anything over, v: PACE_V, the keys it looks for}. The opening doesn't count: the simulator starts at the first cast. */
+const PACE={touch:-1e9, t:0}, PACE_IDLE=90, PACE_V=2;
 ['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{ PACE.touch=S.time; },true));
 function paceState(){ const fresh=!isObj(save.pace); if (fresh) save.pace={};
   const p=save.pace; if (!(p.secs>=0)) p.secs=0; if (!Array.isArray(p.log)) p.log=[]; if (!isObj(p.seen)) p.seen={};
   // a save that was already playing before the log began: what it holds now isn't news, and the minutes start here
   if (fresh && (save.stats.casts>0 || save.coins>0)){ p.late=true; for (const k of paceKeys()) p.seen[k]=1; }
+  // a log begun before the story's steps were looked for (v2, build 33): the pages, bell and letters it already holds aren't news either
+  if (!fresh && p.v!==PACE_V) for (const k of paceKeys()) if (/^(log:|pell:|bell$|invite$|supper$)/.test(k)) p.seen[k]=1;
+  p.v=PACE_V;
   return p; }
 /** Everything the log looks for, as keys (the same keys as data/pace.js). */
 function paceKeys(){ const k=[];
@@ -17540,6 +17562,14 @@ function paceKeys(){ const k=[];
   const n=isObj(save.finds) ? +save.finds.pockets||0 : 0; for (let i=POCKETS.start+1;i<=Math.min(n,POCKETS.max);i++) k.push('pocket:'+i);
   if (isObj(save.ench) && isObj(save.ench.own)) for (const id in save.ench.own) if (ENCH[id]) k.push('rune:'+id);
   for (const id in save.fish) if (FISH[id] && (save.fish[id]||{}).caught>0) k.push('fish:'+id);
+  // the story: the uncle's logbook (page 6 comes with the Sleeper's Scale), the Drowned Bell, Pell's round, the supper
+  const F=isObj(save.finds) ? save.finds : {}, notes=Array.isArray(F.notes) ? F.notes : [];
+  for (let n=1;n<=5;n++) if (notes.includes('log'+n)) k.push('log:'+n);
+  if (isObj(F.have) && F.have.bell) k.push('bell');
+  const done=isObj(save.quarter) && isObj(save.quarter.done) ? save.quarter.done : {};
+  for (const id of ['lantern','answer','tower']) if (done[id]) k.push('pell:'+id);
+  if (isObj(save.story) && save.story.invite) k.push('invite');
+  if (isObj(save.story) && save.story.supper) k.push('supper');
   return k; }
 /** The main loop's tick (game/loop.js): minutes while someone's playing, and a look for anything new every 5 seconds. */
 function paceTick(dt){ if (SIMULATING || INTRO.active || document.hidden || S.time-PACE.touch>PACE_IDLE) return;
@@ -17552,20 +17582,41 @@ function paceName(k){ const [kind,raw]=String(k).split(':'), id=String(raw).repl
   if (kind==='quarter') return 'Pell’s rowboat to the Drowned Quarter'; if (kind==='hollow') return 'The way down to the Hollow';
   if (kind==='part') return PARTS[id]?PARTS[id].name:id; if (kind==='fix'){ const L=FIXUP.find(L=>L.id===id); return L?L.name:id; }
   if (kind==='pocket') return 'Vest pocket '+id; if (kind==='rune') return ENCH[id]?ENCH[id].name:id;
-  if (kind==='fish') return FISH[id]?FISH[id].name:id; return String(k).replace(/[<>&"]/g,''); }
+  if (kind==='fish') return FISH[id]?FISH[id].name:id; if (kind==='log') return 'Logbook page '+id; if (kind==='bell') return 'The Drowned Bell';
+  if (kind==='pell') return 'Pell’s round: '+(PELL_Q[id]?PELL_Q[id].name:id); if (kind==='invite') return 'The Row’s invitation';
+  if (kind==='supper') return 'Supper on Lantern Row: the end of chapter one';
+  return String(k).replace(/[<>&"]/g,''); }
 const paceMin = m => { m=Math.round(m); return m<60?m+' min':Math.floor(m/60)+' h '+String(m%60).padStart(2,'0'); };
-/** Playtest > Pace: this run beside the simulator's, in the order the simulator gets there. */
-function paceHTML(){ const p=paceState(), got=Object.fromEntries(p.log);
+/** Every row the table shows, in the order the simulator gets there (anything the simulator never reaches after). */
+function paceRows(){ const p=paceState(), got=Object.fromEntries(p.log);
   const keys=Object.keys(PACE_SIM).sort((a,b)=>PACE_SIM[a]-PACE_SIM[b]);
   for (const [k] of p.log) if (!(k in PACE_SIM) && !keys.includes(k)) keys.push(k);
-  let h='<div class="stats"><div><b>'+paceMin(p.secs/60)+'</b><span>Played</span></div><div><b>'+p.log.length+'</b><span>Logged</span></div><div><b>'+paceMin(Math.max(0,...Object.values(PACE_SIM)))+'</b><span>Sim finish</span></div></div>';
+  return keys.map(k=>{ const sim=PACE_SIM[k], at=got[k]; return {k, name:paceName(k), at, sim, far:at!=null && sim ? at/sim>=2 || at/sim<=.5 : false}; }); }
+/** This run's longest waits with nothing new: the gap before each thing logged, longest first (the first from the start). */
+function paceWaits(n){ const p=paceState(), L=p.log.slice().sort((a,b)=>a[1]-b[1]), w=[];
+  for (let i=0;i<L.length;i++){ const from=i?L[i-1][1]:0; if (i || !p.late) w.push({k:L[i][0], at:L[i][1], gap:L[i][1]-from}); }
+  return w.sort((a,b)=>b.gap-a.gap).slice(0,n); }
+/** Playtest > Pace: this run beside the simulator's, in the order the simulator gets there. */
+function paceHTML(){ const p=paceState(), got=Object.fromEntries(p.log), rows=paceRows(), waits=paceWaits(3);
+  let h='<div class="stats"><div><b>'+paceMin(p.secs/60)+'</b><span>Played</span></div><div><b>'+(got.supper!=null?paceMin(got.supper):'–')+'</b><span>Chapter’s end</span></div><div><b>'+(PACE_SIM.supper!=null?paceMin(PACE_SIM.supper):'–')+'</b><span>Simulator’s</span></div></div>';
   h+='<p class="note">'+(p.late?'This save was under way before the log began, so the minutes count from then and earlier things aren’t listed. ':'')+
     (p.tools?'Playtest’s tools have been used on this save, so some times may be early. ':'')+
     'Minutes count while the game is showing and someone has touched it in the last '+PACE_IDLE+' seconds. The simulator column is a steady player’s median run. Twice as slow, or half the time, is worth asking a tester about.</p>';
+  if (waits.length) h+='<p class="note pace-waits"><b>Longest waits for anything new:</b> '+waits.map(w=>paceMin(w.gap)+' before '+paceName(w.k)+' (at '+paceMin(w.at)+')').join('; ')+'.</p>';
+  h+='<div class="row"><button class="btn sm" id="paceCopy" type="button">Copy this run</button></div>';
   h+='<table class="bal-tab pace-tab"><thead><tr><th>What</th><th>This run</th><th>Simulator</th></tr></thead><tbody>';
-  for (const k of keys){ const sim=PACE_SIM[k], at=got[k], d=at!=null && sim ? at/sim : null;
-    h+='<tr'+(at==null?' class="pace-todo"':'')+'><td>'+paceName(k)+'</td><td'+(d!=null&&(d>=2||d<=.5)?' class="pace-far"':'')+'>'+(at!=null?paceMin(at):'–')+'</td><td>'+(sim!=null?paceMin(sim):'–')+'</td></tr>'; }
+  for (const r of rows) h+='<tr'+(r.at==null?' class="pace-todo"':'')+'><td>'+r.name+'</td><td'+(r.far?' class="pace-far"':'')+'>'+(r.at!=null?paceMin(r.at):'–')+'</td><td>'+(r.sim!=null?paceMin(r.sim):'–')+'</td></tr>';
   return h+'</tbody></table>'; }
+/** The same as plain text, for a tester to paste into a message: what they reached and when, beside the simulator. */
+function paceText(){ const p=paceState(), got=Object.fromEntries(p.log), rows=paceRows().filter(r=>r.at!=null), waits=paceWaits(3), left=paceRows().length-rows.length;
+  const t=['Hollowmere, build '+BUILD+': one run (Playtest > Pace)',
+    'Played '+paceMin(p.secs/60)+'. End of chapter one: '+(got.supper!=null?paceMin(got.supper):'not yet')+(PACE_SIM.supper!=null?' (simulator '+paceMin(PACE_SIM.supper)+')':'')+'.'];
+  if (p.late) t.push('The log began on a save already under way.'); if (p.tools) t.push('Playtest’s tools were used on this save.');
+  if (waits.length) t.push('Longest waits: '+waits.map(w=>paceMin(w.gap)+' before '+paceName(w.k)+' (at '+paceMin(w.at)+')').join('; ')+'.');
+  t.push('', 'What: this run (simulator)'+(rows.some(r=>r.far)?'. A * is twice the simulator’s time, or half of it':''));
+  for (const r of rows.sort((a,b)=>a.at-b.at)) t.push(r.name+': '+paceMin(r.at)+(r.sim!=null?' ('+paceMin(r.sim)+')':'')+(r.far?' *':''));
+  if (left) t.push('', left+' more still to come.');
+  return t.join('\n'); }
 
 /* ---------- Playtest tools (the wrench, or a long press on the clock) ---------- */
 let PTAB='tools';
@@ -17577,7 +17628,7 @@ function openPlaytest(tab){ if (tab) PTAB=tab;
   const head='<div class="panel-head"><div><h2>Playtest</h2><p>Build '+BUILD+' · numbers for tuning</p></div><div class="spacer"></div><button class="btn" id="closeS" type="button">Close</button></div>'+
     '<div class="seg" role="tablist">'+[['tools','Tools'],['balance','Balance'],['pace','Pace']].map(([k,l])=>'<button type="button" role="tab" data-pt="'+k+'" aria-selected="'+(PTAB===k)+'" class="'+(PTAB===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
   if (PTAB==='balance'){ openSheet(head+balanceFormHTML()); bindPlaytestTabs(); bindBalance(); return; }
-  if (PTAB==='pace'){ openSheet(head+paceHTML()); bindPlaytestTabs(); return; }
+  if (PTAB==='pace'){ openSheet(head+paceHTML()); bindPlaytestTabs(); $('paceCopy').addEventListener('click',e=>copyText(paceText(),e.currentTarget)); return; }
   const s=save.stats, fishCasts=s.casts-(s.hauls||0), rate=fishCasts>0?Math.round(s.catches/fishCasts*100):0, t=save.tune;   // treasure casts aren't missed fish
   const sl=(id,label,v,hint)=>'<label for="'+id+'">'+label+'<output id="'+id+'O">'+v.toFixed(2)+'×</output><input type="range" id="'+id+'" min="0.5" max="1.6" step="0.05" value="'+v+'"><span class="note" style="grid-column:1/-1;margin:0">'+hint+'</span></label>';
   openSheet(head+
